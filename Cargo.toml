@@ -1,8 +1,10 @@
 [package]
 name = "liberty-db"
-keywords = ["eda", "liberty"]
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+keywords = ["eda", "liberty"]
+description = "`liberty` data structre in Rust"
 authors = ["Junzhuo <zhou@junzhuo.me>"]
 readme = "README.md"
 repository = "https://github.com/zao111222333/liberty-db/"
