@@ -5,12 +5,13 @@ const beginParams = params.get('begin');
 const endedParams = params.get('ended');
 const color = 'rgba(255,0,0,0.1)'
 const selectColor = 'rgba(255,0,0,0.3)'
+const container = document.getElementById('page-container');
+let elementArrayList = [];
 
 if (beginParams != null && endedParams != null){
     let beginList = beginParams.split(' ');
     let endedList = endedParams.split(' ');
     if (beginList.length==endedList.length){
-        let elementArrayList = [];
         for (let index = 0; index < beginList.length; index++) {
             const begin = beginList[index].replaceAll('.', ' ');
             const ended = endedList[index].replaceAll('.', ' ');
@@ -19,7 +20,6 @@ if (beginParams != null && endedParams != null){
             highlight(element,ended,elementArray);
             elementArrayList.push(elementArray);
         }
-        const container = document.getElementById('page-container');
         var btnDiv = document.createElement("div");
         var btnDivDiv = document.createElement("div");
         btnDiv.style.display = "flex";
