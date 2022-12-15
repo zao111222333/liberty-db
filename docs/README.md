@@ -1,4 +1,4 @@
-<p>html demo</p>
+## html demo
 <iframe src="https://zao111222333.github.io/liberty-db/static/liberty07_03.html
 ?field=test
 &bgn
@@ -15,7 +15,7 @@
 +t.m0.x2.h6.y13.ff1.fs2.fc2.sc0.ls0.ws0
 " style="width: 90%; height: 600px;"></iframe>
 
-<p>pdfjs demo</p>
+## pdfjs demo
 <iframe src="https://zao111222333.github.io/liberty-db/static/pdfjs/web/viewer.html
 ?file=/liberty-db/reference/liberty07_03.pdf#page=203
 " style="width: 90%; height: 600px;"></iframe>
