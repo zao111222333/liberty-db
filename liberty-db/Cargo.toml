@@ -12,7 +12,7 @@ keywords = [
 description = "`liberty` data structre"
 authors = ["Junzhuo <zhou@junzhuo.me>"]
 readme = "README.md"
-repository = "https://github.com/zao111222333/liberty-db/"
+repository = "https://github.com/zao111222333/liberty-rs/"
 
 [package.metadata.docs.rs]
 all-features = true
