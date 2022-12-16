@@ -1,0 +1,28 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+name = "liberty-parser"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+keywords = [
+    "eda", 
+    "liberty",
+    "parser"
+]
+description = "`liberty` parser"
+authors = ["Junzhuo <zhou@junzhuo.me>"]
+readme = "README.md"
+repository = "https://github.com/zao111222333/liberty-db/"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dependencies]
+hashbrown = "0.12"
+compact_str = "0.6.1"
+readonly = "0.2.2"
+strum = "0.24"
+strum_macros = "0.24"
+
+[dev-dependencies]
