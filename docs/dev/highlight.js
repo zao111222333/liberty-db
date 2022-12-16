@@ -1,6 +1,6 @@
 /*
 Demo:
-https://zao111222333.github.io/liberty-db/liberty07_03.html
+https://zao111222333.github.io/liberty-rs/liberty07_03.html
 ?field=test
 &bgn
 =t.m0.x9.h4.y2926.ff1.fs2.fc2.sc0.ls0.ws0
