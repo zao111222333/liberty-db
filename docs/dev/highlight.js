@@ -120,15 +120,17 @@ function scrollWin() {
             newPagePositionTo = element.parentElement.parentElement.offsetTop;
         }
         container.scrollTo({top: newPagePositionTo});
-        delay(200).then(() => {
-        elementPosition = element.offsetTop;
-        container.scrollTo({top: elementPosition+newPagePosition-10, behavior: 'smooth'});
-    });
+        (function waitForLoad(index) {
+            setTimeout(function() {
+                elementPosition = element.offsetTop;
+                if (elementPosition != 0){
+                    container.scrollTo({top: elementPosition+newPagePosition-10, behavior: 'smooth'});
+                }else{
+                    if (--index) waitForLoad(index);
+                }            
+            }, 40);
+        })(10);
     }
-    // pagePosition = newPagePosition;
-}
-function delay(time) {
-  return new Promise(resolve => setTimeout(resolve, time));
 }
 
 function highlight(element, end, elementArray) {
