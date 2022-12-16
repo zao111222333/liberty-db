@@ -33,14 +33,6 @@ pub enum TimingSenseType{
 /// nochange_high_low | nochange_low_high |
 /// nochange_low_low ;
 /// 
-/// Reference:
-///  <iframe
-///   src="https://zao111222333.github.io/liberty-db/pdfjs/web/viewer.html?file=/liberty-db/reference/liberty07_03.pdf#page=203"
-///   frameBorder="0"
-///   scrolling="auto"
-///   height="600px"
-///   width="100%"
-/// ></iframe>
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default, Display, EnumString)]
 pub enum TimingType{

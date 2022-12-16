@@ -143,21 +143,6 @@ enum Suffix {
 
 /// # Unit structre for liberty
 /// 
-/// Reference:
-///  <iframe
-///   src="https://zao111222333.github.io/liberty-db/pdfjs/web/viewer.html?file=/liberty-db/reference/liberty07_03.pdf#page=4"
-///   frameBorder="0"
-///   scrolling="auto"
-///   height="600px"
-///   width="100%"
-/// ></iframe>
-/// 
-/// ## Example:
-/// 
-/// ```rust
-/// use liberty_db;
-/// let result = liberty_db::add(2, 2);
-/// ``` 
 #[derive(Debug, Clone)]
 pub struct Unit {
     /// Scale of that unit, eg. Km.scale = 1000 

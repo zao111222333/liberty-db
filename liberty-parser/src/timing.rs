@@ -131,7 +131,7 @@ pub enum SimpleAttribute{
 /// Reference:
 /// <iframe 
 /// src="
-/// https://zao111222333.github.io/liberty-db/static/liberty07_03.html
+/// https://zao111222333.github.io/liberty-rs/liberty07_03.html
 /// ?field=test
 /// &bgn
 /// =t.m0.x8.h5.y2516.ff1.fs2.fc2.sc0.ls0.ws0
@@ -147,7 +147,7 @@ pub enum GroupStatement {
     /// Reference:
     /// <iframe 
     /// src="
-    /// https://zao111222333.github.io/liberty-db/static/liberty07_03.html
+    /// https://zao111222333.github.io/liberty-rs/liberty07_03.html
     /// ?field=test
     /// &bgn
     /// =t.m0.x8.h5.y2899.ff1.fs2.fc2.sc0.ls0.ws0
@@ -276,7 +276,7 @@ pub enum GroupStatement {
 /// Reference:
 /// <iframe 
 /// src="
-/// https://zao111222333.github.io/liberty-db/static/liberty07_03.html
+/// https://zao111222333.github.io/liberty-rs/liberty07_03.html
 /// ?field=test
 /// &bgn
 /// =t.m0.x8.h5.y292a.ff1.fs2.fc2.sc0.ls0.ws0

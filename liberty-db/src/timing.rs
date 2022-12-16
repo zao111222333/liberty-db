@@ -10,10 +10,18 @@ pub enum Timing{
     GroupStatement(GroupStatement),
 }
 /// # Simple Attribute
-/// 
-/// <script src="http://code.jquery.com/jquery-latest.js"></script>
-/// <iframe src="http://api.jquery.com/" width="80%" height="600" id='frameDemo'></iframe>
-/// <script>$("#frameDemo").contents().find("div").html("new HTML content goes here");</script>
+/// # Group Statement
+/// Reference:
+/// <iframe 
+/// src="
+/// https://zao111222333.github.io/liberty-rs/liberty07_03.html
+/// ?field=test
+/// &bgn
+/// =t.m0.x9.h4.y2926.ff1.fs2.fc2.sc0.ls0.ws0
+/// &end
+/// =t.m0.xb.h8.y2955.ff7.fs2.fc2.sc0.ls0.ws0
+/// " 
+/// style="width: 90%; height: 600px;"></iframe>
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Display, EnumString)]
 pub enum SimpleAttribute{
@@ -131,12 +139,12 @@ pub enum SimpleAttribute{
 /// Reference:
 /// <iframe 
 /// src="
-/// https://zao111222333.github.io/liberty-db/static/liberty07_03.html
+/// https://zao111222333.github.io/liberty-rs/liberty07_03.html
 /// ?field=test
 /// &bgn
-/// =t.m0.x8.h5.y2516.ff1.fs2.fc2.sc0.ls0.ws0
+/// =t.m0.x9.h4.y2956.ff1.fs2.fc2.sc0.ls0.ws0
 /// &end
-/// =t.m0.x9.hc.y253c.ff7.fs2.fc2.sc0.ls0
+/// =t.m0.xb.h8.y297c.ff7.fs2.fc2.sc0.ls0.ws0
 /// " 
 /// style="width: 90%; height: 600px;"></iframe>
 #[derive(Debug, Clone, PartialEq)]
@@ -147,7 +155,7 @@ pub enum GroupStatement {
     /// Reference:
     /// <iframe 
     /// src="
-    /// https://zao111222333.github.io/liberty-db/static/liberty07_03.html
+    /// https://zao111222333.github.io/liberty-rs/liberty07_03.html
     /// ?field=test
     /// &bgn
     /// =t.m0.x8.h5.y2899.ff1.fs2.fc2.sc0.ls0.ws0
@@ -276,7 +284,7 @@ pub enum GroupStatement {
 /// Reference:
 /// <iframe 
 /// src="
-/// https://zao111222333.github.io/liberty-db/static/liberty07_03.html
+/// https://zao111222333.github.io/liberty-rs/liberty07_03.html
 /// ?field=test
 /// &bgn
 /// =t.m0.x8.h5.y292a.ff1.fs2.fc2.sc0.ls0.ws0
