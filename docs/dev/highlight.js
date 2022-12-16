@@ -125,7 +125,7 @@ function scrollWin() {
         container.scrollTo({top: elementPosition+newPagePosition-10, behavior: 'smooth'});
     });
     }
-    pagePosition = newPagePosition;
+    // pagePosition = newPagePosition;
 }
 function delay(time) {
   return new Promise(resolve => setTimeout(resolve, time));
@@ -148,6 +148,7 @@ function highlight(element, end, elementArray) {
 }
 function updatePageNum(){
     const offset = container.scrollTop;
+    pagePosition = offset;
     var num = pageNum;
     while(offset <= pagePositionList[num-1]){
         num=num-1;
@@ -166,6 +167,7 @@ function updatePageNum(){
 }
 function toPage(element) {
     if(event.key === 'Enter') {
-        container.scrollTop = pagePositionList[+(element.value)-1];
+        var newPagePosition = pagePositionList[+(element.value)-1];
+        container.scrollTop = newPagePosition;
     }
 }
