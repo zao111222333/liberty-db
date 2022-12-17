@@ -7,7 +7,8 @@ let iframeNav = document.createElement('nav');
 iframeNav.style.position = "sticky";
 iframeNav.style.height = "100vh";
 iframeNav.style.top = "0";
-iframeNav.style.width = "1050px";
+iframeNav.style.width = "615px";
+iframeNav.style.minWidth = "615px";
 
 
 iframeElement.style.width = "100%";
