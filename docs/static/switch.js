@@ -26,9 +26,11 @@ iframeNav.appendChild(iframeElement);
 for (let index = 0; index < linkElementList.length; index++) {
     linkList.push(linkElementList[index].href);
     linkElementList[index].href = "javascript:;";
-    linkElementList[index].setAttribute("onclick","www("+index+")")
+    linkElementList[index].setAttribute("onclick","swich_("+index+")");
+    linkElementList[index].innerHTML = "Go To Reference";
+    linkElementList[index].textDecoration = "underline";
 }
 
-function www(index){
+function swich_(index){
     iframeElement.src = linkList[index];
 }
