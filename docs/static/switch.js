@@ -28,7 +28,7 @@ for (let index = 0; index < linkElementList.length; index++) {
     linkElementList[index].href = "javascript:;";
     linkElementList[index].setAttribute("onclick","swich_("+index+")");
     linkElementList[index].innerHTML = "Go To Reference";
-    linkElementList[index].textDecoration = "underline";
+    linkElementList[index].style.textDecoration = "underline";
 }
 
 function swich_(index){
