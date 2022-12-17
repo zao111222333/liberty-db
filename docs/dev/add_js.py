@@ -3,19 +3,12 @@
 import sys
 import os
 import pathlib
-
-js_file=os.path.join(pathlib.Path(__file__).parent.resolve(), "highlight.js")
 file_name=str(sys.argv[1])
 
 # creating a variable and storing the text
 # that we want to search
 search_text = "</body>"
-js_file_data=""
-with open(js_file, 'r') as file:
-    js_file_data = file.read()
-# creating a variable and storing the text
-# that we want to add
-replace_text = "<script>\n"+js_file_data+"\n</script></body>"
+replace_text = "<script src=\"highlight.js\"></script></body>"
 # with open(file_name, 'r') as file:
 
 # Opening our text file in read only
