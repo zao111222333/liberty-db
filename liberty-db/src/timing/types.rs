@@ -16,7 +16,6 @@ pub enum TimingSenseType{
 }
 
 /// # Timing Type
-/// 
 /// combinational | combinational_rise |
 /// combinational_fall | three_state_disable |
 /// three_state_disable_rise | three_state_disable_fall |
@@ -32,7 +31,6 @@ pub enum TimingSenseType{
 /// non_seq_hold_falling | nochange_high_high |
 /// nochange_high_low | nochange_low_high |
 /// nochange_low_low ;
-/// 
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default, Display, EnumString)]
 pub enum TimingType{

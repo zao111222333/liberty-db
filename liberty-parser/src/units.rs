@@ -8,13 +8,9 @@ pub(crate) enum Error{
 }
 
 /// ## Metric Prefix
-/// 
 /// The BIPM specifies twenty-four prefixes for the International System of Units (SI).
-/// 
 /// [reference (wiki)]
-/// 
 /// [reference (wiki)]: https://en.wikipedia.org/wiki/International_System_of_Units#Prefixes
-/// 
 /// https://docs.rs/strum_macros/latest/strum_macros/derive.EnumString.html
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default, Display, EnumString)]
@@ -97,8 +93,7 @@ pub(crate) enum Prefix {
     Quecto = -30,
 }
 impl Prefix {
-    ///
-    pub(crate) fn from_symbol(s: &str) -> Result<Prefix, Error> {
+        pub(crate) fn from_symbol(s: &str) -> Result<Prefix, Error> {
         use std::str::FromStr;
         match Self::from_str(s) {
             Ok(prefix) => { Ok(prefix) }
@@ -108,7 +103,6 @@ impl Prefix {
     
 }
 
-/// 
 #[derive(Debug, Copy, Clone)]
 #[derive(Default, Display, EnumString)]
 enum Suffix {
@@ -142,15 +136,12 @@ enum Suffix {
 
 
 /// # Unit structre for liberty
-/// 
 #[derive(Debug, Clone)]
 pub struct Unit {
     /// Scale of that unit, eg. Km.scale = 1000 
     scale: f64,
-    /// 
-    prefix: Prefix,
-    /// 
-    suffix: Suffix,
+        prefix: Prefix,
+        suffix: Suffix,
 }
 
 impl Unit {

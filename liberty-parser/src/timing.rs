@@ -1,16 +1,12 @@
 use strum_macros::{Display, EnumString};
 use compact_str::CompactString;
 use crate::ast::*;
-/// 
 #[derive(Debug, Clone)]
 pub enum Timing{
-    ///
-    SimpleAttribute(SimpleAttribute),
-    ///
-    GroupStatement(GroupStatement),
+        SimpleAttribute(SimpleAttribute),
+        GroupStatement(GroupStatement),
 }
 /// # Simple Attribute
-/// 
 /// <script src="http://code.jquery.com/jquery-latest.js"></script>
 /// <iframe src="http://api.jquery.com/" width="80%" height="600" id='frameDemo'></iframe>
 /// <script>$("#frameDemo").contents().find("div").html("new HTML content goes here");</script>
@@ -143,8 +139,7 @@ pub enum SimpleAttribute{
 #[derive(Display, EnumString)]
 pub enum GroupStatement {
     /// cell_degradation () { }
-    /// 
-    /// Reference:
+        /// Reference:
     /// <iframe 
     /// src="
     /// https://zao111222333.github.io/liberty-rs/liberty07_03.html
@@ -206,8 +201,7 @@ pub enum GroupStatement {
     #[strum(serialize = "propogated_noise_peak_time_ratio_above_high")]
     PropogatedNoisePeakTimeRatioAboveHigh,
     /// propogated_noise_peak_time_ratio__below_low () { }
-    /// 
-    /// **Notice**: two `_` between `ratio` and `below`
+        /// **Notice**: two `_` between `ratio` and `below`
     #[strum(serialize = "propogated_noise_peak_time_ratio__below_low")]
     PropogatedNoisePeakTimeRatioBelowLow,
     /// propogated_noise_peak_time_ratio_high () { }
@@ -288,18 +282,12 @@ pub enum GroupStatement {
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default)]
 pub struct CallFall{
-    ///
-    template_name: CompactString,
-    ///
-    pub index_1: Vec<f64>,
-    ///
-    pub index_2: Vec<f64>,
-    ///
-    pub index_3: Vec<f64>,
-    ///
-    pub values: Vec<f64>,
+        template_name: CompactString,
+        pub index_1: Vec<f64>,
+        pub index_2: Vec<f64>,
+        pub index_3: Vec<f64>,
+        pub values: Vec<f64>,
 }
-///
 impl Group for CallFall  {
     fn name(&self) -> &CompactString {
         // todo!()

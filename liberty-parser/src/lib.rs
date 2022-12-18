@@ -49,7 +49,7 @@
     unused_qualifications,
     unused_results, // TODO: fix unused results
     variant_size_differences,
-    warnings, // treat all wanings as errors
+    // warnings, // treat all wanings as errors
     clippy::all,
     clippy::restriction,
     clippy::pedantic,
@@ -74,26 +74,22 @@
     clippy::use_debug
 )]
 
+#![warn(missing_docs)]
 
-/// TODO:
-/// 
+// TODO:
 #[allow(dead_code)]
 pub mod ast;
-/// TODO:
-/// 
+// TODO:
 #[allow(dead_code)]
 pub mod units;
-/// TODO:
+// TODO:
 #[allow(dead_code)]
 pub mod library;
 // TODO:
-/// 
 #[allow(dead_code)]
 pub mod cell;
 // TODO:
-/// 
 pub mod pin;
-///
 pub mod timing;
 
 #[cfg(test)]
