@@ -1,6 +1,6 @@
 //!
-//!  This crate implement `liberty` data structre in Rust.
-//!
+//! This crate implement `liberty` data structre in Rust.
+//! <script src="https://zao111222333.github.io/liberty-rs/iframe.js"></script>
 
 #![doc(
     // The following are document setting according to
@@ -35,9 +35,8 @@
     bare_trait_objects,
     box_pointers,
     elided_lifetimes_in_paths, // allow anonymous lifetime
-    missing_copy_implementations, // Copy may cause unnecessary memory copy
     missing_debug_implementations,
-    missing_docs, // TODO: add documents
+    // missing_docs, // TODO: add documents
     single_use_lifetimes, // TODO: fix lifetime names only used once
     trivial_casts, // TODO: remove trivial casts in code
     trivial_numeric_casts,
@@ -49,7 +48,7 @@
     unused_qualifications,
     unused_results, // TODO: fix unused results
     variant_size_differences,
-    warnings, // treat all wanings as errors
+    // warnings, // treat all wanings as errors
     clippy::all,
     clippy::restriction,
     clippy::pedantic,
@@ -73,27 +72,26 @@
     clippy::print_stdout,
     clippy::use_debug
 )]
-
-
-/// TODO:
-/// 
+#![warn(
+    missing_copy_implementations, // Copy may cause unnecessary memory copy
+    missing_docs,
+)]
 #[allow(dead_code)]
-pub mod ast;
-/// TODO:
-/// 
+// mod macros;
+// TODO:
+#[allow(dead_code)]
+pub mod common;
+// TODO:
 #[allow(dead_code)]
 pub mod units;
-/// TODO:
+// TODO:
 #[allow(dead_code)]
 pub mod library;
 // TODO:
-/// 
 #[allow(dead_code)]
 pub mod cell;
 // TODO:
-/// 
 pub mod pin;
-///
 pub mod timing;
 
 #[cfg(test)]
