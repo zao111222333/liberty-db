@@ -34,7 +34,7 @@ if (linkElementList!=null){
 
 function swich_(index){
     iframeElement.src = linkList[index];
-    linkList[activeLinkIndex].style.color = "var(--link-color)";
+    linkElementList[activeLinkIndex].style.color = "var(--link-color)";
     activeLinkIndex = index;
-    linkList[activeLinkIndex].style.color = "var(--type-link-color)";
+    linkElementList[activeLinkIndex].style.color = "var(--type-link-color)";
 }
