@@ -26,7 +26,7 @@ for (let index = 0; index < linkElementList.length; index++) {
     linkElementList[index].style.textDecoration = "underline";
 }
 
-if (linkElementList.length=0){
+if (linkElementList.length!=0){
     swich_(activeLinkIndex);
 }else{
     iframeElement.src = "https://zao111222333.github.io/liberty-rs/liberty07_03.html"
