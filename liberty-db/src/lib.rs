@@ -73,22 +73,23 @@
     clippy::use_debug
 )]
 #![warn(
+    dead_code,
     missing_copy_implementations, // Copy may cause unnecessary memory copy
     missing_docs,
 )]
-#[allow(dead_code)]
+
 // mod macros;
 // TODO:
-#[allow(dead_code)]
+
 pub mod common;
 // TODO:
-#[allow(dead_code)]
+
 pub mod units;
 // TODO:
-#[allow(dead_code)]
+
 pub mod library;
 // TODO:
-#[allow(dead_code)]
+
 pub mod cell;
 // TODO:
 pub mod pin;
