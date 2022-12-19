@@ -41,3 +41,8 @@ pub enum VariableType {
     #[strum(serialize = "input_transition_time")]
     InputTransitionTime,
 }
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Default)]
+pub struct Domain{
+
+}

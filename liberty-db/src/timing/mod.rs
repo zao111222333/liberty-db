@@ -4,6 +4,7 @@
 use compact_str::CompactString;
 use hashbrown::HashMap;
 pub mod items;
+pub mod impls;
 use crate::common::*;
 
 /// A timing group is defined in a bundle, a bus, or a pin group within a cell.
@@ -106,8 +107,16 @@ pub struct Timing {
     /// ?field=test
     /// &bgn
     /// =t.m0.x9.h4.y2b33.ff1.fs2.fc2.sc0.ls0.ws0
+    /// +t.m0.x9.ha.y2b48.ffc.fs2.fc1.sc0.ls0.ws0
+    /// +t.m0.x9.ha.y2b5e.ffc.fs2.fc1.sc0.ls0.ws0
+    /// +t.m0.x9.ha.y2bc9.ffc.fs2.fc1.sc0.ls0.ws0
+    /// +t.m0.x9.ha.y2bde.ffc.fs2.fc1.sc0.ls0.ws0
     /// &end
     /// =t.m0.x39.h4.y2b47.ff1.fs2.fc2.sc0.ls0.ws0
+    /// +t.m0.xb.h4.y2b5d.ff1.fs2.fc2.sc0.ls0.ws0
+    /// +t.m0.x39.h8.y2bc6.ff7.fs2.fc2.sc0.ls0.ws0
+    /// +t.m0.x43.h4.y2bdd.ff1.fs2.fc2.sc0.ls0.ws0
+    /// +t.m0.x43.h4.y2bee.ff1.fs2.fc2.sc0.ls0.ws0
     /// ">Reference-Difinition</a>
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/liberty07_03.html
@@ -175,7 +184,7 @@ pub struct Timing {
     /// &end
     /// =t.m0.xb.h8.y2957.ff7.fs2.fc2.sc0.ls0.ws0
     /// ">Reference-Instance</a>
-    pub cell_degradation: HashMap<CompactString, items::CallFall>,
+    pub cell_degradation: HashMap<CompactString, items::CellDegradation>,
     /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
     ///
     /// **Note:**
