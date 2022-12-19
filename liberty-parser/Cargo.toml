@@ -19,6 +19,7 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
+liberty-db = { path = "../liberty-db"}
 hashbrown = "0.12"
 compact_str = "0.6.1"
 readonly = "0.2.2"
