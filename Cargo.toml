@@ -3,4 +3,5 @@
 members = [
     "liberty-db",
     "liberty-parser",
+    "liberty-log",
 ]
