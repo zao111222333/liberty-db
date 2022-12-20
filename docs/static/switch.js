@@ -22,14 +22,24 @@ for (let index = 0; index < linkElementList.length; index++) {
     linkList.push(linkElementList[index].href);
     linkElementList[index].href = "javascript:;";
     linkElementList[index].setAttribute("onclick","swich_("+index+")");
-    if (linkElementList[index].parentElement.previousElementSibling!=null){
-        if (linkElementList[index].previousElementSibling==null 
-            && linkElementList[index].parentElement.previousElementSibling.className=="example-wrap" ){
-            linkElementList[index].innerHTML = "Reveal in "+linkElementList[index].innerHTML;
-        }else{
-            linkElementList[index].innerHTML = "<br>Reveal in "+linkElementList[index].innerHTML;
-        }
+    var content = linkElementList[1].parentElement.cloneNode(true)
+    while (content.children[0]) {
+        content.removeChild(content.children[0]);
     }
+    if (content.textContent==''&&linkElementList[index].parentElement.previousElementSibling!=null){
+        linkElementList[index].innerHTML = "Reveal in "+linkElementList[index].innerHTML;
+    }else{
+        linkElementList[index].innerHTML = "<br>Reveal in "+linkElementList[index].innerHTML;
+    }
+
+    // if (linkElementList[index].parentElement.previousElementSibling!=null){
+    //     if (linkElementList[index].previousElementSibling==null 
+    //         && linkElementList[index].parentElement.previousElementSibling.className=="example-wrap" ){
+    //         linkElementList[index].innerHTML = "Reveal in "+linkElementList[index].innerHTML;
+    //     }else{
+    //         linkElementList[index].innerHTML = "<br>Reveal in "+linkElementList[index].innerHTML;
+    //     }
+    // }
     linkElementList[index].style.textDecoration = "underline";
 }
 
