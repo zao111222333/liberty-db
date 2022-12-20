@@ -74,9 +74,9 @@ if (bgnParams != null && endParams != null){
     let endList = endParams.split(' ');
     if (bgnList.length==endList.length){
         for (let index = 0; index < bgnList.length; index++) {
-            const bgn = bgnList[index].replaceAll('.', ' ');
-            const end = endList[index].replaceAll('.', ' ');
-            let element = document.getElementsByClassName(bgn)[0];
+            const bgn = bgnList[index];
+            const end = endList[index];
+            let element = document.getElementById(bgn);
             var elementArray = [];
             highlight(element,end,elementArray);
             elementArrayList.push(elementArray);
@@ -139,7 +139,7 @@ function highlight(element, end, elementArray) {
             element.style.backgroundColor = color;
             elementArray.push(element);
         }
-        if (element.className!=end){
+        if (element.id!=end){
             let next = element.nextElementSibling;
             if (next==null){
                 next = element.parentElement.parentElement.nextElementSibling.firstElementChild.firstElementChild;
