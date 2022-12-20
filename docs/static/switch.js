@@ -22,7 +22,12 @@ for (let index = 0; index < linkElementList.length; index++) {
     linkList.push(linkElementList[index].href);
     linkElementList[index].href = "javascript:;";
     linkElementList[index].setAttribute("onclick","swich_("+index+")");
-    linkElementList[index].innerHTML = "<br>Reveal in "+linkElementList[index].innerHTML;
+    if (linkElementList[index].previousElementSibling==null 
+        && linkElementList[index].parentElement.parentElement.className=="example-wrap" ){
+            linkElementList[index].innerHTML = "Reveal in "+linkElementList[index].innerHTML;
+        }else{
+            linkElementList[index].innerHTML = "<br>Reveal in "+linkElementList[index].innerHTML;
+        }
     linkElementList[index].style.textDecoration = "underline";
 }
 
