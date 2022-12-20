@@ -132,7 +132,6 @@ function scrollWin() {
         })(10);
     }
 }
-
 function highlight(element, end, elementArray) {
     if (element!=null){
         if (element.className.substring(0,2)=='t '){

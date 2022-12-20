@@ -25,3 +25,4 @@ soup.body.insert(len(soup.body.contents), js)
 
 with open(file_name, 'w') as save_file:
     save_file.write(str(soup))
+    
