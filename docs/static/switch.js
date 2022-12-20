@@ -26,7 +26,7 @@ for (let index = 0; index < linkElementList.length; index++) {
     while (content.children[0]) {
         content.removeChild(content.children[0]);
     }
-    if (content.textContent==''&&linkElementList[index].parentElement.previousElementSibling!=null){
+    if ((content.textContent==''||content.textContent==' '||content.textContent=='\n')&&linkElementList[index].parentElement.previousElementSibling!=null){
         linkElementList[index].innerHTML = "Reveal in "+linkElementList[index].innerHTML;
     }else{
         linkElementList[index].innerHTML = "<br>Reveal in "+linkElementList[index].innerHTML;
