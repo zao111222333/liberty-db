@@ -22,7 +22,7 @@ for (let index = 0; index < linkElementList.length; index++) {
     linkList.push(linkElementList[index].href);
     linkElementList[index].href = "javascript:;";
     linkElementList[index].setAttribute("onclick","swich_("+index+")");
-    var content = linkElementList[1].parentElement.cloneNode(true)
+    var content = linkElementList[index].parentElement.cloneNode(true)
     while (content.children[0]) {
         content.removeChild(content.children[0]);
     }
