@@ -65,17 +65,19 @@ pageText.disabled = true;
 pageText.value = " / "+pagePositionList.length;
 pageDiv.appendChild(pageText);
 
-var toggleSidebarBtn = document.createElement("button");
-toggleSidebarBtn.innerHTML = "show menu";
-toggleSidebarBtn.addEventListener("click", function(){
-    if (document.getElementById("sidebar").classList.toggle("opened")){
-        toggleSidebarBtn.innerHTML = "hide menu";
-    }else{
-        toggleSidebarBtn.innerHTML = "show menu";
-    }
-});
-Div.appendChild(toggleSidebarBtn);
-
+if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
+    var toggleSidebarBtn = document.createElement("button");
+    toggleSidebarBtn.innerHTML = "show menu";
+    toggleSidebarBtn.addEventListener("click", function(){
+        if (document.getElementById("sidebar").classList.toggle("opened")){
+            toggleSidebarBtn.innerHTML = "hide menu";
+        }else{
+            toggleSidebarBtn.innerHTML = "show menu";
+        }
+    });
+    Div.appendChild(toggleSidebarBtn);
+}
+    
 var pagePosition=0;
 var isScrolling;
 container.onscroll = (_) => {
