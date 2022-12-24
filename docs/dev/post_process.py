@@ -18,10 +18,20 @@ for page_num, page in enumerate(pages):
         id=str(page_num+1)+"."+str(item_num)
         item.attrs['id'] = id
 
-# Add Highlight
+for s in soup.select('script'):
+    s.extract()
+
 js = soup.new_tag("script")
-js['src']="highlight.js"
+js['src']="../js/index.js"
 soup.body.insert(len(soup.body.contents), js)
+head=soup.select("head")[0]
+js1 = soup.new_tag("script")
+js1['src']="../js/pdf2htmlEX.js"
+js2 = soup.new_tag("script")
+js2['src']="../js/compatibility.js"
+head.insert(len(head.contents), js1)
+head.insert(len(head.contents), js2)
+
 
 with open(file_name, 'w') as save_file:
     save_file.write(str(soup))
