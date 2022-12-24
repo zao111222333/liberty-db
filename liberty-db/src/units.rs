@@ -2,7 +2,7 @@ use strum_macros::{Display, EnumString};
 
 /// Error for Unit
 #[derive(Debug, Copy, Clone)]
-pub(crate) enum Error{
+pub enum Error{
     /// Prefix Convert Error
     PrefixConvert(strum::ParseError)
 }
@@ -14,7 +14,7 @@ pub(crate) enum Error{
 /// https://docs.rs/strum_macros/latest/strum_macros/derive.EnumString.html
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default, Display, EnumString)]
-pub(crate) enum Prefix {
+pub enum Prefix {
     /// Q - 10e30
     #[strum(serialize = "Q")]
     Quetta = 30,
@@ -105,7 +105,7 @@ impl Prefix {
 
 #[derive(Debug, Copy, Clone)]
 #[derive(Default, Display, EnumString)]
-enum Suffix {
+pub enum Suffix {
     /// Scalar
     #[default]
     #[strum(serialize = "")]
@@ -139,9 +139,9 @@ enum Suffix {
 #[derive(Debug, Clone)]
 pub struct Unit {
     /// Scale of that unit, eg. Km.scale = 1000 
-    scale: f64,
-        prefix: Prefix,
-        suffix: Suffix,
+    pub scale: f64,
+    pub prefix: Prefix,
+    pub suffix: Suffix,
 }
 
 impl Unit {

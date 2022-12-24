@@ -1,23 +1,36 @@
 //! All trait `impl` for
-//! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/iframe.js"></script>
+//! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+
+use compact_str::CompactString;
+
+use crate::common::traits::Group;
+
+use super::items::CellFall;
+
+impl Group for CellFall {
+    fn name(&self) -> &CompactString {
+        todo!()
+    }
+}
+
 
 mod check{
     //! impl [Check](crate::common::Check) for
-    //! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/iframe.js"></script>
+    //! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
     
-    use crate::{common::Check, timing::Timing};
+    use crate::{common::traits::Check, timing::Timing};
 
     // TODO:
     /// Timing arcs with a timing type of clear or preset require a timing_sense attribute. 
     /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/liberty07_03.html
+    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
     /// ?field=test
     /// &bgn
-    /// =t.m0.x9.h7.y2b31.ff1.fs2.fc2.sc0.ls0.ws0
+    /// =214.5
     /// &end
-    /// =t.m0.x9.h7.y2b31.ff1.fs2.fc2.sc0.ls0.ws0
+    /// =214.5
     /// ">Reference</a>
-    fn need_timing_sense_when_timing_type_is_clear_or_preset(timing: &Timing){
+    fn need_timing_sense_when_timing_type_is_clear_or_preset(timing: &Timing<'_>){
         if timing.timing_sense==None{
             
         }
@@ -26,16 +39,16 @@ mod check{
     // TODO:
     /// If related_pin is an output pin, you must define a timing_sense attribute for that pin.
     /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/liberty07_03.html
+    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
     /// ?field=test
     /// &bgn
-    /// =t.m0.x9.h7.y2b32.ff1.fs2.fc2.sc0.ls0.ws0
+    /// =214.6
     /// &end
-    /// =t.m0.x9.h7.y2b32.ff1.fs2.fc2.sc0.ls0.ws0
+    /// =214.6
     /// ">Reference</a>
     fn need_timing_sense_when_related_pin_is_output(){}
     
-    impl Check for Timing {
+    impl Check for Timing<'_> {
         fn check(&self) {
             need_timing_sense_when_timing_type_is_clear_or_preset(&self);
             need_timing_sense_when_related_pin_is_output();

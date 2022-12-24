@@ -1,6 +1,6 @@
 //!
 //! This crate implement `liberty` data structre in Rust.
-//! <script src="https://zao111222333.github.io/liberty-rs/iframe.js"></script>
+//! <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
 
 #![doc(
     // The following are document setting according to
@@ -93,6 +93,8 @@ pub mod library;
 pub mod cell;
 // TODO:
 pub mod pin;
+pub mod bus;
+pub mod bundle;
 pub mod timing;
 
 #[cfg(test)]

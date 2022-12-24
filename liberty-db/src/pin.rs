@@ -1,5 +1,4 @@
 use compact_str::CompactString;
-use hashbrown::HashMap;
 
 use crate::timing::Timing;
 
@@ -8,28 +7,29 @@ use crate::timing::Timing;
 /// Reference:
 /// <iframe 
 /// src="
-/// https://zao111222333.github.io/liberty-rs/liberty07_03.html
+/// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
 /// ?field=test
 /// &bgn
-/// =t.m0.x6.h1.y1e34.ff1.fs0.fc1.sc0.ls0.ws0
+/// =145.43
 /// &end
-/// =t.m0.xb.h4.y1e48.ff1.fs2.fc2.sc0.ls0.ws0
+/// =146.8
 /// " 
 /// style="width: 90%; height: 600px;"></iframe>
-#[derive(Debug, Clone)]
-pub struct Pin{
+#[derive(Debug, Clone, Default)]
+pub struct Pin<'a>{
+    pub group_name: CompactString,
     /// A timing group is defined within a pin group.
     /// 
     /// Reference:
     /// <iframe 
     /// src="
-    /// https://zao111222333.github.io/liberty-rs/liberty07_03.html
+    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
     /// ?field=test
     /// &bgn
-    /// =t.m0.x9.hc.ye79.ffc.fs6.fc1.sc0.ls0.ws0
+    /// =67.26
     /// &end
-    /// =t.m0.x39.h8.ye8a.ff7.fs2.fc2.sc0.ls0.ws0
+    /// =67.43
     /// " 
     /// style="width: 90%; height: 600px;"></iframe>
-    pub timing_map: HashMap<CompactString,Timing>,
+    pub timing_list: Vec<Timing<'a>>,
 }

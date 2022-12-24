@@ -127,7 +127,7 @@ pub enum SimpleAttribute{
 /// Reference:
 /// <iframe 
 /// src="
-/// https://zao111222333.github.io/liberty-rs/liberty07_03.html
+/// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
 /// ?field=test
 /// &bgn
 /// =t.m0.x8.h5.y2516.ff1.fs2.fc2.sc0.ls0.ws0
@@ -142,7 +142,7 @@ pub enum GroupStatement {
         /// Reference:
     /// <iframe 
     /// src="
-    /// https://zao111222333.github.io/liberty-rs/liberty07_03.html
+    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
     /// ?field=test
     /// &bgn
     /// =t.m0.x8.h5.y2899.ff1.fs2.fc2.sc0.ls0.ws0
@@ -154,7 +154,7 @@ pub enum GroupStatement {
     CellDegradation,
     /// cell_fall () { }
     #[strum(serialize = "cell_fall")]
-    CellFall(CallFall),
+    CellFall(CellFall),
     /// cell_rise () { }
     #[strum(serialize = "cell_rise")]
     CellRise,
@@ -270,7 +270,7 @@ pub enum GroupStatement {
 /// Reference:
 /// <iframe 
 /// src="
-/// https://zao111222333.github.io/liberty-rs/liberty07_03.html
+/// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
 /// ?field=test
 /// &bgn
 /// =t.m0.x8.h5.y292a.ff1.fs2.fc2.sc0.ls0.ws0
@@ -281,14 +281,14 @@ pub enum GroupStatement {
 #[readonly::make]
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default)]
-pub struct CallFall{
+pub struct CellFall{
         template_name: CompactString,
         pub index_1: Vec<f64>,
         pub index_2: Vec<f64>,
         pub index_3: Vec<f64>,
         pub values: Vec<f64>,
 }
-impl Group for CallFall  {
+impl Group for CellFall  {
     fn name(&self) -> &CompactString {
         // todo!()
         &self.template_name
