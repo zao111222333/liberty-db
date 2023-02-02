@@ -1,14 +1,6 @@
-use std::default;
-
 use compact_str::CompactString;
 use strum_macros::{Display, EnumString};
 
-
-#[derive(Debug, Clone, PartialEq)]
-#[derive(Default)]
-pub struct BooleanExpression{
-
-}
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 /// 

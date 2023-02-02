@@ -93,7 +93,7 @@ pub enum Prefix {
     Quecto = -30,
 }
 impl Prefix {
-        pub(crate) fn from_symbol(s: &str) -> Result<Prefix, Error> {
+    pub(crate) fn from_symbol(s: &str) -> Result<Prefix, Error> {
         use std::str::FromStr;
         match Self::from_str(s) {
             Ok(prefix) => { Ok(prefix) }

@@ -9,7 +9,7 @@ pub mod impls;
 pub mod builder;
 #[cfg(test)]
 mod test;
-use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin};
+use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,expression};
 
 /// A timing group is defined in a bundle, a bus, or a pin group within a cell.
 /// The timing group can be used to identify the name or names of multiple timing arcs.
@@ -32,7 +32,7 @@ use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin};
 /// =203.29
 /// ">Reference-Instatnce-In-Pin</a>
 /// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Default)]
 pub struct Timing<'a> {
     pub group_name: CompactString,
     /// Use this attribute to indicate that a constraint arc is for
@@ -158,7 +158,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.34
     /// ">Reference-Instance</a>
-    pub fpga_arc_condition: Option<BooleanExpression>,
+    pub fpga_arc_condition: Option<expression::BooleanExpression>,
     /// Use this attribute to reference a `calc_mode` value in a 
     /// [domain](crate::common::items::Domain) group in a polynomial table. 
     /// 
@@ -1234,7 +1234,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.71
     /// ">Reference-Instance</a>
-    pub when: Option<BooleanExpression>,
+    pub when: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
     /// ?field=test
@@ -1251,7 +1251,7 @@ pub struct Timing<'a> {
     /// &end
     /// =204.0
     /// ">Reference-Instance</a>
-    pub when_end: Option<BooleanExpression>,
+    pub when_end: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
     /// ?field=test
@@ -1268,7 +1268,7 @@ pub struct Timing<'a> {
     /// &end
     /// =204.1
     /// ">Reference-Instance</a>
-    pub when_start: Option<BooleanExpression>,
+    pub when_start: Option<expression::BooleanExpression>,
     // piecewise model only
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
