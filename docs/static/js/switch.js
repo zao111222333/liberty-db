@@ -20,18 +20,11 @@ iframeNav.appendChild(iframeElement);
 
 for (let index = 0; index < linkElementList.length; index++) {
     linkList.push(linkElementList[index].href);
-    // linkElementList[index].href = "javascript:;";
-    // linkElementList[index].setAttribute("onclick","swich_("+index+")");
     linkElementList[index].addEventListener("click", function(){
         iframeElement.src = linkList[index];
         linkElementList[activeLinkIndex].style.color = "var(--link-color)";
         activeLinkIndex = index;
         linkElementList[activeLinkIndex].style.color = "var(--type-link-color)";
-        // if (document.getElementById("sidebar").classList.toggle("opened")){
-        //     toggleSidebarBtn.innerHTML = "hide menu";
-        // }else{
-        //     toggleSidebarBtn.innerHTML = "show menu";
-        // }
     });
     var content = linkElementList[index].parentElement.cloneNode(true)
     while (content.children[0]) {
