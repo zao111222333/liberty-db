@@ -51,21 +51,27 @@ mod for_boolean_expression{
         assert_eq!(format!("{}",exp_not_a_and_b), "!(A&B)");
     }
     #[test]
-    fn logic() {
-        let mut v = LogicVector::new();
-        println!("{v}");
-        v.state_vec.push(LogicState::High);
-        v.state_vec.push(LogicState::High);
-        v.state_vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
-        v.state_vec.push(LogicState::Fall(None));
-        println!("{v}")
-         // let mut pin_map= HashMap::new();
-        // pin_map.insert(LogicVector{
-        //     state_vec: vec![LogicState::High],
-        // }, 1);
-        // for (viking, health) in &pin_map {
-        //     println!("{:?} has {} hp", viking, health);
-        // }
+    fn logic_vecter_as_key() {
+        let mut pin_map= HashMap::new();
+        let v = 12345.000;
+        {
+            let mut v_k1 = LogicVector::new();
+            v_k1.state_vec.push(LogicState::High);
+            v_k1.state_vec.push(LogicState::High);
+            v_k1.state_vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
+            v_k1.state_vec.push(LogicState::Fall(None));
+            println!("{v_k1}");
+            let _ = pin_map.insert(v_k1, v);
+        }
+        {
+            let mut v_k2 = LogicVector::new();
+            v_k2.state_vec.push(LogicState::High);
+            v_k2.state_vec.push(LogicState::High);
+            v_k2.state_vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
+            v_k2.state_vec.push(LogicState::Fall(None));
+            println!("{v_k2}");
+            assert_eq!(Some(&v),pin_map.get(&v_k2));
+        }
     }
     #[test]
     fn expression_length_check() {

@@ -163,17 +163,17 @@ impl std::cmp::Eq for LogicVector {
 use std::hash::{Hash, Hasher};
 impl Hash for LogicVector {
     fn hash<H: Hasher>(&self, hasher: &mut H) {
-        self.hash(hasher);
+        self.to_string().hash(hasher);
     }
 
-    fn hash_slice<H: Hasher>(data: &[Self], state: &mut H)
-    where
-        Self: Sized,
-    {
-        for piece in data {
-            piece.hash(state);
-        }
-    }
+    // fn hash_slice<H: Hasher>(data: &[Self], state: &mut H)
+    // where
+    //     Self: Sized,
+    // {
+    //     for piece in data {
+    //         piece.hash(state);
+    //     }
+    // }
 }
 
 impl std::fmt::Display for LogicVector {

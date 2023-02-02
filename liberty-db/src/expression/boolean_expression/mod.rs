@@ -28,7 +28,7 @@ pub enum ExpressionType {
 }
 
 
-
+/// BooleanExpression is the basic expression
 pub struct BooleanExpression{
     logic_state: LogicState,
     sub_expression_vec:  Vec<Box<dyn BooleanExpressionLike>>,
@@ -37,6 +37,7 @@ pub struct BooleanExpression{
 }
 
 impl BooleanExpression {
+    /// new BooleanExpression
     pub fn new(
         sub_expression_vec: Vec<Box<dyn BooleanExpressionLike>>,
         not_invert_vec: Vec<bool>,
@@ -106,6 +107,7 @@ impl BooleanExpressionLike for  BooleanExpression{
     }
 }
 
+/// Port
 pub struct Port{
     logic_state: LogicState,
     name:  String,
