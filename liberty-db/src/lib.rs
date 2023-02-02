@@ -33,19 +33,18 @@
     // https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
     anonymous_parameters,
     bare_trait_objects,
-    box_pointers,
+    // box_pointers,
     elided_lifetimes_in_paths, // allow anonymous lifetime
     missing_debug_implementations,
     // missing_docs, // TODO: add documents
     single_use_lifetimes, // TODO: fix lifetime names only used once
     trivial_casts, // TODO: remove trivial casts in code
     trivial_numeric_casts,
-    unreachable_pub, // allow clippy::redundant_pub_crate lint instead
     unsafe_code,
     unstable_features,
     unused_extern_crates,
     unused_import_braces,
-    unused_qualifications,
+    // unused_qualifications,
     unused_results, // TODO: fix unused results
     variant_size_differences,
     // warnings, // treat all wanings as errors
@@ -76,12 +75,15 @@
     dead_code,
     missing_copy_implementations, // Copy may cause unnecessary memory copy
     missing_docs,
+    unreachable_pub, // allow clippy::redundant_pub_crate lint instead
+    unused_qualifications,
 )]
 
 // mod macros;
 // TODO:
 
 pub mod common;
+pub mod expression;
 // TODO:
 
 pub mod units;
