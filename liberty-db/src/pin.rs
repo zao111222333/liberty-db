@@ -15,7 +15,7 @@ use crate::timing::Timing;
 /// =146.8
 /// " 
 /// style="width: 90%; height: 600px;"></iframe>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Default)]
 pub struct Pin<'a>{
     pub group_name: CompactString,
     /// A timing group is defined within a pin group.

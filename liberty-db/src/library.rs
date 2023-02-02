@@ -3,7 +3,7 @@ use compact_str::CompactString;
 use crate::pin::Pin;
 use crate::units::Units;
 use crate::cell::Cell;
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Library<'a>{
     pub units: Units,
     pub cell_map: HashMap<CompactString, Cell<'a>>,
