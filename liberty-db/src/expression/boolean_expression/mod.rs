@@ -1,21 +1,26 @@
 mod logic;
 pub use logic::{
     ChangePattern,
+    LogicLike,
     LogicState, 
     LogicVector,
-    LogicOperation
+    LogicStateTable,
+    LogicOperation,
 };
 
+mod port;
+pub use port::{PortId, Port,};
 
-use std::fmt;
+mod latch_ff;
+pub use latch_ff::{Latch, FF};
 
+mod boolean_expression;
+pub use boolean_expression::BooleanExpression;
 
-
-pub trait BooleanExpressionLike: fmt::Display + fmt::Debug{
+/// BooleanExpressionLike
+pub trait BooleanExpressionLike: std::fmt::Display + std::fmt::Debug{
     fn get_type(&self)-> ExpressionType;
-    fn set_state(&mut self, state: LogicState);
-    fn get_state(&mut self) -> Result<LogicState,fmt::Error>;
-
+    fn get_state_stable(&self) -> LogicStateTable;
 }
 
 #[derive(Copy,Clone,Debug)]
@@ -27,226 +32,4 @@ pub enum ExpressionType {
     BooleanExpression,
 }
 
-
-/// BooleanExpression is the basic expression
-pub struct BooleanExpression{
-    logic_state: LogicState,
-    sub_expression_vec:  Vec<Box<dyn BooleanExpressionLike>>,
-    need_inverse_vec: Vec<bool>,
-    operation_vec: Vec<LogicOperation>,
-}
-
-impl BooleanExpression {
-    /// new BooleanExpression
-    pub fn new(
-        sub_expression_vec: Vec<Box<dyn BooleanExpressionLike>>,
-        need_inverse_vec: Vec<bool>,
-        operation_vec: Vec<LogicOperation>,
-    )->Self{
-        Self { 
-            logic_state: LogicState::default(),
-            sub_expression_vec, 
-            need_inverse_vec, 
-            operation_vec,
-        }
-    }
-    fn len_not_match(&self)->bool{
-        self.sub_expression_vec.len() != self.operation_vec.len()+1 
-        || self.sub_expression_vec.len() != self.need_inverse_vec.len()
-    }
-}
-
-impl fmt::Debug for BooleanExpression{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let sub_expr_debug_str= self.sub_expression_vec.iter().fold(
-            "".to_string(),
-            |result, sub_exp| {
-                format!("{result} {sub_exp:?}")
-            }
-        );
-        f.debug_struct("BooleanExpression")
-            .field("sub_expression_vec", &sub_expr_debug_str)
-            .field("need_inverse_vec", &format!("{:?}\n",self.need_inverse_vec))
-            .field("operation_vec", &format!("{:?}\n",self.operation_vec))
-            .finish()
-    }
-}
-
-impl fmt::Display for BooleanExpression{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.len_not_match() {
-            return Err(fmt::Error)
-        }
-        self.sub_expression_vec.iter().enumerate().fold(
-            Ok(()),
-            |result, (idx,sub_exp)| {
-                let sub_exp_str;
-                // sub_exp_str = format!("({})",sub_exp);
-                match (self.need_inverse_vec[idx], sub_exp.get_type()==ExpressionType::BooleanExpression) {
-                    (true, false) => sub_exp_str = format!("!{}",sub_exp),
-                    (true, true ) => sub_exp_str = format!("!({})",sub_exp),
-                    (false,false) => sub_exp_str = format!("{}",sub_exp),
-                    (false,true ) => sub_exp_str = format!("({})",sub_exp),
-                }
-                if idx==0{
-                    result.and_then(|_| write!(f, "{}", sub_exp_str))
-                }else{
-                    result.and_then(|_| write!(f, "{}{}", self.operation_vec[idx-1], sub_exp_str))
-                }
-            }
-        )
-    }
-}
-
-impl BooleanExpressionLike for  BooleanExpression{
-    fn get_type(&self)-> ExpressionType {
-        ExpressionType::BooleanExpression
-    }
-    fn set_state(&mut self, state: LogicState) {
-        self.logic_state = state;
-    }
-    fn get_state(&mut self) -> Result<LogicState,fmt::Error> {
-        if self.len_not_match() {
-            return Err(fmt::Error)
-        }
-        self.logic_state = *self.sub_expression_vec[0]
-                                .get_state()?
-                                .get_inverse(self.need_inverse_vec[0]);
-        for (idx,op) in self.operation_vec.iter().enumerate(){
-            self.logic_state = *op.compute(
-                &self.logic_state, 
-                self.sub_expression_vec[idx+1]
-                            .get_state()?
-                            .get_inverse(self.need_inverse_vec[idx+1])
-            ); 
-        }
-        Ok(self.logic_state)
-    }
-}
-
-/// Port
-pub struct Port{
-    logic_state: LogicState,
-    name:  String,
-}
-
-impl Port {
-    pub fn new(name: &str) -> Self{
-        Self { 
-            name: name.to_string(),
-            logic_state: LogicState::default(),
-
-        }
-    }
-}
-
-impl fmt::Debug for Port{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Port")
-            .field("name", &self.name)
-            .finish()
-    }
-}
-
-impl fmt::Display for Port{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", &self.name)
-    }
-}
-
-impl BooleanExpressionLike for Port{
-    fn get_type(&self)-> ExpressionType{
-        ExpressionType::Port
-    }
-    fn set_state(&mut self, state: LogicState) {
-        self.logic_state = state;
-    }
-    fn get_state(&mut self) -> Result<LogicState,fmt::Error> {
-        Ok(self.logic_state)
-    }
-}
-
-pub struct FF {
-    logic_state: LogicState,
-    name_pair: [String;2],
-    is_inverse: bool,
-    clock_on: Box<dyn BooleanExpressionLike>,
-    next_state: Box<dyn BooleanExpressionLike>,
-}
-
-impl fmt::Debug  for FF{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("FF")
-            .field("name_pair", &format!("{:?}\n",self.name_pair))
-            .field("is_inverse", &format!("{:?}\n",self.is_inverse))
-            .field("clock_on", &format!("{:?}\n",self.clock_on))
-            .field("next_state", &format!("{:?}\n",self.next_state))
-            .finish()
-    }
-}
-
-impl fmt::Display for FF{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.is_inverse {
-            return write!(f, "{}", self.name_pair[1]);
-        } else {
-            return write!(f, "{}", self.name_pair[0]);
-        }
-        
-    }
-}
-
-impl BooleanExpressionLike for FF{
-    fn get_type(&self)-> ExpressionType{
-        ExpressionType::FF
-    }
-    fn set_state(&mut self, state: LogicState) {
-        self.logic_state = state;
-    }
-    fn get_state(&mut self) -> Result<LogicState,fmt::Error> {
-        Ok(self.logic_state)
-    }
-}
-
-pub struct Latch{
-    logic_state: LogicState,
-    name_pair: [String;2],
-    is_inverse: bool,
-    clock_on: Box<dyn BooleanExpressionLike>,
-    next_state: Box<dyn BooleanExpressionLike>,
-}
-
-impl fmt::Debug for Latch{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Latch")
-            .field("name_pair", &format!("{:?}\n",self.name_pair))
-            .field("is_inverse", &format!("{:?}\n",self.is_inverse))
-            .field("clock_on", &format!("{:?}\n",self.clock_on))
-            .field("next_state", &format!("{:?}\n",self.next_state))
-            .finish()
-    }
-}
-
-impl fmt::Display for Latch{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.is_inverse {
-            return write!(f, "{}", self.name_pair[1]);
-        } else {
-            return write!(f, "{}", self.name_pair[0]);
-        }
-        
-    }
-}
-
-impl BooleanExpressionLike for Latch{
-    fn get_type(&self)-> ExpressionType{
-        ExpressionType::Latch
-    }
-    fn set_state(&mut self, state: LogicState) {
-        self.logic_state = state;
-    }
-    fn get_state(&mut self) -> Result<LogicState,fmt::Error> {
-        Ok(self.logic_state)
-    }
-}
-
+type HashMap<K, V> = hashbrown::HashMap<K, V>;

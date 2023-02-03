@@ -1,4 +1,14 @@
-use log::warn;
+use std::process::id;
+
+use log::{warn, error};
+use strum::IntoEnumIterator;
+
+use super::{HashMap,PortId};
+
+pub trait LogicLike: std::fmt::Display + std::fmt::Debug{
+    fn inverse(&self) -> Self;
+    fn inverse_if_need(&self, need: bool) -> Self;
+}
 
 /// ``` text
 /// High:          _______
@@ -12,8 +22,8 @@ use log::warn;
 #[derive(Default)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ChangePattern{
-    settle_down_time: f64,
-    transition_time: f64,
+    pub settle_down_time: f64,
+    pub transition_time: f64,
 }
 impl std::fmt::Display for ChangePattern {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -39,7 +49,11 @@ impl ChangePattern {
 /// LogicState
 #[derive(Default)]
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[derive(strum_macros::Display, strum_macros::EnumString)]
+#[derive(
+    strum_macros::Display, 
+    strum_macros::EnumString,
+    strum_macros::EnumIter,
+)]
 pub enum LogicState {
     /// Unknown
     #[default]
@@ -62,7 +76,38 @@ pub enum LogicState {
     Rise(Option<ChangePattern>),
 }
 
+impl LogicLike for LogicState {
+    #[inline]
+    fn inverse(&self) -> Self{
+        match self{
+            LogicState::Low      => LogicState::High,
+            LogicState::High     => LogicState::Low,
+            LogicState::Rise(_)  => LogicState::Fall(None),
+            LogicState::Fall(_)  => LogicState::Rise(None),
+            _ => *self,
+        }
+    }
+    #[inline]
+    fn inverse_if_need(&self, need: bool) -> Self{
+        if need {
+            self.inverse()
+        }else{
+            *self
+        }
+    }
+}
 impl LogicState {
+    pub fn variant_eq(&self, other: &Self) -> bool{
+        match (self,other) {
+            (LogicState::Unknown, LogicState::Unknown) => true,
+            (LogicState::HighImpedance, LogicState::HighImpedance) => true,
+            (LogicState::High, LogicState::High) => true,
+            (LogicState::Low, LogicState::Low) => true,
+            (LogicState::Fall(_), LogicState::Fall(_)) => true,
+            (LogicState::Rise(_), LogicState::Rise(_)) => true,
+            _ => false,
+        }
+    }
     pub fn get_change_pattern(&self) -> &Option<ChangePattern>{
         match self {
             LogicState::Rise(c) => c,
@@ -70,16 +115,7 @@ impl LogicState {
             _ => &None,
         }
     }
-    pub fn get_inverse(&self, need_inverse: bool) -> &Self{
-        match (need_inverse,self){
-            (false,_) => self,
-            (true,LogicState::Low ) => &LogicState::High,
-            (true,LogicState::High) => &LogicState::Low,
-            (true,LogicState::Rise(_)) => &LogicState::Fall(None),
-            (true,LogicState::Fall(_)) => &LogicState::Rise(None),
-            _ => self,
-        }
-    }
+    
     /// get_bgn state
     /// 
     /// R -> 0, F -> 1, otherwise not change
@@ -141,14 +177,13 @@ impl LogicState {
 
 /// LogicVector
 #[derive(Default)]
-// #[derive(Eq)]
 #[derive(Debug, Clone)]
 pub struct LogicVector {
-    pub state_vec: Vec<LogicState>,
+    pub vec: Vec<LogicState>,
 }
 impl LogicVector {
     pub fn new() -> Self{
-        Self { state_vec: vec![] }
+        Self { vec: vec![] }
     }
 }
 impl PartialEq for LogicVector {
@@ -160,6 +195,7 @@ impl PartialEq for LogicVector {
 impl std::cmp::Eq for LogicVector {
 }
 impl std::hash::Hash for LogicVector {
+    #[inline]
     fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
         self.to_string().hash(hasher);
     }
@@ -167,7 +203,7 @@ impl std::hash::Hash for LogicVector {
 
 impl std::fmt::Display for LogicVector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.state_vec.iter().fold(
+        self.vec.iter().fold(
             Ok(()),
             |result, state| {
                 match state.get_change_pattern() {
@@ -176,6 +212,26 @@ impl std::fmt::Display for LogicVector {
                 }
             }
         )
+    }
+}
+
+impl LogicLike for LogicVector {
+    fn inverse(&self)->Self{
+        let mut inversed = Self{
+            vec:Vec::with_capacity(self.vec.len()),
+        };
+        for (idx,v_state) in self.vec.iter().enumerate() {
+
+            inversed.vec[idx]=v_state.inverse();
+        }
+        inversed
+    }
+    fn inverse_if_need(&self, need: bool)->Self{
+        if need {
+            self.inverse()
+        }else{
+            self.clone()
+        }
     }
 }
 
@@ -212,6 +268,77 @@ impl LogicOperation {
             (_, LogicState::Rise(_)|LogicState::Fall(_), _) => compute_dynamic_logic(),
             _ => self.compute_static(left,right),
         }
+    }
+    pub fn compute_table(&self,
+        left:  &LogicStateTable,
+        right: &LogicStateTable,
+    ) -> LogicStateTable {
+        let mut combine = right.clone();
+        let mut vec_right_len: usize = 0;
+        for (vec_right,_) in right.table.iter(){
+            vec_right_len=vec_right.vec.len();
+            break;
+        }
+        let mut vec_combine_len = vec_right_len;
+        let vec_combine_to_right = |vec_combine: &LogicVector|->LogicVector{
+            LogicVector{
+                vec: vec_combine.vec[..vec_right_len].to_vec(),
+            }
+        };
+        let mut idx_map_combine_to_left: HashMap<usize,usize> = HashMap::new();
+        for (portid_left,idx_left) in left.portid_idx_map.iter(){
+            match combine.portid_idx_map.get(portid_left) {
+                Some(idx_combine) => {
+                    let _=idx_map_combine_to_left.insert(*idx_combine, *idx_left);
+                },
+                None => {
+                    let _ = combine.portid_idx_map.insert(portid_left.clone(), vec_combine_len);
+                    vec_combine_len += 1;
+                    let _=idx_map_combine_to_left.insert(vec_combine_len-1, *idx_left);
+                    let mut new_table:HashMap<LogicVector,LogicState> = HashMap::default();
+                    for state in LogicState::iter(){
+                        for (vec,_) in combine.table.iter(){
+                            let mut new_key = LogicVector { vec: vec.vec.clone()};
+                            new_key.vec.push(state);
+                            let _ = new_table.insert(new_key, LogicState::Unknown);
+                        }
+                    }
+                    combine.table=new_table;
+                },
+            }
+        }
+        let mut count_vec: Vec<_> = idx_map_combine_to_left
+                                            .iter()
+                                            .collect();
+        count_vec.sort_by(|a, b| a.1.cmp(&b.1));
+        let vec_combine_to_left = |vec_combine: &LogicVector|->LogicVector{
+            let mut vec = LogicVector{
+                vec:vec![LogicState::Unknown;count_vec.len()]
+            };
+            for (&idx_combine,&idx_left)  in count_vec.iter() {
+                vec.vec[idx_left] = vec_combine.vec[idx_combine];
+            }
+            vec
+        };
+        let mut new_combine = LogicStateTable{ 
+            table: HashMap::default(), 
+            portid_idx_map: combine.portid_idx_map,
+        };
+        for (vec_in,_) in combine.table.iter() {
+            let state_left  = left.table.get(&vec_combine_to_left(vec_in));
+            let state_right = right.table.get(&vec_combine_to_right(vec_in));
+            match (state_left,state_right) {
+                (Some(left), Some(right)) => {
+                    let _ = new_combine.table.insert(vec_in.clone(), *self.compute(left, right));
+                },
+                _ => {
+                    panic!();
+                    error!("Can Not Find Here");
+                    let _ = new_combine.table.insert(vec_in.clone(), LogicState::Unknown);
+                },
+            }
+        }
+        new_combine
     }
     fn compute_static(&self,
             left:  &LogicState,
@@ -275,3 +402,80 @@ impl LogicOperation {
     }
 }
 
+
+#[derive(Clone,Debug)]
+#[derive(PartialEq)]
+pub struct LogicStateTable{
+    pub table: HashMap<LogicVector, LogicState>,
+    pub portid_idx_map: HashMap<PortId, usize>,
+}
+
+impl LogicStateTable {
+    pub fn new() -> Self{
+        Self { 
+            table: HashMap::default(),
+            portid_idx_map: HashMap::default(),
+        }
+    }
+    pub fn search(
+        &self, 
+        want_port_state_pair: Vec<(PortId,LogicState)>, 
+        want_out_state_if_not_none: Option<LogicState>,
+    ) -> Self{
+        let mut sub = Self{
+            table:HashMap::new(),
+            portid_idx_map:self.portid_idx_map.clone(),
+        };
+        let mut idx_state_pair = Vec::new();
+        for (port_idx,state_want) in want_port_state_pair.iter(){
+            match self.portid_idx_map.get(port_idx) {
+                Some(idx) => idx_state_pair.push((*idx, state_want)),
+                None => {
+                    warn!("Can not find");
+                    panic!()
+                },
+            }
+        }
+        'outer: for (k_vec,v_state) in self.table.iter() {
+            match want_out_state_if_not_none {
+                Some(want_out_state) => if !want_out_state.variant_eq(v_state){
+                    continue 'outer;
+                },
+                _ => (),
+            }
+            for (port_idx,state_want) in idx_state_pair.iter(){
+                let state_got = k_vec.vec[*port_idx];
+                if !state_want.variant_eq(&state_got) {
+                    continue 'outer;
+                }
+            }
+            let _=sub.table.insert(k_vec.clone(), v_state.clone());
+        }
+        sub
+    }
+}
+impl std::fmt::Display for LogicStateTable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f,"{self:?}")
+    }
+}
+impl LogicLike for LogicStateTable {
+    fn inverse(&self)->Self{
+        let mut inversed = Self{
+            table:HashMap::new(),
+            portid_idx_map:self.portid_idx_map.clone(),
+        };
+        for (k_vec,v_state) in self.table.iter() {
+            // v_state = v_state.inverse();
+            let _=inversed.table.insert(k_vec.clone(), v_state.inverse());
+        }
+        inversed
+    }
+    fn inverse_if_need(&self, need: bool)->Self{
+        if need {
+            self.inverse()
+        }else{
+            self.clone()
+        }
+    }
+}

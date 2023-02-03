@@ -1,14 +1,9 @@
-// #[cfg(not(test))]
-// use log::{info, warn};
- 
-// #[cfg(test)]
-// use std::{println as info, println as warn};
-mod for_boolean_expression{
-    use std::fmt::{Formatter, Display};
-    use hashbrown::HashMap;
-    use log::{warn, info};
 
-    use crate::expression::{*, boolean_expression::{LogicVector, BooleanExpressionLike}};
+mod for_boolean_expression{
+    use log::{warn, info};
+    use test_log::test;
+
+    use crate::expression::*;
 
     #[test]
     fn logic_operation() {
@@ -28,7 +23,7 @@ mod for_boolean_expression{
 
     #[test]
     fn logic_state() {
-        use std::str::FromStr;
+        // use std::str::FromStr;
         let h = LogicState::High;
         match h {
             LogicState::Unknown => (),
@@ -46,68 +41,87 @@ mod for_boolean_expression{
         let b = 2 + 2== a;
         assert!(b);
         info!("Looks good!");
-        // panic!("11")
     }
-    // #[test_env_log::test]
+
     #[test]
-    fn expression_nand() {
-        warn!("[warn] ");
-        let test_once = |v: [LogicState;2]|->LogicState{
-            let mut port_a = Port::new("A");
-            let mut port_b = Port::new("B");
-            port_a.set_state(v[0]);
-            port_b.set_state(v[1]);
-            let exp_a_and_b = BooleanExpression::new (
-                vec![Box::new(port_a),Box::new(port_b)], 
-                vec![false,false],
-                vec![LogicOperation::And],
-            );
-            let mut exp_not_a_and_b = BooleanExpression::new (
-                vec![Box::new(exp_a_and_b)], 
-                vec![true],
-                vec![],
-            );
-            assert_eq!(format!("{}",exp_not_a_and_b), "!(A&B)");
-            match exp_not_a_and_b.get_state(){
-                Ok(s) => return s,
-                Err(err) => panic!("{err}"),
-            }
-        };
-        let test_v = vec![
-            ([LogicState::High,       LogicState::High],LogicState::Low ),
-            ([LogicState::Low,        LogicState::High],LogicState::High),
-            ([LogicState::High,       LogicState::Low ],LogicState::High),
-            ([LogicState::Low,        LogicState::Low ],LogicState::High),
-            ([LogicState::Rise(None), LogicState::High],LogicState::Fall(None)),
-            ([LogicState::Rise(ChangePattern::new(1.0, 2.0)),LogicState::High],LogicState::Fall(None)),
-            ([LogicState::Fall(None), LogicState::High],LogicState::Rise(None)),
-        ];
-        for (test_in,want) in test_v.iter(){
-            let got = test_once(*test_in);
-            assert_eq!(*want,got);
+    fn port_as_key() {
+        let port_a1 = Port::new("A");
+        let port_a2 = Port::new("A");
+        println!("{:?}",port_a1.get_state_stable());
+        let mut map = hashbrown::HashMap::new();
+        let v = 1;
+        let _ = map.insert(port_a1.get_id(), v);
+        assert_eq!(
+            Some(&v),
+            map.get(&port_a2.get_id())
+        );
+    }
+    #[test]
+    fn port_compute() {
+        let port_a1 = Port::new("A");
+        let port_a2 = Port::new("A");
+        let and = LogicOperation::And;
+        for (vec_in,state_out) in and.compute_table(
+            &port_a1.get_state_stable(), 
+            &port_a2.get_state_stable()
+        ).table.iter(){
+            println!("{:?} {:?}", vec_in,state_out);
         }
-        
+    }
+    #[test]
+    fn expression_nand_table() {
+        let port_a = Port::new("A");
+        let port_b = Port::new("B");
+        let exp_a_and_b = BooleanExpression::new (
+            vec![Box::new(port_a),Box::new(port_b)], 
+            vec![false,false],
+            vec![LogicOperation::And],
+        );
+        let exp_not_a_and_b = BooleanExpression::new (
+            vec![Box::new(exp_a_and_b)], 
+            vec![true],
+            vec![],
+        );
+        assert_eq!(format!("{}",exp_not_a_and_b), "!(A&B)");
+        println!("**** Origin");
+        let table = exp_not_a_and_b.get_state_stable();
+        for (vec_in,state_out) in table.table.iter(){
+            println!("{:?} {:?}", vec_in,state_out);
+        }
+        println!("**** Search1: A=High, Output=Fall");
+        let table1 = table.search(
+            vec![(PortId::new("A"),LogicState::High)], Some(LogicState::Fall(None)));
+        for (vec_in,state_out) in table1.table.iter(){
+            println!("{:?} {:?}", vec_in,state_out);
+        }
+        println!("**** Search2: A=High, Output=Any");
+        let table2 = table.search(
+            vec![(PortId::new("A"),LogicState::High)], None);
+        for (vec_in,state_out) in table2.table.iter(){
+            println!("{:?} {:?}", vec_in,state_out);
+        }
     }
     #[test]
     fn logic_vecter_as_key() {
+        use hashbrown::HashMap;
         let mut pin_map= HashMap::new();
         let v = 12345.000;
         {
             let mut v_k1 = LogicVector::new();
-            v_k1.state_vec.push(LogicState::High);
-            v_k1.state_vec.push(LogicState::High);
-            v_k1.state_vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
-            v_k1.state_vec.push(LogicState::Fall(None));
-            println!("{v_k1}");
+            v_k1.vec.push(LogicState::High);
+            v_k1.vec.push(LogicState::High);
+            v_k1.vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
+            v_k1.vec.push(LogicState::Fall(None));
+            assert_eq!(format!("{}",v_k1), "11R(3.4567077346E5|1.0000000000E-1)F");
             let _ = pin_map.insert(v_k1, v);
         }
         {
             let mut v_k2 = LogicVector::new();
-            v_k2.state_vec.push(LogicState::High);
-            v_k2.state_vec.push(LogicState::High);
-            v_k2.state_vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
-            v_k2.state_vec.push(LogicState::Fall(None));
-            println!("{v_k2}");
+            v_k2.vec.push(LogicState::High);
+            v_k2.vec.push(LogicState::High);
+            v_k2.vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
+            v_k2.vec.push(LogicState::Fall(None));
+            assert_eq!(format!("{}",v_k2), "11R(3.4567077346E5|1.0000000000E-1)F");
             assert_eq!(Some(&v),pin_map.get(&v_k2));
         }
     }
@@ -158,6 +172,5 @@ mod for_boolean_expression{
                 panic!("\nIt should be error!\n {:?}\n", wrong_on_operation_vec);
             }
         }
-        println!("Pass!")
     }
 }

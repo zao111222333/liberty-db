@@ -46,6 +46,7 @@
     unstable_features,
     unused_extern_crates,
     unused_import_braces,
+    unreachable_pub, // allow clippy::redundant_pub_crate lint instead
     // unused_qualifications,
     unused_results, // TODO: fix unused results
     variant_size_differences,
@@ -77,9 +78,11 @@
     dead_code,
     missing_copy_implementations, // Copy may cause unnecessary memory copy
     missing_docs,
-    unreachable_pub, // allow clippy::redundant_pub_crate lint instead
     unused_qualifications,
 )]
+
+#[macro_use]
+extern crate lazy_static;
 
 // mod macros;
 // TODO:
