@@ -1,8 +1,14 @@
+// #[cfg(not(test))]
+// use log::{info, warn};
+ 
+// #[cfg(test)]
+// use std::{println as info, println as warn};
 mod for_boolean_expression{
     use std::fmt::{Formatter, Display};
     use hashbrown::HashMap;
+    use log::{warn, info};
 
-    use crate::expression::{*, boolean_expression::LogicVector};
+    use crate::expression::{*, boolean_expression::{LogicVector, BooleanExpressionLike}};
 
     #[test]
     fn logic_operation() {
@@ -33,22 +39,53 @@ mod for_boolean_expression{
             LogicState::HighImpedance => todo!(),
         }
     }
-
+    #[test_log::test]
+fn it_works() {
+  info!("Checking whether it still works...");
+  let a = 4;
+  let b = 2 + 2== a;
+  assert!(b);
+  info!("Looks good!");
+}
+    // #[test_env_log::test]
     #[test]
     fn expression_nand() {
-        let port_a = Port::new("A");
-        let port_b = Port::new("B");
-        let exp_a_and_b = BooleanExpression::new (
-            vec![Box::new(port_a),Box::new(port_b)], 
-            vec![true,true],
-            vec![LogicOperation::And],
-        );
-        let exp_not_a_and_b = BooleanExpression::new (
-            vec![Box::new(exp_a_and_b)], 
-            vec![false],
-            vec![],
-        );
-        assert_eq!(format!("{}",exp_not_a_and_b), "!(A&B)");
+        warn!("[warn] ");
+        let test_once = |v: [LogicState;2]|->LogicState{
+            let mut port_a = Port::new("A");
+            let mut port_b = Port::new("B");
+            port_a.set_state(v[0]);
+            port_b.set_state(v[1]);
+            let exp_a_and_b = BooleanExpression::new (
+                vec![Box::new(port_a),Box::new(port_b)], 
+                vec![false,false],
+                vec![LogicOperation::And],
+            );
+            let mut exp_not_a_and_b = BooleanExpression::new (
+                vec![Box::new(exp_a_and_b)], 
+                vec![true],
+                vec![],
+            );
+            assert_eq!(format!("{}",exp_not_a_and_b), "!(A&B)");
+            match exp_not_a_and_b.get_state(){
+                Ok(s) => return s,
+                Err(err) => panic!("{err}"),
+            }
+        };
+        let test_v = vec![
+            ([LogicState::High,       LogicState::High],LogicState::Low ),
+            ([LogicState::Low,        LogicState::High],LogicState::High),
+            ([LogicState::High,       LogicState::Low ],LogicState::High),
+            ([LogicState::Low,        LogicState::Low ],LogicState::High),
+            ([LogicState::Rise(None), LogicState::High],LogicState::Fall(None)),
+            ([LogicState::Rise(ChangePattern::new(1.0, 2.0)),LogicState::High],LogicState::Fall(None)),
+            ([LogicState::Fall(None), LogicState::High],LogicState::Rise(None)),
+        ];
+        for (test_in,want) in test_v.iter(){
+            let got = test_once(*test_in);
+            assert_eq!(*want,got);
+        }
+        
     }
     #[test]
     fn logic_vecter_as_key() {

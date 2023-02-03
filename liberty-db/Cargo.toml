@@ -28,5 +28,10 @@ strum_macros = "0.24"
 
 # darling = "0.14.2"
 # syn = "1.0.91"
+# test-env-log = "0.2.8"
+test-log = "0.2.11"
 
 [dev-dependencies]
+env_logger = "*"
+tracing = {version = "0.1", default-features = false}
+tracing-subscriber = {version = "0.3", default-features = false, features = ["env-filter", "fmt"]}

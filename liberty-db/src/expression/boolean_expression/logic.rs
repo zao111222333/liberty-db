@@ -62,23 +62,22 @@ pub enum LogicState {
     Rise(Option<ChangePattern>),
 }
 
-impl TryFrom<LogicState> for Option<ChangePattern> {
-    type Error = LogicState;
-    fn try_from(other: LogicState) -> Result<Self, Self::Error> {
-        match other {
-            LogicState::Rise(c) => Ok(c),
-            LogicState::Fall(c) => Ok(c),
-            a => Err(a),
-        }
-    }
-}
-
 impl LogicState {
     pub fn get_change_pattern(&self) -> &Option<ChangePattern>{
         match self {
             LogicState::Rise(c) => c,
             LogicState::Fall(c) => c,
-            a => &None,
+            _ => &None,
+        }
+    }
+    pub fn get_inverse(&self, need_inverse: bool) -> &Self{
+        match (need_inverse,self){
+            (false,_) => self,
+            (true,LogicState::Low ) => &LogicState::High,
+            (true,LogicState::High) => &LogicState::Low,
+            (true,LogicState::Rise(_)) => &LogicState::Fall(None),
+            (true,LogicState::Fall(_)) => &LogicState::Rise(None),
+            _ => self,
         }
     }
     /// get_bgn state
