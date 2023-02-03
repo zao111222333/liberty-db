@@ -40,13 +40,14 @@ mod for_boolean_expression{
         }
     }
     #[test_log::test]
-fn it_works() {
-  info!("Checking whether it still works...");
-  let a = 4;
-  let b = 2 + 2== a;
-  assert!(b);
-  info!("Looks good!");
-}
+    fn it_works() {
+        info!("Checking whether it still works...");
+        let a = 4;
+        let b = 2 + 2== a;
+        assert!(b);
+        info!("Looks good!");
+        // panic!("11")
+    }
     // #[test_env_log::test]
     #[test]
     fn expression_nand() {
@@ -115,7 +116,7 @@ fn it_works() {
         use std::fmt::{self, write};
         let right = BooleanExpression::new (
             vec![Box::new(Port::new("A")),Box::new(Port::new("B"))], 
-            vec![true,true],
+            vec![false,false],
             vec![LogicOperation::And],
         );
         assert_eq!(format!("{}",right), "A&B");

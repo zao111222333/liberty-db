@@ -49,7 +49,7 @@ pub struct Timing<'a> {
     /// indicating the timing arc is part of a standard sequential device.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// clock_gating_flag : true ;
     /// ```
     /// <a name ="reference_link" href="
@@ -76,7 +76,7 @@ pub struct Timing<'a> {
     /// `default_timing : bool ; `
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// default_timing : true ;
     /// ```
     /// <a name ="reference_link" href="
@@ -110,7 +110,7 @@ pub struct Timing<'a> {
     /// `value` is a positive floating-point number in terms of delay time per load unit. 
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// fall_resistance : 0.18 ;
     /// ```
     /// <a name ="reference_link" href="
@@ -139,7 +139,7 @@ pub struct Timing<'a> {
     /// `condition` Specifies a Boolean condition. Valid values are true and false.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// fpga_arc_condition : true;
     /// ```
     /// <a name ="reference_link" href="
@@ -169,7 +169,7 @@ pub struct Timing<'a> {
     /// `name`: The `calc_mode` value.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// fpga_domain_style : "speed"; 
     /// ```
     /// <a name ="reference_link" href="
@@ -201,7 +201,7 @@ pub struct Timing<'a> {
     /// `name`: Valid values are 1, 2, 3, and so on.
     /// 
     /// #### Examples
-    /// ```
+    /// ``` liberty
     /// timing()
     ///     related_pin : CLK ;
     ///     timing_type: setup_rising ;
@@ -283,7 +283,7 @@ pub struct Timing<'a> {
     /// `value`: A floating-point number that represents a timing requirement.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// intrinsic_fall : 0.75 ;
     /// ```
     /// <a name ="reference_link" href="
@@ -317,7 +317,7 @@ pub struct Timing<'a> {
     /// `value`: A floating-point number that represents a timing requirement.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// intrinsic_rise : 0.17 ;
     /// ```
     /// <a name ="reference_link" href="
@@ -344,11 +344,11 @@ pub struct Timing<'a> {
     /// `related_bus_equivalent : " name1 [name2 name3 ... ] " ;`
     /// 
     /// #### Example1
-    /// ```
+    /// ``` liberty
     /// related_bus_equivalent : a ;
     /// ```
     /// #### Example2
-    /// ```
+    /// ``` liberty
     /// cell(acell) {
     ///     ...
     ///     bus(y) {
@@ -398,7 +398,7 @@ pub struct Timing<'a> {
     /// `related_bus_pins : " name1 [name2 name3 ... ] " ;`.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// related_bus_pins : "A" ;
     /// ```
     /// <a name ="reference_link" href="
@@ -429,7 +429,7 @@ pub struct Timing<'a> {
     /// `related_output_pin : name ;`.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// related_output_pin : Z ;
     /// ```
     /// <a name ="reference_link" href="
@@ -458,7 +458,7 @@ pub struct Timing<'a> {
     /// #### Example1
     /// In a cell with input pin A and output pin B, define A and its relationship 
     /// to B in the `related_pin` attribute statement in the timing group that describes pin B.
-    /// ```
+    /// ``` liberty
     /// pin (B){  
     ///     direction : output ;  
     ///     function : "A’";  
@@ -476,7 +476,7 @@ pub struct Timing<'a> {
     /// for two identical timing arcs for a cell. For example, in a 2-input NAND gate
     /// with identical delays from both input pins to the output pin, 
     /// it is necessary to define only one timing arc with two related pins.
-    /// ```
+    /// ``` liberty
     /// pin (Z) {  
     ///     direction : output;  
     ///     function : "(A * B)’" ;  
@@ -494,7 +494,7 @@ pub struct Timing<'a> {
     /// range of members is distributed across all members of the parent bus. 
     /// The width of the bus or the range must be the same as the width of the parent bus. 
     /// Pin names used in a `related_pin` statement can start with a nonalphabetic character.
-    /// ```
+    /// ``` liberty
     /// related_pin : "A 1B 2C" ;
     /// ```
     /// ##### Note
@@ -530,7 +530,7 @@ pub struct Timing<'a> {
     /// `value`: A positive floating-point number in terms of delay time per load unit. 
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// rise_resistance : 0.15 ;
     /// ```
     /// <a name ="reference_link" href="
@@ -563,7 +563,7 @@ pub struct Timing<'a> {
     /// valid syntax for these expressions, refer to the OVI specification for SDF, v1.0.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// sdf_cond : "b == 1’b1" ;
     /// ```
     /// <a name ="reference_link" href="
@@ -593,7 +593,7 @@ pub struct Timing<'a> {
     /// `SDF expression`: An SDF expression containing names of input, output, inout, and internal pins.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// sdf_cond_end : "SIG_0 == 1’b1" ;
     /// ```
     /// <a name ="reference_link" href="
@@ -624,7 +624,7 @@ pub struct Timing<'a> {
     /// input, output, inout, and internal pins.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// sdf_cond_start : "SIG_2 == 1’b1" ; 
     /// ```
     /// <a name ="reference_link" href="
@@ -654,7 +654,7 @@ pub struct Timing<'a> {
     /// `end_edge`, or `both_edges`. The default is `noedge`.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// sdf_edges : both_edges; 
     /// sdf_edges : start_edge ; /* edge specification on starting pin */ 
     /// sdf_edges : end_edge ; /* edge specification on end pin */
@@ -692,7 +692,7 @@ pub struct Timing<'a> {
     /// group name predefined in the current library.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// sensitization_master : sensi_2in_1out;
     /// ```
     /// <a name ="reference_link" href="
@@ -714,7 +714,7 @@ pub struct Timing<'a> {
     /// delay resulting in slope delay.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// slope_fall : 0.8 ;
     /// ```
     /// <a name ="reference_link" href="
@@ -744,7 +744,7 @@ pub struct Timing<'a> {
     /// transition delay resulting in slope delay.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// slope_rise : 1.0 ; 
     /// ```
     /// <a name ="reference_link" href="
@@ -776,7 +776,7 @@ pub struct Timing<'a> {
     /// the library unit of capacitance.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// steady_state_resistance_above_high : 200 ; 
     /// ```
     /// <a name ="reference_link" href="
@@ -808,7 +808,7 @@ pub struct Timing<'a> {
     /// the library unit of capacitance.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// steady_state_resistance_below_low : 100 ; 
     /// ```
     /// <a name ="reference_link" href="
@@ -840,7 +840,7 @@ pub struct Timing<'a> {
     /// the library unit of capacitance.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// steady_state_resistance_high : 1500 ;
     /// ```
     /// <a name ="reference_link" href="
@@ -873,7 +873,7 @@ pub struct Timing<'a> {
     /// the library unit of capacitance.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// steady_state_resistance_low : 1100 ; 
     /// ```
     /// <a name ="reference_link" href="
@@ -904,7 +904,7 @@ pub struct Timing<'a> {
     /// `Boolean`: Valid values are true and false.
     /// 
     /// #### Example
-    /// ```
+    /// ``` liberty
     /// tied_off : true ;
     /// ```
     /// <a name ="reference_link" href="
@@ -1143,7 +1143,7 @@ pub struct Timing<'a> {
     /// + `min_clock_tree_path`: Used in timing groups under a clock pin. Defines the minimum clock tree path constraint.
     /// #### Example
     /// A sample library with the timing_type attribute and minimum_pulse_width and minimum_period values.
-    /// ```
+    /// ``` liberty
     /// library(ASIC) {  
     ///     ...  
     ///     delay_model : table_lookup;  

@@ -5,7 +5,7 @@ use strum_macros::{Display, EnumString};
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 /// 
 /// #### Example
-/// ```
+/// ``` liberty
 /// sdf_cond_end : "SIG_0 == 1’b1" ;
 /// ```
 /// <a name ="reference_link" href="
@@ -39,7 +39,7 @@ pub struct SdfExpression{
 /// `end_edge`, or `both_edges`. The default is `noedge`.
 /// 
 /// #### Example
-/// ```
+/// ``` liberty
 /// sdf_edges : both_edges; 
 /// sdf_edges : start_edge ; /* edge specification on starting pin */ 
 /// sdf_edges : end_edge ; /* edge specification on end pin */

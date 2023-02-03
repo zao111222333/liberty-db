@@ -284,7 +284,7 @@ pub enum TimingSenseType {
 /// + `min_clock_tree_path`: Used in timing groups under a clock pin. Defines the minimum clock tree path constraint.
 /// #### Example
 /// A sample library with the timing_type attribute and minimum_pulse_width and minimum_period values.
-/// ```
+/// ``` liberty
 /// library(ASIC) {  
 ///     ...  
 ///     delay_model : table_lookup;  

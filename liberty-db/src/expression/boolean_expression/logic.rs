@@ -159,20 +159,10 @@ impl PartialEq for LogicVector {
 }
 impl std::cmp::Eq for LogicVector {
 }
-use std::hash::{Hash, Hasher};
-impl Hash for LogicVector {
-    fn hash<H: Hasher>(&self, hasher: &mut H) {
+impl std::hash::Hash for LogicVector {
+    fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
         self.to_string().hash(hasher);
     }
-
-    // fn hash_slice<H: Hasher>(data: &[Self], state: &mut H)
-    // where
-    //     Self: Sized,
-    // {
-    //     for piece in data {
-    //         piece.hash(state);
-    //     }
-    // }
 }
 
 impl std::fmt::Display for LogicVector {
