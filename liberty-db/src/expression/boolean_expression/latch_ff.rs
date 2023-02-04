@@ -1,27 +1,22 @@
 use std::fmt;
 use super::{
     BooleanExpressionLike,
-    ExpressionType,
     LogicStateTable,
-    LogicState,LogicVector,LogicOperation,
+    BooleanExpression,
 };
 
-pub struct FF {
+pub struct Ff {
     name_pair: [String;2],
-    is_inverse: bool,
     clock_on: Box<dyn BooleanExpressionLike>,
     next_state: Box<dyn BooleanExpressionLike>,
 }
 
-impl fmt::Debug  for FF{
+impl fmt::Debug for Ff{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("FF")
+        f.debug_struct("Ff")
             .field(
                 "name_pair", 
                 &format!("{:?}\n",self.name_pair))
-            .field(
-                "is_inverse", 
-                &format!("{:?}\n",self.is_inverse))
             .field(
                 "clock_on", 
                 &format!("{:?}\n",self.clock_on))
@@ -32,21 +27,34 @@ impl fmt::Debug  for FF{
     }
 }
 
-impl fmt::Display for FF{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.is_inverse {
-            return write!(f, "{}", self.name_pair[1]);
-        } else {
-            return write!(f, "{}", self.name_pair[0]);
-        }
-        
+#[derive(Debug)]
+pub struct FfExpression {
+    pub ff: Box<Ff>,
+    pub is_inverse: bool,
+}
+
+impl FfExpression {
+    #[inline]
+    pub fn new() -> Self{
+        todo!()
+    }
+    #[inline]
+    pub fn to_box(self) -> Box<Self>{
+        Box::new(self)
     }
 }
 
-impl BooleanExpressionLike for FF{
-    fn get_type(&self)-> ExpressionType{
-        ExpressionType::FF
+impl fmt::Display for FfExpression{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.is_inverse {
+            return write!(f, "{}", self.ff.name_pair[1]);
+        } else {
+            return write!(f, "{}", self.ff.name_pair[0]);
+        }
     }
+}
+
+impl BooleanExpressionLike for FfExpression{
     fn get_state_stable(&self) -> LogicStateTable {
         todo!()
     }
@@ -54,9 +62,8 @@ impl BooleanExpressionLike for FF{
 
 pub struct Latch{
     name_pair: [String;2],
-    is_inverse: bool,
-    clock_on: Box<dyn BooleanExpressionLike>,
-    next_state: Box<dyn BooleanExpressionLike>,
+    clock_on: BooleanExpression,
+    next_state: BooleanExpression,
 }
 
 impl fmt::Debug for Latch{
@@ -66,9 +73,6 @@ impl fmt::Debug for Latch{
                 "name_pair", 
                 &self.name_pair)
             .field(
-                "is_inverse", 
-                &self.is_inverse)
-            .field(
                 "clock_on", 
                 &format!("{:?}\n",self.clock_on))
             .field(
@@ -78,21 +82,24 @@ impl fmt::Debug for Latch{
     }
 }
 
-impl fmt::Display for Latch{
+#[derive(Debug)]
+pub struct LatchExpression {
+    pub latch: Box<Latch>,
+    pub is_inverse: bool,
+}
+
+impl fmt::Display for LatchExpression{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.is_inverse {
-            return write!(f, "{}", self.name_pair[1]);
+            return write!(f, "{}", self.latch.name_pair[1]);
         } else {
-            return write!(f, "{}", self.name_pair[0]);
+            return write!(f, "{}", self.latch.name_pair[0]);
         }
         
     }
 }
 
-impl BooleanExpressionLike for Latch{
-    fn get_type(&self)-> ExpressionType{
-        ExpressionType::Latch
-    }
+impl BooleanExpressionLike for LatchExpression{
     fn get_state_stable(&self) -> LogicStateTable {
         todo!()
     }

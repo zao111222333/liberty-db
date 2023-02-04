@@ -9,27 +9,21 @@ pub use logic::{
 };
 
 mod port;
-pub use port::{PortId, Port,};
+pub use port::Port;
 
 mod latch_ff;
-pub use latch_ff::{Latch, FF};
+pub use latch_ff::{
+    Ff,FfExpression,
+    Latch,LatchExpression, 
+};
 
-mod boolean_expression;
-pub use boolean_expression::BooleanExpression;
+mod boolean;
+pub use boolean::BooleanExpression;
+
+mod not;
+pub use not::NotExpression;
 
 /// BooleanExpressionLike
 pub trait BooleanExpressionLike: std::fmt::Display + std::fmt::Debug{
-    fn get_type(&self)-> ExpressionType;
     fn get_state_stable(&self) -> LogicStateTable;
 }
-
-#[derive(Copy,Clone,Debug)]
-#[derive(PartialEq)]
-pub enum ExpressionType {
-    FF,
-    Latch,
-    Port,
-    BooleanExpression,
-}
-
-type HashMap<K, V> = hashbrown::HashMap<K, V>;

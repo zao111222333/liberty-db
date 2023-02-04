@@ -105,6 +105,9 @@ pub mod bus;
 pub mod bundle;
 pub mod timing;
 
+
+type HashMap<K, V> = hashbrown::HashMap<K, V>;
+
 #[cfg(test)]
 mod tests {
     #[test]

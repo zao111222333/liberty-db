@@ -1,57 +1,44 @@
 use std::fmt;
 use strum::IntoEnumIterator;
-use strum_macros::Display;
-
-// use hashbrown::HashMap;
+use crate::HashMap;
 use super::{
-    BooleanExpressionLike,ExpressionType,
-    LogicStateTable, HashMap,
-    LogicState,LogicVector,LogicOperation,
+    BooleanExpressionLike,
+    LogicState,LogicVector,
+    LogicStateTable,
 };
 
 #[derive(Clone,Debug)]
-pub struct PortId{
+pub struct Port{
     name:  String,
 }
-impl PortId {
+impl Port {
     #[inline]
     pub fn new(name: &str) -> Self{
         Self { name: name.to_string() }
     }
-}
-impl fmt::Display for PortId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"PortId(name: {})",self.name)
+    #[inline]
+    pub fn to_box(self) -> Box<Self>{
+        Box::new(self)
     }
 }
-impl PartialEq for PortId {
+
+impl fmt::Display for Port{
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
+impl PartialEq for Port {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
     }
 }
-impl std::cmp::Eq for PortId {}
-impl std::hash::Hash for PortId {
+impl std::cmp::Eq for Port {}
+impl std::hash::Hash for Port {
     #[inline]
     fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
         self.name.hash(hasher);
-    }
-}
-
-/// Port
-#[derive(Clone)]
-pub struct Port{
-    id: PortId,
-}
-
-impl Port {
-    #[inline]
-    pub fn new(name: &str) -> Self {
-        Self {id: PortId::new(name)}
-    }
-    #[inline]
-    pub fn get_id(&self) -> PortId {
-        self.id.clone()
     }
 }
 
@@ -60,7 +47,7 @@ lazy_static! {
         let mut m = HashMap::new();
         for state in LogicState::iter(){
             let _ = m.insert(
-                LogicVector{vec:vec![state]}, 
+                LogicVector::new(vec![state]),
                 state,
             );
         }
@@ -70,14 +57,10 @@ lazy_static! {
 
 impl BooleanExpressionLike for Port{
     #[inline]
-    fn get_type(&self)-> ExpressionType{
-        ExpressionType::Port
-    }
-    #[inline]
     fn get_state_stable(&self) -> LogicStateTable {
         LogicStateTable::new( 
             BASIC_MAP.clone(), 
-            [(self.get_id(), 0)]
+            [(self.clone(), 0)]
                                 .iter()
                                 .cloned()
                                 .collect(),
@@ -85,18 +68,5 @@ impl BooleanExpressionLike for Port{
     }
 }
 
-impl fmt::Debug for Port{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Port")
-            .field("id", &self.id)
-            .finish()
-    }
-}
 
-impl fmt::Display for Port{
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", &self.id.name)
-    }
-}
 

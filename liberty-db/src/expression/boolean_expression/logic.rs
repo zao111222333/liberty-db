@@ -1,13 +1,10 @@
-use std::process::id;
-
-// use log::{warn, error};
 use strum::IntoEnumIterator;
 
-use super::{HashMap,PortId};
-
+use super::Port;
+use crate::HashMap;
+use std::ops::{Deref,DerefMut};
 pub trait LogicLike: std::fmt::Display + std::fmt::Debug{
     fn inverse(&self) -> Self;
-    fn inverse_if_need(&self, need: bool) -> Self;
 }
 
 /// ``` text
@@ -128,14 +125,6 @@ impl LogicLike for LogicState {
             _ => *self,
         }
     }
-    #[inline]
-    fn inverse_if_need(&self, need: bool) -> Self{
-        if need {
-            self.inverse()
-        }else{
-            *self
-        }
-    }
 }
 impl LogicState {
     #[inline]
@@ -238,11 +227,27 @@ impl LogicState {
 #[derive(Default)]
 #[derive(Debug, Clone)]
 pub struct LogicVector {
-    pub vec: Vec<LogicState>,
+    value: Vec<LogicState>,
 }
+
+impl DerefMut for LogicVector {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.value
+    }
+}
+impl Deref for LogicVector {
+    type Target = Vec<LogicState>;
+    #[inline]
+    fn deref(&self) -> &Vec<LogicState> {
+        &self.value
+    }
+}
+
 impl LogicVector {
-    pub fn new() -> Self{
-        Self { vec: vec![] }
+    #[inline]
+    pub fn new(value: Vec<LogicState>) -> Self{
+        Self { value }
     }
 }
 impl PartialEq for LogicVector {
@@ -262,7 +267,7 @@ impl std::hash::Hash for LogicVector {
 
 impl std::fmt::Display for LogicVector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.vec.iter().fold(
+        self.iter().fold(
             Ok(()),
             |result, state| {
                 match state.get_change_pattern() {
@@ -275,22 +280,14 @@ impl std::fmt::Display for LogicVector {
 }
 
 impl LogicLike for LogicVector {
+    #[inline]
     fn inverse(&self)->Self{
-        let mut inversed = Self{
-            vec:Vec::with_capacity(self.vec.len()),
-        };
-        for (idx,v_state) in self.vec.iter().enumerate() {
+        let mut inversed = Self::new(Vec::with_capacity(self.len()));
+        for (idx,v_state) in self.iter().enumerate() {
 
-            inversed.vec[idx]=v_state.inverse();
+            inversed[idx]=v_state.inverse();
         }
         inversed
-    }
-    fn inverse_if_need(&self, need: bool)->Self{
-        if need {
-            self.inverse()
-        }else{
-            self.clone()
-        }
     }
 }
 
@@ -385,6 +382,7 @@ impl LogicOperation {
             (LogicOperation::Xor, LogicState::Low,           LogicState::Low          ) => LogicState::Low,
         }
     }
+
     pub fn compute_table(&self,
         left:  &LogicStateTable,
         right: &LogicStateTable,
@@ -392,14 +390,12 @@ impl LogicOperation {
         let mut combine = right.clone();
         let mut vec_right_len: usize = 0;
         for (vec_right,_) in right.table.iter(){
-            vec_right_len=vec_right.vec.len();
+            vec_right_len=vec_right.len();
             break;
         }
         let mut vec_combine_len = vec_right_len;
         let vec_combine_to_right = |vec_combine: &LogicVector|->LogicVector{
-            LogicVector{
-                vec: vec_combine.vec[..vec_right_len].to_vec(),
-            }
+            LogicVector::new(vec_combine[..vec_right_len].to_vec())
         };
         let mut idx_map_combine_to_left: HashMap<usize,usize> = HashMap::new();
         for (portid_left,idx_left) in left.portid_idx_map.iter(){
@@ -414,8 +410,8 @@ impl LogicOperation {
                     let mut new_table:HashMap<LogicVector,LogicState> = HashMap::default();
                     for state in LogicState::iter(){
                         for (vec,_) in combine.table.iter(){
-                            let mut new_key = LogicVector { vec: vec.vec.clone()};
-                            new_key.vec.push(state);
+                            let mut new_key = vec.clone();
+                            new_key.push(state);
                             let _ = new_table.insert(new_key, LogicState::Unknown);
                         }
                     }
@@ -428,11 +424,10 @@ impl LogicOperation {
                                             .collect();
         count_vec.sort_by(|a, b| a.1.cmp(&b.1));
         let vec_combine_to_left = |vec_combine: &LogicVector|->LogicVector{
-            let mut vec = LogicVector{
-                vec:vec![LogicState::Unknown;count_vec.len()]
-            };
+            let mut vec = LogicVector::new(
+                vec![LogicState::Unknown;count_vec.len()]);
             for (&idx_combine,&idx_left)  in count_vec.iter() {
-                vec.vec[idx_left] = vec_combine.vec[idx_combine];
+                vec[idx_left] = vec_combine[idx_combine];
             }
             vec
         };
@@ -463,14 +458,14 @@ impl LogicOperation {
 #[derive(PartialEq)]
 pub struct LogicStateTable{
     pub table: HashMap<LogicVector, LogicState>,
-    pub portid_idx_map: HashMap<PortId, usize>,
+    pub portid_idx_map: HashMap<Port, usize>,
 }
 
 impl LogicStateTable {
     #[inline]
     pub fn new(
         table: HashMap<LogicVector, LogicState>,
-        portid_idx_map: HashMap<PortId, usize>,
+        portid_idx_map: HashMap<Port, usize>,
     ) -> Self{
         Self {
             table,
@@ -479,7 +474,7 @@ impl LogicStateTable {
     }
     pub fn search(
         &self, 
-        want_port_state_pair: Vec<(PortId,LogicState)>, 
+        want_port_state_pair: Vec<(Port,LogicState)>, 
         want_out_state_if_not_none: Option<LogicState>,
     ) -> Self{
         let mut sub = Self{
@@ -492,7 +487,6 @@ impl LogicStateTable {
                 Some(idx) => idx_state_pair.push((*idx, state_want)),
                 None => {
                     error!("Can Not Find {}, auto skip it.",port_idx);
-                    // panic!()
                 },
             }
         }
@@ -504,7 +498,7 @@ impl LogicStateTable {
                 _ => (),
             }
             for (port_idx,state_want) in idx_state_pair.iter(){
-                let state_got = k_vec.vec[*port_idx];
+                let state_got = k_vec[*port_idx];
                 if !state_want.variant_eq(&state_got) {
                     continue 'outer;
                 }
@@ -515,11 +509,13 @@ impl LogicStateTable {
     }
 }
 impl std::fmt::Display for LogicStateTable {
+    #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f,"{self:?}")
     }
 }
 impl LogicLike for LogicStateTable {
+    #[inline]
     fn inverse(&self)->Self{
         let mut inversed = Self{
             table:HashMap::new(),
@@ -529,12 +525,5 @@ impl LogicLike for LogicStateTable {
             let _=inversed.table.insert(k_vec.clone(), v_state.inverse());
         }
         inversed
-    }
-    fn inverse_if_need(&self, need: bool)->Self{
-        if need {
-            self.inverse()
-        }else{
-            self.clone()
-        }
     }
 }

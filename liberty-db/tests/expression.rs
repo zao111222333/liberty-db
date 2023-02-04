@@ -1,20 +1,7 @@
-#[test]
-fn test_log_(){
-    env_logger::init();
-    info!("starting up");
-    error!("this is printed by default");
-}
-
 mod for_boolean_expression{
-    // use test_log::test;
-
-    use crate::expression::*;
-    #[test_log::test]
-    fn test_log_(){
-        // env_logger::init();
-        info!("starting up");
-        error!("this is printed by default");
-    }
+    use liberty_db::expression::*;
+    use test_log::test;
+    use log::info;
     #[test]
     fn logic_operation() {
         use std::str::FromStr;
@@ -30,13 +17,10 @@ mod for_boolean_expression{
         assert_eq!(format!("{}",or),  "|");
         assert_eq!(format!("{}",xor), "^");
     }
-
-    #[test_log::test]
+    // TODO: 
+    #[test]
     fn it_works() {
         info!("Checking whether it still works...");
-        let a = 4;
-        let b = 2 + 2== a;
-        assert!(b);
         info!("Looks good!");
     }
 
@@ -47,10 +31,10 @@ mod for_boolean_expression{
         println!("{:?}",port_a1.get_state_stable());
         let mut map = hashbrown::HashMap::new();
         let v = 1;
-        let _ = map.insert(port_a1.get_id(), v);
+        let _ = map.insert(port_a1, v);
         assert_eq!(
             Some(&v),
-            map.get(&port_a2.get_id())
+            map.get(&port_a2)
         );
     }
     #[test]
@@ -60,25 +44,21 @@ mod for_boolean_expression{
         let and = LogicOperation::And;
         for (vec_in,state_out) in and.compute_table(
             &port_a1.get_state_stable(), 
-            &port_a2.get_state_stable()
+            &port_a2.get_state_stable(),
         ).table.iter(){
             println!("{:?} {:?}", vec_in,state_out);
         }
     }
-    #[test]
+    #[test_log::test]
     fn expression_nand_table() {
-        env_logger::init();
-        let port_a = Port::new("A");
-        let port_b = Port::new("B");
-        let exp_a_and_b = BooleanExpression::new (
-            vec![Box::new(port_a),Box::new(port_b)], 
-            vec![false,false],
-            vec![LogicOperation::And],
-        );
-        let exp_not_a_and_b = BooleanExpression::new (
-            vec![Box::new(exp_a_and_b)], 
-            vec![true],
-            vec![],
+        env_logger::init() ;
+        let port_a = Port::new("A").to_box();
+        let port_b = Port::new("B").to_box();
+        let exp_not_a_and_b = NotExpression::new(
+            BooleanExpression::new (
+                vec![port_a,port_b],
+                vec![LogicOperation::And],
+            ).to_box()
         );
         assert_eq!(format!("{}",exp_not_a_and_b), "!(A&B)");
         println!("**** Origin");
@@ -88,13 +68,13 @@ mod for_boolean_expression{
         }
         println!("**** Search1: A=High, Output=Fall");
         let table1 = table.search(
-            vec![(PortId::new("A"),LogicState::High)], Some(LogicState::Fall(None)));
+            vec![(Port::new("A"),LogicState::High)], Some(LogicState::Fall(None)));
         for (vec_in,state_out) in table1.table.iter(){
             println!("{:?} {:?}", vec_in,state_out);
         }
         println!("**** After-Search2: C=High(), Output=Any");
         let table2 = table.search(
-            vec![(PortId::new("C"),LogicState::High)], None);
+            vec![(Port::new("C"),LogicState::High)], None);
         for (vec_in,state_out) in table2.table.iter(){
             println!("{:?} {:?}", vec_in,state_out);
         }
@@ -105,20 +85,20 @@ mod for_boolean_expression{
         let mut pin_map= HashMap::new();
         let v = 12345.000;
         {
-            let mut v_k1 = LogicVector::new();
-            v_k1.vec.push(LogicState::High);
-            v_k1.vec.push(LogicState::High);
-            v_k1.vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
-            v_k1.vec.push(LogicState::Fall(None));
+            let mut v_k1 = LogicVector::new(vec![]);
+            v_k1.push(LogicState::High);
+            v_k1.push(LogicState::High);
+            v_k1.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
+            v_k1.push(LogicState::Fall(None));
             assert_eq!(format!("{}",v_k1), "11R(3.4567077346E5|1.0000000000E-1)F");
             let _ = pin_map.insert(v_k1, v);
         }
         {
-            let mut v_k2 = LogicVector::new();
-            v_k2.vec.push(LogicState::High);
-            v_k2.vec.push(LogicState::High);
-            v_k2.vec.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
-            v_k2.vec.push(LogicState::Fall(None));
+            let mut v_k2 = LogicVector::new(vec![]);
+            v_k2.push(LogicState::High);
+            v_k2.push(LogicState::High);
+            v_k2.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
+            v_k2.push(LogicState::Fall(None));
             assert_eq!(format!("{}",v_k2), "11R(3.4567077346E5|1.0000000000E-1)F");
             assert_eq!(Some(&v),pin_map.get(&v_k2));
         }
@@ -127,29 +107,14 @@ mod for_boolean_expression{
     fn expression_length_check() {
         use std::fmt::{self, write};
         let right = BooleanExpression::new (
-            vec![Box::new(Port::new("A")),Box::new(Port::new("B"))], 
-            vec![false,false],
+            vec![Port::new("A").to_box(),Port::new("B").to_box()],
             vec![LogicOperation::And],
         );
-        assert_eq!(format!("{}",right), "A&B");
-
+        assert_eq!(format!("{}",right), "(A&B)");
         let mut output = String::new();
-        {
-            let wrong_on_not_invert_vec = BooleanExpression::new (
-                vec![Box::new(Port::new("A")),Box::new(Port::new("B"))], 
-                vec![true,true,true],
-                vec![LogicOperation::And],
-            );
-            if let Err(fmt::Error) = write(&mut output, 
-                format_args!("{}", wrong_on_not_invert_vec)) {
-            }else{
-                panic!("\nIt should be error!\n {:?}\n", wrong_on_not_invert_vec);
-            }
-        }
         {
             let wrong_on_sub_expression_vec = BooleanExpression::new (
                 vec![], 
-                vec![true,true],
                 vec![LogicOperation::And],
             );
             if let Err(fmt::Error) = write(&mut output, 
@@ -160,8 +125,7 @@ mod for_boolean_expression{
         }
         {
             let wrong_on_operation_vec = BooleanExpression::new (
-                vec![Box::new(Port::new("A")),Box::new(Port::new("B"))], 
-                vec![true,true],
+                vec![Port::new("A").to_box(),Port::new("B").to_box()], 
                 vec![],
             );
             if let Err(fmt::Error) = write(&mut output, 
