@@ -33,6 +33,6 @@ strum_macros = "0.24"
 test-log = { version = "0.2.11", features = ["trace"], default-features = false }
 
 
-env_logger = "*"
+env_logger = "0.10"
 tracing = {version = "0.1", default-features = false}
 tracing-subscriber = {version = "0.3", default-features = false, features = ["env-filter", "fmt"]}
