@@ -1,10 +1,20 @@
+#[test]
+fn test_log_(){
+    env_logger::init();
+    info!("starting up");
+    error!("this is printed by default");
+}
 
 mod for_boolean_expression{
-    use log::{warn, info};
-    use test_log::test;
+    // use test_log::test;
 
     use crate::expression::*;
-
+    #[test_log::test]
+    fn test_log_(){
+        // env_logger::init();
+        info!("starting up");
+        error!("this is printed by default");
+    }
     #[test]
     fn logic_operation() {
         use std::str::FromStr;
@@ -21,19 +31,6 @@ mod for_boolean_expression{
         assert_eq!(format!("{}",xor), "^");
     }
 
-    #[test]
-    fn logic_state() {
-        // use std::str::FromStr;
-        let h = LogicState::High;
-        match h {
-            LogicState::Unknown => (),
-            LogicState::High => (),
-            LogicState::Low => (),
-            LogicState::Fall(_) => (),
-            LogicState::Rise(_) => (),
-            LogicState::HighImpedance => todo!(),
-        }
-    }
     #[test_log::test]
     fn it_works() {
         info!("Checking whether it still works...");
@@ -70,6 +67,7 @@ mod for_boolean_expression{
     }
     #[test]
     fn expression_nand_table() {
+        env_logger::init();
         let port_a = Port::new("A");
         let port_b = Port::new("B");
         let exp_a_and_b = BooleanExpression::new (
@@ -94,9 +92,9 @@ mod for_boolean_expression{
         for (vec_in,state_out) in table1.table.iter(){
             println!("{:?} {:?}", vec_in,state_out);
         }
-        println!("**** Search2: A=High, Output=Any");
+        println!("**** After-Search2: C=High(), Output=Any");
         let table2 = table.search(
-            vec![(PortId::new("A"),LogicState::High)], None);
+            vec![(PortId::new("C"),LogicState::High)], None);
         for (vec_in,state_out) in table2.table.iter(){
             println!("{:?} {:?}", vec_in,state_out);
         }

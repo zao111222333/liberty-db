@@ -1,5 +1,6 @@
 use std::fmt;
 use strum::IntoEnumIterator;
+use strum_macros::Display;
 
 // use hashbrown::HashMap;
 use super::{
@@ -13,8 +14,14 @@ pub struct PortId{
     name:  String,
 }
 impl PortId {
+    #[inline]
     pub fn new(name: &str) -> Self{
         Self { name: name.to_string() }
+    }
+}
+impl fmt::Display for PortId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,"PortId(name: {})",self.name)
     }
 }
 impl PartialEq for PortId {
@@ -38,12 +45,11 @@ pub struct Port{
 }
 
 impl Port {
+    #[inline]
     pub fn new(name: &str) -> Self {
         Self {id: PortId::new(name)}
     }
-    pub fn set_state(&mut self, state: LogicState) {
-        todo!()
-    }
+    #[inline]
     pub fn get_id(&self) -> PortId {
         self.id.clone()
     }
@@ -63,17 +69,19 @@ lazy_static! {
 }
 
 impl BooleanExpressionLike for Port{
+    #[inline]
     fn get_type(&self)-> ExpressionType{
         ExpressionType::Port
     }
+    #[inline]
     fn get_state_stable(&self) -> LogicStateTable {
-        LogicStateTable { 
-            table: BASIC_MAP.clone(), 
-            portid_idx_map: [(self.get_id(), 0)]
+        LogicStateTable::new( 
+            BASIC_MAP.clone(), 
+            [(self.get_id(), 0)]
                                 .iter()
                                 .cloned()
                                 .collect(),
-        }
+        )
     }
 }
 
@@ -86,6 +94,7 @@ impl fmt::Debug for Port{
 }
 
 impl fmt::Display for Port{
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", &self.id.name)
     }

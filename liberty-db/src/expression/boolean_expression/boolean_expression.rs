@@ -1,4 +1,3 @@
-use hashbrown::HashMap;
 use std::fmt;
 use super::{
     BooleanExpressionLike,ExpressionType,
@@ -15,6 +14,7 @@ pub struct BooleanExpression{
 }
 
 impl BooleanExpression {
+    #[inline]
     /// new BooleanExpression
     pub fn new(
         sub_expression_vec: Vec<Box<dyn BooleanExpressionLike>>,
@@ -27,6 +27,7 @@ impl BooleanExpression {
             operation_vec,
         }
     }
+    #[inline]
     fn len_not_match(&self)->bool{
         self.sub_expression_vec.len() != self.operation_vec.len()+1 
         || self.sub_expression_vec.len() != self.need_inverse_vec.len()
@@ -34,6 +35,7 @@ impl BooleanExpression {
 }
 
 impl BooleanExpressionLike for BooleanExpression{
+    #[inline]
     fn get_type(&self)-> ExpressionType {
         ExpressionType::BooleanExpression
     }
