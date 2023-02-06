@@ -54,12 +54,15 @@ mod for_boolean_expression{
         env_logger::init() ;
         let port_a = Port::new("A").to_box();
         let port_b = Port::new("B").to_box();
-        let exp_not_a_and_b = NotExpression::new(
-            BooleanExpression::new (
-                vec![port_a,port_b],
-                vec![LogicOperation::And],
-            ).to_box()
-        );
+        let exp_not_a_and_b = BooleanExpression::new(
+            vec![ NotExpression::new(
+                    BooleanExpression::new (
+                        vec![port_a,port_b],
+                        vec![LogicOperation::And],
+                    ).to_box()
+                ).to_box()
+            ],
+        vec![]);
         assert_eq!(format!("{}",exp_not_a_and_b), "!(A&B)");
         println!("**** Origin");
         let table = exp_not_a_and_b.get_state_stable();

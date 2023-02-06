@@ -76,17 +76,17 @@ impl fmt::Display for BooleanExpression{
         if self.len_not_match() {
             return Err(fmt::Error)
         }
-        self.sub_expression_vec.iter().enumerate().fold(
-            Ok(()),
-            |result, (idx,sub_exp)| {
-                if idx==0{
-                    result.and_then(|_| write!(f, "{SYMBOL_LEFT}{}", sub_exp))
-                }else{
+        if self.operation_vec.len()==0{
+            write!(f, "{}",self.sub_expression_vec[0])
+        }else{
+            self.sub_expression_vec[1..].iter().enumerate().fold(
+                Ok(()).and_then(|_| write!(f, "{SYMBOL_LEFT}{}",self.sub_expression_vec[0])),
+                |result, (idx,sub_exp)| {
                     result.and_then(|_| write!(f, "{}{}", 
-                        self.operation_vec[idx-1], 
+                        self.operation_vec[idx], 
                         sub_exp))
                 }
-            }
-        ).and_then(|_| write!(f, "{SYMBOL_RIGHT}"))
+            ).and_then(|_| write!(f, "{SYMBOL_RIGHT}"))
+        }
     }
 }
