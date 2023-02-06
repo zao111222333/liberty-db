@@ -21,6 +21,7 @@ iframeNav.appendChild(iframeElement);
 for (let index = 0; index < linkElementList.length; index++) {
     linkList.push(linkElementList[index].href);
     linkElementList[index].removeAttribute("href");
+    linkElementList[index].style.cursor = "pointer";
     linkElementList[index].addEventListener("click", function(){
         iframeElement.src = linkList[index];
         linkElementList[activeLinkIndex].style.color = "var(--link-color)";
