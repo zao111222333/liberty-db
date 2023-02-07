@@ -1,6 +1,6 @@
 const mainElement = document.getElementsByTagName('main')[0];
 
-var linkElementList = document.getElementsByName('reference_link');
+var linkElementList = [];
 var linkList = [];
 let iframeElement = document.createElement('iframe');
 let iframeNav = document.createElement('nav');
@@ -18,12 +18,22 @@ var activeLinkIndex = 0;
 mainElement.after(iframeNav);
 iframeNav.appendChild(iframeElement);
 
+window.onload=function(){
+    linkElementList=document.getElementsByName('reference_link');
+
+
 for (let index = 0; index < linkElementList.length; index++) {
-    linkList.push(linkElementList[index].href);
+    let linkUrl = new URL(linkElementList[index].href);
+    let linkSearch = linkUrl.search;
+    linkUrl.search='';
+    linkList.push([linkUrl.toString(),linkSearch]);
     linkElementList[index].removeAttribute("href");
     linkElementList[index].style.cursor = "pointer";
     linkElementList[index].addEventListener("click", function(){
-        iframeElement.src = linkList[index];
+        if (iframeElement.src != linkList[index][0]){
+            iframeElement.src = linkList[index][0];
+        }
+        iframeElement.contentWindow.postMessage(linkList[index][1]);
         linkElementList[activeLinkIndex].style.color = "var(--link-color)";
         activeLinkIndex = index;
         linkElementList[activeLinkIndex].style.color = "var(--type-link-color)";
@@ -47,7 +57,7 @@ if (linkElementList.length!=0){
 }else{
     iframeElement.src = "https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html"
 }
-
+}
 function swich_(index){
     iframeElement.src = linkList[index];
     linkElementList[activeLinkIndex].style.color = "var(--link-color)";

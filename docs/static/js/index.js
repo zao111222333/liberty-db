@@ -16,17 +16,13 @@ try{
 pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
 }catch(e){}
 
-const queryString = window.location.search;
-const params = new URLSearchParams(queryString);
-const field = params.get('field');
-const bgnParams = params.get('bgn');
-const endParams = params.get('end');
 const color = 'rgba(227,238,0,0.2)';
 const selectColor = 'rgba(180,0,170,0.15)';
 const container = document.getElementById('page-container');
-let elementArrayList = [];
-let pagePositionList = [];
+var elementArrayList = [];
+var pagePositionList = [];
 var pageNum = 1;
+var positionIndex = 0;
 let page = container.firstElementChild;
 pagePositionList.push(page.offsetTop);
 while (page.nextElementSibling!=null) {
@@ -65,6 +61,10 @@ pageText.disabled = true;
 pageText.value = " / "+pagePositionList.length;
 pageDiv.appendChild(pageText);
 
+var btn = document.createElement("button");
+btn.addEventListener("click", scrollWin);
+Div.appendChild(btn);
+
 if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
     var toggleSidebarBtn = document.createElement("button");
     toggleSidebarBtn.innerHTML = "show menu";
@@ -78,6 +78,8 @@ if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
     Div.appendChild(toggleSidebarBtn);
 }
     
+
+
 var pagePosition=0;
 var isScrolling;
 container.onscroll = (_) => {
@@ -87,28 +89,45 @@ container.onscroll = (_) => {
     }, 50);
 };
 
-if (bgnParams != null && endParams != null){
-    let bgnList = bgnParams.split(' ');
-    let endList = endParams.split(' ');
-    if (bgnList.length==endList.length){
-        for (let index = 0; index < bgnList.length; index++) {
-            const bgn = bgnList[index];
-            const end = endList[index];
-            let element = document.getElementById(bgn);
-            var elementArray = [];
-            highlight(element,end,elementArray);
-            elementArrayList.push(elementArray);
+window.onmessage = function(e) {
+    updateQuery(e.data);
+};
+
+window.onload=updateQuery(window.location.search);
+// const queryString = window.location.search;
+
+function updateQuery(queryString) {
+    elementArrayList = [];
+    pagePositionList = [];
+    pageNum = 1;
+    positionIndex = 0;
+    pagePosition=0;
+    let params = new URLSearchParams(queryString);
+    let field = params.get('field');
+    let bgnParams = params.get('bgn');
+    let endParams = params.get('end');
+    if (bgnParams != null && endParams != null){
+        let bgnList = bgnParams.split(' ');
+        let endList = endParams.split(' ');
+        if (bgnList.length==endList.length){
+            for (let index = 0; index < bgnList.length; index++) {
+                const bgn = bgnList[index];
+                const end = endList[index];
+                let element = document.getElementById(bgn);
+                var elementArray = [];
+                highlight(element,end,elementArray);
+                elementArrayList.push(elementArray);
+            }
+            positionIndex = elementArrayList.length-1;
+            scrollWin();
+        }else{
+            console.error("length of Begin and Ended are NOT equal")
         }
-        var btn = document.createElement("button");
-        btn.addEventListener("click", scrollWin);
-        Div.appendChild(btn);
-        var positionIndex = elementArrayList.length-1;
-        scrollWin();
-    }else{
-        console.error("length of Begin and Ended are NOT equal")
     }
+    updatePageNum();
 }
-updatePageNum();
+
+
 
 function scrollWin() {
     for (let index = 0; index < elementArrayList[positionIndex].length; index++) {
