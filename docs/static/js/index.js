@@ -74,8 +74,6 @@ btn = document.createElement("button");
 btn.addEventListener("click", scrollWin);
 Div.appendChild(btn);
 window.onmessage = function(e) {
-    // hight of parent's class="nav-container"
-    Div.style.top = "32px";
     updateQuery(e.data);
 };
 window.onload = function(){
