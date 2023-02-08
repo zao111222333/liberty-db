@@ -18,18 +18,42 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
 
 const color = 'rgba(227,238,0,0.2)';
 const selectColor = 'rgba(180,0,170,0.15)';
-const container = document.getElementById('page-container');
+var pagePosition=0;
+var isScrolling;
 var elementArrayList = [];
 var pagePositionList = [];
 var pageNum = 1;
 var positionIndex = 0;
-let page = container.firstElementChild;
+var page;
+var container;
+var btn;
+var pageInput;
+if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
+    var toggleSidebarBtn = document.createElement("button");
+    toggleSidebarBtn.innerHTML = "show menu";
+    toggleSidebarBtn.addEventListener("click", function(){
+        if (document.getElementById("sidebar").classList.toggle("opened")){
+            toggleSidebarBtn.innerHTML = "hide menu";
+        }else{
+            toggleSidebarBtn.innerHTML = "show menu";
+        }
+    });
+    Div.appendChild(toggleSidebarBtn);
+}
+container = document.getElementById('page-container');
+container.onscroll = (_) => {
+    window.clearTimeout( isScrolling );
+    isScrolling = setTimeout(function() {
+        updatePageNum();
+        console.log(1);
+    }, 50);
+};
+page = container.firstElementChild;
 pagePositionList.push(page.offsetTop);
 while (page.nextElementSibling!=null) {
     page = page.nextElementSibling;
     pagePositionList.push(page.offsetTop);
 }
-
 var Div = document.createElement("div");
 Div.style.display = "flex";
 Div.style.position = "fixed";
@@ -46,7 +70,7 @@ pageDiv.style.flexDirection = "row";
 pageDiv.style.backgroundColor = "white";
 pageDiv.style.display = "flex";
 Div.appendChild(pageDiv);
-var pageInput = document.createElement("input");
+pageInput = document.createElement("input");
 pageInput.type = "text";
 pageInput.style.width = "30px";
 pageInput.style.zIndex = "3";
@@ -61,47 +85,20 @@ pageText.disabled = true;
 pageText.value = " / "+pagePositionList.length;
 pageDiv.appendChild(pageText);
 
-var btn = document.createElement("button");
+btn = document.createElement("button");
 btn.addEventListener("click", scrollWin);
 Div.appendChild(btn);
-
-if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
-    var toggleSidebarBtn = document.createElement("button");
-    toggleSidebarBtn.innerHTML = "show menu";
-    toggleSidebarBtn.addEventListener("click", function(){
-        if (document.getElementById("sidebar").classList.toggle("opened")){
-            toggleSidebarBtn.innerHTML = "hide menu";
-        }else{
-            toggleSidebarBtn.innerHTML = "show menu";
-        }
-    });
-    Div.appendChild(toggleSidebarBtn);
-}
-    
-
-
-var pagePosition=0;
-var isScrolling;
-container.onscroll = (_) => {
-    window.clearTimeout( isScrolling );
-    isScrolling = setTimeout(function() {
-        updatePageNum();
-    }, 50);
-};
-
 window.onmessage = function(e) {
     updateQuery(e.data);
 };
-
-window.onload=updateQuery(window.location.search);
-// const queryString = window.location.search;
+window.onload = function(){
+    updateQuery(window.location.search);
+} 
 
 function updateQuery(queryString) {
+    console.log(elementArrayList);
+    disHighlight(elementArrayList);
     elementArrayList = [];
-    pagePositionList = [];
-    pageNum = 1;
-    positionIndex = 0;
-    pagePosition=0;
     let params = new URLSearchParams(queryString);
     let field = params.get('field');
     let bgnParams = params.get('bgn');
@@ -169,6 +166,15 @@ function scrollWin() {
         })(10);
     }
 }
+function disHighlight(elementArrayList) {
+    for (let idx1 = 0; idx1 < elementArrayList.length; idx1++) {
+        let elementArray = elementArrayList[idx1];
+        for (let idx2 = 0; idx2 < elementArray.length; idx2++) {
+            console.log(elementArray[idx2]);
+            elementArray[idx2].style.backgroundColor = '';
+        }
+    }
+}
 function highlight(element, end, elementArray) {
     if (element!=null){
         if (element.className.substring(0,2)=='t '){
@@ -184,11 +190,6 @@ function highlight(element, end, elementArray) {
         }
     }
 }
-// function toggleSidebar(){
-//     document.getElementById("sidebar").classList['opened']
-//     .remove("opened");
-// }
-
 function updatePageNum(){
     const offset = container.scrollTop;
     pagePosition = offset;
