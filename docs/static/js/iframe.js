@@ -2,7 +2,7 @@ window.onload=function(){
     var switchFuncList = [];
     var activeLinkIndex = 0;
     var linkElementList = [];
-    let iframeElement=document.getElementById("pdf_iframe_module");
+    let iframeElement=document.getElementById("pdf_iframe");
     var linkList = [];
     Object.defineProperty(this, 'linkIndexWatch', {
         get: function () { return activeLinkIndex; },
@@ -17,6 +17,10 @@ window.onload=function(){
         }
       });
     if (iframeElement==null){
+        const BORDER_SIZE = 5;
+        const BORDER_DEF_COLOR = "#2b2b2b"
+        const BORDER_ACT_COLOR = "#377dce"
+        const main = document.getElementsByTagName('main')[0];
         iframeElement = document.createElement('iframe');
         let iframeNav = document.createElement('nav');
         iframeNav.style.position = "sticky";
@@ -24,13 +28,43 @@ window.onload=function(){
         iframeNav.style.height = "calc(100vh - "+navHight+")";
         iframeNav.style.top = navHight;
         iframeNav.style.width = "615px";
-        iframeNav.style.minWidth = "615px";
-        iframeElement.id = "pdf_iframe_module";
+        iframeNav.style.minWidth = "300px";
+        iframeNav.style.paddingLeft = BORDER_SIZE+"px";
+        iframeNav.style.cursor='ew-resize';
+        iframeNav.style.backgroundColor = BORDER_DEF_COLOR;
+        iframeElement.id = "pdf_iframe";
         iframeElement.style.width = "100%";
         iframeElement.style.height = "100%";
         iframeElement.style.marginRight = "0px";
-        document.getElementsByTagName('main')[0].after(iframeNav);
+        main.after(iframeNav);
         iframeNav.appendChild(iframeElement);
+
+        // resize
+        let m_pos;
+        
+        function resize(e){
+            const dx = m_pos - e.x;
+            m_pos = e.x;
+            iframeNav.style.width = (parseInt(getComputedStyle(iframeNav, '').width) + dx) + "px";
+            main.style.width = (parseInt(getComputedStyle(main, '').width) - dx) + "px";
+        }
+        
+        iframeNav.addEventListener("mousedown", function(e){
+            iframeElement.style.pointerEvents='none';
+            document.body.style.cursor='ew-resize';
+            iframeNav.style.backgroundColor = BORDER_ACT_COLOR;
+            if (e.offsetX < BORDER_SIZE) {
+              m_pos = e.x;
+              document.addEventListener("mousemove", resize, false);
+            }
+          }, false);
+          
+          document.addEventListener("mouseup", function(){
+            iframeElement.style.pointerEvents='auto';
+            document.body.style.cursor='';
+            iframeNav.style.backgroundColor = BORDER_DEF_COLOR;
+            document.removeEventListener("mousemove", resize, false);
+          }, false);
     }
     linkElementList=document.getElementsByName('reference_link');
     for (let index = 0; index < linkElementList.length; index++) {
