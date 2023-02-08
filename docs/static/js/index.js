@@ -1,17 +1,3 @@
-/*
-Demo:
-https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
-?field=test
-&bgn
-=t.m0.x9.h4.y2926.ff1.fs2.fc2.sc0.ls0.ws0
-+t.m0.x9.h4.y2956.ff1.fs2.fc2.sc0.ls0.ws0
-+t.m0.xb.h7.y285c.ff1.fs2.fc2.sc0.ls0.ws0
-&end
-=t.m0.xb.h8.yf8d.ff7.fs2.fc2.sc0.ls0.ws0
-+t.m0.xb.h8.y297c.ff7.fs2.fc2.sc0.ls0.ws0
-+t.m0.x39.h8.y2874.ff8.fs2.fc2.sc0.ls0.ws0
-*/
-
 try{
 pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
 }catch(e){}
@@ -88,6 +74,8 @@ btn = document.createElement("button");
 btn.addEventListener("click", scrollWin);
 Div.appendChild(btn);
 window.onmessage = function(e) {
+    // hight of parent's class="nav-container"
+    Div.style.top = "32px";
     updateQuery(e.data);
 };
 window.onload = function(){
