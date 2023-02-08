@@ -33,12 +33,7 @@ container.onscroll = (_) => {
         updatePageNum();
     }, 50);
 };
-page = container.firstElementChild;
-pagePositionList.push(page.offsetTop);
-while (page.nextElementSibling!=null) {
-    page = page.nextElementSibling;
-    pagePositionList.push(page.offsetTop);
-}
+updatePagePosition();
 var Div = document.createElement("div");
 Div.style.display = "flex";
 Div.style.position = "fixed";
@@ -47,6 +42,23 @@ Div.style.top = "0px";
 Div.style.justifyContent = "space-between";
 Div.className = "w0";
 Div.style.flexDirection = "row-reverse";
+
+var observer = new MutationObserver(function(mutations) {
+    updatePagePosition();
+    let isElement = function (o){
+        return (
+          typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+          o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+      );
+    }
+    if (isElement(container.firstElementChild)){
+        let style = getComputedStyle(container.firstElementChild);
+        if (style!=null){
+            Div.style.width=style.width;
+        }
+    }
+});
+observer.observe(container.firstElementChild, { attributes : true, attributeFilter : ['style'] });
 
 
 container.firstElementChild.appendChild(Div);
@@ -196,5 +208,14 @@ function toPage(element) {
     if(event.key === 'Enter') {
         var newPagePosition = pagePositionList[+(element.value)-1];
         container.scrollTop = newPagePosition;
+    }
+}
+function updatePagePosition(){
+    pagePositionList=[];
+    page = container.firstElementChild;
+    pagePositionList.push(page.offsetTop);
+    while (page.nextElementSibling!=null) {
+        page = page.nextElementSibling;
+        pagePositionList.push(page.offsetTop);
     }
 }
