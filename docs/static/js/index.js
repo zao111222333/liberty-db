@@ -45,7 +45,6 @@ container.onscroll = (_) => {
     window.clearTimeout( isScrolling );
     isScrolling = setTimeout(function() {
         updatePageNum();
-        console.log(1);
     }, 50);
 };
 page = container.firstElementChild;
@@ -96,7 +95,6 @@ window.onload = function(){
 } 
 
 function updateQuery(queryString) {
-    console.log(elementArrayList);
     disHighlight(elementArrayList);
     elementArrayList = [];
     let params = new URLSearchParams(queryString);
@@ -170,7 +168,6 @@ function disHighlight(elementArrayList) {
     for (let idx1 = 0; idx1 < elementArrayList.length; idx1++) {
         let elementArray = elementArrayList[idx1];
         for (let idx2 = 0; idx2 < elementArray.length; idx2++) {
-            console.log(elementArray[idx2]);
             elementArray[idx2].style.backgroundColor = '';
         }
     }

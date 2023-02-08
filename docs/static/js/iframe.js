@@ -1,9 +1,21 @@
-var switchFuncList = [];
 window.onload=function(){
-    let iframeElement=document.getElementById("pdf_iframe_module");
-    var linkElementList = [];
-    var linkList = [];
+    var switchFuncList = [];
     var activeLinkIndex = 0;
+    var linkElementList = [];
+    let iframeElement=document.getElementById("pdf_iframe_module");
+    var linkList = [];
+    Object.defineProperty(this, 'linkIndexWatch', {
+        get: function () { return activeLinkIndex; },
+        set: function (v) {
+          linkElementList[activeLinkIndex].style.color = "var(--link-color)";
+          activeLinkIndex = v;
+          linkElementList[activeLinkIndex].style.color = "var(--type-link-color)";
+          iframeElement.contentWindow.postMessage(linkList[activeLinkIndex][1],'*');
+          iframeElement.addEventListener("load", function() {
+            iframeElement.contentWindow.postMessage(linkList[activeLinkIndex][1],'*');
+          });
+        }
+      });
     if (iframeElement==null){
         iframeElement = document.createElement('iframe');
         let iframeNav = document.createElement('nav');
@@ -28,13 +40,10 @@ window.onload=function(){
         linkElementList[index].removeAttribute("href");
         linkElementList[index].style.cursor = "pointer";
         switchFuncList.push(function(){
+            linkIndexWatch = index;
             if (iframeElement.src != linkList[index][0]){
                 iframeElement.src = linkList[index][0];
             }
-            iframeElement.contentWindow.postMessage(linkList[index][1],'*');
-            linkElementList[activeLinkIndex].style.color = "var(--link-color)";
-            activeLinkIndex = index;
-            linkElementList[activeLinkIndex].style.color = "var(--type-link-color)";
         });
         linkElementList[index].addEventListener("click", switchFuncList[index]);
         var content = linkElementList[index].parentElement.cloneNode(true)
@@ -50,8 +59,8 @@ window.onload=function(){
         }
         linkElementList[index].style.textDecoration = "underline";
     }
-
     if (switchFuncList.length!=0){
+        iframeElement.src = linkList[0][0];
         switchFuncList[0]();
     }else{
         iframeElement.src = "https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html"
