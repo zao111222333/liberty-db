@@ -1,14 +1,12 @@
-var mouseDown = false;
-document.body.onmousedown = function() { 
-    mouseDown = true;
-}
-document.body.onmouseup = function() {
-    mouseDown = false;
-}
-let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-
 window.onload=function(){
+    var mouseDown = false;
+    document.body.onmousedown = function() { 
+        mouseDown = true;
+    }
+    document.body.onmouseup = function() {
+        mouseDown = false;
+    }
+    let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     var switchFuncList = [];
     var activeLinkIndex = 0;
