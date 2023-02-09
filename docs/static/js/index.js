@@ -3,7 +3,8 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
 }catch(e){}
 
 const queryOpts = { name: 'clipboard-write', allowWithoutGesture: false };
-const permissionStatus = await navigator.permissions.query(queryOpts);
+// const permissionStatus = await navigator.permissions.query(queryOpts);
+const permissionStatus = navigator.permissions.query(queryOpts);
 
 const color = 'rgba(227,238,0,0.2)';
 const selectColor = 'rgba(180,0,170,0.15)';
