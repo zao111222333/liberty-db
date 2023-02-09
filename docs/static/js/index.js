@@ -111,7 +111,7 @@ btnDiv.appendChild(srollBtn);
 Div.appendChild(btnDiv);
 window.onmessage = function(e) {
     updateQuery(e.data);
-    addLinkBtn(queryString);
+    addLinkBtn(e.data);
 };
 window.onload = function(){
     updateQuery(window.location.search);
