@@ -54,7 +54,7 @@ window.onload=function(){
         iframeElement.style.height = "100%";
         iframeElement.style.border = 'none';
         iframeElement.style.marginRight = "0px";
-        iframeElement.setAttribute(allow, "clipboard-write");
+        iframeElement.setAttribute('allow', 'clipboard-write');
         let resizeBar = document.createElement('div');
         resizeBar.style.height = "100%";
         resizeBar.style.marginLeft = -BORDER_SIZE+"px";
