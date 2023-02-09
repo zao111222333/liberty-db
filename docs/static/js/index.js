@@ -14,9 +14,36 @@ var page;
 var container;
 var btn;
 var pageInput;
+
+container = document.getElementById('page-container');
+container.onscroll = (_) => {
+    window.clearTimeout( isScrolling );
+    isScrolling = setTimeout(function() {
+        updatePageNum();
+    }, 50);
+};
+updatePagePosition();
+var bgDiv = document.createElement("div");
+bgDiv.style.position = "fixed";
+bgDiv.style.zIndex = "1";
+bgDiv.style.top = "0px";
+bgDiv.style.left = "0px";
+bgDiv.style.width = "100%";
+bgDiv.style.paddingBottom = '3px';
+bgDiv.style.display = "flex";
+bgDiv.style.justifyContent = "center";
+bgDiv.style.backgroundColor = 'rgb(32,32,32)';
+var Div = document.createElement("div");
+Div.style.display = "flex";
+Div.style.justifyContent = "space-between";
+Div.className = "w0";
+Div.style.flexDirection = "row-reverse";
 if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
     var toggleSidebarBtn = document.createElement("button");
     toggleSidebarBtn.innerHTML = "show menu";
+    toggleSidebarBtn.style.cursor = 'pointer';
+    toggleSidebarBtn.style.color = '#ffffff';
+    toggleSidebarBtn.style.backgroundColor = 'rgb(63,63,63)';
     toggleSidebarBtn.addEventListener("click", function(){
         if (document.getElementById("sidebar").classList.toggle("opened")){
             toggleSidebarBtn.innerHTML = "hide menu";
@@ -26,23 +53,6 @@ if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
     });
     Div.appendChild(toggleSidebarBtn);
 }
-container = document.getElementById('page-container');
-container.onscroll = (_) => {
-    window.clearTimeout( isScrolling );
-    isScrolling = setTimeout(function() {
-        updatePageNum();
-    }, 50);
-};
-updatePagePosition();
-var Div = document.createElement("div");
-Div.style.display = "flex";
-Div.style.position = "fixed";
-Div.style.zIndex = "1";
-Div.style.top = "0px";
-Div.style.justifyContent = "space-between";
-Div.className = "w0";
-Div.style.flexDirection = "row-reverse";
-
 var observer = new MutationObserver(function(mutations) {
     updatePagePosition();
     let isElement = function (o){
@@ -61,15 +71,21 @@ var observer = new MutationObserver(function(mutations) {
 observer.observe(container.firstElementChild, { attributes : true, attributeFilter : ['style'] });
 
 
-container.firstElementChild.appendChild(Div);
+container.firstElementChild.appendChild(bgDiv);
+bgDiv.appendChild(Div);
+container.firstElementChild.style.marginTop = '24px';
 var pageDiv = document.createElement("div");
 pageDiv.style.flexDirection = "row";
-pageDiv.style.backgroundColor = "white";
+// pageDiv.style.backgroundColor = "white";
 pageDiv.style.display = "flex";
 Div.appendChild(pageDiv);
 pageInput = document.createElement("input");
 pageInput.type = "text";
 pageInput.style.width = "30px";
+pageInput.style.color = '#ffffff';
+pageInput.style.borderColor = 'rgb(180,180,180)';
+pageInput.style.borderWidth = 'thin';
+pageInput.style.backgroundColor = 'rgb(63,63,63)';
 pageInput.style.zIndex = "3";
 pageInput.style.marginRight = "-5px";
 pageInput.style.textAlign = "right";
@@ -77,13 +93,19 @@ pageInput.setAttribute("onkeydown", "toPage(this)");
 pageDiv.appendChild(pageInput);
 var pageText = document.createElement("input");
 pageText.style.width = "40px";
+pageText.style.color = '#ffffff'
+pageText.style.border = 'none'
+pageText.style.background = 'none'
 pageText.type = "text";
 pageText.disabled = true;
-pageText.value = " / "+pagePositionList.length;
+pageText.value = "  / "+pagePositionList.length;
 pageDiv.appendChild(pageText);
 
 btn = document.createElement("button");
 btn.addEventListener("click", scrollWin);
+btn.style.cursor = 'pointer';
+btn.style.color = '#ffffff';
+btn.style.backgroundColor = 'rgb(63,63,63)';
 Div.appendChild(btn);
 window.onmessage = function(e) {
     updateQuery(e.data);
@@ -112,17 +134,21 @@ function updateQuery(queryString) {
                 elementArrayList.push(elementArray);
             }
             positionIndex = elementArrayList.length-1;
-            scrollWin();
         }else{
             console.error("length of Begin and Ended are NOT equal")
         }
     }
+    scrollWin();
     updatePageNum();
 }
 
 
 
 function scrollWin() {
+    if (elementArrayList.length==0){
+        btn.innerHTML = 'none';
+        return
+    }
     for (let index = 0; index < elementArrayList[positionIndex].length; index++) {
         const element = elementArrayList[positionIndex][index];
         element.style.backgroundColor = color;
