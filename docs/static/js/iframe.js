@@ -5,8 +5,11 @@ document.body.onmousedown = function() {
 document.body.onmouseup = function() {
     mouseDown = false;
 }
+let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 
 window.onload=function(){
+    
     var switchFuncList = [];
     var activeLinkIndex = 0;
     var linkElementList = [];
@@ -32,14 +35,22 @@ window.onload=function(){
         main.style.minWidth = "400px";
         iframeElement = document.createElement('iframe');
         let iframeNav = document.createElement('nav');
-        iframeNav.style.position = "sticky";
-        navHight = getComputedStyle(document.getElementsByClassName("sidebar")[0]).top;
-        iframeNav.style.height = "calc(100vh - "+navHight+")";
-        iframeNav.style.top = navHight;
-        iframeNav.style.width = "615px";
-        iframeNav.style.minWidth = "300px";
         iframeNav.style.display="flex";
-        iframeNav.style.flexDirection="row";
+        if (isMobile){
+            iframeNav.style.position = "fixed";
+            iframeNav.style.height = "40vh";
+            iframeNav.style.bottom = '0';
+            iframeNav.style.width = "100vw";
+            main.style.paddingBottom = '42vh';
+        }else{
+            let navHight = getComputedStyle(document.getElementsByClassName("sidebar")[0]).top;
+            iframeNav.style.position = "sticky";
+            iframeNav.style.height = "calc(100vh - "+navHight+")";
+            iframeNav.style.top = navHight;
+            iframeNav.style.width = "615px";
+            iframeNav.style.minWidth = "300px";
+            iframeNav.style.flexDirection="row";
+        }
         iframeElement.id = "pdf_iframe";
         iframeElement.style.width = "100%";
         iframeElement.style.height = "100%";
