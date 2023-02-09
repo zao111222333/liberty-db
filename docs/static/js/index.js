@@ -110,8 +110,9 @@ var btnDiv = document.createElement("div");
 btnDiv.appendChild(srollBtn);
 Div.appendChild(btnDiv);
 window.onmessage = function(e) {
-    updateQuery(e.data);
-    addLinkBtn(e.data);
+    queryString=e.data;
+    updateQuery(queryString);
+    addLinkBtn(queryString);
 };
 window.onload = function(){
     updateQuery(window.location.search);
