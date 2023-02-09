@@ -30,6 +30,7 @@ bgDiv.style.top = "0px";
 bgDiv.style.left = "0px";
 bgDiv.style.width = "100%";
 bgDiv.style.paddingBottom = '3px';
+bgDiv.style.paddingTop = '2px';
 bgDiv.style.display = "flex";
 bgDiv.style.justifyContent = "center";
 bgDiv.style.backgroundColor = 'rgb(32,32,32)';
@@ -93,9 +94,9 @@ pageInput.setAttribute("onkeydown", "toPage(this)");
 pageDiv.appendChild(pageInput);
 var pageText = document.createElement("input");
 pageText.style.width = "40px";
-pageText.style.color = '#ffffff'
-pageText.style.border = 'none'
-pageText.style.background = 'none'
+pageText.style.color = '#ffffff';
+pageText.style.border = 'none';
+pageText.style.background = 'none';
 pageText.type = "text";
 pageText.disabled = true;
 pageText.value = "  / "+pagePositionList.length;

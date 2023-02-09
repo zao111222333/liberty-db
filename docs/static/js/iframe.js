@@ -43,6 +43,7 @@ window.onload=function(){
         iframeElement.id = "pdf_iframe";
         iframeElement.style.width = "100%";
         iframeElement.style.height = "100%";
+        iframeElement.style.border = 'none';
         iframeElement.style.marginRight = "0px";
         let resizeBar = document.createElement('div');
         resizeBar.style.height = "100%";
