@@ -1,8 +1,12 @@
 mod logic;
 pub use logic::{
+    CommonState,
+    StaticState,
+    DynamicState,
+    UninitState,
+    LogicState,
     ChangePattern,
     LogicLike,
-    LogicState, 
     LogicVector,
     LogicStateTable,
     LogicOperation,

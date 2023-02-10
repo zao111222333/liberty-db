@@ -1,6 +1,6 @@
 use std::fmt;
 use strum::IntoEnumIterator;
-use crate::HashMap;
+use crate::types::*;
 use super::{
     BooleanExpressionLike,
     LogicState,LogicVector,

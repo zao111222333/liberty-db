@@ -1,7 +1,7 @@
-use compact_str::CompactString;
+
 
 pub trait Group {
-    fn name(&self) -> &CompactString;
+    fn name(&self) -> &String;
 }
 
 pub trait Check{

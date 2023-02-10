@@ -1,5 +1,5 @@
 use strum_macros::{Display, EnumString};
-use compact_str::CompactString;
+
 use crate::ast::*;
 #[derive(Debug, Clone)]
 pub enum Timing{
@@ -27,7 +27,7 @@ pub enum SimpleAttribute{
     FpgaArcCondition(BooleanExpression),
     /// fpga_domain_style : name ;
     #[strum(serialize = "fpga_domain_style")]
-    FpgaDomainStyle(CompactString),
+    FpgaDomainStyle(String),
     /// interdependence_id : integer ;
     #[strum(serialize = "interdependence_id")]
     InterdependenceId(i64),
@@ -45,7 +45,7 @@ pub enum SimpleAttribute{
     RelatedBusPins(NameList),
     /// related_output_pin : name ;
     #[strum(serialize = "related_output_pin")]
-    RelatedOutputPin(CompactString),
+    RelatedOutputPin(String),
     /// related_pin : " name1 [name2 name3 ... ] " ;
     #[strum(serialize = "related_pin")]
     RelatedPin(NameList),
@@ -282,14 +282,14 @@ pub enum GroupStatement {
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default)]
 pub struct CellFall{
-        template_name: CompactString,
+        template_name: String,
         pub index_1: Vec<f64>,
         pub index_2: Vec<f64>,
         pub index_3: Vec<f64>,
         pub values: Vec<f64>,
 }
 impl Group for CellFall  {
-    fn name(&self) -> &CompactString {
+    fn name(&self) -> &String {
         // todo!()
         &self.template_name
     }

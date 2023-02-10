@@ -2,7 +2,7 @@
 //! implement.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
 //! Demonstrating HTML tables.
 
-use compact_str::CompactString;
+
 use hashbrown::HashMap;
 pub mod items;
 pub mod impls;
@@ -34,7 +34,7 @@ use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,express
 /// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
 #[derive(Debug, Default)]
 pub struct Timing<'a> {
-    pub group_name: CompactString,
+    pub group_name: String,
     /// Use this attribute to indicate that a constraint arc is for
     /// a clock gating relation between the data and clock pin,
     /// instead of a constraint found in standard sequential devices,
@@ -188,7 +188,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.35
     /// ">Reference-Instance</a>
-    pub fpga_domain_style: Option<CompactString>,
+    pub fpga_domain_style: Option<String>,
     /// Use pairs of `interdependence_id` attributes to identify interdependent pairs 
     /// of `setup` and `hold` constraint tables. Interdependence data is supported 
     /// in conditional constraint checking, the `interdependence_id` attribute increases 
@@ -1387,7 +1387,7 @@ pub struct Timing<'a> {
     /// &end
     /// =204.9
     /// ">Reference-Instance</a>
-    pub cell_degradation: HashMap<CompactString, items::CellDegradation>,
+    pub cell_degradation: HashMap<String, items::CellDegradation>,
     /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
     ///
     /// **Note:**
@@ -1412,41 +1412,41 @@ pub struct Timing<'a> {
     /// &end
     /// =204.10
     /// ">Reference-Instance</a>
-    pub cell_fall: HashMap<CompactString, items::CellFall>,
-    pub cell_rise: HashMap<CompactString, items::CellFall>,
-    pub fall_constraint: HashMap<CompactString, items::CellFall>,
-    pub fall_propagation: HashMap<CompactString, items::CellFall>,
-    pub fall_transition: HashMap<CompactString, items::CellFall>,
-    pub noise_immunity_above_high: HashMap<CompactString, items::CellFall>,
-    pub noise_immunity_below_low: HashMap<CompactString, items::CellFall>,
-    pub noise_immunity_high: HashMap<CompactString, items::CellFall>,
-    pub noise_immunity_low: HashMap<CompactString, items::CellFall>,
-    pub output_current_fall: HashMap<CompactString, items::CellFall>,
-    pub output_current_rise: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_height_above_high: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_height_below_low: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_height_high: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_height_low: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_peak_time_ratio_above_high: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_peak_time_ratio__below_low: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_peak_time_ratio_high: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_peak_time_ratio_low: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_width_above_high: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_width_below_low: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_width_high: HashMap<CompactString, items::CellFall>,
-    pub propogated_noise_width_low: HashMap<CompactString, items::CellFall>,
-    pub receiver_capacitance1_fall: HashMap<CompactString, items::CellFall>,
-    pub receiver_capacitance1_rise: HashMap<CompactString, items::CellFall>,
-    pub receiver_capacitance2_fall: HashMap<CompactString, items::CellFall>,
-    pub receiver_capacitance2_rise: HashMap<CompactString, items::CellFall>,
-    pub retaining_fall: HashMap<CompactString, items::CellFall>,
-    pub retaining_rise: HashMap<CompactString, items::CellFall>,
-    pub retain_fall_slew: HashMap<CompactString, items::CellFall>,
-    pub retain_rise_slew: HashMap<CompactString, items::CellFall>,
-    pub rise_constraint: HashMap<CompactString, items::CellFall>,
-    pub rise_propagation: HashMap<CompactString, items::CellFall>,
-    pub rise_transition: HashMap<CompactString, items::CellFall>,
-    pub steady_state_current_high: HashMap<CompactString, items::CellFall>,
-    pub steady_state_current_low: HashMap<CompactString, items::CellFall>,
-    pub steady_state_current_tristate: HashMap<CompactString, items::CellFall>,
+    pub cell_fall: HashMap<String, items::CellFall>,
+    pub cell_rise: HashMap<String, items::CellFall>,
+    pub fall_constraint: HashMap<String, items::CellFall>,
+    pub fall_propagation: HashMap<String, items::CellFall>,
+    pub fall_transition: HashMap<String, items::CellFall>,
+    pub noise_immunity_above_high: HashMap<String, items::CellFall>,
+    pub noise_immunity_below_low: HashMap<String, items::CellFall>,
+    pub noise_immunity_high: HashMap<String, items::CellFall>,
+    pub noise_immunity_low: HashMap<String, items::CellFall>,
+    pub output_current_fall: HashMap<String, items::CellFall>,
+    pub output_current_rise: HashMap<String, items::CellFall>,
+    pub propogated_noise_height_above_high: HashMap<String, items::CellFall>,
+    pub propogated_noise_height_below_low: HashMap<String, items::CellFall>,
+    pub propogated_noise_height_high: HashMap<String, items::CellFall>,
+    pub propogated_noise_height_low: HashMap<String, items::CellFall>,
+    pub propogated_noise_peak_time_ratio_above_high: HashMap<String, items::CellFall>,
+    pub propogated_noise_peak_time_ratio__below_low: HashMap<String, items::CellFall>,
+    pub propogated_noise_peak_time_ratio_high: HashMap<String, items::CellFall>,
+    pub propogated_noise_peak_time_ratio_low: HashMap<String, items::CellFall>,
+    pub propogated_noise_width_above_high: HashMap<String, items::CellFall>,
+    pub propogated_noise_width_below_low: HashMap<String, items::CellFall>,
+    pub propogated_noise_width_high: HashMap<String, items::CellFall>,
+    pub propogated_noise_width_low: HashMap<String, items::CellFall>,
+    pub receiver_capacitance1_fall: HashMap<String, items::CellFall>,
+    pub receiver_capacitance1_rise: HashMap<String, items::CellFall>,
+    pub receiver_capacitance2_fall: HashMap<String, items::CellFall>,
+    pub receiver_capacitance2_rise: HashMap<String, items::CellFall>,
+    pub retaining_fall: HashMap<String, items::CellFall>,
+    pub retaining_rise: HashMap<String, items::CellFall>,
+    pub retain_fall_slew: HashMap<String, items::CellFall>,
+    pub retain_rise_slew: HashMap<String, items::CellFall>,
+    pub rise_constraint: HashMap<String, items::CellFall>,
+    pub rise_propagation: HashMap<String, items::CellFall>,
+    pub rise_transition: HashMap<String, items::CellFall>,
+    pub steady_state_current_high: HashMap<String, items::CellFall>,
+    pub steady_state_current_low: HashMap<String, items::CellFall>,
+    pub steady_state_current_tristate: HashMap<String, items::CellFall>,
 }

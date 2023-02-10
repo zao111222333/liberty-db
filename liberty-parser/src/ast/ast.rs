@@ -1,12 +1,12 @@
-use compact_str::CompactString;
+
 
 
 /// name1 \[name2 name3 ... \]
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default)]
 pub struct NameList{
-    name1: CompactString,
-    name2_n: Vec<CompactString>,
+    name1: String,
+    name2_n: Vec<String>,
 }
 // #[derive(Debug, Clone, PartialEq)]
 // #[derive(Default)]
@@ -14,6 +14,6 @@ pub struct NameList{
 // }
 
 pub trait Group {
-        fn name(&self) -> &CompactString;
+        fn name(&self) -> &String;
     // fn summarize(&self) -> String;
 }

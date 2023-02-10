@@ -1,14 +1,14 @@
 //! All trait `impl` for
 //! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
 
-use compact_str::CompactString;
+
 
 use crate::common::traits::Group;
 
 use super::items::CellFall;
 
 impl Group for CellFall {
-    fn name(&self) -> &CompactString {
+    fn name(&self) -> &String {
         todo!()
     }
 }

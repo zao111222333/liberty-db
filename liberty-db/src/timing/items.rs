@@ -2,7 +2,7 @@
 //! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
 
 use crate::common::{traits::Group, items::Domain};
-use compact_str::CompactString;
+
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
 /// <a name ="reference_link" href="
@@ -886,7 +886,7 @@ pub struct Mode {}
 /// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct CellDegradation {
-    pub group_name: CompactString,
+    pub group_name: String,
     /* polynomial model */ 
     pub coefs: Vec<f64>,
     /* polynomial model */ 

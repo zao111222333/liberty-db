@@ -1,4 +1,3 @@
-use compact_str::CompactString;
 use strum_macros::{Display, EnumString};
 
 
@@ -108,8 +107,8 @@ pub enum VariableType {
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default)]
 pub struct Domain{
-    pub group_name: CompactString,
-    pub calc_mode: Option<CompactString>,
+    pub group_name: String,
+    pub calc_mode: Option<String>,
     pub variable_1: Option<VariableType>,
     pub variable_2: Option<VariableType>,
     pub variable_3: Option<VariableType>,

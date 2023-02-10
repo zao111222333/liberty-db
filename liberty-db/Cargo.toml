@@ -22,12 +22,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [dependencies]
 log = { version = "0.4", features = ["std", "serde"] }
 hashbrown = "0.12"
-compact_str = "0.6.1"
 lazy_static = "1.4.0"
-# readonly = "0.2.2"
 strum = "0.24"
 strum_macros = "0.24"
-# test-log = "0.2.11"
 
 [dev-dependencies]
 test-log = { version = "0.2.11", features = ["trace"], default-features = false }
