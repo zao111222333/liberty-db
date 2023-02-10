@@ -37,7 +37,6 @@ bgDiv.style.backgroundColor = 'rgb(32,32,32)';
 var Div = document.createElement("div");
 Div.style.display = "flex";
 Div.style.justifyContent = "space-between";
-Div.className = "w0";
 Div.style.flexDirection = "row-reverse";
 if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
     var toggleSidebarBtn = document.createElement("button");
@@ -56,28 +55,21 @@ if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
 }
 var observer = new MutationObserver(function(mutations) {
     updatePagePosition();
-    let isElement = function (o){
-        return (
-          typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-          o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
-      );
-    }
-    if (isElement(container.firstElementChild)){
-        let style = getComputedStyle(container.firstElementChild);
-        if (style!=null){
-            Div.style.width=style.width;
-        }
-    }
+    updateDivWidth();
 });
 observer.observe(container.firstElementChild, { attributes : true, attributeFilter : ['style'] });
-
+function updateDivWidth(){
+    let style = getComputedStyle(container.firstElementChild);
+    if (style!=null){
+        Div.style.width=style.width;
+    }
+}
 
 container.firstElementChild.appendChild(bgDiv);
 bgDiv.appendChild(Div);
 container.firstElementChild.style.marginTop = '28px';
 var pageDiv = document.createElement("div");
 pageDiv.style.flexDirection = "row";
-// pageDiv.style.backgroundColor = "white";
 pageDiv.style.display = "flex";
 Div.appendChild(pageDiv);
 pageInput = document.createElement("input");
@@ -90,7 +82,22 @@ pageInput.style.backgroundColor = 'rgb(63,63,63)';
 pageInput.style.zIndex = "3";
 pageInput.style.marginRight = "-5px";
 pageInput.style.textAlign = "right";
-pageInput.setAttribute("onkeydown", "toPage(this)");
+pageInput.addEventListener("keydown", (event) => {
+    if (event.isComposing || event.keyCode === 229) {
+      return;
+    }
+    if(event.key === 'Enter') {
+        let num = parseInt(pageInput.value);
+        if (num<=0){
+            num = 1;
+        }
+        if (num>pagePositionList.length){
+            num=pagePositionList.length
+        }
+        pageInput.value=num;
+        container.scrollTop = pagePositionList[num-1];
+    }
+  })
 pageDiv.appendChild(pageInput);
 var pageText = document.createElement("input");
 pageText.style.width = "40px";
@@ -115,6 +122,7 @@ window.onmessage = function(e) {
     addLinkBtn(queryString);
 };
 window.onload = function(){
+    updateDivWidth()
     updateQuery(window.location.search);
 } 
 
@@ -124,10 +132,15 @@ function addLinkBtn(queryString) {
     if (linkBtn==null){
         linkBtn = document.createElement("button");
         linkBtn.id = 'link_btn';
-        linkBtn.innerHTML = `<a>Copy<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;">
+        let innerText = document.createElement('a');
+        innerText.innerHTML+='Copy';
+        let linkSymbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;">
         <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"></path>
         <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"></path>
-        </svg>&nbsp;&nbsp;&nbsp;</a>`;
+        </svg>`;
+        innerText.innerHTML+=linkSymbol;
+        innerText.innerHTML+='&nbsp;&nbsp;&nbsp;';
+        linkBtn.appendChild(innerText);
         linkBtn.style.cursor = 'pointer';
         linkBtn.style.color = '#ffffff';
         linkBtn.style.backgroundColor = 'rgb(63,63,63)';
@@ -255,12 +268,6 @@ function updatePageNum(){
     }
     pageNum=num;
     pageInput.value = pageNum;
-}
-function toPage(element) {
-    if(event.key === 'Enter') {
-        var newPagePosition = pagePositionList[+(element.value)-1];
-        container.scrollTop = newPagePosition;
-    }
 }
 function updatePagePosition(){
     pagePositionList=[];
