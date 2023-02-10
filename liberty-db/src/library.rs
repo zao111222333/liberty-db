@@ -1,14 +1,12 @@
-use hashbrown::HashMap;
-use compact_str::CompactString;
-use crate::pin::Pin;
+use crate::types::*;
 use crate::units::Units;
 use crate::cell::Cell;
 #[derive(Debug)]
 pub struct Library<'a>{
     pub units: Units,
-    pub cell_map: HashMap<CompactString, Cell<'a>>,
-    pub voltage_map: HashMap<CompactString, f64>,
-    pub sensitization_map: HashMap<CompactString, Sensitization>,
+    pub cell_map: HashMap<String, Cell<'a>>,
+    pub voltage_map: HashMap<String, f64>,
+    pub sensitization_map: HashMap<String, Sensitization>,
 
 }
 
@@ -22,7 +20,7 @@ pub struct Library<'a>{
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone)]
 pub struct Sensitization{
-    pub group_name: CompactString,
+    pub group_name: String,
     pub pin_names: PinNames,
     pub vector: Vector,
 }
@@ -35,5 +33,5 @@ pub struct PinNames{
 #[derive(Debug, Clone)]
 pub struct Vector{
     pub id: usize,
-    pub string: CompactString,
+    pub string: String,
 }

@@ -1,3 +1,4 @@
+
 mod for_boolean_expression{
     use liberty_db::expression::*;
     use test_log::test;
@@ -67,19 +68,19 @@ mod for_boolean_expression{
         println!("**** Origin");
         let table = exp_not_a_and_b.get_state_stable();
         for (vec_in,state_out) in table.table.iter(){
-            println!("{:?} {:?}", vec_in,state_out);
+            println!("{:} {:}", vec_in,state_out);
         }
         println!("**** Search1: A=High, Output=Fall");
         let table1 = table.search(
-            vec![(Port::new("A"),LogicState::High)], Some(LogicState::Fall(None)));
+            vec![(Port::new("A"),LogicState::Static(StaticState::High))], Some(LogicState::Dynamic(DynamicState::Fall(None))));
         for (vec_in,state_out) in table1.table.iter(){
-            println!("{:?} {:?}", vec_in,state_out);
+            println!("{:} {:}", vec_in,state_out);
         }
         println!("**** After-Search2: C=High(), Output=Any");
         let table2 = table.search(
-            vec![(Port::new("C"),LogicState::High)], None);
+            vec![(Port::new("C"),LogicState::Static(StaticState::High))], None);
         for (vec_in,state_out) in table2.table.iter(){
-            println!("{:?} {:?}", vec_in,state_out);
+            println!("{:} {:}", vec_in,state_out);
         }
     }
     #[test]
@@ -89,19 +90,19 @@ mod for_boolean_expression{
         let v = 12345.000;
         {
             let mut v_k1 = LogicVector::new(vec![]);
-            v_k1.push(LogicState::High);
-            v_k1.push(LogicState::High);
-            v_k1.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
-            v_k1.push(LogicState::Fall(None));
+            v_k1.push(LogicState::Static(StaticState::High));
+            v_k1.push(LogicState::Static(StaticState::High));
+            v_k1.push(LogicState::Dynamic(DynamicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1))));
+            v_k1.push(LogicState::Dynamic(DynamicState::Fall(None)));
             assert_eq!(format!("{}",v_k1), "11R(3.4567077346E5|1.0000000000E-1)F");
             let _ = pin_map.insert(v_k1, v);
         }
         {
             let mut v_k2 = LogicVector::new(vec![]);
-            v_k2.push(LogicState::High);
-            v_k2.push(LogicState::High);
-            v_k2.push(LogicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1)));
-            v_k2.push(LogicState::Fall(None));
+            v_k2.push(LogicState::Static(StaticState::High));
+            v_k2.push(LogicState::Static(StaticState::High));
+            v_k2.push(LogicState::Dynamic(DynamicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1))));
+            v_k2.push(LogicState::Dynamic(DynamicState::Fall(None)));
             assert_eq!(format!("{}",v_k2), "11R(3.4567077346E5|1.0000000000E-1)F");
             assert_eq!(Some(&v),pin_map.get(&v_k2));
         }
