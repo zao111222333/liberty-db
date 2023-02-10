@@ -74,7 +74,7 @@ observer.observe(container.firstElementChild, { attributes : true, attributeFilt
 
 container.firstElementChild.appendChild(bgDiv);
 bgDiv.appendChild(Div);
-container.firstElementChild.style.marginTop = '24px';
+container.firstElementChild.style.marginTop = '28px';
 var pageDiv = document.createElement("div");
 pageDiv.style.flexDirection = "row";
 // pageDiv.style.backgroundColor = "white";

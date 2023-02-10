@@ -1,5 +1,11 @@
 <body style="display: flex; flex-direction: row; flex-wrap: nowrap;">
 <nav style="position: sticky; height: 100vh; top: 0px; width: 615px; min-width: 615px;">
+<button onclick="setHighligh()" type="button">Set Highlight</button>
+<script>
+    function setHighligh(){
+        document.getElementById('1').contentWindow.postMessage(`?bgn=214.28+214.50+217.19&end=214.49+216.60+217.35`,'*');
+    }
+</script>
 <iframe id="1" src="2007.03/_user_guide.html
 ?field=test
 &bgn
@@ -15,7 +21,6 @@
 +217.18
 +217.35
 " style="width: 100%; height: 100%;"></iframe>
-
 </nav>
 <nav style="position: sticky; height: 100vh; top: 0px; width: 100%;">
 <iframe id="2" src="https://zao111222333.github.io/liberty-rs/pdfjs/web/viewer.html?
