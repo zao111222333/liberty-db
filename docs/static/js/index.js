@@ -38,21 +38,7 @@ var Div = document.createElement("div");
 Div.style.display = "flex";
 Div.style.justifyContent = "space-between";
 Div.style.flexDirection = "row-reverse";
-if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
-    var toggleSidebarBtn = document.createElement("button");
-    toggleSidebarBtn.innerHTML = "Show Menu";
-    toggleSidebarBtn.style.cursor = 'pointer';
-    toggleSidebarBtn.style.color = '#ffffff';
-    toggleSidebarBtn.style.backgroundColor = 'rgb(63,63,63)';
-    toggleSidebarBtn.addEventListener("click", function(){
-        if (document.getElementById("sidebar").classList.toggle("opened")){
-            toggleSidebarBtn.innerHTML = "Hide Menu";
-        }else{
-            toggleSidebarBtn.innerHTML = "Show Menu";
-        }
-    });
-    Div.appendChild(toggleSidebarBtn);
-}
+
 var observer = new MutationObserver(function(mutations) {
     updatePagePosition();
     updateDivWidth();
@@ -80,6 +66,8 @@ pageInput.style.borderColor = 'rgb(180,180,180)';
 pageInput.style.borderWidth = 'thin';
 pageInput.style.backgroundColor = 'rgb(63,63,63)';
 pageInput.style.zIndex = "3";
+pageInput.style.marginTop = "1px";
+pageInput.style.marginBottom = "2px";
 pageInput.style.marginRight = "-5px";
 pageInput.style.textAlign = "right";
 pageInput.addEventListener("keydown", (event) => {
@@ -114,6 +102,7 @@ srollBtn.style.cursor = 'pointer';
 srollBtn.style.color = '#ffffff';
 srollBtn.style.backgroundColor = 'rgb(63,63,63)';
 var btnDiv = document.createElement("div");
+addSidebarBtn();
 btnDiv.appendChild(srollBtn);
 Div.appendChild(btnDiv);
 window.onmessage = function(e) {
@@ -276,5 +265,27 @@ function updatePagePosition(){
     while (page.nextElementSibling!=null) {
         page = page.nextElementSibling;
         pagePositionList.push(page.offsetTop);
+    }
+}
+function addSidebarBtn(){
+    if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
+        var toggleSidebarBtn = document.createElement("button");
+        let innerText = document.createElement('a');
+        let linkSymbol = `<svg width="16" height="16" style="margin-bottom:-3px;margin-top:-1px;" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 3H2v14h5V3zm2 0v14h9V3H9zM0 3c0-1.1.9-2 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm3 1h3v2H3V4zm0 3h3v2H3V7zm0 3h3v2H3v-2z"/>
+        </svg>`;
+        innerText.innerHTML+=linkSymbol;
+        toggleSidebarBtn.appendChild(innerText);
+        toggleSidebarBtn.style.cursor = 'pointer';
+        toggleSidebarBtn.style.color = '#ffffff';
+        toggleSidebarBtn.style.backgroundColor = 'rgb(63,63,63)';
+        toggleSidebarBtn.addEventListener("click", function(){
+            if (document.getElementById("sidebar").classList.toggle("opened")){
+                toggleSidebarBtn.style.backgroundColor = 'rgb(53,53,53)';
+            }else{
+                toggleSidebarBtn.style.backgroundColor = 'rgb(63,63,63)';
+            }
+        });
+        btnDiv.appendChild(toggleSidebarBtn);
     }
 }
