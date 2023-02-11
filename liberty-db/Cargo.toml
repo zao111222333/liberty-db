@@ -15,9 +15,11 @@ authors = ["Junzhuo <zhou@junzhuo.me>"]
 readme = "README.md"
 repository = "https://github.com/zao111222333/liberty-rs/"
 
+# Enable katex in documentation
+# RUSTDOCFLAGS="--html-in-header docs/header.html" cargo doc --no-deps --open
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 
 [dependencies]
 log = { version = "0.4", features = ["std", "serde"] }
