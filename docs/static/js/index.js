@@ -4,16 +4,16 @@ pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
 
 const color = 'rgba(227,238,0,0.2)';
 const selectColor = 'rgba(180,0,170,0.15)';
-var pagePosition=0;
-var isScrolling;
-var elementArrayList = [];
-var pagePositionList = [];
-var pageNum = 1;
-var positionIndex = 0;
-var page;
-var container;
-var srollBtn;
-var pageInput;
+let pagePosition=0;
+let isScrolling;
+let elementArrayList = [];
+let pagePositionList = [];
+let pageNum = 1;
+let positionIndex = 0;
+let page;
+let container;
+let srollBtn;
+let pageInput;
 
 container = document.getElementById('page-container');
 container.onscroll = (_) => {
@@ -23,7 +23,7 @@ container.onscroll = (_) => {
     }, 50);
 };
 updatePagePosition();
-var bgDiv = document.createElement("div");
+let bgDiv = document.createElement("div");
 bgDiv.style.position = "fixed";
 bgDiv.style.zIndex = "1";
 bgDiv.style.top = "0px";
@@ -34,12 +34,12 @@ bgDiv.style.paddingTop = '2px';
 bgDiv.style.display = "flex";
 bgDiv.style.justifyContent = "center";
 bgDiv.style.backgroundColor = 'rgb(32,32,32)';
-var Div = document.createElement("div");
+let Div = document.createElement("div");
 Div.style.display = "flex";
 Div.style.justifyContent = "space-between";
 Div.style.flexDirection = "row-reverse";
 
-var observer = new MutationObserver(function(mutations) {
+let observer = new MutationObserver(function(mutations) {
     updatePagePosition();
     updateDivWidth();
 });
@@ -54,7 +54,7 @@ function updateDivWidth(){
 container.firstElementChild.appendChild(bgDiv);
 bgDiv.appendChild(Div);
 container.firstElementChild.style.marginTop = '28px';
-var pageDiv = document.createElement("div");
+let pageDiv = document.createElement("div");
 pageDiv.style.flexDirection = "row";
 pageDiv.style.display = "flex";
 Div.appendChild(pageDiv);
@@ -87,7 +87,7 @@ pageInput.addEventListener("keydown", (event) => {
     }
   })
 pageDiv.appendChild(pageInput);
-var pageText = document.createElement("input");
+let pageText = document.createElement("input");
 pageText.style.width = "40px";
 pageText.style.color = '#ffffff';
 pageText.style.border = 'none';
@@ -101,7 +101,7 @@ srollBtn.addEventListener("click", scrollWin);
 srollBtn.style.cursor = 'pointer';
 srollBtn.style.color = '#ffffff';
 srollBtn.style.backgroundColor = 'rgb(63,63,63)';
-var btnDiv = document.createElement("div");
+let btnDiv = document.createElement("div");
 addSidebarBtn();
 btnDiv.appendChild(srollBtn);
 Div.appendChild(btnDiv);
@@ -117,7 +117,7 @@ window.onload = function(){
 
 
 function addLinkBtn(queryString) {
-    var linkBtn = document.getElementById('link_btn');
+    let linkBtn = document.getElementById('link_btn');
     if (linkBtn==null){
         linkBtn = document.createElement("button");
         linkBtn.id = 'link_btn';
@@ -157,7 +157,7 @@ function updateQuery(queryString) {
                 const bgn = bgnList[index];
                 const end = endList[index];
                 let element = document.getElementById(bgn);
-                var elementArray = [];
+                let elementArray = [];
                 highlight(element,end,elementArray);
                 elementArrayList.push(elementArray);
             }
@@ -192,12 +192,12 @@ function scrollWin() {
     }
     srollBtn.innerHTML = (positionIndex+1)+" of "+elementArrayList.length;
     const element = elementArrayList[positionIndex][0];
-    var newPagePosition = element.parentElement.parentElement.offsetTop;
-    var elementPosition = element.offsetTop;
+    let newPagePosition = element.parentElement.parentElement.offsetTop;
+    let elementPosition = element.offsetTop;
     if (Math.abs(newPagePosition-pagePosition)<1000){
         container.scrollTo({top: elementPosition+newPagePosition-10, behavior: 'smooth'});
     }else{
-        var newPagePositionTo;
+        let newPagePositionTo;
         if (newPagePosition<pagePosition){
             newPagePositionTo = element.parentElement.parentElement.nextElementSibling.offsetTop;
         }else{
@@ -242,7 +242,7 @@ function highlight(element, end, elementArray) {
 function updatePageNum(){
     const offset = container.scrollTop;
     pagePosition = offset;
-    var num = pageNum;
+    let num = pageNum;
     while(offset <= pagePositionList[num-1]){
         num=num-1;
     }
@@ -269,7 +269,7 @@ function updatePagePosition(){
 }
 function addSidebarBtn(){
     if (document.getElementById("outline").getElementsByTagName('ul').length!=0){
-        var toggleSidebarBtn = document.createElement("button");
+        let toggleSidebarBtn = document.createElement("button");
         let innerText = document.createElement('a');
         let linkSymbol = `<svg width="16" height="16" style="margin-bottom:-3px;margin-top:-1px;" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
         <path d="M7 3H2v14h5V3zm2 0v14h9V3H9zM0 3c0-1.1.9-2 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm3 1h3v2H3V4zm0 3h3v2H3V7zm0 3h3v2H3v-2z"/>
