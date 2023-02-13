@@ -1,5 +1,5 @@
 //! Timing module
-//! implement.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+//! implement.
 //! Demonstrating HTML tables.
 
 
@@ -31,7 +31,7 @@ use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,express
 /// &end
 /// =203.29
 /// ">Reference-Instatnce-In-Pin</a>
-/// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+/// 
 #[derive(Debug, Default)]
 pub struct Timing<'a> {
     pub group_name: String,

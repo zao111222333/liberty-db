@@ -1,6 +1,8 @@
 //!
 //! This crate implement `liberty` data structre in Rust.
-//! <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+//! <script>
+//! IFRAME('https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html');
+//! </script>
 
 
 
@@ -13,6 +15,7 @@
     // html_logo_url = "https://example.com/logo.jpg",
     html_playground_url = "https://play.rust-lang.org",
 )]
+
 
 // #![cfg_attr(
 //     feature = "nightly",
@@ -85,21 +88,12 @@
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
-// mod macros;
-// TODO:
 
 pub mod common;
 pub mod expression;
-// TODO:
-
 pub mod units;
-// TODO:
-
 pub mod library;
-// TODO:
-
 pub mod cell;
-// TODO:
 pub mod pin;
 pub mod bus;
 pub mod bundle;
@@ -107,11 +101,3 @@ pub mod timing;
 
 
 mod types;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(4, 4);
-    }
-}

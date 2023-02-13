@@ -1,22 +1,22 @@
 use std::fmt;
 use super::{
     BooleanExpressionLike,
-    LogicStateTable, LogicOperation, 
+    LogicStateTable, LogicOperation, BooleanExpression, 
 };
 static SYMBOL_LEFT: &str = "(";
 static SYMBOL_RIGHT: &str = ")";
 
-/// BooleanExpression is the basic expression
-pub struct BooleanExpression{
-    sub_expression_vec:  Vec<Box<dyn BooleanExpressionLike>>,
+/// FunctionExpression is the basic expression
+pub struct FunctionExpression{
+    sub_expression_vec:  Vec<BooleanExpression>,
     operation_vec: Vec<LogicOperation>,
 }
 
-impl BooleanExpression {
-    /// new BooleanExpression
+impl FunctionExpression {
+    /// new FunctionExpression
     #[inline]
     pub fn new(
-        sub_expression_vec: Vec<Box<dyn BooleanExpressionLike>>,
+        sub_expression_vec: Vec<BooleanExpression>,
         operation_vec: Vec<LogicOperation>,
     )->Self{
         Self { 
@@ -25,16 +25,21 @@ impl BooleanExpression {
         }
     }
     #[inline]
-    pub fn to_box(self) -> Box<Self>{
-        Box::new(self)
-    }
-    #[inline]
     fn len_not_match(&self)->bool{
         self.sub_expression_vec.len() != self.operation_vec.len()+1 
     }
 }
 
-impl BooleanExpressionLike for BooleanExpression{
+impl Into<BooleanExpression> for FunctionExpression{
+    #[inline]
+    fn into(self) -> BooleanExpression {
+        BooleanExpression{
+            value: Box::new(self)
+        }
+    }
+}
+
+impl BooleanExpressionLike for FunctionExpression{
     #[inline]
     fn get_state_stable(&self) -> LogicStateTable {
         if self.len_not_match() {
@@ -52,7 +57,7 @@ impl BooleanExpressionLike for BooleanExpression{
     }
 }
 
-impl fmt::Debug for BooleanExpression{
+impl fmt::Debug for FunctionExpression{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let sub_expr_debug_str= self.sub_expression_vec.iter().fold(
             "".to_string(),
@@ -60,7 +65,7 @@ impl fmt::Debug for BooleanExpression{
                 format!("{result} {sub_exp:?}")
             }
         );
-        f.debug_struct("BooleanExpression")
+        f.debug_struct("FunctionExpression")
             .field(
                 "sub_expression_vec", 
                 &sub_expr_debug_str)
@@ -71,7 +76,7 @@ impl fmt::Debug for BooleanExpression{
     }
 }
 
-impl fmt::Display for BooleanExpression{
+impl fmt::Display for FunctionExpression{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.len_not_match() {
             return Err(fmt::Error)

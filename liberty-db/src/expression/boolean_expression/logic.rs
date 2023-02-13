@@ -1,6 +1,9 @@
+use crate::types;
 use crate::types::*;
+use crate::units;
 use super::Port;
 use strum_macros::Display;
+use std::fmt::Display;
 use std::ops::{Deref,DerefMut};
 pub trait LogicLike: std::fmt::Display + std::fmt::Debug{
     fn inverse(&self) -> Self;
@@ -17,31 +20,48 @@ pub trait LogicLike: std::fmt::Display + std::fmt::Debug{
 ///      settle transition
 /// ```
 #[derive(Default)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
+// #[derive(PartialEq, Eq)]
 pub struct ChangePattern{
-    pub settle_down_time: f64,
-    pub transition_time: f64,
+    pub settle_down_time: units::Time,
+    pub transition_time: units::Time,
+}
+
+impl std::hash::Hash for ChangePattern {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        float_hash(state, self.settle_down_time.value);
+        float_hash(state, self.transition_time.value);
+    }
+}
+impl PartialEq for ChangePattern {
+    fn eq(&self, other: &Self) -> bool {
+        float_eq(self.settle_down_time.value,other.settle_down_time.value) && 
+        float_eq(self.transition_time.value,other.transition_time.value)
+    }
+}
+impl Eq for ChangePattern {
 }
 impl std::fmt::Display for ChangePattern {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // https://doc.rust-lang.org/stable/std/fmt/trait.UpperExp.html
-        write!(f, "({:.10E}|{:.10E})", 
-                self.settle_down_time, 
-                self.transition_time)
+        use units::Unit;
+        write!(f, "({:.10E}{}|{:.10E}{})", 
+                self.settle_down_time.get::<units::time::nanosecond>(),units::time::nanosecond::abbreviation(),
+                self.transition_time.get::<units::time::nanosecond>(),units::time::nanosecond::abbreviation())
     }
 }
+
 impl ChangePattern {
     #[inline]
     /// new ChangePattern
     pub fn new(
-        settle_down_time: f64,
-        transition_time: f64,
-    )->Option<Self>{
-        Some(Self{
+        settle_down_time: units::Time,
+        transition_time: units::Time,
+    )->Self{
+        Self{
             settle_down_time,
             transition_time,
-        })
+        }
     }
     #[inline]
     pub fn combine(a: &Option<Self>, b: &Option<Self>) -> Option<Self>{
@@ -49,13 +69,14 @@ impl ChangePattern {
             (None, None) => None,
             (None, Some(b)) => Some(*b),
             (Some(a), None) => Some(*a),
-            // TODO: 
+            // FIXME: 
             (Some(a), Some(b)) => Some(*a),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
 #[derive(
     strum_macros::Display, 
     strum_macros::EnumString,
@@ -88,9 +109,10 @@ impl LogicLike for StaticState {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
 #[derive(
-    strum_macros::Display, 
+    // strum_macros::Display, 
     strum_macros::EnumString,
     strum_macros::EnumIter,
 )]
@@ -101,6 +123,20 @@ pub enum DynamicState {
     /// Rise
     #[strum(serialize = "r", serialize = "R")]
     Rise(Option<ChangePattern>),
+}
+impl Display for DynamicState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DynamicState::Fall(c) => match c {
+                Some(c) => write!(f,"F{}",c),
+                None => write!(f,"F"),
+            },
+            DynamicState::Rise(c) => match c {
+                Some(c) =>  write!(f,"R{}",c),
+                None => write!(f,"R"),
+            },
+        }
+    }
 }
 impl LogicLike for DynamicState {
     #[inline]
@@ -142,23 +178,29 @@ impl IllegalType {
                     (Self::None, Self::None) => Self::None,
                     (Self::None, b_vaild) => *b_vaild,
                     (a_vaild, Self::None) => *a_vaild,
-                    // TODO:
+                    // FIXME:
                     (a_vaild, b_vaild) => *a_vaild,
                 }
             },
         }
     }
 }
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
 #[derive(
     strum_macros::Display, 
     strum_macros::EnumString,
     strum_macros::EnumIter,
 )]
+#[derive(derivative::Derivative)]
+#[derivative(PartialEq, Hash, Eq)]
 pub enum UninitState {
     /// Unknown
     #[strum(serialize = "x", serialize = "X")]
-    Unknown(IllegalType),
+    Unknown(
+        #[derivative(Hash="ignore")]
+        #[derivative(PartialEq="ignore")]
+        IllegalType,
+    ),
     /// HighImpedance
     #[strum(serialize = "z", serialize = "Z")]
     HighImpedance,
@@ -182,7 +224,7 @@ impl LogicLike for UninitState {
         }
     }
 }
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash)]
 pub enum CommonState {
     Dynamic(DynamicState),
     Static(StaticState),
@@ -196,7 +238,8 @@ impl CommonState {
     }
 }
 /// LogicState
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
 pub enum LogicState {
     Uninit(UninitState),
     Dynamic(DynamicState),
@@ -348,6 +391,7 @@ impl LogicState {
 /// LogicVector
 #[derive(Default)]
 #[derive(Debug, Clone)]
+#[derive(Hash, PartialEq, Eq)]
 pub struct LogicVector {
     value: Vec<LogicState>,
 }
@@ -361,7 +405,7 @@ impl DerefMut for LogicVector {
 impl Deref for LogicVector {
     type Target = Vec<LogicState>;
     #[inline]
-    fn deref(&self) -> &Vec<LogicState> {
+    fn deref(&self) -> &Self::Target {
         &self.value
     }
 }
@@ -372,20 +416,20 @@ impl LogicVector {
         Self { value }
     }
 }
-impl PartialEq for LogicVector {
-    #[inline]
-    fn eq(&self, other: &Self) -> bool {
-        self.to_string() == other.to_string()
-    }
-}
-impl std::cmp::Eq for LogicVector {
-}
-impl std::hash::Hash for LogicVector {
-    #[inline]
-    fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
-        self.to_string().hash(hasher);
-    }
-}
+// impl PartialEq for LogicVector {
+//     #[inline]
+//     fn eq(&self, other: &Self) -> bool {
+//         self.to_string() == other.to_string()
+//     }
+// }
+// impl std::cmp::Eq for LogicVector {
+// }
+// impl std::hash::Hash for LogicVector {
+//     #[inline]
+//     fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
+//         for 
+//     }
+// }
 
 impl std::fmt::Display for LogicVector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

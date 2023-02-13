@@ -7,8 +7,8 @@ use super::{
 
 pub struct Ff {
     name_pair: [String;2],
-    clock_on: Box<dyn BooleanExpressionLike>,
-    next_state: Box<dyn BooleanExpressionLike>,
+    clock_on: BooleanExpression,
+    next_state: BooleanExpression,
 }
 
 impl fmt::Debug for Ff{

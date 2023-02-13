@@ -65,3 +65,16 @@ pub enum NextstateType{
     ScanEnable,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+pub enum PinFuncType{
+    #[strum(serialize = "clock_enable")]
+    ClockEnable,
+    #[strum(serialize = "active_high")]
+    ActiveHigh,
+    #[strum(serialize = "active_low")]
+    ActiveLow,
+    #[strum(serialize = "active_rising")]
+    ActiveRising,
+    #[strum(serialize = "active_falling")]
+    ActiveFalling,
+}

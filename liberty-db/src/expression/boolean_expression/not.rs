@@ -3,21 +3,27 @@ use super::{
     BooleanExpressionLike,
     LogicStateTable,
     LogicLike,
+    BooleanExpression,
 };
 
 static SYMBOL_NOT: &str = "!";
 pub struct NotExpression{
-    sub_expression:  Box<dyn BooleanExpressionLike>,
+    sub_expression:  BooleanExpression,
 }
 impl NotExpression {
     /// new BooleanExpression
     #[inline]
-    pub fn new(sub_expression: Box<dyn BooleanExpressionLike>)->Self{
+    pub fn new(sub_expression: BooleanExpression)->Self{
         Self { sub_expression, }
     }
+}
+
+impl Into<BooleanExpression> for NotExpression{
     #[inline]
-    pub fn to_box(self) -> Box<Self>{
-        Box::new(self)
+    fn into(self) -> BooleanExpression {
+        BooleanExpression{
+            value: Box::new(self)
+        }
     }
 }
 

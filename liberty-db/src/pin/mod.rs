@@ -1,10 +1,13 @@
-//! `pin` group structure.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+//! `pin` group structure.
+//! <script>
+//! IFRAME('https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html');
+//! </script>
 
 use crate::types::*;
 use crate::expression::{BooleanExpression, CommonState};
 use crate::timing::Timing;
-pub mod items;
-use items::*;
+mod items;
+pub use items::*;
 /// You can define a `pin` group within a [`cell`](crate::cell::Cell), 
 /// [`test_cell`](crate::test_cell), [`model`](crate::model), 
 /// or [`bus`](crate::bus::Bus) group.
@@ -16,7 +19,7 @@ use items::*;
 /// &end
 /// =227.8
 /// ">Reference</a>
-/// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+/// 
 /// + An example of the `pin` group syntax showing the attribute 
 /// and group statements that you can use within the `pin` group
 /// + Descriptions of the attributes and groups you can use in a `pin` group
@@ -567,10 +570,35 @@ pub struct Pin<'a>{
     /// &end
     /// =228.66
     /// ">Reference-Instance</a>
-    // pub output_voltage : String,
-    // pin_func_type : clock_enable| active_high | active_low | active_rising | active_falling ;
-    // prefer_tied : "0" | "1" ;
-    // primary_output : bool,
+    pub output_voltage : String,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.2
+    /// &end
+    /// =229.3
+    /// ">Reference-Instance</a>
+    pub pin_func_type : Option<PinFuncType>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.4
+    /// &end
+    /// =229.4
+    /// ">Reference-Instance</a>
+    // FIXME:
+    pub prefer_tied : bool,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.5
+    /// &end
+    /// =229.5
+    /// ">Reference-Instance</a>
+    pub primary_output : bool,
     // pulling_current : current value ;
     // pulling_resistance : resistance value;
     pub restore_action: Option<CommonState>,

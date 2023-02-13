@@ -4,7 +4,7 @@ use crate::types::*;
 use super::{
     BooleanExpressionLike,
     LogicState,LogicVector,
-    LogicStateTable,
+    LogicStateTable, BooleanExpression,
 };
 
 #[derive(Clone,Debug)]
@@ -16,9 +16,14 @@ impl Port {
     pub fn new(name: &str) -> Self{
         Self { name: name.to_string() }
     }
+}
+
+impl Into<BooleanExpression> for Port{
     #[inline]
-    pub fn to_box(self) -> Box<Self>{
-        Box::new(self)
+    fn into(self) -> BooleanExpression {
+        BooleanExpression{
+            value: Box::new(self)
+        }
     }
 }
 

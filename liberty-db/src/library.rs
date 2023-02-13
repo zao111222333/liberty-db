@@ -1,13 +1,20 @@
 use crate::types::*;
-use crate::units::Units;
+use crate::units;
 use crate::cell::Cell;
 #[derive(Debug)]
 pub struct Library<'a>{
-    pub units: Units,
+    pub time_unit: units::Time,
+    pub capacitance_unit: units::Capacitance,
+    pub voltage_unit: units::ElectricPotential,
+    pub resistance_unit: units::ElectricalResistance,
+    pub pulling_resistance_unit: units::ElectricalResistance,
+    pub current_unit: units::ElectricCurrent,
+    pub power_unit: units::Power,
+    pub distance_unit: units::Length,
+    pub scalar_unit: units::Ratio,
     pub cell_map: HashMap<String, Cell<'a>>,
     pub voltage_map: HashMap<String, f64>,
     pub sensitization_map: HashMap<String, Sensitization>,
-
 }
 
 /// <a name ="reference_link" href="

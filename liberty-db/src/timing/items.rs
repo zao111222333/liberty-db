@@ -1,5 +1,5 @@
 //! All item structure inside
-//! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+//! `Timing`.
 
 use crate::common::{traits::Group, items::Domain};
 
@@ -21,7 +21,7 @@ use strum_macros::{Display, EnumString};
 /// &end
 /// =203.55
 /// ">Reference-Instance</a>
-/// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+/// 
 /// 
 /// #### Syntax 
 /// `timing_sense : positive_unate | negative_unate | non_unate ;`
@@ -153,7 +153,7 @@ pub enum TimingSenseType {
 /// &end
 /// =203.70
 /// ">Reference-Instance</a>
-/// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+/// 
 /// 
 /// #### Syntax
 /// `timing_type : combinational | combinational_rise | combinational_fall | three_state_disable | 
@@ -857,7 +857,7 @@ pub enum TimingType {
 /// &end
 /// =204.5
 /// ">Reference-Instance</a>
-/// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+/// 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Mode {}
 
@@ -883,7 +883,7 @@ pub struct Mode {}
 /// &end
 /// =204.9
 /// ">Reference-Instance</a>
-/// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+/// 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct CellDegradation {
     pub group_name: String,
@@ -927,7 +927,7 @@ pub struct CellDegradation {
 /// 
 /// **Used By:**
 /// [Timing](crate::timing::Timing)
-/// <script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+/// 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct CellFall {
     /// <a name ="reference_link" href="

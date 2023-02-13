@@ -1,5 +1,5 @@
 //! All trait `impl` for
-//! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+//! `Timing`.
 
 
 
@@ -16,7 +16,7 @@ impl Group for CellFall {
 
 mod check{
     //! impl [Check](crate::common::Check) for
-    //! `Timing`.<script src="https://zao111222333.github.io/liberty-rs/js/iframe.js"></script>
+    //! `Timing`.
     
     use crate::{common::traits::Check, timing::Timing};
 
