@@ -1,6 +1,89 @@
-
+#[cfg(test)]
+mod hash{
+    use std::hash::{Hash, Hasher};
+    use liberty_db::{expression::*, units};
+    fn get_hash<T: Hash>(s: T)->u64{
+        use std::collections::hash_map::DefaultHasher;
+        let mut hasher = DefaultHasher::new();
+        s.hash(&mut hasher);
+        hasher.finish()
+    }
+    lazy_static::lazy_static!{
+        static ref HIGH:      LogicState = LogicState::Static(StaticState::High);
+        static ref LOW:       LogicState = LogicState::Static(StaticState::Low);
+        static ref RISE_NONE: LogicState = LogicState::Dynamic(DynamicState::Rise(None));
+        static ref RISE_BASE: LogicState = LogicState::Dynamic(DynamicState::Rise(
+                                                                Some(ChangePattern::new(
+                                                                    units::second(1.0),
+                                                                    units::second(1.0))
+                                                                )));
+        static ref RISE_BASE_E10: LogicState = LogicState::Dynamic(DynamicState::Rise(
+                                                                Some(ChangePattern::new(
+                                                                    units::second(1.0 + 1e-10),
+                                                                    units::second(1.0 + 1e-10))
+                                                                )));
+        static ref RISE_BASE_E11: LogicState = LogicState::Dynamic(DynamicState::Rise(
+                                                                Some(ChangePattern::new(
+                                                                    units::second(1.0 + 1e-11),
+                                                                    units::second(1.0 + 1e-11))
+                                                                )));
+    }
+    
+    #[test]
+    fn change_pattern() {
+    }
+    #[test]
+    fn logic_state() {
+        assert_eq!(get_hash(*HIGH),get_hash(*HIGH));
+        assert_eq!(get_hash(*RISE_NONE),get_hash(*RISE_NONE));
+        assert_eq!(get_hash(*RISE_BASE),get_hash(*RISE_BASE));
+        assert_ne!(get_hash(*HIGH),get_hash(*LOW));
+        println!("{}", *RISE_BASE);
+        println!("{}", *RISE_BASE_E10);
+        println!("{}", *RISE_BASE_E11);
+        // 1+1e-10 != 1
+        assert_ne!(*RISE_BASE, *RISE_BASE_E10);
+        assert_ne!(get_hash(*RISE_BASE),get_hash(*RISE_BASE_E10));
+        // 1+1e-11 == 1
+        assert_eq!(*RISE_BASE, *RISE_BASE_E11);
+        assert_eq!(get_hash(*RISE_BASE),get_hash(*RISE_BASE_E11));
+    }
+    #[test]
+    fn logic_vecter_as_key() {
+        use hashbrown::HashMap;
+        let mut pin_map= HashMap::new();
+        let v = 12345.000;
+        {
+            let mut v_k1 = LogicVector::new(vec![]);
+            v_k1.push(LogicState::Static(StaticState::High));
+            v_k1.push(LogicState::Static(StaticState::High));
+            v_k1.push(LogicState::Dynamic(DynamicState::Rise(
+                Some(ChangePattern::new(
+                    units::second(345670.7734567893456789456787777771),
+                    units::second(0.1))
+                ))
+            ));
+            v_k1.push(LogicState::Dynamic(DynamicState::Fall(None)));
+            let _ = pin_map.insert(v_k1, v);
+        }
+        {
+            let mut v_k2 = LogicVector::new(vec![]);
+            v_k2.push(LogicState::Static(StaticState::High));
+            v_k2.push(LogicState::Static(StaticState::High));
+            v_k2.push(LogicState::Dynamic(DynamicState::Rise(
+                Some(ChangePattern::new(
+                    units::second(345670.7734567893456789456787777771),
+                    units::second(0.1))
+                ))
+            ));
+            v_k2.push(LogicState::Dynamic(DynamicState::Fall(None)));
+            assert_eq!(Some(&v),pin_map.get(&v_k2));
+        }
+    }
+}
+#[cfg(test)]
 mod for_boolean_expression{
-    use liberty_db::expression::*;
+    use liberty_db::{expression::*, units};
     use test_log::test;
     use log::info;
     #[test]
@@ -53,15 +136,15 @@ mod for_boolean_expression{
     #[test_log::test]
     fn expression_nand_table() {
         env_logger::init() ;
-        let port_a = Port::new("A").to_box();
-        let port_b = Port::new("B").to_box();
-        let exp_not_a_and_b = BooleanExpression::new(
+        let port_a = Port::new("A").into();
+        let port_b = Port::new("B").into();
+        let exp_not_a_and_b = FunctionExpression::new(
             vec![ NotExpression::new(
-                    BooleanExpression::new (
+                    FunctionExpression::new (
                         vec![port_a,port_b],
                         vec![LogicOperation::And],
-                    ).to_box()
-                ).to_box()
+                    ).into()
+                ).into()
             ],
         vec![]);
         assert_eq!(format!("{}",exp_not_a_and_b), "!(A&B)");
@@ -84,43 +167,19 @@ mod for_boolean_expression{
         }
     }
     #[test]
-    fn logic_vecter_as_key() {
-        use hashbrown::HashMap;
-        let mut pin_map= HashMap::new();
-        let v = 12345.000;
-        {
-            let mut v_k1 = LogicVector::new(vec![]);
-            v_k1.push(LogicState::Static(StaticState::High));
-            v_k1.push(LogicState::Static(StaticState::High));
-            v_k1.push(LogicState::Dynamic(DynamicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1))));
-            v_k1.push(LogicState::Dynamic(DynamicState::Fall(None)));
-            assert_eq!(format!("{}",v_k1), "11R(3.4567077346E5|1.0000000000E-1)F");
-            let _ = pin_map.insert(v_k1, v);
-        }
-        {
-            let mut v_k2 = LogicVector::new(vec![]);
-            v_k2.push(LogicState::Static(StaticState::High));
-            v_k2.push(LogicState::Static(StaticState::High));
-            v_k2.push(LogicState::Dynamic(DynamicState::Rise(ChangePattern::new(345670.7734567893456789456787777771,0.1))));
-            v_k2.push(LogicState::Dynamic(DynamicState::Fall(None)));
-            assert_eq!(format!("{}",v_k2), "11R(3.4567077346E5|1.0000000000E-1)F");
-            assert_eq!(Some(&v),pin_map.get(&v_k2));
-        }
-    }
-    #[test]
     fn expression_length_check() {
         use std::fmt::{self, write};
-        let right = BooleanExpression::new (
-            vec![Port::new("A").to_box(),Port::new("B").to_box()],
+        let right: BooleanExpression = FunctionExpression::new (
+            vec![Port::new("A").into(),Port::new("B").into()],
             vec![LogicOperation::And],
-        );
+        ).into();
         assert_eq!(format!("{}",right), "(A&B)");
         let mut output = String::new();
         {
-            let wrong_on_sub_expression_vec = BooleanExpression::new (
+            let wrong_on_sub_expression_vec:BooleanExpression = FunctionExpression::new (
                 vec![], 
                 vec![LogicOperation::And],
-            );
+            ).into();
             if let Err(fmt::Error) = write(&mut output, 
                     format_args!("{}", wrong_on_sub_expression_vec)) {
             }else{
@@ -128,10 +187,10 @@ mod for_boolean_expression{
             }
         }
         {
-            let wrong_on_operation_vec = BooleanExpression::new (
-                vec![Port::new("A").to_box(),Port::new("B").to_box()], 
+            let wrong_on_operation_vec: BooleanExpression = FunctionExpression::new (
+                vec![Port::new("A").into(),Port::new("B").into()], 
                 vec![],
-            );
+            ).into();
             if let Err(fmt::Error) = write(&mut output, 
                     format_args!("{}", wrong_on_operation_vec)) {
             }else{
