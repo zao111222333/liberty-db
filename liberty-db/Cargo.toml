@@ -20,7 +20,7 @@ documentation = "https://docs.rs/liberty-db"
 # RUSTDOCFLAGS="--html-in-header docs/header.html" cargo doc --no-deps --open
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "header.html" ]
 
 [features]
 default = []
@@ -37,6 +37,8 @@ strum_macros = "0.24"
 cfg-if = "1.0"
 float-cmp = "0.9.0"
 derivative = "2.2.0"
+prettytable-rs = "^0.10"
+itertools = "0.10.5"
 
 [dependencies.uom]
 version = "0.34.0"

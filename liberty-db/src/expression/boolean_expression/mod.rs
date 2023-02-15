@@ -1,3 +1,6 @@
+//! <script>
+//! IFRAME('https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html');
+//! </script>
 mod logic;
 pub use logic::{
     CommonState,
@@ -8,8 +11,9 @@ pub use logic::{
     ChangePattern,
     LogicLike,
     LogicVector,
-    LogicStateTable,
-    LogicOperation,
+    LogicTable,
+    LogicOperator1,
+    LogicOperator2,
 };
 
 mod port;
@@ -21,17 +25,22 @@ pub use latch_ff::{
     Latch,LatchExpression, 
 };
 
-mod boolean;
-pub use boolean::FunctionExpression;
-
-mod not;
-pub use not::NotExpression;
+mod function;
+pub use function::FunctionExpression;
 
 /// BooleanExpressionLike
 pub trait BooleanExpressionLike: std::fmt::Display + std::fmt::Debug{
-    fn get_state_stable(&self) -> LogicStateTable;
+    fn to_table(&self) -> LogicTable;
 }
 
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+/// ?field=test
+/// &bgn
+/// =132.36
+/// &end
+/// =132.38
+/// ">Reference</a>
 #[derive(Debug)]
 pub struct BooleanExpression{
     value: Box<dyn BooleanExpressionLike>,
@@ -39,7 +48,7 @@ pub struct BooleanExpression{
 
 impl PartialEq for BooleanExpression {
     fn eq(&self, other: &Self) -> bool {
-        self.get_state_stable() == other.get_state_stable()
+        self.to_table() == other.to_table()
     }
 }
 
@@ -60,6 +69,6 @@ impl Deref for BooleanExpression {
 
 impl Display for BooleanExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{}",self.value)
+        self.value.fmt(f)
     }
 }

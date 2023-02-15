@@ -4,7 +4,7 @@ use crate::types::*;
 use super::{
     BooleanExpressionLike,
     LogicState,LogicVector,
-    LogicStateTable, BooleanExpression,
+    LogicTable, BooleanExpression,
 };
 
 #[derive(Clone,Debug)]
@@ -48,30 +48,18 @@ impl std::hash::Hash for Port {
 }
 
 lazy_static! {
-    static ref BASIC_MAP: HashMap<LogicVector, LogicState> = {
-        let mut m = HashMap::new();
-        for state in LogicState::iter(){
-            let _ = m.insert(
-                LogicVector::new(vec![state]),
-                state,
-            );
-        }
-        m
-    };
+    static ref BASIC_MAP: HashMap<LogicVector, LogicState> = LogicState::iter().map(|state| 
+                                                                    (vec![state].into(),state)
+                                                                ).collect();
 }
 
 impl BooleanExpressionLike for Port{
     #[inline]
-    fn get_state_stable(&self) -> LogicStateTable {
-        LogicStateTable::new( 
-            BASIC_MAP.clone(), 
-            [(self.clone(), 0)]
-                                .iter()
-                                .cloned()
-                                .collect(),
+    fn to_table(&self) -> LogicTable {
+        LogicTable::new( 
+            &self.name,
+            BASIC_MAP.clone(),
+            vec![self.clone()]
         )
     }
 }
-
-
-

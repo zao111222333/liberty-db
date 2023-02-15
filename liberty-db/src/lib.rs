@@ -78,16 +78,16 @@
     clippy::use_debug
 )]
 #![warn(
+    clippy::todo,
     dead_code,
     missing_copy_implementations, // Copy may cause unnecessary memory copy
     missing_docs,
     unused_qualifications,
 )]
 
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate log;
+#[macro_use] extern crate lazy_static;
+#[macro_use] extern crate log;
+// #[macro_use] extern crate prettytable;
 
 pub mod common;
 pub mod expression;

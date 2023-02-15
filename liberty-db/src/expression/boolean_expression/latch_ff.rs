@@ -1,30 +1,15 @@
 use std::fmt;
 use super::{
     BooleanExpressionLike,
-    LogicStateTable,
+    LogicTable,
     BooleanExpression,
 };
 
+#[derive(Debug)]
 pub struct Ff {
     name_pair: [String;2],
     clock_on: BooleanExpression,
     next_state: BooleanExpression,
-}
-
-impl fmt::Debug for Ff{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Ff")
-            .field(
-                "name_pair", 
-                &format!("{:?}\n",self.name_pair))
-            .field(
-                "clock_on", 
-                &format!("{:?}\n",self.clock_on))
-            .field(
-                "next_state", 
-                &format!("{:?}\n",self.next_state))
-            .finish()
-    }
 }
 
 #[derive(Debug)]
@@ -55,31 +40,16 @@ impl fmt::Display for FfExpression{
 }
 
 impl BooleanExpressionLike for FfExpression{
-    fn get_state_stable(&self) -> LogicStateTable {
+    fn to_table(&self) -> LogicTable {
         todo!()
     }
 }
 
+#[derive(Debug)]
 pub struct Latch{
     name_pair: [String;2],
     clock_on: BooleanExpression,
     next_state: BooleanExpression,
-}
-
-impl fmt::Debug for Latch{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Latch")
-            .field(
-                "name_pair", 
-                &self.name_pair)
-            .field(
-                "clock_on", 
-                &format!("{:?}\n",self.clock_on))
-            .field(
-                "next_state", 
-                &format!("{:?}\n",self.next_state))
-            .finish()
-    }
 }
 
 #[derive(Debug)]
@@ -100,7 +70,7 @@ impl fmt::Display for LatchExpression{
 }
 
 impl BooleanExpressionLike for LatchExpression{
-    fn get_state_stable(&self) -> LogicStateTable {
+    fn to_table(&self) -> LogicTable {
         todo!()
     }
 }
