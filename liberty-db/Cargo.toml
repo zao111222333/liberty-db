@@ -15,6 +15,7 @@ authors = ["Junzhuo <zhou@junzhuo.me>"]
 readme = "README.md"
 repository = "https://github.com/zao111222333/liberty-rs/"
 documentation = "https://docs.rs/liberty-db"
+include = ["/src", "/tests", "/docs", "/build.rs", "README.md"]
 
 # Enable katex in documentation
 # RUSTDOCFLAGS="--html-in-header docs/header.html" cargo doc --no-deps --open
@@ -63,4 +64,4 @@ tracing = {version = "0.1", default-features = false}
 tracing-subscriber = {version = "0.3", default-features = false, features = ["env-filter", "fmt"]}
 
 [build-dependencies]
-dircpy = "0.3.14"
+# dircpy = "0.3.14"
