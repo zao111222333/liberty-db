@@ -1,7 +1,7 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [package]
 name = "liberty-db"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 license = "MIT"
 keywords = [
@@ -20,10 +20,10 @@ documentation = "https://docs.rs/liberty-db"
 # RUSTDOCFLAGS="--html-in-header docs/header.html" cargo doc --no-deps --open
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "header.html" ]
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 
 [features]
-default = []
+default = ["f32"]
 f32 = []
 f64 = []
 
@@ -61,3 +61,6 @@ env_logger = "0.10"
 test-log = { version = "0.2.11", features = ["trace"], default-features = false }
 tracing = {version = "0.1", default-features = false}
 tracing-subscriber = {version = "0.3", default-features = false, features = ["env-filter", "fmt"]}
+
+[build-dependencies]
+dircpy = "0.3.14"

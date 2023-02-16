@@ -1,4 +1,3 @@
-//! `pin` group structure.
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html');
 //! </script>
@@ -19,6 +18,9 @@ pub use items::*;
 /// &end
 /// =227.8
 /// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html');
+/// </script>
 /// 
 /// + An example of the `pin` group syntax showing the attribute 
 /// and group statements that you can use within the `pin` group

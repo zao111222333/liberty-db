@@ -1,13 +1,6 @@
-// mod uom{
-//! Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
-//! used in the library public interface.
-
-
-// pub fn fuzzy_cmp<T: std::ops::Add<T, T> + std::ops::Sub<T, T> + PartialOrd>(a: T, b: T, tolerance: T) -> bool {
-//     a >= b - tolerance && a <= b + tolerance
-// }
-
-// use std::ops::Add;
+//! <script>
+//! IFRAME('https://en.wikipedia.org/wiki/International_System_of_Units');
+//! </script>
 
 #[cfg(not(feature = "f32"))]
 pub use uom::si::f64::{
@@ -44,16 +37,26 @@ pub use uom::si::Unit;
 pub use uom::si::{
     capacitance,
     electrical_resistance,
-    length,
-    electric_charge, 
+    // length,
+    // electric_charge, 
     electric_current, 
     electric_potential, 
-    energy, 
-    power, 
+    // energy, 
+    // power, 
     ratio, 
     thermodynamic_temperature, 
-    time,
+    // time,
 };
+/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
+pub mod length;
+/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
+pub mod electric_charge;
+/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
+pub mod power;
+/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
+pub mod energy;
+/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
+pub mod time;
 
 use crate::types::Float;
 

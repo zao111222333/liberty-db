@@ -1,4 +1,3 @@
-//!
 //! This crate implement `liberty` data structre in Rust.
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html');
@@ -89,14 +88,24 @@
 #[macro_use] extern crate log;
 // #[macro_use] extern crate prettytable;
 
+/// Common items/miscs.
 pub mod common;
+/// `Boolean Expression`, `SDF Expression`, and so on.
 pub mod expression;
+/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
+/// used in the library public interface.
 pub mod units;
+/// `Library` group structure, top level of liberty format.
 pub mod library;
+/// `cell` group structure.
 pub mod cell;
+/// `pin` group structure.
 pub mod pin;
+/// `bus` group structure.
 pub mod bus;
+/// `bundle` group structure.
 pub mod bundle;
+/// `timing` group structure.
 pub mod timing;
 
 

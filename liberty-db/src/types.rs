@@ -8,7 +8,7 @@ pub(crate) type HashMap<K, V> = hashbrown::HashMap<K, V>;
 //     }
 // }
 
-#[cfg(feature = "f32")]
+// #[cfg(feature = "f32")]
 pub(crate) type Float = f32;
 #[cfg(feature = "f32")]
 pub(crate) use std::f32 as floats;
