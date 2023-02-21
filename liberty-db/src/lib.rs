@@ -103,6 +103,8 @@ pub mod cell;
 pub mod pin;
 /// `bus` group structure.
 pub mod bus;
+/// `table` group structure.
+pub mod table;
 /// `bundle` group structure.
 pub mod bundle;
 /// `timing` group structure.
@@ -110,3 +112,4 @@ pub mod timing;
 
 
 mod types;
+mod util;
