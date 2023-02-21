@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 use crate::types::*;
 use crate::units;
 use crate::util;
@@ -23,6 +25,7 @@ pub trait LogicLike: std::fmt::Display + std::fmt::Debug{
 /// ```
 #[derive(Default)]
 #[derive(Debug, Clone, Copy)]
+#[derive(PartialOrd)]
 // #[derive(PartialEq, Eq)]
 pub struct ChangePattern{
     /// settle down time
@@ -31,6 +34,19 @@ pub struct ChangePattern{
     pub transition_time: units::Time,
 }
 
+impl Ord for ChangePattern {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        match (
+            self.settle_down_time.partial_cmp(&other.settle_down_time),
+            self.transition_time.partial_cmp(&other.transition_time),
+        ) {
+            (Some(c), _) => c,
+            (None, Some(c)) => c,
+            (None, None) => std::cmp::Ordering::Equal,
+        }
+        // todo!()
+    }
+}
 impl std::hash::Hash for ChangePattern {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         float_hash(state, self.settle_down_time.value);
@@ -82,6 +98,7 @@ impl ChangePattern {
 
 
 /// StaticState
+#[derive(Ord,PartialOrd)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(
@@ -119,6 +136,7 @@ impl LogicLike for StaticState {
 /// EdgeState
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
 #[derive(
     strum_macros::EnumString,
     strum_macros::EnumIter,
@@ -207,6 +225,23 @@ pub enum UninitState {
     #[strum(serialize = "z", serialize = "Z")]
     HighImpedance,
 }
+
+impl PartialOrd for UninitState {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for UninitState {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        match (self,other) {
+            (UninitState::Unknown(_), UninitState::Unknown(_)) => std::cmp::Ordering::Equal,
+            (UninitState::Unknown(_), UninitState::HighImpedance) => std::cmp::Ordering::Greater,
+            (UninitState::HighImpedance, UninitState::Unknown(_)) => std::cmp::Ordering::Less,
+            (UninitState::HighImpedance, UninitState::HighImpedance) => std::cmp::Ordering::Equal,
+        }
+    }
+}
+
 impl std::fmt::Display for UninitState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -218,6 +253,7 @@ impl std::fmt::Display for UninitState {
         }
     }
 }
+
 impl Default for UninitState {
     fn default() -> Self {
         Self::Unknown(None)
@@ -258,6 +294,7 @@ impl Into<LogicState> for CommonState {
 /// LogicState
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
+#[derive(Ord,PartialOrd)]
 pub enum LogicState {
     /// X Z
     Uninit(UninitState),
@@ -419,6 +456,7 @@ impl LogicState {
 #[derive(Default)]
 #[derive(Debug, Clone)]
 #[derive(Hash, PartialEq, Eq)]
+#[derive(Ord,PartialOrd)]
 pub struct LogicVector {
     value: Vec<LogicState>,
 }
@@ -440,6 +478,12 @@ impl Deref for LogicVector {
 impl From<Vec<LogicState>> for LogicVector {
     fn from(value: Vec<LogicState>) -> Self {
         Self { value }
+    }
+}
+
+impl Into<Vec<LogicState>> for LogicVector {
+    fn into(self) -> Vec<LogicState> {
+        self.value
     }
 }
 
@@ -735,10 +779,9 @@ impl PartialEq for LogicTable {
 
 impl Hash for LogicTable {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.self_node.hash(state);
-        // self.table.hash(state);
-        self.port_idx.hash(state);
-        todo!();
+        let sorted_table = self.sort();
+        _ = sorted_table.table.iter().map(|xy|xy.hash(state));
+        sorted_table.port_idx.hash(state);
     }
 }
 
@@ -756,108 +799,30 @@ impl LogicTable {
             port_idx,
         }
     }
-
+    pub fn sort(&self)->Self{
+        let idx_map = util::misc::argsort(&self.port_idx);
+        Self::new(
+            &self.self_node, 
+            self.table.iter().map(
+                |(vec,s)|
+                // self.port_idx[idx_map[idx]]
+                (vec.iter().enumerate().map(|(idx,_)|
+                vec[idx_map[idx]].clone()
+            ).collect::<Vec<LogicState>>().into(),
+                    s.clone())
+            ).collect(),
+            self.port_idx.iter().enumerate().map(
+                |(idx,_)|
+                self.port_idx[idx_map[idx]].clone()
+            ).collect(),
+        )
+    }
     pub fn simplify(&self)->Self{
         todo!()
     }
     fn to_expression(&self) -> BooleanExpression {
         let table = self.simplify();
         todo!()
-    }
-    /// search `LogicTable` by port-state-pair
-    pub fn search(
-        &self, 
-        include_port_state: Vec<(Port,LogicState)>,
-        include_out_state: Option<LogicState>,
-        exclude_port_state: Vec<(Port,LogicState)>,
-        exclude_out_state: Option<LogicState>,
-    ) -> Self {
-        let get_port_idx = |port: &Port|->Option<usize>{self.port_idx.iter().position(|v| v==port)};
-        let include_state_idx = include_port_state
-                                                        .iter()
-                                                        .filter(
-                                                            |(port,_)|
-                                                            match get_port_idx(port){
-                                                                Some(_) => true,
-                                                                None => {error!("Can Not Find {}, auto skip it.",port);false},
-                                                            }
-                                                        )
-                                                        .map(
-                                                            |(port,state_want)|
-                                                            (get_port_idx(port).unwrap(),state_want)
-                                                        ).collect::<Vec<(usize, &LogicState)>>();
-        let exclude_state_idx = exclude_port_state
-                                                        .iter()
-                                                        .filter(
-                                                            |(port,_)|
-                                                            match get_port_idx(port){
-                                                                Some(_) => true,
-                                                                None => {error!("Can Not Find {}, auto skip it.",port);false},
-                                                            }
-                                                        )
-                                                        .map(
-                                                            |(port,state_want)|
-                                                            (get_port_idx(port).unwrap(),state_want)
-                                                        ).collect::<Vec<(usize, &LogicState)>>();          
-        Self::new(
-            &format!("[{}]-include-[{}]-exclude-[{}]",
-                        self.self_node,
-                        include_port_state.iter().fold(
-                            {match include_out_state {
-                                Some(s) => format!("Out={s}"),
-                                None => format!("Out=Any"),
-                            }} ,
-                            |result, pair| {
-                                format!("{},{}={}",result,pair.0,pair.1)
-                            }
-                        ),
-                        exclude_port_state.iter().fold(
-                            {match exclude_out_state {
-                                Some(s) => format!("Out={s}"),
-                                None => format!(""),
-                            }} ,
-                            |result, pair| {
-                                format!("{},{}={}",result,pair.0,pair.1)
-                            }
-                        )
-                    ),
-            self.table.iter()
-                    .filter(|(k_vec,v_state)|
-                        {
-                            match include_out_state {
-                                Some(_include_out_state) => 
-                                if !_include_out_state.variant_eq(v_state){
-                                    return false;
-                                },
-                                _ => (),
-                            }
-                            match exclude_out_state {
-                                Some(_exclude_out_state) => 
-                                if _exclude_out_state.variant_eq(v_state){
-                                    return false;
-                                },
-                                _ => (),
-                            }
-                            for (port_idx,state) in include_state_idx.iter(){
-                                if !state.variant_eq(&k_vec[*port_idx]) {
-                                    return false;
-                                }
-                            }
-                            for (port_idx,state) in exclude_state_idx.iter(){
-                                if state.variant_eq(&k_vec[*port_idx]) {
-                                    return false;
-                                }
-                            }
-                            return true
-                        }
-                    )
-                    .map(
-                        |(k_vec,v_state)|
-                        (k_vec.clone(), v_state.clone())
-                    )
-                    .collect::<HashMap<LogicVector, LogicState>>(),
-            self.port_idx.clone(),
-        )
     }
 }
 
@@ -872,7 +837,7 @@ impl std::fmt::Display for LogicTable {
                             v.push(Port::new(&self.self_node));
                             v
                         }));
-        for (vec_in,state_out) in self.table.iter(){
+        for (vec_in,state_out) in self.table.iter().sorted(){
             let _ = table.add_row(Row::from({
                 let mut v:Vec<LogicState> = vec_in.to_vec();
                 v.push(state_out.clone());
@@ -900,5 +865,137 @@ impl LogicLike for LogicTable {
     #[inline]
     fn variant_eq(&self, other: &Self) -> bool {
         todo!()
+    }
+}
+
+#[derive(Debug)]
+pub struct Searcher{
+    include_port_state: Vec<(Port,HashSet<LogicState>)>,
+    include_out_state: Option<HashSet<LogicState>>,
+    exclude_port_state: Vec<(Port,HashSet<LogicState>)>,
+    exclude_out_state: Option<HashSet<LogicState>>,
+}
+
+impl std::fmt::Display for Searcher {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let print_hash_set = |name: &str,set: &HashSet<LogicState>| -> String{
+            let s = set.iter().fold(
+                "".to_string(),
+                |result, pair| {
+                    format!("{result}/{pair}")
+                }
+            );
+            if s!=""{
+                format!("{name}=({})",s.chars().skip(1).collect::<String>())
+            }else{
+                s
+            }
+        };
+        write!(f,"searcher-[include:{}]-[exclude:{}]",
+                        self.include_port_state.iter().fold(
+                            {match &self.include_out_state {
+                                Some(s) => print_hash_set("Out",s),
+                                None => format!("Out=All"),
+                            }} ,
+                            |result, pair| {
+                                format!("{},{}",result,print_hash_set(&pair.0.to_string(),&pair.1))
+                            }
+                        ),
+                        self.exclude_port_state.iter().fold(
+                            {match &self.exclude_out_state {
+                                Some(s) => print_hash_set("Out",s),
+                                None => format!("Out=None"),
+                            }},
+                            |result, pair| {
+                                format!("{},{}",result,print_hash_set(&pair.0.to_string(),&pair.1))
+                            }
+                        )
+                    )
+    }
+}
+
+impl Searcher {
+    /// New Searcher
+    pub fn new(
+        include_port_state: Vec<(Port,HashSet<LogicState>)>,
+        include_out_state: Option<HashSet<LogicState>>,
+        exclude_port_state: Vec<(Port,HashSet<LogicState>)>,
+        exclude_out_state: Option<HashSet<LogicState>>,
+    ) -> Self{
+        Self { include_port_state, include_out_state, exclude_port_state, exclude_out_state }
+    }
+    /// search `LogicTable` by port-state-pair
+    pub fn search(
+        &self,
+        table: &LogicTable, 
+    ) -> LogicTable {
+        
+        let get_port_idx = |port: &Port|->Option<usize>{table.port_idx.iter().position(|v| v==port)};
+        let include_state_idx = self.include_port_state
+                                                        .iter()
+                                                        .filter(
+                                                            |(port,_)|
+                                                            match get_port_idx(port){
+                                                                Some(_) => true,
+                                                                None => {error!("Can Not Find {}, auto skip it.",port);false},
+                                                            }
+                                                        )
+                                                        .map(
+                                                            |(port,state_want)|
+                                                            (get_port_idx(port).unwrap(),state_want)
+                                                        ).collect::<Vec<(usize, &HashSet<LogicState>)>>();
+        let exclude_state_idx = self.exclude_port_state
+                                                        .iter()
+                                                        .filter(
+                                                            |(port,_)|
+                                                            match get_port_idx(port){
+                                                                Some(_) => true,
+                                                                None => {error!("Can Not Find {}, auto skip it.",port);false},
+                                                            }
+                                                        )
+                                                        .map(
+                                                            |(port,state_want)|
+                                                            (get_port_idx(port).unwrap(),state_want)
+                                                        ).collect::<Vec<(usize, &HashSet<LogicState>)>>();          
+        LogicTable::new(
+            &format!("[{}]-[{self}]",table.self_node),
+            table.table.iter()
+                    .filter(|(k_vec,v_state)|
+                        {
+                            match &self.include_out_state {
+                                Some(_include_out_state) => 
+                                if !_include_out_state.contains(v_state) {
+                                    return false;
+                                },
+                                _ => (),
+                            }
+                            
+                            match &self.exclude_out_state {
+                                Some(_exclude_out_state) => 
+                                if _exclude_out_state.contains(v_state) {
+                                    return false;
+                                },
+                                _ => (),
+                            }
+                            for (port_idx,state) in include_state_idx.iter(){
+                                if !state.contains(&k_vec[*port_idx]) {
+                                    return false;
+                                }
+                            }
+                            for (port_idx,state) in exclude_state_idx.iter(){
+                                if state.contains(&k_vec[*port_idx]) {
+                                    return false;
+                                }
+                            }
+                            return true
+                        }
+                    )
+                    .map(
+                        |(k_vec,v_state)|
+                        (k_vec.clone(), v_state.clone())
+                    )
+                    .collect::<HashMap<LogicVector, LogicState>>(),
+            table.port_idx.clone(),
+        )
     }
 }

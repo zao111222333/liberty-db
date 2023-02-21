@@ -1,4 +1,5 @@
 pub(crate) type HashMap<K, V> = hashbrown::HashMap<K, V>;
+pub(crate) type HashSet<K> = hashbrown::HashSet<K>;
 
 // cfg_if::cfg_if! {
 //     if #[cfg(feature = "f32")] {

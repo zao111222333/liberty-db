@@ -7,6 +7,8 @@ use super::{
 };
 
 #[derive(Clone,Debug,Hash,PartialEq,Eq)]
+#[derive(Ord)]
+#[derive(PartialOrd)]
 pub struct Port{
     name:  String,
 }

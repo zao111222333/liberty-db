@@ -14,6 +14,7 @@ pub use logic::{
     LogicTable,
     LogicOperator1,
     LogicOperator2,
+    Searcher,
 };
 
 mod port;
