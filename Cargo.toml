@@ -2,5 +2,6 @@
 
 members = [
     "liberty-db",
+    "liberty-db/macros",
     "liberty-parser",
 ]
