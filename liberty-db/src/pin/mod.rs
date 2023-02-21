@@ -3,10 +3,16 @@
 //! </script>
 
 use crate::types::*;
-use crate::expression::{BooleanExpression, CommonState};
+use crate::expression;
 use crate::timing::Timing;
 mod items;
 pub use items::*;
+use crate::units;
+
+#[derive(Debug, Default, Clone)]
+pub struct PinId{
+    pub name: String,
+}
 /// You can define a `pin` group within a [`cell`](crate::cell::Cell), 
 /// [`test_cell`](crate::test_cell), [`model`](crate::model), 
 /// or [`bus`](crate::bus::Bus) group.
@@ -25,8 +31,8 @@ pub use items::*;
 /// + An example of the `pin` group syntax showing the attribute 
 /// and group statements that you can use within the `pin` group
 /// + Descriptions of the attributes and groups you can use in a `pin` group
-#[derive(Debug, Default)]
-pub struct Pin<'a>{
+#[derive(Debug, Default, Clone)]
+pub struct Pin{
     pub group_name: String,
     /* Simple Attributes in a pin Group */
     /// <a name ="reference_link" href="
@@ -112,7 +118,7 @@ pub struct Pin<'a>{
     /// &end
     /// =228.9
     /// ">Reference-Instance</a>
-    pub clamp_0_function: Option<BooleanExpression>,
+    pub clamp_0_function: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
@@ -121,7 +127,7 @@ pub struct Pin<'a>{
     /// &end
     /// =228.10
     /// ">Reference-Instance</a>
-    pub clamp_1_function: Option<BooleanExpression>,
+    pub clamp_1_function: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
@@ -130,7 +136,7 @@ pub struct Pin<'a>{
     /// &end
     /// =228.11
     /// ">Reference-Instance</a>
-    pub clamp_latch_function: Option<BooleanExpression>,
+    pub clamp_latch_function: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
@@ -139,7 +145,7 @@ pub struct Pin<'a>{
     /// &end
     /// =228.12
     /// ">Reference-Instance</a>
-    pub clamp_z_function: Option<BooleanExpression>,
+    pub clamp_z_function: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
@@ -329,7 +335,7 @@ pub struct Pin<'a>{
     /// &end
     /// =228.35
     /// ">Reference-Instance</a>
-    pub function: Option<BooleanExpression>,
+    pub function: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
@@ -338,7 +344,7 @@ pub struct Pin<'a>{
     /// &end
     /// =228.36
     /// ">Reference-Instance</a>
-    pub has_builtin_pad: Option<BooleanExpression>,
+    pub has_builtin_pad: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
@@ -356,7 +362,7 @@ pub struct Pin<'a>{
     /// &end
     /// =228.38
     /// ">Reference-Instance</a>
-    pub illegal_clamp_condition: Option<BooleanExpression>,
+    pub illegal_clamp_condition: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
@@ -600,26 +606,170 @@ pub struct Pin<'a>{
     /// &end
     /// =229.5
     /// ">Reference-Instance</a>
-    pub primary_output : bool,
-    // pulling_current : current value ;
-    // pulling_resistance : resistance value;
-    pub restore_action: Option<CommonState>,
-    // restore_edge_type : edge_trigger | leading | trailing ;
-    // rise_capacitance: Float,
-    // rise_current_slope_after_threshold: Float,
-    // rise_current_slope_before_threshold: Float,
-    // rise_time_after_threshold: Float, 
-    // rise_time_before_threshold: Float,
-    pub save_action: Option<CommonState>,
-    // signal_type : test_scan_in | test_scan_in_inverted | test_scan_out | test_scan_out_inverted | test_scan_enable |  test_scan_enable_inverted |test_scan_clock | test_scan_clock_a | test_scan_clock_b | test_clock ;
-    // slew_control : low | medium | high | none ;
-    // state_function: BooleanExpression,
-    // test_output_only :  bool,
-    // three_state: BooleanExpression,
-    // x_function: BooleanExpression,   
+    pub primary_output: bool,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.6
+    /// &end
+    /// =229.6
+    /// ">Reference-Instance</a>
+    pub pulling_current: Option<units::ElectricCurrent>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.7
+    /// &end
+    /// =229.7
+    /// ">Reference-Instance</a>
+    pub pulling_resistance: Option<units::ElectricalResistance>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.8
+    /// &end
+    /// =229.8
+    /// ">Reference-Instance</a>
+    pub restore_action: Option<expression::CommonState>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.9
+    /// &end
+    /// =229.9
+    /// ">Reference-Instance</a>
+    pub restore_edge_type: Option<RestoreEdgeType>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.10
+    /// &end
+    /// =229.10
+    /// ">Reference-Instance</a>
+    pub rise_capacitance: Option<units::Capacitance>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.11
+    /// &end
+    /// =229.11
+    /// ">Reference-Instance</a>
+    pub rise_current_slope_after_threshold: Float,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.12
+    /// &end
+    /// =229.12
+    /// ">Reference-Instance</a>
+    pub rise_current_slope_before_threshold: Float,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.13
+    /// &end
+    /// =229.13
+    /// ">Reference-Instance</a>
+    pub rise_time_after_threshold: Float, 
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.14
+    /// &end
+    /// =229.14
+    /// ">Reference-Instance</a>
+    pub rise_time_before_threshold: Float,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.15
+    /// &end
+    /// =229.15
+    /// ">Reference-Instance</a>
+    pub save_action: Option<expression::CommonState>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.16
+    /// &end
+    /// =229.19
+    /// ">Reference-Instance</a>
+    pub signal_type: Option<SignalType>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.20
+    /// &end
+    /// =229.20
+    /// ">Reference-Instance</a>
+    pub slew_control: SlewControl,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.21
+    /// &end
+    /// =229.21
+    /// ">Reference-Instance</a>
+    pub state_function: Option<expression::BooleanExpression>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.22
+    /// &end
+    /// =229.22
+    /// ">Reference-Instance</a>
+    pub test_output_only: bool,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.23
+    /// &end
+    /// =229.23
+    /// ">Reference-Instance</a>
+    pub three_state: Option<expression::BooleanExpression>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.24
+    /// &end
+    /// =229.24
+    /// ">Reference-Instance</a>
+    pub x_function: Option<expression::BooleanExpression>,
     // /* Complex Attributes in a pin Group */ 
-    // fall_capacitance_range ( float, float) ; 
-    // rise_capacitance_range ( float, float) ;    
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.28
+    /// &end
+    /// =229.28
+    /// ">Reference-Instance</a>
+    pub fall_capacitance_range: Option<(units::Capacitance, units::Capacitance)>,
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
+    /// ?field=test
+    /// &bgn
+    /// =229.29
+    /// &end
+    /// =229.29
+    /// ">Reference-Instance</a>
+    pub rise_capacitance_range: Option<(units::Capacitance, units::Capacitance)>,
     // /* Group Statements in a pin Group */ 
     // electromigration () { }
     // input_ccb (string) { }
@@ -643,5 +793,5 @@ pub struct Pin<'a>{
     // / =67.43
     // / " 
     // / style="width: 90%; height: 600px;"></iframe>
-    pub timing_list: Vec<Timing<'a>>,
+    pub timing_list: Vec<Timing>,
 }

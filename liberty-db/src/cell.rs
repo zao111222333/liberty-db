@@ -1,6 +1,7 @@
 use hashbrown::HashMap;
-use crate::pin::Pin;
+use crate::pin::{Pin, PinId};
 #[derive(Debug)]
-pub struct Cell<'a>{
-    pub pin_map: HashMap<&'a str,Pin<'a>>
+#[derive(liberty_macros::Group)]
+pub struct Cell{
+    pub pin: HashMap<PinId,Pin>
 }

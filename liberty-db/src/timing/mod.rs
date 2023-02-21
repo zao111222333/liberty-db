@@ -9,7 +9,7 @@ pub mod impls;
 pub mod builder;
 #[cfg(test)]
 mod test;
-use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,expression};
+use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,expression, types::Float, units};
 
 /// A timing group is defined in a bundle, a bus, or a pin group within a cell.
 /// The timing group can be used to identify the name or names of multiple timing arcs.
@@ -32,8 +32,8 @@ use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,express
 /// =203.29
 /// ">Reference-Instatnce-In-Pin</a>
 /// 
-#[derive(Debug, Default)]
-pub struct Timing<'a> {
+#[derive(Debug, Default, Clone)]
+pub struct Timing {
     pub group_name: String,
     /// Use this attribute to indicate that a constraint arc is for
     /// a clock gating relation between the data and clock pin,
@@ -61,12 +61,12 @@ pub struct Timing<'a> {
     /// =204.59
     /// ">Reference-Definition</a>
     /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
     /// &bgn
-    /// =203.31
+    /// =320.6
     /// &end
-    /// =203.31
+    /// =320.6
     /// ">Reference-Instance</a>
     pub clock_gating_flag: Option<bool>,
     /// The `default_timing` attribute allows you to specify one timing arc as the default 
@@ -88,48 +88,48 @@ pub struct Timing<'a> {
     /// =205.6
     /// ">Reference-Definition</a>
     /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
     /// &bgn
-    /// =203.32
+    /// =320.7
     /// &end
-    /// =203.32
+    /// =320.7
     /// ">Reference-Instance</a>
     pub default_timing: Option<bool>,
-    /// The `fall_resistance` attribute represents the load-dependent output resistance, 
-    /// or drive capability, for a logic 1-to-0 transition.
-    /// 
-    /// #### Note
-    /// You cannot specify a resistance unit in the library. 
-    /// Instead, the resistance unit is derived from the ratio of the time_unit 
-    /// value to the capacitive_load_unit value.
-    /// 
-    /// #### Syntax
-    /// `fall_resistance : valuefloat ; `
-    /// 
-    /// `value` is a positive floating-point number in terms of delay time per load unit. 
-    /// 
-    /// #### Example
-    /// ``` liberty
-    /// fall_resistance : 0.18 ;
-    /// ```
-    /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
-    /// ?field=test
-    /// &bgn
-    /// =205.7
-    /// &end
-    /// =205.20
-    /// ">Reference-Definition</a>
-    /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
-    /// ?field=test
-    /// &bgn
-    /// =203.33
-    /// &end
-    /// =203.33
-    /// ">Reference-Instance</a>
-    pub fall_resistance: Option<f64>,
+    // /// The `fall_resistance` attribute represents the load-dependent output resistance, 
+    // /// or drive capability, for a logic 1-to-0 transition.
+    // /// 
+    // /// #### Note
+    // /// You cannot specify a resistance unit in the library. 
+    // /// Instead, the resistance unit is derived from the ratio of the time_unit 
+    // /// value to the capacitive_load_unit value.
+    // /// 
+    // /// #### Syntax
+    // /// `fall_resistance : valuefloat ; `
+    // /// 
+    // /// `value` is a positive floating-point number in terms of delay time per load unit. 
+    // /// 
+    // /// #### Example
+    // /// ``` liberty
+    // /// fall_resistance : 0.18 ;
+    // /// ```
+    // /// <a name ="reference_link" href="
+    // /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
+    // /// ?field=test
+    // /// &bgn
+    // /// =205.7
+    // /// &end
+    // /// =205.20
+    // /// ">Reference-Definition</a>
+    // /// <a name ="reference_link" href="
+    // /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
+    // /// ?field=test
+    // /// &bgn
+    // /// =203.33
+    // /// &end
+    // /// =203.33
+    // /// ">Reference-Instance</a>
+    // pub fall_resistance: Option<units::ElectricalResistance>,
     /// The `fpga_arc_condition` attribute specifies a Boolean condition that enables 
     /// a timing arc.
     /// 
@@ -302,7 +302,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.37
     /// ">Reference-Instance</a>
-    pub intrinsic_fall: Option<f64>,
+    pub intrinsic_fall: Option<units::Time>,
     /// On an output pin, `intrinsic_rise` defines the 0-to-Z propagation time 
     /// for a three-state-disable timing type and a Z-to-1 propagation time 
     /// for a three-state-enable timing type.
@@ -336,7 +336,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.38
     /// ">Reference-Instance</a>
-    pub intrinsic_rise: Option<f64>,
+    pub intrinsic_rise: Option<units::Time>,
     /// The `related_bus_equivalent` attribute generates a single timing arc 
     /// for all paths from points in a group through an internal pin (I) to given endpoints.
     /// 
@@ -382,7 +382,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.39
     /// ">Reference-Instance</a>
-    pub related_bus_equivalent: Vec<&'a Bus>,
+    pub related_bus_equivalent: Vec<Box<Pin>>,
     /// The `related_bus_pins` attribute defines the pin or pins that 
     /// are the startpoint of the timing arc. The primary use of 
     /// `related_bus_pins` is for module generators. 
@@ -417,7 +417,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.40
     /// ">Reference-Instance</a>
-    pub related_bus_pins: Vec<&'a Pin<'a>>,
+    pub related_bus_pins: Vec<Box<Pin>>,
     /// The `related_output_pin` attribute specifies the output or inout pin used 
     /// to describe a load-dependent constraint. This is an attribute in the timing group 
     /// of the output or inout pin. The pin defined must be a pin in the same cell, 
@@ -448,7 +448,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.41
     /// ">Reference-Instance</a>
-    pub related_output_pin: Option<&'a Pin<'a>>,
+    pub related_output_pin: Option<Box<Pin>>,
     /// The `related_pin` attribute defines the pin or pins representing 
     /// the beginning point of the timing arc. It is required in all timing groups.
     /// 
@@ -515,7 +515,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.42
     /// ">Reference-Instance</a>
-    pub related_pin: Vec<&'a Pin<'a>>,
+    pub related_pin: Vec<Box<Pin>>,
     /// The `rise_resistance` attribute represents the load-dependent output resistance, 
     /// or drive capability, for a logic 0-to-1 transition. 
     /// 
@@ -549,7 +549,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.43
     /// ">Reference-Instance</a>
-    pub rise_resistance: Option<f64>,
+    pub rise_resistance: Option<units::ElectricalResistance>,
     /// The `sdf_cond` attribute is defined in the state-dependent timing group 
     /// to support SDF file generation and condition matching during back-annotation.
     /// #### Syntax
@@ -703,7 +703,7 @@ pub struct Timing<'a> {
     /// &end
     /// =211.15
     /// ">Reference-Definition</a>
-    pub sensitization_master: Option<&'a Sensitization>,
+    pub sensitization_master: Option<Sensitization>,
     /// The `slope_fall` attribute represents the incremental delay 
     /// to add to the slope of the input waveform for a logic 1-to-0 transition.
     /// 
@@ -733,7 +733,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.48
     /// ">Reference-Instance</a>
-    pub slope_fall: Option<f64>,
+    pub slope_fall: Option<units::Time>,
     /// The `slope_rise` attribute represents the incremental delay 
     /// to add to the slope of the input waveform for a logic 0-to-1 transition.
     /// 
@@ -763,7 +763,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.49
     /// ">Reference-Instance</a>
-    pub slope_rise: Option<f64>,
+    pub slope_rise: Option<units::Time>,
     /// The `steady_state_resistance_above_high` attribute specifies a 
     /// steady-state resistance value for a region of a current-voltage (I-V) curve 
     /// when the output is high and the noise is over the high voltage rail.
@@ -795,7 +795,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.50
     /// ">Reference-Instance</a>
-    pub steady_state_resistance_above_high: Option<f64>,
+    pub steady_state_resistance_above_high: Option<units::ElectricalResistance>,
     /// The `steady_state_resistance_below_low` attribute specifies a steady-state 
     /// resistance value for a region of a current-voltage (I-V) curve 
     /// when the output is low and the noise is below the low voltage rail.
@@ -827,7 +827,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.51
     /// ">Reference-Instance</a>
-    pub steady_state_resistance_below_low: Option<f64>,
+    pub steady_state_resistance_below_low: Option<units::ElectricalResistance>,
     /// The `steady_state_resistance_high` attribute specifies a steady-state 
     /// resistance value for a region of a current-voltage (I-V) curve when 
     /// the output is high and the noise is below the high voltage rail.
@@ -859,7 +859,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.52
     /// ">Reference-Instance</a>
-    pub steady_state_resistance_high: Option<f64>,
+    pub steady_state_resistance_high: Option<units::ElectricalResistance>,
     /// The `steady_state_resistance_low` attribute specifies a steady-state 
     /// resistance value for a region of a current-voltage (I-V) curve 
     /// when the output is low and the noise is over the low voltage rail.
@@ -892,7 +892,7 @@ pub struct Timing<'a> {
     /// &end
     /// =203.53
     /// ">Reference-Instance</a>
-    pub steady_state_resistance_low: Option<f64>,
+    pub steady_state_resistance_low: Option<units::ElectricalResistance>,
     /// Used for noise modeling, the `tied_off` attribute allows you 
     /// to specify the I-V characteristics and steady-state resistance values 
     /// on tied-off cells. 
@@ -1219,12 +1219,12 @@ pub struct Timing<'a> {
     /// the constrained pin and a negative pulse on the related pin.
     pub timing_type: Option<items::TimingType>,
     /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
     /// &bgn
-    /// =
+    /// =150.10
     /// &end
-    /// =
+    /// =150.16
     /// ">Reference-Definition</a>
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
@@ -1236,12 +1236,12 @@ pub struct Timing<'a> {
     /// ">Reference-Instance</a>
     pub when: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
     /// &bgn
-    /// =
+    /// =338.12
     /// &end
-    /// =
+    /// =338.20
     /// ">Reference-Definition</a>
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
@@ -1253,12 +1253,12 @@ pub struct Timing<'a> {
     /// ">Reference-Instance</a>
     pub when_end: Option<expression::BooleanExpression>,
     /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
+    /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test
     /// &bgn
-    /// =
+    /// =338.21
     /// &end
-    /// =
+    /// =338.30
     /// ">Reference-Definition</a>
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
@@ -1286,7 +1286,7 @@ pub struct Timing<'a> {
     /// &end
     /// =204.3
     /// ">Reference-Instance</a>
-    pub fall_delay_intercept: Option<(i64, f64)>,
+    pub fall_delay_intercept: Option<(i64, Float)>,
     // piecewise model only
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
@@ -1304,7 +1304,7 @@ pub struct Timing<'a> {
     /// &end
     /// =204.4
     /// ">Reference-Instance</a>
-    pub fall_pin_resistance: Option<(i64, f64)>,
+    pub fall_pin_resistance: Option<(i64, Float)>,
     /// You define the mode attribute within a timing group.
     /// A mode attribute pertains to an individual timing arc.
     /// The timing arc is active when mode is instantiated with a name and a value.
@@ -1346,7 +1346,7 @@ pub struct Timing<'a> {
     /// &end
     /// =204.6
     /// ">Reference-Instance</a>
-    pub rise_delay_intercept: Option<(i64, f64)>,
+    pub rise_delay_intercept: Option<(i64, Float)>,
     // piecewise model only
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2007.03/_user_guide.html
@@ -1364,7 +1364,7 @@ pub struct Timing<'a> {
     /// &end
     /// =204.7
     /// ">Reference-Instance</a>
-    pub rise_pin_resistance: Option<(i64, f64)>,
+    pub rise_pin_resistance: Option<(i64, Float)>,
     /// The `cell_degradation` group describes a cell performance degradation
     /// design rule for compiling a design. A cell degradation design rule
     /// specifies the maximum capacitive load a cell can drive without causing

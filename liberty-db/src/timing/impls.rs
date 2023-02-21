@@ -30,7 +30,7 @@ mod check{
     /// &end
     /// =214.5
     /// ">Reference</a>
-    fn need_timing_sense_when_timing_type_is_clear_or_preset(timing: &Timing<'_>){
+    fn need_timing_sense_when_timing_type_is_clear_or_preset(timing: &Timing){
         if timing.timing_sense==None{
             
         }
@@ -48,7 +48,7 @@ mod check{
     /// ">Reference</a>
     fn need_timing_sense_when_related_pin_is_output(){}
     
-    impl Check for Timing<'_> {
+    impl Check for Timing {
         fn check(&self) {
             need_timing_sense_when_timing_type_is_clear_or_preset(&self);
             need_timing_sense_when_related_pin_is_output();
