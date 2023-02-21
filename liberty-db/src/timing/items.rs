@@ -1,7 +1,7 @@
 //! All item structure inside
 //! `Timing`.
 
-use crate::common::{traits::Group, items::Domain};
+use crate::{common::{traits::Group, items::Domain}, expression::{self, LogicLike}};
 
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
@@ -124,6 +124,16 @@ pub enum TimingSenseType {
     /// ">Reference</a>
     #[strum(serialize = "non_unate")]
     NonUnate,
+}
+
+impl TimingSenseType {
+    pub fn compute_edge(&self, pin_edge: &expression::EdgeState)->Option<expression::EdgeState>{
+        match self {
+            TimingSenseType::PositiveUnate => Some(*pin_edge),
+            TimingSenseType::NegativeUnate => Some(pin_edge.inverse()),
+            TimingSenseType::NonUnate => None,
+        }
+    }
 }
 
 /// The `timing_type` attribute distinguishes between combinational
@@ -832,6 +842,48 @@ pub enum TimingType {
     /// ">Reference</a>
     #[strum(serialize = "nochange_low_low")]
     NochangeLowLow,
+}
+
+impl TimingType {
+    pub fn compute_edge(&self) -> Option<expression::EdgeState>{
+        match self {
+            TimingType::Combinational => None,
+            TimingType::CombinationalRise => Some(expression::EdgeState::Rise(None)),
+            TimingType::CombinationalFall => Some(expression::EdgeState::Fall(None)),
+            TimingType::ThreeStateDisable => None,
+            TimingType::ThreeStateDisableRise => Some(expression::EdgeState::Rise(None)),
+            TimingType::ThreeStateDisableFall => Some(expression::EdgeState::Fall(None)),
+            TimingType::ThreeStateEnable => None,
+            TimingType::ThreeStateEnableRise => Some(expression::EdgeState::Rise(None)),
+            TimingType::ThreeStateEnableFall => Some(expression::EdgeState::Fall(None)),
+            TimingType::RisingEdge => Some(expression::EdgeState::Rise(None)),
+            TimingType::FallingEdge => Some(expression::EdgeState::Fall(None)),
+            TimingType::Preset => None,
+            TimingType::Clear => None,
+            TimingType::HoldRising => Some(expression::EdgeState::Rise(None)),
+            TimingType::HoldFalling => Some(expression::EdgeState::Fall(None)),
+            TimingType::SetupRising => Some(expression::EdgeState::Rise(None)),
+            TimingType::SetupFalling => Some(expression::EdgeState::Fall(None)),
+            TimingType::RecoveryRising => Some(expression::EdgeState::Rise(None)),
+            TimingType::RecoveryFalling => Some(expression::EdgeState::Fall(None)),
+            TimingType::SkewRising => Some(expression::EdgeState::Rise(None)),
+            TimingType::SkewFalling => Some(expression::EdgeState::Fall(None)),
+            TimingType::RemovalRising => Some(expression::EdgeState::Rise(None)),
+            TimingType::RemovalFalling => Some(expression::EdgeState::Fall(None)),
+            TimingType::MinPulseWidth => None,
+            TimingType::MinimumPeriod => None,
+            TimingType::MaxClockTreePath => None,
+            TimingType::MinClockTreePath => None,
+            TimingType::NonSeqSetupRising => Some(expression::EdgeState::Rise(None)),
+            TimingType::NonSeqSetupFalling => Some(expression::EdgeState::Fall(None)),
+            TimingType::NonSeqHoldRising => Some(expression::EdgeState::Rise(None)),
+            TimingType::NonSeqHoldFalling => Some(expression::EdgeState::Fall(None)),
+            TimingType::NochangeHighHigh => None,
+            TimingType::NochangeHighLow => None,
+            TimingType::NochangeLowHigh => None,
+            TimingType::NochangeLowLow => None,
+        }
+    }
 }
 
 /// You define the mode attribute within a timing group.
