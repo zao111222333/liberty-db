@@ -1,7 +1,9 @@
 use crate::types::*;
 use crate::units;
+use crate::util;
+use super::BooleanExpression;
 use super::Port;
-use strum_macros::Display;
+use std::hash::Hash;
 use std::ops::{Deref,DerefMut};
 
 /// LogicLike
@@ -12,11 +14,11 @@ pub trait LogicLike: std::fmt::Display + std::fmt::Debug{
 
 /// ``` text
 /// High:          _______
-///               /|
-///              / |
-///             /  |
-/// Low: ______/   |
-///     |<-  ->|<->|
+///               /│
+///              / │
+///             /  │
+/// Low: ______/   │
+///     │<-  ->│<->│
 ///      settle transition
 /// ```
 #[derive(Default)]
@@ -114,14 +116,14 @@ impl LogicLike for StaticState {
     }
 }
 
-/// DynamicState
+/// EdgeState
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(
     strum_macros::EnumString,
     strum_macros::EnumIter,
 )]
-pub enum DynamicState {
+pub enum EdgeState {
     /// Fall
     #[strum(serialize = "f", serialize = "F")]
     Fall(Option<ChangePattern>),
@@ -129,21 +131,21 @@ pub enum DynamicState {
     #[strum(serialize = "r", serialize = "R")]
     Rise(Option<ChangePattern>),
 }
-impl std::fmt::Display for DynamicState {
+impl std::fmt::Display for EdgeState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DynamicState::Fall(c) => match c {
+            EdgeState::Fall(c) => match c {
                 Some(c) => write!(f,"F{c}"),
                 None => write!(f,"F"),
             },
-            DynamicState::Rise(c) => match c {
+            EdgeState::Rise(c) => match c {
                 Some(c) =>  write!(f,"R{c}"),
                 None => write!(f,"R"),
             },
         }
     }
 }
-impl LogicLike for DynamicState {
+impl LogicLike for EdgeState {
     #[inline]
     fn inverse(&self) -> Self{
         match self{
@@ -154,15 +156,15 @@ impl LogicLike for DynamicState {
     #[inline]
     fn variant_eq(&self, other: &Self) -> bool{
         match (self,other) {
-            (DynamicState::Fall(_), DynamicState::Fall(_)) => true,
-            (DynamicState::Rise(_), DynamicState::Rise(_)) => true,
+            (EdgeState::Fall(_), EdgeState::Fall(_)) => true,
+            (EdgeState::Rise(_), EdgeState::Rise(_)) => true,
             _ => false,
         }
     }
 }
 /// LogicState
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[derive(Display)]
+#[derive(strum_macros::Display)]
 pub enum IllegalType {
     HighImpedanceInput,
     NoIdea,
@@ -188,7 +190,6 @@ impl IllegalType {
 /// UninitState
 #[derive(Debug, Clone, Copy)]
 #[derive(
-    // strum_macros::Display, 
     strum_macros::EnumString,
     strum_macros::EnumIter,
 )]
@@ -240,7 +241,7 @@ impl LogicLike for UninitState {
 #[derive(Debug, Clone, Copy, PartialEq, Hash)]
 pub enum CommonState {
     /// R F
-    Dynamic(DynamicState),
+    Edge(EdgeState),
     /// H L
     Static(StaticState),
 }
@@ -248,7 +249,7 @@ pub enum CommonState {
 impl Into<LogicState> for CommonState {
     fn into(self) -> LogicState {
         match self {
-            CommonState::Dynamic(s) => LogicState::Dynamic(s),
+            CommonState::Edge(s) => LogicState::Edge(s),
             CommonState::Static(s) => LogicState::Static(s),
         }
     }
@@ -261,7 +262,7 @@ pub enum LogicState {
     /// X Z
     Uninit(UninitState),
     /// R F
-    Dynamic(DynamicState),
+    Edge(EdgeState),
     /// H L
     Static(StaticState),
 }
@@ -269,7 +270,7 @@ impl std::fmt::Display for LogicState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             LogicState::Uninit(s) => s.fmt(f),
-            LogicState::Dynamic(s) => s.fmt(f),
+            LogicState::Edge(s) => s.fmt(f),
             LogicState::Static(s) => s.fmt(f),
         }
     }
@@ -286,7 +287,7 @@ impl LogicLike for LogicState {
     fn inverse(&self) -> Self{
         match self{
             Self::Uninit(s) => Self::Uninit(s.inverse()),
-            Self::Dynamic(s) => Self::Dynamic(s.inverse()),
+            Self::Edge(s) => Self::Edge(s.inverse()),
             Self::Static(s) => Self::Static(s.inverse()),
         }
     }
@@ -294,7 +295,7 @@ impl LogicLike for LogicState {
     fn variant_eq(&self, other: &Self) -> bool{
         match (self,other) {
             (Self::Uninit(a), Self::Uninit(b)) => a.variant_eq(b),
-            (Self::Dynamic(a), Self::Dynamic(b)) => a.variant_eq(b),
+            (Self::Edge(a), Self::Edge(b)) => a.variant_eq(b),
             (Self::Static(a), Self::Static(b)) => a.variant_eq(b),
             _ => false,
         }
@@ -305,8 +306,8 @@ impl LogicState {
     const LIST: [Self;6] = [
         Self::Uninit(UninitState::Unknown(None)),
         Self::Uninit(UninitState::HighImpedance),
-        Self::Dynamic(DynamicState::Fall(None)),
-        Self::Dynamic(DynamicState::Rise(None)),
+        Self::Edge(EdgeState::Fall(None)),
+        Self::Edge(EdgeState::Rise(None)),
         Self::Static(StaticState::Low),
         Self::Static(StaticState::High),
     ];
@@ -319,9 +320,9 @@ impl LogicState {
     #[inline]
     pub fn get_change_pattern(&self) -> Option<ChangePattern>{
         match self {
-            LogicState::Dynamic(s) => match s {
-                DynamicState::Fall(c) => *c,
-                DynamicState::Rise(c) => *c,
+            LogicState::Edge(s) => match s {
+                EdgeState::Fall(c) => *c,
+                EdgeState::Rise(c) => *c,
             },
             _ => None,
         }
@@ -330,9 +331,9 @@ impl LogicState {
     #[inline]
     pub fn set_change_pattern(&self,c: &Option<ChangePattern>) -> Self{
         match self {
-            LogicState::Dynamic(s) => match s {
-                DynamicState::Fall(_) => Self::Dynamic(DynamicState::Fall(*c)),
-                DynamicState::Rise(_) => Self::Dynamic(DynamicState::Rise(*c)),
+            LogicState::Edge(s) => match s {
+                EdgeState::Fall(_) => Self::Edge(EdgeState::Fall(*c)),
+                EdgeState::Rise(_) => Self::Edge(EdgeState::Rise(*c)),
             },
             _ => *self,
         }
@@ -365,9 +366,9 @@ impl LogicState {
     #[inline]
     pub fn get_bgn(&self) -> Self{
         match self{
-            LogicState::Dynamic(s) => match s {
-                DynamicState::Fall(_) => Self::Static(StaticState::High),
-                DynamicState::Rise(_) => Self::Static(StaticState::Low),
+            LogicState::Edge(s) => match s {
+                EdgeState::Fall(_) => Self::Static(StaticState::High),
+                EdgeState::Rise(_) => Self::Static(StaticState::Low),
             },
             _ => *self,
         }
@@ -378,9 +379,9 @@ impl LogicState {
     #[inline]
     pub fn get_end(&self) -> Self{
         match self{
-            LogicState::Dynamic(s) => match s {
-                DynamicState::Fall(_) => Self::Static(StaticState::Low),
-                DynamicState::Rise(_) => Self::Static(StaticState::High),
+            LogicState::Edge(s) => match s {
+                EdgeState::Fall(_) => Self::Static(StaticState::Low),
+                EdgeState::Rise(_) => Self::Static(StaticState::High),
             },
             _ => *self,
         }
@@ -399,15 +400,15 @@ impl LogicState {
     #[inline]
     pub fn combine_bgn_end(bgn: &Self, end: &Self) -> Self{
         match (bgn,end) {
-            (_, Self::Dynamic(_)) => Self::Uninit(UninitState::Unknown(Some(IllegalType::RiseFallAtStatic))),
-            (Self::Dynamic(_), _) => Self::Uninit(UninitState::Unknown(Some(IllegalType::RiseFallAtStatic))),
+            (_, Self::Edge(_)) => Self::Uninit(UninitState::Unknown(Some(IllegalType::RiseFallAtStatic))),
+            (Self::Edge(_), _) => Self::Uninit(UninitState::Unknown(Some(IllegalType::RiseFallAtStatic))),
             (Self::Uninit(_), Self::Uninit(_)) => *end,
             (Self::Uninit(_), Self::Static(_)) => *end,
             (Self::Static(_), Self::Uninit(_)) => *end,
             (Self::Static(bgn), Self::Static(end)) => match (bgn,end) {
                 (StaticState::High, StaticState::High) => Self::Static(StaticState::High),
-                (StaticState::High, StaticState::Low) => Self::Dynamic(DynamicState::Fall(None)),
-                (StaticState::Low, StaticState::High) => Self::Dynamic(DynamicState::Rise(None)),
+                (StaticState::High, StaticState::Low) => Self::Edge(EdgeState::Fall(None)),
+                (StaticState::Low, StaticState::High) => Self::Edge(EdgeState::Rise(None)),
                 (StaticState::Low, StaticState::Low) => Self::Static(StaticState::Low),
             },
         }
@@ -493,12 +494,12 @@ pub enum LogicOperator1 {
     /// invert previous expression & invert following expression
     #[strum(serialize = "'", serialize = "!")]
     Not,
-    /// signal tied to logic 1
-    #[strum(serialize = "1")]
-    Logic1,
-    /// signal tied to logic 0
-    #[strum(serialize = "0")]
-    Logic0,
+    // /// signal tied to logic 1
+    // #[strum(serialize = "1")]
+    // Logic1,
+    // /// signal tied to logic 0
+    // #[strum(serialize = "0")]
+    // Logic0,
 }
 
 impl LogicOperator1 {
@@ -511,8 +512,8 @@ impl LogicOperator1 {
     pub fn compute(&self, a: &LogicState)->LogicState{
         match self {
             LogicOperator1::Not => a.inverse(),
-            LogicOperator1::Logic1 => LogicState::Static(StaticState::High),
-            LogicOperator1::Logic0 => LogicState::Static(StaticState::Low),
+            // LogicOperator1::Logic1 => LogicState::Static(StaticState::High),
+            // LogicOperator1::Logic0 => LogicState::Static(StaticState::Low),
         }
     }
     /// compute_table
@@ -562,7 +563,7 @@ impl LogicOperator2 {
         a: &LogicState,
         b: &LogicState,
     ) -> LogicState{
-        let compute_dynamic_logic = || -> LogicState {
+        let compute_Edge_logic = || -> LogicState {
             let bgn_state = self.compute(&a.get_bgn(), &b.get_bgn());
             let end_state = self.compute(&a.get_end(), &b.get_end());
             let a_pattern = a.get_change_pattern();
@@ -576,8 +577,8 @@ impl LogicOperator2 {
             LogicState::Uninit(UninitState::Unknown(IllegalType::combine(&a_illegal, &b_illegal)))
         };
         match (self,a,b) {
-            (_, _, LogicState::Dynamic(_)) => compute_dynamic_logic(),
-            (_, LogicState::Dynamic(_), _) => compute_dynamic_logic(),
+            (_, _, LogicState::Edge(_)) => compute_Edge_logic(),
+            (_, LogicState::Edge(_), _) => compute_Edge_logic(),
             (_, LogicState::Uninit(_a), LogicState::Uninit(_b)) => combine_illegal(),
             (LogicOperator2::And, LogicState::Uninit(_a), LogicState::Static(_b)) => match (_a,_b) {
                 (UninitState::Unknown(_), StaticState::High) => *a,
@@ -732,6 +733,15 @@ impl PartialEq for LogicTable {
     }
 }
 
+impl Hash for LogicTable {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.self_node.hash(state);
+        // self.table.hash(state);
+        self.port_idx.hash(state);
+        todo!();
+    }
+}
+
 impl LogicTable {
     /// new `LogicTable`
     #[inline]
@@ -745,6 +755,14 @@ impl LogicTable {
             table,
             port_idx,
         }
+    }
+
+    pub fn simplify(&self)->Self{
+        todo!()
+    }
+    fn to_expression(&self) -> BooleanExpression {
+        let table = self.simplify();
+        todo!()
     }
     /// search `LogicTable` by port-state-pair
     pub fn search(
@@ -847,9 +865,8 @@ impl std::fmt::Display for LogicTable {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use prettytable::{Table, Row};
-        use prettytable::format;
         let mut table = Table::new();
-        table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+        table.set_format(*util::format::FORMAT_NO_BORDER_BOX_CHARS);
         table.set_titles(Row::from({
                             let mut v = self.port_idx.clone();
                             v.push(Port::new(&self.self_node));

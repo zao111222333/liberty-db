@@ -1,13 +1,12 @@
 use std::fmt;
-use strum::IntoEnumIterator;
 use crate::types::*;
 use super::{
     BooleanExpressionLike,
     LogicState,LogicVector,
-    LogicTable, BooleanExpression,
+    LogicTable, BooleanExpression, StaticState,
 };
 
-#[derive(Clone,Debug)]
+#[derive(Clone,Debug,Hash,PartialEq,Eq)]
 pub struct Port{
     name:  String,
 }
@@ -33,23 +32,16 @@ impl fmt::Display for Port{
         write!(f, "{}", self.name)
     }
 }
-impl PartialEq for Port {
-    #[inline]
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-    }
-}
-impl std::cmp::Eq for Port {}
-impl std::hash::Hash for Port {
-    #[inline]
-    fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
-        self.name.hash(hasher);
-    }
-}
 
 lazy_static! {
     static ref BASIC_MAP: HashMap<LogicVector, LogicState> = LogicState::iter().map(|state| 
                                                                     (vec![state].into(),state)
+                                                                ).collect();
+    static ref ONE_MAP: HashMap<LogicVector, LogicState> = LogicState::iter().map(|state| 
+                                                                    (vec![state].into(),LogicState::Static(StaticState::High))
+                                                                ).collect();
+    static ref ZERO_MAP: HashMap<LogicVector, LogicState> = LogicState::iter().map(|state| 
+                                                                    (vec![state].into(),LogicState::Static(StaticState::Low))
                                                                 ).collect();
 }
 
@@ -60,6 +52,61 @@ impl BooleanExpressionLike for Port{
             &self.name,
             BASIC_MAP.clone(),
             vec![self.clone()]
+        )
+    }
+}
+
+#[derive(Clone,Debug,Hash,PartialEq,Eq)]
+pub struct StaticExpression{
+    state:  StaticState,
+}
+impl StaticExpression {
+    #[inline]
+    pub fn new(state:  StaticState,) -> Self{
+        Self { state }
+    }
+}
+
+impl Into<BooleanExpression> for StaticExpression{
+    #[inline]
+    fn into(self) -> BooleanExpression {
+        BooleanExpression{
+            value: Box::new(self)
+        }
+    }
+}
+
+impl fmt::Display for StaticExpression{
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.state.fmt(f)
+    }
+}
+
+impl std::ops::Deref for StaticExpression {
+    type Target=StaticState;
+
+    fn deref(&self) -> &Self::Target {
+        &self.state
+    }
+}
+
+impl Into<StaticState> for StaticExpression {
+    fn into(self) -> StaticState {
+        self.state
+    }
+}
+
+impl BooleanExpressionLike for StaticExpression{
+    #[inline]
+    fn to_table(&self) -> LogicTable {
+        LogicTable::new(
+            format!("{}",self.state).as_str(),
+            {match self.state {
+                StaticState::High => ONE_MAP.clone(),
+                StaticState::Low => ZERO_MAP.clone(),
+            }},
+            vec![Port::new(format!("{}",self.state).as_str())],
         )
     }
 }

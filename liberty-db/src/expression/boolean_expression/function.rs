@@ -12,7 +12,7 @@ static SYMBOL_LEFT: &str = "(";
 static SYMBOL_RIGHT: &str = ")";
 
 /// FunctionExpression is the basic expression
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct FunctionExpression{
     sub_expression_vec:  Vec<BooleanExpression>,
     op1_vec: Vec<Option<LogicOperator1>>,

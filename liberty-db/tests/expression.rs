@@ -11,18 +11,18 @@ mod hash{
     lazy_static::lazy_static!{
         static ref HIGH:      LogicState = LogicState::Static(StaticState::High);
         static ref LOW:       LogicState = LogicState::Static(StaticState::Low);
-        static ref RISE_NONE: LogicState = LogicState::Dynamic(DynamicState::Rise(None));
-        static ref RISE_BASE: LogicState = LogicState::Dynamic(DynamicState::Rise(
+        static ref RISE_NONE: LogicState = LogicState::Edge(EdgeState::Rise(None));
+        static ref RISE_BASE: LogicState = LogicState::Edge(EdgeState::Rise(
                                                                 Some(ChangePattern::new(
                                                                     units::second(1.0),
                                                                     units::second(1.0))
                                                                 )));
-        static ref RISE_BASE_E10: LogicState = LogicState::Dynamic(DynamicState::Rise(
+        static ref RISE_BASE_E10: LogicState = LogicState::Edge(EdgeState::Rise(
                                                                 Some(ChangePattern::new(
                                                                     units::second(1.0 + 1e-10),
                                                                     units::second(1.0 + 1e-10))
                                                                 )));
-        static ref RISE_BASE_E11: LogicState = LogicState::Dynamic(DynamicState::Rise(
+        static ref RISE_BASE_E11: LogicState = LogicState::Edge(EdgeState::Rise(
                                                                 Some(ChangePattern::new(
                                                                     units::second(1.0 + 1e-11),
                                                                     units::second(1.0 + 1e-11))
@@ -57,26 +57,26 @@ mod hash{
             let mut v_k1:LogicVector = vec![].into();
             v_k1.push(LogicState::Static(StaticState::High));
             v_k1.push(LogicState::Static(StaticState::High));
-            v_k1.push(LogicState::Dynamic(DynamicState::Rise(
+            v_k1.push(LogicState::Edge(EdgeState::Rise(
                 Some(ChangePattern::new(
                     units::second(345670.7734567893456789456787777771),
                     units::second(0.1))
                 ))
             ));
-            v_k1.push(LogicState::Dynamic(DynamicState::Fall(None)));
+            v_k1.push(LogicState::Edge(EdgeState::Fall(None)));
             let _ = pin_map.insert(v_k1, v);
         }
         {
             let mut v_k2:LogicVector = vec![].into();
             v_k2.push(LogicState::Static(StaticState::High));
             v_k2.push(LogicState::Static(StaticState::High));
-            v_k2.push(LogicState::Dynamic(DynamicState::Rise(
+            v_k2.push(LogicState::Edge(EdgeState::Rise(
                 Some(ChangePattern::new(
                     units::second(345670.7734567893456789456787777771),
                     units::second(0.1))
                 ))
             ));
-            v_k2.push(LogicState::Dynamic(DynamicState::Fall(None)));
+            v_k2.push(LogicState::Edge(EdgeState::Fall(None)));
             assert_eq!(Some(&v),pin_map.get(&v_k2));
         }
     }
@@ -100,9 +100,29 @@ mod for_boolean_expression{
         ).into();
         exp_not_a_and_b
     }
+    fn _0 ()->BooleanExpression{
+        StaticExpression::new(StaticState::Low).into()
+    }
+    fn _1 ()->BooleanExpression{
+        StaticExpression::new(StaticState::High).into()
+    }
     fn and_ab()->BooleanExpression{
         let port_a: BooleanExpression = Port::new("A").into();
         let port_b = Port::new("B").into();
+        let exp_not_a_and_b: BooleanExpression = FunctionExpression::new(
+            vec![FunctionExpression::new (
+                vec![port_a,port_b],
+                vec![None,None],
+                vec![LogicOperator2::And],
+            ).into()],
+            vec![None],
+            vec![],
+        ).into();
+        exp_not_a_and_b
+    }
+    fn and_aa()->BooleanExpression{
+        let port_a: BooleanExpression = Port::new("A").into();
+        let port_b = Port::new("A").into();
         let exp_not_a_and_b: BooleanExpression = FunctionExpression::new(
             vec![FunctionExpression::new (
                 vec![port_a,port_b],
@@ -168,6 +188,12 @@ mod for_boolean_expression{
         println!("{}",nand_ab()==nand_ab());
     }
     #[test]
+    fn static_expression() {
+        println!("{}",_0().to_table());
+        println!("{}",_1().to_table());
+        println!("{}",and_aa().to_table());
+    }
+    #[test]
     fn expression_nand_table() {
         env_logger::init() ;
         println!("{}",Into::<BooleanExpression>::into(Port::new("A")).to_table());
@@ -183,7 +209,7 @@ mod for_boolean_expression{
                 (Port::new("A"),LogicState::Static(StaticState::High)),
                 (Port::new("C"),LogicState::Static(StaticState::High)),
             ],
-            Some(LogicState::Dynamic(DynamicState::Fall(None))),
+            Some(LogicState::Edge(EdgeState::Fall(None))),
             vec![],
             None,
         ));
@@ -192,7 +218,7 @@ mod for_boolean_expression{
         println!("{}", table.search(
             vec![
                 (Port::new("A"),LogicState::Static(StaticState::High)),
-                (Port::new("B"),LogicState::Dynamic(DynamicState::Fall(None)))
+                (Port::new("B"),LogicState::Edge(EdgeState::Fall(None)))
                 ], 
             None,
             vec![],

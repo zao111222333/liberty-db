@@ -5,7 +5,7 @@ mod logic;
 pub use logic::{
     CommonState,
     StaticState,
-    DynamicState,
+    EdgeState,
     UninitState,
     LogicState,
     ChangePattern,
@@ -17,11 +17,17 @@ pub use logic::{
 };
 
 mod port;
-pub use port::Port;
+pub use port::{
+    Port,
+    StaticExpression
+};
 
-mod latch_ff;
-pub use latch_ff::{
+mod ff;
+pub use ff::{
     Ff,FfExpression,
+};
+mod latch;
+pub use latch::{
     Latch,LatchExpression, 
 };
 
@@ -29,7 +35,7 @@ mod function;
 pub use function::FunctionExpression;
 
 /// BooleanExpressionLike
-pub trait BooleanExpressionLike: std::fmt::Display + std::fmt::Debug{
+pub trait BooleanExpressionLike: std::fmt::Display + std::fmt::Debug + BooleanExpressionClone{
     fn to_table(&self) -> LogicTable;
 }
 
@@ -52,7 +58,32 @@ impl PartialEq for BooleanExpression {
     }
 }
 
-use std::{ops::{Deref,DerefMut}, fmt::Display};
+pub trait BooleanExpressionClone {
+    fn clone_box(&self) -> Box<dyn BooleanExpressionLike>;
+}
+
+impl<T> BooleanExpressionClone for T
+where
+    T: 'static + BooleanExpressionLike + Clone,
+{
+    fn clone_box(&self) -> Box<dyn BooleanExpressionLike> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn BooleanExpressionLike> {
+    fn clone(&self) -> Self {
+        self.clone_box()
+    }
+}
+
+impl Clone for BooleanExpression {
+    fn clone(&self) -> Self {
+        BooleanExpression { value: self.value.clone_box() }
+    }
+}
+
+use std::{ops::{Deref,DerefMut}, fmt::Display, hash::Hash};
 impl DerefMut for BooleanExpression {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
@@ -70,5 +101,11 @@ impl Deref for BooleanExpression {
 impl Display for BooleanExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.value.fmt(f)
+    }
+}
+
+impl Hash for BooleanExpression {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.value.to_table().hash(state);
     }
 }
