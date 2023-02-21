@@ -6,7 +6,7 @@ use std::path::{PathBuf,Path};
 
 fn main() {
     let root_docs_str = "../docs";
-    println!("cargo:rerun-if-changed={root_docs_str}");
+    println!("cargo:rerun-if-changed={root_docs_str}/*");
     let root_docs = Path::new(&root_docs_str);
     let local_docs = Path::new("docs");
     if root_docs.exists() {
