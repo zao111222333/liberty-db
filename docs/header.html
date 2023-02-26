@@ -36,9 +36,9 @@
                 Object.defineProperty(this, 'linkIndexWatch', {
                     get: function () { return activeLinkIndex; },
                     set: function (v) {
-                    linkElementList[activeLinkIndex].style.color = 'let(--link-color)';
+                    linkElementList[activeLinkIndex].style.color = 'var(--link-color)';
                     activeLinkIndex = v;
-                    linkElementList[activeLinkIndex].style.color = 'let(--type-link-color)';
+                    linkElementList[activeLinkIndex].style.color = 'var(--type-link-color)';
                     iframeElement.contentWindow.postMessage(linkList[activeLinkIndex][1],'*');
                     iframeElement.addEventListener('load', function() {
                         iframeElement.contentWindow.postMessage(linkList[activeLinkIndex][1],'*');
