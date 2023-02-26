@@ -1,9 +1,14 @@
 //! Timing module
 //! implement.
 //! Demonstrating HTML tables.
+//! <script>
+//! IFRAME('https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html');
+//! </script> 
 
+use crate::types::*;
+mod timing_type;
+pub use timing_type::*;
 
-use hashbrown::HashMap;
 pub mod items;
 pub mod impls;
 pub mod builder;
@@ -1217,7 +1222,7 @@ pub struct Timing {
     /// the constrained pin and a positive pulse on the related pin.
     /// + `nochange_low_low` (negative/negative): Indicates a negative pulse on 
     /// the constrained pin and a negative pulse on the related pin.
-    pub timing_type: Option<items::TimingType>,
+    pub timing_type: TimingType,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html
     /// ?field=test

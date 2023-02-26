@@ -1,4 +1,4 @@
-use crate::{expression, pin::PinId, timing::items::TimingType};
+use crate::{expression, pin::PinId, timing::TimingType};
 
 
 struct TableId{

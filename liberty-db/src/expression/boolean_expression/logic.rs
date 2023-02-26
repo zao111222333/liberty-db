@@ -868,11 +868,11 @@ impl LogicLike for LogicTable {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct Searcher{
-    include_port_state: Vec<(Port,HashSet<LogicState>)>,
+    include_port_state: HashMap<Port,HashSet<LogicState>>,
     include_out_state: Option<HashSet<LogicState>>,
-    exclude_port_state: Vec<(Port,HashSet<LogicState>)>,
+    exclude_port_state: HashMap<Port,HashSet<LogicState>>,
     exclude_out_state: Option<HashSet<LogicState>>,
 }
 
@@ -917,12 +917,27 @@ impl std::fmt::Display for Searcher {
 impl Searcher {
     /// New Searcher
     pub fn new(
-        include_port_state: Vec<(Port,HashSet<LogicState>)>,
-        include_out_state: Option<HashSet<LogicState>>,
-        exclude_port_state: Vec<(Port,HashSet<LogicState>)>,
-        exclude_out_state: Option<HashSet<LogicState>>,
+        include_port_state: Vec<(Port,Vec<LogicState>)>,
+        include_out_state: Option<Vec<LogicState>>,
+        exclude_port_state: Vec<(Port,Vec<LogicState>)>,
+        exclude_out_state: Option<Vec<LogicState>>,
     ) -> Self{
-        Self { include_port_state, include_out_state, exclude_port_state, exclude_out_state }
+        Self { 
+            include_port_state: include_port_state.iter().map(|(p,v)|
+                    (p.clone(),v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>())
+                ).collect(), 
+            include_out_state: match include_out_state{
+                Some(v) => Some(v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>()),
+                None => None,
+                },
+            exclude_port_state:exclude_port_state.iter().map(|(p,v)|
+                    (p.clone(),v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>())
+                ).collect(),  
+            exclude_out_state: match exclude_out_state{
+                    Some(v) => Some(v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>()),
+                    None => None,
+                }, 
+        }
     }
     /// search `LogicTable` by port-state-pair
     pub fn search(
