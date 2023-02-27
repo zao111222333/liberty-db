@@ -793,5 +793,5 @@ pub struct Pin{
     // / =67.43
     // / " 
     // / style="width: 90%; height: 600px;"></iframe>
-    pub timing_list: Vec<Timing>,
+    pub timing: Vec<Timing>,
 }

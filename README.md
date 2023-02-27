@@ -9,4 +9,6 @@
 ## TODO:
 
 + [x] Logic Search
++ [x] `timing_type` group
++ [ ] `timing` group
 + [ ] Karnaugh Map Simplify, [link1](https://www.geeksforgeeks.org/variable-entrant-map-vem-in-digital-logic), [link2](https://www.allaboutcircuits.com/textbook/digital/chpt-8/logic-simplification-karnaugh-maps/)

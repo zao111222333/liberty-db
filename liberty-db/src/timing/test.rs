@@ -6,7 +6,7 @@ fn it_works() {
     let pin_a = Pin::default();
     let mut pin_b = Pin::default();
     timing.related_pin = vec![Box::new(pin_a)];
-    pin_b.timing_list = vec![timing];
+    pin_b.timing = vec![timing];
     println!("{:?}", pin_b);
     // println!("{:?}", pin_a);
 }
