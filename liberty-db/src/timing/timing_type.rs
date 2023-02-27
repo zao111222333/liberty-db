@@ -756,7 +756,7 @@ impl Default for TimingType {
     /// combinational
     #[inline]
     fn default() -> Self {
-        Self::combinational()
+        Self::COMBINATIONAL
     }
 }
 impl Display for TimingType {
@@ -772,224 +772,115 @@ impl Display for TimingType {
 }
 
 impl TimingType {
-    // Combinational
-    /// combinational
-    #[inline]
-    pub const fn combinational() -> Self{
-        Self::Combinational(ArcCombinational::Combinational(None))
-    }
-    /// combinational_rise
-    #[inline]
-    pub const fn combinational_rise() -> Self{
-        Self::Combinational(ArcCombinational::Combinational(Some(EdgeState::Rise(None))))
-    }
-    /// combinational_fall
-    #[inline]
-    pub const fn combinational_fall() -> Self{
-        Self::Combinational(ArcCombinational::Combinational(Some(EdgeState::Fall(None))))
-    }
-    /// three_state_disable
-    #[inline]
-    pub const fn three_state_disable() -> Self{
-        Self::Combinational(ArcCombinational::ThreeStateDisable(None))
-    }
-    /// three_state_disable_rise
-    #[inline]
-    pub const fn three_state_disable_rise() -> Self{
-        Self::Combinational(ArcCombinational::ThreeStateDisable(Some(EdgeState::Rise(None))))
-    }
-    /// three_state_disable_fall
-    #[inline]
-    pub const fn three_state_disable_fall() -> Self{
-        Self::Combinational(ArcCombinational::ThreeStateDisable(Some(EdgeState::Fall(None))))
-    }
-    /// three_state_enable
-    #[inline]
-    pub const fn three_state_enable() -> Self{
-        Self::Combinational(ArcCombinational::ThreeStateEnable(None))
-    }
-    /// three_state_enable_rise
-    #[inline]
-    pub const fn three_state_enable_rise() -> Self{
-        Self::Combinational(ArcCombinational::ThreeStateEnable(Some(EdgeState::Rise(None))))
-    }
-    /// three_state_enable_fall
-    #[inline]
-    pub const fn three_state_enable_fall() -> Self{
-        Self::Combinational(ArcCombinational::ThreeStateEnable(Some(EdgeState::Fall(None))))
-    }
-    // Sequential
-    /// rising_edge
-    #[inline]
-    pub const fn rising_edge() -> Self{
-        Self::Sequential(ArcSequential::Edge(EdgeState::Rise(None)))
-    }
-    /// falling_edge
-    #[inline]
-    pub const fn falling_edge() -> Self{
-        Self::Sequential(ArcSequential::Edge(EdgeState::Fall(None)))
-    }
-    /// preset
-    #[inline]
-    pub const fn preset() -> Self{
-        Self::Sequential(ArcSequential::Preset)
-    }
-    /// clear
-    #[inline]
-    pub const fn clear() -> Self{
-        Self::Sequential(ArcSequential::Clear)
-    }
-    /// hold_rising
-    #[inline]
-    pub const fn hold_rising() -> Self{
-        Self::Sequential(ArcSequential::Hold(EdgeState::Rise(None)))
-    }
-    /// hold_falling
-    #[inline]
-    pub const fn hold_falling() -> Self{
-        Self::Sequential(ArcSequential::Hold(EdgeState::Fall(None)))
-    }
-    /// setup_rising
-    #[inline]
-    pub const fn setup_rising() -> Self{
-        Self::Sequential(ArcSequential::Setup(EdgeState::Rise(None)))
-    }
-    /// setup_falling
-    #[inline]
-    pub const fn setup_falling() -> Self{
-        Self::Sequential(ArcSequential::Setup(EdgeState::Fall(None)))
-    }
-    /// recovery_rising
-    #[inline]
-    pub const fn recovery_rising() -> Self{
-        Self::Sequential(ArcSequential::Recovery(EdgeState::Rise(None)))
-    }
-    /// recovery_falling
-    #[inline]
-    pub const fn recovery_falling() -> Self{
-        Self::Sequential(ArcSequential::Recovery(EdgeState::Fall(None)))
-    }
-    /// skew_rising
-    #[inline]
-    pub const fn skew_rising() -> Self{
-        Self::Sequential(ArcSequential::Skew(EdgeState::Rise(None)))
-    }
-    /// skew_falling
-    #[inline]
-    pub const fn skew_falling() -> Self{
-        Self::Sequential(ArcSequential::Skew(EdgeState::Fall(None)))
-    }
-    /// removal_rising
-    #[inline]
-    pub const fn removal_rising() -> Self{
-        Self::Sequential(ArcSequential::Removal(EdgeState::Rise(None)))
-    }
-    /// removal_falling
-    #[inline]
-    pub const fn removal_falling() -> Self{
-        Self::Sequential(ArcSequential::Removal(EdgeState::Fall(None)))
-    }
-    /// min_pulse_width
-    #[inline]
-    pub const fn min_pulse_width() -> Self{
-        Self::Sequential(ArcSequential::MinPulseWidth)
-    }
-    /// minimum_period
-    #[inline]
-    pub const fn minimum_period() -> Self{
-        Self::Sequential(ArcSequential::MinimumPeriod)
-    }
-    /// max_clock_tree_path
-    #[inline]
-    pub const fn max_clock_tree_path() -> Self{
-        Self::Sequential(ArcSequential::ClockTreePath(MaxMin::Max))
-    }
-    /// min_clock_tree_path
-    #[inline]
-    pub const fn min_clock_tree_path() -> Self{
-        Self::Sequential(ArcSequential::ClockTreePath(MaxMin::Min))
-    }
-    // NonSequential
-    /// non_seq_setup_rising
-    #[inline]
-    pub const fn non_seq_setup_rising() -> Self{
-        Self::NonSequential(ArcNonSequential::NonSeqSetup(EdgeState::Rise(None)))
-    }
-    /// non_seq_setup_falling
-    #[inline]
-    pub const fn non_seq_setup_falling() -> Self{
-        Self::NonSequential(ArcNonSequential::NonSeqSetup(EdgeState::Fall(None)))
-    }
-    /// non_seq_hold_rising
-    #[inline]
-    pub const fn non_seq_hold_rising() -> Self{
-        Self::NonSequential(ArcNonSequential::NonSeqHold(EdgeState::Rise(None)))
-    }
-    /// non_seq_hold_falling
-    #[inline]
-    pub const fn non_seq_hold_falling() -> Self{
-        Self::NonSequential(ArcNonSequential::NonSeqHold(EdgeState::Fall(None)))
-    }
-    // NoChange
-    /// nochange_high_high
-    #[inline]
-    pub const fn nochange_high_high() -> Self{
-        Self::NoChange(ArcNoChange::NoChange(StaticState::High, StaticState::High))
-    }
-    /// nochange_high_low
-    #[inline]
-    pub const fn nochange_high_low() -> Self{
-        Self::NoChange(ArcNoChange::NoChange(StaticState::High, StaticState::Low))
-    }
-    /// nochange_low_high
-    #[inline]
-    pub const fn nochange_low_high() -> Self{
-        Self::NoChange(ArcNoChange::NoChange(StaticState::Low, StaticState::High))
-    }
-    /// nochange_low_low
-    #[inline]
-    pub const fn nochange_low_low() -> Self{
-        Self::NoChange(ArcNoChange::NoChange(StaticState::Low, StaticState::Low))
-    }
+    /// COMBINATIONAL
+    pub const COMBINATIONAL: Self = Self::Combinational(ArcCombinational::Combinational(None));
+    /// COMBINATIONAL_RISE
+    pub const COMBINATIONAL_RISE: Self = Self::Combinational(ArcCombinational::Combinational(Some(EdgeState::Rise(None))));
+    /// COMBINATIONAL_FALL
+    pub const COMBINATIONAL_FALL: Self = Self::Combinational(ArcCombinational::Combinational(Some(EdgeState::Fall(None))));
+    /// THREE_STATE_DISABLE
+    pub const THREE_STATE_DISABLE: Self = Self::Combinational(ArcCombinational::ThreeStateDisable(None));
+    /// THREE_STATE_DISABLE_RISE
+    pub const THREE_STATE_DISABLE_RISE: Self = Self::Combinational(ArcCombinational::ThreeStateDisable(Some(EdgeState::Rise(None))));
+    /// THREE_STATE_DISABLE_FALL
+    pub const THREE_STATE_DISABLE_FALL: Self = Self::Combinational(ArcCombinational::ThreeStateDisable(Some(EdgeState::Fall(None))));
+    /// THREE_STATE_ENABLE
+    pub const THREE_STATE_ENABLE: Self = Self::Combinational(ArcCombinational::ThreeStateEnable(None));
+    /// THREE_STATE_ENABLE_RISE
+    pub const THREE_STATE_ENABLE_RISE: Self = Self::Combinational(ArcCombinational::ThreeStateEnable(Some(EdgeState::Rise(None))));
+    /// THREE_STATE_ENABLE_FALL
+    pub const THREE_STATE_ENABLE_FALL: Self = Self::Combinational(ArcCombinational::ThreeStateEnable(Some(EdgeState::Fall(None))));
+    /// RISING_EDGE
+    pub const RISING_EDGE: Self = Self::Sequential(ArcSequential::Edge(EdgeState::Rise(None)));
+    /// FALLING_EDGE
+    pub const FALLING_EDGE: Self = Self::Sequential(ArcSequential::Edge(EdgeState::Fall(None)));
+    /// PRESET
+    pub const PRESET: Self = Self::Sequential(ArcSequential::Preset);
+    /// CLEAR
+    pub const CLEAR: Self = Self::Sequential(ArcSequential::Clear);
+    /// HOLD_RISING
+    pub const HOLD_RISING: Self = Self::Sequential(ArcSequential::Hold(EdgeState::Rise(None)));
+    /// HOLD_FALLING
+    pub const HOLD_FALLING: Self = Self::Sequential(ArcSequential::Hold(EdgeState::Fall(None)));
+    /// SETUP_RISING
+    pub const SETUP_RISING: Self = Self::Sequential(ArcSequential::Setup(EdgeState::Rise(None)));
+    /// SETUP_FALLING
+    pub const SETUP_FALLING: Self = Self::Sequential(ArcSequential::Setup(EdgeState::Fall(None)));
+    /// RECOVERY_RISING
+    pub const RECOVERY_RISING: Self = Self::Sequential(ArcSequential::Recovery(EdgeState::Rise(None)));
+    /// RECOVERY_FALLING
+    pub const RECOVERY_FALLING: Self = Self::Sequential(ArcSequential::Recovery(EdgeState::Fall(None)));
+    /// SKEW_RISING
+    pub const SKEW_RISING: Self = Self::Sequential(ArcSequential::Skew(EdgeState::Rise(None)));
+    /// SKEW_FALLING
+    pub const SKEW_FALLING: Self = Self::Sequential(ArcSequential::Skew(EdgeState::Fall(None)));
+    /// REMOVAL_RISING
+    pub const REMOVAL_RISING: Self = Self::Sequential(ArcSequential::Removal(EdgeState::Rise(None)));
+    /// REMOVAL_FALLING
+    pub const REMOVAL_FALLING: Self = Self::Sequential(ArcSequential::Removal(EdgeState::Fall(None)));
+    /// MIN_PULSE_WIDTH
+    pub const MIN_PULSE_WIDTH: Self = Self::Sequential(ArcSequential::MinPulseWidth);
+    /// MINIMUM_PERIOD
+    pub const MINIMUM_PERIOD: Self = Self::Sequential(ArcSequential::MinimumPeriod);
+    /// MAX_CLOCK_TREE_PATH
+    pub const MAX_CLOCK_TREE_PATH: Self = Self::Sequential(ArcSequential::ClockTreePath(MaxMin::Max));
+    /// MIN_CLOCK_TREE_PATH
+    pub const MIN_CLOCK_TREE_PATH: Self = Self::Sequential(ArcSequential::ClockTreePath(MaxMin::Min));
+    /// NON_SEQ_SETUP_RISING
+    pub const NON_SEQ_SETUP_RISING: Self = Self::NonSequential(ArcNonSequential::NonSeqSetup(EdgeState::Rise(None)));
+    /// NON_SEQ_SETUP_FALLING
+    pub const NON_SEQ_SETUP_FALLING: Self = Self::NonSequential(ArcNonSequential::NonSeqSetup(EdgeState::Fall(None)));
+    /// NON_SEQ_HOLD_RISING
+    pub const NON_SEQ_HOLD_RISING: Self = Self::NonSequential(ArcNonSequential::NonSeqHold(EdgeState::Rise(None)));
+    /// NON_SEQ_HOLD_FALLING
+    pub const NON_SEQ_HOLD_FALLING: Self = Self::NonSequential(ArcNonSequential::NonSeqHold(EdgeState::Fall(None)));
+    /// NOCHANGE_HIGH_HIGH
+    pub const NOCHANGE_HIGH_HIGH: Self = Self::NoChange(ArcNoChange::NoChange(StaticState::High, StaticState::High));
+    /// NOCHANGE_HIGH_LOW
+    pub const NOCHANGE_HIGH_LOW: Self = Self::NoChange(ArcNoChange::NoChange(StaticState::High, StaticState::Low));
+    /// NOCHANGE_LOW_HIGH
+    pub const NOCHANGE_LOW_HIGH: Self = Self::NoChange(ArcNoChange::NoChange(StaticState::Low, StaticState::High));
+    /// NOCHANGE_LOW_LOW
+    pub const NOCHANGE_LOW_LOW: Self = Self::NoChange(ArcNoChange::NoChange(StaticState::Low, StaticState::Low));
 }
 
 impl TimingType {
     const LIST: [Self;35] = [
-        Self::combinational(),
-        Self::combinational_rise(),
-        Self::combinational_fall(),
-        Self::three_state_disable(),
-        Self::three_state_disable_rise(),
-        Self::three_state_disable_fall(),
-        Self::three_state_enable(),
-        Self::three_state_enable_rise(),
-        Self::three_state_enable_fall(),
-        Self::rising_edge(),
-        Self::falling_edge(),
-        Self::preset(),
-        Self::clear(),
-        Self::hold_rising(),
-        Self::hold_falling(),
-        Self::setup_rising(),
-        Self::setup_falling(),
-        Self::recovery_rising(),
-        Self::recovery_falling(),
-        Self::skew_rising(),
-        Self::skew_falling(),
-        Self::removal_rising(),
-        Self::removal_falling(),
-        Self::min_pulse_width(),
-        Self::minimum_period(),
-        Self::max_clock_tree_path(),
-        Self::min_clock_tree_path(),
-        Self::non_seq_setup_rising(),
-        Self::non_seq_setup_falling(),
-        Self::non_seq_hold_rising(),
-        Self::non_seq_hold_falling(),
-        Self::nochange_high_high(),
-        Self::nochange_high_low(),
-        Self::nochange_low_high(),
-        Self::nochange_low_low(),
+        Self::COMBINATIONAL,
+        Self::COMBINATIONAL_RISE,
+        Self::COMBINATIONAL_FALL,
+        Self::THREE_STATE_DISABLE,
+        Self::THREE_STATE_DISABLE_RISE,
+        Self::THREE_STATE_DISABLE_FALL,
+        Self::THREE_STATE_ENABLE,
+        Self::THREE_STATE_ENABLE_RISE,
+        Self::THREE_STATE_ENABLE_FALL,
+        Self::RISING_EDGE,
+        Self::FALLING_EDGE,
+        Self::PRESET,
+        Self::CLEAR,
+        Self::HOLD_RISING,
+        Self::HOLD_FALLING,
+        Self::SETUP_RISING,
+        Self::SETUP_FALLING,
+        Self::RECOVERY_RISING,
+        Self::RECOVERY_FALLING,
+        Self::SKEW_RISING,
+        Self::SKEW_FALLING,
+        Self::REMOVAL_RISING,
+        Self::REMOVAL_FALLING,
+        Self::MIN_PULSE_WIDTH,
+        Self::MINIMUM_PERIOD,
+        Self::MAX_CLOCK_TREE_PATH,
+        Self::MIN_CLOCK_TREE_PATH,
+        Self::NON_SEQ_SETUP_RISING,
+        Self::NON_SEQ_SETUP_FALLING,
+        Self::NON_SEQ_HOLD_RISING,
+        Self::NON_SEQ_HOLD_FALLING,
+        Self::NOCHANGE_HIGH_HIGH,
+        Self::NOCHANGE_HIGH_LOW,
+        Self::NOCHANGE_LOW_HIGH,
+        Self::NOCHANGE_LOW_LOW,
     ];
     /// iter
     #[inline]
@@ -1003,41 +894,41 @@ impl FromStr for TimingType {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            ArcCombinational::COMBINATIONAL => Ok(Self::combinational()),
-            ArcCombinational::COMBINATIONAL_RISE => Ok(Self::combinational_rise()),
-            ArcCombinational::COMBINATIONAL_FALL => Ok(Self::combinational_fall()),
-            ArcCombinational::THREE_STATE_DISABLE => Ok(Self::three_state_disable()),
-            ArcCombinational::THREE_STATE_DISABLE_RISE => Ok(Self::three_state_disable_rise()),
-            ArcCombinational::THREE_STATE_DISABLE_FALL => Ok(Self::three_state_disable_fall()),
-            ArcCombinational::THREE_STATE_ENABLE => Ok(Self::three_state_enable()),
-            ArcCombinational::THREE_STATE_ENABLE_RISE => Ok(Self::three_state_enable_rise()),
-            ArcCombinational::THREE_STATE_ENABLE_FALL => Ok(Self::three_state_enable_fall()),
-            ArcSequential::RISING_EDGE => Ok(Self::rising_edge()),
-            ArcSequential::FALLING_EDGE => Ok(Self::falling_edge()),
-            ArcSequential::PRESET => Ok(Self::preset()),
-            ArcSequential::CLEAR => Ok(Self::clear()),
-            ArcSequential::HOLD_RISING => Ok(Self::hold_rising()),
-            ArcSequential::HOLD_FALLING => Ok(Self::hold_falling()),
-            ArcSequential::SETUP_RISING => Ok(Self::setup_rising()),
-            ArcSequential::SETUP_FALLING => Ok(Self::setup_falling()),
-            ArcSequential::RECOVERY_RISING => Ok(Self::recovery_rising()),
-            ArcSequential::RECOVERY_FALLING => Ok(Self::recovery_falling()),
-            ArcSequential::SKEW_RISING => Ok(Self::skew_rising()),
-            ArcSequential::SKEW_FALLING => Ok(Self::skew_falling()),
-            ArcSequential::REMOVAL_RISING => Ok(Self::removal_rising()),
-            ArcSequential::REMOVAL_FALLING => Ok(Self::removal_falling()),
-            ArcSequential::MIN_PULSE_WIDTH => Ok(Self::min_pulse_width()),
-            ArcSequential::MINIMUM_PERIOD => Ok(Self::minimum_period()),
-            ArcSequential::MAX_CLOCK_TREE_PATH => Ok(Self::max_clock_tree_path()),
-            ArcSequential::MIN_CLOCK_TREE_PATH => Ok(Self::min_clock_tree_path()),
-            ArcNonSequential::NON_SEQ_SETUP_RISING => Ok(Self::non_seq_setup_rising()),
-            ArcNonSequential::NON_SEQ_SETUP_FALLING => Ok(Self::non_seq_setup_falling()),
-            ArcNonSequential::NON_SEQ_HOLD_RISING => Ok(Self::non_seq_hold_rising()),
-            ArcNonSequential::NON_SEQ_HOLD_FALLING => Ok(Self::non_seq_hold_falling()),
-            ArcNoChange::NOCHANGE_HIGH_HIGH => Ok(Self::nochange_high_high()),
-            ArcNoChange::NOCHANGE_HIGH_LOW => Ok(Self::nochange_high_low()),
-            ArcNoChange::NOCHANGE_LOW_HIGH => Ok(Self::nochange_low_high()),
-            ArcNoChange::NOCHANGE_LOW_LOW => Ok(Self::nochange_low_low()),
+            ArcCombinational::COMBINATIONAL => Ok(Self::COMBINATIONAL),
+            ArcCombinational::COMBINATIONAL_RISE => Ok(Self::COMBINATIONAL_RISE),
+            ArcCombinational::COMBINATIONAL_FALL => Ok(Self::COMBINATIONAL_FALL),
+            ArcCombinational::THREE_STATE_DISABLE => Ok(Self::THREE_STATE_DISABLE),
+            ArcCombinational::THREE_STATE_DISABLE_RISE => Ok(Self::THREE_STATE_DISABLE_RISE),
+            ArcCombinational::THREE_STATE_DISABLE_FALL => Ok(Self::THREE_STATE_DISABLE_FALL),
+            ArcCombinational::THREE_STATE_ENABLE => Ok(Self::THREE_STATE_ENABLE),
+            ArcCombinational::THREE_STATE_ENABLE_RISE => Ok(Self::THREE_STATE_ENABLE_RISE),
+            ArcCombinational::THREE_STATE_ENABLE_FALL => Ok(Self::THREE_STATE_ENABLE_FALL),
+            ArcSequential::RISING_EDGE => Ok(Self::RISING_EDGE),
+            ArcSequential::FALLING_EDGE => Ok(Self::FALLING_EDGE),
+            ArcSequential::PRESET => Ok(Self::PRESET),
+            ArcSequential::CLEAR => Ok(Self::CLEAR),
+            ArcSequential::HOLD_RISING => Ok(Self::HOLD_RISING),
+            ArcSequential::HOLD_FALLING => Ok(Self::HOLD_FALLING),
+            ArcSequential::SETUP_RISING => Ok(Self::SETUP_RISING),
+            ArcSequential::SETUP_FALLING => Ok(Self::SETUP_FALLING),
+            ArcSequential::RECOVERY_RISING => Ok(Self::RECOVERY_RISING),
+            ArcSequential::RECOVERY_FALLING => Ok(Self::RECOVERY_FALLING),
+            ArcSequential::SKEW_RISING => Ok(Self::SKEW_RISING),
+            ArcSequential::SKEW_FALLING => Ok(Self::SKEW_FALLING),
+            ArcSequential::REMOVAL_RISING => Ok(Self::REMOVAL_RISING),
+            ArcSequential::REMOVAL_FALLING => Ok(Self::REMOVAL_FALLING),
+            ArcSequential::MIN_PULSE_WIDTH => Ok(Self::MIN_PULSE_WIDTH),
+            ArcSequential::MINIMUM_PERIOD => Ok(Self::MINIMUM_PERIOD),
+            ArcSequential::MAX_CLOCK_TREE_PATH => Ok(Self::MAX_CLOCK_TREE_PATH),
+            ArcSequential::MIN_CLOCK_TREE_PATH => Ok(Self::MIN_CLOCK_TREE_PATH),
+            ArcNonSequential::NON_SEQ_SETUP_RISING => Ok(Self::NON_SEQ_SETUP_RISING),
+            ArcNonSequential::NON_SEQ_SETUP_FALLING => Ok(Self::NON_SEQ_SETUP_FALLING),
+            ArcNonSequential::NON_SEQ_HOLD_RISING => Ok(Self::NON_SEQ_HOLD_RISING),
+            ArcNonSequential::NON_SEQ_HOLD_FALLING => Ok(Self::NON_SEQ_HOLD_FALLING),
+            ArcNoChange::NOCHANGE_HIGH_HIGH => Ok(Self::NOCHANGE_HIGH_HIGH),
+            ArcNoChange::NOCHANGE_HIGH_LOW => Ok(Self::NOCHANGE_HIGH_LOW),
+            ArcNoChange::NOCHANGE_LOW_HIGH => Ok(Self::NOCHANGE_LOW_HIGH),
+            ArcNoChange::NOCHANGE_LOW_LOW => Ok(Self::NOCHANGE_LOW_LOW),
             _ => Err(std::fmt::Error)
         }
     }

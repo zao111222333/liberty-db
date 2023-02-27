@@ -10,7 +10,11 @@ use std::ops::{Deref,DerefMut};
 
 /// LogicLike
 pub trait LogicLike: std::fmt::Display + std::fmt::Debug{
+    /// inverse
+    /// 
+    /// 0->1, 1->0
     fn inverse(&self) -> Self;
+    /// Fall(_) == Fall(_)
     fn variant_eq(&self, other: &Self) -> bool;
 }
 
@@ -44,7 +48,6 @@ impl Ord for ChangePattern {
             (None, Some(c)) => c,
             (None, None) => std::cmp::Ordering::Equal,
         }
-        // todo!()
     }
 }
 impl std::hash::Hash for ChangePattern {
@@ -53,6 +56,7 @@ impl std::hash::Hash for ChangePattern {
         float_hash(state, self.transition_time.value);
     }
 }
+
 impl PartialEq for ChangePattern {
     fn eq(&self, other: &Self) -> bool {
         float_eq(self.settle_down_time.value,other.settle_down_time.value) && 
@@ -115,6 +119,13 @@ pub enum StaticState {
     Low,
 }
 
+impl StaticState {
+    /// High
+    pub const H: Self = Self::High;
+    /// Low
+    pub const L: Self = Self::Low;
+}
+
 impl LogicLike for StaticState {
     #[inline]
     fn inverse(&self) -> Self{
@@ -149,6 +160,14 @@ pub enum EdgeState {
     #[strum(serialize = "r", serialize = "R")]
     Rise(Option<ChangePattern>),
 }
+
+impl EdgeState {
+    /// Fall
+    pub const F: Self = Self::Fall(None);
+    /// Rise
+    pub const R: Self = Self::Rise(None);
+}
+
 impl std::fmt::Display for EdgeState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -163,6 +182,7 @@ impl std::fmt::Display for EdgeState {
         }
     }
 }
+
 impl LogicLike for EdgeState {
     #[inline]
     fn inverse(&self) -> Self{
@@ -180,6 +200,7 @@ impl LogicLike for EdgeState {
         }
     }
 }
+
 /// LogicState
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[derive(strum_macros::Display)]
@@ -226,6 +247,13 @@ pub enum UninitState {
     HighImpedance,
 }
 
+impl UninitState {
+    /// Unknown
+    pub const X: Self = Self::Unknown(None);
+    /// Unknown
+    pub const Z: Self = Self::HighImpedance;
+}
+
 impl PartialOrd for UninitState {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
@@ -256,7 +284,7 @@ impl std::fmt::Display for UninitState {
 
 impl Default for UninitState {
     fn default() -> Self {
-        Self::Unknown(None)
+        Self::X
     }
 }
 impl LogicLike for UninitState {
@@ -280,6 +308,17 @@ pub enum CommonState {
     Edge(EdgeState),
     /// H L
     Static(StaticState),
+}
+
+impl CommonState {
+    /// Rise
+    pub const R: Self = Self::Edge(EdgeState::R);
+    /// Fall
+    pub const F: Self = Self::Edge(EdgeState::F);
+    /// High
+    pub const H: Self = Self::Static(StaticState::H);
+    /// Low
+    pub const L: Self = Self::Static(StaticState::L);
 }
 
 impl Into<LogicState> for CommonState {
@@ -315,7 +354,7 @@ impl std::fmt::Display for LogicState {
 
 impl Default for LogicState {
     fn default() -> Self {
-        return Self::Uninit(UninitState::default());
+        return Self::X;
     }
 }
 
@@ -340,13 +379,25 @@ impl LogicLike for LogicState {
 }
 
 impl LogicState {
+    /// Unknown
+    pub const X: Self = Self::Uninit(UninitState::X);
+    /// HighImpedance
+    pub const Z: Self = Self::Uninit(UninitState::Z);
+    /// Fall
+    pub const F: Self = Self::Edge(EdgeState::F);
+    /// Rise
+    pub const R: Self = Self::Edge(EdgeState::R);
+    /// High
+    pub const H: Self = Self::Static(StaticState::L);
+    /// Low
+    pub const L: Self = Self::Static(StaticState::H);
     const LIST: [Self;6] = [
-        Self::Uninit(UninitState::Unknown(None)),
-        Self::Uninit(UninitState::HighImpedance),
-        Self::Edge(EdgeState::Fall(None)),
-        Self::Edge(EdgeState::Rise(None)),
-        Self::Static(StaticState::Low),
-        Self::Static(StaticState::High),
+        Self::X,
+        Self::Z,
+        Self::F,
+        Self::R,
+        Self::H,
+        Self::L,
     ];
     /// iter
     #[inline]
@@ -607,7 +658,7 @@ impl LogicOperator2 {
         a: &LogicState,
         b: &LogicState,
     ) -> LogicState{
-        let compute_Edge_logic = || -> LogicState {
+        let compute_edge_logic = || -> LogicState {
             let bgn_state = self.compute(&a.get_bgn(), &b.get_bgn());
             let end_state = self.compute(&a.get_end(), &b.get_end());
             let a_pattern = a.get_change_pattern();
@@ -621,8 +672,8 @@ impl LogicOperator2 {
             LogicState::Uninit(UninitState::Unknown(IllegalType::combine(&a_illegal, &b_illegal)))
         };
         match (self,a,b) {
-            (_, _, LogicState::Edge(_)) => compute_Edge_logic(),
-            (_, LogicState::Edge(_), _) => compute_Edge_logic(),
+            (_, _, LogicState::Edge(_)) => compute_edge_logic(),
+            (_, LogicState::Edge(_), _) => compute_edge_logic(),
             (_, LogicState::Uninit(_a), LogicState::Uninit(_b)) => combine_illegal(),
             (LogicOperator2::And, LogicState::Uninit(_a), LogicState::Static(_b)) => match (_a,_b) {
                 (UninitState::Unknown(_), StaticState::High) => *a,
@@ -799,6 +850,7 @@ impl LogicTable {
             port_idx,
         }
     }
+    /// sort
     pub fn sort(&self)->Self{
         let idx_map = util::misc::argsort(&self.port_idx);
         Self::new(
@@ -817,11 +869,14 @@ impl LogicTable {
             ).collect(),
         )
     }
+    /// TODO: simplify 
     pub fn simplify(&self)->Self{
         todo!()
     }
-    fn to_expression(&self) -> BooleanExpression {
+    /// TODO: to_expression
+    pub fn to_expression(&self) -> BooleanExpression {
         let table = self.simplify();
+        let _ = table;
         todo!()
     }
 }
@@ -868,6 +923,7 @@ impl LogicLike for LogicTable {
     }
 }
 
+/// Logic Searcher
 #[derive(Debug,Clone)]
 pub struct Searcher{
     include_port_state: HashMap<Port,HashSet<LogicState>>,
@@ -922,17 +978,37 @@ impl Searcher {
         exclude_port_state: Vec<(Port,Vec<LogicState>)>,
         exclude_out_state: Option<Vec<LogicState>>,
     ) -> Self{
+        let port_state2map = |port_state: Vec<(Port, Vec<LogicState>)>| -> HashMap<Port, HashSet<LogicState>>{
+            let mut map: HashMap<Port, HashSet<LogicState>> = HashMap::new();
+            for (p,v) in port_state.iter(){
+                match map.get(p){
+                    Some(set) => {
+                        let mut _set = set.clone();
+                        for s in v.iter(){
+                            let _ = _set.insert(s.clone());
+                        }
+                        let _ = map.insert(
+                            p.clone(),
+                            _set,
+                        );
+                    },
+                    None => {
+                        let _ = map.insert(
+                            p.clone(), 
+                            v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>(),
+                        );
+                    },
+                }
+            }
+            map
+        };
         Self { 
-            include_port_state: include_port_state.iter().map(|(p,v)|
-                    (p.clone(),v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>())
-                ).collect(), 
+            include_port_state: port_state2map(include_port_state),
             include_out_state: match include_out_state{
                 Some(v) => Some(v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>()),
                 None => None,
                 },
-            exclude_port_state:exclude_port_state.iter().map(|(p,v)|
-                    (p.clone(),v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>())
-                ).collect(),  
+            exclude_port_state: port_state2map(exclude_port_state),
             exclude_out_state: match exclude_out_state{
                     Some(v) => Some(v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>()),
                     None => None,

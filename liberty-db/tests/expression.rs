@@ -92,9 +92,9 @@ fn get_hash<T: Hash>(s: T)->u64{
     hasher.finish()
 }
 lazy_static::lazy_static!{
-    static ref HIGH:      LogicState = LogicState::Static(StaticState::High);
-    static ref LOW:       LogicState = LogicState::Static(StaticState::Low);
-    static ref RISE_NONE: LogicState = LogicState::Edge(EdgeState::Rise(None));
+    static ref HIGH:      LogicState = LogicState::H;
+    static ref LOW:       LogicState = LogicState::L;
+    static ref RISE_NONE: LogicState = LogicState::R;
     static ref RISE_BASE: LogicState = LogicState::Edge(EdgeState::Rise(
                                                             Some(ChangePattern::new(
                                                                 units::second(1.0),
@@ -152,28 +152,28 @@ fn logic_vecter_as_key() {
     let v = 12345.000;
     {
         let mut v_k1:LogicVector = vec![].into();
-        v_k1.push(LogicState::Static(StaticState::High));
-        v_k1.push(LogicState::Static(StaticState::High));
+        v_k1.push(LogicState::H);
+        v_k1.push(LogicState::H);
         v_k1.push(LogicState::Edge(EdgeState::Rise(
             Some(ChangePattern::new(
                 units::second(345670.7734567893456789456787777771),
                 units::second(0.1))
             ))
         ));
-        v_k1.push(LogicState::Edge(EdgeState::Fall(None)));
+        v_k1.push(LogicState::F);
         let _ = pin_map.insert(v_k1, v);
     }
     {
         let mut v_k2:LogicVector = vec![].into();
-        v_k2.push(LogicState::Static(StaticState::High));
-        v_k2.push(LogicState::Static(StaticState::High));
+        v_k2.push(LogicState::H);
+        v_k2.push(LogicState::H);
         v_k2.push(LogicState::Edge(EdgeState::Rise(
             Some(ChangePattern::new(
                 units::second(345670.7734567893456789456787777771),
                 units::second(0.1))
             ))
         ));
-        v_k2.push(LogicState::Edge(EdgeState::Fall(None)));
+        v_k2.push(LogicState::F);
         assert_eq!(Some(&v),pin_map.get(&v_k2));
     }
 }
@@ -246,10 +246,10 @@ fn expression_nand_table() {
     println!("**** Search1 ****************");
     println!("{}", Searcher::new(
         vec![
-            (Port::new("A"),vec![ LogicState::Static(StaticState::High) ],),
-            (Port::new("C"),vec![ LogicState::Static(StaticState::High) ],),
+            (Port::new("A"),vec![ LogicState::H ],),
+            (Port::new("C"),vec![ LogicState::H ],),
         ],
-        Some(vec![LogicState::Edge(EdgeState::Fall(None)) ]),
+        Some(vec![LogicState::F ]),
         vec![],
         None,
     ).search(&table));
@@ -257,16 +257,13 @@ fn expression_nand_table() {
     println!("**** Search2 ****************");
     println!("{}", Searcher::new(
         vec![
-            (
-                Port::new("A"),
-                vec![ 
-                    LogicState::Static(StaticState::High),
-                    LogicState::Static(StaticState::Low),
-                ],
-            ), 
-            (
-                Port::new("B"),
-                vec![ LogicState::Edge(EdgeState::Fall(None)) ],
+            (Port::new("A"),
+            vec![ 
+                LogicState::H,
+                LogicState::L,
+            ]), 
+            (Port::new("B"),
+            vec![ LogicState::F ],
             )
             ], 
         None,
@@ -274,38 +271,37 @@ fn expression_nand_table() {
         Some(vec![]), 
     ).search(&table));
 
-    
     println!("**** Search3 ****************");
     println!("{}", Searcher::new(
         vec![(Port::new("A"),
-        vec![ LogicState::Static(StaticState::High) ])], 
+        vec![ LogicState::H ])], 
         None,
         vec![],
-        Some(vec![ LogicState::Uninit(UninitState::Unknown(None)) ]),
+        Some(vec![ LogicState::X ]),
     ).search(&table));
 
     println!("**** Search4 ****************");
     println!("{}", Searcher::new(
         vec![
             // FIXME: need append, not replace
-            (Port::new("A"),vec![LogicState::Static(StaticState::Low)]),
-            (Port::new("A"),vec![LogicState::Static(StaticState::High)]),
+            (Port::new("A"),vec![LogicState::L]),
+            (Port::new("A"),vec![LogicState::H]),
             ], 
         None,
-        vec![(Port::new("B"),vec![ 
-            LogicState::Static(StaticState::High),
-            LogicState::Static(StaticState::Low),
-            ])], 
+        vec![
+            (Port::new("B"),vec![ LogicState::H]),
+            (Port::new("B"),vec![ LogicState::F]),
+            ],
         None,
     ).search(&table));
 
     println!("**** Search5 ****************");
     println!("{}", Searcher::new(
         vec![(Port::new("C"),
-        vec![ LogicState::Static(StaticState::High) ])], 
+        vec![ LogicState::H ])], 
         None,
         vec![],
-        Some(vec![LogicState::Static(StaticState::High)]),
+        Some(vec![ LogicState::H ]),
     ).search(&table));
 }
 // #[test]
