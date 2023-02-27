@@ -102,7 +102,7 @@ lazy_static::lazy_static!{
                                                             )));
     static ref RISE_BASE_E10: LogicState = LogicState::Edge(EdgeState::Rise(
                                                             Some(ChangePattern::new(
-                                                                units::second(1.0 + 1e-10),
+                                                                units::second(1.0 + 2e-10),
                                                                 units::second(1.0 + 1e-10))
                                                             )));
     static ref RISE_BASE_E11: LogicState = LogicState::Edge(EdgeState::Rise(

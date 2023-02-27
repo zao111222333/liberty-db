@@ -2,7 +2,7 @@
 //! IFRAME('https://en.wikipedia.org/wiki/International_System_of_Units');
 //! </script>
 
-#[cfg(not(feature = "f32"))]
+// #[cfg(not(feature = "f32"))]
 pub use uom::si::f64::{
     Capacitance,
     ElectricalResistance,
@@ -17,20 +17,20 @@ pub use uom::si::f64::{
     Time,
 };
 
-#[cfg(feature = "f32")]
-pub use uom::si::f32::{
-    Capacitance,
-    ElectricalResistance,
-    Length,
-    ElectricCharge, 
-    ElectricCurrent, 
-    ElectricPotential, 
-    Energy, 
-    Power, 
-    Ratio, 
-    ThermodynamicTemperature, 
-    Time,
-};
+// #[cfg(feature = "f32")]
+// pub use uom::si::f32::{
+//     Capacitance,
+//     ElectricalResistance,
+//     Length,
+//     ElectricCharge, 
+//     ElectricCurrent, 
+//     ElectricPotential, 
+//     Energy, 
+//     Power, 
+//     Ratio, 
+//     ThermodynamicTemperature, 
+//     Time,
+// };
 
 pub use uom::fmt::DisplayStyle;
 pub use uom::si::Unit;

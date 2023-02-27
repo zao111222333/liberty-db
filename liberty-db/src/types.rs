@@ -10,12 +10,12 @@ pub(crate) type HashSet<K> = hashbrown::HashSet<K>;
 // }
 
 // #[cfg(feature = "f32")]
-pub(crate) type Float = f32;
-#[cfg(feature = "f32")]
-pub(crate) use std::f32 as floats;
-#[cfg(not(feature = "f32"))]
+// pub(crate) type Float = f32;
+// #[cfg(feature = "f32")]
+// pub(crate) use std::f32 as floats;
+// #[cfg(not(feature = "f32"))]
 pub(crate) type Float = f64;
-#[cfg(not(feature = "f32"))]
+// #[cfg(not(feature = "f32"))]
 pub(crate) use std::f64 as floats;
 // pub type Complex = num_complex::Complex<Float>;
 
