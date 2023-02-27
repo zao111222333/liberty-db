@@ -984,9 +984,7 @@ impl Searcher {
                 match map.get(p){
                     Some(set) => {
                         let mut _set = set.clone();
-                        for s in v.iter(){
-                            let _ = _set.insert(s.clone());
-                        }
+                        _set.extend(v.iter());
                         let _ = map.insert(
                             p.clone(),
                             _set,
@@ -995,7 +993,7 @@ impl Searcher {
                     None => {
                         let _ = map.insert(
                             p.clone(), 
-                            v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>(),
+                            v.iter().copied().collect(),
                         );
                     },
                 }
@@ -1005,12 +1003,12 @@ impl Searcher {
         Self { 
             include_port_state: port_state2map(include_port_state),
             include_out_state: match include_out_state{
-                Some(v) => Some(v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>()),
+                Some(v) => Some(v.iter().copied().collect()),
                 None => None,
                 },
             exclude_port_state: port_state2map(exclude_port_state),
             exclude_out_state: match exclude_out_state{
-                    Some(v) => Some(v.iter().map(|s|s.clone()).collect::<HashSet<LogicState>>()),
+                    Some(v) => Some(v.iter().copied().collect()),
                     None => None,
                 }, 
         }

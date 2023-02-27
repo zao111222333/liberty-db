@@ -283,7 +283,6 @@ fn expression_nand_table() {
     println!("**** Search4 ****************");
     println!("{}", Searcher::new(
         vec![
-            // FIXME: need append, not replace
             (Port::new("A"),vec![LogicState::L]),
             (Port::new("A"),vec![LogicState::H]),
             ], 
