@@ -2,6 +2,11 @@
 name = "liberty-macros"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "`liberty` macros"
+authors = ["Junzhuo <zhou@junzhuo.me>"]
+readme = "README.md"
+repository = "https://github.com/zao111222333/liberty-rs/"
 
 [lib]
 proc-macro = true
