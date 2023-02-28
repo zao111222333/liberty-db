@@ -1,3 +1,5 @@
+//! Time (base unit second, s).
+
 pub use uom::si::time::{
     attosecond,
     centisecond,

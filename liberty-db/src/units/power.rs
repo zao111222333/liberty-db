@@ -1,3 +1,5 @@
+//! Power (base unit watt, m² · kg · s⁻³).
+
 pub use uom::si::power::{
     attowatt,
     centiwatt,

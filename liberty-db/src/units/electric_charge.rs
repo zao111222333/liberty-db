@@ -1,3 +1,5 @@
+//! Electric charge (base unit coulomb, A · s).
+
 pub use uom::si::electric_charge::{
     abcoulomb,
     ampere_hour,

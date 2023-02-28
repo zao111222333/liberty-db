@@ -37,25 +37,15 @@ pub use uom::si::Unit;
 pub use uom::si::{
     capacitance,
     electrical_resistance,
-    // length,
-    // electric_charge, 
     electric_current, 
     electric_potential, 
-    // energy, 
-    // power, 
     ratio, 
     thermodynamic_temperature, 
-    // time,
 };
-/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
 pub mod length;
-/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
 pub mod electric_charge;
-/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
 pub mod power;
-/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
 pub mod energy;
-/// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
 pub mod time;
 
 use crate::types::Float;

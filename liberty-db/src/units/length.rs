@@ -1,3 +1,5 @@
+//! Length (base unit meter, m).
+
 pub use uom::si::length::{
     // angstrom,
     // astronomical_unit,

@@ -1,3 +1,5 @@
+//! Energy (base unit joule, kg · m² · s⁻²).
+
 pub use uom::si::energy::{
     attojoule,
     // btu,
