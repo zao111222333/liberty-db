@@ -14,6 +14,48 @@ let page;
 let container;
 let srollBtn;
 let pageInput;
+var queryCtx = {
+    field: "",
+    bgnList: [],
+    endList: [],
+};
+function updateQueryCtx(queryString){
+    let params = new URLSearchParams(queryString);
+    queryCtx.field = params.get('field');
+    let bgnParams = params.get('bgn');
+    let endParams = params.get('end');
+    if (bgnParams != null && endParams != null){
+        queryCtx.bgnList = bgnParams.split(' ');
+        queryCtx.endList = endParams.split(' ');
+    }
+}
+function queryString(){
+    let s = '?';
+    if (queryCtx.field!=''){
+        s+='field='+queryCtx.field+'&';
+    }
+    let bgnParams='';
+    if (queryCtx.bgnList.length!=0){
+        bgnParams = "bgn="
+        for (let index = 0; index < queryCtx.bgnList.length; index++) {
+            bgnParams += queryCtx.bgnList[index]+"+"
+        }
+        s+=bgnParams.slice(0, -1)+'&'; 
+    }
+    let endParams='';
+    if (queryCtx.endList.length!=0){
+        endParams = "end="
+        for (let index = 0; index < queryCtx.endList.length; index++) {
+            endParams += queryCtx.endList[index]+"+"
+        }
+        s+=endParams.slice(0, -1)+'&';
+    }
+    if (s=='?'){
+        return ''
+    }else{
+        return s.slice(0, -1)
+    }
+}
 
 container = document.getElementById('page-container');
 container.onscroll = (_) => {
@@ -105,66 +147,156 @@ let btnDiv = document.createElement("div");
 addSidebarBtn();
 btnDiv.appendChild(srollBtn);
 Div.appendChild(btnDiv);
-window.onmessage = function(e) {
-    queryString=e.data;
-    updateQuery(queryString);
-    addLinkBtn(queryString);
-};
-window.onload = function(){
-    updateDivWidth()
-    updateQuery(window.location.search);
-} 
 
+let removeBtn = document.getElementById('remove_btn');
+if (removeBtn==null){
+    removeBtn = document.createElement("button");
+    removeBtn.id = 'remove_btn';
+    let innerText = document.createElement('a');
+    innerText.innerHTML+='Remove';
+    removeBtn.appendChild(innerText);
+    removeBtn.style.cursor = 'pointer';
+    removeBtn.style.color = '#ffffff';
+    removeBtn.style.backgroundColor = 'rgb(63,63,63)';
+    btnDiv.appendChild(removeBtn);
+    removeBtn.addEventListener("click",removeOne)
+}
 
-function addLinkBtn(queryString) {
-    let linkBtn = document.getElementById('link_btn');
-    if (linkBtn==null){
-        linkBtn = document.createElement("button");
-        linkBtn.id = 'link_btn';
-        let innerText = document.createElement('a');
-        innerText.innerHTML+='Copy';
-        let linkSymbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;">
-        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"></path>
-        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"></path>
-        </svg>`;
-        innerText.innerHTML+=linkSymbol;
-        innerText.innerHTML+='&nbsp;&nbsp;&nbsp;';
-        linkBtn.appendChild(innerText);
-        linkBtn.style.cursor = 'pointer';
-        linkBtn.style.color = '#ffffff';
-        linkBtn.style.backgroundColor = 'rgb(63,63,63)';
-        btnDiv.appendChild(linkBtn);
+function removeOne(){
+    if (elementArrayList.length>0){
+        disHighlight([elementArrayList[positionIndex]])
+        elementArrayList.splice(positionIndex, 1);
+        queryCtx.bgnList.splice(positionIndex, 1);
+        queryCtx.endList.splice(positionIndex, 1);
+        updateLinkBtn();
+        if (positionIndex !=0){
+            positionIndex --
+        }
+        if (elementArrayList.length==0){
+            srollBtn.innerHTML = "None";
+        }else{
+            srollBtn.innerHTML = (positionIndex+1)+" of "+elementArrayList.length;
+        }
     }
+}
+
+let linkBtn = document.getElementById('link_btn');
+if (linkBtn==null){
+    linkBtn = document.createElement("button");
+    linkBtn.id = 'link_btn';
+    let innerText = document.createElement('a');
+    innerText.innerHTML+='Copy';
+    let linkSymbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;">
+    <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"></path>
+    <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"></path>
+    </svg>`;
+    innerText.innerHTML+=linkSymbol;
+    innerText.innerHTML+='&nbsp;&nbsp;&nbsp;';
+    linkBtn.appendChild(innerText);
+    linkBtn.style.cursor = 'pointer';
+    linkBtn.style.color = '#ffffff';
+    linkBtn.style.backgroundColor = 'rgb(63,63,63)';
+    btnDiv.appendChild(linkBtn);
+}
+
+let appendBtn = document.getElementById('append_btn');
+if (appendBtn==null){
+    appendBtn = document.createElement("button");
+    appendBtn.id = 'append_btn';
+    let innerText = document.createElement('a');
+    innerText.innerHTML+='Append';
+    appendBtn.appendChild(innerText);
+    appendBtn.style.cursor = 'pointer';
+    appendBtn.style.color = '#ffffff';
+    appendBtn.style.backgroundColor = 'rgb(63,63,63)';
+    btnDiv.appendChild(appendBtn);
+    appendBtn.style.display = 'none';
+}
+// var _baseNode;
+// var _extentNode;
+document.onselectionchange = function(){
+    if (window.getSelection().type == "Range"){
+        appendBtn.style.display = '';
+        appendBtn.removeEventListener("click", ()=>{})
+        appendBtn.addEventListener("click",function listener(){
+            function getIdOffsite(node){
+                if (node.id == undefined | node.id ==''){
+                    let parent = node.parentElement
+                    if (document.body === parent){
+                        return ["worn_id",0];
+                    }else{
+                        return getIdOffsite(parent);
+                    }
+                }
+                return [node.id,node.offsetTop+node.parentElement.parentElement.offsetTop];
+            }
+            if (window.getSelection().type == "Range"){
+                let bgnId;
+                let endId;
+                let [baseId,baseOffset] = getIdOffsite(window.getSelection().baseNode);
+                let [extentId,extentOffset] = getIdOffsite(window.getSelection().extentNode);
+                if (baseOffset<extentOffset){
+                    bgnId = baseId
+                    endId = extentId
+                }else{
+                    bgnId = extentId
+                    endId = baseId
+                }
+                queryCtx.bgnList.push(bgnId);
+                queryCtx.endList.push(endId);
+                updateLinkBtn();
+                let elementArray = [];
+                let hasErr = highlight(document.getElementById(bgnId),endId,elementArray);
+                if (!hasErr){
+                    elementArrayList.push(elementArray);
+                    positionIndex=0;
+                    srollBtn.innerHTML = (positionIndex+1)+" of "+elementArrayList.length;
+                    srollBtn.addEventListener("click", scrollWin);
+                    removeBtn.addEventListener("click", removeOne);
+                    appendBtn.style.display = 'none';
+                }
+                window.getSelection().removeAllRanges();
+            }
+        })
+    }else{
+        appendBtn.style.display = 'none';
+    }
+};
+
+
+function updateLinkBtn() {
     linkBtn.addEventListener("click",()=>{
         let linkUrl = new URL(window.location.href);
-        linkUrl.search = queryString;
+        linkUrl.search = queryString();
         navigator.clipboard.writeText(linkUrl.toString());
-    })
-    
+    })   
 }
-function updateQuery(queryString) {
+window.onmessage = function(e) {
+    updateQueryCtx(e.data);
+    updateQuery();
+    updateLinkBtn();
+};
+window.onload = function(){
+    updateQueryCtx(window.location.search);
+    updateDivWidth();
+    updateQuery();
+    updateLinkBtn();
+} 
+function updateQuery() {
     disHighlight(elementArrayList);
     elementArrayList = [];
-    let params = new URLSearchParams(queryString);
-    let field = params.get('field');
-    let bgnParams = params.get('bgn');
-    let endParams = params.get('end');
-    if (bgnParams != null && endParams != null){
-        let bgnList = bgnParams.split(' ');
-        let endList = endParams.split(' ');
-        if (bgnList.length==endList.length){
-            for (let index = 0; index < bgnList.length; index++) {
-                const bgn = bgnList[index];
-                const end = endList[index];
-                let element = document.getElementById(bgn);
-                let elementArray = [];
-                highlight(element,end,elementArray);
-                elementArrayList.push(elementArray);
-            }
-            positionIndex = elementArrayList.length-1;
-        }else{
-            console.error("length of Begin and Ended are NOT equal")
+    if (queryCtx.bgnList.length==queryCtx.endList.length){
+        for (let index = 0; index < queryCtx.bgnList.length; index++) {
+            const bgn = queryCtx.bgnList[index];
+            const end = queryCtx.endList[index];
+            let element = document.getElementById(bgn);
+            let elementArray = [];
+            highlight(element,end,elementArray);
+            elementArrayList.push(elementArray);
         }
+        positionIndex = elementArrayList.length-1;
+    }else{
+        console.error("length of Begin and Ended are NOT equal")
     }
     scrollWin();
     updatePageNum();
@@ -208,7 +340,7 @@ function scrollWin() {
             setTimeout(function() {
                 elementPosition = element.offsetTop;
                 if (elementPosition != 0){
-                    container.scrollTo({top: elementPosition+newPagePosition-10, behavior: 'smooth'});
+                    container.scrollTo({top: elementPosition+newPagePosition-20, behavior: 'smooth'});
                 }else{
                     if (--index) waitForLoad(index);
                 }            
@@ -225,19 +357,24 @@ function disHighlight(elementArrayList) {
     }
 }
 function highlight(element, end, elementArray) {
-    if (element!=null){
-        if (element.className.substring(0,2)=='t '){
-            element.style.backgroundColor = color;
-            elementArray.push(element);
-        }
-        if (element.id!=end){
-            let next = element.nextElementSibling;
-            if (next==null){
-                next = element.parentElement.parentElement.nextElementSibling.firstElementChild.firstElementChild;
+    try {
+        if (element!=null){
+            if (element.className.substring(0,2)=='t '){
+                element.style.backgroundColor = color;
+                elementArray.push(element);
             }
-            highlight(next,end,elementArray);
+            if (element.id!=end){
+                let next = element.nextElementSibling;
+                if (next==null){
+                    next = element.parentElement.parentElement.nextElementSibling.firstElementChild.firstElementChild;
+                }
+                highlight(next,end,elementArray);
+            }
         }
+    } catch (e) {
+        return true
     }
+    return false
 }
 function updatePageNum(){
     const offset = container.scrollTop;
