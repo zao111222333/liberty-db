@@ -8,8 +8,8 @@ use super::{
     LogicTable, 
     LogicOperator2, LogicOperator1,
 };
-static SYMBOL_LEFT: &str = "(";
-static SYMBOL_RIGHT: &str = ")";
+pub(super) static SYMBOL_LEFT: &str = "(";
+pub(super) static SYMBOL_RIGHT: &str = ")";
 
 /// FunctionExpression is the basic expression
 #[derive(Debug,Clone)]

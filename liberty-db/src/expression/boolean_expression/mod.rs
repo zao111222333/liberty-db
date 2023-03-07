@@ -18,10 +18,7 @@ pub use logic::{
 };
 
 mod port;
-pub use port::{
-    Port,
-    StaticExpression
-};
+pub use port::Port;
 
 mod ff;
 pub use ff::{
@@ -30,10 +27,14 @@ pub use ff::{
 mod latch;
 pub use latch::{
     Latch,LatchExpression, 
+    LatchFfId,
 };
 
 mod function;
 pub use function::FunctionExpression;
+
+mod tri_state;
+pub use tri_state::TriState;
 
 /// BooleanExpressionLike
 pub trait BooleanExpressionLike: std::fmt::Display + std::fmt::Debug + BooleanExpressionClone{
@@ -85,6 +86,8 @@ impl Clone for BooleanExpression {
 }
 
 use std::{ops::{Deref,DerefMut}, fmt::Display, hash::Hash};
+
+use crate::types::HashMap;
 impl DerefMut for BooleanExpression {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
@@ -108,5 +111,25 @@ impl Display for BooleanExpression {
 impl Hash for BooleanExpression {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.value.to_table().hash(state);
+    }
+}
+impl BooleanExpression {
+    const BRACKET_L: char = '(';
+    const BRACKET_R: char = ')';
+    // TODO:
+    pub fn from_str(
+        s: &str, 
+        ff_map: &HashMap<LatchFfId,Ff>,
+        latch_map: &HashMap<LatchFfId,Latch>,
+    ) -> Result<Self, std::fmt::Error> {
+        let l_pos_list = s.match_indices(Self::BRACKET_L).map(|(i, _)|i).collect::<Vec<usize>>();
+        let r_pos_list = s.match_indices(Self::BRACKET_R).map(|(i, _)|i).collect::<Vec<usize>>();
+        // match (s.find(Self::BRACKET_L),s.find(Self::BRACKET_R)){
+        //     (None, None) => todo!(),
+        //     (None, Some(_)) => Err(std::fmt::Error),
+        //     (Some(_), None) => Err(std::fmt::Error),
+        //     (Some(idx_l), Some(idx_r)) => todo!(),
+        // }
+        todo!()
     }
 }

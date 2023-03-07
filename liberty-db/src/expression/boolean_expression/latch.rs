@@ -6,6 +6,12 @@ use super::{
 };
 
 #[derive(Debug,Clone)]
+pub struct LatchFfId{
+    var_1: String,
+    var_2: String,
+}
+
+#[derive(Debug,Clone)]
 pub struct Latch{
     name_pair: [String;2],
     clock_on: BooleanExpression,
