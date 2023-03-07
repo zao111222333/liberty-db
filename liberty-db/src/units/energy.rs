@@ -61,5 +61,5 @@ pub use uom::si::energy::{
     yoctojoule,
     yottajoule,
     zeptojoule,
-    zettajoule,
+    // zettajoule,
 };
