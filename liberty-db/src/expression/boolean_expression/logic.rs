@@ -584,20 +584,30 @@ impl LogicLike for LogicVector {
 
 /// LogicOperator1
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[derive(strum_macros::Display, strum_macros::EnumString)]
+// #[derive(strum_macros::Display, strum_macros::EnumString)]
 pub enum LogicOperator1 {
     /// invert previous expression & invert following expression
-    #[strum(serialize = "'", serialize = "!")]
     Not,
-    // /// signal tied to logic 1
-    // #[strum(serialize = "1")]
-    // Logic1,
-    // /// signal tied to logic 0
-    // #[strum(serialize = "0")]
-    // Logic0,
+    /// signal tied to logic 1
+    Logic1,
+    /// signal tied to logic 0
+    Logic0,
+}
+
+impl std::fmt::Display for LogicOperator1 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self{
+            LogicOperator1::Not => write!(f,"{}", Self::NOT_LIST[0]),
+            LogicOperator1::Logic1 => write!(f,"{}", Self::LOGIC1_LIST[0]),
+            LogicOperator1::Logic0 => write!(f,"{}", Self::LOGIC0_LIST[0]),
+        }
+    }
 }
 
 impl LogicOperator1 {
+    const NOT_LIST: [char;2] = ['!','\''];
+    const LOGIC1_LIST: [char;1] = ['1'];
+    const LOGIC0_LIST: [char;1] = ['0'];
     /// compute one logic state with logic operation, e.g. 
     /// 
     /// `Not` `High` = `Low`
@@ -607,8 +617,8 @@ impl LogicOperator1 {
     pub fn compute(&self, a: &LogicState)->LogicState{
         match self {
             LogicOperator1::Not => a.inverse(),
-            // LogicOperator1::Logic1 => LogicState::Static(StaticState::High),
-            // LogicOperator1::Logic0 => LogicState::Static(StaticState::Low),
+            LogicOperator1::Logic1 => LogicState::H,
+            LogicOperator1::Logic0 => LogicState::L,
         }
     }
     /// compute_table
@@ -637,20 +647,32 @@ impl LogicOperator1 {
 /// =133.11
 /// ">Reference</a>
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[derive(strum_macros::Display, strum_macros::EnumString)]
+// #[derive(strum_macros::Display, strum_macros::EnumString)]
 pub enum LogicOperator2 {
     /// FIXME: only sapce `" "` between two expression means `AND`
-    #[strum(serialize = "*",serialize = " ",serialize = "&")]
+    // #[strum(serialize = "*",serialize = " ",serialize = "&")]
     And,
     /// Or
-    #[strum(serialize = "+",serialize = "|")]
+    // #[strum(serialize = "+",serialize = "|")]
     Or,
     /// Xor
-    #[strum(serialize = "^")]
+    // #[strum(serialize = "^")]
     Xor,
 }
 
+impl std::fmt::Display for LogicOperator2 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LogicOperator2::And => write!(f,"{}", Self::AND_LIST[0]),
+            LogicOperator2::Or => write!(f,"{}", Self::OR_LIST[0]),
+            LogicOperator2::Xor => write!(f,"{}", Self::XOR_LIST[0]),
+        }
+    }
+}
 impl LogicOperator2 {
+    const AND_LIST: [char;3] = ['*',' ','&'];
+    const OR_LIST: [char;2] = ['+','|'];
+    const XOR_LIST: [char;1] = ['^'];
     /// compute two logic state with logic operation
     /// 
     /// e.g. `High` `or` `Low` = `High`
