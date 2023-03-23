@@ -110,6 +110,8 @@ pub mod bundle;
 /// `timing` group structure.
 pub mod timing;
 
+pub mod parser;
+
 
 mod types;
 mod util;
