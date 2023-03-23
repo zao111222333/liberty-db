@@ -2,7 +2,7 @@ use std::fmt;
 use super::{
     BooleanExpressionLike,
     LogicTable,
-    BooleanExpression, function::{SYMBOL_LEFT, SYMBOL_RIGHT},
+    BooleanExpression,
 };
 
 #[derive(Debug,Clone)]
@@ -25,7 +25,9 @@ impl TriState {
 impl fmt::Display for TriState{
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{SYMBOL_LEFT}{}{SYMBOL_RIGHT}@Z{SYMBOL_LEFT}{}{SYMBOL_RIGHT}",self.logic,self.enable)
+        write!(f, "{}{}{}@Z{}{}{}",
+        BooleanExpression::BRACKET_L, self.logic,  BooleanExpression::BRACKET_R,
+        BooleanExpression::BRACKET_L, self.enable, BooleanExpression::BRACKET_R)
     }
 }
 

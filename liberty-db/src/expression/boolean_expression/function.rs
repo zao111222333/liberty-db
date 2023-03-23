@@ -8,8 +8,6 @@ use super::{
     LogicTable, 
     LogicOperator2, LogicOperator1,
 };
-pub(super) static SYMBOL_LEFT: &str = "(";
-pub(super) static SYMBOL_RIGHT: &str = ")";
 
 /// FunctionExpression is the basic expression
 #[derive(Debug,Clone)]
@@ -121,12 +119,12 @@ impl fmt::Display for FunctionExpression{
             append_sub(0,f)
         }else{
             self.sub_expression_vec[1..].iter().enumerate().fold(
-                Ok(()).and_then(|_| write!(f, "{SYMBOL_LEFT}{}",self.sub_expression_vec[0])),
+                Ok(()).and_then(|_| write!(f, "{}{}",BooleanExpression::BRACKET_L, self.sub_expression_vec[0])),
                 |result, (idx,_)| {
                     result.and_then(|_| write!(f, "{}", 
                         self.op2_vec[idx])).and_then(|_|append_sub(idx+1,f) )
                 }
-            ).and_then(|_| write!(f, "{SYMBOL_RIGHT}"))
+            ).and_then(|_| write!(f, "{}", BooleanExpression::BRACKET_R))
         }
     }
 }
