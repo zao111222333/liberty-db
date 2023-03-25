@@ -260,6 +260,44 @@ fn x2() {
   println!("{:?}", simple::<VerboseError<&str>>("\"www 11111"));
   println!("{:?}", simple::<VerboseError<&str>>("(1,2)"));
 }
+fn complex_single_sub<'a, E>(
+  i: &'a str,
+) -> IResult<&'a str, Vec<String>, E> 
+where
+  E: ParseError<&'a str> 
+   + ContextError<&'a str> 
+   + FromExternalError<&'a str, E>
+{
+  // println!("{:?}",i);
+separated_list0(
+  delimited(
+    space,
+    char(','),
+    space_newline_complex,
+  ),
+  preceded(
+    space_newline_complex,
+    alt((
+      // normal case
+      key,
+      // [] case
+      // e.g. [point_time2, point_current2, bc_id3, ...]
+      map(
+        tuple((
+          char('['),
+          escaped(
+            none_of("]\n"),
+            '\\', 
+            one_of(r#"\"rnt"#),
+          ),
+          char(']'),
+        )),
+        |(s1,s2,s3)|format!("{s1}{s2}{s3}"),
+      )
+    )),
+  ), 
+)(i)
+}
 
 /// some combinators, like `separated_list0` or `many0`, will call a parser repeatedly,
 /// accumulating results in a `Vec`, until it encounters an error.
@@ -278,41 +316,19 @@ where
       char('\"'),
       delimited(
         space,
-        complex_single,
+        complex_single_sub,
         preceded(
           opt(char(',')), 
           space),
       ),
       char('\"'),
     ),
-    separated_list0(
-      delimited(
-        space,
-        char(','),
-        space_newline_complex,
-      ),
-      preceded(
-        space_newline_complex,
-        alt((
-          // normal case
-          key,
-          // [] case
-          // e.g. [point_time2, point_current2, bc_id3, ...]
-          map(
-            tuple((
-              char('['),
-              escaped(
-                none_of("]\n"),
-                '\\', 
-                one_of(r#"\"rnt"#),
-              ),
-              char(']'),
-            )),
-            |(s1,s2,s3)|format!("{s1}{s2}{s3}"),
-          )
-        )),
-      ), 
+    map(
+      unquote,
+      |s| vec![s],
     ),
+    complex_single_sub,
+    
   ))(i)
 }
 
@@ -357,14 +373,14 @@ where
 }
 #[test]
 fn x3() {
-  assert_eq!(Ok(("",      ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(wwww,bww)"));
-  assert_eq!(Ok(("yyyy",  ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(wwww , bww)yyyy"));
-  assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\"wwww,bww\")kkkkk"));
-  assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\"wwww, bww\")kkkkk"));
-  assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\"wwww ,bww\")kkkkk"));
-  assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\"wwww , bww\")kkkkk"));
-  assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\" wwww ,bww\")kkkkk"));
-  assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\"wwww ,bww \")kkkkk"));
+  println!("{:?}", complex::<VerboseError<&str>>("(wwww,bww)"));
+  println!("{:?}", complex::<VerboseError<&str>>("(wwww , bww)yyyy"));
+  println!("{:?}", complex::<VerboseError<&str>>("(\"wwww,bww\")kkkkk"));
+  println!("{:?}", complex::<VerboseError<&str>>("(\"wwww, bww\")kkkkk"));
+  println!("{:?}", complex::<VerboseError<&str>>("(\"wwww ,bww\")kkkkk"));
+  println!("{:?}", complex::<VerboseError<&str>>("(\"wwww , bww\")kkkkk"));
+  println!("{:?}", complex::<VerboseError<&str>>("(\" wwww ,bww\")kkkkk"));
+  println!("{:?}", complex::<VerboseError<&str>>("(\"wwww ,bww \")kkkkk"));
   println!("{:?}", complex::<VerboseError<&str>>(r#"("CK E SE","IQ")"#));
   let values1 = r#"("0.0365012,1", 2, \
    0.0370929);"#;

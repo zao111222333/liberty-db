@@ -1,7 +1,7 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [package]
 name = "liberty-db"
-version = "0.1.8"
+version = "0.1.9"
 edition = "2021"
 license = "MIT"
 keywords = [
@@ -67,5 +67,12 @@ tracing-subscriber = {version = "0.3", default-features = false, features = ["en
 walkdir = "2"
 # test-case = "3.0.0"
 colored = "2.0.0"
+criterion = "0.3"
+liberty-io = "0.0.2"
+libertyparse = "0.2.2"
 [build-dependencies]
 # dircpy = "0.3.14"
+
+# [[bench]]
+# name = "my_benchmark"
+# harness = false
