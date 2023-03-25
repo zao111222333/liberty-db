@@ -1,6 +1,6 @@
 use nom::{
   branch::alt,
-  bytes::complete::{escaped, tag, take_while, is_not},
+  bytes::complete::{escaped, tag, take_while, is_not, take_until},
   character::{complete::{alphanumeric1 as alphanumeric, char, one_of, none_of, crlf, anychar}, streaming::alphanumeric1},
   combinator::{cut, map, opt, value, map_res, all_consuming, recognize, verify},
   error::{context, convert_error, ContextError, ErrorKind, ParseError, VerboseError, VerboseErrorKind, FromExternalError},
@@ -16,7 +16,8 @@ use crate::types::HashMap;
 #[derive(Debug)]
 pub struct Library{
   attribute: String,
-  group: GroupWrapper,
+  comment: Vec<String>,
+  content: GroupWrapper,
 }
 
 // #[derive(Debug, PartialEq)]
@@ -27,6 +28,11 @@ pub struct Library{
 // }
 
 #[derive(Debug)]
+pub enum Attribute {
+  ValuePair(String, LibertyValue),
+  Comment(Vec<String>),
+}
+  #[derive(Debug)]
 pub enum LibertyValue {
   Simple(SimpleWrapper),
   Complex(ComplexWrapper),
@@ -45,8 +51,8 @@ pub struct ComplexWrapper{
 
 #[derive(Debug)]
 pub struct GroupWrapper{
-  name: String, 
-  pair_list: Vec<(String, LibertyValue)>,
+  name: ComplexWrapper, 
+  attr_list: Vec<Attribute>,
 }
 
 /// parser combinators are constructed from the bottom up:
@@ -80,7 +86,10 @@ where
     delimited(
       space,
       tag("\\"),
-      space_newline,
+      preceded(
+        opt(comment), 
+        space_newline,
+      ),
     ),
     space,
   ))(i)
@@ -144,20 +153,22 @@ where
 {
   context(
     "key",
-    map(
-      many1(
-        alt((
-          alphanumeric1,
-          tag("_"),
-          tag("."),
-          tag("/"),
-          tag("-"),
-          tag("+"),
-        )),
+    alt((
+      map(
+        many1(
+          alt((
+            alphanumeric1,
+            tag("_"),
+            tag("."),
+            tag("/"),
+            tag("-"),
+            tag("+"),
+          )),
+        ),
+        |list| list.concat(),
       ),
-      |list| list.concat(),
-      )
-  )(i)
+    )),
+    )(i)
 }
 
 #[test]
@@ -221,7 +232,9 @@ where
       delimited(
         space,
         complex_single,
-        space,
+        preceded(
+          opt(char(',')), 
+          space),
       ),
       char('\"'),
     ),
@@ -233,10 +246,24 @@ where
       ),
       preceded(
         space_newline_complex,
-        map(
+        alt((
+          // normal case
           key,
-          |s| String::from(s),
-        ),
+          // [] case
+          // e.g. [point_time2, point_current2, bc_id3, ...]
+          map(
+            tuple((
+              char('['),
+              escaped(
+                none_of("]\n"),
+                '\\', 
+                one_of(r#"\"rnt"#),
+              ),
+              char(']'),
+            )),
+            |(s1,s2,s3)|format!("{s1}{s2}{s3}"),
+          )
+        )),
       ), 
     ),
   ))(i)
@@ -390,11 +417,12 @@ fn x5() {
   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\"); www"));
   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);\nwww"));
   println!("{:?}", key_complex::<VerboseError<&str>>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);www"));
+  println!("{:?}", key_complex::<VerboseError<&str>>("index_2(\"init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current\");"));
 }
 
 fn group<'a, E>(
   i: &'a str,
-) -> IResult<&'a str, Vec<(String, LibertyValue)>, E> 
+) -> IResult<&'a str, Vec<Attribute>, E> 
 where 
   E: ParseError<&'a str> 
    + ContextError<&'a str> 
@@ -402,19 +430,19 @@ where
 {
   context(
     "group",
-    map(
+    // map(
       many0(
         preceded(space_newline, key_value),
         ),
-      |tuple_vec| {
-        tuple_vec
-          .into_iter()
-          .map(|(k, v)| 
-            (String::from(k), v)
-          )
-          .collect()
-      },
-    )
+      // |tuple_vec| {
+      //   tuple_vec
+      //     .into_iter()
+      //     .map(|(k, v)|
+      //       (String::from(k), v)
+      //     )
+      //     .collect()
+      // },
+    // )
   )(i)
 }
 
@@ -435,6 +463,7 @@ fn x55() {
     date : "[2012 JAN 31]";
     simulator : "HSPICE -- C-2009.03-SP1 32-BIT (May 25 2009)";
     variable_1 : related_pin_transition;
+    index_2("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
     variable_2 : related_pin_transition;"#;
     println!("{:?}", group::<VerboseError<&str>>(shader));
     // println!("{:?}", key_value("variable_1 : related_pin_transition;\n      variable_2 : related_pin_transition;"));
@@ -455,41 +484,25 @@ where
 {
   context(
     "key_group",
-    separated_pair(
+    pair(
       delimited(
         space_newline,
         key,
         space,
       ),
-      char('('),
       map(
-        separated_pair(
+        pair(
+          complex,
           delimited(
-            space, 
-            alt((
-              unquote, 
-              key, 
-              map(space, String::from),
-            )), 
-            space,
-          ),
-          delimited(
-            char(')'),
-            space,
-            char('{'),
-          ),
-          terminated(
+            preceded(space_newline, char('{')),
             group,
-            preceded(
-              space_newline,
-              char('}'),
-            ),
+            preceded(space_newline, char('}')),
           ),
         ),
-        |(name,pair_list)|(
+        |(name,attr_list)|(
           GroupWrapper{
-            name: String::from(name),
-            pair_list,
+            name,
+            attr_list,
           }
         ),
       ),
@@ -531,7 +544,7 @@ let shader = r#"lu_table_template ( "recovery_template_6x6") {
 
 fn key_value<'a, E>(
   i: &'a str,
-) -> IResult<&'a str, (String, LibertyValue), E> 
+) -> IResult<&'a str, Attribute, E> 
 where
   E: ParseError<&'a str> 
    + ContextError<&'a str> 
@@ -540,19 +553,103 @@ where
   context(
     "key_value",
     alt((
-      map(key_simple, |(k,v)| (
-        k,
-        LibertyValue::Simple(v))),
-      map(key_complex, |(k,list)| (
-        k,
-        LibertyValue::Complex(list))),
-      map(key_group, |(k,group_wrapper)| (
-        k,
-        LibertyValue::Group(group_wrapper)),
+      map(
+        comment,
+        Attribute::Comment,
+      ),
+      map(
+        key_simple, 
+        |(k,v)| Attribute::ValuePair(k, LibertyValue::Simple(v)),
+      ),
+      map(
+        key_complex, 
+        |(k,list)| Attribute::ValuePair(k, LibertyValue::Complex(list)),
+      ),
+      map(
+        key_group, 
+        |(k,group_wrapper)| Attribute::ValuePair(k, LibertyValue::Group(group_wrapper)),
       ),
     )),
   )(i)
 }
+
+fn comment<'a, E>(
+  i: &'a str,
+) -> IResult<&'a str, Vec<String>, E> 
+where 
+  E: ParseError<&'a str> 
+   + ContextError<&'a str> 
+   + FromExternalError<&'a str, E>
+{
+    many1(
+      map(
+        preceded(
+          space_newline, 
+          alt((
+            comment_single,
+            comment_multi,
+          )),
+        ),
+        String::from,
+      )
+  )(i)
+}
+
+fn comment_single<'a, E>(
+  i: &'a str,
+) -> IResult<&'a str, &'a str, E> 
+where 
+  E: ParseError<&'a str> 
+   + ContextError<&'a str> 
+   + FromExternalError<&'a str, E>
+{
+  preceded(
+    char('*'),
+    alt((
+      terminated(
+        take_until("\n"), 
+        space_newline),
+      terminated(
+        space, 
+        space_newline,
+      ),
+    )),
+  )(i)
+}
+
+#[test]
+fn test_comment(){
+  println!("{:?}",comment_single::<VerboseError<&str>>("* www"));
+  println!("{:?}",comment_single::<VerboseError<&str>>("* www\nbb"));
+  println!("{:?}",comment_single::<VerboseError<&str>>("*\nbb"));
+  println!("{:?}",comment_multi::<VerboseError<&str>>(r#"/* www
+  wwaawd
+  
+  */  "#));
+}
+
+fn comment_multi<'a, E>(
+  i: &'a str,
+) -> IResult<&'a str, &'a str, E> 
+where 
+  E: ParseError<&'a str> 
+   + ContextError<&'a str> 
+   + FromExternalError<&'a str, E>
+{
+  preceded(
+    tag("/*"),
+    alt((
+      terminated(
+        take_until("*/"),
+        tag("*/"),),
+      terminated(
+        space, 
+        tag("*/"),
+      ),
+    )),
+  )(i)
+}
+
 
 /// the root element of a JSON parser is either an object or an array
 pub fn library_wrapper<'a>(
@@ -562,16 +659,31 @@ pub fn library_wrapper<'a>(
   context(
     "library_wrapper",
     map_res(
-      delimited(
-        space_newline,
-        key_value,
-        opt(space_newline),
+      pair(
+        terminated(opt(comment), space_newline),
+        terminated(key_value, space_newline),
       ),
-      |(k,v)|(
-        match v {
-          LibertyValue::Simple(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
-          LibertyValue::Complex(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
-          LibertyValue::Group(group) => Ok(Library { attribute: String::from(k), group }),
+      |(comment,attri)|(
+        match attri {
+            Attribute::ValuePair(k, v) => match v {
+              LibertyValue::Simple(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
+              LibertyValue::Complex(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
+              LibertyValue::Group(content) => {
+                match comment{
+                    Some(comment) => Ok(Library { 
+                      attribute: String::from(k), 
+                      content,
+                      comment,
+                    }),
+                    None => Ok(Library { 
+                      attribute: String::from(k), 
+                      content,
+                      comment:vec![],
+                    }),
+                }
+              },
+            },
+            Attribute::Comment(_) => todo!(),
         }
       ),
     )

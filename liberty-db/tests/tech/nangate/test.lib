@@ -1,0 +1,4 @@
+library (NangateOpenCellLibrary) {
+	statetable ("CK E SE","IQ") {
+	} 
+}
