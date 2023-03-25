@@ -1,7 +1,7 @@
 use nom::{
   branch::alt,
-  bytes::complete::{escaped, tag, take_while, is_not, take_until},
-  character::{complete::{alphanumeric1 as alphanumeric, char, one_of, none_of, crlf, anychar}, streaming::alphanumeric1},
+  bytes::complete::{escaped, tag, take_while, is_not, take_until, take_while1},
+  character::{complete::{alphanumeric1 as alphanumeric, char, one_of, none_of, crlf, anychar}, streaming::alphanumeric1, is_alphabetic, is_alphanumeric},
   combinator::{cut, map, opt, value, map_res, all_consuming, recognize, verify},
   error::{context, convert_error, ContextError, ErrorKind, ParseError, VerboseError, VerboseErrorKind, FromExternalError},
   multi::{separated_list0, separated_list1, many0, many0_count, many1},
@@ -95,6 +95,60 @@ where
   ))(i)
 }
 
+
+
+fn unquote_multi<'a, E>(
+  i: &'a str,
+) -> IResult<&'a str, String, E> 
+where
+  E: ParseError<&'a str> 
+   + ContextError<&'a str> 
+   + FromExternalError<&'a str, E>
+{
+preceded(
+  char('\"'),
+  map(
+    pair(
+      many0(
+        delimited(
+          space,
+          take_while(move |c:char| 
+            !"\"\\\n\r".contains(c)
+          ),
+          delimited(
+            char('\\'),
+            space,
+            char('\n'),
+          ),
+        ),
+      ),
+      delimited(
+        space, 
+        take_while(move |c:char| 
+          !"\"\\\n\r".contains(c)
+        ),
+        preceded(
+          space, 
+          char('\"')),
+      ),
+    ),
+    |(list,last)| {
+      list.join("")+&String::from(last)
+    },
+  ),
+)(i)
+}
+#[test]
+fn test_unquote_multi() {
+  println!("{:?}", unquote_multi::<VerboseError<&str>>(r#""L L L : - : L ,\
+              L L H : - : H ,\
+              L H L : - : H ,\
+              L H H : - : H ,\
+              H - - : - : N " ;
+  "#));
+}
+
+
 /// this parser combines the previous `parse_str` parser, that recognizes the
 /// interior of a string, with a parse to recognize the double quote character,
 /// before the string (using `preceded`) and after the string (using `terminated`).
@@ -116,25 +170,26 @@ where
 {
   context(
     "unquote",
-    map(
-      delimited(
-        char('\"'),
-        alt((
-          escaped(
-            none_of("\"\n\r"),
-            '\\', 
-            one_of(r#"\"rnt"#),
+        delimited(
+          char('\"'),
+          map(
+            take_while(move |c:char| 
+              !"\"\n\r".contains(c)
+            ),
+            String::from,
           ),
-          space,
-        )),
-        char('\"'),
-      ),  
-      String::from,
-    )
+          char('\"'),
+        ),
   )(i)
 }
 #[test]
 fn test_unquote() {
+  println!("{:?}", unquote::<VerboseError<&str>>(r#""L L L : - : L ,\
+              L L H : - : H ,\
+              L H L : - : H ,\
+              L H H : - : H ,\
+              H - - : - : N " ;
+  "#));
   println!("{:?}", unquote::<VerboseError<&str>>("\"\"11111"));
   println!("{:?}", unquote::<VerboseError<&str>>("\" \"11111"));
   println!("{:?}", unquote::<VerboseError<&str>>("\" www\"11111"));
@@ -153,21 +208,12 @@ where
 {
   context(
     "key",
-    alt((
       map(
-        many1(
-          alt((
-            alphanumeric1,
-            tag("_"),
-            tag("."),
-            tag("/"),
-            tag("-"),
-            tag("+"),
-          )),
-        ),
-        |list| list.concat(),
+          take_while1(move |c:char| 
+            "/_.+-".contains(c)||is_alphanumeric(c as u8)
+          ),
+          String::from,
       ),
-    )),
     )(i)
 }
 
@@ -197,7 +243,7 @@ where
     map(
       delimited(
         space, 
-        alt((unquote, key)), 
+        alt((unquote, key, unquote_multi)), 
         space,
       ),
       |s| SimpleWrapper { value: s }
@@ -207,6 +253,7 @@ where
 #[test]
 fn x2() {
   println!("{:?}", simple::<VerboseError<&str>>("\"\"11111"));
+  println!("{:?}", simple::<VerboseError<&str>>(" 11111"));
   println!("{:?}", simple::<VerboseError<&str>>("\" \"11111"));
   println!("{:?}", simple::<VerboseError<&str>>("\" www\"11111"));
   println!("{:?}", simple::<VerboseError<&str>>("\"www\" 11111"));
@@ -318,6 +365,7 @@ fn x3() {
   assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\"wwww , bww\")kkkkk"));
   assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\" wwww ,bww\")kkkkk"));
   assert_eq!(Ok(("kkkkk", ComplexWrapper{list:vec![String::from("wwww"), String::from("bww")]})), complex::<VerboseError<&str>>("(\"wwww ,bww \")kkkkk"));
+  println!("{:?}", complex::<VerboseError<&str>>(r#"("CK E SE","IQ")"#));
   let values1 = r#"("0.0365012,1", 2, \
    0.0370929);"#;
   println!("{:?}", complex::<VerboseError<&str>>(values1));
@@ -366,6 +414,11 @@ where
 
 #[test]
 fn x4() {
+  println!("{:?}", key_simple::<VerboseError<&str>>(r#"table: "L L L : - : L ,\
+              L L H : - : H ,\
+              L H L : - : H ,\
+              L H H : - : H ,\
+              H - - : - : N " ;"#));
   println!("{:?}", key_simple::<(&str, ErrorKind)>("comment : \"\";"));
   println!("{:?}", key_simple::<(&str, ErrorKind)>("date : \"[2012 JAN 31]\";"));
   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : setup_falling;"));
@@ -604,7 +657,10 @@ where
    + FromExternalError<&'a str, E>
 {
   preceded(
-    char('*'),
+    alt((
+      tag("*"),
+      tag("//"),
+    )),
     alt((
       terminated(
         take_until("\n"), 
