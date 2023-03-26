@@ -1,17 +1,14 @@
 use nom::{
   branch::alt,
-  bytes::complete::{escaped, tag, take_while, is_not, take_until, take_while1},
-  character::{complete::{alphanumeric1 as alphanumeric, char, one_of, none_of, crlf, anychar}, streaming::alphanumeric1, is_alphabetic, is_alphanumeric},
-  combinator::{cut, map, opt, value, map_res, all_consuming, recognize, verify},
-  error::{context, convert_error, ContextError, ErrorKind, ParseError, VerboseError, VerboseErrorKind, FromExternalError},
-  multi::{separated_list0, separated_list1, many0, many0_count, many1},
-  number::complete::double,
+  bytes::complete::{escaped, tag, take_while, take_until, take_while1},
+  character::{complete::{char, one_of, none_of}, is_alphanumeric},
+  combinator::{map, opt, map_res},
+  error::{context, ContextError, ErrorKind, ParseError, VerboseError, FromExternalError},
+  multi::{separated_list0, many0, many1},
   sequence::{delimited, preceded, separated_pair, terminated, tuple, pair},
   IResult,
 };
 use std::str::{self, FromStr};
-
-use crate::types::HashMap;
 
 #[derive(Debug)]
 pub struct Library{
@@ -82,17 +79,18 @@ where
    + ContextError<&'a str> 
    + FromExternalError<&'a str, E>
 {
-  alt((
-    delimited(
+    terminated(
       space,
-      tag("\\"),
-      preceded(
-        opt(comment), 
-        space_newline,
-      ),
-    ),
-    space,
-  ))(i)
+      opt(
+        tuple((
+          char('\\'),
+          opt(comment), 
+          char('\n'),
+          space,
+        )),
+      )
+    )
+  (i)
 }
 
 
@@ -373,6 +371,7 @@ where
 }
 #[test]
 fn x3() {
+  println!("{:?}", space_newline::<VerboseError<&str>>("\n  \n  "));
   println!("{:?}", complex::<VerboseError<&str>>("(wwww,bww)"));
   println!("{:?}", complex::<VerboseError<&str>>("(wwww , bww)yyyy"));
   println!("{:?}", complex::<VerboseError<&str>>("(\"wwww,bww\")kkkkk"));
@@ -397,97 +396,97 @@ fn x3() {
   println!("{:?}", complex::<VerboseError<&str>>(values));
 }
 
-fn key_simple<'a,E>(
-  i: &'a str,
-) -> IResult<&'a str, (String, SimpleWrapper), E> 
-where
-  E: ParseError<&'a str> 
-   + ContextError<&'a str> 
-   + FromExternalError<&'a str, E>
-{
-  context(
-    "key_simple",
-    separated_pair(
-      preceded(
-        space_newline,
-        key,
-      ),
-      preceded(
-        space_newline_complex,
-        tag(":"),
-      ),  
-      delimited(
-        space_newline_complex,
-        simple,
-        preceded(
-          space,
-          char(';'),
-        ),
-      ),
-    )
-  )(i)
-}
+// fn key_simple<'a,E>(
+//   i: &'a str,
+// ) -> IResult<&'a str, (String, SimpleWrapper), E> 
+// where
+//   E: ParseError<&'a str> 
+//    + ContextError<&'a str> 
+//    + FromExternalError<&'a str, E>
+// {
+//   context(
+//     "key_simple",
+//     separated_pair(
+//       preceded(
+//         space_newline,
+//         key,
+//       ),
+//       preceded(
+//         space_newline_complex,
+//         tag(":"),
+//       ),  
+//       delimited(
+//         space_newline_complex,
+//         simple,
+//         preceded(
+//           space,
+//           char(';'),
+//         ),
+//       ),
+//     )
+//   )(i)
+// }
 
-#[test]
-fn x4() {
-  println!("{:?}", key_simple::<VerboseError<&str>>(r#"table: "L L L : - : L ,\
-              L L H : - : H ,\
-              L H L : - : H ,\
-              L H H : - : H ,\
-              H - - : - : N " ;"#));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("comment : \"\";"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("date : \"[2012 JAN 31]\";"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : setup_falling;"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : \\ \n \"setup_falling\";"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : \"setup_falling\" ;"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : setup_falling ;"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type: setup_falling;"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type :setup_falling ; wwww"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type :setup_falling wwww"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type:setup_falling;wwww"));
-  println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : setup_falling\nwwww"));
-}
+// #[test]
+// fn x4() {
+//   println!("{:?}", key_simple::<VerboseError<&str>>(r#"table: "L L L : - : L ,\
+//               L L H : - : H ,\
+//               L H L : - : H ,\
+//               L H H : - : H ,\
+//               H - - : - : N " ;"#));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("comment : \"\";"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("date : \"[2012 JAN 31]\";"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : setup_falling;"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : \\ \n \"setup_falling\";"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : \"setup_falling\" ;"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : setup_falling ;"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type: setup_falling;"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type :setup_falling ; wwww"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type :setup_falling wwww"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type:setup_falling;wwww"));
+//   println!("{:?}", key_simple::<(&str, ErrorKind)>("timing_type : setup_falling\nwwww"));
+// }
 
-fn key_complex<'a, E>(
-  i: &'a str,
-) -> IResult<&'a str, (String, ComplexWrapper), E> 
-where
-  E: ParseError<&'a str> 
-   + ContextError<&'a str> 
-   + FromExternalError<&'a str, E>
-{
-  context(
-    "key_complex",
-    separated_pair(
-      preceded(
-        space_newline_complex,
-        key,
-      ),
-      space_newline_complex,
-      terminated(
-          complex,
-        preceded(
-          space,
-          char(';'),
-        ),
-      ),
-    )
-  )(i)
-}
+// fn key_complex<'a, E>(
+//   i: &'a str,
+// ) -> IResult<&'a str, (String, ComplexWrapper), E> 
+// where
+//   E: ParseError<&'a str> 
+//    + ContextError<&'a str> 
+//    + FromExternalError<&'a str, E>
+// {
+//   context(
+//     "key_complex",
+//     separated_pair(
+//       preceded(
+//         space_newline_complex,
+//         key,
+//       ),
+//       space_newline_complex,
+//       terminated(
+//           complex,
+//         preceded(
+//           space,
+//           char(';'),
+//         ),
+//       ),
+//     )
+//   )(i)
+// }
 
-#[test]
-fn x5() {
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2 \n (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\");"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2 \\\n (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\");"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2 \\ \n (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\");"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\") ; www"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\"); www"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);\nwww"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);www"));
-  println!("{:?}", key_complex::<VerboseError<&str>>("index_2(\"init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current\");"));
-}
+// #[test]
+// fn x5() {
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 \n (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\");"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 \\\n (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\");"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 \\ \n (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\");"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\") ; www"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\"); www"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);\nwww"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);www"));
+//   println!("{:?}", key_complex::<VerboseError<&str>>("index_2(\"init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current\");"));
+// }
 
 fn group<'a, E>(
   i: &'a str,
@@ -499,43 +498,33 @@ where
 {
   context(
     "group",
-    // map(
+    delimited(
+      preceded(space_newline, char('{')),
       many0(
         preceded(space_newline, key_value),
-        ),
-      // |tuple_vec| {
-      //   tuple_vec
-      //     .into_iter()
-      //     .map(|(k, v)|
-      //       (String::from(k), v)
-      //     )
-      //     .collect()
-      // },
-    // )
+      ),
+      preceded(space_newline, char('}')),
+    ),
   )(i)
 }
 
 #[test]
 fn x55() {
-  //   let shader = r#"
-  //   lu_table_template(recovery_template_6x6) {
-  //     variable_1 : related_pin_transition;
-  //     variable_2 : constrained_pin_transition;
-  //     index_1 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0, 1005.0");
-  //     index_2 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0, 1005.0");
-  //   }
-  // "#;
-  let shader = r#"index_1(\
-    "1000.0, 1001.0, 1002.0,\
-    1003.0, 1004.0, 1005.0");
-    comment : "";
-    date : "[2012 JAN 31]";
-    simulator : "HSPICE -- C-2009.03-SP1 32-BIT (May 25 2009)";
-    variable_1 : related_pin_transition;
-    index_2("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
-    variable_2 : related_pin_transition;"#;
-    println!("{:?}", group::<VerboseError<&str>>(shader));
-    // println!("{:?}", key_value("variable_1 : related_pin_transition;\n      variable_2 : related_pin_transition;"));
+  let shader = r#"
+  {
+    index_1(\
+      "1000.0, 1001.0, 1002.0,\
+      1003.0, 1004.0, 1005.0");
+      comment : "";
+      date : "[2012 JAN 31]";
+      simulator : "HSPICE -- C-2009.03-SP1 32-BIT (May 25 2009)";
+      variable_1 : related_pin_transition;
+      index_2("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
+      variable_2 : related_pin_transition;
+    }
+    "#;
+    assert!(group::<VerboseError<&str>>(shader).is_ok());
+    assert!(key_value::<VerboseError<&str>>("variable_1 : related_pin_transition;\n      variable_2 : related_pin_transition;").is_ok());
     // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);"));
     // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);"));
     // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2 (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\") ; www"));
@@ -543,52 +532,9 @@ fn x55() {
     // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);\nwww"));
     // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);www"));
   }
-fn key_group<'a, E>(
-  i: &'a str,
-) -> IResult<&'a str, (String, GroupWrapper), E> 
-where
-  E: ParseError<&'a str> 
-   + ContextError<&'a str> 
-   + FromExternalError<&'a str, E>
-{
-  context(
-    "key_group",
-    pair(
-      delimited(
-        space_newline,
-        key,
-        space,
-      ),
-      map(
-        pair(
-          complex,
-          delimited(
-            preceded(space_newline, char('{')),
-            group,
-            preceded(space_newline, char('}')),
-          ),
-        ),
-        |(name,attr_list)|(
-          GroupWrapper{
-            name,
-            attr_list,
-          }
-        ),
-      ),
-    )
-  )(i)
-}
 
 #[test]
 fn x6() {
-//   let shader = r#"
-//   lu_table_template(recovery_template_6x6) {
-//     variable_1 : related_pin_transition;
-//     variable_2 : constrained_pin_transition;
-//     index_1 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0, 1005.0");
-//     index_2 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0, 1005.0");
-//   }
-// "#;
 let shader = r#"lu_table_template ( "recovery_template_6x6") { 
     variable_1 : related_pin_transition;
     variable_2 : related_pin_transition;
@@ -602,13 +548,7 @@ let shader = r#"lu_table_template ( "recovery_template_6x6") {
     }
   }
   "#;
-  println!("{:?}", key_group::<(&str, ErrorKind)>(shader));
-  // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);"));
-  // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);"));
-  // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2 (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\") ; www"));
-  // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2 (\"0.06, 0.24, 0.48, 0.9, 1.2, 1.8\"); www"));
-  // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2 (0.06, 0.24, 0.48, 0.9, 1.2, 1.8);\nwww"));
-  // println!("{:?}", key_complex::<(&str, ErrorKind)>("index_2(0.06, 0.24, 0.48, 0.9, 1.2, 1.8);www"));
+  assert!(key_value::<(&str, ErrorKind)>(shader).is_ok());
 }
 
 fn key_value<'a, E>(
@@ -626,19 +566,67 @@ where
         comment,
         Attribute::Comment,
       ),
+      // map(
       map(
-        key_simple, 
-        |(k,v)| Attribute::ValuePair(k, LibertyValue::Simple(v)),
-      ),
-      map(
-        key_complex, 
-        |(k,list)| Attribute::ValuePair(k, LibertyValue::Complex(list)),
-      ),
-      map(
-        key_group, 
-        |(k,group_wrapper)| Attribute::ValuePair(k, LibertyValue::Group(group_wrapper)),
-      ),
-    )),
+        pair(
+          delimited(
+            space_newline,
+            key,
+            space_newline_complex,
+          ),
+          alt((
+            map(
+              tuple((
+                char(':'),
+                space_newline_complex,
+                simple,
+                space,
+                char(';'),
+              )),
+              |(_,_,wrapper,_,_)| LibertyValue::Simple(wrapper),
+            ),
+            map(
+              pair(
+                terminated(
+                  complex, space_newline_complex,
+                ),
+                alt((
+                  map(
+                    char(';'),
+                    |_| None,
+                  ),
+                  map(
+                    group,
+                    |group| Some(group),
+                  ),
+                )),
+              ),
+              |(complex,group)|
+              match group {
+                Some(group) => LibertyValue::Group(
+                  GroupWrapper { name: complex, attr_list: group }),
+                None => LibertyValue::Complex(complex),
+              }
+            ),
+          )),
+        ),
+        |(k,v)| Attribute::ValuePair(k, v)
+      )
+      // |x| todo!()
+      // map(
+      //   key_simple, 
+      //   |(k,v)| Attribute::ValuePair(k, LibertyValue::Simple(v)),
+      // ),
+      // map(
+      //   key_complex, 
+      //   |(k,list)| Attribute::ValuePair(k, LibertyValue::Complex(list)),
+      // ),
+      // map(
+      //   key_group, 
+      //   |(k,group_wrapper)| Attribute::ValuePair(k, LibertyValue::Group(group_wrapper)),
+      // ),
+      // ),
+    ))
   )(i)
 }
 
@@ -694,6 +682,28 @@ fn test_comment(){
   println!("{:?}",comment_single::<VerboseError<&str>>("* www"));
   println!("{:?}",comment_single::<VerboseError<&str>>("* www\nbb"));
   println!("{:?}",comment_single::<VerboseError<&str>>("*\nbb"));
+  println!("{:?}",comment_multi::<VerboseError<&str>>(r#"/**/  "#));
+  println!("{:?}",comment_multi::<VerboseError<&str>>(r#"/*
+  SPDX-FileCopyrightText: 2022 Thomas Kramer <code@tkramer.ch>
+  SPDX-FileCopyrightText: 2011 W. Rhett Davis, and Harun Demircioglu, North Carolina State University
+  SPDX-FileCopyrightText: 2008 W. Rhett Davis, Michael Bucher, and Sunil Basavarajaiah, North Carolina State University (ncsu_basekit subtree), James Stine, and Ivan Castellanos, and Oklahoma State University (osu_soc subtree)
+  SPDX-FileCopyrightText: 2007 W. Rhett Davis, Paul Franzon, Michael Bucher, and Sunil Basavarajaiah, North Carolina State University
+  
+  SPDX-License-Identifier: Apache-2.0
+  */
+  
+  /*
+   Test liberty file for the liberty parser.
+   This is copied from the FreePDK45 but stripped down to save space.
+  */
+        
+  /*
+   delay model :       typ
+   check model :       typ
+   power model :       typ
+   capacitance model : typ
+   other model :       typ
+  */"#));
   println!("{:?}",comment_multi::<VerboseError<&str>>(r#"/* www
   wwaawd
   
@@ -710,54 +720,52 @@ where
 {
   preceded(
     tag("/*"),
-    alt((
-      terminated(
-        take_until("*/"),
-        tag("*/"),),
-      terminated(
-        space, 
-        tag("*/"),
-      ),
-    )),
+    terminated(
+      take_until("*/"),
+      tag("*/"),
+    ),
   )(i)
 }
 
 
+
 /// the root element of a JSON parser is either an object or an array
-pub fn library_wrapper<'a>(
-  i: &'a str,
+pub fn library_wrapper<'a, E>(  i: &'a str,
 ) -> IResult<&'a str, Library, VerboseError<&str>> 
+where
+  E: ParseError<&'a str> 
+   + ContextError<&'a str> 
+   + FromExternalError<&'a str, E>
 {
   context(
     "library_wrapper",
     map_res(
-      pair(
-        terminated(opt(comment), space_newline),
-        terminated(key_value, space_newline),
-      ),
-      |(comment,attri)|(
+      tuple((
+        opt(comment),
+        space_newline,
+        key_value,
+      )),
+      |(comment,_,attri)|
         match attri {
-            Attribute::ValuePair(k, v) => match v {
-              LibertyValue::Simple(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
-              LibertyValue::Complex(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
-              LibertyValue::Group(content) => {
-                match comment{
-                    Some(comment) => Ok(Library { 
-                      attribute: String::from(k), 
-                      content,
-                      comment,
-                    }),
-                    None => Ok(Library { 
-                      attribute: String::from(k), 
-                      content,
-                      comment:vec![],
-                    }),
-                }
-              },
-            },
-            Attribute::Comment(_) => todo!(),
-        }
-      ),
+        Attribute::ValuePair(k, v) => match v {
+          LibertyValue::Simple(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
+          LibertyValue::Complex(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
+          LibertyValue::Group(content) => 
+          match comment{
+            Some(comment) => Ok(Library { 
+              attribute: String::from(k), 
+              content,
+              comment,
+            }),
+            None => Ok(Library { 
+              attribute: String::from(k), 
+              content,
+              comment:vec![],
+            }),
+          },
+        },
+        Attribute::Comment(_) => Err(VerboseError::from_error_kind("No group in root", ErrorKind::Verify)),
+      }
     )
   )(i)
 }
@@ -766,7 +774,7 @@ impl FromStr for Library {
     type Err=std::fmt::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-      match library_wrapper(s) {
+      match library_wrapper::<(&str,ErrorKind)>(s) {
         Ok((_,l)) => Ok(l),
         Err(_) => Err(std::fmt::Error),
     }
@@ -821,24 +829,33 @@ library(gscl45nm) {
   library (/home/jzzhou/project/liberate_demo/LIBRARY/debug_liberate_INV0_hspice) {
     comment : "www";
   }"#;
-  static  TEMPLATE_ERR2: &str = r#"
-  delay_model : table_lookup;
-  in_place_swap_mode : match_footprint;
-  time_unit : "1ns";
-  voltage_unit : "1V";
-  current_unit : "1uA";
-  pulling_resistance_unit : "1kohm";
-  leakage_power_unit : "1nW";
-  capacitive_load_unit (1,pf);
-  slew_upper_threshold_pct_rise : 80;
+  static  TEMPLATE_ERR2: &str = r#"/*
+SPDX-FileCopyrightText: 2022 Thomas Kramer <code@tkramer.ch>
+SPDX-FileCopyrightText: 2011 W. Rhett Davis, and Harun Demircioglu, North Carolina State University
+SPDX-FileCopyrightText: 2008 W. Rhett Davis, Michael Bucher, and Sunil Basavarajaiah, North Carolina State University (ncsu_basekit subtree), James Stine, and Ivan Castellanos, and Oklahoma State University (osu_soc subtree)
+SPDX-FileCopyrightText: 2007 W. Rhett Davis, Paul Franzon, Michael Bucher, and Sunil Basavarajaiah, North Carolina State University
+
+SPDX-License-Identifier: Apache-2.0
+*/
+
+/*
+ Test liberty file for the liberty parser.
+ This is copied from the FreePDK45 but stripped down to save space.
+*/
+      
+/*
+ delay model :       typ
+ check model :       typ
+ power model :       typ
+ capacitance model : typ
+ other model :       typ
+*/
+library(gscl45nm) {}
   "#;
   #[test]
   fn x6() {
-    println!("{:?}", library_wrapper(TEMPLATE_ERR1));
-    // match library_wrapper(TEMPLATE) {
-    //     Ok((_,l)) => println!("{:?}",l),
-    //     Result::Err(_) => todo!(),
-    // }
-    // println!("{:?}", library_wrapper(TEMPLATE_ERR1));
+    // println!("{:?}", library_wrapper::<(&str,ErrorKind)>(TEMPLATE_ERR1));
+    // println!("{:?}", library_wrapper::<(&str,ErrorKind)>(TEMPLATE));
+    println!("{:?}", library_wrapper::<(&str,ErrorKind)>(TEMPLATE_ERR2));
   }
 }
