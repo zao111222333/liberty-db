@@ -1,4 +1,5 @@
 # liberty-db
+*/!\Work in progress, if you put it in production, you fix it/!*
 
 <details>
 <summary>
