@@ -1,19 +1,6 @@
 //! All trait `impl` for
 //! `Timing`.
 
-
-
-use crate::common::traits::Group;
-
-use super::items::CellFall;
-
-impl Group for CellFall {
-    fn name(&self) -> &String {
-        todo!()
-    }
-}
-
-
 mod check{
     //! impl [Check](crate::common::Check) for
     //! `Timing`.

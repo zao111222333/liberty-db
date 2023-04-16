@@ -33,15 +33,18 @@ f64 = []
 log = { version = "0.4", features = ["std", "serde"] }
 hashbrown = "0.12"
 lazy_static = "1.4.0"
+phf = { version = "0.11.1", features = ["macros"] }
 strum = "0.24"
 strum_macros = "0.24"
-cfg-if = "1.0"
+enum_dispatch = "0.3.11"
+# cfg-if = "1.0"
 float-cmp = "0.9.0"
 derivative = "2.2.0"
 prettytable-rs = "^0.10"
 itertools = "0.10.5"
 nom = "7.1"
 liberty-macros = {path = "../liberty-macros", version = "0.1.0"}
+liberty-parser = {path = "../liberty-parser", version = "0.1.1"}
 
 [dependencies.uom]
 version = "0.34.0"
@@ -70,6 +73,7 @@ colored = "2.0.0"
 criterion = "0.3"
 liberty-io = "0.0.2"
 libertyparse = "0.2.2"
+
 [build-dependencies]
 # dircpy = "0.3.14"
 

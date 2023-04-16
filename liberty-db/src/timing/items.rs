@@ -1,7 +1,7 @@
 //! All item structure inside
 //! `Timing`.
 
-use crate::{common::{traits::Group, items::Domain}, expression::{self, LogicLike}};
+use crate::{common::items::Domain, expression::{self, LogicLike}};
 
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.

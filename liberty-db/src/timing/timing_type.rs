@@ -3,6 +3,8 @@
 //! </script>
 use std::{fmt::Display, str::FromStr};
 
+// use nom::error::ParseError;
+
 use crate::{expression::{EdgeState, StaticState}, types::MaxMin};
 
 
@@ -741,6 +743,7 @@ impl PartialEq for ArcNoChange {
 /// min_clock_tree_path |non_seq_setup_rising | non_seq_setup_falling | non_seq_hold_rising | 
 /// non_seq_hold_falling | nochange_high_high | nochange_high_low | nochange_low_high | nochange_low_low ;`
 #[derive(Debug, Clone, Copy, PartialEq)]
+// #[derive(liberty_macros::SingleSimple)]
 pub enum TimingType {
     /// [Combinational](crate::timing::ArcCombinational)
     Combinational(ArcCombinational),
@@ -891,7 +894,7 @@ impl TimingType {
 
 impl FromStr for TimingType {
     type Err=std::fmt::Error;
-
+    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             ArcCombinational::COMBINATIONAL => Ok(Self::COMBINATIONAL),
@@ -938,6 +941,8 @@ impl FromStr for TimingType {
 mod test{
     use std::str::FromStr;
 
+    use nom::{sequence::{delimited,preceded}, multi::many0, combinator::map, IResult, error::Error};
+
     use super::TimingType;
 
     #[test]
@@ -947,4 +952,43 @@ mod test{
             assert_eq!(Ok(t),TimingType::from_str(&format!("{t}")));
         }
     }
+    struct Timing{
+        t1: TimingType,
+        t2: TimingType,
+    }
+    use liberty_parser::{wrapper::space_newline, Group};
+    use nom::character::streaming::char;
+    use phf::phf_map;
+    impl Timing {
+        const MAP: phf::Map<&'static str, liberty_parser::AttriType> = phf_map! {
+            "t1" => liberty_parser::AttriType::SimpleSingle,
+            "t2" => liberty_parser::AttriType::SimpleSingle,
+        };
+        #[inline]
+        fn group_parser<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Group<'a>, Error<&'a str>>{
+            liberty_parser::group_parser(Some(Self::MAP))(i, line_num)
+        }
+    }
+    struct Pin{
+        t: Timing,
+    }
+    impl Pin {
+        const MAP: phf::Map<&'static str, liberty_parser::AttriType> = phf_map! {
+            "t" => liberty_parser::AttriType::Group(&Timing::group_parser),
+        }; 
+        #[inline]
+        fn group_parser<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Group<'a>, Error<&'a str>>{
+            liberty_parser::group_parser(Some(Self::MAP))(i, line_num)
+        }
+    }
+
+    // impl liberty_parser::LibertyAttri for Timing {
+    //     const T: liberty_parser::AttriType = liberty_parser::AttriType::Group(Self::MAP);
+
+    //     fn parser<'a>(i: &'a str) -> nom::IResult<&'a str, Self, nom::error::Error<&str>> 
+    // where
+    //   Self: Sized {
+    //     todo!()
+    // }
+    // }
 }

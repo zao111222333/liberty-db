@@ -110,8 +110,40 @@ pub mod bundle;
 /// `timing` group structure.
 pub mod timing;
 
-pub mod parser;
-
 
 mod types;
 mod util;
+
+
+mod test{
+    use std::{str::FromStr, string};
+
+    struct A (String);
+    impl FromStr for A {
+        type Err=std::fmt::Error;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            Ok(Self(s.to_string()))
+        }
+    }
+    struct B (String);
+    impl FromStr for B {
+        type Err=std::fmt::Error;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            Ok(Self(s.to_string()))
+        }
+    }
+    struct MyStruct{
+        a: A,
+        b: B,
+    }
+
+    // fn xxx(){
+    //     use std::collections::HashMap;
+    //     let mut parsers = HashMap::new();
+    //     let _ = parsers.insert('k', A::from_str);
+    //     let _ = parsers.insert('x', B::from_str);
+    // }
+
+}

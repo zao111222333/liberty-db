@@ -1,5 +1,5 @@
 #[cfg(test)]
-use liberty_db::parser::wrapper::library_wrapper;
+use liberty_parser::wrapper::library_wrapper;
 use colored::Colorize;
 use nom::error::ErrorKind;
 use walkdir::WalkDir;
