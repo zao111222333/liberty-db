@@ -1,9 +1,4 @@
 
-
-pub trait Group {
-    fn name(&self) -> &String;
-}
-
 pub trait Check{
     fn check(&self);
 }
