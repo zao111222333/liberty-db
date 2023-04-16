@@ -19,14 +19,14 @@ impl Port {
     }
 }
 
-impl Into<BooleanExpression> for Port{
-    #[inline]
-    fn into(self) -> BooleanExpression {
-        BooleanExpression{
-            value: Box::new(self)
-        }
-    }
-}
+// impl Into<BooleanExpression> for Port{
+//     #[inline]
+//     fn into(self) -> BooleanExpression {
+//         BooleanExpression{
+//             value: Box::new(self)
+//         }
+//     }
+// }
 
 impl fmt::Display for Port{
     #[inline]
@@ -49,7 +49,7 @@ lazy_static! {
 
 impl BooleanExpressionLike for Port{
     #[inline]
-    fn to_table(&self) -> LogicTable {
+    fn table(&self) -> LogicTable {
         LogicTable::new( 
             &self.name,
             BASIC_MAP.clone(),

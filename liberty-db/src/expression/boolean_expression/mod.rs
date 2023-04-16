@@ -1,6 +1,7 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-rs/2020.09/reference_manual.html');
 //! </script>
+mod test;
 mod logic;
 pub use logic::{
     CommonState,
@@ -34,11 +35,14 @@ mod function;
 pub use function::FunctionExpression;
 
 mod tri_state;
+// use strum_macros::Display;
 pub use tri_state::TriState;
-
+use std::{fmt::{Display,Debug}, hash::Hash};
 /// BooleanExpressionLike
-pub trait BooleanExpressionLike: std::fmt::Display + std::fmt::Debug + BooleanExpressionClone{
-    fn to_table(&self) -> LogicTable;
+#[enum_dispatch::enum_dispatch(BooleanExpression)]
+pub trait BooleanExpressionLike: Display + Debug + Clone{
+    /// get table with function
+    fn table(&self) -> LogicTable;
 }
 
 /// <a name ="reference_link" href="
@@ -49,68 +53,42 @@ pub trait BooleanExpressionLike: std::fmt::Display + std::fmt::Debug + BooleanEx
 /// &end
 /// =132.38
 /// ">Reference</a>
-#[derive(Debug)]
-pub struct BooleanExpression{
-    value: Box<dyn BooleanExpressionLike>,
-}
-
-impl PartialEq for BooleanExpression {
-    fn eq(&self, other: &Self) -> bool {
-        self.to_table() == other.to_table()
-    }
-}
-
-pub trait BooleanExpressionClone {
-    fn clone_box(&self) -> Box<dyn BooleanExpressionLike>;
-}
-
-impl<T> BooleanExpressionClone for T
-where
-    T: 'static + BooleanExpressionLike + Clone,
-{
-    fn clone_box(&self) -> Box<dyn BooleanExpressionLike> {
-        Box::new(self.clone())
-    }
-}
-
-impl Clone for Box<dyn BooleanExpressionLike> {
-    fn clone(&self) -> Self {
-        self.clone_box()
-    }
-}
-
-impl Clone for BooleanExpression {
-    fn clone(&self) -> Self {
-        BooleanExpression { value: self.value.clone_box() }
-    }
-}
-
-use std::{ops::{Deref,DerefMut}, fmt::Display, hash::Hash};
-
-use crate::types::HashMap;
-impl DerefMut for BooleanExpression {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.value
-    }
-}
-impl Deref for BooleanExpression {
-    type Target = Box<dyn BooleanExpressionLike>;
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.value
-    }
+#[enum_dispatch::enum_dispatch]
+#[derive(Debug,Clone)]
+pub enum BooleanExpression {
+    Port(Port),
+    FF(FfExpression),
+    Latch(LatchExpression),
+    Function(FunctionExpression),
+    TriState(TriState),
 }
 
 impl Display for BooleanExpression {
+    #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.value.fmt(f)
+        match self {
+            BooleanExpression::Port(exp) => std::fmt::Display::fmt(&exp, f),
+            BooleanExpression::FF(exp) => std::fmt::Display::fmt(&exp, f),
+            BooleanExpression::Latch(exp) => std::fmt::Display::fmt(&exp, f),
+            BooleanExpression::Function(exp) => std::fmt::Display::fmt(&exp, f),
+            BooleanExpression::TriState(exp) => std::fmt::Display::fmt(&exp, f),
+        }
     }
 }
 
+impl PartialEq for BooleanExpression {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.table() == other.table()
+    }
+}
+
+use crate::types::HashMap;
+
 impl Hash for BooleanExpression {
+    #[inline]
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.value.to_table().hash(state);
+        self.table().hash(state);
     }
 }
 impl BooleanExpression {

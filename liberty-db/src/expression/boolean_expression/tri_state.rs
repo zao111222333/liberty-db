@@ -7,8 +7,8 @@ use super::{
 
 #[derive(Debug,Clone)]
 pub struct TriState {
-    enable: BooleanExpression,
-    logic: BooleanExpression,
+    enable: Box<BooleanExpression>,
+    logic: Box<BooleanExpression>,
 }
 
 impl TriState {
@@ -33,7 +33,7 @@ impl fmt::Display for TriState{
 
 impl BooleanExpressionLike for TriState{
     #[inline]
-    fn to_table(&self) -> LogicTable {
+    fn table(&self) -> LogicTable {
         todo!()
     }
 }

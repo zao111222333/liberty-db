@@ -37,16 +37,13 @@ impl FunctionExpression {
     }
 }
 
-impl Into<BooleanExpression> for FunctionExpression{
-    #[inline]
-    fn into(self) -> BooleanExpression {
-        BooleanExpression{
-            value: Box::new(self)
-        }
-    }
-}
+// impl Into<BooleanExpression> for FunctionExpression{
+//     fn into(self) -> BooleanExpression {
+//         todo!()
+//     }
+// }
 impl BooleanExpressionLike for FunctionExpression{
-    #[inline]
+    
     /// TODO: Add test case for: `XOR` > `AND` > `OR`.
     /// 
     /// The order of precedence of the operators is left to right, with inversion performed first, then XOR, then AND, then OR.
@@ -58,7 +55,8 @@ impl BooleanExpressionLike for FunctionExpression{
     /// &end
     /// =133.13
     /// ">Reference</a>
-    fn to_table(&self) -> LogicTable {
+    #[inline]
+    fn table(&self) -> LogicTable {
         #[inline]
         fn compute_op2(
             target_op2: &LogicOperator2, 
@@ -90,17 +88,19 @@ impl BooleanExpressionLike for FunctionExpression{
                                                                           .map(
                                                                                 |(idx,x)|
                                                                                     match self.op1_vec[idx] {
-                                                                                        Some(op1) => op1.compute_table(&x.to_table()),
-                                                                                        None => x.to_table(),
+                                                                                        Some(op1) => op1.compute_table(&x.table()),
+                                                                                        None => x.table(),
                                                                                     }
                                                                             )
                                                                           .collect();
         let (_op_xor,_state_xor) = compute_op2(&LogicOperator2::Xor,op_vec,state_table_vec);
         let (_op_and,_state_and) = compute_op2(&LogicOperator2::And,&_op_xor,&_state_xor);
         let (_op_or,_state_or) = compute_op2(&LogicOperator2::Or,&_op_and,&_state_and);
-        let mut out = _state_or[0].clone();
-        out.self_node = self.to_string();
-        out
+        LogicTable{ 
+            self_node: self.to_string(),
+            table: _state_or[0].table.clone(),
+            port_idx: _state_or[0].port_idx.clone(),
+        }
     }
 }
 

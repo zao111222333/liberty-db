@@ -36,7 +36,7 @@ impl fmt::Display for LatchExpression{
 }
 
 impl BooleanExpressionLike for LatchExpression{
-    fn to_table(&self) -> LogicTable {
+    fn table(&self) -> LogicTable {
         todo!()
     }
 }

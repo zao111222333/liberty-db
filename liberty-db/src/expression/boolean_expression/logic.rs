@@ -388,9 +388,9 @@ impl LogicState {
     /// Rise
     pub const R: Self = Self::Edge(EdgeState::R);
     /// High
-    pub const H: Self = Self::Static(StaticState::L);
+    pub const H: Self = Self::Static(StaticState::H);
     /// Low
-    pub const L: Self = Self::Static(StaticState::H);
+    pub const L: Self = Self::Static(StaticState::L);
     const LIST: [Self;6] = [
         Self::X,
         Self::Z,
@@ -633,7 +633,7 @@ impl LogicOperator1 {
                             )
                           .collect(),
             a.port_idx.clone(),
-                        )
+        )
     }
 }
 

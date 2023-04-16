@@ -40,7 +40,7 @@ impl fmt::Display for FfExpression{
 }
 
 impl BooleanExpressionLike for FfExpression{
-    fn to_table(&self) -> LogicTable {
+    fn table(&self) -> LogicTable {
         todo!()
     }
 }
