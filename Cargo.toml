@@ -5,3 +5,8 @@ members = [
     "liberty-macros",
     "liberty-parser",
 ]
+
+[workspace.dependencies]
+log = { version = "0.4", features = ["std", "serde"] }
+nom = "7.1"
+thiserror = "1.0.40"

@@ -24,25 +24,24 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 
 [features]
-default = ["f32"]
-f32 = []
-f64 = []
+# default = ["f32"]
+# f32 = []
+# f64 = []
 
 
 [dependencies]
-log = { version = "0.4", features = ["std", "serde"] }
 hashbrown = "0.12"
+nom = {workspace = true}
+log = {workspace = true}
+thiserror = {workspace = true}
 lazy_static = "1.4.0"
-phf = { version = "0.11.1", features = ["macros"] }
 strum = "0.24"
 strum_macros = "0.24"
 enum_dispatch = "0.3.11"
-# cfg-if = "1.0"
 float-cmp = "0.9.0"
 derivative = "2.2.0"
 prettytable-rs = "^0.10"
 itertools = "0.10.5"
-nom = "7.1"
 liberty-macros = {path = "../liberty-macros", version = "0.1.0"}
 liberty-parser = {path = "../liberty-parser", version = "0.1.1"}
 
@@ -56,7 +55,8 @@ features = [
     # "bigint", "biguint", # Arbitrary width integer storage types.
     # "rational", "rational32", "rational64", "bigrational", # Integer ratio storage types.
     # "complex32", "complex64", # Complex floating point storage types.
-    "f32", "f64", # Floating point storage types.
+    # "f32", 
+    "f64", # Floating point storage types.
     "si", "std", # Built-in SI system and std library support.
     # "use_serde", # Serde support.
 ]

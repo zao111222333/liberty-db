@@ -5,6 +5,8 @@ use std::{fmt::Display, str::FromStr};
 
 // use nom::error::ParseError;
 
+use liberty_parser::SimpleAttri;
+
 use crate::{expression::{EdgeState, StaticState}, types::MaxMin};
 
 
@@ -755,13 +757,58 @@ pub enum TimingType {
     NoChange(ArcNoChange),
 }
 
-impl Default for TimingType {
-    /// combinational
+impl SimpleAttri for TimingType {
+    type Error=std::fmt::Error;
     #[inline]
-    fn default() -> Self {
-        Self::COMBINATIONAL
+    fn parse(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            ArcCombinational::COMBINATIONAL => Ok(Self::COMBINATIONAL),
+            ArcCombinational::COMBINATIONAL_RISE => Ok(Self::COMBINATIONAL_RISE),
+            ArcCombinational::COMBINATIONAL_FALL => Ok(Self::COMBINATIONAL_FALL),
+            ArcCombinational::THREE_STATE_DISABLE => Ok(Self::THREE_STATE_DISABLE),
+            ArcCombinational::THREE_STATE_DISABLE_RISE => Ok(Self::THREE_STATE_DISABLE_RISE),
+            ArcCombinational::THREE_STATE_DISABLE_FALL => Ok(Self::THREE_STATE_DISABLE_FALL),
+            ArcCombinational::THREE_STATE_ENABLE => Ok(Self::THREE_STATE_ENABLE),
+            ArcCombinational::THREE_STATE_ENABLE_RISE => Ok(Self::THREE_STATE_ENABLE_RISE),
+            ArcCombinational::THREE_STATE_ENABLE_FALL => Ok(Self::THREE_STATE_ENABLE_FALL),
+            ArcSequential::RISING_EDGE => Ok(Self::RISING_EDGE),
+            ArcSequential::FALLING_EDGE => Ok(Self::FALLING_EDGE),
+            ArcSequential::PRESET => Ok(Self::PRESET),
+            ArcSequential::CLEAR => Ok(Self::CLEAR),
+            ArcSequential::HOLD_RISING => Ok(Self::HOLD_RISING),
+            ArcSequential::HOLD_FALLING => Ok(Self::HOLD_FALLING),
+            ArcSequential::SETUP_RISING => Ok(Self::SETUP_RISING),
+            ArcSequential::SETUP_FALLING => Ok(Self::SETUP_FALLING),
+            ArcSequential::RECOVERY_RISING => Ok(Self::RECOVERY_RISING),
+            ArcSequential::RECOVERY_FALLING => Ok(Self::RECOVERY_FALLING),
+            ArcSequential::SKEW_RISING => Ok(Self::SKEW_RISING),
+            ArcSequential::SKEW_FALLING => Ok(Self::SKEW_FALLING),
+            ArcSequential::REMOVAL_RISING => Ok(Self::REMOVAL_RISING),
+            ArcSequential::REMOVAL_FALLING => Ok(Self::REMOVAL_FALLING),
+            ArcSequential::MIN_PULSE_WIDTH => Ok(Self::MIN_PULSE_WIDTH),
+            ArcSequential::MINIMUM_PERIOD => Ok(Self::MINIMUM_PERIOD),
+            ArcSequential::MAX_CLOCK_TREE_PATH => Ok(Self::MAX_CLOCK_TREE_PATH),
+            ArcSequential::MIN_CLOCK_TREE_PATH => Ok(Self::MIN_CLOCK_TREE_PATH),
+            ArcNonSequential::NON_SEQ_SETUP_RISING => Ok(Self::NON_SEQ_SETUP_RISING),
+            ArcNonSequential::NON_SEQ_SETUP_FALLING => Ok(Self::NON_SEQ_SETUP_FALLING),
+            ArcNonSequential::NON_SEQ_HOLD_RISING => Ok(Self::NON_SEQ_HOLD_RISING),
+            ArcNonSequential::NON_SEQ_HOLD_FALLING => Ok(Self::NON_SEQ_HOLD_FALLING),
+            ArcNoChange::NOCHANGE_HIGH_HIGH => Ok(Self::NOCHANGE_HIGH_HIGH),
+            ArcNoChange::NOCHANGE_HIGH_LOW => Ok(Self::NOCHANGE_HIGH_LOW),
+            ArcNoChange::NOCHANGE_LOW_HIGH => Ok(Self::NOCHANGE_LOW_HIGH),
+            ArcNoChange::NOCHANGE_LOW_LOW => Ok(Self::NOCHANGE_LOW_LOW),
+            _ => Err(std::fmt::Error)
+        }
     }
 }
+
+// impl Default for TimingType {
+//     /// combinational
+//     #[inline]
+//     fn default() -> Self {
+//         Self::COMBINATIONAL
+//     }
+// }
 impl Display for TimingType {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -890,105 +937,4 @@ impl TimingType {
     pub fn iter() -> impl Iterator<Item = Self> {
         Self::LIST.iter().copied()
     }
-}
-
-impl FromStr for TimingType {
-    type Err=std::fmt::Error;
-    #[inline]
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            ArcCombinational::COMBINATIONAL => Ok(Self::COMBINATIONAL),
-            ArcCombinational::COMBINATIONAL_RISE => Ok(Self::COMBINATIONAL_RISE),
-            ArcCombinational::COMBINATIONAL_FALL => Ok(Self::COMBINATIONAL_FALL),
-            ArcCombinational::THREE_STATE_DISABLE => Ok(Self::THREE_STATE_DISABLE),
-            ArcCombinational::THREE_STATE_DISABLE_RISE => Ok(Self::THREE_STATE_DISABLE_RISE),
-            ArcCombinational::THREE_STATE_DISABLE_FALL => Ok(Self::THREE_STATE_DISABLE_FALL),
-            ArcCombinational::THREE_STATE_ENABLE => Ok(Self::THREE_STATE_ENABLE),
-            ArcCombinational::THREE_STATE_ENABLE_RISE => Ok(Self::THREE_STATE_ENABLE_RISE),
-            ArcCombinational::THREE_STATE_ENABLE_FALL => Ok(Self::THREE_STATE_ENABLE_FALL),
-            ArcSequential::RISING_EDGE => Ok(Self::RISING_EDGE),
-            ArcSequential::FALLING_EDGE => Ok(Self::FALLING_EDGE),
-            ArcSequential::PRESET => Ok(Self::PRESET),
-            ArcSequential::CLEAR => Ok(Self::CLEAR),
-            ArcSequential::HOLD_RISING => Ok(Self::HOLD_RISING),
-            ArcSequential::HOLD_FALLING => Ok(Self::HOLD_FALLING),
-            ArcSequential::SETUP_RISING => Ok(Self::SETUP_RISING),
-            ArcSequential::SETUP_FALLING => Ok(Self::SETUP_FALLING),
-            ArcSequential::RECOVERY_RISING => Ok(Self::RECOVERY_RISING),
-            ArcSequential::RECOVERY_FALLING => Ok(Self::RECOVERY_FALLING),
-            ArcSequential::SKEW_RISING => Ok(Self::SKEW_RISING),
-            ArcSequential::SKEW_FALLING => Ok(Self::SKEW_FALLING),
-            ArcSequential::REMOVAL_RISING => Ok(Self::REMOVAL_RISING),
-            ArcSequential::REMOVAL_FALLING => Ok(Self::REMOVAL_FALLING),
-            ArcSequential::MIN_PULSE_WIDTH => Ok(Self::MIN_PULSE_WIDTH),
-            ArcSequential::MINIMUM_PERIOD => Ok(Self::MINIMUM_PERIOD),
-            ArcSequential::MAX_CLOCK_TREE_PATH => Ok(Self::MAX_CLOCK_TREE_PATH),
-            ArcSequential::MIN_CLOCK_TREE_PATH => Ok(Self::MIN_CLOCK_TREE_PATH),
-            ArcNonSequential::NON_SEQ_SETUP_RISING => Ok(Self::NON_SEQ_SETUP_RISING),
-            ArcNonSequential::NON_SEQ_SETUP_FALLING => Ok(Self::NON_SEQ_SETUP_FALLING),
-            ArcNonSequential::NON_SEQ_HOLD_RISING => Ok(Self::NON_SEQ_HOLD_RISING),
-            ArcNonSequential::NON_SEQ_HOLD_FALLING => Ok(Self::NON_SEQ_HOLD_FALLING),
-            ArcNoChange::NOCHANGE_HIGH_HIGH => Ok(Self::NOCHANGE_HIGH_HIGH),
-            ArcNoChange::NOCHANGE_HIGH_LOW => Ok(Self::NOCHANGE_HIGH_LOW),
-            ArcNoChange::NOCHANGE_LOW_HIGH => Ok(Self::NOCHANGE_LOW_HIGH),
-            ArcNoChange::NOCHANGE_LOW_LOW => Ok(Self::NOCHANGE_LOW_LOW),
-            _ => Err(std::fmt::Error)
-        }
-    }
-}
-
-#[cfg(test)]
-mod test{
-    use std::str::FromStr;
-
-    use nom::{sequence::{delimited,preceded}, multi::many0, combinator::map, IResult, error::Error};
-
-    use super::TimingType;
-
-    #[test]
-    fn iter() {
-        for t in TimingType::iter(){
-            println!("{t}\t{t:?}");
-            assert_eq!(Ok(t),TimingType::from_str(&format!("{t}")));
-        }
-    }
-    struct Timing{
-        t1: TimingType,
-        t2: TimingType,
-    }
-    use liberty_parser::{wrapper::space_newline, Group};
-    use nom::character::streaming::char;
-    use phf::phf_map;
-    impl Timing {
-        const MAP: phf::Map<&'static str, liberty_parser::AttriType> = phf_map! {
-            "t1" => liberty_parser::AttriType::SimpleSingle,
-            "t2" => liberty_parser::AttriType::SimpleSingle,
-        };
-        #[inline]
-        fn group_parser<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Group<'a>, Error<&'a str>>{
-            liberty_parser::group_parser(Some(Self::MAP))(i, line_num)
-        }
-    }
-    struct Pin{
-        t: Timing,
-    }
-    impl Pin {
-        const MAP: phf::Map<&'static str, liberty_parser::AttriType> = phf_map! {
-            "t" => liberty_parser::AttriType::Group(&Timing::group_parser),
-        }; 
-        #[inline]
-        fn group_parser<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Group<'a>, Error<&'a str>>{
-            liberty_parser::group_parser(Some(Self::MAP))(i, line_num)
-        }
-    }
-
-    // impl liberty_parser::LibertyAttri for Timing {
-    //     const T: liberty_parser::AttriType = liberty_parser::AttriType::Group(Self::MAP);
-
-    //     fn parser<'a>(i: &'a str) -> nom::IResult<&'a str, Self, nom::error::Error<&str>> 
-    // where
-    //   Self: Sized {
-    //     todo!()
-    // }
-    // }
 }

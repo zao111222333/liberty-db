@@ -1044,66 +1044,50 @@ impl Searcher {
         let get_port_idx = |port: &Port|->Option<usize>{table.port_idx.iter().position(|v| v==port)};
         let include_state_idx = self.include_port_state
                                                         .iter()
-                                                        .filter(
-                                                            |(port,_)|
-                                                            match get_port_idx(port){
-                                                                Some(_) => true,
-                                                                None => {error!("Can Not Find {}, auto skip it.",port);false},
-                                                            }
-                                                        )
-                                                        .map(
+                                                        .filter_map(
                                                             |(port,state_want)|
-                                                            (get_port_idx(port).unwrap(),state_want)
+                                                            match get_port_idx(port){
+                                                                Some(u) => Some((u,state_want)),
+                                                                None => {error!("Can Not Find {}, auto skip it.",port);None},
+                                                            }
                                                         ).collect::<Vec<(usize, &HashSet<LogicState>)>>();
         let exclude_state_idx = self.exclude_port_state
                                                         .iter()
-                                                        .filter(
-                                                            |(port,_)|
-                                                            match get_port_idx(port){
-                                                                Some(_) => true,
-                                                                None => {error!("Can Not Find {}, auto skip it.",port);false},
-                                                            }
-                                                        )
-                                                        .map(
+                                                        .filter_map(
                                                             |(port,state_want)|
-                                                            (get_port_idx(port).unwrap(),state_want)
+                                                            match get_port_idx(port){
+                                                                Some(u) => Some((u,state_want)),
+                                                                None => {error!("Can Not Find {}, auto skip it.",port);None},
+                                                            }
                                                         ).collect::<Vec<(usize, &HashSet<LogicState>)>>();          
         LogicTable::new(
             &format!("[{}]-[{self}]",table.self_node),
             table.table.iter()
-                    .filter(|(k_vec,v_state)|
+                    .filter_map(|(k_vec,v_state)|
                         {
-                            match &self.include_out_state {
-                                Some(_include_out_state) => 
+                            if let Some(_include_out_state) = &self.include_out_state{
                                 if !_include_out_state.contains(v_state) {
-                                    return false;
-                                },
-                                _ => (),
+                                    return None;
+                                }
                             }
                             
-                            match &self.exclude_out_state {
-                                Some(_exclude_out_state) => 
+                            if let Some(_exclude_out_state) = &self.exclude_out_state{ 
                                 if _exclude_out_state.contains(v_state) {
-                                    return false;
-                                },
-                                _ => (),
+                                    return None;
+                                }
                             }
                             for (port_idx,state) in include_state_idx.iter(){
                                 if !state.contains(&k_vec[*port_idx]) {
-                                    return false;
+                                    return None;
                                 }
                             }
                             for (port_idx,state) in exclude_state_idx.iter(){
                                 if state.contains(&k_vec[*port_idx]) {
-                                    return false;
+                                    return None;
                                 }
                             }
-                            return true
+                            return Some((k_vec.clone(), v_state.clone()))
                         }
-                    )
-                    .map(
-                        |(k_vec,v_state)|
-                        (k_vec.clone(), v_state.clone())
                     )
                     .collect::<HashMap<LogicVector, LogicState>>(),
             table.port_idx.clone(),

@@ -23,7 +23,17 @@ fn uom() {
     // let t2 = units::minute!(1.0);
     // let x:units::ElectricCurrent = ma.from_primitive(5.0);
 }
-
+#[test]
+fn t() {
+    fn tt(s: &str) {
+        println!("{:?}",s);
+    }
+    let s: &str = "646464";
+    println!("{}",&s);
+    tt(s);
+    tt(&s);
+    // assert_eq!(s,&s)
+}
 #[cfg(feature = "f64")]
 // #[cfg("f64")]
 // #[cfg(test)]
