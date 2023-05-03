@@ -24,6 +24,6 @@ Click to show Cargo.toml.
 
 ```toml
 [dependencies]
-liberty_db = "0.1.7"
+liberty_db = "0.2"
 ```
 </details>
