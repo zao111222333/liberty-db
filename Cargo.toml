@@ -1,12 +1,75 @@
-[workspace]
-
-members = [
-    "liberty-db",
-    "liberty-macros",
-    "liberty-parser",
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+name = "liberty-db"
+version = "0.2.0"
+edition = "2021"
+license = "MIT"
+keywords = [
+    "eda", 
+    "liberty",
+    "database",
+    "parser",
 ]
+description = "`liberty` data structre"
+authors = ["Junzhuo <zhou@junzhuo.site>"]
+readme = "README.md"
+repository = "https://github.com/zao111222333/liberty-db/"
+documentation = "https://docs.rs/liberty-db"
+include = ["/src", "/tests", "/docs/header.html", "/build.rs", "README.md"]
 
-[workspace.dependencies]
+# Enable katex in documentation
+# RUSTDOCFLAGS="--html-in-header docs/header.html" cargo doc --no-deps --open
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
+
+[features]
+default = []
+
+[workspace]
+members = ["macros"]
+
+
+
+[dependencies]
+liberty-macros = {path = "./macros", version = "0.2.0"}
 log = { version = "0.4", features = ["std", "serde"] }
 nom = "7.1"
 thiserror = "1.0.40"
+lazy_static = "1.4.0"
+strum = "0.24"
+strum_macros = "0.24"
+enum_dispatch = "0.3.11"
+float-cmp = "0.9.0"
+derivative = "2.2.0"
+prettytable-rs = "^0.10"
+itertools = "0.10.5"
+
+[dependencies.uom]
+version = "0.34.0"
+default-features = false
+features = [
+    "f64", # Floating point storage types.
+    "si", "std", # Built-in SI system and std library support.
+    # "use_serde", # Serde support.
+]
+
+
+[dev-dependencies]
+env_logger = "0.10"
+test-log = { version = "0.2.11", features = ["trace"], default-features = false }
+tracing = {version = "0.1", default-features = false}
+tracing-subscriber = {version = "0.3", default-features = false, features = ["env-filter", "fmt"]}
+walkdir = "2"
+# test-case = "3.0.0"
+colored = "2.0.0"
+criterion = "0.3"
+liberty-io = "0.0.2"
+libertyparse = "0.2.2"
+
+[build-dependencies]
+# dircpy = "0.3.14"
+
+# [[bench]]
+# name = "my_benchmark"
+# harness = false
