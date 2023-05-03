@@ -1,3 +1,4 @@
+//! cargo expand common::demo
 use crate::timing::TimingType;
 
 #[derive(Default)]
@@ -100,6 +101,11 @@ fn cell_test(){
     println!("{n}");
     println!("{:?}",<Cell as crate::ast::GroupAttri>::nom_parse(r#"(INV){
         pin(C){
+            timing(w){
+                t1: combinational;
+            }
+        }
+        pin("A"){
             timing(w){
                 t1: combinational;
             }
