@@ -4,7 +4,7 @@ use syn::{parse_macro_input, DeriveInput, Attribute, NestedMeta};
 use syn::{Data, Fields};
 
 #[proc_macro_derive(NameIdx)]
-pub fn name_idx_macro(input: TokenStream) -> TokenStream {
+pub fn macro_name_idx(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let name = &ast.ident;
   let idx_name = format_ident!("{}Idx", name);
@@ -30,21 +30,21 @@ pub fn name_idx_macro(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(Group, attributes(arrti_type))]
-pub fn group_macro(input: TokenStream) -> TokenStream {
+pub fn macro_group(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
-  let toks =from_string_inner(&ast, false).unwrap_or_else(|err| err.to_compile_error().into());
+  let toks = group_inner(&ast, false).unwrap_or_else(|err| err.to_compile_error().into());
   toks.into()
 }
 
 #[proc_macro_derive(GroupHashed, attributes(arrti_type))]
-pub fn group_macro1(input: TokenStream) -> TokenStream {
+pub fn macro_group_hashed(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
-  let toks =from_string_inner(&ast, true).unwrap_or_else(|err| err.to_compile_error().into());
+  let toks = group_inner(&ast, true).unwrap_or_else(|err| err.to_compile_error().into());
   toks.into()
 }
 
 use proc_macro2::Span;
-fn from_string_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>{
+fn group_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>{
   let name = &ast.ident;
   let st = match &ast.data {
     Data::Struct(s) => s,

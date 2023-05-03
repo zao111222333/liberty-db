@@ -18,8 +18,7 @@ impl crate::ast::ComplexAttri for Values {
     }
   }
 }
-#[derive(Default)]
-#[derive(Debug)]
+#[derive(Default,Debug)]
 #[derive(liberty_macros::Group)]
 struct Timing{
   _undefined: crate::ast::UndefinedAttributes,
