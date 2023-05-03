@@ -33,7 +33,6 @@ pub fn name_idx_macro(input: TokenStream) -> TokenStream {
 pub fn group_macro(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let toks =from_string_inner(&ast, false).unwrap_or_else(|err| err.to_compile_error().into());
-  println!("{}", toks);
   toks.into()
 }
 
@@ -41,7 +40,6 @@ pub fn group_macro(input: TokenStream) -> TokenStream {
 pub fn group_macro1(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let toks =from_string_inner(&ast, true).unwrap_or_else(|err| err.to_compile_error().into());
-  println!("{}", toks);
   toks.into()
 }
 
@@ -99,7 +97,8 @@ fn from_string_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>
                 (input,n) = crate::ast::parser::space_newline(input)?;
                 *line_num+=n;
               },
-              AttriType::GroupHashed => arm = quote!{
+              AttriType::GroupHashed => arm = 
+              quote!{
                 let group: _;
                 let title: _;
                 (input,(title,group)) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
@@ -172,12 +171,6 @@ fn from_string_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>
       }
     }
   };
-  // impl_group = quote!{
-  //   #impl_group
-  //   struct xxxx{}
-  // };
-  // todo!()
-  // Err(syn::Error::new(Span::call_site(), "This macro only supports struct."))
   Ok(quote!{
       #impl_group
   }.into())
@@ -197,18 +190,16 @@ fn parse_field_attrs(field_attrs: &Vec<Attribute>) -> Option<AttriType>{
   for attri in field_attrs.into_iter(){
     if let Some(seg_title) = attri.path.segments.first(){
       if "arrti_type"== &seg_title.ident.to_string(){
-        if let Ok(nested)=attri.parse_args::<NestedMeta>(){
-          if let NestedMeta::Meta(meta) = nested{
-            if let Some(seg_type) = meta.path().segments.first(){
-              let type_str = seg_type.ident.to_string();
-              match type_str.as_str(){
-                "simple" => return Some(AttriType::Simple),
-                "simple_multi" => return Some(AttriType::SimpleMulti),
-                "complex" => return Some(AttriType::Complex),
-                "group" => return Some(AttriType::Group),
-                "group_hashed" => return Some(AttriType::GroupHashed),
-                _ => return Some(AttriType::Unkown(type_str)),
-              }
+        if let Ok(NestedMeta::Meta(meta))=attri.parse_args::<NestedMeta>(){
+          if let Some(seg_type) = meta.path().segments.first(){
+            let type_str = seg_type.ident.to_string();
+            match type_str.as_str(){
+              "simple" => return Some(AttriType::Simple),
+              "simple_multi" => return Some(AttriType::SimpleMulti),
+              "complex" => return Some(AttriType::Complex),
+              "group" => return Some(AttriType::Group),
+              "group_hashed" => return Some(AttriType::GroupHashed),
+              _ => return Some(AttriType::Unkown(type_str)),
             }
           }
         }
