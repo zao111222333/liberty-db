@@ -1,14 +1,22 @@
+//!
+//! All parser utilis.
+//!
+
+
 use nom::{
   error::{Error, ContextError, FromExternalError, ParseError, ErrorKind, VerboseError}, 
   IResult, 
-  combinator::{map, opt, map_res, map_opt},
-  sequence::{tuple, delimited, preceded, pair, terminated},
+  combinator::{map, opt, map_opt},
+  sequence::{tuple, delimited, preceded, pair},
   character::streaming::{char, none_of, one_of},
   branch::alt,
   bytes::{streaming::{take_while, escaped, take_until, take}, complete::tag}, 
   multi::{separated_list0, many0}, 
   InputTakeAtPosition, 
 };
+
+use crate::ast::GroupWrapper;
+
 fn comment_single<'a>(
   i: &'a str,
 ) -> IResult<&'a str, usize, Error<&'a str>> 
@@ -57,7 +65,7 @@ fn comment_test(){
 }
 
 #[inline]
-pub fn space<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>> 
+fn space<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>> 
 {
   map(
     take_while(move |c| " \t\r".contains(c)), 
@@ -65,7 +73,7 @@ pub fn space<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>>
   )(i)
 }
 #[inline]
-pub fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
+pub(crate) fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
 {
   map(
     take_while(move |c| " \t\r\n".contains(c)), 
@@ -74,7 +82,7 @@ pub fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>>
 }
 
 #[inline]
-pub fn space_newline_slash<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
+fn space_newline_slash<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
 {
   map(
     pair(
@@ -125,9 +133,63 @@ fn space_test(){
 }
 
 #[inline]
-pub fn undefine<'a>(i: &'a str) -> IResult<&'a str, super::AttriValue, Error<&'a str>> 
+pub(crate) fn undefine<'a>(
+  i: &'a str, line_num: &mut usize,
+) -> IResult<&'a str, super::AttriValue, Error<&'a str>> 
 {
-  todo!()
+  let line_num_back = line_num.clone();
+  if let Ok((input,res)) = simple(i, line_num){
+    return Ok(
+      (
+        input,
+        super::AttriValue::Simple(res.to_string()),
+      )
+    )
+  }
+  *line_num=line_num_back;
+  if let Ok((input,res)) = complex(i, line_num){
+    return Ok(
+      (
+        input,
+        super::AttriValue::Complex(res.into_iter()
+                                      .map(|v|
+                                            v.into_iter().map(ToString::to_string).collect()
+                                          ).collect() 
+                                        ),
+      )
+    )
+  }
+  *line_num=line_num_back;
+  match title(i, line_num){
+    Ok((mut input, title)) => {
+      let mut res = GroupWrapper{
+        title: title.into_iter().map(ToString::to_string).collect(),
+        attr_list: vec![],
+      };
+      loop {
+        match key(input) {
+          Err(nom::Err::Error(_)) => {
+            (input, _) = end_group(input)?;
+            return Ok((input, super::AttriValue::Group(res)));
+          }
+          Err(e) => return Err(e),
+          Ok((_input, _key)) => {
+            input = _input;
+            if let Ok((_input, attri)) = undefine(_input, line_num){
+              input = _input;
+              if let super::AttriValue::Group(_)=attri{
+                let n: usize;
+                (input,n) = space_newline(input)?;
+                *line_num+=n;
+              }
+              res.attr_list.push((_key.to_owned(),attri));
+            }
+          }
+        }
+      }
+    },
+    Err(e) => return Err(e),
+  }
 }
 
 #[inline]
@@ -160,7 +222,7 @@ fn unquote_test(){
 }
 
 
-pub fn key<'a, E>(
+pub(crate) fn key<'a, E>(
   i: &'a str,
 ) -> IResult<&'a str, &'a str, E> 
 where
@@ -174,7 +236,7 @@ where
   )
 }
 
-pub fn word<'a, E>(
+pub(crate) fn word<'a, E>(
   i: &'a str,
 ) -> IResult<&'a str, &'a str, E> 
 where
@@ -287,7 +349,7 @@ fn key_test(){
 }
 
 
-pub fn title<'a>(
+pub(crate) fn title<'a>(
   i: &'a str, line_num: &mut usize,
 ) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>>
 {
@@ -317,7 +379,7 @@ pub fn title<'a>(
   )(i)
 }
 
-pub fn end_group<'a>(
+pub(crate) fn end_group<'a>(
   i: &'a str, 
 ) -> IResult<&'a str, (), Error<&'a str>>
 {

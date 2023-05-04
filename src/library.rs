@@ -1,13 +1,18 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
-use crate::types::*;
+// use crate::types::*;
 use crate::units;
 use crate::cell::Cell;
 use std::collections::HashMap;
-#[derive(Debug)]
+#[derive(Debug,Default)]
+#[derive(liberty_macros::GroupHashed)]
+#[derive(liberty_macros::NameIdx)]
 pub struct Library{
+    _undefined: crate::ast::UndefinedAttributes,
+    #[arrti_type(complex)]
     pub time_unit: units::Time,
+    #[arrti_type(complex)]
     pub capacitance_unit: units::Capacitance,
     pub voltage_unit: units::ElectricPotential,
     pub resistance_unit: units::ElectricalResistance,
@@ -16,7 +21,8 @@ pub struct Library{
     pub power_unit: units::Power,
     pub distance_unit: units::Length,
     pub scalar_unit: units::Ratio,
-    pub cell_map: HashMap<String, Cell>,
+    #[arrti_type(group_hashed)]
+    pub cell: <Cell as crate::ast::GroupAttri>::Set,
     pub voltage_map: HashMap<String, f64>,
     pub sensitization_map: HashMap<String, Sensitization>,
 }

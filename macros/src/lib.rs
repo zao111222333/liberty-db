@@ -10,14 +10,21 @@ pub fn macro_name_idx(input: TokenStream) -> TokenStream {
   let idx_name = format_ident!("{}Idx", name);
   let toks = quote! {
     /// Identitied by its Name.
-    #[derive(Debug,Default,Hash,Eq, PartialEq)]
+    #[derive(Debug,Default,Hash,Eq,PartialEq)]
     pub struct #idx_name {
       // Name.
       pub name: String,
     }
+    impl crate::ast::GroupIdx for #idx_name {
+      #[inline]
+      fn title(&self) -> Vec<String> {
+        vec![self.name.clone()]
+      }
+    }
     impl crate::ast::HashedGroup for #name {
       type Idx=#idx_name;
-      fn idx<'a>(s: &Self, mut title: Vec<&'a str>)->Result<Self::Idx,crate::ast::IdxError<'a>> {
+      #[inline]
+      fn idx<'a>(&self, mut title: Vec<&'a str>)->Result<Self::Idx,crate::ast::IdxError<'a>>{
         let l=title.len();
         if l!=1{
             return Err(crate::ast::IdxError::TitleLenMismatch(1,l,title));
@@ -44,22 +51,38 @@ pub fn macro_group_hashed(input: TokenStream) -> TokenStream {
 }
 
 use proc_macro2::Span;
-fn group_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>{
+fn group_inner(ast: &DeriveInput, hashed: bool) -> syn::Result<TokenStream>{
   let name = &ast.ident;
   let st = match &ast.data {
     Data::Struct(s) => s,
     _ => return Err(syn::Error::new(Span::call_site(), "This macro only supports struct.")),
   };
-  let mut arms = quote!{};
+  let mut parser_arms = quote!{};
+  let mut to_wrappers = quote!{};
   if let Fields::Named(named) =  &st.fields{
     let fields = &named.named;
     for field in fields.into_iter(){
       if let (Some(field_name),field_attrs) = (&field.ident,&field.attrs){
         if let Some(arrti_type) = parse_field_attrs(field_attrs){
-          let arm: _;
+          let s_field_name = field_name.to_string();
+          let to_wrapper: _;
+          let parser_arm: _;
           match arrti_type{
-              AttriType::Simple => arm = 
-              quote!{
+            AttriType::Unkown(s) => return Err(syn::Error::new(Span::call_site(), 
+              format!("Unspported type: {s}, spport: [simple,simple_multi,complex,group,group_hashed]")
+            )),
+            AttriType::Simple => {
+              to_wrapper = quote!{
+                if let Some(simple) = self.#field_name {
+                  attr_list.push((
+                    #s_field_name.to_string(),
+                    crate::ast::AttriValue::Simple(
+                      crate::ast::SimpleAttri::to_wrapper(&simple),
+                    ),
+                  ));  
+                }
+              };
+              parser_arm = quote!{
                 let simple_res: _;
                 (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input,line_num)?;
                 match simple_res {
@@ -71,13 +94,34 @@ fn group_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>{
                     res.add_undefine_attri(key,attri);
                   },
                 }
-              },
-              AttriType::SimpleMulti => arm = 
-              quote!{
-                todo()!
-              },
-              AttriType::Complex => arm = 
-              quote!{
+              };
+            },
+            AttriType::SimpleMulti => {
+              to_wrapper = quote!{
+                if let Some(simple) = self.#field_name {
+                  attr_list.push((
+                    #s_field_name.to_string(),
+                    crate::ast::AttriValue::Simple(
+                      crate::ast::SimpleAttri::to_wrapper(&simple),
+                    ),
+                  ));  
+                }
+              };
+              parser_arm = quote!{
+              };
+            },
+            AttriType::Complex => {
+              to_wrapper = quote!{
+                if !crate::ast::ComplexAttri::is_empty(&self.#field_name) {
+                  attr_list.push((
+                    #s_field_name.to_string(),
+                    crate::ast::AttriValue::Complex(
+                      crate::ast::ComplexAttri::to_wrapper(&self.#field_name),
+                    ),
+                  ));  
+                }
+              };
+              parser_arm = quote!{
                 let complex_res: _;
                 (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,line_num)?;
                 match complex_res {
@@ -87,22 +131,50 @@ fn group_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>{
                     res.add_undefine_attri(key,attri);
                   },
                 }
-              },
-              AttriType::Group => arm = 
-              quote!{
+              };
+            },
+            AttriType::Group => {
+              to_wrapper = quote!{
+                attr_list.extend(self.#field_name.iter().map(
+                  |group|(
+                    #s_field_name.to_string(),
+                    crate::ast::AttriValue::Group(
+                      crate::ast::GroupAttri::to_wrapper(
+                        group,
+                        vec![],
+                      ),
+                    )
+                  )
+                ).collect::<Vec<(String, crate::ast::AttriValue)>>());
+              };
+              parser_arm = quote!{
                 let group: _;
                 (input,(_,group)) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
                 res.#field_name.push(group);
                 let n: usize;
                 (input,n) = crate::ast::parser::space_newline(input)?;
                 *line_num+=n;
-              },
-              AttriType::GroupHashed => arm = 
-              quote!{
+              };
+            },
+            AttriType::GroupHashed => {
+              to_wrapper = quote!{
+                attr_list.extend(self.#field_name.iter().map(
+                  |(idx,group)|(
+                    #s_field_name.to_string(),
+                    crate::ast::AttriValue::Group(
+                      crate::ast::GroupAttri::to_wrapper(
+                        group,
+                        crate::ast::GroupIdx::title(idx),
+                      ),
+                    )
+                  )
+                ).collect::<Vec<(String, crate::ast::AttriValue)>>());
+              };
+              parser_arm = quote!{
                 let group: _;
                 let title: _;
                 (input,(title,group)) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
-                match <_ as crate::ast::HashedGroup>::idx(&group, title){
+                match crate::ast::HashedGroup::idx(&group,title){
                   Ok(idx) => {
                     if let Some(old) = res.#field_name.insert(idx, group) {
                       let e = crate::ast::IdxError::RepeatIdx; 
@@ -114,18 +186,19 @@ fn group_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>{
                 let n: usize;
                 (input,n) = crate::ast::parser::space_newline(input)?;
                 *line_num+=n;
-              },
-              AttriType::Unkown(s) => return Err(syn::Error::new(Span::call_site(), 
-                                        format!("Unspported type: {s}, spport: [simple,simple_multi,complex,group,group_hashed]")
-                                        )),
-          }
-          let s_field_name = field_name.to_string();
-          arms = quote!{
-            #arms
-            #s_field_name => {
-              #arm
+              };
             },
           };
+          parser_arms = quote!{
+            #parser_arms
+            #s_field_name => {
+              #parser_arm
+            },
+          };
+          to_wrappers = quote!{
+            #to_wrappers
+            #to_wrapper
+          }
         }
       }
     }
@@ -138,9 +211,18 @@ fn group_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>{
   let impl_group = quote!{
     impl crate::ast::GroupAttri for #name {
       #impl_set
-
+      #[inline]
       fn add_undefine_attri(&mut self, key: &str, attri: crate::ast::AttriValue) {
         self._undefined.push((key.to_owned(),attri))
+      }
+
+      fn to_wrapper(&self, title: Vec<String>) -> crate::ast::GroupWrapper {
+        let mut attr_list: Vec<(String, crate::ast::AttriValue)> = self._undefined.clone();
+        #to_wrappers
+        crate::ast::GroupWrapper{ 
+          title,
+          attr_list,
+        }
       }
       fn nom_parse<'a>(
         i: &'a str, line_num: &mut usize
@@ -157,12 +239,14 @@ fn group_inner(ast: &DeriveInput,hashed: bool) -> syn::Result<TokenStream>{
             Ok((_input,key)) => {
               input = _input;
               match key {
-                #arms
+                #parser_arms
                 _ => {
                   let undefine: crate::ast::AttriValue;
-                  (input,undefine) = crate::ast::parser::undefine(input)?;
-                  println!("Line={}; Undefinde Error; Key={};",line_num,key);
-                  res.add_undefine_attri(key, undefine)
+                  (input,undefine) = crate::ast::parser::undefine(input,line_num)?;
+                  res.add_undefine_attri(key, undefine);
+                  let n: usize;
+                  (input,n) = crate::ast::parser::space_newline(input)?;
+                  *line_num+=n;
                 },
               }
             }

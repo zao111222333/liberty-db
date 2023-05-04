@@ -17,20 +17,40 @@ pub use uom::si::f64::{
     Time,
 };
 
-// #[cfg(feature = "f32")]
-// pub use uom::si::f32::{
-//     Capacitance,
-//     ElectricalResistance,
-//     Length,
-//     ElectricCharge, 
-//     ElectricCurrent, 
-//     ElectricPotential, 
-//     Energy, 
-//     Power, 
-//     Ratio, 
-//     ThermodynamicTemperature, 
-//     Time,
-// };
+impl crate::ast::ComplexAttri for Time {
+    type Error=std::fmt::Error;
+
+    fn parse(v: &Vec<Vec<&str>>)->Result<Self,Self::Error> {
+        todo!()
+    }
+
+    fn is_empty(&self) -> bool {
+        let zero = <Self as Default>::default();
+        self.eq(&zero)
+    }
+
+    fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+        todo!()
+    }
+}
+
+impl crate::ast::ComplexAttri for Capacitance {
+    type Error=std::fmt::Error;
+
+    fn parse(v: &Vec<Vec<&str>>)->Result<Self,Self::Error> {
+        todo!()
+    }
+
+    fn is_empty(&self) -> bool {
+        let zero = <Self as Default>::default();
+        self.eq(&zero)
+    }
+
+    fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+        todo!()
+    }
+}
+
 
 pub use uom::fmt::DisplayStyle;
 pub use uom::si::Unit;
