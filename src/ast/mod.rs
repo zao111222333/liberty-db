@@ -98,7 +98,9 @@ pub trait HashedGroup: Sized {
   type Idx: Sized+Hash;
   /// generate title for wrapper
   fn title(&self) -> Vec<String>;
-  fn idx(&self) -> Self::Idx;
+  /// generate idx from self
+  fn idx(&self) -> &Self::Idx;
+  fn idx_clone(&self) -> Self::Idx;
   /// combine `self` and `title`, generate index
   fn gen_idx(&self, title: Vec<String>) -> Result<Self::Idx,IdxError>;
 }

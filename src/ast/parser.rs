@@ -334,6 +334,7 @@ fn complex_complex<'a>(
     if _s==""{None}else{Some(_s)}}
   ).collect()))
 }
+
 pub(crate) fn complex<'a>(
   i: &'a str, line_num: &mut usize,
 ) -> IResult<&'a str, Vec<Vec<&'a str>>, Error<&'a str>>
@@ -375,10 +376,8 @@ pub(crate) fn complex<'a>(
         *line_num += n;
         v
       }).collect::<Vec<Vec<&'a str>>>();
-      // }).flatten().collect::<Vec<&'a str>>();
-      if let Some((mut last_vec,n)) = last{
+      if let Some((last_vec,n)) = last{
         *line_num += n;
-        // vec.append(&mut last_vec);
         vec.push(last_vec)
       }
       vec
@@ -410,20 +409,16 @@ pub(crate) fn title<'a>(
         char(','),
         delimited(
           space, 
-          alt((
-            unquote,
-            word,
-          )),
+          alt((unquote,word)),
           space,
         ),
       ),
-      space,
       char(')'),
       space,
       char('{'),
       comment_space_newline,
     )),
-    |(_,_,v,_,_,_,_,n)| {
+    |(_,_,v,_,_,_,n)| {
       *line_num += n;
       v.into_iter().map(ToString::to_string).collect()
     },

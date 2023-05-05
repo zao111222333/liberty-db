@@ -2,8 +2,6 @@
 //! implement basic types
 //!
 
-use std::fmt::Display;
-
 impl super::SimpleAttri for f64 {
   type Error=std::num::ParseFloatError;
   fn parse(s: &str)->Result<Self,Self::Error> {

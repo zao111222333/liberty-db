@@ -16,6 +16,16 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
     };
     let name = &ast.ident;
     let idx_name = format_ident!("{}Idx", name);
+    let fn_idx = quote!{
+      #[inline]
+      fn idx(&self) -> &Self::Idx {
+        self._idx.as_ref()
+      }
+      #[inline]
+      fn idx_clone(&self) -> Self::Idx{
+        (*self._idx).clone()
+      }
+    };
     let toks = match idx_len{
       IdxLen::Num(0) => return Err(syn::Error::new(Span::call_site(), "`idx_len` should larger than `1`")),
       IdxLen::Num(1) => quote! {
@@ -31,10 +41,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
           fn title(&self) -> Vec<String>{
             vec![self._idx.name.clone()]
           }
-          #[inline]
-          fn idx(&self) -> Self::Idx {
-            (*self._idx).clone()
-          }
+          #fn_idx
           #[inline]
           fn gen_idx(&self, mut title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError>{
             let l=title.len();
@@ -62,10 +69,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
           fn title(&self) -> Vec<String>{
             self._idx.name.clone().to_vec()
           }
-          #[inline]
-          fn idx(&self) -> Self::Idx {
-            (*self._idx).clone()
-          }
+          #fn_idx
           #[inline]
           fn gen_idx(&self, title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError>{
             let l=title.len();
@@ -92,10 +96,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
           fn title(&self) -> Vec<String>{
             self._idx.name.clone()
           }
-          #[inline]
-          fn idx(&self) -> Self::Idx {
-            (*self._idx).clone()
-          }
+          #fn_idx
           #[inline]
           fn gen_idx(&self, title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError>{
             Ok(Self::Idx { name: title })
@@ -103,10 +104,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
         }
       },
     };
-    
-    Ok(quote!{
-      #toks
-    })
+    Ok(toks)
   }
   
   #[derive(Debug)]

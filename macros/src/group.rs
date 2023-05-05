@@ -4,7 +4,7 @@ use quote::quote;
 use syn::{DeriveInput, Attribute, NestedMeta};
 use syn::{Data, Fields};
 
-pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<TokenStream>{
+pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<proc_macro2::TokenStream>{
   let name = &ast.ident;
   let st = match &ast.data {
     Data::Struct(s) => s,
@@ -116,7 +116,7 @@ pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<TokenStream>
                 match group_res{
                   Ok(group) => {
                     if let Some(old) = res.#field_name.insert(
-                      <_ as crate::ast::HashedGroup>::idx(&group),
+                      <_ as crate::ast::HashedGroup>::idx_clone(&group),
                       group,
                     ){
                     let e = crate::ast::IdxError::RepeatIdx; 
@@ -220,9 +220,7 @@ pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<TokenStream>
       }
     }
   };
-  Ok(quote!{
-    #impl_group
-  }.into())
+  Ok(impl_group)
 }
   
 #[derive(Debug)]

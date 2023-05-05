@@ -1,10 +1,8 @@
-#[cfg(test)]
 use colored::Colorize;
 use walkdir::WalkDir;
 use std::fmt::Display;
 use std::path::PathBuf;
-use std::{fs, default};
-use std::fs::metadata;
+use std::{fs,fs::metadata};
 use std::ffi::OsStr;
 use std::time::{Instant, Duration};
 
@@ -99,7 +97,7 @@ fn parse_lib_files(
             match panic_result{
                 Ok((r,d)) => match r {
                     Ok(_) => {
-                        out.state = ReturnState::PASS(bgn.elapsed());
+                        out.state = ReturnState::PASS(d);
                     },
                     Err(_) => {
                         out.state = ReturnState::FAIL;
@@ -130,7 +128,6 @@ const PARSER_LIBERTY_IO: ParserCtx = ParserCtx{
     name: "liberty-io",
     info: "https://crates.io/crates/liberty-io",
     parser: |filepath| {
-        use liberty_io;
         let f = File::open(filepath).expect("Failed to open file.");
         let mut buf = BufReader::new(f);
         let result = liberty_io::read_liberty_bytes(&mut buf);

@@ -13,7 +13,7 @@ pub struct Cell {
     #[arrti_type(group_hashed)]
     pub pin: <Pin as crate::ast::GroupAttri>::Set,
     #[arrti_type(group_hashed)]
-    statetable: <Statetable as crate::ast::GroupAttri>::Set,
+    pub statetable: <Statetable as crate::ast::GroupAttri>::Set,
 }
 
 
@@ -30,8 +30,8 @@ pub struct Statetable{
 }
 
 #[derive(Default,Debug)]
-struct Table{
-    v: Vec<String>,
+pub struct Table{
+    pub v: Vec<String>,
 }
 
 impl std::fmt::Display for Table {
