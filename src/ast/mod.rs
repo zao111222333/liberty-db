@@ -3,13 +3,10 @@
 //!
 
 pub mod impls;
-
 pub mod parser;
-/// TODO: Remove it
-pub mod wrapper;
 
 use std::{hash::Hash, fmt::Display};
-use nom::{error::{Error, VerboseError},IResult};
+use nom::{error::Error, IResult};
 
 /// Wrapper for simple attribute
 pub type SimpleWrapper = String;

@@ -138,6 +138,19 @@ mod test{
       index_1 ("1000.0, 1001.0, 1002.0, 1003.0");
       index_2 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0");
     }
+
+      cell (SDFFRS_X2) {
+    
+    
+      ff ("IQ","IQN") {
+        next_state         	: "((SE * SI) + (D * !SE))";
+        clocked_on         	: "CK";
+        preset             	: "!SN";
+        clear              	: "!RN";
+        clear_preset_var1  	: L;
+        clear_preset_var2  	: L;
+      }
+      }
   }
     "#;
     static  TEMPLATE_ERR1: &str = r#"
@@ -171,7 +184,7 @@ mod test{
     #[test]
     fn x6() {
       println!("{:?}", Library::parse(TEMPLATE));
-      println!("{:?}", Library::parse(TEMPLATE_ERR1));
-      println!("{:?}", Library::parse(TEMPLATE_ERR2));
+      // println!("{:?}", Library::parse(TEMPLATE_ERR1));
+      // println!("{:?}", Library::parse(TEMPLATE_ERR2));
     }
   }

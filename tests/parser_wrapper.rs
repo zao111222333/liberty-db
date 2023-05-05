@@ -1,7 +1,5 @@
 #[cfg(test)]
-use liberty_db::ast::wrapper::library_wrapper;
 use colored::Colorize;
-use nom::error::ErrorKind;
 use walkdir::WalkDir;
 use std::fmt::Display;
 use std::path::PathBuf;
@@ -128,19 +126,6 @@ const PARSER_LIBERTY_DB: ParserCtx = ParserCtx{
     },
 };
 
-const PARSER_LIBERTY_DB_WRAPPER: ParserCtx = ParserCtx{
-    name: "liberty-db",
-    info: "https://crates.io/crates/liberty-db",
-    parser: |filepath| {
-        let data = fs::read_to_string(filepath.clone()).expect("Failed to open file.");
-        let result = library_wrapper::<(&str,ErrorKind)>(&data);
-        match result {
-            Ok(_) => Ok(()),
-            Err(_) => Err(std::fmt::Error),
-        }
-    },
-};
-
 const PARSER_LIBERTY_IO: ParserCtx = ParserCtx{
     name: "liberty-io",
     info: "https://crates.io/crates/liberty-io",
@@ -175,7 +160,6 @@ fn test_all_lib_files(){
     use prettytable::{Table, Row, Cell};
     let all_parser:Vec<ParserCtx> = vec![
         PARSER_LIBERTY_DB,
-        PARSER_LIBERTY_DB_WRAPPER,
         PARSER_LIBERTY_IO,
         PARSER_LIBERTYPARSE,
     ];

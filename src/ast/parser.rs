@@ -406,16 +406,16 @@ pub(crate) fn title<'a>(
     tuple((
       space,
       char('('),
-      space,
       separated_list0(
-        preceded(
+        char(','),
+        delimited(
+          space, 
+          alt((
+            unquote,
+            word,
+          )),
           space,
-          char(','),
         ),
-        alt((
-          unquote,
-          word,
-        )),
       ),
       space,
       char(')'),
@@ -423,7 +423,7 @@ pub(crate) fn title<'a>(
       char('{'),
       comment_space_newline,
     )),
-    |(_,_,_,v,_,_,_,_,n)| {
+    |(_,_,v,_,_,_,_,n)| {
       *line_num += n;
       v.into_iter().map(ToString::to_string).collect()
     },
