@@ -30,6 +30,8 @@ use crate::units;
 #[derive(liberty_macros::GroupHashed)]
 #[derive(liberty_macros::NameIdx)]
 pub struct Pin{
+    #[idx_len(1)]
+    _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
     _undefined: crate::ast::UndefinedAttributes,
     pub group_name: String,
     /* Simple Attributes in a pin Group */

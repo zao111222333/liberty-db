@@ -1,4 +1,7 @@
 //! cargo expand common::demo
+
+use std::fmt::Pointer;
+
 use crate::timing::TimingType;
 
 #[derive(Default)]
@@ -41,8 +44,11 @@ struct Timing{
 fn timing_test(){
     use crate::ast::GroupAttri;
     let mut n= 1;
-    if let Ok((_,(title,group))) = 
+    if let Ok((_,Ok(group))) = 
     Timing::nom_parse(r#"(w){
+        // www
+        /* com
+        ment2 */
         t1 : "combinational";
         values ( \
             1,"2,3",4,\ // comment1
@@ -52,12 +58,10 @@ fn timing_test(){
     }
     "#,&mut n) {
         println!("{:?}",group);
-        println!("{:?}",group.to_wrapper(title.into_iter().map(ToString::to_string).collect()
-        ));
+        println!("{:?}",group.to_wrapper());
         println!("{n}");
     }
-    if let Ok((_,(title,group))) = 
-    Timing::nom_parse(r#"(w){
+    match Timing::nom_parse(r#"( w ){
         t1: ombinational;
         t2: combinational;
         values ( \
@@ -65,10 +69,13 @@ fn timing_test(){
         );
         }
     "#,&mut n){
-        println!("{:?}",group);
-        println!("{:?}",group.to_wrapper(title.into_iter().map(ToString::to_string).collect()
-        ));
-        println!("{n}");
+        Ok((_,Ok(group)))=>{
+            println!("{:?}",group);
+            println!("{:?}",group.to_wrapper());
+            println!("{n}");
+        },
+        Ok((_,Err(e))) => panic!("{e}"),
+        Err(e) => panic!("{e}"),
     }
 }
 
@@ -76,7 +83,7 @@ fn timing_test(){
 fn pin_test(){
     use crate::ast::GroupAttri;
     let mut n= 1;
-    if let Ok((_,(title,group))) = 
+    if let Ok((_,Ok(group))) = 
     Pin::nom_parse(r#"(A){
         timing(w){
             t1: combinational;
@@ -84,11 +91,10 @@ fn pin_test(){
     }
     "#,&mut n){
         println!("{:?}",group);
-        println!("{:?}",group.to_wrapper(title.into_iter().map(ToString::to_string).collect()
-        ));
+        println!("{:?}",group.to_wrapper());
         println!("{n}");
     }
-    if let Ok((_,(title,group))) = 
+    if let Ok((_,Ok(group))) = 
     Pin::nom_parse(r#"(B){
         timing(w){
             t1: combinational;
@@ -96,55 +102,90 @@ fn pin_test(){
     }
     "#,&mut n){
         println!("{:?}",group);
-        println!("{:?}",group.to_wrapper(title.into_iter().map(ToString::to_string).collect()
-        ));
+        println!("{:?}",group.to_wrapper());
         println!("{n}");
     }
 }
 #[derive(Default,Debug)]
-#[derive(liberty_macros::GroupHashed,liberty_macros::NameIdx)]
+#[derive(liberty_macros::NameIdx)]
+#[derive(liberty_macros::GroupHashed)]
 struct Pin{
+    #[idx_len(1)]
+    _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
     _undefined: crate::ast::UndefinedAttributes,
     #[arrti_type(group)]
     timing: <Timing as crate::ast::GroupAttri>::Set,
 }
+#[derive(Default,Debug)]
+#[derive(liberty_macros::GroupHashed)]
+#[derive(liberty_macros::NameIdx)]
+struct Ff{
+  #[idx_len(2)]
+  _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
+  _undefined: crate::ast::UndefinedAttributes,
+  #[arrti_type(simple)]
+  next_state: Option<String>,
+}
+
 
 #[test]
 fn cell_test(){
     use crate::ast::GroupAttri;
     let mut n= 1;
-    if let Ok((_,(title,group))) = 
-    Cell::nom_parse(r#"(INV){
+    
+    match Cell::nom_parse(r#"(INV){
+        // should ok
         area : 5.4;
-          pin(A){
-              timing(w){
-                  t1: combinational;
-              }
-          }
-          pin(Y){
-              timing(){
-                  t1: combinational;
-              }
-          }
+        // should ok
+        ff(IQ,IQN){
+            next_state: "!A";
+        }
+        // should ok
+        pin(A){
+            timing(w){
+                t1: combinational;
+            }
+        }
+        // should ok
+        pin(Y){
+            timing(){
+                // should error
+                t1: foo_error;
+            }
+        }
+        statetable ("CLK EN SE",ENL) {
+            table : "	H   L  L : - : L ,\
+            H   L  H : - : H ,\
+            H   H  L : - : H ,\
+            H   H  H : - : H ,\
+            L   -  - : - : N ";
+        }
       }
     "#,&mut n){
-        println!("{:?}",group);
-        println!("{:?}",group.to_wrapper(title.into_iter().map(ToString::to_string).collect()
-        ));
-        println!("{n}");
+        Ok((_,Ok(group))) =>{
+            println!("{:?}",group);
+            println!("{:?}",group.to_wrapper());
+            println!("{n}");
+        },
+        Ok((_,Err(e))) => panic!("{:#?}",e),
+        Err(e) => panic!("{:#?}",e),
     }
-    match Cell::nom_parse(r#"(INV){
+    if let Ok((_,Ok(group))) =  Cell::nom_parse(r#"(INV){
+        // should error
         undefine_area : 5.4;
+        // should error
         undefine_pin(C){
             timing(w){
                 t1: combinational;
             }
         }
+        // should error
         pin("A"){
             timing(w){
                 t1: combinational;
             }
         }
+        // should error
         pin(A,Y){
             timing(w){
                 t1: combinational;
@@ -152,22 +193,24 @@ fn cell_test(){
         }
     }
     "#,&mut n){
-        Ok((_,(title,group)))=>{
-            println!("{:?}",group);
-            println!("{:?}",group.to_wrapper(title.into_iter().map(ToString::to_string).collect()
-            ));
-            println!("{n}");
-        }
-        Err(e) => println!("{:?}",e),
+        println!("{:?}",group);
+        println!("{:?}",group.to_wrapper());
+        println!("{n}");
     }
 }
 #[derive(Default,Debug)]
 #[derive(liberty_macros::GroupHashed)]
 #[derive(liberty_macros::NameIdx)]
 struct Cell{
+  #[idx_len(1)]
+  _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
   _undefined: crate::ast::UndefinedAttributes,
   #[arrti_type(simple)]
   area: Option<f64>,
   #[arrti_type(group_hashed)]
+  ff: <Ff as crate::ast::GroupAttri>::Set,
+  #[arrti_type(group_hashed)]
   pin: <Pin as crate::ast::GroupAttri>::Set,
+  #[arrti_type(group_hashed)]
+  statetable: <crate::cell::Statetable as crate::ast::GroupAttri>::Set,
 }

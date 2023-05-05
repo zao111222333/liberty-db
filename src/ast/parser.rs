@@ -56,6 +56,7 @@ fn comment_test(){
   println!("{:?}",comment_single("iwww\" \n \nw"));
   println!("{:?}",comment_single("*iwww\" \n \nw"));
   println!("{:?}",comment_single("//iwww\" \n \nw"));
+  println!("{:?}",comment_multi("//iwww\" \n \nw"));
   println!("{:?}",comment_multi(r#"/*iwww\
 
   */
@@ -73,7 +74,7 @@ fn space<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>>
   )(i)
 }
 #[inline]
-pub(crate) fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
+fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
 {
   map(
     take_while(move |c| " \t\r\n".contains(c)), 
@@ -82,7 +83,31 @@ pub(crate) fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a
 }
 
 #[inline]
-fn space_newline_slash<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
+pub(crate) fn comment_space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
+{
+  map(
+    pair(
+      many0(
+        pair(
+          space_newline,
+          alt((
+            comment_single,
+            comment_multi,
+          )),
+        ),
+      ),
+      space_newline),
+    |(v,n3)| 
+        v.iter()
+         .map(|(n1,n2)|n1+n2)
+         .sum::<usize>()
+        +n3
+  )(i)
+}
+
+
+#[inline]
+fn comment_space_newline_slash<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
 {
   map(
     pair(
@@ -120,15 +145,16 @@ fn space_newline_slash<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>
 
 #[test]
 fn space_test(){
-  println!("{:?}",space_newline_slash(r#"/*iwww\
+  println!("{:?}",comment_space_newline_slash(r#" w"#));
+  println!("{:?}",comment_space_newline_slash(r#"/*iwww\
   
   */
   w"#));
-  println!("{:?}",space_newline_slash(r#"\ /*iwww\*/
+  println!("{:?}",comment_space_newline_slash(r#"\ /*iwww\*/
   w"#));
-  println!("{:?}",space_newline_slash(r#"\
+  println!("{:?}",comment_space_newline_slash(r#"\
   w"#));
-  println!("{:?}",space_newline_slash(r#"\ //www
+  println!("{:?}",comment_space_newline_slash(r#"\ //www
   w"#));
 }
 
@@ -163,7 +189,7 @@ pub(crate) fn undefine<'a>(
   match title(i, line_num){
     Ok((mut input, title)) => {
       let mut res = GroupWrapper{
-        title: title.into_iter().map(ToString::to_string).collect(),
+        title,
         attr_list: vec![],
       };
       loop {
@@ -179,7 +205,7 @@ pub(crate) fn undefine<'a>(
               input = _input;
               if let super::AttriValue::Group(_)=attri{
                 let n: usize;
-                (input,n) = space_newline(input)?;
+                (input,n) = comment_space_newline(input)?;
                 *line_num+=n;
               }
               res.attr_list.push((_key.to_owned(),attri));
@@ -250,6 +276,29 @@ where
   )
 }
 
+pub(crate) fn simple_multi<'a>(
+  i: &'a str, line_num: &mut usize,
+) -> IResult<&'a str, &'a str, Error<&'a str>>
+{
+  map(
+    tuple((
+      space,
+      char(':'),
+      space,
+      char('"'),
+      take_while(move |c| c!='"'),
+      take(1usize),
+      space,
+      char(';'),
+      comment_space_newline,
+    )),
+    |(_,_,_,_,s,_,_,_,n)| {
+        *line_num += n+s.chars().filter(|&x| x == '\n').count();
+        s
+      }
+  )(i)
+}
+
 pub(crate) fn simple<'a>(
   i: &'a str, line_num: &mut usize,
 ) -> IResult<&'a str, &'a str, Error<&'a str>>
@@ -265,7 +314,7 @@ pub(crate) fn simple<'a>(
       )),
       space,
       char(';'),
-      space_newline,
+      comment_space_newline,
     )),
     |(_,_,_,s,_,_,n)| {
         *line_num += n;
@@ -281,7 +330,7 @@ fn complex_complex<'a>(
 {
   let (input, words) = unquote(i)?;
   Ok((input, words.split(',').filter_map(|s|{
-    let _s = s.trim(); 
+    let _s = s.trim();
     if _s==""{None}else{Some(_s)}}
   ).collect()))
 }
@@ -293,7 +342,7 @@ pub(crate) fn complex<'a>(
     tuple((
       space,
       char('('),
-      space_newline_slash,
+      comment_space_newline_slash,
       many0(
         pair(
           alt((
@@ -302,7 +351,7 @@ pub(crate) fn complex<'a>(
           )),
           preceded(
             char(','),
-            space_newline_slash,
+            comment_space_newline_slash,
           ),
         )
       ),
@@ -312,13 +361,13 @@ pub(crate) fn complex<'a>(
             complex_complex,
             map(word, |s| vec![s]),
           )),
-          space_newline_slash,
+          comment_space_newline_slash,
         ),
       ),
       char(')'),
       space,
       char(';'),
-      space_newline,
+      comment_space_newline,
     )),
     |(_,_,n0,res,last,_,_,_,n1)| {
       *line_num += n0+n1;
@@ -339,7 +388,7 @@ pub(crate) fn complex<'a>(
 
 #[test]
 fn key_test(){
-  println!("{:?}",space_newline("\n\r\t\n : b ; "));
+  println!("{:?}",comment_space_newline("\n\r\t\n : b ; "));
   println!("{:?}",simple(" : b; }", &mut 1));
   println!("{:?}",simple(" : iwww ; ", &mut 1));
   println!("{:?}",key::<VerboseError<&str>>("iwww "));
@@ -351,12 +400,13 @@ fn key_test(){
 
 pub(crate) fn title<'a>(
   i: &'a str, line_num: &mut usize,
-) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>>
+) -> IResult<&'a str, Vec<String>, Error<&'a str>>
 {
   map(
     tuple((
       space,
       char('('),
+      space,
       separated_list0(
         preceded(
           space,
@@ -367,14 +417,15 @@ pub(crate) fn title<'a>(
           word,
         )),
       ),
+      space,
       char(')'),
       space,
       char('{'),
-      space_newline,
+      comment_space_newline,
     )),
-    |(_,_,x,_,_,_,n)| {
+    |(_,_,_,v,_,_,_,_,n)| {
       *line_num += n;
-      x
+      v.into_iter().map(ToString::to_string).collect()
     },
   )(i)
 }

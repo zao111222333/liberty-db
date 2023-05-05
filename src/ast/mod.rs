@@ -2,12 +2,14 @@
 //!  This crate implement `liberty` data structre in Rust.
 //!
 
+pub mod impls;
+
 pub mod parser;
 /// TODO: Remove it
 pub mod wrapper;
 
 use std::{hash::Hash, fmt::Display};
-use nom::{error::Error,IResult};
+use nom::{error::{Error, VerboseError},IResult};
 
 /// Wrapper for simple attribute
 pub type SimpleWrapper = String;
@@ -93,18 +95,15 @@ pub trait ComplexAttri: Sized {
   }
 }
 
-/// Index for [HashedGroup]
-pub trait GroupIdx: Sized+Hash {
-  /// generate title for wrapper
-  fn title(&self) -> Vec<String>;
-}
-
 /// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
 pub trait HashedGroup: Sized {
   /// its Index
-  type Idx: GroupIdx;
+  type Idx: Sized+Hash;
+  /// generate title for wrapper
+  fn title(&self) -> Vec<String>;
+  fn idx(&self) -> Self::Idx;
   /// combine `self` and `title`, generate index
-  fn idx<'a>(&self, title: Vec<&'a str>) -> Result<Self::Idx,IdxError<'a>>;
+  fn gen_idx(&self, title: Vec<String>) -> Result<Self::Idx,IdxError>;
 }
 
 /// Group Attribute in Liberty
@@ -120,18 +119,18 @@ pub trait GroupAttri: Sized {
   /// 
   fn add_undefine_attri(&mut self, key: &str, attri: AttriValue);
   /// nom_parse, will be implemented by macros
-  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, (Vec<&'a str>,Self), Error<&'a str>>;
+  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Result<Self,IdxError>, Error<&'a str>>;
   /// 
-  fn to_wrapper(&self, title: Vec<String>) -> GroupWrapper;
+  fn to_wrapper(&self) -> GroupWrapper;
 }
 
 /// Error for parser Group Index
 #[derive(Debug)]
 #[derive(thiserror::Error)]
-pub enum IdxError<'a> {
+pub enum IdxError {
   /// TitleLenMismatch(want,got,title)
   #[error("title length mismatch (want={0},got={1}), title={2:?}")]
-  TitleLenMismatch(usize,usize,Vec<&'a str>),
+  TitleLenMismatch(usize,usize,Vec<String>),
   /// replace same idx
   #[error("replace same idx")]
   RepeatIdx,
@@ -140,25 +139,18 @@ pub enum IdxError<'a> {
   Other(String),
 }
 
-impl SimpleAttri for f64 {
-  type Error=std::num::ParseFloatError;
-  fn parse(s: &str)->Result<Self,Self::Error> {
-    s.parse()
-  }
-}
-
-impl ComplexAttri for Vec<f64> {
-  type Error=std::num::ParseFloatError;
-  fn is_empty(&self) -> bool {
-    self.is_empty()
-  }
-  fn parse<'a>(v: &'a Vec<Vec<&'a str>>)->Result<Self,Self::Error> {
-    v.iter().flatten()
-      .map(|s| s.parse())
-      .collect()
-  }
-
-  fn to_wrapper(&self) -> ComplexWrapper {
-    vec![self.iter().map(|f|format!("{:.10E}",f)).collect()]
-  }
+/// Error for parser
+#[derive(Debug)]
+#[derive(thiserror::Error)]
+pub enum ParserError<'a> {
+  /// TitleLenMismatch(want,got,title)
+  #[error("Line:{0}, error:{1}")]
+  IdxError(usize,IdxError),
+  /// replace same idx
+  #[error("replace same idx")]
+  NomError(usize,nom::Err<Error<&'a str>>),
+  // NomError(usize,Error<&'a str>),
+  /// something else
+  #[error("{0}")]
+  Other(usize,String),
 }
