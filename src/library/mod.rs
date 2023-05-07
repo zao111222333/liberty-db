@@ -1,35 +1,76 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
-use nom::error::ErrorKind;
 
-use crate::ast::{ComplexAttri, HashedGroup, IdxError};
+mod items;
+// pub use items::*;
+
+use crate::ast::ComplexAttri;
 // use crate::types::*;
 use crate::units;
 use crate::cell::Cell;
 use std::collections::HashMap;
-#[derive(Debug,Default)]
+#[derive(Debug,derivative::Derivative)]
+#[derivative(Default)]
 #[derive(liberty_macros::NameIdx)]
 #[derive(liberty_macros::GroupHashed)]
 pub struct Library{
-    #[idx_len(any)]
-    _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-    _undefined: crate::ast::UndefinedAttributes,
-    // #[arrti_type(simple)]
-    pub time_unit: units::Time,
-    // #[arrti_type(complex)]
-    pub capacitance_unit: units::Capacitance,
-    pub voltage_unit: units::ElectricPotential,
-    pub resistance_unit: units::ElectricalResistance,
-    pub pulling_resistance_unit: units::ElectricalResistance,
-    pub current_unit: units::ElectricCurrent,
-    pub power_unit: units::Power,
-    pub distance_unit: units::Length,
-    pub scalar_unit: units::Ratio,
-    #[arrti_type(group_hashed)]
-    pub cell: <Cell as crate::ast::GroupAttri>::Set,
-    pub voltage_map: HashMap<String, f64>,
-    pub sensitization_map: HashMap<String, Sensitization>,
+  #[idx_len(any)]
+  _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
+  _undefined: crate::ast::UndefinedAttributes,
+  /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=42.25&end=42.30
+  /// ">Reference</a>
+  #[arrti_type(simple)]
+  pub time_unit: units::TimeUnit,
+  /// This attribute specifies the unit for all capacitance 
+  /// values within the logic library, including 
+  /// default capacitances, max_fanout capacitances, 
+  /// pin capacitances, and wire capacitances.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.7&end=44.19
+  /// ">Reference</a>
+  #[arrti_type(complex)]
+  pub capacitive_load_unit: units::CapacitiveLoadUnit,
+  /// Valid values are 1mV, 10mV, 100mV, and 1V. The default is 1V.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.2&end=43.9
+  /// ">Reference</a>
+  #[arrti_type(simple)]
+  pub voltage_unit: units::VoltageUnit,
+  /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A. 
+  /// **No default exists for the `current_unit` attribute if the attribute is omitted.**
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.12&end=43.24
+  /// ">Reference</a>
+  #[arrti_type(simple)]
+  pub current_unit: Option<units::CurrentUnit>,
+  /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm. 
+  /// **No default exists for `pulling_resistance_unit` if the attribute is omitted.**
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.25&end=44.4
+  /// ">Reference</a>
+  #[arrti_type(simple)]
+  pub pulling_resistance_unit: Option<units::PullingResistanceUnit>,
+  /// This attribute indicates the units of the power values 
+  /// in the library. If this attribute is missing, the 
+  /// leakage-power values are expressed without units.
+  /// Valid values are 1W, 100mW, 10mW, 1mW, 100nW, 10nW, 1nW, 100pW, 10pW, and 1pW.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.22&end=44.31
+  /// ">Reference</a>
+  #[arrti_type(simple)]
+  pub leakage_power_unit: Option<units::LeakagePowerUnit>,
+  // pub distance_unit: units::Length,
+  // pub scalar_unit: units::Ratio,
+  #[arrti_type(simple)]
+  #[derivative(Default(value = "80.0"))]
+  pub slew_upper_threshold_pct_rise: f64,
+  #[arrti_type(group_hashed)]
+  pub cell: <Cell as crate::ast::GroupAttri>::Set,
+  pub voltage_map: HashMap<String, f64>,
+  pub sensitization_map: HashMap<String, Sensitization>,
 }
 
 /// <a name ="reference_link" href="
@@ -54,11 +95,7 @@ impl ComplexAttri for Vec<crate::pin::PinIdx> {
         todo!()
     }
 
-    fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
-        todo!()
-    }
-
-    fn is_empty(&self) -> bool {
+    fn to_wrapper(&self) -> Option<crate::ast::ComplexWrapper> {
         todo!()
     }
 }
@@ -107,16 +144,16 @@ mod test{
     delay_model : table_lookup;
     in_place_swap_mode : match_footprint;
   
-    time_unit : "1ns";
-    voltage_unit : "1V";
+    time_unit : "1ps";
+    voltage_unit : "10mV";
     current_unit : "1uA";
     pulling_resistance_unit : "1kohm";
     leakage_power_unit : "1nW";
-    capacitive_load_unit (1,pf);
+    // capacitive_load_unit (1,pf);
   
     slew_upper_threshold_pct_rise : 80;
     slew_lower_threshold_pct_rise : 20;
-    slew_upper_threshold_pct_fall : 80;
+    slew_upper_threshold_pct_fall : 70;
     slew_lower_threshold_pct_fall : 20;
     input_threshold_pct_rise : 50;
     input_threshold_pct_fall : 50;
@@ -183,8 +220,12 @@ mod test{
     "#;
     #[test]
     fn x6() {
-      println!("{:?}", Library::parse(TEMPLATE));
-      // println!("{:?}", Library::parse(TEMPLATE_ERR1));
-      // println!("{:?}", Library::parse(TEMPLATE_ERR2));
+      match Library::parse(TEMPLATE){
+        Ok(library) => {
+          println!("{:#?}", library);
+          println!("{:#?}", library.to_wrapper());
+        }
+        Err(e) => println!("{:#?}", e),
+      }
     }
   }
