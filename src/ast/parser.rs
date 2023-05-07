@@ -27,7 +27,7 @@ fn comment_single<'a>(
         tag("*"),
         tag("//"),
       )),
-      take_until("\n"),
+      take_while(move |c:char| c!='\n'),
       take(1usize),
       space,
     )),
@@ -43,7 +43,8 @@ fn comment_multi<'a>(
     tuple((
       tag("/*"),
       take_until("*/"),
-      tag("*/"),
+      // tag("*/"),
+      take(2usize),
       space,
     )),
     |(_,s,_,_)|s.chars().filter(|&x| x == '\n').count()
@@ -69,7 +70,7 @@ fn comment_test(){
 fn space<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>> 
 {
   map(
-    take_while(move |c| " \t\r".contains(c)), 
+    take_while(move |c:char| matches!(c, '\t' | '\r' | ' ')),
     |_|(),
   )(i)
 }
@@ -77,7 +78,7 @@ fn space<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>>
 fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> 
 {
   map(
-    take_while(move |c| " \t\r\n".contains(c)), 
+    take_while(move |c:char| matches!(c, '\t' | '\n' |  '\r' | ' ')),
     |s: &str|s.chars().filter(|&x| x == '\n').count(),
   )(i)
 }
@@ -96,7 +97,8 @@ pub(crate) fn comment_space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, E
           )),
         ),
       ),
-      space_newline),
+      space_newline,
+    ),
     |(v,n3)| 
         v.iter()
          .map(|(n1,n2)|n1+n2)
@@ -430,10 +432,9 @@ pub(crate) fn end_group<'a>(
 ) -> IResult<&'a str, (), Error<&'a str>>
 {
   map(
-    delimited(
+    pair(
       char('}'), 
       space,
-      opt(char(';')),
     ),
     |_|())(i)
 }
