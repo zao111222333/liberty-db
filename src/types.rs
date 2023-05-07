@@ -4,7 +4,8 @@ pub(crate) type Float=f64;
 #[inline]
 pub(crate) fn float_hash<H: std::hash::Hasher>(state: &mut H, f: Float) {
     use std::hash::Hash;
-    format!("{:.10E}",f).hash(state);
+    let mut buffer = ryu::Buffer::new();
+    buffer.format(f).hash(state);
 }
 
 use float_cmp::approx_eq;
