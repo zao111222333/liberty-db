@@ -64,6 +64,20 @@ pub trait SimpleAttri: Sized + Display{
     format!("{self}")
   }
 }
+
+
+#[derive(thiserror::Error,Debug)]
+pub enum ComplexParseError {
+  #[error("{0}")]
+  Float(std::num::ParseFloatError),
+  #[error("title length mismatch")]
+  LengthDismatch,
+  #[error("other")]
+  Other,
+  #[error("unsurpport word")]
+  UnsupportedWord,
+}
+
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
   /// Parser error
@@ -71,9 +85,7 @@ pub trait ComplexAttri: Sized {
   /// basic parser
   fn parse(v: &Vec<Vec<&str>>)->Result<Self,Self::Error>;
   /// to_wrapper
-  fn to_wrapper(&self) -> ComplexWrapper;
-  /// when `is_empty`, it will not wrapper
-  fn is_empty(&self) -> bool;
+  fn to_wrapper(&self) -> Option<ComplexWrapper>;
   /// nom_parse, auto implement
   #[inline]
   fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Result<Self,(Self::Error,AttriValue)>, Error<&'a str>>{
@@ -110,7 +122,7 @@ pub trait HashedGroup: Sized {
 /// Use `#[derive(liberty_macros::Group)]` or 
 /// 
 /// `#[derive(liberty_macros::GroupHashed,liberty_macros::NameIdx)]`
-pub trait GroupAttri: Sized {
+pub trait GroupAttri: Sized + std::fmt::Debug{
   /// `HashedGroup`: `HashMap<<Self as HashedGroup>::Idx,Self>`
   /// 
   /// `Otherwise`: `Vec<Self>`
@@ -128,8 +140,8 @@ pub trait GroupAttri: Sized {
 #[derive(thiserror::Error)]
 pub enum IdxError {
   /// TitleLenMismatch(want,got,title)
-  #[error("title length mismatch (want={0},got={1}), title={2:?}")]
-  TitleLenMismatch(usize,usize,Vec<String>),
+  #[error("title length dismatch (want={0},got={1}), title={2:?}")]
+  LengthDismatch(usize,usize,Vec<String>),
   /// replace same idx
   #[error("replace same idx")]
   RepeatIdx,
@@ -152,4 +164,19 @@ pub enum ParserError<'a> {
   /// something else
   #[error("{0}")]
   Other(usize,String),
+}
+
+pub(crate) fn test_parse_group<G:GroupAttri> (s: &str) -> (G,GroupWrapper,usize){
+  let mut n= 1;
+  match G::nom_parse(s,&mut n){
+    Ok((_,Ok(group))) =>{
+      println!("{:?}",group);
+      println!("{:?}",group.to_wrapper());
+      println!("{n}");
+      let wrapper = group.to_wrapper();
+      return (group,wrapper,n);
+    },
+    Ok((_,Err(e))) => panic!("{:#?}",e),
+    Err(e) => panic!("{:#?}",e),
+}
 }

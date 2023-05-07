@@ -18,34 +18,18 @@ impl super::SimpleAttri for String {
 
 impl super::ComplexAttri for Vec<f64> {
   type Error=std::num::ParseFloatError;
-  fn is_empty(&self) -> bool {
-    self.is_empty()
-  }
   fn parse<'a>(v: &'a Vec<Vec<&'a str>>)->Result<Self,Self::Error> {
     v.iter().flatten()
       .map(|s| s.parse())
       .collect()
   }
 
-  fn to_wrapper(&self) -> super::ComplexWrapper {
-    vec![self.iter().map(|f|format!("{:.10E}",f)).collect()]
-  }
-}
-
-
-impl super::ComplexAttri for crate::units::Capacitance {
-  type Error=std::fmt::Error;
-
-  fn parse(v: &Vec<Vec<&str>>)->Result<Self,Self::Error> {
-      todo!()
-  }
-
-  fn is_empty(&self) -> bool {
-      let zero = <Self as Default>::default();
-      self.eq(&zero)
-  }
-
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
-      todo!()
+  fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
+    if self.is_empty(){
+      None
+    }else{
+      let mut buffer = ryu::Buffer::new();
+      Some(vec![self.iter().map(|f|buffer.format(*f).to_string()).collect()])
+    }
   }
 }
