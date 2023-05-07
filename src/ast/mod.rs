@@ -70,6 +70,8 @@ pub trait SimpleAttri: Sized + Display{
 pub enum ComplexParseError {
   #[error("{0}")]
   Float(std::num::ParseFloatError),
+  #[error("{0}")]
+  Int(std::num::ParseIntError),
   #[error("title length mismatch")]
   LengthDismatch,
   #[error("other")]
@@ -121,12 +123,8 @@ pub trait HashedGroup: Sized {
 /// 
 /// Use `#[derive(liberty_macros::Group)]` or 
 /// 
-/// `#[derive(liberty_macros::GroupHashed,liberty_macros::NameIdx)]`
+/// `#[derive(liberty_macros::Group,liberty_macros::NameIdx)]`
 pub trait GroupAttri: Sized + std::fmt::Debug{
-  /// `HashedGroup`: `HashMap<<Self as HashedGroup>::Idx,Self>`
-  /// 
-  /// `Otherwise`: `Vec<Self>`
-  type Set;
   /// 
   fn add_undefine_attri(&mut self, key: &str, attri: AttriValue);
   /// nom_parse, will be implemented by macros
