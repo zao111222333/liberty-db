@@ -3,23 +3,25 @@
 //! </script>
 
 
-use crate::pin::Pin;
+use std::collections::HashMap;
+
+use crate::{pin::Pin, ast::{HashedGroup, UndefinedAttributes}};
 mod items;
 pub use items::*;
 
 /// cell
 #[derive(Debug,Default)]
 #[derive(liberty_macros::NameIdx)]
-#[derive(liberty_macros::GroupHashed)]
+#[derive(liberty_macros::Group)]
 pub struct Cell {
     #[idx_len(1)]
-    _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-    _undefined: crate::ast::UndefinedAttributes,
+    _idx: Box<<Self as HashedGroup>::Idx>,
+    _undefined: UndefinedAttributes,
     
     #[arrti_type(simple)]
     pub area: Option<f64>,
-    #[arrti_type(group_hashed)]
-    pub pin: <Pin as crate::ast::GroupAttri>::Set,
-    #[arrti_type(group_hashed)]
-    pub statetable: <Statetable as crate::ast::GroupAttri>::Set,
+    #[arrti_type(group)]
+    pub pin: HashMap<<Pin as HashedGroup>::Idx, Pin>,
+    #[arrti_type(group)]
+    pub statetable: Option<Statetable>,
 }

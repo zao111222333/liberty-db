@@ -1,7 +1,9 @@
 //! All item structure inside
 //! `Timing`.
 
-use crate::{common::items::Domain, expression::{self, LogicLike}};
+use std::collections::HashMap;
+
+use crate::{common::items::Domain, expression::{self, LogicLike}, ast};
 
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
@@ -187,20 +189,32 @@ pub struct Mode {}
 /// =204.9
 /// ">Reference-Instance</a>
 /// 
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, Default)]
+// #[derive(liberty_macros::Group)]
+#[derive(liberty_macros::NameIdx)]
 pub struct CellDegradation {
-    pub group_name: String,
-    /* polynomial model */ 
-    pub coefs: Vec<f64>,
-    /* polynomial model */ 
-    pub orders: Vec<usize>,
-    /* lookup table */ 
-    pub index_1: Vec<f64>,
-    /* lookup table */ 
-    pub values: Vec<f64>,
-    /* polynomial model */
-    pub variable_n_range: Option<(f64,f64)>, 
-    pub domain: Option<Domain>,
+    #[idx_len(1)]
+    _idx: Box<<Self as ast::HashedGroup>::Idx>,
+    _undefined: ast::UndefinedAttributes,
+    // /* polynomial model */ 
+    // #[arrti_type(complex)]
+    // pub coefs: Vec<f64>,
+    // /* polynomial model */ 
+    // #[arrti_type(complex)]
+    // pub orders: Vec<usize>,
+    // /* lookup table */ 
+    // #[arrti_type(complex)]
+    // pub index_1: Vec<f64>,
+    // /* lookup table */ 
+    // #[arrti_type(complex)]
+    // pub values: Vec<f64>,
+    // /* polynomial model */
+    // #[arrti_type(complex)]
+    // pub variable_n_range: Option<(f64,f64)>, 
+    // #[arrti_type(group)]
+    // pub domain: HashMap<<Domain as ast::HashedGroup>::Idx,Domain>,
+    // TODO:
+    // pub domain: Option<Domain>,
 }
 
 /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
@@ -230,9 +244,13 @@ pub struct CellDegradation {
 /// 
 /// **Used By:**
 /// [Timing](crate::timing::Timing)
-/// 
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(liberty_macros::Group)]
+#[derive(liberty_macros::NameIdx)]
+#[derive(Debug, Clone, Default)]
 pub struct CellFall {
+    #[idx_len(1)]
+    _idx: Box<<Self as ast::HashedGroup>::Idx>,
+    _undefined: ast::UndefinedAttributes,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
     /// ?field=test

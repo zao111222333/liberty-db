@@ -2,7 +2,6 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use crate::types::*;
 use crate::expression;
 use crate::timing::Timing;
 mod items;
@@ -27,13 +26,12 @@ use crate::units;
 /// and group statements that you can use within the `pin` group
 /// + Descriptions of the attributes and groups you can use in a `pin` group
 #[derive(Debug, Default, Clone)]
-#[derive(liberty_macros::GroupHashed)]
+#[derive(liberty_macros::Group)]
 #[derive(liberty_macros::NameIdx)]
 pub struct Pin{
     #[idx_len(1)]
     _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
     _undefined: crate::ast::UndefinedAttributes,
-    pub group_name: String,
     /* Simple Attributes in a pin Group */
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -109,7 +107,7 @@ pub struct Pin{
     /// &end
     /// =228.8
     /// ">Reference-Instance</a>
-    pub capacitance: Float,
+    pub capacitance: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -253,7 +251,7 @@ pub struct Pin{
     /// &end
     /// =228.24
     /// ">Reference-Instance</a>
-    pub drive_current: Float,
+    pub drive_current: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -271,7 +269,7 @@ pub struct Pin{
     /// &end
     /// =228.28
     /// ">Reference-Instance</a>
-    pub fall_capacitance: Float,
+    pub fall_capacitance: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -280,7 +278,7 @@ pub struct Pin{
     /// &end
     /// =228.29
     /// ">Reference-Instance</a>
-    pub fall_current_slope_after_threshold: Float,
+    pub fall_current_slope_after_threshold: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -289,7 +287,7 @@ pub struct Pin{
     /// &end
     /// =228.30
     /// ">Reference-Instance</a>
-    pub fall_current_slope_before_threshold: Float,
+    pub fall_current_slope_before_threshold: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -298,7 +296,7 @@ pub struct Pin{
     /// &end
     /// =228.31
     /// ">Reference-Instance</a>
-    pub fall_time_after_threshold: Float,
+    pub fall_time_after_threshold: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -307,7 +305,7 @@ pub struct Pin{
     /// &end
     /// =228.32
     /// ">Reference-Instance</a>
-    pub fall_time_before_threshold: Float,
+    pub fall_time_before_threshold: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -316,7 +314,7 @@ pub struct Pin{
     /// &end
     /// =228.33
     /// ">Reference-Instance</a>
-    pub fanout_load: Float,
+    pub fanout_load: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -434,7 +432,7 @@ pub struct Pin{
     /// &end
     /// =228.50
     /// ">Reference-Instance</a>
-    pub max_capacitance: Float,
+    pub max_capacitance: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -443,7 +441,7 @@ pub struct Pin{
     /// &end
     /// =228.41
     /// ">Reference-Instance</a>
-    pub max_fanout: Float,
+    pub max_fanout: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -452,7 +450,7 @@ pub struct Pin{
     /// &end
     /// =228.52
     /// ">Reference-Instance</a>
-    pub max_input_delta_overdrive_high: Float,
+    pub max_input_delta_overdrive_high: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -461,7 +459,7 @@ pub struct Pin{
     /// &end
     /// =228.53
     /// ">Reference-Instance</a>
-    pub max_input_delta_underdrive_high: Float,
+    pub max_input_delta_underdrive_high: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -470,7 +468,7 @@ pub struct Pin{
     /// &end
     /// =228.54
     /// ">Reference-Instance</a>
-    pub max_transition: Float,
+    pub max_transition: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -479,7 +477,7 @@ pub struct Pin{
     /// &end
     /// =228.55
     /// ">Reference-Instance</a>
-    pub min_capacitance: Float,
+    pub min_capacitance: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -488,7 +486,7 @@ pub struct Pin{
     /// &end
     /// =228.56
     /// ">Reference-Instance</a>
-    pub min_fanout: Float,
+    pub min_fanout: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -497,7 +495,7 @@ pub struct Pin{
     /// &end
     /// =228.57
     /// ">Reference-Instance</a>
-    pub min_period: Float,
+    pub min_period: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -506,7 +504,7 @@ pub struct Pin{
     /// &end
     /// =228.58
     /// ">Reference-Instance</a>
-    pub min_pulse_width_high: Float,
+    pub min_pulse_width_high: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -515,7 +513,7 @@ pub struct Pin{
     /// &end
     /// =228.59
     /// ">Reference-Instance</a>
-    pub min_pulse_width_low: Float,
+    pub min_pulse_width_low: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -524,7 +522,7 @@ pub struct Pin{
     /// &end
     /// =228.60
     /// ">Reference-Instance</a>
-    pub min_transition: Float,
+    pub min_transition: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -560,7 +558,7 @@ pub struct Pin{
     /// &end
     /// =228.64
     /// ">Reference-Instance</a>
-    pub output_signal_level_high: Float,
+    pub output_signal_level_high: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -569,7 +567,7 @@ pub struct Pin{
     /// &end
     /// =228.65
     /// ">Reference-Instance</a>
-    pub output_signal_level_low: Float,
+    pub output_signal_level_low: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -660,7 +658,7 @@ pub struct Pin{
     /// &end
     /// =229.11
     /// ">Reference-Instance</a>
-    pub rise_current_slope_after_threshold: Float,
+    pub rise_current_slope_after_threshold: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -669,7 +667,7 @@ pub struct Pin{
     /// &end
     /// =229.12
     /// ">Reference-Instance</a>
-    pub rise_current_slope_before_threshold: Float,
+    pub rise_current_slope_before_threshold: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -678,7 +676,7 @@ pub struct Pin{
     /// &end
     /// =229.13
     /// ">Reference-Instance</a>
-    pub rise_time_after_threshold: Float, 
+    pub rise_time_after_threshold: f64, 
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -687,7 +685,7 @@ pub struct Pin{
     /// &end
     /// =229.14
     /// ">Reference-Instance</a>
-    pub rise_time_before_threshold: Float,
+    pub rise_time_before_threshold: f64,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
     /// ?field=test
@@ -780,18 +778,18 @@ pub struct Pin{
     // output_ccb (string) { }
     // timing ()  { }
     // tlatch () {}
-    // / A timing group is defined within a pin group.
-    // / 
-    // / Reference:
-    // / <iframe 
-    // / src="
-    // / https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-    // / ?field=test
-    // / &bgn
-    // / =67.26
-    // / &end
-    // / =67.43
-    // / " 
-    // / style="width: 90%; height: 600px;"></iframe>
+    /// A timing group is defined within a pin group.
+    /// 
+    /// Reference:
+    /// <iframe 
+    /// src="
+    /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+    /// ?field=test
+    /// &bgn
+    /// =67.26
+    /// &end
+    /// =67.43
+    /// " 
+    /// style="width: 90%; height: 600px;"></iframe>
     pub timing: Vec<Timing>,
 }

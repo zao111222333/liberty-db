@@ -13,7 +13,7 @@ use std::collections::HashMap;
 #[derive(Debug,derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::NameIdx)]
-#[derive(liberty_macros::GroupHashed)]
+#[derive(liberty_macros::Group)]
 pub struct Library{
   #[idx_len(any)]
   _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
@@ -67,8 +67,8 @@ pub struct Library{
   #[arrti_type(simple)]
   #[derivative(Default(value = "80.0"))]
   pub slew_upper_threshold_pct_rise: f64,
-  #[arrti_type(group_hashed)]
-  pub cell: <Cell as crate::ast::GroupAttri>::Set,
+  // #[arrti_type(group)]
+  // pub cell: <Cell as crate::ast::GroupAttri>::Set,
   pub voltage_map: HashMap<String, f64>,
   pub sensitization_map: HashMap<String, Sensitization>,
 }

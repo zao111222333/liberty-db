@@ -7,7 +7,6 @@
 
 use std::collections::HashMap;
 
-use crate::types::*;
 mod timing_type;
 pub use timing_type::*;
 
@@ -16,7 +15,7 @@ pub mod impls;
 pub mod builder;
 #[cfg(test)]
 mod test;
-use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,expression, types::Float, units};
+use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,expression, units};
 
 /// A timing group is defined in a bundle, a bus, or a pin group within a cell.
 /// The timing group can be used to identify the name or names of multiple timing arcs.
@@ -40,7 +39,9 @@ use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,express
 /// ">Reference-Instatnce-In-Pin</a>
 /// 
 #[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
 pub struct Timing {
+    _undefined: crate::ast::UndefinedAttributes,
     /// Use this attribute to indicate that a constraint arc is for
     /// a clock gating relation between the data and clock pin,
     /// instead of a constraint found in standard sequential devices,
@@ -74,6 +75,7 @@ pub struct Timing {
     /// &end
     /// =320.6
     /// ">Reference-Instance</a>
+    #[arrti_type(simple)]
     pub clock_gating_flag: Option<bool>,
     /// The `default_timing` attribute allows you to specify one timing arc as the default 
     /// in the case of multiple timing arcs with when statements.
@@ -1292,7 +1294,7 @@ pub struct Timing {
     /// &end
     /// =204.3
     /// ">Reference-Instance</a>
-    pub fall_delay_intercept: Option<(i64, Float)>,
+    pub fall_delay_intercept: Option<(i64, f64)>,
     // piecewise model only
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1310,7 +1312,7 @@ pub struct Timing {
     /// &end
     /// =204.4
     /// ">Reference-Instance</a>
-    pub fall_pin_resistance: Option<(i64, Float)>,
+    pub fall_pin_resistance: Option<(i64, f64)>,
     /// You define the mode attribute within a timing group.
     /// A mode attribute pertains to an individual timing arc.
     /// The timing arc is active when mode is instantiated with a name and a value.
@@ -1352,7 +1354,7 @@ pub struct Timing {
     /// &end
     /// =204.6
     /// ">Reference-Instance</a>
-    pub rise_delay_intercept: Option<(i64, Float)>,
+    pub rise_delay_intercept: Option<(i64, f64)>,
     // piecewise model only
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1370,7 +1372,7 @@ pub struct Timing {
     /// &end
     /// =204.7
     /// ">Reference-Instance</a>
-    pub rise_pin_resistance: Option<(i64, Float)>,
+    pub rise_pin_resistance: Option<(i64, f64)>,
     /// The `cell_degradation` group describes a cell performance degradation
     /// design rule for compiling a design. A cell degradation design rule
     /// specifies the maximum capacitive load a cell can drive without causing

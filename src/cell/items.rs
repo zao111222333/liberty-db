@@ -1,7 +1,3 @@
-
-
-
-
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.4&end=141.5
@@ -10,7 +6,7 @@
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[derive(Default,Debug)]
-#[derive(liberty_macros::GroupHashed)]
+#[derive(liberty_macros::Group)]
 pub struct Statetable{
   _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
   _undefined: crate::ast::UndefinedAttributes,

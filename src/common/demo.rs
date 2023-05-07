@@ -1,11 +1,17 @@
 //! cargo expand common::demo
 
-use crate::timing::TimingType;
+use std::collections::HashMap;
+
+use crate::{
+    timing::TimingType, 
+    cell::Statetable,
+    ast::{UndefinedAttributes,HashedGroup}, 
+};
 
 #[derive(Default,Debug)]
 #[derive(liberty_macros::Group)]
 struct Timing{
-  _undefined: crate::ast::UndefinedAttributes,
+  _undefined: UndefinedAttributes,
   #[arrti_type(complex)]
   values: Vec<f64>,
   #[arrti_type(simple)]
@@ -13,6 +19,43 @@ struct Timing{
   #[arrti_type(simple)]
   t2: Option<TimingType>,
 }
+#[derive(Default,Debug)]
+#[derive(liberty_macros::NameIdx)]
+#[derive(liberty_macros::Group)]
+struct Pin{
+    #[idx_len(1)]
+    _idx: Box<<Self as HashedGroup>::Idx>,
+    _undefined: UndefinedAttributes,
+    #[arrti_type(group)]
+    timing: Vec<Timing>,
+}
+#[derive(Default,Debug)]
+#[derive(liberty_macros::Group)]
+#[derive(liberty_macros::NameIdx)]
+struct Ff{
+  #[idx_len(2)]
+  _idx: Box<<Self as HashedGroup>::Idx>,
+  _undefined: UndefinedAttributes,
+  #[arrti_type(simple)]
+  next_state: Option<String>,
+}
+#[derive(Default,Debug)]
+#[derive(liberty_macros::Group)]
+#[derive(liberty_macros::NameIdx)]
+struct Cell{
+  #[idx_len(1)]
+  _idx: Box<<Self as HashedGroup>::Idx>,
+  _undefined: UndefinedAttributes,
+  #[arrti_type(simple)]
+  area: Option<f64>,
+  #[arrti_type(group)]
+  ff: HashMap<<Ff as HashedGroup>::Idx,Ff>,
+  #[arrti_type(group)]
+  pin: HashMap<<Pin as HashedGroup>::Idx,Pin>,
+  #[arrti_type(group)]
+  statetable: Option<Statetable>,
+}
+
 #[test]
 fn timing_test(){
     let _ = crate::ast::test_parse_group::<Timing>(r#"(w){
@@ -52,26 +95,6 @@ fn pin_test(){
         }
     }
     "#);
-}
-#[derive(Default,Debug)]
-#[derive(liberty_macros::NameIdx)]
-#[derive(liberty_macros::GroupHashed)]
-struct Pin{
-    #[idx_len(1)]
-    _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-    _undefined: crate::ast::UndefinedAttributes,
-    #[arrti_type(group)]
-    timing: <Timing as crate::ast::GroupAttri>::Set,
-}
-#[derive(Default,Debug)]
-#[derive(liberty_macros::GroupHashed)]
-#[derive(liberty_macros::NameIdx)]
-struct Ff{
-  #[idx_len(2)]
-  _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-  _undefined: crate::ast::UndefinedAttributes,
-  #[arrti_type(simple)]
-  next_state: Option<String>,
 }
 
 
@@ -134,20 +157,4 @@ fn cell_test(){
         }
     }
     "#);
-}
-#[derive(Default,Debug)]
-#[derive(liberty_macros::GroupHashed)]
-#[derive(liberty_macros::NameIdx)]
-struct Cell{
-  #[idx_len(1)]
-  _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-  _undefined: crate::ast::UndefinedAttributes,
-  #[arrti_type(simple)]
-  area: Option<f64>,
-  #[arrti_type(group_hashed)]
-  ff: <Ff as crate::ast::GroupAttri>::Set,
-  #[arrti_type(group_hashed)]
-  pin: <Pin as crate::ast::GroupAttri>::Set,
-  #[arrti_type(group_hashed)]
-  statetable: <crate::cell::Statetable as crate::ast::GroupAttri>::Set,
 }
