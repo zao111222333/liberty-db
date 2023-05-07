@@ -1,40 +1,13 @@
 //! cargo expand common::demo
 
-use std::fmt::Pointer;
-
 use crate::timing::TimingType;
 
-#[derive(Default)]
-#[derive(Debug)]
-struct Values {
-  v: Vec<f64>,
-}
-impl crate::ast::ComplexAttri for Values {
-  type Error=std::num::ParseFloatError;
-  #[inline]
-  fn parse(v: &Vec<Vec<&str>>)->Result<Self, Self::Error> {
-    match v.iter().flatten()
-      .map(|s| s.parse())
-      .collect() {
-      Ok(v) => Ok(Self { v }),
-      Err(e) => Err(e),
-    }
-  }
-
-  fn is_empty(&self) -> bool {
-    self.v.is_empty()
-  }
-
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
-    vec![self.v.iter().map(|f|format!("{:.10E}",f)).collect()]
-  }
-}
 #[derive(Default,Debug)]
 #[derive(liberty_macros::Group)]
 struct Timing{
   _undefined: crate::ast::UndefinedAttributes,
   #[arrti_type(complex)]
-  values: Values,
+  values: Vec<f64>,
   #[arrti_type(simple)]
   t1: Option<TimingType>,
   #[arrti_type(simple)]
@@ -42,10 +15,7 @@ struct Timing{
 }
 #[test]
 fn timing_test(){
-    use crate::ast::GroupAttri;
-    let mut n= 1;
-    if let Ok((_,Ok(group))) = 
-    Timing::nom_parse(r#"(w){
+    let _ = crate::ast::test_parse_group::<Timing>(r#"(w){
         // www
         /* com
         ment2 */
@@ -56,55 +26,32 @@ fn timing_test(){
             6\ /* comment3 */
         );
     }
-    "#,&mut n) {
-        println!("{:?}",group);
-        println!("{:?}",group.to_wrapper());
-        println!("{n}");
-    }
-    match Timing::nom_parse(r#"( w ){
+    "#);
+    let _ = crate::ast::test_parse_group::<Timing>(r#"( w ){
         t1: ombinational;
         t2: combinational;
         values ( \
             1,"2,3,",\
+            1,"2,3,",\
         );
         }
-    "#,&mut n){
-        Ok((_,Ok(group)))=>{
-            println!("{:?}",group);
-            println!("{:?}",group.to_wrapper());
-            println!("{n}");
-        },
-        Ok((_,Err(e))) => panic!("{e}"),
-        Err(e) => panic!("{e}"),
-    }
+    "#);
 }
 
 #[test]
 fn pin_test(){
-    use crate::ast::GroupAttri;
-    let mut n= 1;
-    if let Ok((_,Ok(group))) = 
-    Pin::nom_parse(r#"(A){
+    let _ = crate::ast::test_parse_group::<Pin>(r#"(A){
         timing(w){
             t1: combinational;
         }
     }
-    "#,&mut n){
-        println!("{:?}",group);
-        println!("{:?}",group.to_wrapper());
-        println!("{n}");
-    }
-    if let Ok((_,Ok(group))) = 
-    Pin::nom_parse(r#"(B){
+    "#);
+    let _ = crate::ast::test_parse_group::<Pin>(r#"(B){
         timing(w){
             t1: combinational;
         }
     }
-    "#,&mut n){
-        println!("{:?}",group);
-        println!("{:?}",group.to_wrapper());
-        println!("{n}");
-    }
+    "#);
 }
 #[derive(Default,Debug)]
 #[derive(liberty_macros::NameIdx)]
@@ -130,10 +77,7 @@ struct Ff{
 
 #[test]
 fn cell_test(){
-    use crate::ast::GroupAttri;
-    let mut n= 1;
-    
-    match Cell::nom_parse(r#"(INV){
+    let _ = crate::ast::test_parse_group::<Cell>(r#"(INV){
         // should ok
         area : 5.4;
         // should ok
@@ -161,16 +105,8 @@ fn cell_test(){
             L   -  - : - : N ";
         }
       }
-    "#,&mut n){
-        Ok((_,Ok(group))) =>{
-            println!("{:?}",group);
-            println!("{:?}",group.to_wrapper());
-            println!("{n}");
-        },
-        Ok((_,Err(e))) => panic!("{:#?}",e),
-        Err(e) => panic!("{:#?}",e),
-    }
-    if let Ok((_,Ok(group))) =  Cell::nom_parse(r#"(INV){
+    "#);
+    let _ = crate::ast::test_parse_group::<Cell>(r#"(INV){
         // should error
         undefine_area : 5.4;
         // should error
@@ -179,10 +115,15 @@ fn cell_test(){
                 t1: combinational;
             }
         }
-        // should error
+        // should ok
         pin("A"){
             timing(w){
                 t1: combinational;
+            }
+        }
+        pin("A"){
+            timing(w){
+                t2: combinational;
             }
         }
         // should error
@@ -192,11 +133,7 @@ fn cell_test(){
             }
         }
     }
-    "#,&mut n){
-        println!("{:?}",group);
-        println!("{:?}",group.to_wrapper());
-        println!("{n}");
-    }
+    "#);
 }
 #[derive(Default,Debug)]
 #[derive(liberty_macros::GroupHashed)]
