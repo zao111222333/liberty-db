@@ -46,7 +46,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
           fn gen_idx(&self, mut title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError>{
             let l=title.len();
             if l!=1{
-                return Err(crate::ast::IdxError::TitleLenMismatch(1,l,title));
+                return Err(crate::ast::IdxError::LengthDismatch(1,l,title));
             }
             if let Some(name) = title.pop(){
               Ok(Self::Idx { name })
@@ -74,7 +74,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
           fn gen_idx(&self, title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError>{
             let l=title.len();
             if l!=#c{
-                return Err(crate::ast::IdxError::TitleLenMismatch(#c,l,title));
+                return Err(crate::ast::IdxError::LengthDismatch(#c,l,title));
             }
             match TryInto::<[String; #c ]>::try_into(title){
               Ok(name) => Ok(Self::Idx { name }),

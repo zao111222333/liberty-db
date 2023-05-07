@@ -22,43 +22,81 @@ pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<proc_macro2:
           let parser_arm: _;
           match arrti_type{
             AttriType::Unkown(s) => return Err(syn::Error::new(Span::call_site(), 
-              format!("Unspported type: {s}, spport: [simple,complex,group,group_hashed]")
+              format!("Unsupported type: {s}, support: [simple,complex,group,group_hashed]")
             )),
             AttriType::Simple => {
-              to_wrapper = quote!{
-                if let Some(simple) = &self.#field_name {
-                  attr_list.push((
-                    #s_field_name.to_string(),
-                    crate::ast::AttriValue::Simple(
-                      crate::ast::SimpleAttri::to_wrapper(simple),
-                    ),
-                  ));  
-                }
-              };
-              parser_arm = quote!{
-                let simple_res: _;
-                (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input,line_num)?;
-                match simple_res {
-                  Ok(simple) => {
-                    res.#field_name=Some(simple);
-                  },
-                  Err((e,attri)) => {
-                    println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,attri,e);
-                    res.add_undefine_attri(key,attri);
-                  },
-                }
-              };
+              match extract_type_from_option(&field.ty){
+                // for Option<xxx>
+                Some(_) => {
+                  to_wrapper = quote!{
+                    if let Some(simple) = &self.#field_name {
+                      attr_list.push((
+                        #s_field_name.to_string(),
+                        crate::ast::AttriValue::Simple(
+                          crate::ast::SimpleAttri::to_wrapper(simple),
+                        ),
+                      ));  
+                    }
+                  };
+                  parser_arm = quote!{
+                    let simple_res: _;
+                    (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input,line_num)?;
+                    match simple_res {
+                      Ok(simple) => {
+                        res.#field_name=Some(simple);
+                      },
+                      Err((e,attri)) => {
+                        println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,attri,e);
+                        res.add_undefine_attri(key,attri);
+                      },
+                    }
+                  };
+                },
+                None => {
+                  // for xxx
+                  to_wrapper = quote!{
+                    attr_list.push((
+                      #s_field_name.to_string(),
+                      crate::ast::AttriValue::Simple(
+                        crate::ast::SimpleAttri::to_wrapper(&self.#field_name),
+                      ),
+                    ));
+                  };
+                  parser_arm = quote!{
+                    let simple_res: _;
+                    (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input,line_num)?;
+                    match simple_res {
+                      Ok(simple) => {
+                        res.#field_name=simple;
+                      },
+                      Err((e,attri)) => {
+                        println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,attri,e);
+                        res.add_undefine_attri(key,attri);
+                      },
+                    }
+                  };
+                },
+              }
             },
+            // AttriType::SimpleOption => {
+              
+            // },
             AttriType::Complex => {
               to_wrapper = quote!{
-                if !crate::ast::ComplexAttri::is_empty(&self.#field_name) {
+                if let Some(wrapper) = crate::ast::ComplexAttri::to_wrapper(&self.#field_name){
                   attr_list.push((
                     #s_field_name.to_string(),
-                    crate::ast::AttriValue::Complex(
-                      crate::ast::ComplexAttri::to_wrapper(&self.#field_name),
-                    ),
-                  ));  
+                    crate::ast::AttriValue::Complex(wrapper),
+                  ));
                 }
+                // if !crate::ast::ComplexAttri::is_empty(&self.#field_name) {
+                //   attr_list.push((
+                //     #s_field_name.to_string(),
+                //     crate::ast::AttriValue::Complex(
+                //       crate::ast::ComplexAttri::to_wrapper(&self.#field_name),
+                //     ),
+                //   ));  
+                // }
               };
               parser_arm = quote!{
                 let complex_res: _;
@@ -226,6 +264,7 @@ pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<proc_macro2:
 #[derive(Debug)]
 enum AttriType {
   Simple,
+  // SimpleOption,
   Complex,
   Group,
   GroupHashed,
@@ -241,6 +280,7 @@ fn parse_field_attrs(field_attrs: &Vec<Attribute>) -> Option<AttriType>{
             let type_str = seg_type.ident.to_string();
             match type_str.as_str(){
               "simple" => return Some(AttriType::Simple),
+              // "simple" => return Some(AttriType::SimpleOption),
               "complex" => return Some(AttriType::Complex),
               "group" => return Some(AttriType::Group),
               "group_hashed" => return Some(AttriType::GroupHashed),
@@ -252,5 +292,49 @@ fn parse_field_attrs(field_attrs: &Vec<Attribute>) -> Option<AttriType>{
     }
   }
   return None;
+}
+
+fn extract_type_from_option(ty: &syn::Type) -> Option<&syn::Type> {
+  use syn::{GenericArgument, Path, PathArguments, PathSegment};
+
+  fn extract_type_path(ty: &syn::Type) -> Option<&Path> {
+      match *ty {
+          syn::Type::Path(ref typepath) if typepath.qself.is_none() => Some(&typepath.path),
+          _ => None,
+      }
+  }
+
+  // TODO store (with lazy static) the vec of string
+  // TODO maybe optimization, reverse the order of segments
+  fn extract_option_segment(path: &Path) -> Option<&PathSegment> {
+      let idents_of_path = path
+          .segments
+          .iter()
+          .into_iter()
+          .fold(String::new(), |mut acc, v| {
+              acc.push_str(&v.ident.to_string());
+              acc.push('|');
+              acc
+          });
+      vec!["Option|", "std|option|Option|", "core|option|Option|"]
+          .into_iter()
+          .find(|s| &idents_of_path == *s)
+          .and_then(|_| path.segments.last())
+  }
+
+  extract_type_path(ty)
+      .and_then(|path| extract_option_segment(path))
+      .and_then(|path_seg| {
+          let type_params = &path_seg.arguments;
+          // It should have only on angle-bracketed param ("<String>"):
+          match *type_params {
+              PathArguments::AngleBracketed(ref params) => params.args.first(),
+              _ => None,
+          }
+      })
+      .and_then(|generic_arg| match *generic_arg {
+          GenericArgument::Type(ref ty) => Some(ty),
+          _ => None,
+      })
 }
   
