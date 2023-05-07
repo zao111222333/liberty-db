@@ -8,18 +8,16 @@ mod group;
 /// group is the only hash-identity for that group.
 /// ```
 /// #[derive(liberty_macros::NameIdx)]
-/// #[derive(liberty_macros::GroupHashed)]
+/// #[derive(liberty_macros::Group)]
 /// pub struct Cell {
 ///   #[idx_len(1)]
 ///   _idx: Box<<Self as HashedGroup>::Idx>,
 /// }
 /// ```
 /// Here are the options for `_idx`:
-/// ```
-/// #[idx_len(1)] -> name: String
-/// #[idx_len(usize)] -> name: [String;usize]
-/// #[idx_len(anyelse)] / not-define -> name: Vec[String]
-/// ```
+/// + `#[idx_len(1)]` -> name: String
+/// + `#[idx_len(usize)]` -> name: [String;usize]
+/// + `#[idx_len(anyelse)]` or `not-define` -> name: Vec[String]
 #[proc_macro_derive(NameIdx,attributes(idx_len))]
 pub fn macro_name_idx(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
@@ -30,75 +28,47 @@ pub fn macro_name_idx(input: TokenStream) -> TokenStream {
   toks.into()
 }
 
-/// Auto implement `GroupAttri`, with behavier of `Set=Vec<Self>`
+/// Auto implement `GroupAttri`, when that `Struct` have a field named `_idx` (`_idx: Box<<Self as HashedGroup>::Idx>`),
+/// it will implement additional function to handle group index.
 /// 
 /// Here are the options for each attributes:
 /// + `#[arrti_type(simple)]`: `field: Type` or `field: Option<Type>`, 
 /// where `Type` have implement `SimpleAttri`
 /// + `#[arrti_type(complex)]`: `field: Type`, 
 /// where `Type` have implement `ComplexAttri`
-/// + `#[arrti_type(group)]`: `field: <Type as crate::ast::GroupAttri>::Set`,
-/// where `Type` have implement `GroupAttri`
-/// + `#[arrti_type(group_hashed)]`: `field: <Type as crate::ast::GroupAttri>::Set`,
-/// where `Type` have implement `GroupAttri` and `HashedGroup`
+/// + `#[arrti_type(group)]`, Type need implement `GroupAttri`
+///   + when field is `Option<Type>`
+///   + when field is `Vec<Type>`
+///   + when field is `HashMap<<Type as HashedGroup>::Idx,Type>`
 /// 
 /// Demo
 /// ```
+/// use crate::ast::{UndefinedAttributes,HashedGroup};
+/// #[derive(Default,Debug)]
+/// #[derive(liberty_macros::Group)]
+/// struct Timing{
+///   _undefined: UndefinedAttributes,
+///   #[arrti_type(simple)]
+///   timing_type: Option<TimingType>,
+/// }
 /// #[derive(liberty_macros::NameIdx)]
-/// #[derive(liberty_macros::GroupHashed)]
+/// #[derive(liberty_macros::Group)]
 /// pub struct Cell {
 ///   #[idx_len(1)]
 ///   _idx: Box<<Self as HashedGroup>::Idx>,
-///   _undefined: crate::ast::UndefinedAttributes,
+///   _undefined: UndefinedAttributes,
 ///   #[arrti_type(simple)]
 ///   area: Option<f64>,
-///   #[arrti_type(group_hashed)]
-///   ff: <Ff as crate::ast::GroupAttri>::Set,
-///   #[arrti_type(group_hashed)]
-///   pin: <Pin as crate::ast::GroupAttri>::Set,
+///   #[arrti_type(group)]
+///   ff: HashMap<<Ff as HashedGroup>::Idx,Ff>,
+///   #[arrti_type(group)]
+///   pin: HashMap<<Pin as HashedGroup>::Idx,Pin>,
 /// }
 /// ```
 #[proc_macro_derive(Group, attributes(arrti_type))]
 pub fn macro_group(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
-  let toks = group::inner(&ast, false)
-    .unwrap_or_else(|err| 
-      err.to_compile_error().into()
-    );
-  toks.into()
-}
-/// Auto implement `GroupAttri`, with behavier of `Set=HashMap<Self::Idx,Self>`
-/// 
-/// Here are the options for each attributes:
-/// + `#[arrti_type(simple)]`: `field: Type` or `field: Option<Type>`, 
-/// where `Type` have implement `SimpleAttri`
-/// + `#[arrti_type(complex)]`: `field: Type`, 
-/// where `Type` have implement `ComplexAttri`
-/// + `#[arrti_type(group)]`: `field: <Type as crate::ast::GroupAttri>::Set`,
-/// where `Type` have implement `GroupAttri`
-/// + `#[arrti_type(group_hashed)]`: `field: <Type as crate::ast::GroupAttri>::Set`,
-/// where `Type` have implement `GroupAttri` and `HashedGroup`
-/// 
-/// Demo
-/// ```
-/// #[derive(liberty_macros::NameIdx)]
-/// #[derive(liberty_macros::GroupHashed)]
-/// pub struct Cell {
-///   #[idx_len(1)]
-///   _idx: Box<<Self as HashedGroup>::Idx>,
-///   _undefined: crate::ast::UndefinedAttributes,
-///   #[arrti_type(simple)]
-///   area: Option<f64>,
-///   #[arrti_type(group_hashed)]
-///   ff: <Ff as crate::ast::GroupAttri>::Set,
-///   #[arrti_type(group_hashed)]
-///   pin: <Pin as crate::ast::GroupAttri>::Set,
-/// }
-/// ```
-#[proc_macro_derive(GroupHashed, attributes(arrti_type))]
-pub fn macro_group_hashed(input: TokenStream) -> TokenStream {
-  let ast = parse_macro_input!(input as DeriveInput);
-  let toks = group::inner(&ast, true)
+  let toks = group::inner(&ast)
     .unwrap_or_else(|err| 
       err.to_compile_error().into()
     );

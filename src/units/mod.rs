@@ -412,7 +412,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
     let value: f64 = match i.next(){
       Some(s) => match s.parse(){
         Ok(f) => f,
-        Err(e) => return Err(Self::Error::Float(e)),
+        Err(e) => return Err(Self::Error::f64(e)),
       },
       None => return Err(Self::Error::LengthDismatch),
     };
