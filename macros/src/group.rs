@@ -1,5 +1,4 @@
 use proc_macro2::Span;
-use proc_macro::TokenStream;
 use quote::quote;
 use syn::{DeriveInput, Attribute, NestedMeta};
 use syn::{Data, Fields};
@@ -78,9 +77,6 @@ pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<proc_macro2:
                 },
               }
             },
-            // AttriType::SimpleOption => {
-              
-            // },
             AttriType::Complex => {
               to_wrapper = quote!{
                 if let Some(wrapper) = crate::ast::ComplexAttri::to_wrapper(&self.#field_name){
@@ -89,14 +85,6 @@ pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<proc_macro2:
                     crate::ast::AttriValue::Complex(wrapper),
                   ));
                 }
-                // if !crate::ast::ComplexAttri::is_empty(&self.#field_name) {
-                //   attr_list.push((
-                //     #s_field_name.to_string(),
-                //     crate::ast::AttriValue::Complex(
-                //       crate::ast::ComplexAttri::to_wrapper(&self.#field_name),
-                //     ),
-                //   ));  
-                // }
               };
               parser_arm = quote!{
                 let complex_res: _;
@@ -264,7 +252,6 @@ pub(crate) fn inner(ast: &DeriveInput, hashed: bool) -> syn::Result<proc_macro2:
 #[derive(Debug)]
 enum AttriType {
   Simple,
-  // SimpleOption,
   Complex,
   Group,
   GroupHashed,
@@ -280,7 +267,6 @@ fn parse_field_attrs(field_attrs: &Vec<Attribute>) -> Option<AttriType>{
             let type_str = seg_type.ident.to_string();
             match type_str.as_str(){
               "simple" => return Some(AttriType::Simple),
-              // "simple" => return Some(AttriType::SimpleOption),
               "complex" => return Some(AttriType::Complex),
               "group" => return Some(AttriType::Group),
               "group_hashed" => return Some(AttriType::GroupHashed),
