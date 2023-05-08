@@ -70,10 +70,11 @@ impl Eq for ChangePattern {
 impl std::fmt::Display for ChangePattern {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use units::Unit;
-        write!(f, "({:.10E}{}|{:.10E}{})", 
-                self.settle_down_time.get::<units::time::nanosecond>(),units::time::nanosecond::abbreviation(),
-                self.transition_time.get::<units::time::nanosecond>(),units::time::nanosecond::abbreviation())
+        let mut buffer1 = ryu::Buffer::new();
+        let mut buffer2 = ryu::Buffer::new();
+        write!(f, "({}|{})",
+        buffer1.format(self.settle_down_time.value),
+        buffer2.format(self.transition_time.value),)
     }
 }
 
