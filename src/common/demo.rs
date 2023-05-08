@@ -74,7 +74,7 @@ fn timing_test(){
         t1: ombinational;
         t2: combinational;
         values ( \
-            1,"2,3,",\
+            -1e2,"2,3,",\
             1,"2,3,",\
         );
         }

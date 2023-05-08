@@ -263,6 +263,10 @@ where
     ErrorKind::Alpha
   )
 }
+#[inline]
+pub(super) fn char_in_word(c:char)->bool{
+  c.is_alphanumeric()||"/_.+-".contains(c)
+}
 
 pub(crate) fn word<'a, E>(
   i: &'a str,
@@ -273,7 +277,7 @@ where
     + FromExternalError<&'a str, E>
 {
   i.split_at_position1(|item| 
-    !(item.is_alphanumeric()||"/_.+-".contains(item)), 
+    !char_in_word(item),
     ErrorKind::Alpha
   )
 }

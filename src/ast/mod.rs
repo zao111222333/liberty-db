@@ -4,8 +4,10 @@
 
 pub mod impls;
 pub mod parser;
-
-use std::{hash::Hash, fmt::Display};
+mod fmt;
+pub use fmt::CodeFormatter;
+use itertools::Itertools;
+use std::{hash::Hash, fmt::{Display, Write}};
 use nom::{error::Error, IResult};
 
 /// Wrapper for simple attribute
@@ -172,9 +174,86 @@ pub(crate) fn test_parse_group<G:GroupAttri> (s: &str) -> (G,GroupWrapper,usize)
       println!("{:?}",group.to_wrapper());
       println!("{n}");
       let wrapper = group.to_wrapper();
+      let mut output = String::new();
+      let mut f = CodeFormatter::new(&mut output , "| ");
+      if let Err(e) = Format::liberty(&wrapper, &mut f){
+          panic!("");
+      }
+      println!("{}",output);
       return (group,wrapper,n);
     },
     Ok((_,Err(e))) => panic!("{:#?}",e),
     Err(e) => panic!("{:#?}",e),
+  }
 }
+pub trait Format {
+  fn liberty<T: Write>(
+    &self, 
+    f: &mut CodeFormatter<'_, T>,
+  ) -> std::fmt::Result;
+}
+impl Format for SimpleWrapper {
+  fn liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    if is_word(self){
+      write!(f, " : {};",self)
+    }else{
+      write!(f, " : \"{}\";",self)
+    }
+  }
+}
+
+fn is_word(s: &String)->bool{
+  s.chars().all(parser::char_in_word)
+}
+impl Format for ComplexWrapper {
+  fn liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    if self.is_empty() {return write!(f, " ();\n")};
+    if self[0].iter().all(is_word){
+      write!(f," ({}", self[0].join(","))?;  
+    }else{
+      write!(f," (\"{}\"", self[0].join(","))?;
+    }
+    f.indent(1);
+    for v in self.iter().skip(1){
+      if v.iter().all(is_word){
+        write!(f, ", \\\n{}",v.join(","))?;
+      }else{
+        write!(f, ", \\\n\"{}\"",v.join(","))?;
+      }
+    }
+    f.dedent(1);
+    write!(f, ");")
+  }
+}
+
+impl Format for GroupWrapper {
+  fn liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    f.indent(1);
+    write!(f," ({}) {{\n", self.title.iter().map(
+      |s|
+      if is_word(s){
+        s.clone()
+      }else{
+        "\"".to_owned()+s+"\""
+      }
+    ).join(","))?;
+    let mut iter = self.attr_list.iter().peekable();
+    loop {
+      if let Some((key,attr)) = iter.next(){
+        write!(f,"{}", key)?;
+        match attr{
+          AttriValue::Simple(a) => Format::liberty(a, f)?,
+          AttriValue::Complex(a) => Format::liberty(a, f)?,
+          AttriValue::Group(a) => Format::liberty(a, f)?,
+        }
+        if iter.peek().is_none(){
+          f.dedent(1);
+          write!(f,"\n")?;
+          break;
+        }
+        write!(f,"\n")?;
+      }
+    }
+    write!(f, "}}")
+  }
 }
