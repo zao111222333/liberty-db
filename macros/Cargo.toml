@@ -1,12 +1,14 @@
 [package]
 name = "liberty-macros"
-version = "0.2.3"
-edition = "2021"
-license = "MIT"
 description = "`liberty` macros"
-authors = ["Junzhuo <zhou@junzhuo.site>"]
-readme = "README.md"
-repository = "https://github.com/zao111222333/liberty-db/"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+keywords.workspace = true
+authors.workspace = true
+readme.workspace = true
+repository.workspace = true
+documentation.workspace = true
 
 [lib]
 proc-macro = true
