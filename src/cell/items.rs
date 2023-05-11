@@ -9,7 +9,7 @@
 #[derive(liberty_macros::Group)]
 pub struct Statetable{
   _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-  _undefined: crate::ast::UndefinedAttributes,
+  _undefined: crate::ast::AttributeList,
   #[arrti_type(simple)]
   table: Table,
 }

@@ -5,18 +5,17 @@
 
 use std::collections::HashMap;
 
-use crate::{pin::Pin, ast::{HashedGroup, UndefinedAttributes}};
+use crate::{pin::Pin, ast::{HashedGroup, AttributeList}};
 mod items;
 pub use items::*;
 
 /// cell
 #[derive(Debug,Default)]
-#[derive(liberty_macros::NameIdx)]
 #[derive(liberty_macros::Group)]
 pub struct Cell {
     #[idx_len(1)]
     _idx: Box<<Self as HashedGroup>::Idx>,
-    _undefined: UndefinedAttributes,
+    _undefined: AttributeList,
     
     #[arrti_type(simple)]
     pub area: Option<f64>,

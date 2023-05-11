@@ -5,47 +5,49 @@ use std::collections::HashMap;
 use crate::{
     timing::TimingType, 
     cell::Statetable,
-    ast::{UndefinedAttributes,HashedGroup}, 
+    ast::{AttributeList,HashedGroup}, 
 };
 
 #[derive(Default,Debug)]
 #[derive(liberty_macros::Group)]
 struct Timing{
-  _undefined: UndefinedAttributes,
+  _undefined: AttributeList,
   #[arrti_type(complex)]
   values: Vec<f64>,
+//   #[arrti_type(complex)]
+//   test_table: Vec<Vec<f64>>,
   #[arrti_type(simple)]
   t1: Option<TimingType>,
   #[arrti_type(simple)]
   t2: Option<TimingType>,
 }
 #[derive(Default,Debug)]
-#[derive(liberty_macros::NameIdx)]
+// #[derive(liberty_macros::NameIdx)]
 #[derive(liberty_macros::Group)]
 struct Pin{
     #[idx_len(1)]
     _idx: Box<<Self as HashedGroup>::Idx>,
-    _undefined: UndefinedAttributes,
+    _undefined: AttributeList,
     #[arrti_type(group)]
     timing: Vec<Timing>,
 }
 #[derive(Default,Debug)]
 #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::NameIdx)]
+// #[derive(liberty_macros::NameIdx)]
 struct Ff{
   #[idx_len(2)]
   _idx: Box<<Self as HashedGroup>::Idx>,
-  _undefined: UndefinedAttributes,
+  _undefined: AttributeList,
   #[arrti_type(simple)]
   next_state: Option<String>,
 }
 #[derive(Default,Debug)]
 #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::NameIdx)]
+// #[derive(liberty_macros::NameIdx)]
 struct Cell{
   #[idx_len(1)]
   _idx: Box<<Self as HashedGroup>::Idx>,
-  _undefined: UndefinedAttributes,
+  _undefined: AttributeList,
   #[arrti_type(simple)]
   area: Option<f64>,
   #[arrti_type(group)]
@@ -118,6 +120,10 @@ fn cell_test(){
             timing(){
                 // should error
                 t1: foo_error;
+                test_table (\
+                    "1,2,",\
+                    "4,5,6",\
+                    4 , 5 , 6);
             }
         }
         statetable ("CLK EN SE",ENL) {

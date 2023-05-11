@@ -407,8 +407,8 @@ impl Deref for CapacitiveLoadUnit{
 impl ComplexAttri for CapacitiveLoadUnit {
   type Error=crate::ast::ComplexParseError;
 
-  fn parse(v: &Vec<Vec<&str>>)->Result<Self,Self::Error> {
-    let mut i = v.iter().flatten();
+  fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
+    let mut i = v.into_iter();
     let value: f64 = match i.next(){
       Some(s) => match s.parse(){
         Ok(f) => f,
@@ -418,11 +418,11 @@ impl ComplexAttri for CapacitiveLoadUnit {
     };
     let (ff_pf,_v):(bool,Capacitance) = match i.next(){
       Some(s) => match s{
-        &"ff" => (
+        "ff" => (
           true,
           Capacitance::new::<capacitance::femtofarad>(value),
         ),
-        &"pf" => (
+        "pf" => (
           false,
           Capacitance::new::<capacitance::picofarad>(value),
         ),

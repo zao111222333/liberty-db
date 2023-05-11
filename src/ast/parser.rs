@@ -7,11 +7,11 @@ use nom::{
   error::{Error, ContextError, FromExternalError, ParseError, ErrorKind, VerboseError}, 
   IResult, 
   combinator::{map, opt, map_opt},
-  sequence::{tuple, delimited, preceded, pair},
+  sequence::{tuple, delimited, preceded, pair, terminated},
   character::streaming::{char, none_of, one_of},
   branch::alt,
   bytes::{streaming::{take_while, escaped, take_until, take}, complete::tag}, 
-  multi::{separated_list0, many0}, 
+  multi::{separated_list0, many0, many1}, 
   InputTakeAtPosition, 
 };
 
@@ -148,6 +148,7 @@ fn comment_space_newline_slash<'a>(i: &'a str) -> IResult<&'a str, usize, Error<
 #[test]
 fn space_test(){
   println!("{:?}",comment_space_newline_slash(r#" w"#));
+  println!("{:?}",comment_space_newline_slash(r#" );"#));
   println!("{:?}",comment_space_newline_slash(r#"/*iwww\
   
   */
@@ -176,16 +177,13 @@ pub(crate) fn undefine<'a>(
   }
   *line_num=line_num_back;
   if let Ok((input,res)) = complex(i, line_num){
-    return Ok(
-      (
-        input,
-        super::AttriValue::Complex(res.into_iter()
-                                      .map(|v|
-                                            v.into_iter().map(ToString::to_string).collect()
-                                          ).collect() 
-                                        ),
-      )
-    )
+    return Ok((
+      input,
+      super::AttriValue::Complex(vec![
+                                res.into_iter()
+                                .map(ToString::to_string).collect() 
+                                ]),
+    ))
   }
   *line_num=line_num_back;
   match title(i, line_num){
@@ -343,7 +341,7 @@ fn complex_complex<'a>(
 
 pub(crate) fn complex<'a>(
   i: &'a str, line_num: &mut usize,
-) -> IResult<&'a str, Vec<Vec<&'a str>>, Error<&'a str>>
+) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>>
 {
   map(
     tuple((
@@ -356,11 +354,12 @@ pub(crate) fn complex<'a>(
             map(word, |s|vec![s]),
             complex_complex,
           )),
-          preceded(
+          tuple((
+            space,
             char(','),
             comment_space_newline_slash,
-          ),
-        )
+          )),
+        ),
       ),
       opt(
         pair(
@@ -378,13 +377,17 @@ pub(crate) fn complex<'a>(
     )),
     |(_,_,n0,res,last,_,_,_,n1)| {
       *line_num += n0+n1;
-      let mut vec = res.into_iter().map(|(v,n)|{
+      let mut vec: Vec<&'a str> = res.into_iter().map(|(v,(_,_,n))|{
         *line_num += n;
         v
-      }).collect::<Vec<Vec<&'a str>>>();
+      }).flatten().collect();
       if let Some((last_vec,n)) = last{
         *line_num += n;
-        vec.push(last_vec)
+        vec.extend(last_vec);
+        // if let Some(l) = vec.last_mut(){
+        // }else{
+        //   vec = vec![last_vec];
+        // }
       }
       vec
     },

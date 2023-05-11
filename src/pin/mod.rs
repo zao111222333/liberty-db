@@ -27,11 +27,11 @@ use crate::units;
 /// + Descriptions of the attributes and groups you can use in a `pin` group
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::NameIdx)]
+// #[derive(liberty_macros::NameIdx)]
 pub struct Pin{
     #[idx_len(1)]
     _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-    _undefined: crate::ast::UndefinedAttributes,
+    _undefined: crate::ast::AttributeList,
     /* Simple Attributes in a pin Group */
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

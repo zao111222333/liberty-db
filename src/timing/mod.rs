@@ -41,7 +41,7 @@ use crate::{common::items::*, library::Sensitization, bus::Bus, pin::Pin,express
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 pub struct Timing {
-    _undefined: crate::ast::UndefinedAttributes,
+    _undefined: crate::ast::AttributeList,
     /// Use this attribute to indicate that a constraint arc is for
     /// a clock gating relation between the data and clock pin,
     /// instead of a constraint found in standard sequential devices,

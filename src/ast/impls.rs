@@ -54,8 +54,8 @@ impl super::SimpleAttri for String {
 
 impl super::ComplexAttri for Vec<f64> {
   type Error=std::num::ParseFloatError;
-  fn parse<'a>(v: &'a Vec<Vec<&'a str>>)->Result<Self,Self::Error> {
-    v.iter().flatten()
+  fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
+    v.into_iter()
       .map(|s| s.parse())
       .collect()
   }
@@ -70,11 +70,40 @@ impl super::ComplexAttri for Vec<f64> {
   }
 }
 
+// impl super::ComplexAttri for Vec<Vec<f64>> {
+//   type Error=std::num::ParseFloatError;
+//   fn parse<'a>(v: &'a Vec<Vec<&'a str>>)->Result<Self,Self::Error> {
+//     println!("{:?}",v);
+//     v.iter()
+//       .map(|inner_vec| {
+//           inner_vec
+//               .iter()
+//               .map(|&s| s.parse::<f64>())
+//               .collect()
+//       })
+//       .collect()
+//   }
+
+//   fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
+//     if self.is_empty(){
+//       None
+//     }else{
+//       if self[0].is_empty(){
+//         None
+//       }else{
+//         let mut buffer = ryu::Buffer::new();
+//         Some(self.iter().map(|inner_vec|
+//           inner_vec.iter().map(|f|buffer.format(*f).to_string()).collect::<Vec<String>>()
+//         ).collect())
+//       }
+//     }
+//   }
+// }
+
 impl super::ComplexAttri for Vec<usize> {
   type Error=std::num::ParseIntError;
-  fn parse<'a>(v: &'a Vec<Vec<&'a str>>)->Result<Self,Self::Error> {
-    v.iter().flatten()
-      .map(|s| s.parse())
+  fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
+    v.into_iter().map(|s| s.parse())
       .collect()
   }
 
@@ -90,8 +119,8 @@ impl super::ComplexAttri for Vec<usize> {
 impl super::ComplexAttri for Option<(f64,f64)> {
   type Error=crate::ast::ComplexParseError;
 
-  fn parse(v: &Vec<Vec<&str>>)->Result<Self,Self::Error> {
-    let mut i = v.iter().flatten();
+  fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
+    let mut i = v.into_iter();
     let v1: f64 = match i.next(){
       Some(s) => match s.parse(){
         Ok(f) => f,

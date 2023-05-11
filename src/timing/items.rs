@@ -190,12 +190,12 @@ pub struct Mode {}
 /// ">Reference-Instance</a>
 /// 
 #[derive(Debug, Clone, Default)]
-// #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::NameIdx)]
+#[derive(liberty_macros::Group)]
+// #[derive(liberty_macros::NameIdx)]
 pub struct CellDegradation {
     #[idx_len(1)]
     _idx: Box<<Self as ast::HashedGroup>::Idx>,
-    _undefined: ast::UndefinedAttributes,
+    _undefined: ast::AttributeList,
     // /* polynomial model */ 
     // #[arrti_type(complex)]
     // pub coefs: Vec<f64>,
@@ -245,12 +245,12 @@ pub struct CellDegradation {
 /// **Used By:**
 /// [Timing](crate::timing::Timing)
 #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::NameIdx)]
+// #[derive(liberty_macros::NameIdx)]
 #[derive(Debug, Clone, Default)]
 pub struct CellFall {
     #[idx_len(1)]
     _idx: Box<<Self as ast::HashedGroup>::Idx>,
-    _undefined: ast::UndefinedAttributes,
+    _undefined: ast::AttributeList,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
     /// ?field=test

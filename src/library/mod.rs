@@ -5,19 +5,19 @@
 mod items;
 // pub use items::*;
 
-use crate::ast::ComplexAttri;
+use crate::ast::{ComplexAttri, HashedGroup};
 // use crate::types::*;
 use crate::units;
 use crate::cell::Cell;
 use std::collections::HashMap;
 #[derive(Debug,derivative::Derivative)]
 #[derivative(Default)]
-#[derive(liberty_macros::NameIdx)]
+// #[derive(liberty_macros::NameIdx)]
 #[derive(liberty_macros::Group)]
 pub struct Library{
-  #[idx_len(any)]
+  #[idx_len(-1)]
   _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-  _undefined: crate::ast::UndefinedAttributes,
+  _undefined: crate::ast::AttributeList,
   /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=42.25&end=42.30
@@ -67,8 +67,8 @@ pub struct Library{
   #[arrti_type(simple)]
   #[derivative(Default(value = "80.0"))]
   pub slew_upper_threshold_pct_rise: f64,
-  // #[arrti_type(group)]
-  // pub cell: <Cell as crate::ast::GroupAttri>::Set,
+  #[arrti_type(group)]
+  pub cell: HashMap<<Cell as HashedGroup>::Idx,Cell>,
   pub voltage_map: HashMap<String, f64>,
   pub sensitization_map: HashMap<String, Sensitization>,
 }
@@ -91,7 +91,7 @@ pub struct Sensitization{
 impl ComplexAttri for Vec<crate::pin::PinIdx> {
     type Error=std::fmt::Error;
 
-    fn parse(v: &Vec<Vec<&str>>)->Result<Self,Self::Error> {
+    fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
         todo!()
     }
 
@@ -135,9 +135,7 @@ impl Library {
 
 mod test{
     use super::*;
-    // TODO: 
-    // 1. support comment
-    // 2. support multi-line `\`
+    
     static  TEMPLATE: &str = r#"
   library(gscl45nm) {
   
@@ -149,7 +147,7 @@ mod test{
     current_unit : "1uA";
     pulling_resistance_unit : "1kohm";
     leakage_power_unit : "1nW";
-    // capacitive_load_unit (1,pf);
+    capacitive_load_unit (1,pf);
   
     slew_upper_threshold_pct_rise : 80;
     slew_lower_threshold_pct_rise : 20;
@@ -223,7 +221,13 @@ mod test{
       match Library::parse(TEMPLATE){
         Ok(library) => {
           println!("{:#?}", library);
-          println!("{:#?}", library.to_wrapper());
+          // println!("{:#?}", library.to_wrapper());
+          let mut output = String::new();
+          let mut f = crate::ast::CodeFormatter::new(&mut output , "| ");
+          if let Err(e) = library.liberty("library", &mut f){
+              panic!("");
+          }
+          println!("{}",output);
         }
         Err(e) => println!("{:#?}", e),
       }

@@ -27,10 +27,10 @@ pub struct GroupWrapper{
   /// title
   pub title: Vec<String>,
   /// attr_list
-  pub attr_list: Vec<(String, AttriValue)>,
+  pub attr_list: AttributeList,
 }
 /// type for UndefinedAttributes, same to `attri_list`
-pub type UndefinedAttributes=Vec<(String, AttriValue)>;
+pub type AttributeList=Vec<(String, AttriValue)>;
 /// AttriValue for undefined_attribute/serialization
 #[derive(Debug,Clone)]
 pub enum AttriValue {
@@ -65,6 +65,10 @@ pub trait SimpleAttri: Sized + Display{
   fn to_wrapper(&self) -> SimpleWrapper{
     format!("{self}")
   }
+  #[inline]
+  fn liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    <SimpleWrapper as Format>::liberty(&self.to_wrapper(), key, f)
+  }
 }
 
 
@@ -87,23 +91,43 @@ pub trait ComplexAttri: Sized {
   /// Parser error
   type Error: std::error::Error;
   /// basic parser
-  fn parse(v: &Vec<Vec<&str>>)->Result<Self,Self::Error>;
+  fn parse(v: Vec<&str>)->Result<Self,Self::Error>;
   /// to_wrapper
   fn to_wrapper(&self) -> Option<ComplexWrapper>;
   /// nom_parse, auto implement
   #[inline]
-  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Result<Self,(Self::Error,AttriValue)>, Error<&'a str>>{
+  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Result<Self,Self::Error>, Error<&'a str>>{
     let (input,complex) = parser::complex(i,line_num)?;
-    match Self::parse(&complex){
+    match Self::parse(complex){
       Ok(s) => Ok((input,Ok(s))),
       Err(e) => Ok((
         input,
-        Err((e, AttriValue::Complex(
-          complex.into_iter()
-          .map(|vec_string| vec_string.into_iter().map(|s| s.to_string()).collect())
-          .collect()
-        )))
+        Err(e)
       )),
+    }
+  }
+  #[inline]
+  fn liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    if let Some(wrapper) = self.to_wrapper(){
+      <ComplexWrapper as Format>::liberty(&wrapper, key, f)
+      // if wrapper.is_empty() {return write!(f, "\n{key} ();")};
+      // if wrapper[0].iter().all(is_word){
+      //   write!(f,"\n{key} ({}", wrapper[0].join(","))?;  
+      // }else{
+      //   write!(f,"\n{key} (\"{}\"", wrapper[0].join(","))?;
+      // }
+      // f.indent(1);
+      // for v in wrapper.iter().skip(1){
+      //   if v.iter().all(is_word){
+      //     write!(f, ", \\\n{}",v.join(","))?;
+      //   }else{
+      //     write!(f, ", \\\n\"{}\"",v.join(","))?;
+      //   }
+      // }
+      // f.dedent(1);
+      // write!(f, ");")
+    }else {
+      Ok(())
     }
   }
 }
@@ -132,7 +156,8 @@ pub trait GroupAttri: Sized + std::fmt::Debug{
   /// nom_parse, will be implemented by macros
   fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Result<Self,IdxError>, Error<&'a str>>;
   /// 
-  fn to_wrapper(&self) -> GroupWrapper;
+  // fn to_wrapper(&self) -> GroupWrapper;
+  fn liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result;
 }
 
 /// Error for parser Group Index
@@ -166,21 +191,21 @@ pub enum ParserError<'a> {
   Other(usize,String),
 }
 
-pub(crate) fn test_parse_group<G:GroupAttri> (s: &str) -> (G,GroupWrapper,usize){
+pub(crate) fn test_parse_group<G:GroupAttri> (s: &str) -> (G,usize){
   let mut n= 1;
   match G::nom_parse(s,&mut n){
     Ok((_,Ok(group))) =>{
       println!("{:?}",group);
-      println!("{:?}",group.to_wrapper());
+      // println!("{:?}",group.to_wrapper());
       println!("{n}");
-      let wrapper = group.to_wrapper();
+      // let wrapper = group.to_wrapper();
       let mut output = String::new();
       let mut f = CodeFormatter::new(&mut output , "| ");
-      if let Err(e) = Format::liberty(&wrapper, &mut f){
+      if let Err(e) = GroupAttri::liberty(&group,"some_key",&mut f){
           panic!("");
       }
       println!("{}",output);
-      return (group,wrapper,n);
+      return (group,n);
     },
     Ok((_,Err(e))) => panic!("{:#?}",e),
     Err(e) => panic!("{:#?}",e),
@@ -189,29 +214,30 @@ pub(crate) fn test_parse_group<G:GroupAttri> (s: &str) -> (G,GroupWrapper,usize)
 pub trait Format {
   fn liberty<T: Write>(
     &self, 
+    key: &str,
     f: &mut CodeFormatter<'_, T>,
   ) -> std::fmt::Result;
 }
+pub(crate) fn is_word(s: &String)->bool{
+  s.chars().all(parser::char_in_word)
+}
 impl Format for SimpleWrapper {
-  fn liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  #[inline]
+  fn liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
     if is_word(self){
-      write!(f, " : {};",self)
+      write!(f, "\n{key} : {};",self)
     }else{
-      write!(f, " : \"{}\";",self)
+      write!(f, "\n{key} : \"{}\";",self)
     }
   }
 }
-
-fn is_word(s: &String)->bool{
-  s.chars().all(parser::char_in_word)
-}
 impl Format for ComplexWrapper {
-  fn liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
-    if self.is_empty() {return write!(f, " ();\n")};
+  fn liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    if self.is_empty() {return write!(f, "\n{key} ();")};
     if self[0].iter().all(is_word){
-      write!(f," ({}", self[0].join(","))?;  
+      write!(f,"\n{key} ({}", self[0].join(","))?;  
     }else{
-      write!(f," (\"{}\"", self[0].join(","))?;
+      write!(f,"\n{key} (\"{}\"", self[0].join(","))?;
     }
     f.indent(1);
     for v in self.iter().skip(1){
@@ -226,10 +252,20 @@ impl Format for ComplexWrapper {
   }
 }
 
+pub(crate) fn liberty_attr_list<T: Write>(attr_list: &AttributeList, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  for (key,attr) in attr_list.iter(){
+    match attr{
+      AttriValue::Simple(a) => Format::liberty(a, key, f)?,
+      AttriValue::Complex(a) => Format::liberty(a, key, f)?,
+      AttriValue::Group(a) => Format::liberty(a, key, f)?,
+    }
+  }
+  Ok(())
+}
+
 impl Format for GroupWrapper {
-  fn liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
-    f.indent(1);
-    write!(f," ({}) {{\n", self.title.iter().map(
+  fn liberty<T: Write>(&self, key:&str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    write!(f,"\n{key} ({}) {{", self.title.iter().map(
       |s|
       if is_word(s){
         s.clone()
@@ -237,23 +273,9 @@ impl Format for GroupWrapper {
         "\"".to_owned()+s+"\""
       }
     ).join(","))?;
-    let mut iter = self.attr_list.iter().peekable();
-    loop {
-      if let Some((key,attr)) = iter.next(){
-        write!(f,"{}", key)?;
-        match attr{
-          AttriValue::Simple(a) => Format::liberty(a, f)?,
-          AttriValue::Complex(a) => Format::liberty(a, f)?,
-          AttriValue::Group(a) => Format::liberty(a, f)?,
-        }
-        if iter.peek().is_none(){
-          f.dedent(1);
-          write!(f,"\n")?;
-          break;
-        }
-        write!(f,"\n")?;
-      }
-    }
-    write!(f, "}}")
+    f.indent(1);
+    liberty_attr_list(&self.attr_list, f);
+    f.dedent(1);
+    write!(f, "\n}}")
   }
 }

@@ -107,11 +107,11 @@ pub enum VariableType {
 #[derive(Debug, Clone)]
 #[derive(Default)]
 #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::NameIdx)]
+// #[derive(liberty_macros::NameIdx)]
 pub struct Domain{
     #[idx_len(1)]
     _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-    _undefined: crate::ast::UndefinedAttributes,
+    _undefined: crate::ast::AttributeList,
     pub group_name: String,
     pub calc_mode: Option<String>,
     pub variable_1: Option<VariableType>,
