@@ -1,21 +1,35 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[package]
-name = "liberty-db"
-version = "0.2.3"
-edition = "2021"
+[workspace]
+members = ["macros"]
+
+[workspace.package]
+version = "0.2.4"
 license = "MIT"
+edition = "2021"
+authors = ["Junzhuo <zhou@junzhuo.site>"]
 keywords = [
     "eda", 
     "liberty",
     "database",
     "parser",
 ]
-description = "`liberty` data structre"
-authors = ["Junzhuo <zhou@junzhuo.site>"]
 readme = "README.md"
 repository = "https://github.com/zao111222333/liberty-db/"
 documentation = "https://docs.rs/liberty-db"
+
+
+[package]
+name = "liberty-db"
+description = "`liberty` data structre"
 include = ["/src", "/tests", "/docs/header.html", "/build.rs", "README.md"]
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+keywords.workspace = true
+authors.workspace = true
+readme.workspace = true
+repository.workspace = true
+documentation.workspace = true
 
 # Enable katex in documentation
 # RUSTDOCFLAGS="--html-in-header docs/header.html" cargo doc --no-deps --open
@@ -26,13 +40,10 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 [features]
 default = []
 
-[workspace]
-members = ["macros"]
-
 
 
 [dependencies]
-liberty-macros = {path = "./macros", version = "0.2.3"}
+liberty-macros = { path = "macros" }
 anyhow = "1.0"
 log = { version = "0.4", features = ["std", "serde"] }
 nom = "7.1"
@@ -47,16 +58,8 @@ prettytable-rs = "^0.10"
 itertools = "0.10.5"
 ryu = "1.0.13"
 itoa = "1.0"
+uom = { version = "0.34.0", default-features = false, features = ["autoconvert","f64","si", "std",] }
 
-[dependencies.uom]
-version = "0.34.0"
-default-features = false
-features = [
-    "autoconvert",
-    "f64", # Floating point storage types.
-    "si", "std", # Built-in SI system and std library support.
-    # "use_serde", # Serde support.
-]
 
 
 [dev-dependencies]

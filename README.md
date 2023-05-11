@@ -10,20 +10,21 @@
 ## TODO:
 
 + [x] Logic Search
-+ [x] `timing_type` group ![](https://progress-bar.dev/91?title=done)
++ [x] `timing_type`
 + [ ] `timing` group
 + [ ] Karnaugh Map Simplify, [link1](https://www.geeksforgeeks.org/variable-entrant-map-vem-in-digital-logic), [link2](https://www.allaboutcircuits.com/textbook/digital/chpt-8/logic-simplification-karnaugh-maps/)
 
 # liberty-db
-*/!\Work in progress, if you put it in production, you fix it/!*
-
-<details>
-<summary>
-Click to show Cargo.toml.
-</summary>
+**Work in progress, unstable**
 
 ```toml
 [dependencies]
 liberty_db = "0.2"
 ```
-</details>
+
+## ToDo List
++ ![](https://progress-bar.dev/100?title=done) support comment
++ ![](https://progress-bar.dev/100?title=done) support multi-line `\`
++ ![](https://progress-bar.dev/90?title=doing) format to `liberty`
++ ![](https://progress-bar.dev/60?title=doing) macros
++ ![](https://progress-bar.dev/0?title=todo) stream input
