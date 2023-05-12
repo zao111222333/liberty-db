@@ -1,6 +1,6 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["macros"]
+members = ["macros","tests"]
 
 [workspace.package]
 version = "0.2.4"
@@ -62,17 +62,6 @@ uom = { version = "0.34.0", default-features = false, features = ["autoconvert",
 
 
 
-[dev-dependencies]
-env_logger = "0.10"
-test-log = { version = "0.2.11", features = ["trace"], default-features = false }
-tracing = {version = "0.1", default-features = false}
-tracing-subscriber = {version = "0.3", default-features = false, features = ["env-filter", "fmt"]}
-walkdir = "2"
-# test-case = "3.0.0"
-colored = "2.0.0"
-criterion = "0.3"
-liberty-io = "0.0.2"
-libertyparse = "0.2.2"
 
 [build-dependencies]
 # dircpy = "0.3.14"
