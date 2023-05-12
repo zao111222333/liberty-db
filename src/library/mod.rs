@@ -5,18 +5,17 @@
 mod items;
 // pub use items::*;
 
-use crate::ast::{ComplexAttri, HashedGroup};
-// use crate::types::*;
+use crate::ast::HashedGroup;
+use crate::pin::Pin;
 use crate::units;
 use crate::cell::Cell;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 #[derive(Debug,derivative::Derivative)]
 #[derivative(Default)]
-// #[derive(liberty_macros::NameIdx)]
 #[derive(liberty_macros::Group)]
 pub struct Library{
-  #[idx_len(-1)]
-  _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
+  #[id_len(-1)]
+  _id: <Self as crate::ast::HashedGroup>::Id,
   _undefined: crate::ast::AttributeList,
   /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
   /// <a name ="reference_link" href="
@@ -68,7 +67,7 @@ pub struct Library{
   #[derivative(Default(value = "80.0"))]
   pub slew_upper_threshold_pct_rise: f64,
   #[arrti_type(group)]
-  pub cell: HashMap<<Cell as HashedGroup>::Idx,Cell>,
+  pub cell: HashSet<Cell>,
   pub voltage_map: HashMap<String, f64>,
   pub sensitization_map: HashMap<String, Sensitization>,
 }
@@ -84,21 +83,21 @@ pub struct Library{
 #[derive(Debug, Clone)]
 pub struct Sensitization{
     pub group_name: String,
-    pub pin_names: Vec<crate::pin::PinIdx>,
+    pub pin_names: Vec<<Pin as HashedGroup>::Id>,
     pub vector: Vector,
 }
 
-impl ComplexAttri for Vec<crate::pin::PinIdx> {
-    type Error=std::fmt::Error;
+// impl ComplexAttri for Vec<crate::pin::PinIdx> {
+//     type Error=std::fmt::Error;
 
-    fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
-        todo!()
-    }
+//     fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
+//         todo!()
+//     }
 
-    fn to_wrapper(&self) -> Option<crate::ast::ComplexWrapper> {
-        todo!()
-    }
-}
+//     fn to_wrapper(&self) -> Option<crate::ast::ComplexWrapper> {
+//         todo!()
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub struct Vector{
@@ -124,7 +123,7 @@ impl Library {
     if key=="library"{
       match <Self as GroupAttri>::nom_parse(input,&mut line_num){
         Err(e) => return Err(ParserError::NomError(line_num, e)),
-        Ok((_,Err(e))) => return Err(ParserError::IdxError(line_num, e)),
+        Ok((_,Err(e))) => return Err(ParserError::IdError(line_num, e)),
         Ok((_,Ok(l))) => return Ok(l),
     }
     }else{
@@ -221,10 +220,9 @@ mod test{
       match Library::parse(TEMPLATE){
         Ok(library) => {
           println!("{:#?}", library);
-          // println!("{:#?}", library.to_wrapper());
           let mut output = String::new();
           let mut f = crate::ast::CodeFormatter::new(&mut output , "| ");
-          if let Err(e) = library.liberty("library", &mut f){
+          if let Err(e) = library.fmt_liberty("library", &mut f){
               panic!("");
           }
           println!("{}",output);

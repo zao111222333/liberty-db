@@ -9,7 +9,6 @@ pub use fmt::CodeFormatter;
 use itertools::Itertools;
 use std::{hash::Hash, fmt::{Display, Write}};
 use nom::{error::Error, IResult};
-
 /// Wrapper for simple attribute
 pub type SimpleWrapper = String;
 /// Wrapper for complex attribute
@@ -66,7 +65,7 @@ pub trait SimpleAttri: Sized + Display{
     format!("{self}")
   }
   #[inline]
-  fn liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  fn fmt_liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
     <SimpleWrapper as Format>::liberty(&self.to_wrapper(), key, f)
   }
 }
@@ -107,42 +106,35 @@ pub trait ComplexAttri: Sized {
     }
   }
   #[inline]
-  fn liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  fn fmt_liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
     if let Some(wrapper) = self.to_wrapper(){
       <ComplexWrapper as Format>::liberty(&wrapper, key, f)
-      // if wrapper.is_empty() {return write!(f, "\n{key} ();")};
-      // if wrapper[0].iter().all(is_word){
-      //   write!(f,"\n{key} ({}", wrapper[0].join(","))?;  
-      // }else{
-      //   write!(f,"\n{key} (\"{}\"", wrapper[0].join(","))?;
-      // }
-      // f.indent(1);
-      // for v in wrapper.iter().skip(1){
-      //   if v.iter().all(is_word){
-      //     write!(f, ", \\\n{}",v.join(","))?;
-      //   }else{
-      //     write!(f, ", \\\n\"{}\"",v.join(","))?;
-      //   }
-      // }
-      // f.dedent(1);
-      // write!(f, ");")
     }else {
       Ok(())
     }
   }
 }
 
+// impl Eq for Cell {}
+
+// impl PartialEq for Cell {
+//     fn eq(&self, other: &Self) -> bool {
+//         self._idx == other._idx
+//     }
+// }
+
 /// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
-pub trait HashedGroup: Sized {
+pub trait HashedGroup: Sized + Hash + Eq{
   /// its Index
-  type Idx: Sized+Hash;
+  type Id: Sized+Hash;
   /// generate title for wrapper
   fn title(&self) -> Vec<String>;
-  /// generate idx from self
-  fn idx(&self) -> &Self::Idx;
-  fn idx_clone(&self) -> Self::Idx;
+  /// generate id from self
+  fn id(&self) -> &Self::Id;
+  // fn idx_box(&self) -> Box<Self::Id>;
+  // fn idx_clone(&self) -> Self::Id;
   /// combine `self` and `title`, generate index
-  fn gen_idx(&self, title: Vec<String>) -> Result<Self::Idx,IdxError>;
+  fn gen_id(&self, title: Vec<String>) -> Result<Self::Id,IdError>;
 }
 
 /// Group Attribute in Liberty
@@ -152,23 +144,24 @@ pub trait HashedGroup: Sized {
 /// `#[derive(liberty_macros::Group,liberty_macros::NameIdx)]`
 pub trait GroupAttri: Sized + std::fmt::Debug{
   /// 
-  fn add_undefine_attri(&mut self, key: &str, attri: AttriValue);
+  fn undefined_list(&mut self)-> &mut AttributeList;
+  // fn add_undefine_attri(&mut self, key: &str, attri: AttriValue);
   /// nom_parse, will be implemented by macros
-  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Result<Self,IdxError>, Error<&'a str>>;
+  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, Result<Self,IdError>, Error<&'a str>>;
   /// 
   // fn to_wrapper(&self) -> GroupWrapper;
-  fn liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result;
+  fn fmt_liberty<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result;
 }
 
 /// Error for parser Group Index
 #[derive(Debug)]
 #[derive(thiserror::Error)]
-pub enum IdxError {
+pub enum IdError {
   /// TitleLenMismatch(want,got,title)
   #[error("title length dismatch (want={0},got={1}), title={2:?}")]
   LengthDismatch(usize,usize,Vec<String>),
-  /// replace same idx
-  #[error("replace same idx")]
+  /// replace same id
+  #[error("replace same id")]
   RepeatIdx,
   /// something else
   #[error("{0}")]
@@ -181,9 +174,9 @@ pub enum IdxError {
 pub enum ParserError<'a> {
   /// TitleLenMismatch(want,got,title)
   #[error("Line:{0}, error:{1}")]
-  IdxError(usize,IdxError),
-  /// replace same idx
-  #[error("replace same idx")]
+  IdError(usize,IdError),
+  /// replace same id
+  #[error("replace same id")]
   NomError(usize,nom::Err<Error<&'a str>>),
   // NomError(usize,Error<&'a str>),
   /// something else
@@ -201,7 +194,7 @@ pub(crate) fn test_parse_group<G:GroupAttri> (s: &str) -> (G,usize){
       // let wrapper = group.to_wrapper();
       let mut output = String::new();
       let mut f = CodeFormatter::new(&mut output , "| ");
-      if let Err(e) = GroupAttri::liberty(&group,"some_key",&mut f){
+      if let Err(e) = GroupAttri::fmt_liberty(&group,std::any::type_name::<G>(),&mut f){
           panic!("");
       }
       println!("{}",output);

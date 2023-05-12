@@ -109,8 +109,8 @@ pub enum VariableType {
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 pub struct Domain{
-    #[idx_len(1)]
-    _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
+    #[id_len(1)]
+    _id: <Self as crate::ast::HashedGroup>::Id,
     _undefined: crate::ast::AttributeList,
     pub group_name: String,
     pub calc_mode: Option<String>,

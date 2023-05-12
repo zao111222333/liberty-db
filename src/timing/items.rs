@@ -193,8 +193,8 @@ pub struct Mode {}
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 pub struct CellDegradation {
-    #[idx_len(1)]
-    _idx: Box<<Self as ast::HashedGroup>::Idx>,
+    #[id_len(1)]
+    _id: <Self as ast::HashedGroup>::Id,
     _undefined: ast::AttributeList,
     // /* polynomial model */ 
     // #[arrti_type(complex)]
@@ -212,7 +212,7 @@ pub struct CellDegradation {
     // #[arrti_type(complex)]
     // pub variable_n_range: Option<(f64,f64)>, 
     // #[arrti_type(group)]
-    // pub domain: HashMap<<Domain as ast::HashedGroup>::Idx,Domain>,
+    // pub domain: HashMap<<Domain as ast::HashedGroup>::Id,Domain>,
     // TODO:
     // pub domain: Option<Domain>,
 }
@@ -248,8 +248,8 @@ pub struct CellDegradation {
 // #[derive(liberty_macros::NameIdx)]
 #[derive(Debug, Clone, Default)]
 pub struct CellFall {
-    #[idx_len(1)]
-    _idx: Box<<Self as ast::HashedGroup>::Idx>,
+    #[id_len(1)]
+    _id: <Self as ast::HashedGroup>::Id,
     _undefined: ast::AttributeList,
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html

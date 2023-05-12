@@ -2,6 +2,7 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
+use crate::ast::{HashedGroup, AttributeList};
 use crate::expression;
 use crate::timing::Timing;
 mod items;
@@ -29,9 +30,9 @@ use crate::units;
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 pub struct Pin{
-    #[idx_len(1)]
-    _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
-    _undefined: crate::ast::AttributeList,
+    #[id_len(1)]
+    _id: <Self as HashedGroup>::Id,
+    _undefined: AttributeList,
     /* Simple Attributes in a pin Group */
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

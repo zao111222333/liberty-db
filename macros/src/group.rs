@@ -9,13 +9,13 @@ enum IdxLen {
   Num(usize),
   Vector,
   ParserError,
-  NotImpl,
+  OnlyImplHashEq,
 }
 
-fn parse_idx_len(field_attrs: &Vec<Attribute>) -> IdxLen{
+fn parse_id_len(field_attrs: &Vec<Attribute>) -> IdxLen{
   for attri in field_attrs.into_iter(){
     if let Some(seg_title) = attri.path.segments.first(){
-      if "idx_len"== &seg_title.ident.to_string(){
+      if "id_len"== &seg_title.ident.to_string(){
         if let Ok(NestedMeta::Lit(syn::Lit::Int(n)))=attri.parse_args::<NestedMeta>(){
           match n.base10_parse::<isize>(){
             Ok(n) => match usize::try_from(n){
@@ -30,14 +30,14 @@ fn parse_idx_len(field_attrs: &Vec<Attribute>) -> IdxLen{
       }
     }
   }
-  return IdxLen::NotImpl;
+  return IdxLen::OnlyImplHashEq;
 }
 
-fn find_idx_len(fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>) -> Option<IdxLen>{
+fn find_id_len(fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>) -> Option<IdxLen>{
   for field in fields.into_iter(){
     if let Some(id) = &field.ident{
-      if "_idx" == &id.to_string(){
-        return Some(parse_idx_len(&field.attrs));
+      if "_id" == &id.to_string(){
+        return Some(parse_id_len(&field.attrs));
       }
     }
   }
@@ -62,7 +62,7 @@ fn group_field_fn(
         Some((Some(FieldType::Option),_)) => {
           write_field = quote!{
             if let Some(simple) = &self.#field_name {
-              crate::ast::SimpleAttri::liberty(simple, #s_field_name, f)?; 
+              crate::ast::SimpleAttri::fmt_liberty(simple, #s_field_name, f)?; 
             }
           };
           parser_arm = quote!{
@@ -72,16 +72,17 @@ fn group_field_fn(
               Ok(simple) => {
                 res.#field_name=Some(simple);
               },
-              Err((e,attri)) => {
-                println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,attri,e);
-                res.add_undefine_attri(key,attri);
+              Err((e,undefined)) => {
+                println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+                // res.add_undefine_attri(key,attri);
+                res.undefined_list().push((key.to_owned(), undefined));
               },
             }
           };
         },
         _ => {
           write_field = quote!{
-            crate::ast::SimpleAttri::liberty(&self.#field_name, #s_field_name, f)?; 
+            crate::ast::SimpleAttri::fmt_liberty(&self.#field_name, #s_field_name, f)?; 
           };
           parser_arm = quote!{
             let simple_res: _;
@@ -90,9 +91,10 @@ fn group_field_fn(
               Ok(simple) => {
                 res.#field_name=simple;
               },
-              Err((e,attri)) => {
-                println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,attri,e);
-                res.add_undefine_attri(key,attri);
+              Err((e,undefined)) => {
+                println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+                // res.add_undefine_attri(key,attri);
+                res.undefined_list().push((key.to_owned(), undefined));
               },
             }
           };
@@ -101,16 +103,8 @@ fn group_field_fn(
     },
     AttriType::Complex => {
       write_field = quote!{
-        crate::ast::ComplexAttri::liberty(&self.#field_name, #s_field_name, f)?; 
+        crate::ast::ComplexAttri::fmt_liberty(&self.#field_name, #s_field_name, f)?; 
       };
-      // to_wrapper = quote!{
-      //   if let Some(wrapper) = crate::ast::ComplexAttri::to_wrapper(&self.#field_name){
-      //     attr_list.push((
-      //       #s_field_name.to_string(),
-      //       crate::ast::AttriValue::Complex(wrapper),
-      //     ));
-      //   }
-      // };
       parser_arm = quote!{
         let complex_res: _;
         (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,line_num)?;
@@ -118,7 +112,6 @@ fn group_field_fn(
           Ok(complex) => res.#field_name=complex,
           Err(e) => {
             println!("Line={}; Key={}; Err={}",line_num,key,e);
-            // res.add_undefine_attri(key,attri);
           },
         }
       };
@@ -128,19 +121,9 @@ fn group_field_fn(
         Some((Some(FieldType::Vector),_)) => {
           write_field = quote!{
             for group in self.#field_name.iter(){
-              crate::ast::GroupAttri::liberty(group, #s_field_name, f)?; 
+              crate::ast::GroupAttri::fmt_liberty(group, #s_field_name, f)?; 
             }
           };
-          // to_wrapper = quote!{
-          //   attr_list.extend(self.#field_name.iter().map(
-          //     |group|(
-          //       #s_field_name.to_string(),
-          //       crate::ast::AttriValue::Group(
-          //         crate::ast::GroupAttri::to_wrapper(group),
-          //       )
-          //     )
-          //   ).collect::<Vec<(String, crate::ast::AttriValue)>>());
-          // };
           parser_arm = quote!{
             let group_res: _;
             (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
@@ -157,32 +140,21 @@ fn group_field_fn(
             *line_num+=n;
           };
         },
-        Some((Some(FieldType::HashMap),_)) => {
+        Some((Some(FieldType::HashSet),_)) => {
           write_field = quote!{
-            for (_,group) in self.#field_name.iter(){
-              crate::ast::GroupAttri::liberty(group, #s_field_name, f)?; 
+            for group in self.#field_name.iter(){
+              crate::ast::GroupAttri::fmt_liberty(group, #s_field_name, f)?; 
             }
           };
-          // to_wrapper = quote!{
-          //   attr_list.extend(self.#field_name.iter().map(
-          //     |(_,group)|(
-          //       #s_field_name.to_string(),
-          //       crate::ast::AttriValue::Group(
-          //         crate::ast::GroupAttri::to_wrapper(group)
-          //       )
-          //     )
-          //   ).collect::<Vec<(String, crate::ast::AttriValue)>>());
-          // };
           parser_arm = quote!{
             let group_res: _;
             (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
             match group_res{
               Ok(group) => {
-                if let Some(old) = res.#field_name.insert(
-                  <_ as crate::ast::HashedGroup>::idx_clone(&group),
+                if !res.#field_name.insert(
                   group,
                 ){
-                  let e = crate::ast::IdxError::RepeatIdx; 
+                  let e = crate::ast::IdError::RepeatIdx; 
                   println!("Line={}, error={}",line_num,e);
                 }
               },
@@ -198,26 +170,16 @@ fn group_field_fn(
         Some((Some(FieldType::Option),_)) => {
           write_field = quote!{
             if let Some(group) = &self.#field_name {
-              crate::ast::GroupAttri::liberty(group, #s_field_name, f)?; 
+              crate::ast::GroupAttri::fmt_liberty(group, #s_field_name, f)?; 
             }
           };
-          // to_wrapper = quote!{
-          //   if let Some(group) = &self.#field_name {
-          //     attr_list.push((
-          //       #s_field_name.to_string(),
-          //       crate::ast::AttriValue::Group(
-          //         crate::ast::GroupAttri::to_wrapper(group),
-          //       ),
-          //     ));  
-          //   }
-          // };
           parser_arm = quote!{
             let group_res: _;
             (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
             match group_res{
               Ok(group) => {
                 if let Some(old) = res.#field_name{
-                  let e = crate::ast::IdxError::RepeatIdx; 
+                  let e = crate::ast::IdError::RepeatIdx; 
                   println!("Line={}, error={}",line_num,e);
                 }
                 res.#field_name = Some(group);
@@ -249,95 +211,95 @@ fn group_field_fn(
     ),
   ))
 }
-fn name_idx(name: &proc_macro2::Ident, idx_len: &IdxLen) -> syn::Result<proc_macro2::TokenStream>{
-  let idx_name = quote::format_ident!("{}Idx", name);
-  let fn_idx = quote!{
-    #[inline]
-    fn idx(&self) -> &Self::Idx {
-      self._idx.as_ref()
+fn name_id(name: &proc_macro2::Ident, id_len: &IdxLen) -> syn::Result<proc_macro2::TokenStream>{
+  // let id_name = quote::format_ident!("{}Id", name);
+  let impl_trait = quote!{
+    impl Eq for #name {}
+    impl PartialEq for #name {
+      fn eq(&self, other: &Self) -> bool {
+        <#name as crate::ast::HashedGroup>::id(&self) == <#name as crate::ast::HashedGroup>::id(other)
+      }
     }
+    impl std::hash::Hash for #name {
+      fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        <#name as crate::ast::HashedGroup>::id(&self).hash(state);
+      }
+    }
+    impl std::borrow::Borrow<<#name as crate::ast::HashedGroup>::Id> for #name{
+      fn borrow(&self) -> &<Self as crate::ast::HashedGroup>::Id {
+        <#name as crate::ast::HashedGroup>::id(&self)
+      }
+  }
+  };
+  let fn_id = quote!{
     #[inline]
-    fn idx_clone(&self) -> Self::Idx{
-      (*self._idx).clone()
+    fn id(&self) -> &Self::Id {
+      &self._id
     }
   };
-  let toks = match idx_len{
-    IdxLen::NotImpl => quote! {
+  let toks = match id_len{
+    IdxLen::OnlyImplHashEq => quote! {
+      #impl_trait
     },
-    IdxLen::ParserError => return Err(syn::Error::new(Span::call_site(), "`idx_len` parse error")),
-    IdxLen::Num(0) => return Err(syn::Error::new(Span::call_site(), "`idx_len` should larger than `1`")),
+    IdxLen::ParserError => return Err(syn::Error::new(Span::call_site(), "`id_len` parse error")),
+    IdxLen::Num(0) => return Err(syn::Error::new(Span::call_site(), "`id_len` should larger than `1`")),
     IdxLen::Num(1) => quote! {
-      /// Identitied by its Name.
-      #[derive(Debug,Default,Clone,Hash,Eq,PartialEq)]
-      pub struct #idx_name {
-        // Name.
-        pub name: String,
-      }
+      #impl_trait
       impl crate::ast::HashedGroup for #name {
-        type Idx=#idx_name;
+        type Id=String;
         #[inline]
         fn title(&self) -> Vec<String>{
-          vec![self._idx.name.clone()]
+          vec![self._id.clone()]
         }
-        #fn_idx
+        #fn_id
         #[inline]
-        fn gen_idx(&self, mut title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError>{
+        fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id,crate::ast::IdError>{
           let l=title.len();
           if l!=1{
-              return Err(crate::ast::IdxError::LengthDismatch(1,l,title));
+              return Err(crate::ast::IdError::LengthDismatch(1,l,title));
           }
           if let Some(name) = title.pop(){
-            Ok(Self::Idx { name })
+            Ok(name)
           }else{
-            return Err(crate::ast::IdxError::Other("Unkown pop error".into()));
+            return Err(crate::ast::IdError::Other("Unkown pop error".into()));
           }
         }
       }
     },
     IdxLen::Num(c) => quote! {
-      /// Identitied by its Name.
-      #[derive(Debug,Default,Clone,Hash,Eq,PartialEq)]
-      pub struct #idx_name {
-        // Name.
-        pub name: [String;#c],
-      }
+      #impl_trait
       impl crate::ast::HashedGroup for #name {
-        type Idx=#idx_name;
+        type Id=[String;#c];
         #[inline]
         fn title(&self) -> Vec<String>{
-          self._idx.name.clone().to_vec()
+          self._id.clone().to_vec()
         }
-        #fn_idx
+        #fn_id
         #[inline]
-        fn gen_idx(&self, title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError>{
+        fn gen_id(&self, title: Vec<String>) -> Result<Self::Id,crate::ast::IdError>{
           let l=title.len();
           if l!=#c{
-              return Err(crate::ast::IdxError::LengthDismatch(#c,l,title));
+              return Err(crate::ast::IdError::LengthDismatch(#c,l,title));
           }
           match TryInto::<[String; #c ]>::try_into(title){
-            Ok(name) => Ok(Self::Idx { name }),
-            Err(e) => Err(crate::ast::IdxError::Other(format!("try_into error: {:?}",e))),
+            Ok(name) => Ok(name),
+            Err(e) => Err(crate::ast::IdError::Other(format!("try_into error: {:?}",e))),
           }
         }
       }
     },
     IdxLen::Vector => quote! {
-      /// Identitied by its Name.
-      #[derive(Debug,Default,Clone,Hash,Eq,PartialEq)]
-      pub struct #idx_name {
-        // Name.
-        pub name: Vec<String>,
-      }
+      #impl_trait
       impl crate::ast::HashedGroup for #name {
-        type Idx=#idx_name;
+        type Id=Vec<String>;
         #[inline]
         fn title(&self) -> Vec<String>{
-          self._idx.name.clone()
+          self._id.clone()
         }
-        #fn_idx
+        #fn_id
         #[inline]
-        fn gen_idx(&self, title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError>{
-          Ok(Self::Idx { name: title })
+        fn gen_id(&self, title: Vec<String>) -> Result<Self::Id,crate::ast::IdError>{
+          Ok(title)
         }
       }
     },
@@ -353,8 +315,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
 
   if let Fields::Named(named) =  &st.fields{
     let fields = &named.named;
-    let (hashed,impl_hashed_group) = match find_idx_len(fields){
-        Some(idx_len) => (true, name_idx(name, &idx_len)?),
+    let (hashed,impl_hashed_group) = match find_id_len(fields){
+        Some(id_len) => (true, name_id(name, &id_len)?),
         None => (false, quote!{}),
     };
     let mut parser_arms = quote!{};
@@ -377,11 +339,11 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
         }
       }
     }
-    let change_idx_return = if hashed {
+    let change_id_return = if hashed {
       quote!{
-        match crate::ast::HashedGroup::gen_idx(&res,title){
-          Ok(idx) => {
-            res._idx = Box::new(idx);
+        match crate::ast::HashedGroup::gen_id(&res,title){
+          Ok(id) => {
+            res._id = id;
             return Ok((input,Ok(res)));
           },
           Err(e) => {
@@ -411,32 +373,32 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
     let impl_group = quote!{
       impl crate::ast::GroupAttri for #name {
         #[inline]
-        fn add_undefine_attri(&mut self, key: &str, attri: crate::ast::AttriValue) {
-          self._undefined.push((key.to_owned(),attri))
+        fn undefined_list(&mut self)-> &mut crate::ast::AttributeList{
+          &mut self._undefined
         }
-        fn liberty<T: std::fmt::Write>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T>) -> std::fmt::Result {
+        fn fmt_liberty<T: std::fmt::Write>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T>) -> std::fmt::Result {
           use std::fmt::Write;
           use itertools::Itertools;
           #write_title
           f.indent(1);
           #write_fields
           if !self._undefined.is_empty(){
-            write!(f, "\n/* Undefined attributes from here */");
-            crate::ast::liberty_attr_list(&self._undefined,f);
+            write!(f, "\n/* Undefined attributes from here */")?;
+            crate::ast::liberty_attr_list(&self._undefined,f)?;
           }
           f.dedent(1);
           write!(f, "\n}}")
         }
         fn nom_parse<'a>(
           i: &'a str, line_num: &mut usize
-        ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdxError>, nom::error::Error<&'a str>> {
+        ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
           let (mut input,title) = crate::ast::parser::title(i,line_num)?;
           let mut res = Self::default();
           loop {
             match crate::ast::parser::key(input){
               Err(nom::Err::Error(_)) => {
                 (input,_) = crate::ast::parser::end_group(input)?;
-                #change_idx_return
+                #change_id_return
               },
               Err(e) => return Err(e),
               Ok((_input,key)) => {
@@ -444,9 +406,10 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream>{
                 match key {
                   #parser_arms
                   _ => {
-                    let undefine: crate::ast::AttriValue;
-                    (input,undefine) = crate::ast::parser::undefine(input,line_num)?;
-                    res.add_undefine_attri(key, undefine);
+                    let undefined: crate::ast::AttriValue;
+                    (input,undefined) = crate::ast::parser::undefine(input,line_num)?;
+                    // res.add_undefine_attri(key, undefine);
+                    res.undefined_list().push((key.to_owned(), undefined));
                     let n: usize;
                     (input,n) = crate::ast::parser::comment_space_newline(input)?;
                     *line_num+=n;
@@ -500,7 +463,7 @@ fn parse_field_attrs(field_attrs: &Vec<Attribute>) -> Option<AttriType>{
 }
 
 enum FieldType {
-  HashMap,
+  HashSet,
   Vector,
   Option,
 }
@@ -523,10 +486,10 @@ fn extract_type(ty: &syn::Type) -> Option<(Option<FieldType>,String)> {
         .find(|s| &idents_of_path == s){
           return Some((Some(FieldType::Option),idents_of_path));
         }
-      if let Some(_)=vec!["HashMap|","std|collections|HashMap|"]
+      if let Some(_)=vec!["HashSet|","collections|HashSet|","std|collections|HashSet|"]
         .into_iter()
         .find(|s| &idents_of_path == s){
-          return Some((Some(FieldType::HashMap),idents_of_path));
+          return Some((Some(FieldType::HashSet),idents_of_path));
         }
         
       if let Some(_)=vec!["Vec|", "alloc|vec|Vec|"]

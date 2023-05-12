@@ -1,3 +1,5 @@
+use std::hash::Hash;
+
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.4&end=141.5
@@ -8,7 +10,7 @@
 #[derive(Default,Debug)]
 #[derive(liberty_macros::Group)]
 pub struct Statetable{
-  _idx: Box<<Self as crate::ast::HashedGroup>::Idx>,
+  _id: <Self as crate::ast::HashedGroup>::Id,
   _undefined: crate::ast::AttributeList,
   #[arrti_type(simple)]
   table: Table,
@@ -16,47 +18,43 @@ pub struct Statetable{
 
 
 #[derive(Debug,Default,Clone,Hash,Eq,PartialEq)]
-pub struct StatetableIdx{
-    pub input_npde: Vec<String>,
-    pub internal_node: Vec<String>,
+pub struct StatetableId{
+  pub input_npde: Vec<String>,
+  pub internal_node: Vec<String>,
 }
 
 impl crate::ast::HashedGroup for Statetable {
-  type Idx=StatetableIdx;
+  type Id=StatetableId;
 
   fn title(&self) -> Vec<String> {
-    let idx = self.idx_clone();
-    vec![idx.input_npde.join(" "),idx.internal_node.join(" ")]
+    let id = self.id().clone();
+    vec![id.input_npde.join(" "),id.internal_node.join(" ")]
   }
 
-  fn idx(&self) -> &Self::Idx {
-    &self._idx
+  fn id(&self) -> &Self::Id {
+    &self._id
   }
 
-  fn idx_clone(&self) -> Self::Idx {
-    (*self._idx).clone()
-  }
-
-  fn gen_idx(&self, mut title: Vec<String>) -> Result<Self::Idx,crate::ast::IdxError> {
+  fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id,crate::ast::IdError> {
     let l=title.len();
     if l!=2{
-      return Err(crate::ast::IdxError::LengthDismatch(2,l,title));
+      return Err(crate::ast::IdError::LengthDismatch(2,l,title));
     }
     let internal_node = if let Some(s) = title.pop(){
       s.split_ascii_whitespace()
        .map(ToString::to_string)
        .collect::<Vec<String>>()
     }else{
-      return Err(crate::ast::IdxError::Other("Unkown pop error".into()));
+      return Err(crate::ast::IdError::Other("Unkown pop error".into()));
     };
     let input_npde = if let Some(s) = title.pop(){
       s.split_ascii_whitespace()
        .map(ToString::to_string)
        .collect::<Vec<String>>()
     }else{
-      return Err(crate::ast::IdxError::Other("Unkown pop error".into()));
+      return Err(crate::ast::IdError::Other("Unkown pop error".into()));
     };
-    Ok(Self::Idx{input_npde,internal_node})
+    Ok(Self::Id{input_npde,internal_node})
   }
 }
 

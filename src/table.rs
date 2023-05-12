@@ -1,10 +1,10 @@
-use crate::{expression, pin::PinIdx, timing::TimingType};
+use crate::{expression, timing::TimingType, ast::HashedGroup, pin::Pin};
 
 
 struct TableId{
     vec: expression::LogicVector,
-    pin: PinIdx,
-    related_pin: PinIdx,
+    pin: <Pin as HashedGroup>::Id,
+    related_pin: <Pin as HashedGroup>::Id,
     info: TableInfo,
 }
 
