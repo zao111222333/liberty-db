@@ -3,28 +3,17 @@
 //!
 
 impl super::SimpleAttri for f64 {
-  type Error = std::num::ParseFloatError;
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    s.parse()
-  }
+  #[inline]
   fn to_wrapper(&self) -> super::SimpleWrapper {
     let mut buffer = ryu::Buffer::new();
     buffer.format(*self).to_string()
   }
 }
 
-impl super::SimpleAttri for bool {
-  type Error = std::str::ParseBoolError;
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    s.parse()
-  }
-}
+impl super::SimpleAttri for bool {}
 
 impl super::SimpleAttri for usize {
-  type Error = std::num::ParseIntError;
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    s.parse()
-  }
+  #[inline]
   fn to_wrapper(&self) -> super::SimpleWrapper {
     let mut buffer = itoa::Buffer::new();
     buffer.format(*self).to_string()
@@ -32,32 +21,22 @@ impl super::SimpleAttri for usize {
 }
 
 impl super::SimpleAttri for isize {
-  type Error = std::num::ParseIntError;
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    s.parse()
-  }
+  #[inline]
   fn to_wrapper(&self) -> super::SimpleWrapper {
     let mut buffer = itoa::Buffer::new();
     buffer.format(*self).to_string()
   }
 }
 
-impl super::SimpleAttri for String {
-  type Error = std::fmt::Error;
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    Ok(s.to_string())
-  }
-  fn to_wrapper(&self) -> super::SimpleWrapper {
-    self.to_string()
-  }
-}
+impl super::SimpleAttri for String {}
 
 impl super::ComplexAttri for Vec<f64> {
   type Error = std::num::ParseFloatError;
+  #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
     v.into_iter().map(|s| s.parse()).collect()
   }
-
+  #[inline]
   fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
     if self.is_empty() {
       None
@@ -100,10 +79,11 @@ impl super::ComplexAttri for Vec<f64> {
 
 impl super::ComplexAttri for Vec<usize> {
   type Error = std::num::ParseIntError;
+  #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
     v.into_iter().map(|s| s.parse()).collect()
   }
-
+  #[inline]
   fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
     if self.is_empty() {
       None
@@ -115,7 +95,7 @@ impl super::ComplexAttri for Vec<usize> {
 }
 impl super::ComplexAttri for Option<(f64, f64)> {
   type Error = crate::ast::ComplexParseError;
-
+  #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
     let mut i = v.into_iter();
     let v1: f64 = match i.next() {
@@ -137,7 +117,7 @@ impl super::ComplexAttri for Option<(f64, f64)> {
     }
     Ok(Some((v1, v2)))
   }
-
+  #[inline]
   fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
     if let Some((v1, v2)) = self {
       let mut buffer = ryu::Buffer::new();

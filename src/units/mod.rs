@@ -108,13 +108,7 @@ impl Deref for TimeUnit {
   }
 }
 
-impl SimpleAttri for TimeUnit {
-  type Error = <Self as std::str::FromStr>::Err;
-  #[inline]
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    <Self as std::str::FromStr>::from_str(s)
-  }
-}
+impl SimpleAttri for TimeUnit {}
 
 /// Valid values are 1mV, 10mV, 100mV, and 1V. The default is 1V.
 /// <a name ="reference_link" href="
@@ -178,13 +172,7 @@ impl Deref for VoltageUnit {
   }
 }
 
-impl SimpleAttri for VoltageUnit {
-  type Error = <Self as std::str::FromStr>::Err;
-  #[inline]
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    <Self as std::str::FromStr>::from_str(s)
-  }
-}
+impl SimpleAttri for VoltageUnit {}
 
 /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
 /// **No default exists for the current_unit attribute if the attribute is omitted.**
@@ -275,13 +263,7 @@ impl Deref for CurrentUnit {
   }
 }
 
-impl SimpleAttri for CurrentUnit {
-  type Error = <Self as std::str::FromStr>::Err;
-  #[inline]
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    <Self as std::str::FromStr>::from_str(s)
-  }
-}
+impl SimpleAttri for CurrentUnit {}
 
 /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm.
 /// **No default exists for `pulling_resistance_unit` if the attribute is omitted.**
@@ -345,13 +327,7 @@ impl Deref for PullingResistanceUnit {
   }
 }
 
-impl SimpleAttri for PullingResistanceUnit {
-  type Error = <Self as std::str::FromStr>::Err;
-  #[inline]
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    <Self as std::str::FromStr>::from_str(s)
-  }
-}
+impl SimpleAttri for PullingResistanceUnit {}
 
 /// This attribute specifies the unit for all capacitance
 /// values within the logic library, including
@@ -552,10 +528,4 @@ impl Deref for LeakagePowerUnit {
   }
 }
 
-impl SimpleAttri for LeakagePowerUnit {
-  type Error = <Self as std::str::FromStr>::Err;
-  #[inline]
-  fn parse(s: &str) -> Result<Self, Self::Error> {
-    <Self as std::str::FromStr>::from_str(s)
-  }
-}
+impl SimpleAttri for LeakagePowerUnit {}

@@ -6,6 +6,7 @@ use std::{fmt::Display, str::FromStr};
 // use nom::error::ParseError;
 
 use crate::{
+  ast::SimpleAttri,
   expression::{EdgeState, StaticState},
   types::MaxMin,
 };
@@ -765,11 +766,13 @@ pub enum TimingType {
   NoChange(ArcNoChange),
 }
 
-impl crate::ast::SimpleAttri for TimingType {
-  type Error = std::fmt::Error;
-  #[inline]
-  fn parse(value: &str) -> Result<Self, Self::Error> {
-    match value {
+impl SimpleAttri for TimingType {}
+
+impl FromStr for TimingType {
+  type Err = std::fmt::Error;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
       ArcCombinational::COMBINATIONAL => Ok(Self::COMBINATIONAL),
       ArcCombinational::COMBINATIONAL_RISE => Ok(Self::COMBINATIONAL_RISE),
       ArcCombinational::COMBINATIONAL_FALL => Ok(Self::COMBINATIONAL_FALL),
@@ -810,13 +813,6 @@ impl crate::ast::SimpleAttri for TimingType {
   }
 }
 
-// impl Default for TimingType {
-//     /// combinational
-//     #[inline]
-//     fn default() -> Self {
-//         Self::COMBINATIONAL
-//     }
-// }
 impl Display for TimingType {
   #[inline]
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

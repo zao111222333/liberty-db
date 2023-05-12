@@ -9,8 +9,10 @@ pub use fmt::CodeFormatter;
 use itertools::Itertools;
 use nom::{error::Error, IResult};
 use std::{
+  borrow::Borrow,
   fmt::{Display, Write},
   hash::Hash,
+  str::FromStr,
 };
 /// Wrapper for simple attribute
 pub type SimpleWrapper = String;
@@ -45,17 +47,20 @@ pub enum AttriValue {
 }
 
 /// Simple Attribute in Liberty
-pub trait SimpleAttri: Sized + Display {
+pub trait SimpleAttri: Sized + Display + FromStr {
   /// Parser error
-  type Error: std::error::Error;
   /// basic parser
-  fn parse(s: &str) -> Result<Self, Self::Error>;
+  #[inline]
+  fn parse(s: &str) -> Result<Self, <Self as FromStr>::Err> {
+    FromStr::from_str(s)
+  }
   /// nom_parse, auto implement
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     line_num: &mut usize,
-  ) -> IResult<&'a str, Result<Self, (Self::Error, AttriValue)>, Error<&'a str>> {
+  ) -> IResult<&'a str, Result<Self, (<Self as FromStr>::Err, AttriValue)>, Error<&'a str>>
+  {
     let (input, simple) = parser::simple(i, line_num)?;
     match Self::parse(simple) {
       Ok(s) => Ok((input, Ok(s))),
@@ -125,16 +130,8 @@ pub trait ComplexAttri: Sized {
   }
 }
 
-// impl Eq for Cell {}
-
-// impl PartialEq for Cell {
-//     fn eq(&self, other: &Self) -> bool {
-//         self._idx == other._idx
-//     }
-// }
-
 /// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
-pub trait HashedGroup: Sized + Hash + Eq {
+pub trait HashedGroup: Sized + Hash + Eq + Borrow<Self::Id> {
   /// its Index
   type Id: Sized + Hash;
   /// generate title for wrapper

@@ -1,4 +1,4 @@
-use std::hash::Hash;
+use std::{hash::Hash, str::FromStr};
 
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
@@ -68,14 +68,14 @@ impl std::fmt::Display for Table {
   }
 }
 
-impl crate::ast::SimpleAttri for Table {
-  type Error = std::fmt::Error;
+impl FromStr for Table {
+  type Err = std::fmt::Error;
   /// To prevent syntax errors, the line continuation character
   /// must be followed immediately by the next line character.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.18&end=141.21
   /// ">Reference</a>
-  fn parse(s: &str) -> Result<Self, Self::Error> {
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(Self {
       v: s
         .split("\\\n")
@@ -92,12 +92,15 @@ impl crate::ast::SimpleAttri for Table {
         .collect(),
     })
   }
+}
+
+impl crate::ast::SimpleAttri for Table {
   fn nom_parse<'a>(
     i: &'a str,
     line_num: &mut usize,
   ) -> nom::IResult<
     &'a str,
-    Result<Self, (Self::Error, crate::ast::AttriValue)>,
+    Result<Self, (Self::Err, crate::ast::AttriValue)>,
     nom::error::Error<&'a str>,
   > {
     let (input, simple_multi) = crate::ast::parser::simple_multi(i, line_num)?;
