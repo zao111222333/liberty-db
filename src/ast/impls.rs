@@ -3,8 +3,8 @@
 //!
 
 impl super::SimpleAttri for f64 {
-  type Error=std::num::ParseFloatError;
-  fn parse(s: &str)->Result<Self,Self::Error> {
+  type Error = std::num::ParseFloatError;
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     s.parse()
   }
   fn to_wrapper(&self) -> super::SimpleWrapper {
@@ -14,15 +14,15 @@ impl super::SimpleAttri for f64 {
 }
 
 impl super::SimpleAttri for bool {
-  type Error=std::str::ParseBoolError;
-  fn parse(s: &str)->Result<Self,Self::Error> {
+  type Error = std::str::ParseBoolError;
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     s.parse()
   }
 }
 
 impl super::SimpleAttri for usize {
-  type Error=std::num::ParseIntError;
-  fn parse(s: &str)->Result<Self,Self::Error> {
+  type Error = std::num::ParseIntError;
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     s.parse()
   }
   fn to_wrapper(&self) -> super::SimpleWrapper {
@@ -32,8 +32,8 @@ impl super::SimpleAttri for usize {
 }
 
 impl super::SimpleAttri for isize {
-  type Error=std::num::ParseIntError;
-  fn parse(s: &str)->Result<Self,Self::Error> {
+  type Error = std::num::ParseIntError;
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     s.parse()
   }
   fn to_wrapper(&self) -> super::SimpleWrapper {
@@ -43,8 +43,8 @@ impl super::SimpleAttri for isize {
 }
 
 impl super::SimpleAttri for String {
-  type Error=std::fmt::Error;
-  fn parse(s: &str)->Result<Self,Self::Error> {
+  type Error = std::fmt::Error;
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     Ok(s.to_string())
   }
   fn to_wrapper(&self) -> super::SimpleWrapper {
@@ -53,19 +53,17 @@ impl super::SimpleAttri for String {
 }
 
 impl super::ComplexAttri for Vec<f64> {
-  type Error=std::num::ParseFloatError;
-  fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
-    v.into_iter()
-      .map(|s| s.parse())
-      .collect()
+  type Error = std::num::ParseFloatError;
+  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
+    v.into_iter().map(|s| s.parse()).collect()
   }
 
   fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
-    if self.is_empty(){
+    if self.is_empty() {
       None
-    }else{
+    } else {
       let mut buffer = ryu::Buffer::new();
-      Some(vec![self.iter().map(|f|buffer.format(*f).to_string()).collect()])
+      Some(vec![self.iter().map(|f| buffer.format(*f).to_string()).collect()])
     }
   }
 }
@@ -101,51 +99,50 @@ impl super::ComplexAttri for Vec<f64> {
 // }
 
 impl super::ComplexAttri for Vec<usize> {
-  type Error=std::num::ParseIntError;
-  fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
-    v.into_iter().map(|s| s.parse())
-      .collect()
+  type Error = std::num::ParseIntError;
+  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
+    v.into_iter().map(|s| s.parse()).collect()
   }
 
   fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
-    if self.is_empty(){
+    if self.is_empty() {
       None
-    }else{
+    } else {
       let mut buffer = itoa::Buffer::new();
-      Some(vec![self.iter().map(|i|buffer.format(*i).to_string()).collect()])
+      Some(vec![self.iter().map(|i| buffer.format(*i).to_string()).collect()])
     }
   }
 }
-impl super::ComplexAttri for Option<(f64,f64)> {
-  type Error=crate::ast::ComplexParseError;
+impl super::ComplexAttri for Option<(f64, f64)> {
+  type Error = crate::ast::ComplexParseError;
 
-  fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
+  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
     let mut i = v.into_iter();
-    let v1: f64 = match i.next(){
-      Some(s) => match s.parse(){
+    let v1: f64 = match i.next() {
+      Some(s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(Self::Error::Float(e)),
       },
       None => return Err(Self::Error::LengthDismatch),
     };
-    let v2: f64 = match i.next(){
-      Some(s) => match s.parse(){
+    let v2: f64 = match i.next() {
+      Some(s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(Self::Error::Float(e)),
       },
       None => return Err(Self::Error::LengthDismatch),
     };
-    if let Some(_) = i.next(){
+    if let Some(_) = i.next() {
       return Err(Self::Error::LengthDismatch);
     }
-    Ok(Some((v1,v2)))
+    Ok(Some((v1, v2)))
   }
 
   fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
-    if let Some((v1,v2)) = self {
+    if let Some((v1, v2)) = self {
       let mut buffer = ryu::Buffer::new();
-      Some(vec![vec![buffer.format(*v1).to_string(),buffer.format(*v2).to_string()]])
-    }else{
+      Some(vec![vec![buffer.format(*v1).to_string(), buffer.format(*v2).to_string()]])
+    } else {
       None
     }
   }

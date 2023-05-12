@@ -3,14 +3,14 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::{
-    timing::TimingType, 
-    cell::Statetable,
-    ast::{AttributeList,HashedGroup}, 
+  ast::{AttributeList, HashedGroup},
+  cell::Statetable,
+  timing::TimingType,
 };
 
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
-struct Timing{
+struct Timing {
   _undefined: AttributeList,
   #[arrti_type(complex)]
   values: Vec<f64>,
@@ -19,27 +19,27 @@ struct Timing{
   #[arrti_type(simple)]
   t2: Option<TimingType>,
 }
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
-struct Pin{
-    #[id_len(1)]
-    _id: <Self as HashedGroup>::Id,
-    _undefined: AttributeList,
-    #[arrti_type(group)]
-    timing: Vec<Timing>,
+struct Pin {
+  #[id_len(1)]
+  _id: <Self as HashedGroup>::Id,
+  _undefined: AttributeList,
+  #[arrti_type(group)]
+  timing: Vec<Timing>,
 }
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
-struct Ff{
+struct Ff {
   #[id_len(2)]
   _id: <Self as HashedGroup>::Id,
   _undefined: AttributeList,
   #[arrti_type(simple)]
   next_state: Option<String>,
 }
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
-struct Cell{
+struct Cell {
   #[id_len(1)]
   _id: <Self as HashedGroup>::Id,
   _undefined: AttributeList,
@@ -54,8 +54,9 @@ struct Cell{
 }
 
 #[test]
-fn timing_test(){
-    let _ = crate::ast::test_parse_group::<Timing>(r#"(w){
+fn timing_test() {
+  let _ = crate::ast::test_parse_group::<Timing>(
+    r#"(w){
         // www
         /* com
         ment2 */
@@ -66,8 +67,10 @@ fn timing_test(){
             6\ /* comment3 */
         );
     }
-    "#);
-    let _ = crate::ast::test_parse_group::<Timing>(r#"( w ){
+    "#,
+  );
+  let _ = crate::ast::test_parse_group::<Timing>(
+    r#"( w ){
         t1: ombinational;
         t2: combinational;
         values ( \
@@ -75,29 +78,34 @@ fn timing_test(){
             1,"2,3,",\
         );
         }
-    "#);
+    "#,
+  );
 }
 
 #[test]
-fn pin_test(){
-    let _ = crate::ast::test_parse_group::<Pin>(r#"(A){
+fn pin_test() {
+  let _ = crate::ast::test_parse_group::<Pin>(
+    r#"(A){
         timing(w){
             t1: combinational;
         }
     }
-    "#);
-    let _ = crate::ast::test_parse_group::<Pin>(r#"(B){
+    "#,
+  );
+  let _ = crate::ast::test_parse_group::<Pin>(
+    r#"(B){
         timing(w){
             t1: combinational;
         }
     }
-    "#);
+    "#,
+  );
 }
 
-
 #[test]
-fn cell_test(){
-    let _ = crate::ast::test_parse_group::<Cell>(r#"(INV){
+fn cell_test() {
+  let _ = crate::ast::test_parse_group::<Cell>(
+    r#"(INV){
         // should ok
         area : 5.4;
         // should ok
@@ -129,8 +137,10 @@ fn cell_test(){
             L   -  - : - : N ";
         }
       }
-    "#);
-    let _ = crate::ast::test_parse_group::<Cell>(r#"(INV){
+    "#,
+  );
+  let _ = crate::ast::test_parse_group::<Cell>(
+    r#"(INV){
         // should error
         undefine_area : 5.4;
         // should error
@@ -157,5 +167,6 @@ fn cell_test(){
             }
         }
     }
-    "#);
+    "#,
+  );
 }

@@ -3,61 +3,47 @@
 //! </script>
 
 pub use uom::si::f64::{
-  Capacitance,
-  ElectricalResistance,
-  Length,
-  ElectricCharge, 
-  ElectricCurrent, 
-  ElectricPotential, 
-  Energy, 
-  Power, 
-  Ratio, 
-  ThermodynamicTemperature, 
-  Time,
+  Capacitance, ElectricCharge, ElectricCurrent, ElectricPotential, ElectricalResistance,
+  Energy, Length, Power, Ratio, ThermodynamicTemperature, Time,
 };
-
 
 pub use uom::fmt::DisplayStyle;
 pub use uom::si::Unit;
 pub use uom::si::{
-  capacitance,
-  electrical_resistance,
-  electric_current, 
-  electric_potential, 
-  ratio, 
-  thermodynamic_temperature, 
+  capacitance, electric_current, electric_potential, electrical_resistance, ratio,
+  thermodynamic_temperature,
 };
-pub mod length;
 pub mod electric_charge;
-pub mod power;
 pub mod energy;
+pub mod length;
+pub mod power;
 pub mod time;
 
 /// Create `Length` quantity with `meter` unit
 #[inline]
-pub fn meter(v: f64) -> Length{
+pub fn meter(v: f64) -> Length {
   Length::new::<length::meter>(v)
 }
 
 /// Create `Time` quantity with `second` unit
 #[inline]
-pub fn second(v: f64) -> Time{
+pub fn second(v: f64) -> Time {
   Time::new::<time::second>(v)
 }
 
 /// Create `Time` quantity with `microsecond` unit
 #[inline]
-pub fn microsecond(v: f64) -> Time{
+pub fn microsecond(v: f64) -> Time {
   Time::new::<time::microsecond>(v)
 }
 
 /// Create `Time` quantity with `nanosecond` unit
 #[inline]
-pub fn nanosecond(v: f64) -> Time{
+pub fn nanosecond(v: f64) -> Time {
   Time::new::<time::nanosecond>(v)
 }
 
-use crate::ast::{SimpleAttri, ComplexAttri};
+use crate::ast::{ComplexAttri, SimpleAttri};
 use std::ops::Deref;
 
 /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
@@ -68,8 +54,8 @@ use std::ops::Deref;
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Default, Clone, Copy)]
-#[derive(strum_macros::EnumString,strum_macros::Display)]
-pub enum TimeUnit{
+#[derive(strum_macros::EnumString, strum_macros::Display)]
+pub enum TimeUnit {
   /// 1ps, 1e-12
   #[strum(serialize = "1ps")]
   _1ps,
@@ -86,36 +72,36 @@ pub enum TimeUnit{
 }
 
 impl TimeUnit {
-  const LUT: [<Self as Deref>::Target;4] = [
+  const LUT: [<Self as Deref>::Target; 4] = [
     // 1ps
-    Time{ 
-      dimension: std::marker::PhantomData, 
+    Time {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-12,
     },
     // 10ps
-    Time{ 
-      dimension: std::marker::PhantomData, 
+    Time {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-11,
     },
     // 100ps
-    Time{ 
-      dimension: std::marker::PhantomData, 
+    Time {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-10,
     },
     // 1ns
-    Time{ 
-      dimension: std::marker::PhantomData, 
+    Time {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-9,
     },
   ];
 }
 
-impl Deref for TimeUnit{
-  type Target=Time;
+impl Deref for TimeUnit {
+  type Target = Time;
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -123,13 +109,12 @@ impl Deref for TimeUnit{
 }
 
 impl SimpleAttri for TimeUnit {
-  type Error=<Self as std::str::FromStr>::Err;
+  type Error = <Self as std::str::FromStr>::Err;
   #[inline]
-  fn parse(s: &str)->Result<Self, Self::Error> {
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     <Self as std::str::FromStr>::from_str(s)
   }
 }
-
 
 /// Valid values are 1mV, 10mV, 100mV, and 1V. The default is 1V.
 /// <a name ="reference_link" href="
@@ -139,8 +124,8 @@ impl SimpleAttri for TimeUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Default, Clone, Copy)]
-#[derive(strum_macros::EnumString,strum_macros::Display)]
-pub enum VoltageUnit{
+#[derive(strum_macros::EnumString, strum_macros::Display)]
+pub enum VoltageUnit {
   /// 1mV, 1e-3
   #[strum(serialize = "1mV")]
   _1mV,
@@ -157,36 +142,36 @@ pub enum VoltageUnit{
 }
 
 impl VoltageUnit {
-  const LUT: [<Self as Deref>::Target;4] = [
+  const LUT: [<Self as Deref>::Target; 4] = [
     // 1mV
-    ElectricPotential{ 
-      dimension: std::marker::PhantomData, 
+    ElectricPotential {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-3,
     },
     // 10mV
-    ElectricPotential{ 
-      dimension: std::marker::PhantomData, 
+    ElectricPotential {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-2,
     },
     // 100mV
-    ElectricPotential{ 
-      dimension: std::marker::PhantomData, 
+    ElectricPotential {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-1,
     },
     // 1V
-    ElectricPotential{ 
-      dimension: std::marker::PhantomData, 
+    ElectricPotential {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E0,
     },
   ];
 }
 
-impl Deref for VoltageUnit{
-  type Target=ElectricPotential;
+impl Deref for VoltageUnit {
+  type Target = ElectricPotential;
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -194,14 +179,14 @@ impl Deref for VoltageUnit{
 }
 
 impl SimpleAttri for VoltageUnit {
-  type Error=<Self as std::str::FromStr>::Err;
+  type Error = <Self as std::str::FromStr>::Err;
   #[inline]
-  fn parse(s: &str)->Result<Self, Self::Error> {
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     <Self as std::str::FromStr>::from_str(s)
   }
 }
 
-/// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A. 
+/// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
 /// **No default exists for the current_unit attribute if the attribute is omitted.**
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.12&end=43.24
@@ -210,8 +195,8 @@ impl SimpleAttri for VoltageUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString,strum_macros::Display)]
-pub enum CurrentUnit{
+#[derive(strum_macros::EnumString, strum_macros::Display)]
+pub enum CurrentUnit {
   /// 1uA, 1e-6
   #[strum(serialize = "1uA")]
   _1uA,
@@ -236,54 +221,54 @@ pub enum CurrentUnit{
 }
 
 impl CurrentUnit {
-  const LUT: [<Self as Deref>::Target;7] = [
+  const LUT: [<Self as Deref>::Target; 7] = [
     // 1uA
-    ElectricCurrent{
+    ElectricCurrent {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-6,
     },
     // 10uA
-    ElectricCurrent{
+    ElectricCurrent {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-5,
     },
     // 100uA
-    ElectricCurrent{
+    ElectricCurrent {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-4,
     },
     // 1mA
-    ElectricCurrent{
-      dimension: std::marker::PhantomData, 
+    ElectricCurrent {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-3,
     },
     // 10mA
-    ElectricCurrent{
-      dimension: std::marker::PhantomData, 
+    ElectricCurrent {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-2,
     },
     // 100mA
-    ElectricCurrent{
-      dimension: std::marker::PhantomData, 
+    ElectricCurrent {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-1,
     },
     // 1A
-    ElectricCurrent{
-      dimension: std::marker::PhantomData, 
+    ElectricCurrent {
+      dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E0,
-    }
+    },
   ];
 }
 
-impl Deref for CurrentUnit{
-  type Target=ElectricCurrent;
+impl Deref for CurrentUnit {
+  type Target = ElectricCurrent;
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -291,14 +276,14 @@ impl Deref for CurrentUnit{
 }
 
 impl SimpleAttri for CurrentUnit {
-  type Error=<Self as std::str::FromStr>::Err;
+  type Error = <Self as std::str::FromStr>::Err;
   #[inline]
-  fn parse(s: &str)->Result<Self, Self::Error> {
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     <Self as std::str::FromStr>::from_str(s)
   }
 }
 
-/// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm. 
+/// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm.
 /// **No default exists for `pulling_resistance_unit` if the attribute is omitted.**
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.25&end=44.4
@@ -307,8 +292,8 @@ impl SimpleAttri for CurrentUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString,strum_macros::Display)]
-pub enum PullingResistanceUnit{
+#[derive(strum_macros::EnumString, strum_macros::Display)]
+pub enum PullingResistanceUnit {
   /// 1ohm, 1
   #[strum(serialize = "1ohm")]
   _1ohm,
@@ -324,27 +309,27 @@ pub enum PullingResistanceUnit{
 }
 
 impl PullingResistanceUnit {
-  const LUT: [<Self as Deref>::Target;4] = [
+  const LUT: [<Self as Deref>::Target; 4] = [
     // 1ohm
-    ElectricalResistance{
+    ElectricalResistance {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E0,
     },
     // 10ohm
-    ElectricalResistance{
+    ElectricalResistance {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E1,
     },
     // 100ohm
-    ElectricalResistance{
+    ElectricalResistance {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E2,
     },
     // 1kohm
-    ElectricalResistance{
+    ElectricalResistance {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E3,
@@ -352,8 +337,8 @@ impl PullingResistanceUnit {
   ];
 }
 
-impl Deref for PullingResistanceUnit{
-  type Target=ElectricalResistance;
+impl Deref for PullingResistanceUnit {
+  type Target = ElectricalResistance;
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -361,16 +346,16 @@ impl Deref for PullingResistanceUnit{
 }
 
 impl SimpleAttri for PullingResistanceUnit {
-  type Error=<Self as std::str::FromStr>::Err;
+  type Error = <Self as std::str::FromStr>::Err;
   #[inline]
-  fn parse(s: &str)->Result<Self, Self::Error> {
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     <Self as std::str::FromStr>::from_str(s)
   }
 }
 
-/// This attribute specifies the unit for all capacitance 
-/// values within the logic library, including 
-/// default capacitances, max_fanout capacitances, 
+/// This attribute specifies the unit for all capacitance
+/// values within the logic library, including
+/// default capacitances, max_fanout capacitances,
 /// pin capacitances, and wire capacitances.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.7&end=44.19
@@ -378,85 +363,80 @@ impl SimpleAttri for PullingResistanceUnit {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug,Default,Clone,Copy)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct CapacitiveLoadUnit {
   ff_pf: bool,
   _v: Option<Capacitance>,
 }
 
 impl CapacitiveLoadUnit {
-  const NIL:Capacitance = Capacitance{
+  const NIL: Capacitance = Capacitance {
     dimension: std::marker::PhantomData,
     units: std::marker::PhantomData,
     value: 0.0,
   };
 }
 
-impl Deref for CapacitiveLoadUnit{
-  type Target=Capacitance;
+impl Deref for CapacitiveLoadUnit {
+  type Target = Capacitance;
   #[inline]
   fn deref(&self) -> &Self::Target {
-    match self._v.as_ref(){
+    match self._v.as_ref() {
       Some(v) => v,
       None => &Self::NIL,
     }
   }
 }
 
-
 impl ComplexAttri for CapacitiveLoadUnit {
-  type Error=crate::ast::ComplexParseError;
+  type Error = crate::ast::ComplexParseError;
 
-  fn parse(v: Vec<&str>)->Result<Self,Self::Error> {
+  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
     let mut i = v.into_iter();
-    let value: f64 = match i.next(){
-      Some(s) => match s.parse(){
+    let value: f64 = match i.next() {
+      Some(s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(Self::Error::Float(e)),
       },
       None => return Err(Self::Error::LengthDismatch),
     };
-    let (ff_pf,_v):(bool,Capacitance) = match i.next(){
-      Some(s) => match s{
-        "ff" => (
-          true,
-          Capacitance::new::<capacitance::femtofarad>(value),
-        ),
-        "pf" => (
-          false,
-          Capacitance::new::<capacitance::picofarad>(value),
-        ),
+    let (ff_pf, _v): (bool, Capacitance) = match i.next() {
+      Some(s) => match s {
+        "ff" => (true, Capacitance::new::<capacitance::femtofarad>(value)),
+        "pf" => (false, Capacitance::new::<capacitance::picofarad>(value)),
         _ => return Err(Self::Error::UnsupportedWord),
-      }
+      },
       None => return Err(Self::Error::LengthDismatch),
     };
-    if let Some(_) = i.next(){return Err(Self::Error::LengthDismatch)}
-    Ok(Self{ ff_pf, _v: Some(_v) })
+    if let Some(_) = i.next() {
+      return Err(Self::Error::LengthDismatch);
+    }
+    Ok(Self { ff_pf, _v: Some(_v) })
   }
 
   fn to_wrapper(&self) -> Option<crate::ast::ComplexWrapper> {
-    match self._v{
+    match self._v {
       Some(cap) => {
         let mut buffer = ryu::Buffer::new();
-        if self.ff_pf{
+        if self.ff_pf {
           Some(vec![vec![
             buffer.format(cap.get::<capacitance::femtofarad>()).to_owned(),
-            "ff".to_owned()
+            "ff".to_owned(),
           ]])
-        }else{
+        } else {
           Some(vec![vec![
             buffer.format(cap.get::<capacitance::picofarad>()).to_owned(),
-            "pf".to_owned()
+            "pf".to_owned(),
           ]])
         }
-      },
+      }
       None => None,
     }
   }
 }
 
-/// This attribute indicates the units of the power values 
-/// in the library. If this attribute is missing, the 
+/// This attribute indicates the units of the power values
+/// in the library. If this attribute is missing, the
 /// leakage-power values are expressed without units.
 /// Valid values are 1W, 100mW, 10mW, 1mW, 100nW, 10nW, 1nW, 100pW, 10pW, and 1pW.
 /// <a name ="reference_link" href="
@@ -466,8 +446,8 @@ impl ComplexAttri for CapacitiveLoadUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString,strum_macros::Display)]
-pub enum LeakagePowerUnit{
+#[derive(strum_macros::EnumString, strum_macros::Display)]
+pub enum LeakagePowerUnit {
   /// 1pW, 1e-12
   #[strum(serialize = "1pW")]
   _1pW,
@@ -500,63 +480,63 @@ pub enum LeakagePowerUnit{
   _1W,
 }
 impl LeakagePowerUnit {
-  const LUT: [<Self as Deref>::Target;10] = [
+  const LUT: [<Self as Deref>::Target; 10] = [
     // 1pW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-12,
     },
     // 10pW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-11,
     },
     // 100pW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-10,
     },
     // 1nW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-9,
     },
     // 10nW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-8,
     },
     // 100nW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-7,
     },
     // 1mW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-3,
     },
     // 10mW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-2,
     },
     // 100mW
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-1,
     },
     // 1W
-    Power{
+    Power {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E0,
@@ -564,8 +544,8 @@ impl LeakagePowerUnit {
   ];
 }
 
-impl Deref for LeakagePowerUnit{
-  type Target=Power;
+impl Deref for LeakagePowerUnit {
+  type Target = Power;
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -573,9 +553,9 @@ impl Deref for LeakagePowerUnit{
 }
 
 impl SimpleAttri for LeakagePowerUnit {
-  type Error=<Self as std::str::FromStr>::Err;
+  type Error = <Self as std::str::FromStr>::Err;
   #[inline]
-  fn parse(s: &str)->Result<Self, Self::Error> {
+  fn parse(s: &str) -> Result<Self, Self::Error> {
     <Self as std::str::FromStr>::from_str(s)
   }
 }

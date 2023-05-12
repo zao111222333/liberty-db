@@ -6,14 +6,14 @@ mod items;
 // pub use items::*;
 
 use crate::ast::HashedGroup;
+use crate::cell::Cell;
 use crate::pin::Pin;
 use crate::units;
-use crate::cell::Cell;
 use std::collections::{HashMap, HashSet};
-#[derive(Debug,derivative::Derivative)]
+#[derive(Debug, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
-pub struct Library{
+pub struct Library {
   #[id_len(-1)]
   _id: <Self as crate::ast::HashedGroup>::Id,
   _undefined: crate::ast::AttributeList,
@@ -23,9 +23,9 @@ pub struct Library{
   /// ">Reference</a>
   #[arrti_type(simple)]
   pub time_unit: units::TimeUnit,
-  /// This attribute specifies the unit for all capacitance 
-  /// values within the logic library, including 
-  /// default capacitances, max_fanout capacitances, 
+  /// This attribute specifies the unit for all capacitance
+  /// values within the logic library, including
+  /// default capacitances, max_fanout capacitances,
   /// pin capacitances, and wire capacitances.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.7&end=44.19
@@ -38,22 +38,22 @@ pub struct Library{
   /// ">Reference</a>
   #[arrti_type(simple)]
   pub voltage_unit: units::VoltageUnit,
-  /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A. 
+  /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
   /// **No default exists for the `current_unit` attribute if the attribute is omitted.**
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.12&end=43.24
   /// ">Reference</a>
   #[arrti_type(simple)]
   pub current_unit: Option<units::CurrentUnit>,
-  /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm. 
+  /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm.
   /// **No default exists for `pulling_resistance_unit` if the attribute is omitted.**
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.25&end=44.4
   /// ">Reference</a>
   #[arrti_type(simple)]
   pub pulling_resistance_unit: Option<units::PullingResistanceUnit>,
-  /// This attribute indicates the units of the power values 
-  /// in the library. If this attribute is missing, the 
+  /// This attribute indicates the units of the power values
+  /// in the library. If this attribute is missing, the
   /// leakage-power values are expressed without units.
   /// Valid values are 1W, 100mW, 10mW, 1mW, 100nW, 10nW, 1nW, 100pW, 10pW, and 1pW.
   /// <a name ="reference_link" href="
@@ -81,10 +81,10 @@ pub struct Library{
 /// =66.21
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone)]
-pub struct Sensitization{
-    pub group_name: String,
-    pub pin_names: Vec<<Pin as HashedGroup>::Id>,
-    pub vector: Vector,
+pub struct Sensitization {
+  pub group_name: String,
+  pub pin_names: Vec<<Pin as HashedGroup>::Id>,
+  pub vector: Vector,
 }
 
 // impl ComplexAttri for Vec<crate::pin::PinIdx> {
@@ -100,42 +100,43 @@ pub struct Sensitization{
 // }
 
 #[derive(Debug, Clone)]
-pub struct Vector{
+pub struct Vector {
   pub id: usize,
   pub string: String,
 }
 
-
-
-use crate::ast::{GroupAttri,ParserError};
 use crate::ast::parser;
+use crate::ast::{GroupAttri, ParserError};
 impl Library {
-  pub fn parse<'a>(i: &'a str) -> Result<Self,ParserError<'a>> {
-    let mut line_num =1;
-    let input = match parser::comment_space_newline(i){
-        Ok((input,n)) => {line_num+=n;input},
-        Err(e) => return Err(ParserError::NomError(line_num, e)),
+  pub fn parse<'a>(i: &'a str) -> Result<Self, ParserError<'a>> {
+    let mut line_num = 1;
+    let input = match parser::comment_space_newline(i) {
+      Ok((input, n)) => {
+        line_num += n;
+        input
+      }
+      Err(e) => return Err(ParserError::NomError(line_num, e)),
     };
-    let (input,key) = match parser::key::<nom::error::Error<&str>>(input){
-        Ok(res) => res,
-        Err(e) => return Err(ParserError::NomError(line_num, e)),
+    let (input, key) = match parser::key::<nom::error::Error<&str>>(input) {
+      Ok(res) => res,
+      Err(e) => return Err(ParserError::NomError(line_num, e)),
     };
-    if key=="library"{
-      match <Self as GroupAttri>::nom_parse(input,&mut line_num){
+    if key == "library" {
+      match <Self as GroupAttri>::nom_parse(input, &mut line_num) {
         Err(e) => return Err(ParserError::NomError(line_num, e)),
-        Ok((_,Err(e))) => return Err(ParserError::IdError(line_num, e)),
-        Ok((_,Ok(l))) => return Ok(l),
-    }
-    }else{
-      Err(ParserError::Other(line_num, format!("Need key=library, find={}",key)))
+        Ok((_, Err(e))) => return Err(ParserError::IdError(line_num, e)),
+        Ok((_, Ok(l))) => return Ok(l),
+      }
+    } else {
+      Err(ParserError::Other(line_num, format!("Need key=library, find={}", key)))
     }
   }
 }
 
-mod test{
-    use super::*;
-    
-    static  TEMPLATE: &str = r#"
+mod test {
+  use super::*;
+
+  static TEMPLATE: &str = r#"
   library(gscl45nm) {
   
     delay_model : table_lookup;
@@ -187,12 +188,12 @@ mod test{
       }
   }
     "#;
-    static  TEMPLATE_ERR1: &str = r#"
+  static TEMPLATE_ERR1: &str = r#"
     library (/home/jzzhou/project/liberate_demo/LIBRARY/debug_liberate_INV0_hspice) {
       comment : "www";
     }
     *"#;
-    static  TEMPLATE_ERR2: &str = r#"/*
+  static TEMPLATE_ERR2: &str = r#"/*
   SPDX-FileCopyrightText: 2022 Thomas Kramer <code@tkramer.ch>
   SPDX-FileCopyrightText: 2011 W. Rhett Davis, and Harun Demircioglu, North Carolina State University
   SPDX-FileCopyrightText: 2008 W. Rhett Davis, Michael Bucher, and Sunil Basavarajaiah, North Carolina State University (ncsu_basekit subtree), James Stine, and Ivan Castellanos, and Oklahoma State University (osu_soc subtree)
@@ -215,19 +216,19 @@ mod test{
   */
   library(gscl45nm) {}
     "#;
-    #[test]
-    fn x6() {
-      match Library::parse(TEMPLATE){
-        Ok(library) => {
-          println!("{:#?}", library);
-          let mut output = String::new();
-          let mut f = crate::ast::CodeFormatter::new(&mut output , "| ");
-          if let Err(e) = library.fmt_liberty("library", &mut f){
-              panic!("");
-          }
-          println!("{}",output);
+  #[test]
+  fn x6() {
+    match Library::parse(TEMPLATE) {
+      Ok(library) => {
+        println!("{:#?}", library);
+        let mut output = String::new();
+        let mut f = crate::ast::CodeFormatter::new(&mut output, "| ");
+        if let Err(e) = library.fmt_liberty("library", &mut f) {
+          panic!("");
         }
-        Err(e) => println!("{:#?}", e),
+        println!("{}", output);
       }
+      Err(e) => println!("{:#?}", e),
     }
   }
+}

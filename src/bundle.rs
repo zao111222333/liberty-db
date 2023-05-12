@@ -1,4 +1,2 @@
 #[derive(Debug, Clone)]
-pub struct Bundle{
-
-}
+pub struct Bundle {}

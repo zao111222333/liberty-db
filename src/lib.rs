@@ -3,8 +3,6 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-
-
 #![doc(
     // The following are document setting according to
     // https://doc.rust-lang.org/rustdoc/write-documentation/the-doc-attribute.html
@@ -14,8 +12,6 @@
     // html_logo_url = "https://example.com/logo.jpg",
     html_playground_url = "https://play.rust-lang.org",
 )]
-
-
 // #![cfg_attr(
 //     feature = "nightly",
 //     feature(
@@ -31,7 +27,6 @@
 //         build_hasher_simple_hash_one
 //     )
 // )]
-
 #![deny(
     // The following are allowed by default lints according to
     // https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
@@ -58,7 +53,6 @@
     clippy::nursery,
     clippy::cargo
 )]
-
 #![allow(
     // Some explicitly allowed Clippy lints, must have clear reason to allow
     clippy::blanket_clippy_restriction_lints, // allow clippy::restriction
@@ -84,68 +78,67 @@
     unused_qualifications,
 )]
 
-#[macro_use] extern crate lazy_static;
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate lazy_static;
+#[macro_use]
+extern crate log;
 // #[macro_use] extern crate prettytable;
 
+/// `bundle` group structure.
+pub mod bundle;
+/// `bus` group structure.
+pub mod bus;
+/// `cell` group structure.
+pub mod cell;
 /// Common items/miscs.
 pub mod common;
 /// `Boolean Expression`, `SDF Expression`, and so on.
 pub mod expression;
+/// `Library` group structure, top level of liberty format.
+pub mod library;
+/// `pin` group structure.
+pub mod pin;
+/// `table` group structure.
+pub mod table;
+/// `timing` group structure.
+pub mod timing;
 /// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
 /// used in the library public interface.
 pub mod units;
-/// `Library` group structure, top level of liberty format.
-pub mod library;
-/// `cell` group structure.
-pub mod cell;
-/// `pin` group structure.
-pub mod pin;
-/// `bus` group structure.
-pub mod bus;
-/// `table` group structure.
-pub mod table;
-/// `bundle` group structure.
-pub mod bundle;
-/// `timing` group structure.
-pub mod timing;
 
 pub mod ast;
-
 
 mod types;
 mod util;
 
+mod test {
+  use std::{str::FromStr, string};
 
-mod test{
-    use std::{str::FromStr, string};
+  struct A(String);
+  impl FromStr for A {
+    type Err = std::fmt::Error;
 
-    struct A (String);
-    impl FromStr for A {
-        type Err=std::fmt::Error;
-
-        fn from_str(s: &str) -> Result<Self, Self::Err> {
-            Ok(Self(s.to_string()))
-        }
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+      Ok(Self(s.to_string()))
     }
-    struct B (String);
-    impl FromStr for B {
-        type Err=std::fmt::Error;
+  }
+  struct B(String);
+  impl FromStr for B {
+    type Err = std::fmt::Error;
 
-        fn from_str(s: &str) -> Result<Self, Self::Err> {
-            Ok(Self(s.to_string()))
-        }
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+      Ok(Self(s.to_string()))
     }
-    struct MyStruct{
-        a: A,
-        b: B,
-    }
+  }
+  struct MyStruct {
+    a: A,
+    b: B,
+  }
 
-    // fn xxx(){
-    //     use std::collections::HashMap;
-    //     let mut parsers = HashMap::new();
-    //     let _ = parsers.insert('k', A::from_str);
-    //     let _ = parsers.insert('x', B::from_str);
-    // }
-
+  // fn xxx(){
+  //     use std::collections::HashMap;
+  //     let mut parsers = HashMap::new();
+  //     let _ = parsers.insert('k', A::from_str);
+  //     let _ = parsers.insert('x', B::from_str);
+  // }
 }
