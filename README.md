@@ -7,20 +7,22 @@
 [![liberty-macros](https://shields.io/crates/v/liberty-macros.svg?style=flat-square&label=liberty-macros)](https://crates.io/crates/liberty-macros)
 [![Docs](https://docs.rs/liberty-db/badge.svg)](https://docs.rs/liberty-db)
 
-## TODO:
-
-+ [x] Logic Search
-+ [x] `timing_type`
-+ [ ] `timing` group
-+ [ ] Karnaugh Map Simplify, [link1](https://www.geeksforgeeks.org/variable-entrant-map-vem-in-digital-logic), [link2](https://www.allaboutcircuits.com/textbook/digital/chpt-8/logic-simplification-karnaugh-maps/)
 
 # liberty-db
 **Work in progress, unstable**
 
+
+## Test
+```shell
+cargo test --package liberty-tests --test tests
+```
+## Usage
 ```toml
 [dependencies]
 liberty_db = "0.2"
 ```
+
+See more in [doc](https://docs.rs/liberty-db)
 
 ## ToDo List
 + ![](https://progress-bar.dev/100?title=done) support comment

@@ -11,7 +11,7 @@ use std::io::BufReader;
 use std::panic;
 
 fn all_lib_files() -> Vec<PathBuf>{
-    WalkDir::new("tests/tech").into_iter().filter_map(|e|
+    WalkDir::new("tech").into_iter().filter_map(|e|
         match e {
             Ok(entry) => {
                 let path = entry.path();
@@ -152,8 +152,8 @@ const PARSER_LIBERTYPARSE: ParserCtx = ParserCtx{
     },
 };
 
-#[test]
-fn test_all_lib_files(){
+// #[test]
+pub fn test_all_lib_files(){
     use prettytable::{Table, Row, Cell};
     let all_parser:Vec<ParserCtx> = vec![
         PARSER_LIBERTY_DB,
