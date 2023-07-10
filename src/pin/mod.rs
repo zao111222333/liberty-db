@@ -794,3 +794,48 @@ pub struct Pin {
   /// style="width: 90%; height: 600px;"></iframe>
   pub timing: Vec<Timing>,
 }
+
+#[test]
+fn test_link() {
+  use crate::ast::{LinkError, LinkedGroup};
+  use std::cell::RefCell;
+  use std::collections::HashSet;
+  use std::rc::Rc;
+  let rc_set: Rc<RefCell<HashSet<Pin>>>;
+  {
+    let mut pin_a = Pin::default();
+    pin_a._id = String::from("A");
+    let mut pin_b = Pin::default();
+    pin_b._id = String::from("B");
+    let mut set = HashSet::<Pin>::new();
+    let _ = set.insert(pin_a);
+    let _ = set.insert(pin_b);
+    rc_set = Rc::new(RefCell::new(set));
+  }
+  let pin_a_link = LinkedGroup::<Pin>::new(String::from("A"), &rc_set);
+  pin_a_link.get_linked(|r| {
+    println!("{:?}", r);
+  });
+  println!("---------");
+  {
+    let mut pin_a = Pin::default();
+    pin_a._id = String::from("A");
+    pin_a.bit_width = 12345;
+    let _ = rc_set.borrow_mut().replace(pin_a);
+    pin_a_link.get_linked(|r| {
+      assert!(matches!(r, Ok(_)));
+      assert_eq!(r.unwrap().bit_width, 12345);
+    });
+  }
+  println!("---------");
+  {
+    let xxx = rc_set.borrow_mut();
+    let pin_a_link__ = LinkedGroup::<Pin>::new(String::from("A"), &rc_set);
+    pin_a_link__.get_linked(|r| assert!(matches!(r, Err(LinkError::BorrowError(_)))));
+  }
+  println!("---------");
+  {
+    let pin_c_link__ = LinkedGroup::<Pin>::new(String::from("C"), &rc_set);
+    pin_c_link__.get_linked(|r| assert!(matches!(r, Err(LinkError::NotFind))));
+  }
+}
