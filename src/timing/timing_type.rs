@@ -3,8 +3,6 @@
 //! </script>
 use std::{fmt::Display, str::FromStr};
 
-// use nom::error::ParseError;
-
 use crate::{
   ast::SimpleAttri,
   expression::{EdgeState, StaticState},
