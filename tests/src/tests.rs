@@ -1,5 +1,7 @@
+mod demo;
 mod parser_bench;
 
-fn main(){
-    parser_bench::test_all_lib_files();
+fn main() {
+  demo::demo();
+  parser_bench::test_all_lib_files();
 }
