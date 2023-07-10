@@ -44,7 +44,6 @@ default = []
 
 [dependencies]
 liberty-macros = { path = "macros" }
-anyhow = "1.0"
 log = { version = "0.4", features = ["std", "serde"] }
 nom = "7.1"
 thiserror = "1.0.40"
@@ -59,13 +58,3 @@ itertools = "0.10.5"
 ryu = "1.0.13"
 itoa = "1.0"
 uom = { version = "0.34.0", default-features = false, features = ["autoconvert","f64","si", "std",] }
-
-
-
-
-[build-dependencies]
-# dircpy = "0.3.14"
-
-# [[bench]]
-# name = "my_benchmark"
-# harness = false
