@@ -10,8 +10,11 @@ use itertools::Itertools;
 use nom::{error::Error, IResult};
 use std::{
   borrow::Borrow,
-  fmt::{Display, Write},
+  cell::RefCell,
+  collections::HashSet,
+  fmt::{Debug, Display, Write},
   hash::Hash,
+  rc::Rc,
   str::FromStr,
 };
 /// Wrapper for simple attribute
@@ -44,6 +47,73 @@ pub enum AttriValue {
   Complex(ComplexWrapper),
   ///
   Group(GroupWrapper),
+}
+
+/// Error for LinkedGroup
+#[derive(Debug)]
+#[derive(thiserror::Error)]
+// #[derive(PartialEq)]
+pub enum LinkError {
+  /// Not Find
+  #[error("Can not find in hashset!")]
+  NotFind,
+  // NomError(usize,Error<&'a str>),
+  /// BorrowError
+  #[error("{0}")]
+  BorrowError(core::cell::BorrowError),
+}
+
+impl PartialEq for LinkError {
+  fn eq(&self, other: &Self) -> bool {
+    match (self, other) {
+      (Self::BorrowError(_), Self::BorrowError(_)) => true,
+      (LinkError::NotFind, LinkError::NotFind) => true,
+      _ => false,
+    }
+  }
+}
+
+/// Reference: https://rustcc.cn/article?id=ac75148b-6eb0-4249-b36d-0a14875b736e
+#[derive(Debug, Clone)]
+pub struct LinkedGroup<LinkTo>
+where
+  LinkTo: HashedGroup + GroupAttri,
+{
+  id: <LinkTo as HashedGroup>::Id,
+  from: Rc<RefCell<HashSet<LinkTo>>>,
+}
+
+impl<LinkTo: HashedGroup + GroupAttri> LinkedGroup<LinkTo> {
+  pub fn new(
+    id: <LinkTo as HashedGroup>::Id,
+    from: &Rc<RefCell<HashSet<LinkTo>>>,
+  ) -> Self {
+    Self { id, from: from.clone() }
+  }
+  pub fn get_linked<F>(&self, f: F)
+  where
+    F: FnOnce(Result<&LinkTo, LinkError>),
+  {
+    match self.from.as_ref().try_borrow() {
+      Ok(set) => match set.get(&self.id) {
+        Some(linked) => f(Ok(linked)),
+        None => f(Err(LinkError::NotFind)),
+      },
+      Err(err) => f(Err(LinkError::BorrowError(err))),
+    }
+  }
+  // fn get_linked_<'b>(&'b self)->Result<&'b LinkTo,LinkError>{
+  //   match self.from.as_ref().try_borrow(){
+  //       Ok(set) => match set.get(&self.id) {
+  //           Some(linked) => {
+  //             // let clone = Rc::clone(linked);
+  //             Ok(linked)
+  //           },
+  //           None => Err(LinkError::NotFind),
+  //       },
+  //       Err(err) => Err(LinkError::BorrowError(err)),
+  //   }
+  // }
 }
 
 /// Simple Attribute in Liberty
@@ -133,7 +203,7 @@ pub trait ComplexAttri: Sized {
 /// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
 pub trait HashedGroup: Sized + Hash + Eq + Borrow<Self::Id> {
   /// its Index
-  type Id: Sized + Hash;
+  type Id: Sized + Hash + Eq + Debug + Clone;
   /// generate title for wrapper
   fn title(&self) -> Vec<String>;
   /// generate id from self
@@ -219,12 +289,22 @@ pub(crate) fn test_parse_group<G: GroupAttri>(s: &str) -> (G, usize) {
     Err(e) => panic!("{:#?}", e),
   }
 }
+/// For basic formatter
 pub trait Format {
+  /// `.lib` format
   fn liberty<T: Write>(
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T>,
   ) -> std::fmt::Result;
+  /// `.db` format
+  fn db<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    todo!()
+  }
+  /// `.json` format
+  fn json<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    todo!()
+  }
 }
 pub(crate) fn is_word(s: &String) -> bool {
   s.chars().all(parser::char_in_word)
