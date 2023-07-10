@@ -53,3 +53,10 @@ pub fn macro_group(input: TokenStream) -> TokenStream {
   let toks = group::inner(&ast).unwrap_or_else(|err| err.to_compile_error().into());
   toks.into()
 }
+
+#[proc_macro_derive(Nothing, attributes(arrti_type, id_len))]
+pub fn macro_nothing(input: TokenStream) -> TokenStream {
+  let tmp: syn::Result<proc_macro2::TokenStream> = Ok(quote::quote!());
+  let toks = tmp.unwrap_or_else(|err| err.to_compile_error().into());
+  toks.into()
+}

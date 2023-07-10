@@ -153,7 +153,7 @@ fn group_field_fn(
           (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
           match group_res{
             Ok(group) => {
-              if !res.#field_name.insert(
+              if let Some(_) = res.#field_name.replace(
                 group,
               ){
                 let e = crate::ast::IdError::RepeatIdx;
