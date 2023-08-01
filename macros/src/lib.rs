@@ -1,6 +1,7 @@
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, DeriveInput};
 
+mod attribute;
 mod group;
 
 /// Auto implement `GroupAttri` for `struct`, which should have a field named
@@ -47,15 +48,16 @@ mod group;
 ///   pin: HashMap<<Pin as HashedGroup>::Id,Pin>,
 /// }
 /// ```
-#[proc_macro_derive(Group, attributes(arrti_type, id_len))]
+#[proc_macro_derive(Group, attributes(liberty))]
 pub fn macro_group(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let toks = group::inner(&ast).unwrap_or_else(|err| err.to_compile_error().into());
   toks.into()
+  // todo!()
 }
 
-#[proc_macro_derive(Nothing, attributes(arrti_type, id_len))]
-pub fn macro_nothing(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(Nothing, attributes(liberty))]
+pub fn macro_nothing(_: TokenStream) -> TokenStream {
   let tmp: syn::Result<proc_macro2::TokenStream> = Ok(quote::quote!());
   let toks = tmp.unwrap_or_else(|err| err.to_compile_error().into());
   toks.into()

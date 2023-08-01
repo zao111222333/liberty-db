@@ -1,5 +1,7 @@
 use std::{hash::Hash, str::FromStr};
 
+use crate::ast::GroupId;
+
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.4&end=141.5
@@ -10,9 +12,11 @@ use std::{hash::Hash, str::FromStr};
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 pub struct Statetable {
-  _id: <Self as crate::ast::HashedGroup>::Id,
+  #[liberty(id)]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
-  #[arrti_type(simple)]
+  #[liberty(simple)]
   table: Table,
 }
 
@@ -28,10 +32,6 @@ impl crate::ast::HashedGroup for Statetable {
   fn title(&self) -> Vec<String> {
     let id = self.id().clone();
     vec![id.input_npde.join(" "), id.internal_node.join(" ")]
-  }
-
-  fn id(&self) -> &Self::Id {
-    &self._id
   }
 
   fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
@@ -54,6 +54,10 @@ impl crate::ast::HashedGroup for Statetable {
       return Err(crate::ast::IdError::Other("Unkown pop error".into()));
     };
     Ok(Self::Id { input_npde, internal_node })
+  }
+
+  fn id(&self) -> GroupId<Self> {
+    self._id.clone()
   }
 }
 

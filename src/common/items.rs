@@ -1,4 +1,8 @@
+use std::rc::Rc;
+
 use strum_macros::{Display, EnumString};
+
+use crate::ast::GroupId;
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -104,10 +108,10 @@ pub enum VariableType {
 #[derive(Debug, Clone)]
 #[derive(Default)]
 #[derive(liberty_macros::Group)]
-// #[derive(liberty_macros::NameIdx)]
 pub struct Domain {
-  #[id_len(1)]
-  _id: <Self as crate::ast::HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 1))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   pub group_name: String,
   pub calc_mode: Option<String>,

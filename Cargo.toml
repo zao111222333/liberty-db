@@ -3,7 +3,7 @@
 members = ["macros","tests"]
 
 [workspace.package]
-version = "0.2.4"
+version = "0.3.0"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]

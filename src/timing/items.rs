@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use crate::{
-  ast,
+  ast::{self, GroupId},
   common::items::Domain,
   expression::{self, LogicLike},
 };
@@ -198,8 +198,9 @@ pub struct Mode {}
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 pub struct CellDegradation {
-  #[id_len(1)]
-  _id: <Self as ast::HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 1))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: ast::AttributeList,
   // /* polynomial model */
   // #[arrti_type(complex)]
@@ -249,12 +250,13 @@ pub struct CellDegradation {
 ///
 /// **Used By:**
 /// [Timing](crate::timing::Timing)
-#[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 #[derive(Debug, Clone, Default)]
+#[derive(liberty_macros::Group)]
 pub struct CellFall {
-  #[id_len(1)]
-  _id: <Self as ast::HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 0))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: ast::AttributeList,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html

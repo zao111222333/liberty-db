@@ -2,7 +2,7 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use crate::ast::{AttributeList, HashedGroup};
+use crate::ast::{AttributeList, GroupId, GroupMap, HashedGroup};
 use crate::expression;
 use crate::timing::Timing;
 mod items;
@@ -30,8 +30,9 @@ pub use items::*;
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 pub struct Pin {
-  #[id_len(1)]
-  _id: <Self as HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 1))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: AttributeList,
   /* Simple Attributes in a pin Group */
   /// <a name ="reference_link" href="
@@ -800,28 +801,28 @@ fn test_link() {
   use crate::ast::{LinkError, LinkedGroup};
   use std::cell::RefCell;
   use std::collections::HashSet;
-  use std::rc::Rc;
-  let rc_set: Rc<RefCell<HashSet<Pin>>>;
+  use std::sync::Arc;
+  let arc_set: Arc<RefCell<GroupMap<Pin>>>;
   {
     let mut pin_a = Pin::default();
-    pin_a._id = String::from("A");
+    pin_a._id = String::from("A").into();
     let mut pin_b = Pin::default();
-    pin_b._id = String::from("B");
-    let mut set = HashSet::<Pin>::new();
+    pin_b._id = String::from("B").into();
+    let mut set = GroupMap::<Pin>::default();
     let _ = set.insert(pin_a);
     let _ = set.insert(pin_b);
-    rc_set = Rc::new(RefCell::new(set));
+    arc_set = Arc::new(RefCell::new(set));
   }
-  let pin_a_link = LinkedGroup::<Pin>::new(String::from("A"), &rc_set);
+  let pin_a_link = LinkedGroup::<Pin>::new(String::from("A").into(), &arc_set);
   pin_a_link.get_linked(|r| {
     println!("{:?}", r);
   });
   println!("---------");
   {
     let mut pin_a = Pin::default();
-    pin_a._id = String::from("A");
+    pin_a._id = String::from("A").into();
     pin_a.bit_width = 12345;
-    let _ = rc_set.borrow_mut().replace(pin_a);
+    let _ = arc_set.borrow_mut().insert(pin_a);
     pin_a_link.get_linked(|r| {
       assert!(matches!(r, Ok(_)));
       assert_eq!(r.unwrap().bit_width, 12345);
@@ -829,13 +830,13 @@ fn test_link() {
   }
   println!("---------");
   {
-    let xxx = rc_set.borrow_mut();
-    let pin_a_link__ = LinkedGroup::<Pin>::new(String::from("A"), &rc_set);
+    let xxx = arc_set.borrow_mut();
+    let pin_a_link__ = LinkedGroup::<Pin>::new(String::from("A").into(), &arc_set);
     pin_a_link__.get_linked(|r| assert!(matches!(r, Err(LinkError::BorrowError(_)))));
   }
   println!("---------");
   {
-    let pin_c_link__ = LinkedGroup::<Pin>::new(String::from("C"), &rc_set);
+    let pin_c_link__ = LinkedGroup::<Pin>::new(String::from("C").into(), &arc_set);
     pin_c_link__.get_linked(|r| assert!(matches!(r, Err(LinkError::NotFind))));
   }
 }

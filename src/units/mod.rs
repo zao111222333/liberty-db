@@ -342,25 +342,22 @@ impl SimpleAttri for PullingResistanceUnit {}
 #[derive(Debug, Default, Clone, Copy)]
 pub struct CapacitiveLoadUnit {
   ff_pf: bool,
-  _v: Option<Capacitance>,
+  _v: Capacitance,
 }
 
-impl CapacitiveLoadUnit {
-  const NIL: Capacitance = Capacitance {
-    dimension: std::marker::PhantomData,
-    units: std::marker::PhantomData,
-    value: 0.0,
-  };
-}
+// impl CapacitiveLoadUnit {
+//   const NIL: Capacitance = Capacitance {
+//     dimension: std::marker::PhantomData,
+//     units: std::marker::PhantomData,
+//     value: 0.0,
+//   };
+// }
 
 impl Deref for CapacitiveLoadUnit {
   type Target = Capacitance;
   #[inline]
   fn deref(&self) -> &Self::Target {
-    match self._v.as_ref() {
-      Some(v) => v,
-      None => &Self::NIL,
-    }
+    &self._v
   }
 }
 
@@ -387,28 +384,28 @@ impl ComplexAttri for CapacitiveLoadUnit {
     if let Some(_) = i.next() {
       return Err(Self::Error::LengthDismatch);
     }
-    Ok(Self { ff_pf, _v: Some(_v) })
+    Ok(Self { ff_pf, _v })
   }
 
-  fn to_wrapper(&self) -> Option<crate::ast::ComplexWrapper> {
-    match self._v {
-      Some(cap) => {
-        let mut buffer = ryu::Buffer::new();
-        if self.ff_pf {
-          Some(vec![vec![
-            buffer.format(cap.get::<capacitance::femtofarad>()).to_owned(),
-            "ff".to_owned(),
-          ]])
-        } else {
-          Some(vec![vec![
-            buffer.format(cap.get::<capacitance::picofarad>()).to_owned(),
-            "pf".to_owned(),
-          ]])
-        }
-      }
-      None => None,
+  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+    // match self._v {
+    //   Some(cap) => {
+    let mut buffer = ryu::Buffer::new();
+    if self.ff_pf {
+      vec![vec![
+        buffer.format(self._v.get::<capacitance::femtofarad>()).to_owned(),
+        "ff".to_owned(),
+      ]]
+    } else {
+      vec![vec![
+        buffer.format(self._v.get::<capacitance::picofarad>()).to_owned(),
+        "pf".to_owned(),
+      ]]
     }
   }
+  //   None => None,
+  // }
+  // }
 }
 
 /// This attribute indicates the units of the power values

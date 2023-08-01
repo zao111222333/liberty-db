@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "tamasfe.even-better-toml",
+        "wayou.vscode-todo-highlight",
+        "eamodio.gitlens",
+    ]
+}

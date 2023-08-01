@@ -43,6 +43,7 @@ use crate::{
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 pub struct Timing {
+  #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   /// Use this attribute to indicate that a constraint arc is for
   /// a clock gating relation between the data and clock pin,
@@ -77,7 +78,7 @@ pub struct Timing {
   /// &end
   /// =320.6
   /// ">Reference-Instance</a>
-  #[arrti_type(simple)]
+  #[liberty(simple(type=Option))]
   pub clock_gating_flag: Option<bool>,
   /// The `default_timing` attribute allows you to specify one timing arc as the default
   /// in the case of multiple timing arcs with when statements.
@@ -105,6 +106,7 @@ pub struct Timing {
   /// &end
   /// =320.7
   /// ">Reference-Instance</a>
+  #[liberty(simple(type=Option))]
   pub default_timing: Option<bool>,
   // /// The `fall_resistance` attribute represents the load-dependent output resistance,
   // /// or drive capability, for a logic 1-to-0 transition.

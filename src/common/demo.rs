@@ -3,7 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::{
-  ast::{AttributeList, HashedGroup},
+  ast::{AttributeList, GroupId, GroupMap, HashedGroup},
   cell::Statetable,
   timing::TimingType,
 };
@@ -11,45 +11,59 @@ use crate::{
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Timing {
+  #[liberty(undefined)]
   _undefined: AttributeList,
-  #[arrti_type(complex)]
+  #[liberty(complex)]
   values: Vec<f64>,
-  #[arrti_type(simple)]
+  #[liberty(simple(type=Option))]
   t1: Option<TimingType>,
-  #[arrti_type(simple)]
+  #[liberty(simple(type=Option))]
   t2: Option<TimingType>,
 }
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Pin {
-  #[id_len(1)]
-  _id: <Self as HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 1))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: AttributeList,
-  #[arrti_type(group)]
+  #[liberty(group(type=Vec))]
   timing: Vec<Timing>,
 }
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Ff {
-  #[id_len(2)]
-  _id: <Self as HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 2))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: AttributeList,
-  #[arrti_type(simple)]
+  #[liberty(simple(type=Option))]
   next_state: Option<String>,
+}
+#[derive(Default, Debug)]
+struct Comment {}
+#[derive(Default, Debug)]
+struct CellComment {
+  /// self
+  s: Comment,
+  area: Option<Comment>,
 }
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Cell {
-  #[id_len(1)]
-  _id: <Self as HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 1))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: AttributeList,
-  #[arrti_type(simple)]
+  // <Self as Group>::Comment
+  comment: CellComment,
+  #[liberty(simple(type=Option))]
   area: Option<f64>,
-  #[arrti_type(group)]
-  ff: HashSet<Ff>,
-  #[arrti_type(group)]
-  pin: HashSet<Pin>,
-  #[arrti_type(group)]
+  #[liberty(group(type=Map))]
+  ff: GroupMap<Ff>,
+  #[liberty(group(type=Map))]
+  pin: GroupMap<Pin>,
+  #[liberty(group(type=Option))]
   statetable: Option<Statetable>,
 }
 

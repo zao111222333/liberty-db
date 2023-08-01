@@ -9,13 +9,13 @@ pub use fmt::CodeFormatter;
 use itertools::Itertools;
 use nom::{error::Error, IResult};
 use std::{
-  borrow::Borrow,
   cell::RefCell,
-  collections::HashSet,
+  collections::HashMap,
   fmt::{Debug, Display, Write},
   hash::Hash,
-  rc::Rc,
+  ops::DerefMut,
   str::FromStr,
+  sync::Arc,
 };
 /// Wrapper for simple attribute
 pub type SimpleWrapper = String;
@@ -57,7 +57,6 @@ pub enum LinkError {
   /// Not Find
   #[error("Can not find in hashset!")]
   NotFind,
-  // NomError(usize,Error<&'a str>),
   /// BorrowError
   #[error("{0}")]
   BorrowError(core::cell::BorrowError),
@@ -79,16 +78,16 @@ pub struct LinkedGroup<LinkTo>
 where
   LinkTo: HashedGroup + GroupAttri,
 {
-  id: <LinkTo as HashedGroup>::Id,
-  from: Rc<RefCell<HashSet<LinkTo>>>,
+  id: Arc<<LinkTo as HashedGroup>::Id>,
+  from: Arc<RefCell<GroupMap<LinkTo>>>,
 }
 
 impl<LinkTo: HashedGroup + GroupAttri> LinkedGroup<LinkTo> {
   pub fn new(
-    id: <LinkTo as HashedGroup>::Id,
-    from: &Rc<RefCell<HashSet<LinkTo>>>,
+    id: Arc<<LinkTo as HashedGroup>::Id>,
+    from: &Arc<RefCell<GroupMap<LinkTo>>>,
   ) -> Self {
-    Self { id, from: from.clone() }
+    Self { id: id.clone(), from: from.clone() }
   }
   pub fn get_linked<F>(&self, f: F)
   where
@@ -102,18 +101,6 @@ impl<LinkTo: HashedGroup + GroupAttri> LinkedGroup<LinkTo> {
       Err(err) => f(Err(LinkError::BorrowError(err))),
     }
   }
-  // fn get_linked_<'b>(&'b self)->Result<&'b LinkTo,LinkError>{
-  //   match self.from.as_ref().try_borrow(){
-  //       Ok(set) => match set.get(&self.id) {
-  //           Some(linked) => {
-  //             // let clone = Rc::clone(linked);
-  //             Ok(linked)
-  //           },
-  //           None => Err(LinkError::NotFind),
-  //       },
-  //       Err(err) => Err(LinkError::BorrowError(err)),
-  //   }
-  // }
 }
 
 /// Simple Attribute in Liberty
@@ -173,7 +160,7 @@ pub trait ComplexAttri: Sized {
   /// basic parser
   fn parse(v: Vec<&str>) -> Result<Self, Self::Error>;
   /// to_wrapper
-  fn to_wrapper(&self) -> Option<ComplexWrapper>;
+  fn to_wrapper(&self) -> ComplexWrapper;
   /// nom_parse, auto implement
   #[inline]
   fn nom_parse<'a>(
@@ -192,22 +179,54 @@ pub trait ComplexAttri: Sized {
     key: &str,
     f: &mut CodeFormatter<'_, T>,
   ) -> std::fmt::Result {
-    if let Some(wrapper) = self.to_wrapper() {
-      <ComplexWrapper as Format>::liberty(&wrapper, key, f)
-    } else {
-      Ok(())
-    }
+    // if let Some(wrapper) = self.to_wrapper() {
+    //   <ComplexWrapper as Format>::liberty(&wrapper, key, f)
+    // } else {
+    //   Ok(())
+    // }
+    <ComplexWrapper as Format>::liberty(&self.to_wrapper(), key, f)
   }
 }
 
+#[derive(Debug, Default)]
+pub struct GroupMap<T: HashedGroup> {
+  map: HashMap<Arc<<T as HashedGroup>::Id>, T>,
+}
+
+impl<T: HashedGroup> GroupMap<T> {
+  #[inline]
+  pub fn insert(&mut self, v: T) -> Option<T> {
+    <Self as DerefMut>::deref_mut(self).insert(v.id(), v)
+  }
+}
+use std::ops::Deref;
+impl<T: HashedGroup> Deref for GroupMap<T> {
+  type Target = HashMap<Arc<<T as HashedGroup>::Id>, T>;
+  #[inline]
+  fn deref(&self) -> &Self::Target {
+    &self.map
+  }
+}
+
+impl<T: HashedGroup> DerefMut for GroupMap<T> {
+  #[inline]
+  fn deref_mut(&mut self) -> &mut Self::Target {
+    &mut self.map
+  }
+}
+
+/// Group Id
+pub type GroupId<T: HashedGroup> = Arc<<T as HashedGroup>::Id>;
+
 /// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
-pub trait HashedGroup: Sized + Hash + Eq + Borrow<Self::Id> {
+pub trait HashedGroup {
   /// its Index
   type Id: Sized + Hash + Eq + Debug + Clone;
+  // type GroupId = Arc<<Self as HashedGroup>::Id>;
   /// generate title for wrapper
   fn title(&self) -> Vec<String>;
   /// generate id from self
-  fn id(&self) -> &Self::Id;
+  fn id(&self) -> GroupId<Self>;
   // fn idx_box(&self) -> Box<Self::Id>;
   // fn idx_clone(&self) -> Self::Id;
   /// combine `self` and `title`, generate index

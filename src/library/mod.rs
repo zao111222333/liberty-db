@@ -4,23 +4,24 @@
 
 mod items;
 
-use crate::ast::{AttributeList, HashedGroup};
+use crate::ast::{AttributeList, GroupId, GroupMap, HashedGroup};
 use crate::cell::Cell;
 use crate::pin::Pin;
 use crate::units;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 #[derive(Debug, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
 pub struct Library {
-  #[id_len(-1)]
-  _id: <Self as HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 1))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: AttributeList,
   /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=42.25&end=42.30
   /// ">Reference</a>
-  #[arrti_type(simple)]
+  #[liberty(simple)]
   pub time_unit: units::TimeUnit,
   /// This attribute specifies the unit for all capacitance
   /// values within the logic library, including
@@ -29,27 +30,27 @@ pub struct Library {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.7&end=44.19
   /// ">Reference</a>
-  #[arrti_type(complex)]
-  pub capacitive_load_unit: units::CapacitiveLoadUnit,
+  #[liberty(complex(type=Option))]
+  pub capacitive_load_unit: Option<units::CapacitiveLoadUnit>,
   /// Valid values are 1mV, 10mV, 100mV, and 1V. The default is 1V.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.2&end=43.9
   /// ">Reference</a>
-  #[arrti_type(simple)]
+  #[liberty(simple)]
   pub voltage_unit: units::VoltageUnit,
   /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
   /// **No default exists for the `current_unit` attribute if the attribute is omitted.**
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.12&end=43.24
   /// ">Reference</a>
-  #[arrti_type(simple)]
+  #[liberty(simple(type=Option))]
   pub current_unit: Option<units::CurrentUnit>,
   /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm.
   /// **No default exists for `pulling_resistance_unit` if the attribute is omitted.**
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.25&end=44.4
   /// ">Reference</a>
-  #[arrti_type(simple)]
+  #[liberty(simple(type=Option))]
   pub pulling_resistance_unit: Option<units::PullingResistanceUnit>,
   /// This attribute indicates the units of the power values
   /// in the library. If this attribute is missing, the
@@ -58,13 +59,13 @@ pub struct Library {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.22&end=44.31
   /// ">Reference</a>
-  #[arrti_type(simple)]
+  #[liberty(simple(type=Option))]
   pub leakage_power_unit: Option<units::LeakagePowerUnit>,
-  #[arrti_type(simple)]
+  #[liberty(simple)]
   #[derivative(Default(value = "80.0"))]
   pub slew_upper_threshold_pct_rise: f64,
-  #[arrti_type(group)]
-  pub cell: HashSet<Cell>,
+  #[liberty(group(type=Map))]
+  pub cell: GroupMap<Cell>,
   pub voltage_map: HashMap<String, f64>,
   pub sensitization_map: HashMap<String, Sensitization>,
 }

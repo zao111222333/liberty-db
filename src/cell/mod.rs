@@ -5,7 +5,7 @@
 use std::collections::HashSet;
 
 use crate::{
-  ast::{AttributeList, HashedGroup},
+  ast::{AttributeList, GroupId, GroupMap, HashedGroup},
   pin::Pin,
 };
 mod items;
@@ -15,14 +15,14 @@ pub use items::*;
 #[derive(Debug, Default)]
 #[derive(liberty_macros::Group)]
 pub struct Cell {
-  #[id_len(1)]
-  _id: <Self as HashedGroup>::Id,
+  #[liberty(id(auto_impl_len = 1))]
+  _id: GroupId<Self>,
+  #[liberty(undefined)]
   _undefined: AttributeList,
-
-  #[arrti_type(simple)]
+  #[liberty(simple(type = Option))]
   pub area: Option<f64>,
-  #[arrti_type(group)]
-  pub pin: HashSet<Pin>,
-  #[arrti_type(group)]
+  #[liberty(group(type=Map))]
+  pub pin: GroupMap<Pin>,
+  #[liberty(group(type=Option))]
   pub statetable: Option<Statetable>,
 }

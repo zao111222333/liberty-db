@@ -37,13 +37,13 @@ impl super::ComplexAttri for Vec<f64> {
     v.into_iter().map(|s| s.parse()).collect()
   }
   #[inline]
-  fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
-    if self.is_empty() {
-      None
-    } else {
-      let mut buffer = ryu::Buffer::new();
-      Some(vec![self.iter().map(|f| buffer.format(*f).to_string()).collect()])
-    }
+  fn to_wrapper(&self) -> super::ComplexWrapper {
+    // if self.is_empty() {
+    //   None
+    // } else {
+    let mut buffer = ryu::Buffer::new();
+    vec![self.iter().map(|f| buffer.format(*f).to_string()).collect()]
+    // }
   }
 }
 
@@ -54,16 +54,16 @@ impl super::ComplexAttri for Vec<usize> {
     v.into_iter().map(|s| s.parse()).collect()
   }
   #[inline]
-  fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
-    if self.is_empty() {
-      None
-    } else {
-      let mut buffer = itoa::Buffer::new();
-      Some(vec![self.iter().map(|i| buffer.format(*i).to_string()).collect()])
-    }
+  fn to_wrapper(&self) -> super::ComplexWrapper {
+    // if self.is_empty() {
+    //   None
+    // } else {
+    let mut buffer = itoa::Buffer::new();
+    vec![self.iter().map(|i| buffer.format(*i).to_string()).collect()]
+    // }
   }
 }
-impl super::ComplexAttri for Option<(f64, f64)> {
+impl super::ComplexAttri for (f64, f64) {
   type Error = crate::ast::ComplexParseError;
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
@@ -85,15 +85,15 @@ impl super::ComplexAttri for Option<(f64, f64)> {
     if let Some(_) = i.next() {
       return Err(Self::Error::LengthDismatch);
     }
-    Ok(Some((v1, v2)))
+    Ok((v1, v2))
   }
   #[inline]
-  fn to_wrapper(&self) -> Option<super::ComplexWrapper> {
-    if let Some((v1, v2)) = self {
-      let mut buffer = ryu::Buffer::new();
-      Some(vec![vec![buffer.format(*v1).to_string(), buffer.format(*v2).to_string()]])
-    } else {
-      None
-    }
+  fn to_wrapper(&self) -> super::ComplexWrapper {
+    // if let Some((v1, v2)) = self {
+    let mut buffer = ryu::Buffer::new();
+    vec![vec![buffer.format(self.0).to_string(), buffer.format(self.1).to_string()]]
+    // } else {
+    //   None
+    // }
   }
 }

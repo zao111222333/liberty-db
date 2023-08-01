@@ -1,8 +1,12 @@
 {
     // individual zoom level
-    "window.zoomLevel": 3,
+    "window.zoomLevel": 2,
     "files.watcherExclude": {
         "docs/static": true,
+    },
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer",
+        "editor.formatOnSave": true,
     },
     "rust-analyzer.linkedProjects": [
         "./tests/Cargo.toml",
@@ -18,4 +22,18 @@
         "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup",
     },
     "terminal.integrated.copyOnSelection": true,
+    "todohighlight.keywords": [
+        {
+            "text": "NOTE:",
+            "color": "#ff0000",
+            "backgroundColor": "yellow",
+            "overviewRulerColor": "grey"
+        },
+        {
+            "text": "HACK:",
+            "color": "blue",
+            "backgroundColor": "yellow",
+            "isWholeLine": false,
+        },
+    ]
 }
