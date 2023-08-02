@@ -5,7 +5,7 @@
 use std::collections::HashSet;
 
 use crate::{
-  ast::{AttributeList, GroupId, GroupMap, HashedGroup},
+  ast::{AttributeList, GroupComments, GroupId, GroupMap, HashedGroup},
   pin::Pin,
 };
 mod items;
@@ -17,6 +17,8 @@ pub use items::*;
 pub struct Cell {
   #[liberty(id(auto_impl_len = 1))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(simple(type = Option))]

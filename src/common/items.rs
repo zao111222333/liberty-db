@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use strum_macros::{Display, EnumString};
 
-use crate::ast::GroupId;
+use crate::ast::{GroupComments, GroupId};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -105,12 +105,13 @@ pub enum VariableType {
 /// &end
 /// =39.24
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 pub struct Domain {
   #[liberty(id(auto_impl_len = 1))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   pub group_name: String,

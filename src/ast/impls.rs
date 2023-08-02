@@ -38,12 +38,8 @@ impl super::ComplexAttri for Vec<f64> {
   }
   #[inline]
   fn to_wrapper(&self) -> super::ComplexWrapper {
-    // if self.is_empty() {
-    //   None
-    // } else {
     let mut buffer = ryu::Buffer::new();
     vec![self.iter().map(|f| buffer.format(*f).to_string()).collect()]
-    // }
   }
 }
 
@@ -55,12 +51,36 @@ impl super::ComplexAttri for Vec<usize> {
   }
   #[inline]
   fn to_wrapper(&self) -> super::ComplexWrapper {
-    // if self.is_empty() {
-    //   None
-    // } else {
     let mut buffer = itoa::Buffer::new();
     vec![self.iter().map(|i| buffer.format(*i).to_string()).collect()]
-    // }
+  }
+}
+
+impl super::ComplexAttri for (usize, String) {
+  type Error = crate::ast::ComplexParseError;
+
+  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
+    let mut i = v.into_iter();
+    let v1: usize = match i.next() {
+      Some(s) => match s.parse() {
+        Ok(f) => f,
+        Err(e) => return Err(Self::Error::Int(e)),
+      },
+      None => return Err(Self::Error::LengthDismatch),
+    };
+    let v2: String = match i.next() {
+      Some(s) => s.to_owned(),
+      None => return Err(Self::Error::LengthDismatch),
+    };
+    if let Some(_) = i.next() {
+      return Err(Self::Error::LengthDismatch);
+    }
+    Ok((v1, v2))
+  }
+
+  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+    let mut buffer = itoa::Buffer::new();
+    vec![vec![buffer.format(self.0).to_string(), self.1.clone()]]
   }
 }
 impl super::ComplexAttri for (f64, f64) {
@@ -89,11 +109,7 @@ impl super::ComplexAttri for (f64, f64) {
   }
   #[inline]
   fn to_wrapper(&self) -> super::ComplexWrapper {
-    // if let Some((v1, v2)) = self {
     let mut buffer = ryu::Buffer::new();
     vec![vec![buffer.format(self.0).to_string(), buffer.format(self.1).to_string()]]
-    // } else {
-    //   None
-    // }
   }
 }

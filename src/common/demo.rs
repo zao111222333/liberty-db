@@ -1,18 +1,16 @@
 //! cargo expand common::demo
-
-use std::collections::{HashMap, HashSet};
-
 use crate::{
-  ast::{AttributeList, GroupId, GroupMap, HashedGroup},
+  ast::{AttributeList, GroupComments, GroupId, GroupMap},
   cell::Statetable,
   timing::TimingType,
 };
-
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Timing {
   #[liberty(undefined)]
   _undefined: AttributeList,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(complex)]
   values: Vec<f64>,
   #[liberty(simple(type=Option))]
@@ -20,11 +18,14 @@ struct Timing {
   #[liberty(simple(type=Option))]
   t2: Option<TimingType>,
 }
+
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Pin {
   #[liberty(id(auto_impl_len = 1))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(group(type=Vec))]
@@ -35,28 +36,23 @@ struct Pin {
 struct Ff {
   #[liberty(id(auto_impl_len = 2))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(simple(type=Option))]
   next_state: Option<String>,
 }
-#[derive(Default, Debug)]
-struct Comment {}
-#[derive(Default, Debug)]
-struct CellComment {
-  /// self
-  s: Comment,
-  area: Option<Comment>,
-}
+
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Cell {
   #[liberty(id(auto_impl_len = 1))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
-  // <Self as Group>::Comment
-  comment: CellComment,
   #[liberty(simple(type=Option))]
   area: Option<f64>,
   #[liberty(group(type=Map))]

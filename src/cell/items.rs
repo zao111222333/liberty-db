@@ -1,6 +1,6 @@
 use std::{hash::Hash, str::FromStr};
 
-use crate::ast::GroupId;
+use crate::ast::{GroupComments, GroupId};
 
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
@@ -14,6 +14,8 @@ use crate::ast::GroupId;
 pub struct Statetable {
   #[liberty(id)]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   #[liberty(simple)]

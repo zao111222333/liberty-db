@@ -13,7 +13,7 @@ use std::{
   collections::HashMap,
   fmt::{Debug, Display, Write},
   hash::Hash,
-  ops::DerefMut,
+  ops::{Deref, DerefMut},
   str::FromStr,
   sync::Arc,
 };
@@ -52,7 +52,6 @@ pub enum AttriValue {
 /// Error for LinkedGroup
 #[derive(Debug)]
 #[derive(thiserror::Error)]
-// #[derive(PartialEq)]
 pub enum LinkError {
   /// Not Find
   #[error("Can not find in hashset!")]
@@ -179,11 +178,6 @@ pub trait ComplexAttri: Sized {
     key: &str,
     f: &mut CodeFormatter<'_, T>,
   ) -> std::fmt::Result {
-    // if let Some(wrapper) = self.to_wrapper() {
-    //   <ComplexWrapper as Format>::liberty(&wrapper, key, f)
-    // } else {
-    //   Ok(())
-    // }
     <ComplexWrapper as Format>::liberty(&self.to_wrapper(), key, f)
   }
 }
@@ -199,7 +193,6 @@ impl<T: HashedGroup> GroupMap<T> {
     <Self as DerefMut>::deref_mut(self).insert(v.id(), v)
   }
 }
-use std::ops::Deref;
 impl<T: HashedGroup> Deref for GroupMap<T> {
   type Target = HashMap<Arc<<T as HashedGroup>::Id>, T>;
   #[inline]
@@ -216,7 +209,8 @@ impl<T: HashedGroup> DerefMut for GroupMap<T> {
 }
 
 /// Group Id
-pub type GroupId<T: HashedGroup> = Arc<<T as HashedGroup>::Id>;
+pub type GroupId<T> = Arc<<T as HashedGroup>::Id>;
+pub type GroupComments<T> = <T as GroupAttri>::Comments;
 
 /// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
 pub trait HashedGroup {
@@ -233,14 +227,22 @@ pub trait HashedGroup {
   fn gen_id(&self, title: Vec<String>) -> Result<Self::Id, IdError>;
 }
 
+/// AttriComment
+pub type AttriComment = Vec<String>;
 /// Group Attribute in Liberty
 ///
 /// Use `#[derive(liberty_macros::Group)]` or
 ///
 /// `#[derive(liberty_macros::Group,liberty_macros::NameIdx)]`
-pub trait GroupAttri: Sized + std::fmt::Debug {
+pub trait GroupAttri: Sized {
+  type Comments;
+  fn comment(&self) -> &AttriComment;
+  fn comment_mut(&mut self) -> &mut AttriComment;
+  fn comments(&self) -> &Self::Comments;
+  fn comments_mut(&mut self) -> &mut Self::Comments;
   ///
-  fn undefined_list(&mut self) -> &mut AttributeList;
+  fn undefined_list(&self) -> &AttributeList;
+  fn undefined_list_mut(&mut self) -> &mut AttributeList;
   // fn add_undefine_attri(&mut self, key: &str, attri: AttriValue);
   /// nom_parse, will be implemented by macros
   fn nom_parse<'a>(
@@ -287,14 +289,12 @@ pub enum ParserError<'a> {
   Other(usize, String),
 }
 
-pub(crate) fn test_parse_group<G: GroupAttri>(s: &str) -> (G, usize) {
+pub(crate) fn test_parse_group<G: GroupAttri + Debug>(s: &str) -> (G, usize) {
   let mut n = 1;
   match G::nom_parse(s, &mut n) {
     Ok((_, Ok(group))) => {
       println!("{:?}", group);
-      // println!("{:?}",group.to_wrapper());
       println!("{n}");
-      // let wrapper = group.to_wrapper();
       let mut output = String::new();
       let mut f = CodeFormatter::new(&mut output, "| ");
       if let Err(e) = GroupAttri::fmt_liberty(&group, std::any::type_name::<G>(), &mut f)
@@ -327,6 +327,16 @@ pub trait Format {
 }
 pub(crate) fn is_word(s: &String) -> bool {
   s.chars().all(parser::char_in_word)
+}
+impl Format for AttriComment {
+  #[inline]
+  fn liberty<T: Write>(&self, _: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    match self.len() {
+      0 => Ok(()),
+      1 => write!(f, "\n/* {} */", self[0]),
+      _ => write!(f, "\n/*\n{}\n*/", self.join("\n")),
+    }
+  }
 }
 impl Format for SimpleWrapper {
   #[inline]

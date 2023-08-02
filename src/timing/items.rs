@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use crate::{
-  ast::{self, GroupId},
+  ast::{self, GroupComments, GroupId},
   common::items::Domain,
   expression::{self, LogicLike},
 };
@@ -200,6 +200,8 @@ pub struct Mode {}
 pub struct CellDegradation {
   #[liberty(id(auto_impl_len = 1))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: ast::AttributeList,
   // /* polynomial model */
@@ -256,6 +258,8 @@ pub struct CellDegradation {
 pub struct CellFall {
   #[liberty(id(auto_impl_len = 0))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: ast::AttributeList,
   /// <a name ="reference_link" href="

@@ -16,7 +16,8 @@ pub mod items;
 #[cfg(test)]
 mod test;
 use crate::{
-  bus::Bus, common::items::*, expression, library::Sensitization, pin::Pin, units,
+  ast::GroupComments, bus::Bus, common::items::*, expression, library::Sensitization,
+  pin::Pin, units,
 };
 
 /// A timing group is defined in a bundle, a bus, or a pin group within a cell.
@@ -40,9 +41,11 @@ use crate::{
 /// =203.29
 /// ">Reference-Instatnce-In-Pin</a>
 ///
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default)]
 #[derive(liberty_macros::Group)]
 pub struct Timing {
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   /// Use this attribute to indicate that a constraint arc is for

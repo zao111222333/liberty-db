@@ -17,6 +17,8 @@ enum InternalType {
   Id(Option<AutoImplConfig>),
   /// `undefined`
   UndefinedAttributeList,
+  /// `comment`
+  Comment,
 }
 
 pub(crate) type IdConfig = (Ident, Option<AutoImplConfig>);
@@ -69,9 +71,12 @@ pub(crate) fn parse_fields_type(
   Option<IdConfig>,
   // undefined name
   &Ident,
+  // comment name
+  &Ident,
 )> {
   let mut id_config = None;
   let mut _undefined_name = None;
+  let mut _comments_name = None;
   let mut err_buf = None;
   let attri_type_map: HashMap<&Ident, AttriType> = fields
     .iter()
@@ -101,6 +106,17 @@ pub(crate) fn parse_fields_type(
               }
               None
             }
+            FieldType::Internal(InternalType::Comment) => {
+              if let Some(name) = &_comments_name {
+                err_buf = Some(syn::Error::new(
+                  proc_macro2::Span::call_site(),
+                  format!("duplicated comment {}.", name),
+                ));
+              } else {
+                _comments_name = Some(field_name);
+              }
+              None
+            }
             FieldType::Attri(attri_type) => Some((field_name, attri_type)),
           },
           Ok(None) => None,
@@ -119,13 +135,28 @@ pub(crate) fn parse_fields_type(
   if let Some(e) = err_buf {
     return Err(e);
   } else {
-    if let Some(undefined_name) = _undefined_name {
-      return Ok((attri_type_map, id_config, undefined_name));
-    } else {
-      return Err(syn::Error::new(
-        proc_macro2::Span::call_site(),
-        format!("Can not find undefined"),
-      ));
+    match (_undefined_name, _comments_name) {
+      (None, None) => {
+        return Err(syn::Error::new(
+          proc_macro2::Span::call_site(),
+          format!("Can not find undefined & comment"),
+        ))
+      }
+      (None, Some(_)) => {
+        return Err(syn::Error::new(
+          proc_macro2::Span::call_site(),
+          format!("Can not find undefined"),
+        ))
+      }
+      (Some(_), None) => {
+        return Err(syn::Error::new(
+          proc_macro2::Span::call_site(),
+          format!("Can not find comment"),
+        ))
+      }
+      (Some(undefined_name), Some(comments_name)) => {
+        return Ok((attri_type_map, id_config, undefined_name, comments_name))
+      }
     }
   }
 }
@@ -180,6 +211,7 @@ fn parse_field_attrs(
                   InternalType::UndefinedAttributeList,
                 )))
               }
+              "comments" => return Ok(Some(FieldType::Internal(InternalType::Comment))),
               "simple" => {
                 let simple_type = parse_simple_type(tokens)?;
                 return Ok(Some(FieldType::Attri(AttriType::Simple(simple_type))));

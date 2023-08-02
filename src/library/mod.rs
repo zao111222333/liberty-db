@@ -3,18 +3,22 @@
 //! </script>
 
 mod items;
+pub use items::*;
 
-use crate::ast::{AttributeList, GroupId, GroupMap, HashedGroup};
+use crate::ast::{AttributeList, GroupComments, GroupId, GroupMap, HashedGroup};
 use crate::cell::Cell;
 use crate::pin::Pin;
 use crate::units;
 use std::collections::HashMap;
+use std::fmt::Write;
 #[derive(Debug, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
 pub struct Library {
   #[liberty(id(auto_impl_len = 1))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
   /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
@@ -70,30 +74,15 @@ pub struct Library {
   pub sensitization_map: HashMap<String, Sensitization>,
 }
 
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =66.4
-/// &end
-/// =66.21
-/// ">Reference-Definition</a>
-#[derive(Debug, Clone)]
-pub struct Sensitization {
-  pub group_name: String,
-  pub pin_names: Vec<<Pin as HashedGroup>::Id>,
-  pub vector: Vector,
-}
-
-#[derive(Debug, Clone)]
-pub struct Vector {
-  pub id: usize,
-  pub string: String,
-}
-
 use crate::ast::parser;
-use crate::ast::{GroupAttri, ParserError};
+use crate::ast::{AttriComment, CodeFormatter, Format, GroupAttri, ParserError};
 impl Library {
+  #[inline]
+  /// Format [Library] struct as `.lib` file
+  pub fn fmt<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    <AttriComment as Format>::liberty(self.comment(), "", f)?;
+    self.fmt_liberty("library", f)
+  }
   /// Parse `.lib` file as a [Library] struct.
   pub fn parse<'a>(i: &'a str) -> Result<Self, ParserError<'a>> {
     let mut line_num = 1;
@@ -117,5 +106,77 @@ impl Library {
     } else {
       Err(ParserError::Other(line_num, format!("Need key=library, find={}", key)))
     }
+  }
+}
+
+static TEMPLATE: &str = r#"
+library(gscl45nm) {
+
+    delay_model : table_lookup;
+    in_place_swap_mode : match_footprint;
+
+    time_unit : "1ps";
+    voltage_unit : "10mV";
+    current_unit : "1uA";
+    pulling_resistance_unit : "1kohm";
+    leakage_power_unit : "1nW";
+    capacitive_load_unit (1,pf);
+
+    slew_upper_threshold_pct_rise : 80;
+    slew_lower_threshold_pct_rise : 20;
+    slew_upper_threshold_pct_fall : 70;
+    slew_lower_threshold_pct_fall : 20;
+    input_threshold_pct_rise : 50;
+    input_threshold_pct_fall : 50;
+    output_threshold_pct_rise : 50;
+    output_threshold_pct_fall : 50;
+    nom_process : 1;
+    nom_voltage : 1.1;
+    nom_temperature : 27;
+    operating_conditions ( typical ) {
+        process : 1;
+        voltage : 1.1;
+        temperature : 27;
+    }
+    default_operating_conditions : typical;
+
+    lu_table_template(delay_template_4x5) {
+    variable_1 : total_output_net_capacitance;
+    variable_2 : input_net_transition;
+    index_1 ("1000.0, 1001.0, 1002.0, 1003.0");
+    index_2 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0");
+    }
+
+    cell (SDFFRS_X2) {
+    
+    
+    ff ("IQ","IQN") {
+        next_state         	: "((SE * SI) + (D * !SE))";
+        clocked_on         	: "CK";
+        preset             	: "!SN";
+        clear              	: "!RN";
+        clear_preset_var1  	: L;
+        clear_preset_var2  	: L;
+    }
+    }
+}
+    "#;
+#[test]
+fn demo() {
+  match Library::parse(TEMPLATE) {
+    Ok(ref mut library) => {
+      let x = library.comment_mut();
+      x.push("value".to_owned());
+      x.push("value".to_owned());
+      // x = &Some(vec!["www".to_string(), "www2".to_string()]);
+      println!("{:#?}", library);
+      let mut output = String::new();
+      let mut f = crate::ast::CodeFormatter::new(&mut output, "| ");
+      if let Err(e) = library.fmt(&mut f) {
+        panic!("{e}");
+      }
+      println!("{}", output);
+    }
+    Err(e) => println!("{:#?}", e),
   }
 }

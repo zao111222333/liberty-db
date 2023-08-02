@@ -2,7 +2,7 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use crate::ast::{AttributeList, GroupId, GroupMap, HashedGroup};
+use crate::ast::{AttributeList, GroupComments, GroupId, GroupMap, HashedGroup};
 use crate::expression;
 use crate::timing::Timing;
 mod items;
@@ -26,12 +26,14 @@ pub use items::*;
 /// + An example of the `pin` group syntax showing the attribute
 /// and group statements that you can use within the `pin` group
 /// + Descriptions of the attributes and groups you can use in a `pin` group
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default)]
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 pub struct Pin {
   #[liberty(id(auto_impl_len = 1))]
   _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
   /* Simple Attributes in a pin Group */

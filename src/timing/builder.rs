@@ -2,7 +2,7 @@ use crate::common::traits::Builder;
 
 use super::Timing;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct TimingBuilder {
   pub content: Box<Timing>,
 }
