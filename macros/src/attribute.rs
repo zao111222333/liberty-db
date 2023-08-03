@@ -164,11 +164,13 @@ pub(crate) fn parse_fields_type(
 /// ```
 /// // UndefinedAttribute
 /// #[liberty(undefined)]
+/// // GroupComments
+/// #[liberty(comments)]
 /// // Auto vector Id: Vec<String>
 /// #[liberty(id(auto_impl_len=0))]
 /// // Auto slice Id: [String:2]
 /// #[liberty(id(auto_impl_len=2))]
-/// // Id
+/// // GroupId
 /// #[liberty(id)]
 /// // Simple liberty attribute, defualt=Default
 /// #[liberty(simple)]

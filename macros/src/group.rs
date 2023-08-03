@@ -355,23 +355,25 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         write!(f,"\n{} () {{",key)?;
       }
     };
-    let comments_ident = Ident::new(&format!("{}Comment", name), Span::call_site());
+    let comments_ident = Ident::new(&format!("{}Comments", name), Span::call_site());
+    let comments_self = Ident::new("_self", Span::call_site());
+    let comments_undefined = Ident::new("_undefined", Span::call_site());
     let impl_group = quote! {
       #[derive(Default,Debug,Clone)]
       pub struct #comments_ident{
-        _self: crate::ast::AttriComment,
-        _undefined: crate::ast::AttriComment,
+        #comments_self: crate::ast::AttriComment,
+        #comments_undefined: crate::ast::AttriComment,
         #attri_comments
       }
       impl crate::ast::GroupAttri for #name {
         type Comments=#comments_ident;
         #[inline]
         fn comment(&self) -> &crate::ast::AttriComment{
-          &self.#comments_name._self
+          &self.#comments_name.#comments_self
         }
         #[inline]
         fn comment_mut(&mut self) -> &mut crate::ast::AttriComment{
-          &mut self.#comments_name._self
+          &mut self.#comments_name.#comments_self
         }
         #[inline]
         fn comments(&self) -> &Self::Comments{
@@ -396,7 +398,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           f.indent(1);
           #write_fields
           if !self.undefined_list().is_empty(){
-            <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name._undefined, "", f)?;
+            <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined, "", f)?;
             crate::ast::liberty_attr_list(&self.undefined_list(),f)?;
           }
           f.dedent(1);
@@ -407,7 +409,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
           let (mut input,title) = crate::ast::parser::title(i,line_num)?;
           let mut res = Self::default();
-          res.comments_mut()._undefined.push("Undefined attributes from here".to_string());
+          res.comments_mut().#comments_undefined.push("Undefined attributes from here".to_string());
           loop {
             match crate::ast::parser::key(input){
               Err(nom::Err::Error(_)) => {
@@ -445,20 +447,21 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
 
 #[test]
 fn main() {
-  use syn::{parse_str, Data};
+  use syn::parse_str;
   let input = r#"
-  struct Timing {
-    #[liberty(undefined)]
-    _undefined: AttributeList,
-    #[liberty(comments)]
-    _comments: GroupComments<Self>,
-    #[liberty(complex)]
-    values: Vec<f64>,
-    #[liberty(simple(type=Option))]
-    t1: Option<TimingType>,
-    #[liberty(simple(type=Option))]
-    t2: Option<TimingType>,
-  }"#;
+  #[derive(liberty_macros::Group)]
+struct Timing {
+  #[liberty(undefined)]
+  _undefined: AttributeList,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(complex)]
+  values: Vec<f64>,
+  #[liberty(simple(type=Option))]
+  t1: Option<TimingType>,
+  #[liberty(simple(type=Option))]
+  t2: Option<TimingType>,
+}"#;
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();
   let out = inner(&ast).unwrap_or_else(|err| err.to_compile_error().into());
   println!("{}", out)

@@ -293,13 +293,13 @@ pub(crate) fn test_parse_group<G: GroupAttri + Debug>(s: &str) -> (G, usize) {
   let mut n = 1;
   match G::nom_parse(s, &mut n) {
     Ok((_, Ok(group))) => {
-      println!("{:?}", group);
+      println!("{:#?}", group);
       println!("{n}");
       let mut output = String::new();
       let mut f = CodeFormatter::new(&mut output, "| ");
       if let Err(e) = GroupAttri::fmt_liberty(&group, std::any::type_name::<G>(), &mut f)
       {
-        panic!("");
+        panic!("{e}");
       }
       println!("{}", output);
       return (group, n);
@@ -326,15 +326,14 @@ pub trait Format {
   }
 }
 pub(crate) fn is_word(s: &String) -> bool {
-  s.chars().all(parser::char_in_word)
+  !s.is_empty() && s.chars().all(parser::char_in_word)
 }
 impl Format for AttriComment {
   #[inline]
   fn liberty<T: Write>(&self, _: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
     match self.len() {
       0 => Ok(()),
-      1 => write!(f, "\n/* {} */", self[0]),
-      _ => write!(f, "\n/*\n{}\n*/", self.join("\n")),
+      _ => write!(f, "\n* {}", self.join("\n").replace("\n", "\n* ")),
     }
   }
 }

@@ -79,7 +79,8 @@ use crate::ast::{AttriComment, CodeFormatter, Format, GroupAttri, ParserError};
 impl Library {
   #[inline]
   /// Format [Library] struct as `.lib` file
-  pub fn fmt<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  pub fn fmt<T: Write>(&self, w: &mut T) -> std::fmt::Result {
+    let f = &mut crate::ast::CodeFormatter::new(w, "  ");
     <AttriComment as Format>::liberty(self.comment(), "", f)?;
     self.fmt_liberty("library", f)
   }
@@ -158,21 +159,18 @@ library(gscl45nm) {
         clear_preset_var1  	: L;
         clear_preset_var2  	: L;
     }
-    }
+  }
 }
     "#;
 #[test]
 fn demo() {
   match Library::parse(TEMPLATE) {
     Ok(ref mut library) => {
-      let x = library.comment_mut();
-      x.push("value".to_owned());
-      x.push("value".to_owned());
-      // x = &Some(vec!["www".to_string(), "www2".to_string()]);
+      library.comment_mut().push("line1\nline2".to_owned());
+      library.comment_mut().push("line3".to_owned());
       println!("{:#?}", library);
       let mut output = String::new();
-      let mut f = crate::ast::CodeFormatter::new(&mut output, "| ");
-      if let Err(e) = library.fmt(&mut f) {
+      if let Err(e) = library.fmt(&mut output) {
         panic!("{e}");
       }
       println!("{}", output);

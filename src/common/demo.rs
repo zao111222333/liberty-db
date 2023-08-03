@@ -1,9 +1,10 @@
 //! cargo expand common::demo
 use crate::{
-  ast::{AttributeList, GroupComments, GroupId, GroupMap},
+  ast::{AttributeList, GroupAttri, GroupComments, GroupId, GroupMap},
   cell::Statetable,
   timing::TimingType,
 };
+
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Timing {
@@ -120,13 +121,13 @@ fn cell_test() {
         area : 5.4;
         // should ok
         ff(IQ,IQN){
-            next_state: "!A";
+          next_state: "!A";
         }
         // should ok
         pin(A){
-            timing(w){
-                t1: combinational;
-            }
+          timing(w){
+            t1: combinational;
+          }
         }
         // should ok
         pin(Y){
@@ -149,9 +150,10 @@ fn cell_test() {
       }
     "#,
   );
-  let _ = crate::ast::test_parse_group::<Cell>(
+  let (g, _) = &mut crate::ast::test_parse_group::<Cell>(
     r#"(INV){
         // should error
+        area : 5.4;
         undefine_area : 5.4;
         // should error
         undefine_pin(C){
@@ -179,4 +181,12 @@ fn cell_test() {
     }
     "#,
   );
+  g.comments_mut().area.push("xc".to_owned());
+  g.comments_mut().area.push("xc".to_owned());
+  let mut output = String::new();
+  let mut f = crate::ast::CodeFormatter::new(&mut output, "| ");
+  if let Err(e) = GroupAttri::fmt_liberty(g, std::any::type_name::<Cell>(), &mut f) {
+    panic!("{e}");
+  }
+  println!("{}", output);
 }

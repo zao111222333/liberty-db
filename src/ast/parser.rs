@@ -31,16 +31,9 @@ fn comment_single<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
 }
 
 fn comment_multi<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
-  map(
-    tuple((
-      tag("/*"),
-      take_until("*/"),
-      // tag("*/"),
-      take(2usize),
-      space,
-    )),
-    |(_, s, _, _)| s.chars().filter(|&x| x == '\n').count(),
-  )(i)
+  map(tuple((tag("/*"), take_until("*/"), take(2usize), space)), |(_, s, _, _)| {
+    s.chars().filter(|&x| x == '\n').count()
+  })(i)
 }
 
 #[test]
