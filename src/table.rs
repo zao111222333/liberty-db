@@ -1,7 +1,7 @@
-use crate::{ast::HashedGroup, expression, pin::Pin, timing::TimingType};
+use crate::{ast::HashedGroup, expression::logic, pin::Pin, timing::TimingType};
 
 struct TableId {
-  vec: expression::LogicVector,
+  vec: logic::Vector,
   pin: <Pin as HashedGroup>::Id,
   related_pin: <Pin as HashedGroup>::Id,
   info: TableInfo,

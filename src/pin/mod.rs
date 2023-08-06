@@ -3,7 +3,7 @@
 //! </script>
 
 use crate::ast::{AttributeList, GroupComments, GroupId, GroupMap, HashedGroup};
-use crate::expression;
+use crate::expression::{self, logic};
 use crate::timing::Timing;
 mod items;
 use crate::units;
@@ -635,7 +635,7 @@ pub struct Pin {
   /// &end
   /// =229.8
   /// ">Reference-Instance</a>
-  pub restore_action: Option<expression::CommonState>,
+  pub restore_action: Option<logic::Normal>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -698,7 +698,7 @@ pub struct Pin {
   /// &end
   /// =229.15
   /// ">Reference-Instance</a>
-  pub save_action: Option<expression::CommonState>,
+  pub save_action: Option<logic::Normal>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

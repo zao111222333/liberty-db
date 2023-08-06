@@ -3,7 +3,7 @@
 //! </script>
 //!
 use super::{
-  BooleanExpression, BooleanExpressionLike, LogicOperator1, LogicOperator2, LogicTable,
+  logic, logic::Operator1, logic::Operator2, BooleanExpression, BooleanExpressionLike,
 };
 use std::fmt;
 
@@ -11,8 +11,8 @@ use std::fmt;
 #[derive(Debug, Clone)]
 pub struct FunctionExpression {
   sub_expression_vec: Vec<BooleanExpression>,
-  op1_vec: Vec<Option<LogicOperator1>>,
-  op2_vec: Vec<LogicOperator2>,
+  op1_vec: Vec<Option<logic::Operator1>>,
+  op2_vec: Vec<logic::Operator2>,
 }
 
 impl FunctionExpression {
@@ -20,8 +20,8 @@ impl FunctionExpression {
   #[inline]
   pub fn new(
     sub_expression_vec: Vec<BooleanExpression>,
-    op1_vec: Vec<Option<LogicOperator1>>,
-    op2_vec: Vec<LogicOperator2>,
+    op1_vec: Vec<Option<logic::Operator1>>,
+    op2_vec: Vec<logic::Operator2>,
   ) -> Self {
     Self { sub_expression_vec, op1_vec, op2_vec }
   }
@@ -50,15 +50,15 @@ impl BooleanExpressionLike for FunctionExpression {
   /// =133.13
   /// ">Reference</a>
   #[inline]
-  fn table(&self) -> LogicTable {
+  fn table(&self) -> logic::Table {
     #[inline]
     fn compute_op2(
-      target_op2: &LogicOperator2,
-      op2_vec: &Vec<LogicOperator2>,
-      state_table_vec: &Vec<LogicTable>,
-    ) -> (Vec<LogicOperator2>, Vec<LogicTable>) {
-      let mut _op2_vec: Vec<LogicOperator2> = vec![];
-      let mut _state_table_vec: Vec<LogicTable> = vec![state_table_vec[0].clone()];
+      target_op2: &logic::Operator2,
+      op2_vec: &Vec<logic::Operator2>,
+      state_table_vec: &Vec<logic::Table>,
+    ) -> (Vec<logic::Operator2>, Vec<logic::Table>) {
+      let mut _op2_vec: Vec<logic::Operator2> = vec![];
+      let mut _state_table_vec: Vec<logic::Table> = vec![state_table_vec[0].clone()];
       for (op2_idx, op2) in op2_vec.iter().enumerate() {
         if op2 == target_op2 {
           match _state_table_vec.pop() {
@@ -77,7 +77,7 @@ impl BooleanExpressionLike for FunctionExpression {
       panic!();
     }
     let op_vec = &self.op2_vec;
-    let state_table_vec: &Vec<LogicTable> = &self
+    let state_table_vec: &Vec<logic::Table> = &self
       .sub_expression_vec
       .iter()
       .enumerate()
@@ -87,10 +87,11 @@ impl BooleanExpressionLike for FunctionExpression {
       })
       .collect();
     let (_op_xor, _state_xor) =
-      compute_op2(&LogicOperator2::Xor, op_vec, state_table_vec);
-    let (_op_and, _state_and) = compute_op2(&LogicOperator2::And, &_op_xor, &_state_xor);
-    let (_op_or, _state_or) = compute_op2(&LogicOperator2::Or, &_op_and, &_state_and);
-    LogicTable {
+      compute_op2(&logic::Operator2::Xor, op_vec, state_table_vec);
+    let (_op_and, _state_and) =
+      compute_op2(&logic::Operator2::And, &_op_xor, &_state_xor);
+    let (_op_or, _state_or) = compute_op2(&logic::Operator2::Or, &_op_and, &_state_and);
+    logic::Table {
       self_node: self.to_string(),
       table: _state_or[0].table.clone(),
       port_idx: _state_or[0].port_idx.clone(),

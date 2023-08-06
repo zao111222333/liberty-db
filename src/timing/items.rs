@@ -6,7 +6,10 @@ use std::collections::HashMap;
 use crate::{
   ast::{self, GroupComments, GroupId},
   common::items::Domain,
-  expression::{self, LogicLike},
+  expression::{
+    self,
+    logic::{self, LogicLike},
+  },
 };
 
 use strum_macros::{Display, EnumString};
@@ -132,10 +135,7 @@ pub enum TimingSenseType {
 }
 
 impl TimingSenseType {
-  pub fn compute_edge(
-    &self,
-    pin_edge: &expression::EdgeState,
-  ) -> Option<expression::EdgeState> {
+  pub fn compute_edge(&self, pin_edge: &logic::Edge) -> Option<logic::Edge> {
     match self {
       TimingSenseType::PositiveUnate => Some(*pin_edge),
       TimingSenseType::NegativeUnate => Some(pin_edge.inverse()),

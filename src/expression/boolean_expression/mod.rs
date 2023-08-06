@@ -1,12 +1,12 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
-mod logic;
+pub mod logic;
 mod test;
-pub use logic::{
-  ChangePattern, CommonState, EdgeState, LogicLike, LogicOperator1, LogicOperator2,
-  LogicState, LogicTable, LogicVector, Searcher, StaticState, UninitState,
-};
+// pub use logic::{
+//   ChangePattern, Edge, Level, LogicLike, logic::Operator1, logic::Operator2, LogicTable,
+//   LogicVector, Normal, Searcher, State, Static, UnInit,
+// };
 
 mod port;
 pub use port::Port;
@@ -31,7 +31,7 @@ pub use tri_state::TriState;
 #[enum_dispatch::enum_dispatch(BooleanExpression)]
 pub trait BooleanExpressionLike: Display + Debug + Clone {
   /// get table with function
-  fn table(&self) -> LogicTable;
+  fn table(&self) -> logic::Table;
 }
 
 /// <a name ="reference_link" href="

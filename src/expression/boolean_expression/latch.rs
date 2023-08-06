@@ -1,4 +1,4 @@
-use super::{BooleanExpression, BooleanExpressionLike, LogicTable};
+use super::{logic, BooleanExpression, BooleanExpressionLike};
 use std::fmt;
 
 #[derive(Debug, Clone)]
@@ -31,7 +31,7 @@ impl fmt::Display for LatchExpression {
 }
 
 impl BooleanExpressionLike for LatchExpression {
-  fn table(&self) -> LogicTable {
+  fn table(&self) -> logic::Table {
     todo!()
   }
 }

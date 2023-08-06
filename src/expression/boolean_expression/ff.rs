@@ -1,11 +1,11 @@
-use super::{BooleanExpression, BooleanExpressionLike, LogicTable};
+use super::{logic, BooleanExpression, BooleanExpressionLike, FunctionExpression};
 use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Ff {
   name_pair: [String; 2],
-  clock_on: BooleanExpression,
-  next_state: BooleanExpression,
+  clock_on: FunctionExpression,
+  next_state: FunctionExpression,
 }
 
 #[derive(Debug, Clone)]
@@ -36,7 +36,7 @@ impl fmt::Display for FfExpression {
 }
 
 impl BooleanExpressionLike for FfExpression {
-  fn table(&self) -> LogicTable {
+  fn table(&self) -> logic::Table {
     todo!()
   }
 }

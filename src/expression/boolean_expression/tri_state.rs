@@ -1,4 +1,4 @@
-use super::{BooleanExpression, BooleanExpressionLike, LogicTable};
+use super::{logic, BooleanExpression, BooleanExpressionLike};
 use std::fmt;
 
 #[derive(Debug, Clone)]
@@ -36,7 +36,7 @@ impl fmt::Display for TriState {
 
 impl BooleanExpressionLike for TriState {
   #[inline]
-  fn table(&self) -> LogicTable {
+  fn table(&self) -> logic::Table {
     todo!()
   }
 }

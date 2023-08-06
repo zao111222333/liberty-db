@@ -1,7 +1,4 @@
-use super::{
-  BooleanExpression, BooleanExpressionLike, LogicState, LogicTable, LogicVector,
-  StaticState,
-};
+use super::{logic, BooleanExpression, BooleanExpressionLike};
 use crate::types::*;
 use std::{collections::HashMap, fmt};
 
@@ -35,19 +32,20 @@ impl fmt::Display for Port {
 }
 
 lazy_static! {
-  static ref BASIC_MAP: HashMap<LogicVector, LogicState> =
-    LogicState::iter().map(|state| (vec![state].into(), state)).collect();
-  static ref ONE_MAP: HashMap<LogicVector, LogicState> = LogicState::iter()
-    .map(|state| (vec![state].into(), LogicState::Static(StaticState::High)))
+  static ref BASIC_MAP: HashMap<logic::Vector, logic::State> = logic::State::iter()
+    .map(|state| (vec![state].into(), state))
     .collect();
-  static ref ZERO_MAP: HashMap<LogicVector, LogicState> = LogicState::iter()
-    .map(|state| (vec![state].into(), LogicState::Static(StaticState::Low)))
+  static ref ONE_MAP: HashMap<logic::Vector, logic::State> = logic::State::iter()
+    .map(|state| (vec![state].into(), logic::State::Level(logic::Level::High)))
+    .collect();
+  static ref ZERO_MAP: HashMap<logic::Vector, logic::State> = logic::State::iter()
+    .map(|state| (vec![state].into(), logic::State::Level(logic::Level::Low)))
     .collect();
 }
 
 impl BooleanExpressionLike for Port {
   #[inline]
-  fn table(&self) -> LogicTable {
-    LogicTable::new(&self.name, BASIC_MAP.clone(), vec![self.clone()])
+  fn table(&self) -> logic::Table {
+    logic::Table::new(&self.name, BASIC_MAP.clone(), vec![self.clone()])
   }
 }

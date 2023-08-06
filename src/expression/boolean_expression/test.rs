@@ -13,10 +13,10 @@ fn nand_ab() -> BooleanExpression {
     vec![FunctionExpression::new(
       vec![port_a, port_b],
       vec![None, None],
-      vec![LogicOperator2::And],
+      vec![logic::Operator2::And],
     )
     .into()],
-    vec![Some(LogicOperator1::Not)],
+    vec![Some(logic::Operator1::Not)],
     vec![],
   )
   .into();
@@ -25,7 +25,7 @@ fn nand_ab() -> BooleanExpression {
 fn _0() -> BooleanExpression {
   FunctionExpression::new(
     vec![Port::new("A").into()],
-    vec![Some(LogicOperator1::Logic0)],
+    vec![Some(logic::Operator1::Logic0)],
     vec![],
   )
   .into()
@@ -33,7 +33,7 @@ fn _0() -> BooleanExpression {
 fn _1() -> BooleanExpression {
   FunctionExpression::new(
     vec![Port::new("A").into()],
-    vec![Some(LogicOperator1::Logic1)],
+    vec![Some(logic::Operator1::Logic1)],
     vec![],
   )
   .into()
@@ -45,7 +45,7 @@ fn and_ab() -> BooleanExpression {
     vec![FunctionExpression::new(
       vec![port_a, port_b],
       vec![None, None],
-      vec![LogicOperator2::And],
+      vec![logic::Operator2::And],
     )
     .into()],
     vec![None],
@@ -61,7 +61,7 @@ fn and_ac() -> BooleanExpression {
     vec![FunctionExpression::new(
       vec![port_a, port_c],
       vec![None, None],
-      vec![LogicOperator2::And],
+      vec![logic::Operator2::And],
     )
     .into()],
     vec![None],
@@ -77,7 +77,7 @@ fn and_ba() -> BooleanExpression {
     vec![FunctionExpression::new(
       vec![port_b, port_a],
       vec![None, None],
-      vec![LogicOperator2::And],
+      vec![logic::Operator2::And],
     )
     .into()],
     vec![None],
@@ -93,7 +93,7 @@ fn and_aa() -> BooleanExpression {
     vec![FunctionExpression::new(
       vec![port_a, port_b],
       vec![None, None],
-      vec![LogicOperator2::And],
+      vec![logic::Operator2::And],
     )
     .into()],
     vec![None],
@@ -110,21 +110,21 @@ fn get_hash<T: core::hash::Hash>(s: T) -> u64 {
   hasher.finish()
 }
 lazy_static::lazy_static! {
-    static ref HIGH:      LogicState = LogicState::H;
-    static ref LOW:       LogicState = LogicState::L;
-    static ref RISE_NONE: LogicState = LogicState::R;
-    static ref RISE_BASE: LogicState = LogicState::Edge(EdgeState::Rise(
-                                                            Some(ChangePattern::new(
+    static ref HIGH:      logic::State = logic::State::H;
+    static ref LOW:       logic::State = logic::State::L;
+    static ref RISE_NONE: logic::State = logic::State::R;
+    static ref RISE_BASE: logic::State = logic::State::Edge(logic::Edge::Rise(
+                                                            Some(logic::ChangePattern::new(
                                                                 units::second(1.0),
                                                                 units::second(1.0))
                                                             )));
-    static ref RISE_BASE_E10: LogicState = LogicState::Edge(EdgeState::Rise(
-                                                            Some(ChangePattern::new(
+    static ref RISE_BASE_E10: logic::State = logic::State::Edge(logic::Edge::Rise(
+                                                            Some(logic::ChangePattern::new(
                                                                 units::second(1.0 + 2e-10),
                                                                 units::second(1.0 + 1e-10))
                                                             )));
-    static ref RISE_BASE_E11: LogicState = LogicState::Edge(EdgeState::Rise(
-                                                            Some(ChangePattern::new(
+    static ref RISE_BASE_E11: logic::State = logic::State::Edge(logic::Edge::Rise(
+                                                            Some(logic::ChangePattern::new(
                                                                 units::second(1.0 + 1e-11),
                                                                 units::second(1.0 + 1e-11))
                                                             )));
@@ -168,25 +168,25 @@ fn logic_vecter_as_key() {
   let mut pin_map = HashMap::new();
   let v = 12345.000;
   {
-    let mut v_k1: LogicVector = vec![].into();
-    v_k1.push(LogicState::H);
-    v_k1.push(LogicState::H);
-    v_k1.push(LogicState::Edge(EdgeState::Rise(Some(ChangePattern::new(
+    let mut v_k1: logic::Vector = vec![].into();
+    v_k1.push(logic::State::H);
+    v_k1.push(logic::State::H);
+    v_k1.push(logic::State::Edge(logic::Edge::Rise(Some(logic::ChangePattern::new(
       units::second(345670.7734567893456789456787777771),
       units::second(0.1),
     )))));
-    v_k1.push(LogicState::F);
+    v_k1.push(logic::State::F);
     let _ = pin_map.insert(v_k1, v);
   }
   {
-    let mut v_k2: LogicVector = vec![].into();
-    v_k2.push(LogicState::H);
-    v_k2.push(LogicState::H);
-    v_k2.push(LogicState::Edge(EdgeState::Rise(Some(ChangePattern::new(
+    let mut v_k2: logic::Vector = vec![].into();
+    v_k2.push(logic::State::H);
+    v_k2.push(logic::State::H);
+    v_k2.push(logic::State::Edge(logic::Edge::Rise(Some(logic::ChangePattern::new(
       units::second(345670.7734567893456789456787777771),
       units::second(0.1),
     )))));
-    v_k2.push(LogicState::F);
+    v_k2.push(logic::State::F);
     assert_eq!(Some(&v), pin_map.get(&v_k2));
   }
 }
@@ -194,14 +194,14 @@ fn logic_vecter_as_key() {
 // #[test]
 // fn logic_operation() {
 //     use std::str::FromStr;
-//     assert_eq!(LogicOperator2::from_str("&"), Ok(LogicOperator2::And));
-//     assert_eq!(LogicOperator2::from_str("*"), Ok(LogicOperator2::And));
-//     assert_eq!(LogicOperator2::from_str("|"), Ok(LogicOperator2::Or));
-//     assert_eq!(LogicOperator2::from_str("+"), Ok(LogicOperator2::Or));
-//     assert_eq!(LogicOperator2::from_str("^"), Ok(LogicOperator2::Xor));
-//     let and = LogicOperator2::And;
-//     let or = LogicOperator2::Or;
-//     let xor = LogicOperator2::Xor;
+//     assert_eq!(logic::Operator2::from_str("&"), Ok(logic::Operator2::And));
+//     assert_eq!(logic::Operator2::from_str("*"), Ok(logic::Operator2::And));
+//     assert_eq!(logic::Operator2::from_str("|"), Ok(logic::Operator2::Or));
+//     assert_eq!(logic::Operator2::from_str("+"), Ok(logic::Operator2::Or));
+//     assert_eq!(logic::Operator2::from_str("^"), Ok(logic::Operator2::Xor));
+//     let and = logic::Operator2::And;
+//     let or = logic::Operator2::Or;
+//     let xor = logic::Operator2::Xor;
 //     assert_eq!(format!("{}",and), "&");
 //     assert_eq!(format!("{}",or),  "|");
 //     assert_eq!(format!("{}",xor), "^");
@@ -221,7 +221,7 @@ fn port_as_key() {
 fn port_compute() {
   let port_a1 = Port::new("A");
   let port_a2 = Port::new("A");
-  let and = LogicOperator2::And;
+  let and = logic::Operator2::And;
   for (vec_in, state_out) in
     and.compute_table(&port_a1.table(), &port_a2.table()).table.iter()
   {
@@ -253,12 +253,12 @@ fn expression_nand_table() {
   println!("**** Search1 ****************");
   println!(
     "{}",
-    Searcher::new(
+    logic::Searcher::new(
       vec![
-        (Port::new("A"), vec![LogicState::H],),
-        (Port::new("C"), vec![LogicState::H],),
+        (Port::new("A"), vec![logic::State::H],),
+        (Port::new("C"), vec![logic::State::H],),
       ],
-      Some(vec![LogicState::F]),
+      Some(vec![logic::State::F]),
       vec![],
       None,
     )
@@ -268,10 +268,10 @@ fn expression_nand_table() {
   println!("**** Search2 ****************");
   println!(
     "{}",
-    Searcher::new(
+    logic::Searcher::new(
       vec![
-        (Port::new("A"), vec![LogicState::H, LogicState::L,]),
-        (Port::new("B"), vec![LogicState::F],)
+        (Port::new("A"), vec![logic::State::H, logic::State::L,]),
+        (Port::new("B"), vec![logic::State::F],)
       ],
       None,
       vec![],
@@ -283,11 +283,11 @@ fn expression_nand_table() {
   println!("**** Search3 ****************");
   println!(
     "{}",
-    Searcher::new(
-      vec![(Port::new("A"), vec![LogicState::H])],
+    logic::Searcher::new(
+      vec![(Port::new("A"), vec![logic::State::H])],
       None,
       vec![],
-      Some(vec![LogicState::X]),
+      Some(vec![logic::State::X]),
     )
     .search(&table)
   );
@@ -295,10 +295,16 @@ fn expression_nand_table() {
   println!("**** Search4 ****************");
   println!(
     "{}",
-    Searcher::new(
-      vec![(Port::new("A"), vec![LogicState::L]), (Port::new("A"), vec![LogicState::H]),],
+    logic::Searcher::new(
+      vec![
+        (Port::new("A"), vec![logic::State::L]),
+        (Port::new("A"), vec![logic::State::H]),
+      ],
       None,
-      vec![(Port::new("B"), vec![LogicState::H]), (Port::new("B"), vec![LogicState::F]),],
+      vec![
+        (Port::new("B"), vec![logic::State::H]),
+        (Port::new("B"), vec![logic::State::F]),
+      ],
       None,
     )
     .search(&table)
@@ -307,11 +313,11 @@ fn expression_nand_table() {
   println!("**** Search5 ****************");
   println!(
     "{}",
-    Searcher::new(
-      vec![(Port::new("C"), vec![LogicState::H])],
+    logic::Searcher::new(
+      vec![(Port::new("C"), vec![logic::State::H])],
       None,
       vec![],
-      Some(vec![LogicState::H]),
+      Some(vec![logic::State::H]),
     )
     .search(&table)
   );
@@ -321,14 +327,14 @@ fn expression_nand_table() {
 //     use std::fmt::{self, write};
 //     let right: BooleanExpression = FunctionExpression::new (
 //         vec![Port::new("A").into(),Port::new("B").into()],
-//         vec![LogicOperator2::And],
+//         vec![logic::Operator2::And],
 //     ).into();
 //     assert_eq!(format!("{}",right), "(A&B)");
 //     let mut output = String::new();
 //     {
 //         let wrong_on_sub_expression_vec:BooleanExpression = FunctionExpression::new (
 //             vec![],
-//             vec![LogicOperator2::And],
+//             vec![logic::Operator2::And],
 //         ).into();
 //         if let Err(fmt::Error) = write(&mut output,
 //                 format_args!("{}", wrong_on_sub_expression_vec)) {
