@@ -43,7 +43,7 @@ pub fn nanosecond(v: f64) -> Time {
   Time::new::<time::nanosecond>(v)
 }
 
-use crate::ast::{ComplexAttri, SimpleAttri};
+use crate::ast::{ComplexAttri, ComplexParseError, SimpleAttri};
 use std::ops::Deref;
 
 /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
@@ -362,27 +362,25 @@ impl Deref for CapacitiveLoadUnit {
 }
 
 impl ComplexAttri for CapacitiveLoadUnit {
-  type Error = crate::ast::ComplexParseError;
-
-  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let value: f64 = match i.next() {
       Some(s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => return Err(Self::Error::Float(e)),
+        Err(e) => return Err(ComplexParseError::Float(e)),
       },
-      None => return Err(Self::Error::LengthDismatch),
+      None => return Err(ComplexParseError::LengthDismatch),
     };
     let (ff_pf, _v): (bool, Capacitance) = match i.next() {
       Some(s) => match s {
         "ff" => (true, Capacitance::new::<capacitance::femtofarad>(value)),
         "pf" => (false, Capacitance::new::<capacitance::picofarad>(value)),
-        _ => return Err(Self::Error::UnsupportedWord),
+        _ => return Err(ComplexParseError::UnsupportedWord),
       },
-      None => return Err(Self::Error::LengthDismatch),
+      None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
-      return Err(Self::Error::LengthDismatch);
+      return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { ff_pf, _v })
   }

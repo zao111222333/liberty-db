@@ -2,14 +2,13 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 pub mod logic;
-mod test;
-// pub use logic::{
-//   ChangePattern, Edge, Level, LogicLike, logic::Operator1, logic::Operator2, LogicTable,
-//   LogicVector, Normal, Searcher, State, Static, UnInit,
-// };
-
 mod port;
+mod test;
+use enum_dispatch::enum_dispatch;
 pub use port::Port;
+
+mod statetable;
+pub use statetable::*;
 
 mod ff;
 pub use ff::{Ff, FfExpression};
@@ -28,7 +27,7 @@ use std::{
 };
 pub use tri_state::TriState;
 /// BooleanExpressionLike
-#[enum_dispatch::enum_dispatch(BooleanExpression)]
+#[enum_dispatch(BooleanExpression)]
 pub trait BooleanExpressionLike: Display + Debug + Clone {
   /// get table with function
   fn table(&self) -> logic::Table;
@@ -42,8 +41,8 @@ pub trait BooleanExpressionLike: Display + Debug + Clone {
 /// &end
 /// =132.38
 /// ">Reference</a>
-#[enum_dispatch::enum_dispatch]
 #[derive(Debug, Clone)]
+#[enum_dispatch]
 pub enum BooleanExpression {
   Port(Port),
   FF(FfExpression),
@@ -71,6 +70,8 @@ impl PartialEq for BooleanExpression {
     self.table() == other.table()
   }
 }
+
+impl Eq for BooleanExpression {}
 
 impl Hash for BooleanExpression {
   #[inline]

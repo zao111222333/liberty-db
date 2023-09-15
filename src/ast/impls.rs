@@ -2,6 +2,8 @@
 //! implement basic types
 //!
 
+use super::ComplexParseError;
+
 impl super::SimpleAttri for f64 {
   #[inline]
   fn to_wrapper(&self) -> super::SimpleWrapper {
@@ -31,10 +33,12 @@ impl super::SimpleAttri for isize {
 impl super::SimpleAttri for String {}
 
 impl super::ComplexAttri for Vec<f64> {
-  type Error = std::num::ParseFloatError;
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
-    v.into_iter().map(|s| s.parse()).collect()
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    match v.into_iter().map(|s| s.parse()).collect() {
+      Ok(r) => Ok(r),
+      Err(e) => Err(ComplexParseError::Float(e)),
+    }
   }
   #[inline]
   fn to_wrapper(&self) -> super::ComplexWrapper {
@@ -44,10 +48,12 @@ impl super::ComplexAttri for Vec<f64> {
 }
 
 impl super::ComplexAttri for Vec<usize> {
-  type Error = std::num::ParseIntError;
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
-    v.into_iter().map(|s| s.parse()).collect()
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    match v.into_iter().map(|s| s.parse()).collect() {
+      Ok(r) => Ok(r),
+      Err(e) => Err(ComplexParseError::Int(e)),
+    }
   }
   #[inline]
   fn to_wrapper(&self) -> super::ComplexWrapper {
@@ -57,23 +63,21 @@ impl super::ComplexAttri for Vec<usize> {
 }
 
 impl super::ComplexAttri for (usize, String) {
-  type Error = crate::ast::ComplexParseError;
-
-  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let v1: usize = match i.next() {
       Some(s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => return Err(Self::Error::Int(e)),
+        Err(e) => return Err(ComplexParseError::Int(e)),
       },
-      None => return Err(Self::Error::LengthDismatch),
+      None => return Err(ComplexParseError::LengthDismatch),
     };
     let v2: String = match i.next() {
       Some(s) => s.to_owned(),
-      None => return Err(Self::Error::LengthDismatch),
+      None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
-      return Err(Self::Error::LengthDismatch);
+      return Err(ComplexParseError::LengthDismatch);
     }
     Ok((v1, v2))
   }
@@ -84,26 +88,25 @@ impl super::ComplexAttri for (usize, String) {
   }
 }
 impl super::ComplexAttri for (f64, f64) {
-  type Error = crate::ast::ComplexParseError;
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, Self::Error> {
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let v1: f64 = match i.next() {
       Some(s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => return Err(Self::Error::Float(e)),
+        Err(e) => return Err(ComplexParseError::Float(e)),
       },
-      None => return Err(Self::Error::LengthDismatch),
+      None => return Err(ComplexParseError::LengthDismatch),
     };
     let v2: f64 = match i.next() {
       Some(s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => return Err(Self::Error::Float(e)),
+        Err(e) => return Err(ComplexParseError::Float(e)),
       },
-      None => return Err(Self::Error::LengthDismatch),
+      None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
-      return Err(Self::Error::LengthDismatch);
+      return Err(ComplexParseError::LengthDismatch);
     }
     Ok((v1, v2))
   }

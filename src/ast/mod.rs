@@ -154,10 +154,8 @@ pub enum ComplexParseError {
 
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
-  /// Parser error
-  type Error: std::error::Error;
   /// basic parser
-  fn parse(v: Vec<&str>) -> Result<Self, Self::Error>;
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError>;
   /// to_wrapper
   fn to_wrapper(&self) -> ComplexWrapper;
   /// nom_parse, auto implement
@@ -165,7 +163,7 @@ pub trait ComplexAttri: Sized {
   fn nom_parse<'a>(
     i: &'a str,
     line_num: &mut usize,
-  ) -> IResult<&'a str, Result<Self, Self::Error>, Error<&'a str>> {
+  ) -> IResult<&'a str, Result<Self, ComplexParseError>, Error<&'a str>> {
     let (input, complex) = parser::complex(i, line_num)?;
     match Self::parse(complex) {
       Ok(s) => Ok((input, Ok(s))),

@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use crate::{
-  ast::{self, GroupComments, GroupId},
+  ast::{self, ComplexAttri, GroupComments, GroupId},
   common::items::Domain,
   expression::{
     self,
@@ -170,6 +170,16 @@ impl TimingSenseType {
 ///
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Mode {}
+
+impl ComplexAttri for Mode {
+  fn parse(v: Vec<&str>) -> Result<Self, ast::ComplexParseError> {
+    todo!()
+  }
+
+  fn to_wrapper(&self) -> ast::ComplexWrapper {
+    todo!()
+  }
+}
 
 /// The `cell_degradation` group describes a cell performance degradation
 /// design rule for compiling a design. A cell degradation design rule

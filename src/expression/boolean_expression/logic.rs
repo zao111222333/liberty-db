@@ -839,6 +839,15 @@ pub struct Table {
   /// port_idx
   pub port_idx: Vec<Port>,
 }
+#[derive(Clone, Debug)]
+pub struct NewTable {
+  /// self_node
+  pub self_node: String,
+  /// port_idx
+  pub port_idx: Vec<Port>,
+  /// table
+  pub table: HashMap<Vec<Normal>, HashMap<Vec<Static>, Vec<Static>>>,
+}
 
 impl PartialEq for Table {
   #[inline]

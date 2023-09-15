@@ -25,6 +25,8 @@ pub struct Cell {
   pub area: Option<f64>,
   #[liberty(group(type=Map))]
   pub pin: GroupMap<Pin>,
+  #[liberty(group(type=Map))]
+  pub leakage_power: GroupMap<LeakagePower>,
   #[liberty(group(type=Option))]
   pub statetable: Option<Statetable>,
 }

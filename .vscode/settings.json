@@ -1,6 +1,5 @@
 {
-    // individual zoom level
-    "window.zoomLevel": 2,
+    "window.zoomLevel": 1,
     "files.watcherExclude": {
         "docs/static": true,
     },
@@ -13,7 +12,7 @@
     ],
     "rust-analyzer.procMacro.enable": true,
     "rust-analyzer.server.extraEnv": { 
-        // "RUSTUP_TOOLCHAIN": "stable",
+        "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
         "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup",
     },
@@ -24,16 +23,22 @@
     "terminal.integrated.copyOnSelection": true,
     "todohighlight.keywords": [
         {
-            "text": "NOTE:",
-            "color": "#ff0000",
-            "backgroundColor": "yellow",
-            "overviewRulerColor": "grey"
+            "text": "TODO:",
+            "color": "white",
+            "backgroundColor": "#ffbd2a",
+            "overviewRulerColor": "rgba(255,189,42,0.8)"
         },
         {
-            "text": "HACK:",
-            "color": "blue",
-            "backgroundColor": "yellow",
-            "isWholeLine": false,
+            "text": "FIXME:",
+            "color": "white",
+            "backgroundColor": "#f06292",
+            "overviewRulerColor": "rgba(240,98,146,0.8)"
+        },
+        {
+            "text": "NOTICE:",
+            "color": "white",
+            "backgroundColor": "#004daa",
+            "overviewRulerColor": "rgba(0,77,170,0.8)"
         },
     ]
 }
