@@ -2,22 +2,47 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 //!
-use super::{logic, BooleanExpression, BooleanExpressionLike, BRACKET_L, BRACKET_R};
+use super::{
+  logic, BooleanExpression, BooleanExpressionLike, Port, BRACKET_L, BRACKET_R,
+};
 use std::fmt;
+
+#[derive(Debug, Clone)]
+enum SubExpression {
+  Port(Port),
+  Condition(ConditionExpression),
+}
+impl BooleanExpressionLike for SubExpression {
+  #[doc = r" get table with function"]
+  #[inline]
+  fn table(&self) -> logic::Table {
+    match self {
+      SubExpression::Port(exp) => exp.table(),
+      SubExpression::Condition(exp) => exp.table(),
+    }
+  }
+}
+impl std::fmt::Display for SubExpression {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      SubExpression::Port(exp) => std::fmt::Display::fmt(&exp, f),
+      SubExpression::Condition(exp) => std::fmt::Display::fmt(&exp, f),
+    }
+  }
+}
 
 /// FunctionExpression is the basic expression
 #[derive(Debug, Clone)]
-pub struct FunctionExpression {
-  sub_expression_vec: Vec<BooleanExpression>,
+pub struct ConditionExpression {
+  sub_expression_vec: Vec<SubExpression>,
   op1_vec: Vec<Option<logic::Operator1>>,
   op2_vec: Vec<logic::Operator2>,
 }
-
-impl FunctionExpression {
-  /// new FunctionExpression
+impl ConditionExpression {
   #[inline]
   pub fn new(
-    sub_expression_vec: Vec<BooleanExpression>,
+    sub_expression_vec: Vec<SubExpression>,
     op1_vec: Vec<Option<logic::Operator1>>,
     op2_vec: Vec<logic::Operator2>,
   ) -> Self {
@@ -35,7 +60,7 @@ impl FunctionExpression {
 //         todo!()
 //     }
 // }
-impl BooleanExpressionLike for FunctionExpression {
+impl BooleanExpressionLike for ConditionExpression {
   /// TODO: Add test case for: `XOR` > `AND` > `OR`.
   ///
   /// The order of precedence of the operators is left to right, with inversion performed first, then XOR, then AND, then OR.
@@ -97,7 +122,7 @@ impl BooleanExpressionLike for FunctionExpression {
   }
 }
 
-impl fmt::Display for FunctionExpression {
+impl fmt::Display for ConditionExpression {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let append_sub = |sub_idx: usize, f: &mut fmt::Formatter<'_>| -> fmt::Result {
       match self.op1_vec[sub_idx] {
@@ -126,3 +151,52 @@ impl fmt::Display for FunctionExpression {
     }
   }
 }
+
+impl PartialEq for ConditionExpression {
+  #[inline]
+  fn eq(&self, other: &Self) -> bool {
+    self.table() == other.table()
+  }
+}
+
+impl Eq for ConditionExpression {}
+
+impl std::hash::Hash for ConditionExpression {
+  #[inline]
+  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+    self.table().hash(state);
+  }
+}
+impl std::str::FromStr for ConditionExpression {
+  type Err = std::fmt::Error;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    todo!()
+  }
+}
+// impl BooleanExpression {
+//   const BRACKET_L: char = '(';
+//   const BRACKET_R: char = ')';
+//   // TODO:
+//   pub fn from_str(
+//     s: &str,
+//     ff_map: &HashMap<LatchFfId, Ff>,
+//     latch_map: &HashMap<LatchFfId, Latch>,
+//   ) -> Result<Self, std::fmt::Error> {
+//     let l_pos_list = s
+//       .match_indices(Self::BRACKET_L)
+//       .map(|(i, _)| i)
+//       .collect::<Vec<usize>>();
+//     let r_pos_list = s
+//       .match_indices(Self::BRACKET_R)
+//       .map(|(i, _)| i)
+//       .collect::<Vec<usize>>();
+//     // match (s.find(Self::BRACKET_L),s.find(Self::BRACKET_R)){
+//     //     (None, None) => todo!(),
+//     //     (None, Some(_)) => Err(std::fmt::Error),
+//     //     (Some(_), None) => Err(std::fmt::Error),
+//     //     (Some(idx_l), Some(idx_r)) => todo!(),
+//     // }
+//     todo!()
+//   }
+// }

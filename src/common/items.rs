@@ -1,5 +1,6 @@
-use std::rc::Rc;
+use std::{collections::HashSet, fmt::Debug, rc::Rc};
 
+use itertools::Itertools;
 use strum_macros::{Display, EnumString};
 
 use crate::ast::{GroupComments, GroupId};
@@ -122,4 +123,37 @@ pub struct Domain {
   pub index_1: Vec<f64>,
   pub index_2: Vec<f64>,
   pub index_3: Vec<f64>,
+}
+
+/// sth. like "A B C" will save as set{A B C}
+#[derive(Debug, Default, Clone, Eq, PartialEq)]
+pub struct WordSet {
+  _set: HashSet<String>,
+}
+impl std::fmt::Display for WordSet {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    std::fmt::Display::fmt(&self._set.iter().join(" "), f)
+  }
+}
+
+impl std::hash::Hash for WordSet {
+  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+    let mut sum = 0_u64;
+    for item in &self._set {
+      let mut hasher = std::hash::DefaultHasher::new();
+      item.hash(&mut hasher);
+      sum = sum.wrapping_add(std::hash::Hasher::finish(&hasher));
+    }
+    state.write_u64(sum);
+  }
+}
+
+impl std::str::FromStr for WordSet {
+  type Err = std::fmt::Error;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    Ok(Self {
+      _set: s.split(' ').map(ToString::to_string).collect(),
+    })
+  }
 }

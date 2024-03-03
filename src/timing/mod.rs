@@ -5,8 +5,10 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use std::collections::HashMap;
-
+use std::{
+  collections::{HashMap, HashSet},
+  sync::Arc,
+};
 mod timing_type;
 pub use timing_type::*;
 
@@ -16,9 +18,45 @@ pub mod items;
 #[cfg(test)]
 mod test;
 use crate::{
-  ast::GroupComments, bus::Bus, common::items::*, expression, library::Sensitization,
-  pin::Pin, units,
+  ast::{GroupComments, GroupId},
+  bus::Bus,
+  common::items::*,
+  expression::{self, BooleanExpression},
+  library::Sensitization,
+  pin::Pin,
+  units,
 };
+
+use self::items::TimingSenseType;
+
+#[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
+pub struct TimingId {
+  related_pin: WordSet,
+  when: Option<Arc<BooleanExpression>>,
+  timing_type: Arc<TimingType>,
+  timing_sense: Arc<TimingSenseType>,
+}
+
+impl crate::ast::HashedGroup for Timing {
+  type Id = TimingId;
+
+  fn title(&self) -> Vec<String> {
+    vec![]
+  }
+
+  fn gen_id(&self, _: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
+    // Ok(Self::Id {
+    //   power_level: self.power_level.clone(),
+    //   related_pg_pin: self.related_pg_pin.clone(),
+    //   when: self.when.clone(),
+    // })
+    todo!()
+  }
+
+  fn id(&self) -> GroupId<Self> {
+    self._id.clone()
+  }
+}
 
 /// A timing group is defined in a bundle, a bus, or a pin group within a cell.
 /// The timing group can be used to identify the name or names of multiple timing arcs.
@@ -44,6 +82,8 @@ use crate::{
 #[derive(Debug, Default)]
 #[derive(liberty_macros::Group)]
 pub struct Timing {
+  #[liberty(id)]
+  _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -432,7 +472,7 @@ pub struct Timing {
   /// &end
   /// =203.40
   /// ">Reference-Instance</a>
-  pub related_bus_pins: Vec<Box<Pin>>,
+  pub related_bus_pins: WordSet,
   /// The `related_output_pin` attribute specifies the output or inout pin used
   /// to describe a load-dependent constraint. This is an attribute in the timing group
   /// of the output or inout pin. The pin defined must be a pin in the same cell,
@@ -463,7 +503,8 @@ pub struct Timing {
   /// &end
   /// =203.41
   /// ">Reference-Instance</a>
-  pub related_output_pin: Option<Box<Pin>>,
+  #[liberty(simple)]
+  pub related_output_pin: WordSet,
   /// The `related_pin` attribute defines the pin or pins representing
   /// the beginning point of the timing arc. It is required in all timing groups.
   ///
@@ -530,7 +571,8 @@ pub struct Timing {
   /// &end
   /// =203.42
   /// ">Reference-Instance</a>
-  pub related_pin: Vec<Box<Pin>>,
+  #[liberty(simple)]
+  pub related_pin: WordSet,
   /// The `rise_resistance` attribute represents the load-dependent output resistance,
   /// or drive capability, for a logic 0-to-1 transition.
   ///
@@ -1249,7 +1291,7 @@ pub struct Timing {
   /// &end
   /// =203.71
   /// ">Reference-Instance</a>
-  pub when: Option<expression::BooleanExpression>,
+  pub when: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

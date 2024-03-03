@@ -2,6 +2,8 @@
 //! implement basic types
 //!
 
+use crate::{common::items::WordSet, expression::{BooleanExpression, ConditionExpression}};
+
 use super::ComplexParseError;
 
 impl super::SimpleAttri for f64 {
@@ -12,6 +14,10 @@ impl super::SimpleAttri for f64 {
   }
 }
 
+// impl super::SimpleAttri for BooleanExpression {}
+
+impl super::SimpleAttri for WordSet {}
+impl super::SimpleAttri for ConditionExpression {}
 impl super::SimpleAttri for bool {}
 
 impl super::SimpleAttri for usize {

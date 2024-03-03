@@ -271,19 +271,34 @@ pub enum IdError {
   Other(String),
 }
 
+fn display_nom_error(e: &nom::Err<Error<&str>>) -> String {
+  match e {
+    nom::Err::Incomplete(_) => e.to_string(),
+    nom::Err::Error(e) => format!(
+      "type[{}] at[{}]",
+      e.code.description(),
+      e.input.lines().next().unwrap_or("")
+    ),
+    nom::Err::Failure(e) => format!(
+      "type[{}] at[{}]",
+      e.code.description(),
+      e.input.lines().next().unwrap_or("")
+    ),
+  }
+}
 /// Error for parser
-#[derive(Debug)]
-#[derive(thiserror::Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum ParserError<'a> {
   /// TitleLenMismatch(want,got,title)
-  #[error("Line:{0}, error:{1}")]
+  #[error("Line#{0}, {1}")]
   IdError(usize, IdError),
   /// replace same id
-  #[error("replace same id")]
+  #[error("Line#{0}, {}", display_nom_error(.1))]
   NomError(usize, nom::Err<Error<&'a str>>),
   // NomError(usize,Error<&'a str>),
   /// something else
-  #[error("{0}")]
+  // #[error("{0}")]
+  #[error("Line#{0}, {1}")]
   Other(usize, String),
 }
 

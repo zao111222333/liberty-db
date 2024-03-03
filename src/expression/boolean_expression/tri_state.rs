@@ -1,4 +1,4 @@
-use super::{logic, BooleanExpression, BooleanExpressionLike};
+use super::{logic, BooleanExpression, BooleanExpressionLike, BRACKET_L, BRACKET_R};
 use std::fmt;
 
 #[derive(Debug, Clone)]
@@ -24,12 +24,7 @@ impl fmt::Display for TriState {
     write!(
       f,
       "{}{}{}@Z{}{}{}",
-      BooleanExpression::BRACKET_L,
-      self.logic,
-      BooleanExpression::BRACKET_R,
-      BooleanExpression::BRACKET_L,
-      self.enable,
-      BooleanExpression::BRACKET_R
+      BRACKET_L, self.logic, BRACKET_R, BRACKET_L, self.enable, BRACKET_R
     )
   }
 }

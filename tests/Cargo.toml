@@ -9,8 +9,8 @@ publish = false
 liberty-db = { path = ".." }
 env_logger = "0.10"
 test-log = { version = "0.2.11", features = ["trace"], default-features = false }
-tracing = {version = "0.1", default-features = false}
-tracing-subscriber = {version = "0.3", default-features = false, features = ["env-filter", "fmt"]}
+# tracing = {version = "0.1", default-features = false}
+# tracing-subscriber = {version = "0.3", default-features = false, features = ["env-filter", "fmt"]}
 walkdir = "2"
 prettytable-rs = "^0.10"
 colored = "2.0.0"
@@ -19,7 +19,7 @@ liberty-io = "0.0.2"
 libertyparse = "0.2.2"
 
 
-[[test]]
-name = "tests"
-path = "src/tests.rs"
-harness = false
+# [[test]]
+# name = "tests"
+# path = "src/tests.rs"
+# harness = false

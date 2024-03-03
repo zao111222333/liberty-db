@@ -100,7 +100,7 @@ use crate::{
 ///         </tr>
 ///     </tbody>
 /// </table>
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Hash, Eq)]
 pub enum ArcCombinational {
   /// `combinational`(`Defualt`)/
   /// `combinational_rise`/
@@ -148,15 +148,15 @@ pub enum ArcCombinational {
 }
 
 impl ArcCombinational {
-  const COMBINATIONAL: &str = "combinational";
-  const COMBINATIONAL_RISE: &str = "combinational_rise";
-  const COMBINATIONAL_FALL: &str = "combinational_fall";
-  const THREE_STATE_DISABLE: &str = "three_state_disable";
-  const THREE_STATE_DISABLE_RISE: &str = "three_state_disable_rise";
-  const THREE_STATE_DISABLE_FALL: &str = "three_state_disable_fall";
-  const THREE_STATE_ENABLE: &str = "three_state_enable";
-  const THREE_STATE_ENABLE_RISE: &str = "three_state_enable_rise";
-  const THREE_STATE_ENABLE_FALL: &str = "three_state_enable_fall";
+  const COMBINATIONAL: &'static str = "combinational";
+  const COMBINATIONAL_RISE: &'static str = "combinational_rise";
+  const COMBINATIONAL_FALL: &'static str = "combinational_fall";
+  const THREE_STATE_DISABLE: &'static str = "three_state_disable";
+  const THREE_STATE_DISABLE_RISE: &'static str = "three_state_disable_rise";
+  const THREE_STATE_DISABLE_FALL: &'static str = "three_state_disable_fall";
+  const THREE_STATE_ENABLE: &'static str = "three_state_enable";
+  const THREE_STATE_ENABLE_RISE: &'static str = "three_state_enable_rise";
+  const THREE_STATE_ENABLE_FALL: &'static str = "three_state_enable_fall";
 }
 
 impl Display for ArcCombinational {
@@ -260,7 +260,7 @@ impl PartialEq for ArcCombinational {
 ///     } /* end cell */
 /// } /* end library */
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Hash, Eq)]
 pub enum ArcSequential {
   /// `rising_edge`/
   /// `falling_edge`
@@ -451,24 +451,24 @@ pub enum ArcSequential {
 }
 
 impl ArcSequential {
-  const RISING_EDGE: &str = "rising_edge";
-  const FALLING_EDGE: &str = "falling_edge";
-  const PRESET: &str = "preset";
-  const CLEAR: &str = "clear";
-  const HOLD_RISING: &str = "hold_rising";
-  const HOLD_FALLING: &str = "hold_falling";
-  const SETUP_RISING: &str = "setup_rising";
-  const SETUP_FALLING: &str = "setup_falling";
-  const RECOVERY_RISING: &str = "recovery_rising";
-  const RECOVERY_FALLING: &str = "recovery_falling";
-  const SKEW_RISING: &str = "skew_rising";
-  const SKEW_FALLING: &str = "skew_falling";
-  const REMOVAL_RISING: &str = "removal_rising";
-  const REMOVAL_FALLING: &str = "removal_falling";
-  const MIN_PULSE_WIDTH: &str = "min_pulse_width";
-  const MINIMUM_PERIOD: &str = "minimum_period";
-  const MAX_CLOCK_TREE_PATH: &str = "max_clock_tree_path";
-  const MIN_CLOCK_TREE_PATH: &str = "min_clock_tree_path";
+  const RISING_EDGE: &'static str = "rising_edge";
+  const FALLING_EDGE: &'static str = "falling_edge";
+  const PRESET: &'static str = "preset";
+  const CLEAR: &'static str = "clear";
+  const HOLD_RISING: &'static str = "hold_rising";
+  const HOLD_FALLING: &'static str = "hold_falling";
+  const SETUP_RISING: &'static str = "setup_rising";
+  const SETUP_FALLING: &'static str = "setup_falling";
+  const RECOVERY_RISING: &'static str = "recovery_rising";
+  const RECOVERY_FALLING: &'static str = "recovery_falling";
+  const SKEW_RISING: &'static str = "skew_rising";
+  const SKEW_FALLING: &'static str = "skew_falling";
+  const REMOVAL_RISING: &'static str = "removal_rising";
+  const REMOVAL_FALLING: &'static str = "removal_falling";
+  const MIN_PULSE_WIDTH: &'static str = "min_pulse_width";
+  const MINIMUM_PERIOD: &'static str = "minimum_period";
+  const MAX_CLOCK_TREE_PATH: &'static str = "max_clock_tree_path";
+  const MIN_CLOCK_TREE_PATH: &'static str = "min_clock_tree_path";
 }
 
 impl Display for ArcSequential {
@@ -548,7 +548,7 @@ impl PartialEq for ArcSequential {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Hash, Eq)]
 pub enum ArcNonSequential {
   /// `non_seq_setup_rising`/
   /// `non_seq_setup_falling`
@@ -587,10 +587,10 @@ pub enum ArcNonSequential {
 }
 
 impl ArcNonSequential {
-  const NON_SEQ_SETUP_RISING: &str = "non_seq_setup_rising";
-  const NON_SEQ_SETUP_FALLING: &str = "non_seq_setup_falling";
-  const NON_SEQ_HOLD_RISING: &str = "non_seq_hold_rising";
-  const NON_SEQ_HOLD_FALLING: &str = "non_seq_hold_falling";
+  const NON_SEQ_SETUP_RISING: &'static str = "non_seq_setup_rising";
+  const NON_SEQ_SETUP_FALLING: &'static str = "non_seq_setup_falling";
+  const NON_SEQ_HOLD_RISING: &'static str = "non_seq_hold_rising";
+  const NON_SEQ_HOLD_FALLING: &'static str = "non_seq_hold_falling";
 }
 
 impl Display for ArcNonSequential {
@@ -637,7 +637,7 @@ impl PartialEq for ArcNonSequential {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Hash, Eq)]
 pub enum ArcNoChange {
   /// `nochange_high_high`/
   /// `nochange_high_low`/
@@ -664,10 +664,10 @@ pub enum ArcNoChange {
 }
 
 impl ArcNoChange {
-  const NOCHANGE_HIGH_HIGH: &str = "nochange_high_high";
-  const NOCHANGE_HIGH_LOW: &str = "nochange_high_low";
-  const NOCHANGE_LOW_HIGH: &str = "nochange_low_high";
-  const NOCHANGE_LOW_LOW: &str = "nochange_low_low";
+  const NOCHANGE_HIGH_HIGH: &'static str = "nochange_high_high";
+  const NOCHANGE_HIGH_LOW: &'static str = "nochange_high_low";
+  const NOCHANGE_LOW_HIGH: &'static str = "nochange_low_high";
+  const NOCHANGE_LOW_LOW: &'static str = "nochange_low_low";
 }
 
 impl Display for ArcNoChange {
@@ -752,7 +752,7 @@ impl PartialEq for ArcNoChange {
 /// removal_rising | removal_falling | min_pulse_width | minimum_period | max_clock_tree_path |
 /// min_clock_tree_path |non_seq_setup_rising | non_seq_setup_falling | non_seq_hold_rising |
 /// non_seq_hold_falling | nochange_high_high | nochange_high_low | nochange_low_high | nochange_low_low ;`
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 // #[derive(liberty_macros::SingleSimple)]
 pub enum TimingType {
   /// [Combinational](crate::timing::ArcCombinational)
@@ -765,6 +765,14 @@ pub enum TimingType {
   NoChange(ArcNoChange),
 }
 
+// impl Eq for TimingType {}
+
+impl Default for TimingType {
+  #[inline]
+  fn default() -> Self {
+    Self::Combinational(ArcCombinational::Combinational(None))
+  }
+}
 impl SimpleAttri for TimingType {}
 
 impl FromStr for TimingType {

@@ -2,7 +2,8 @@ use std::{hash::Hash, str::FromStr, sync::Arc};
 
 use crate::{
   ast::{GroupComments, GroupId},
-  expression::BooleanExpression,
+  common::items::WordSet,
+  expression::{BooleanExpression, ConditionExpression},
   timing::items::Mode,
 };
 
@@ -23,14 +24,14 @@ pub struct LeakagePower {
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   // TODO:
-  // #[liberty(simple(type=ArcOption))]
-  power_level: Option<Arc<String>>,
+  #[liberty(simple(type=Option))]
+  power_level: Option<String>,
   // TODO:
-  // #[liberty(simple(type=ArcDefault))]
-  related_pg_pin: Arc<String>,
+  #[liberty(simple)]
+  related_pg_pin: WordSet,
   // TODO:
-  // #[liberty(simple(type=OptionArc))]
-  when: Option<Arc<BooleanExpression>>,
+  #[liberty(simple(type=Option))]
+  when: Option<ConditionExpression>,
   #[liberty(simple)]
   value: f64,
   #[liberty(complex(type=Option))]
@@ -39,9 +40,9 @@ pub struct LeakagePower {
 
 #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
 pub struct LeakagePowerId {
-  power_level: Option<Arc<String>>,
-  related_pg_pin: Arc<String>,
-  when: Option<Arc<BooleanExpression>>,
+  power_level: Option<String>,
+  related_pg_pin: WordSet,
+  when: Option<ConditionExpression>,
 }
 
 impl crate::ast::HashedGroup for LeakagePower {

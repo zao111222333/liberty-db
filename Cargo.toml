@@ -1,7 +1,7 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # cargo publish --allow-dirty --registry crates-io -p liberty-db
 [workspace]
-members = ["macros","tests"]
+members = ["macros","tests","boolean_expression"]
 
 [workspace.package]
 version = "0.3.1"
@@ -44,7 +44,8 @@ default = []
 
 
 [dependencies]
-liberty-macros = "0.3.1"
+liberty-macros = {path = "macros" }
+boolean_expression = {path = "boolean_expression"}
 log = { version = "0.4", features = ["std", "serde"] }
 nom = "7.1"
 thiserror = "1.0.40"

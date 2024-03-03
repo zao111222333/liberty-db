@@ -145,7 +145,7 @@ const PARSER_LIBERTYPARSE: ParserCtx = ParserCtx {
   },
 };
 
-// #[test]
+#[test]
 pub fn test_all_lib_files() {
   use prettytable::{Cell, Row, Table};
   let all_parser: Vec<ParserCtx> =

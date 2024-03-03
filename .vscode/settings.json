@@ -1,27 +1,26 @@
 {
-    "window.zoomLevel": 1,
+    "window.zoomLevel": 2,
     "[rust]": {
         "editor.defaultFormatter": "rust-lang.rust-analyzer",
         "editor.formatOnSave": true
     },
     "rust-analyzer.procMacro.enable": true,
     // vscode-lldb need glibc 2.28
-    // "rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
-    "rust-analyzer.debug.engine": "ms-vscode.cpptools",
-    "rust-analyzer.debug.engineSettings": {
-        "cppdbg": {            
-            "miDebuggerPath": "${env:HOME}/.cargo/bin/rust-gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": false
-                }
-            ],
-        }
-    },
-    // "rust-analyzer.server.path": "${env:HOME}/.cargo/bin/rust-analyzer",
-    "rust-analyzer.server.path": "/toolset/rust/toolchains/nightly-x86_64-unknown-linux-gnu/bin/rust-analyzer",
+    "rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
+    "lldb.launch.initCommands": ["settings set target.disable-aslr false"],
+    // "rust-analyzer.debug.engine": "ms-vscode.cpptools",
+    // "rust-analyzer.debug.engineSettings": {
+    //     "cppdbg": {            
+    //         "miDebuggerPath": "${env:HOME}/.cargo/bin/rust-gdb",
+    //         "setupCommands": [
+    //             {
+    //                 "description": "Enable pretty-printing for gdb",
+    //                 "text": "-enable-pretty-printing",
+    //                 "ignoreFailures": false
+    //             }
+    //         ],
+    //     }
+    // },
     "rust-analyzer.server.extraEnv": { 
         "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",

@@ -18,6 +18,9 @@ pub use latch::{Latch, LatchExpression, LatchFfId};
 mod function;
 pub use function::FunctionExpression;
 
+mod condition;
+pub use condition::ConditionExpression;
+
 mod tri_state;
 // use strum_macros::Display;
 use std::{
@@ -79,23 +82,24 @@ impl Hash for BooleanExpression {
     self.table().hash(state);
   }
 }
+impl std::str::FromStr for BooleanExpression {
+  type Err = std::fmt::Error;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    todo!()
+  }
+}
+const BRACKET_L: char = '(';
+const BRACKET_R: char = ')';
 impl BooleanExpression {
-  const BRACKET_L: char = '(';
-  const BRACKET_R: char = ')';
   // TODO:
   pub fn from_str(
     s: &str,
     ff_map: &HashMap<LatchFfId, Ff>,
     latch_map: &HashMap<LatchFfId, Latch>,
   ) -> Result<Self, std::fmt::Error> {
-    let l_pos_list = s
-      .match_indices(Self::BRACKET_L)
-      .map(|(i, _)| i)
-      .collect::<Vec<usize>>();
-    let r_pos_list = s
-      .match_indices(Self::BRACKET_R)
-      .map(|(i, _)| i)
-      .collect::<Vec<usize>>();
+    let l_pos_list = s.match_indices(BRACKET_L).map(|(i, _)| i).collect::<Vec<usize>>();
+    let r_pos_list = s.match_indices(BRACKET_R).map(|(i, _)| i).collect::<Vec<usize>>();
     // match (s.find(Self::BRACKET_L),s.find(Self::BRACKET_R)){
     //     (None, None) => todo!(),
     //     (None, Some(_)) => Err(std::fmt::Error),

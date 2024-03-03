@@ -92,7 +92,7 @@ use strum_macros::{Display, EnumString};
 /// &end
 /// =203.55
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString, Default, Hash, Eq)]
 pub enum TimingSenseType {
   /// Combines incoming `rise` delays with local `rise` delays
   /// and compares incoming `fall` delays with local `fall` delays.
@@ -131,6 +131,7 @@ pub enum TimingSenseType {
   /// =t.m0.x37.h4.y2b19.ff1.fs2.fc2.sc0.ls0.ws0
   /// ">Reference</a>
   #[strum(serialize = "non_unate")]
+  #[default]
   NonUnate,
 }
 
