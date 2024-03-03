@@ -1,44 +1,83 @@
 {
     "window.zoomLevel": 1,
-    "files.watcherExclude": {
-        "docs/static": true,
-    },
     "[rust]": {
         "editor.defaultFormatter": "rust-lang.rust-analyzer",
-        "editor.formatOnSave": true,
+        "editor.formatOnSave": true
     },
-    "rust-analyzer.linkedProjects": [
-        "./tests/Cargo.toml",
-    ],
     "rust-analyzer.procMacro.enable": true,
+    // vscode-lldb need glibc 2.28
+    // "rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
+    "rust-analyzer.debug.engine": "ms-vscode.cpptools",
+    "rust-analyzer.debug.engineSettings": {
+        "cppdbg": {            
+            "miDebuggerPath": "${env:HOME}/.cargo/bin/rust-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": false
+                }
+            ],
+        }
+    },
+    // "rust-analyzer.server.path": "${env:HOME}/.cargo/bin/rust-analyzer",
+    "rust-analyzer.server.path": "/toolset/rust/toolchains/nightly-x86_64-unknown-linux-gnu/bin/rust-analyzer",
     "rust-analyzer.server.extraEnv": { 
         "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
-        "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup",
+        "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
     },
     "terminal.integrated.env.linux": {
+        "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
-        "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup",
+        "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
+    },
+    "terminal.integrated.env.osx": {
+        "RUSTUP_TOOLCHAIN": "stable",
+        "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
+        "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
     },
     "terminal.integrated.copyOnSelection": true,
-    "todohighlight.keywords": [
-        {
-            "text": "TODO:",
-            "color": "white",
-            "backgroundColor": "#ffbd2a",
-            "overviewRulerColor": "rgba(255,189,42,0.8)"
+    "todo-tree.general.tags":[
+        "BUG",
+        "HACK",
+        "NOTICE",
+        "FIXME",
+        "TODO",
+    ],
+    "todo-tree.highlights.customHighlight": {
+        "TODO": {
+            "type": "text",
+            "borderRadius":"0",
+            "foreground": "#ffffff",
+            "background": "#ffbd2a",
+            "rulerColour":"#ffbd2a",
+            "rulerLane":"left",
+            "icon": "checkbox",
+            "iconColour": "#ffbd2a",
+            "gutterIcon": true,
         },
-        {
-            "text": "FIXME:",
-            "color": "white",
-            "backgroundColor": "#f06292",
-            "overviewRulerColor": "rgba(240,98,146,0.8)"
+        "FIXME": {
+            "type": "text",
+            "borderRadius":"0",
+            "foreground": "#ffffff",
+            "background": "#f06292",
+            "rulerColour": "#ed6a5e",
+            "rulerLane":"left",
+            "icon": "alert",
+            "iconColour": "#ed6a5e",
+            "gutterIcon": true,
         },
-        {
-            "text": "NOTICE:",
-            "color": "white",
-            "backgroundColor": "#004daa",
-            "overviewRulerColor": "rgba(0,77,170,0.8)"
+        "NOTICE": {
+            "type": "text",
+            "borderRadius":"0",
+            "foreground": "#ffffff",
+            "background": "#3282e2",
+            "rulerColour": "#3282e2",
+            "rulerLane":"left",
+            "icon": "note",
+            "iconColour": "#3282e2",
+            "gutterIcon": true,
         },
-    ]
+    },
 }
