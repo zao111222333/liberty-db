@@ -3,7 +3,7 @@
 //! </script>
 
 use crate::ast::{AttributeList, GroupComments, GroupId, GroupMap, HashedGroup};
-use crate::expression::{self, logic};
+use crate::expression::{logic, BooleanExpression};
 use crate::timing::Timing;
 mod items;
 use crate::units;
@@ -120,7 +120,7 @@ pub struct Pin {
   /// &end
   /// =228.9
   /// ">Reference-Instance</a>
-  pub clamp_0_function: Option<expression::BooleanExpression>,
+  pub clamp_0_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -129,7 +129,7 @@ pub struct Pin {
   /// &end
   /// =228.10
   /// ">Reference-Instance</a>
-  pub clamp_1_function: Option<expression::BooleanExpression>,
+  pub clamp_1_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -138,7 +138,7 @@ pub struct Pin {
   /// &end
   /// =228.11
   /// ">Reference-Instance</a>
-  pub clamp_latch_function: Option<expression::BooleanExpression>,
+  pub clamp_latch_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -147,7 +147,7 @@ pub struct Pin {
   /// &end
   /// =228.12
   /// ">Reference-Instance</a>
-  pub clamp_z_function: Option<expression::BooleanExpression>,
+  pub clamp_z_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -337,7 +337,7 @@ pub struct Pin {
   /// &end
   /// =228.35
   /// ">Reference-Instance</a>
-  pub function: Option<expression::BooleanExpression>,
+  pub function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -346,7 +346,7 @@ pub struct Pin {
   /// &end
   /// =228.36
   /// ">Reference-Instance</a>
-  pub has_builtin_pad: Option<expression::BooleanExpression>,
+  pub has_builtin_pad: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -364,7 +364,7 @@ pub struct Pin {
   /// &end
   /// =228.38
   /// ">Reference-Instance</a>
-  pub illegal_clamp_condition: Option<expression::BooleanExpression>,
+  pub illegal_clamp_condition: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -725,7 +725,7 @@ pub struct Pin {
   /// &end
   /// =229.21
   /// ">Reference-Instance</a>
-  pub state_function: Option<expression::BooleanExpression>,
+  pub state_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -743,7 +743,7 @@ pub struct Pin {
   /// &end
   /// =229.23
   /// ">Reference-Instance</a>
-  pub three_state: Option<expression::BooleanExpression>,
+  pub three_state: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -752,7 +752,7 @@ pub struct Pin {
   /// &end
   /// =229.24
   /// ">Reference-Instance</a>
-  pub x_function: Option<expression::BooleanExpression>,
+  pub x_function: Option<BooleanExpression>,
   // /* Complex Attributes in a pin Group */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

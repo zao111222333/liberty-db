@@ -79,4 +79,5 @@
             "gutterIcon": true,
         },
     },
+    "rust-analyzer.showUnlinkedFileNotification": false,
 }

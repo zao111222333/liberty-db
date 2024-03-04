@@ -2,39 +2,8 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 pub mod logic;
-mod port;
-mod test;
-use enum_dispatch::enum_dispatch;
-pub use port::Port;
-
-mod statetable;
-pub use statetable::*;
-
-mod ff;
-pub use ff::{Ff, FfExpression};
-mod latch;
-pub use latch::{Latch, LatchExpression, LatchFfId};
-
-mod function;
-pub use function::FunctionExpression;
-
-mod condition;
-pub use condition::ConditionExpression;
-
-mod tri_state;
-// use strum_macros::Display;
-use std::{
-  collections::HashMap,
-  fmt::{Debug, Display},
-  hash::Hash,
-};
-pub use tri_state::TriState;
-/// BooleanExpressionLike
-#[enum_dispatch(BooleanExpression)]
-pub trait BooleanExpressionLike: Display + Debug + Clone {
-  /// get table with function
-  fn table(&self) -> logic::Table;
-}
+pub mod parser;
+use biodivine_lib_bdd::{boolean_expression::BooleanExpression as Expr, Bdd};
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -44,68 +13,134 @@ pub trait BooleanExpressionLike: Display + Debug + Clone {
 /// &end
 /// =132.38
 /// ">Reference</a>
-#[derive(Debug, Clone)]
-#[enum_dispatch]
-pub enum BooleanExpression {
-  Port(Port),
-  FF(FfExpression),
-  Latch(LatchExpression),
-  Function(FunctionExpression),
-  TriState(TriState),
-}
+///
+/// | Operator | Description                 |
+/// | -------- | --------------------------- |
+/// | '        | invert previous expression  |
+/// | ’        | invert previous expression(?)|
+/// | !        | invert following expression |
+/// | ^        | logical XOR                 |
+/// | \*       | logical AND                 |
+/// | &        | logical AND                 |
+/// | space    | logical AND                 |
+/// | \+       | logical OR                  |
+/// | 1        | logical OR                  |
+/// | 1        | signal tied to logic 1      |
+/// | 0        | signal tied to logic 0      |
+///
+/// A pin name beginning with a number must be enclosed in double quotation marks preceded by a backslash (\), as in the following example
+/// ```
+/// function : " \"1A\" + \"1B\" " ;
+/// ```
+///
 
-impl Display for BooleanExpression {
-  #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    match self {
-      BooleanExpression::Port(exp) => std::fmt::Display::fmt(&exp, f),
-      BooleanExpression::FF(exp) => std::fmt::Display::fmt(&exp, f),
-      BooleanExpression::Latch(exp) => std::fmt::Display::fmt(&exp, f),
-      BooleanExpression::Function(exp) => std::fmt::Display::fmt(&exp, f),
-      BooleanExpression::TriState(exp) => std::fmt::Display::fmt(&exp, f),
-    }
-  }
+#[derive(Debug, Clone)]
+pub struct BooleanExpression {
+  /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
+  /// as `id`, to impl `hash` and `compare`
+  pub bdd: Bdd,
+  /// BooleanExpression itself
+  pub expr: Expr,
 }
 
 impl PartialEq for BooleanExpression {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
-    self.table() == other.table()
+    self.bdd == other.bdd
   }
 }
-
 impl Eq for BooleanExpression {}
-
-impl Hash for BooleanExpression {
+impl std::hash::Hash for BooleanExpression {
   #[inline]
   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-    self.table().hash(state);
+    self.bdd.hash(state);
   }
 }
-impl std::str::FromStr for BooleanExpression {
-  type Err = std::fmt::Error;
 
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    todo!()
+#[allow(dead_code, unused_imports)]
+mod test {
+  use super::*;
+  use itertools::Itertools;
+  use std::{f64::consts::E, str::FromStr};
+  #[test]
+  fn parse_fmt_self_check() {
+    for (should_success, s) in [
+      (true, "A"),
+      (true, "A^B+C"),
+      (true, "(A+B)*(C+D)"),
+      (true, r#"\"1A\" + \"1B\""#),
+      (true, "(A+B)*(C)"),
+      (true, "!(A+((C+A^!!!B))')"),
+      (true, "!(A&B)"),
+      (true, "!(1&B)"),
+      (true, "A+B+C+D"),
+      (true, "B0’ + C"),
+      (true, "A+B+C+D"),
+      (true, "A+(B+C)^D"),
+      (true, "!(1A&B)"),
+      (true, "!(A B)"),
+      (true, "!(A+B')"),
+      (true, "!(A+B')|C"),
+      (true, "(A)'''"),
+      (true, "!!!(((A)))''"),
+      (true, "!!(!((A))')'"),
+      (false, ""),
+      (false, "!"),
+      (false, "A)"),
+      (true, "1A"),
+      (false, "2A"),
+      (false, "(A"),
+    ] {
+      println!("----");
+      println!("origin:   {}", s);
+      let bool_expr = BooleanExpression::from_str(s);
+      if should_success {
+        if let Ok(e) = bool_expr {
+          let fmt_s = format!("{e}");
+          println!("parsed:   {}", fmt_s);
+          let fmt_bool_expr = BooleanExpression::from_str(&fmt_s);
+          if let Ok(fmt_e) = fmt_bool_expr {
+            println!("reparsed: {}", fmt_e);
+            assert_eq!(e, fmt_e);
+          } else {
+            println!("{:?}", e);
+            println!("{:?}", fmt_bool_expr);
+            assert!(false, " not equal");
+          }
+        } else {
+          println!("{:?}", bool_expr);
+          assert!(false, " It should success");
+        }
+      } else {
+        if let Err(e) = bool_expr {
+          println!("{}", e);
+        } else {
+          assert!(false, " It should go wrong");
+        }
+      }
+    }
   }
-}
-const BRACKET_L: char = '(';
-const BRACKET_R: char = ')';
-impl BooleanExpression {
-  // TODO:
-  pub fn from_str(
-    s: &str,
-    ff_map: &HashMap<LatchFfId, Ff>,
-    latch_map: &HashMap<LatchFfId, Latch>,
-  ) -> Result<Self, std::fmt::Error> {
-    let l_pos_list = s.match_indices(BRACKET_L).map(|(i, _)| i).collect::<Vec<usize>>();
-    let r_pos_list = s.match_indices(BRACKET_R).map(|(i, _)| i).collect::<Vec<usize>>();
-    // match (s.find(Self::BRACKET_L),s.find(Self::BRACKET_R)){
-    //     (None, None) => todo!(),
-    //     (None, Some(_)) => Err(std::fmt::Error),
-    //     (Some(_), None) => Err(std::fmt::Error),
-    //     (Some(idx_l), Some(idx_r)) => todo!(),
-    // }
-    todo!()
+  #[test]
+  fn parse_hash() {
+    for (same, s1, s2) in [
+      (true, "!!(!((A))')'", "!A"),
+      (true, "A*C+B*C", "(A+B)*C"),
+      (true, "B*D+B*C+A*D+A*C", "(A+B)*(C+D)"),
+      (false, "A+B^C", "A^B+C"),
+      (true, "(A+B)+C", "A+(B+C)"),
+      (true, "1A", "1"),
+      (true, "1A+B", "1+B"),
+    ] {
+      println!("----");
+      println!("s1: {s1}");
+      println!("s2: {s2}");
+      if same {
+        println!("they should same");
+        assert_eq!(BooleanExpression::from_str(s1), BooleanExpression::from_str(s2));
+      } else {
+        println!("they are different");
+        assert_ne!(BooleanExpression::from_str(s1), BooleanExpression::from_str(s2));
+      }
+    }
   }
 }

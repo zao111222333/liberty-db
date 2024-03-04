@@ -6,10 +6,7 @@ use std::collections::HashMap;
 use crate::{
   ast::{self, ComplexAttri, GroupComments, GroupId},
   common::items::Domain,
-  expression::{
-    self,
-    logic::{self, LogicLike},
-  },
+  expression::{logic, logic::LogicLike, BooleanExpression},
 };
 
 use strum_macros::{Display, EnumString};
