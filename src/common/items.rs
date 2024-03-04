@@ -157,3 +157,24 @@ impl std::str::FromStr for WordSet {
     })
   }
 }
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+pub struct TableLookUp {
+  #[liberty(id(auto_impl_len = 1))]
+  _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(complex(type=Default))]
+  pub index_1: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_2: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_3: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_4: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub values: Vec<f64>,
+}

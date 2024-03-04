@@ -45,6 +45,7 @@ pub struct Pin {
   /// &end
   /// =227.33
   /// ">Reference-Instance</a>
+  #[liberty(simple)]
   pub alive_during_partial_power_down: bool,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -54,6 +55,7 @@ pub struct Pin {
   /// &end
   /// =228.2
   /// ">Reference-Instance</a>
+  #[liberty(simple)]
   pub alive_during_power_up: bool,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -472,6 +474,7 @@ pub struct Pin {
   /// &end
   /// =228.54
   /// ">Reference-Instance</a>
+  #[liberty(simple)]
   pub max_transition: f64,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -490,6 +493,7 @@ pub struct Pin {
   /// &end
   /// =228.56
   /// ">Reference-Instance</a>
+  #[liberty(simple)]
   pub min_fanout: f64,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -771,6 +775,7 @@ pub struct Pin {
   /// &end
   /// =229.29
   /// ">Reference-Instance</a>
+  // #[liberty(simple(type=Option))]
   pub rise_capacitance_range: Option<(units::Capacitance, units::Capacitance)>,
   // /* Group Statements in a pin Group */
   // electromigration () { }
@@ -795,7 +800,8 @@ pub struct Pin {
   /// =67.43
   /// "
   /// style="width: 90%; height: 600px;"></iframe>
-  pub timing: Vec<Timing>,
+  #[liberty(group(type=Map))]
+  pub timing: GroupMap<Timing>,
 }
 
 #[test]

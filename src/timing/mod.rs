@@ -5,13 +5,9 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use std::{
-  collections::{HashMap, HashSet},
-  sync::Arc,
-};
+use std::collections::HashMap;
 mod timing_type;
 pub use timing_type::*;
-
 pub mod builder;
 pub mod impls;
 pub mod items;
@@ -32,9 +28,9 @@ use self::items::TimingSenseType;
 #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
 pub struct TimingId {
   related_pin: WordSet,
-  when: Option<Arc<BooleanExpression>>,
-  timing_type: Arc<TimingType>,
-  timing_sense: Arc<TimingSenseType>,
+  when: Option<BooleanExpression>,
+  timing_type: TimingType,
+  timing_sense: Option<TimingSenseType>,
 }
 
 impl crate::ast::HashedGroup for Timing {
@@ -45,12 +41,12 @@ impl crate::ast::HashedGroup for Timing {
   }
 
   fn gen_id(&self, _: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
-    // Ok(Self::Id {
-    //   power_level: self.power_level.clone(),
-    //   related_pg_pin: self.related_pg_pin.clone(),
-    //   when: self.when.clone(),
-    // })
-    todo!()
+    Ok(Self::Id {
+      related_pin: self.related_pin.clone(),
+      when: self.when.clone(),
+      timing_type: self.timing_type,
+      timing_sense: self.timing_sense,
+    })
   }
 
   fn id(&self) -> GroupId<Self> {
@@ -1043,7 +1039,8 @@ pub struct Timing {
   ///
   /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
   /// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
-  pub timing_sense: Option<items::TimingSenseType>,
+  #[liberty(simple(type=Option))]
+  pub timing_sense: Option<TimingSenseType>,
   /// The `timing_type` attribute distinguishes between combinational
   /// and sequential cells by defining the type of timing arc.
   /// If this attribute is not assigned, the cell is considered combinational.
@@ -1274,7 +1271,8 @@ pub struct Timing {
   /// the constrained pin and a positive pulse on the related pin.
   /// + `nochange_low_low` (negative/negative): Indicates a negative pulse on
   /// the constrained pin and a negative pulse on the related pin.
-  pub timing_type: Option<TimingType>,
+  #[liberty(simple)]
+  pub timing_type: TimingType,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -1291,6 +1289,7 @@ pub struct Timing {
   /// &end
   /// =203.71
   /// ">Reference-Instance</a>
+  #[liberty(simple(type=Option))]
   pub when: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -1469,41 +1468,140 @@ pub struct Timing {
   /// &end
   /// =204.10
   /// ">Reference-Instance</a>
-  pub cell_fall: HashMap<String, items::CellFall>,
-  pub cell_rise: HashMap<String, items::CellFall>,
-  pub fall_constraint: HashMap<String, items::CellFall>,
-  pub fall_propagation: HashMap<String, items::CellFall>,
-  pub fall_transition: HashMap<String, items::CellFall>,
-  pub noise_immunity_above_high: HashMap<String, items::CellFall>,
-  pub noise_immunity_below_low: HashMap<String, items::CellFall>,
-  pub noise_immunity_high: HashMap<String, items::CellFall>,
-  pub noise_immunity_low: HashMap<String, items::CellFall>,
-  pub output_current_fall: HashMap<String, items::CellFall>,
-  pub output_current_rise: HashMap<String, items::CellFall>,
-  pub propogated_noise_height_above_high: HashMap<String, items::CellFall>,
-  pub propogated_noise_height_below_low: HashMap<String, items::CellFall>,
-  pub propogated_noise_height_high: HashMap<String, items::CellFall>,
-  pub propogated_noise_height_low: HashMap<String, items::CellFall>,
-  pub propogated_noise_peak_time_ratio_above_high: HashMap<String, items::CellFall>,
-  pub propogated_noise_peak_time_ratio__below_low: HashMap<String, items::CellFall>,
-  pub propogated_noise_peak_time_ratio_high: HashMap<String, items::CellFall>,
-  pub propogated_noise_peak_time_ratio_low: HashMap<String, items::CellFall>,
-  pub propogated_noise_width_above_high: HashMap<String, items::CellFall>,
-  pub propogated_noise_width_below_low: HashMap<String, items::CellFall>,
-  pub propogated_noise_width_high: HashMap<String, items::CellFall>,
-  pub propogated_noise_width_low: HashMap<String, items::CellFall>,
-  pub receiver_capacitance1_fall: HashMap<String, items::CellFall>,
-  pub receiver_capacitance1_rise: HashMap<String, items::CellFall>,
-  pub receiver_capacitance2_fall: HashMap<String, items::CellFall>,
-  pub receiver_capacitance2_rise: HashMap<String, items::CellFall>,
-  pub retaining_fall: HashMap<String, items::CellFall>,
-  pub retaining_rise: HashMap<String, items::CellFall>,
-  pub retain_fall_slew: HashMap<String, items::CellFall>,
-  pub retain_rise_slew: HashMap<String, items::CellFall>,
-  pub rise_constraint: HashMap<String, items::CellFall>,
-  pub rise_propagation: HashMap<String, items::CellFall>,
-  pub rise_transition: HashMap<String, items::CellFall>,
-  pub steady_state_current_high: HashMap<String, items::CellFall>,
-  pub steady_state_current_low: HashMap<String, items::CellFall>,
-  pub steady_state_current_tristate: HashMap<String, items::CellFall>,
+  #[liberty(group)]
+  pub cell_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub cell_rise: Option<TableLookUp>,
+  // pub cell_rise: HashMap<String, items::CellFall>,
+  #[liberty(group)]
+  pub fall_constraint: Option<TableLookUp>,
+  #[liberty(group)]
+  pub fall_propagation: Option<TableLookUp>,
+  #[liberty(group)]
+  pub fall_transition: Option<TableLookUp>,
+  #[liberty(group)]
+  pub noise_immunity_above_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub noise_immunity_below_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub noise_immunity_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub noise_immunity_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub output_current_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub output_current_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_height_above_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_height_below_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_height_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_height_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_peak_time_ratio_above_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_peak_time_ratio__below_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_peak_time_ratio_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_peak_time_ratio_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_width_above_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_width_below_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_width_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub propogated_noise_width_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub receiver_capacitance1_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub receiver_capacitance1_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub receiver_capacitance2_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub receiver_capacitance2_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub retaining_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub retaining_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub retain_fall_slew: Option<TableLookUp>,
+  #[liberty(group)]
+  pub retain_rise_slew: Option<TableLookUp>,
+  #[liberty(group)]
+  pub rise_constraint: Option<TableLookUp>,
+  #[liberty(group)]
+  pub rise_propagation: Option<TableLookUp>,
+  #[liberty(group)]
+  pub rise_transition: Option<TableLookUp>,
+  #[liberty(group)]
+  pub steady_state_current_high: Option<TableLookUp>,
+  #[liberty(group)]
+  pub steady_state_current_low: Option<TableLookUp>,
+  #[liberty(group)]
+  pub steady_state_current_tristate: Option<TableLookUp>,
+  #[liberty(group)]
+  #[liberty(group)]
+  pub ocv_mean_shift_cell_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_cell_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_rise_transition: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_fall_transition: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_retaining_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_retaining_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_rise_slew: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_fall_slew: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_rise_constraint: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_mean_shift_fall_constraint: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_cell_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_cell_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_rise_transition: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_fall_transition: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_retaining_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_retaining_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_rise_slew: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_fall_slew: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_rise_constraint: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_std_dev_fall_constraint: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_cell_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_cell_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_rise_transition: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_fall_transition: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_retaining_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_retaining_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_rise_slew: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_fall_slew: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_rise_constraint: Option<TableLookUp>,
+  #[liberty(group)]
+  pub ocv_skewness_fall_constraint: Option<TableLookUp>,
 }
