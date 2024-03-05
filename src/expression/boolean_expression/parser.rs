@@ -1,9 +1,6 @@
 // use super::BooleanExpression;
 // use boolean_expression::{Expr, BDD};
-use biodivine_lib_bdd::{
-  boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
-  BddVariableSetBuilder,
-};
+use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use itertools::Itertools;
 use nom::{
   branch::alt,
@@ -14,33 +11,10 @@ use nom::{
   sequence::{pair, preceded, tuple},
   IResult,
 };
-use std::{
-  collections::{HashSet, VecDeque},
-  str::FromStr,
-};
+use std::collections::{HashSet, VecDeque};
 
-impl FromStr for super::BooleanExpression {
-  type Err = BoolExprErr;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    let mut tokens: VecDeque<Token> = match token_vec(s) {
-      Ok((_, vec)) => vec.into_iter().collect(),
-      Err(_) => return Err(BoolExprErr::Nom),
-    };
-    //  println!("{:?}", tokens);
-    let (expr, bdd) = process_tokens(&mut tokens)?;
-    Ok(Self { bdd, expr })
-  }
-}
-
-impl std::fmt::Display for super::BooleanExpression {
-  #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    _fmt(&self.expr, f)
-  }
-}
 #[inline]
-pub fn _fmt(expr: &Expr, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+pub(super) fn _fmt(expr: &Expr, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
   match expr {
     Expr::Variable(s) => {
       if s.as_bytes()[0].is_ascii_digit() {
@@ -134,7 +108,7 @@ enum BinaryOp {
   Xor,
 }
 #[derive(Debug, Clone)]
-enum Token {
+pub(super) enum Token {
   Blank,
   OpenBracket,
   CloseBracket,
@@ -185,7 +159,7 @@ fn node(i: &str) -> IResult<&str, Token> {
     }),
   ))(i)
 }
-fn token_vec(i: &str) -> IResult<&str, Vec<Token>> {
+pub(super) fn token_vec(i: &str) -> IResult<&str, Vec<Token>> {
   many1(preceded(space, alt((open_b, close_b, single_op, binary_op, node))))(i)
 }
 
@@ -206,7 +180,7 @@ pub enum BoolExprErr {
   Bracket,
   ///
   #[error("something go wrong, {0}")]
-  NoIdea(usize),
+  NoIdea(u8),
   ///
   #[error("Can not move back-not")]
   BackNot,
@@ -372,7 +346,90 @@ fn process_once(
   }
 }
 
-fn process_tokens(tokens: &mut VecDeque<Token>) -> Result<(Expr, Bdd), BoolExprErr> {
+// fn new_process_once(tokens: &mut VecDeque<Token>) -> Result<(), BoolExprErr> {
+//   // 0. find all Bracket
+//   'L0: for i in 0..tokens.len() {
+//     match tokens.get(i) {
+//       Some(Token::OpenBracket) => {
+//         // remove this OpenBracket
+//         let _ = tokens.remove(i);
+//         new_process_once(tokens)?;
+//         // now position i should be a expr,
+//         // and position i+1 should be a CloseBracket
+//         // remove that CloseBracket
+//         let _next = tokens.remove(i + 1);
+//         if !matches!(Some(Token::CloseBracket), _next) {
+//           return Err(BoolExprErr::Bracket);
+//         }
+//       }
+//       None => break 'L0,
+//       _ => (),
+//     }
+//   }
+//   // 1. find all single op
+//   fn _single_op(tokens: &mut VecDeque<Token>, i: usize) -> Result<Expr, BoolExprErr> {
+//     match tokens.get(i) {
+//       Some(Token::SingleOp(SingleOp::Not)) => {
+//         let _ = tokens.remove(i);
+//         let expr = _single_op(tokens, i)?;
+//         Ok(Expr::Not(Box::new(expr)))
+//       }
+//       Some(Token::SingleOp(SingleOp::Zero)) => {
+//         let _ = tokens.remove(i);
+//         let _ = _single_op(tokens, i);
+//         Ok(Expr::Const(false))
+//       }
+//       Some(Token::SingleOp(SingleOp::One)) => {
+//         let _ = tokens.remove(i);
+//         let _ = _single_op(tokens, i);
+//         Ok(Expr::Const(true))
+//       }
+//       Some(Token::Expr(_)) => {
+//         if let Some(Token::Expr(e)) = tokens.remove(i) {
+//           Ok(e)
+//         } else {
+//           Err(BoolExprErr::NoIdea(2))
+//         }
+//       }
+//       _ => Err(BoolExprErr::SingleOp),
+//     }
+//   }
+//   'L1: for i in 0..tokens.len() {
+//     match tokens.get(i) {
+//       Some(Token::SingleOp(op)) => {
+//         // remove this OpenBracket
+//         let _ = tokens.remove(i);
+//         new_process_once(tokens)?;
+//         // now position i should be a expr,
+//         // and position i+1 should be a CloseBracket
+//         // remove that CloseBracket
+//         let _next = tokens.remove(i + 1);
+//         if !matches!(Some(Token::CloseBracket), _next) {
+//           return Err(BoolExprErr::Bracket);
+//         }
+//       }
+//       None => break 'L1,
+//       _ => (),
+//     }
+//   }
+//   todo!();
+// }
+// pub(super) fn new_process_tokens(
+//   tokens: &mut VecDeque<Token>,
+// ) -> Result<Expr, BoolExprErr> {
+//   //  println!("{:?}", tokens);
+//   let _ = pre_process_tokens(tokens)?;
+//   new_process_once(tokens)?;
+//   if tokens.len() == 1 {
+//     match tokens.remove(0) {
+//       Some(Token::Expr(expr)) => Ok(expr),
+//       _ => Err(BoolExprErr::NoIdea(2)),
+//     }
+//   } else {
+//     Err(BoolExprErr::NoIdea(0))
+//   }
+// }
+pub(super) fn process_tokens(tokens: &mut VecDeque<Token>) -> Result<Expr, BoolExprErr> {
   //  println!("{:?}", tokens);
   let (mut left, mut right) = pre_process_tokens(tokens)?;
   //  println!("{:?}", tokens);
@@ -418,24 +475,12 @@ fn process_tokens(tokens: &mut VecDeque<Token>) -> Result<(Expr, Bdd), BoolExprE
   }
 
   match tokens.remove(0) {
-    Some(Token::Expr(expr)) => {
-      let mut builder = BddVariableSetBuilder::new();
-      let mut node_set = HashSet::new();
-      build_bdd(&expr, &mut node_set);
-      //  println!("{:?}", node_set);
-      for s in node_set.into_iter().sorted() {
-        let _ = builder.make_variable(s.as_str());
-      }
-      let variables = builder.build();
-      match variables.safe_eval_expression(&expr) {
-        Some(bdd) => Ok((expr, bdd)),
-        None => Err(BoolExprErr::NoIdea(1)),
-      }
-    }
+    Some(Token::Expr(expr)) => Ok(expr),
     _ => Err(BoolExprErr::NoIdea(2)),
   }
 }
-fn build_bdd(expr: &Expr, node_set: &mut HashSet<String>) {
+
+pub(super) fn get_nodes(expr: &Expr, node_set: &mut HashSet<String>) {
   match expr {
     Expr::Const(_) => (),
     Expr::Imp(_, _) => todo!(),
@@ -443,18 +488,18 @@ fn build_bdd(expr: &Expr, node_set: &mut HashSet<String>) {
     Expr::Variable(node) => {
       let _ = node_set.insert(node.to_string());
     }
-    Expr::Not(e) => build_bdd(e, node_set),
+    Expr::Not(e) => get_nodes(e, node_set),
     Expr::And(e1, e2) => {
-      build_bdd(e1, node_set);
-      build_bdd(e2, node_set);
+      get_nodes(e1, node_set);
+      get_nodes(e2, node_set);
     }
     Expr::Or(e1, e2) => {
-      build_bdd(e1, node_set);
-      build_bdd(e2, node_set);
+      get_nodes(e1, node_set);
+      get_nodes(e2, node_set);
     }
     Expr::Xor(e1, e2) => {
-      build_bdd(e1, node_set);
-      build_bdd(e2, node_set);
+      get_nodes(e1, node_set);
+      get_nodes(e2, node_set);
     }
   }
 }

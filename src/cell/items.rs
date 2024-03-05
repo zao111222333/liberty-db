@@ -3,7 +3,7 @@ use std::{hash::Hash, str::FromStr, sync::Arc};
 use crate::{
   ast::{GroupComments, GroupId},
   common::items::WordSet,
-  expression::BooleanExpression,
+  expression::BooleanExpressionId,
   timing::items::Mode,
 };
 
@@ -31,7 +31,7 @@ pub struct LeakagePower {
   related_pg_pin: WordSet,
   // TODO:
   #[liberty(simple(type=Option))]
-  when: Option<BooleanExpression>,
+  when: Option<BooleanExpressionId>,
   #[liberty(simple)]
   value: f64,
   #[liberty(complex(type=Option))]
@@ -42,7 +42,7 @@ pub struct LeakagePower {
 pub struct LeakagePowerId {
   power_level: Option<String>,
   related_pg_pin: WordSet,
-  when: Option<BooleanExpression>,
+  when: Option<BooleanExpressionId>,
 }
 
 impl crate::ast::HashedGroup for LeakagePower {

@@ -17,7 +17,7 @@ use crate::{
   ast::{GroupComments, GroupId, GroupMap},
   bus::Bus,
   common::items::*,
-  expression::{self, BooleanExpression},
+  expression::{self, BooleanExpression, BooleanExpressionId},
   library::Sensitization,
   pin::Pin,
   units,
@@ -28,7 +28,7 @@ use self::items::TimingSenseType;
 #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
 pub struct TimingId {
   related_pin: WordSet,
-  when: Option<BooleanExpression>,
+  when: Option<BooleanExpressionId>,
   timing_type: TimingType,
   timing_sense: Option<TimingSenseType>,
 }
@@ -1290,7 +1290,7 @@ pub struct Timing {
   /// =203.71
   /// ">Reference-Instance</a>
   #[liberty(simple(type=Option))]
-  pub when: Option<BooleanExpression>,
+  pub when: Option<BooleanExpressionId>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
