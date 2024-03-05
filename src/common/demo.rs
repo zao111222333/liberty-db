@@ -23,7 +23,7 @@ struct Timing {
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Pin {
-  #[liberty(id(auto_impl_len = 1))]
+  #[liberty(id(title_len = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
@@ -35,7 +35,7 @@ struct Pin {
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Ff {
-  #[liberty(id(auto_impl_len = 2))]
+  #[liberty(id(title_len = 2))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
@@ -48,7 +48,7 @@ struct Ff {
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 struct Cell {
-  #[liberty(id(auto_impl_len = 1))]
+  #[liberty(id(title_len = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,

@@ -203,6 +203,27 @@ fn impl_hashed_group(
 ) -> syn::Result<proc_macro2::TokenStream> {
   let toks: proc_macro2::TokenStream = match id_config {
     Some((_, None)) => quote! {},
+    Some((id_attri_name, Some(AutoImplConfig::OptionStr))) => quote! {
+      impl crate::ast::HashedGroup for #name {
+        type Id=Option<String>;
+        #[inline]
+        fn title(&self) -> Vec<String> {
+          match Option::as_ref(&self._id) {
+            Some(s) => vec![s.clone()],
+            None => vec![],
+          }
+        }
+        #[inline]
+        fn id(&self) -> crate::ast::GroupId<Self> {
+          self.#id_attri_name.clone()
+          // todo!()
+        }
+        #[inline]
+        fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id,crate::ast::IdError>{
+          Ok(title.pop())
+        }
+      }
+    },
     Some((id_attri_name, Some(AutoImplConfig::Num(0)))) => quote! {
       impl crate::ast::HashedGroup for #name {
         type Id=String;

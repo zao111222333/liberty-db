@@ -109,7 +109,7 @@ pub enum VariableType {
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 pub struct Domain {
-  #[liberty(id(auto_impl_len = 1))]
+  #[liberty(id(title_len = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
@@ -158,10 +158,54 @@ impl std::str::FromStr for WordSet {
   }
 }
 
+// impl crate::ast::HashedGroup for TableLookUp {
+//   type Id = Option<String>;
+//   #[inline]
+//   fn title(&self) -> Vec<String> {
+//     match Option::as_ref(&self._id) {
+//       Some(s) => vec![s.clone()],
+//       None => vec![],
+//     }
+//   }
+//   #[inline]
+//   fn id(&self) -> crate::ast::GroupId<Self> {
+//     self._id.clone()
+//   }
+//   #[inline]
+//   fn gen_id(&self, title: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
+//     // Ok(title.pop())
+//     todo!()
+//   }
+// }
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+pub struct TableLookUpMultiSegment {
+  #[liberty(simple)]
+  // TODO:
+  #[liberty(id(need))]
+  segment: usize,
+  #[liberty(id(title_len = 0.5))]
+  _id: GroupId<Self>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(complex(type=Default))]
+  pub index_1: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_2: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_3: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_4: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub values: Vec<f64>,
+}
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 pub struct TableLookUp {
-  #[liberty(id(auto_impl_len = 1))]
+  #[liberty(id(title_len = 0.5))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,

@@ -10,12 +10,12 @@ use crate::cell::Cell;
 use crate::pin::Pin;
 use crate::units;
 use std::collections::HashMap;
-use std::fmt::Write;
+use std::fmt::{Display, Write};
 #[derive(Debug, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
 pub struct Library {
-  #[liberty(id(auto_impl_len = 1))]
+  #[liberty(id(title_len = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
@@ -74,6 +74,12 @@ pub struct Library {
   pub sensitization_map: HashMap<String, Sensitization>,
 }
 
+impl Display for Library {
+  #[inline]
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+    self.fmt(f)
+  }
+}
 use crate::ast::parser;
 use crate::ast::{AttriComment, CodeFormatter, Format, GroupAttri, ParserError};
 impl Library {

@@ -30,7 +30,7 @@ pub use items::*;
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 pub struct Pin {
-  #[liberty(id(auto_impl_len = 1))]
+  #[liberty(id(title_len = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,

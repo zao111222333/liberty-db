@@ -65,7 +65,7 @@ fn parse_str() {
       }
       println!("{}", output);
     }
-    Err(e) => println!("{:#?}", e),
+    Err(e) => panic!("{:#?}", e),
   }
 }
 
@@ -84,15 +84,23 @@ fn parse_error() {
       }
       println!("{}", output);
     }
-    Err(e) => eprintln!("[ERROR] {}", e),
+    Err(e) => panic!("[ERROR] {}", e),
   }
 }
 
 #[test]
-fn parse_file() {
-  let filepath = "tech/char_result/T22_ocv.lib";
-  let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
-  match liberty_db::library::Library::parse(&data) {
+fn case_1() {
+  let s = r#"
+  library(some){    
+    input_voltage(cmos_schmitt) {
+         vil : 0.3 * VDD ;
+         vih : 0.7 * VDD ;
+         vimin : -0.5 ;
+         vimax : VDD + 0.5 ;
+    }
+  }
+  "#;
+  match Library::parse(s) {
     Ok(library) => {
       let mut output = String::new();
       if let Err(e) = library.fmt(&mut output) {
@@ -100,6 +108,51 @@ fn parse_file() {
       }
       println!("{}", output);
     }
-    Err(e) => eprintln!("[ERROR] {}", e),
+    Err(e) => panic!("[ERROR] {}", e),
   }
+}
+
+#[test]
+fn case_2() {
+  let s = r#"
+  library(some){
+    resistance : 0.00001 ;
+    capacitance : 1 ;
+    area : 0
+    slope : 0 ;
+    fanout_length(1,0.0000)
+    fanout_length(2,0.0000)
+    fanout_length(3,0.0000)
+    fanout_length(4,0.0000)
+    fanout_length(5,0.0000)
+    fanout_length(6,0.0000)
+  }  "#;
+  match Library::parse(s) {
+    Ok(library) => {
+      let mut output = String::new();
+      if let Err(e) = library.fmt(&mut output) {
+        panic!("{e}");
+      }
+      println!("{}", output);
+    }
+    Err(e) => panic!("[ERROR] {:?}", e),
+  }
+}
+
+#[test]
+fn parse_file() -> anyhow::Result<()> {
+  use std::fs::File;
+  use std::io::{BufWriter, Write};
+  let filepath = "/OPT/tech/tsmc/22nm/tcbn22ullbwp30p140_110b/AN61001_20201222/TSMCHOME/digital/Front_End/LVF/CCS/tcbn22ullbwp30p140_110b/tcbn22ullbwp30p140ffg0p88v0c_hm_lvf_p_ccs.lib";
+  // let filepath = "tech/char_result/T22_ocv.lib";
+  let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
+  match liberty_db::library::Library::parse(&data) {
+    Ok(library) => {
+      let file = File::create("output.lib")?;
+      let mut writer = BufWriter::new(file);
+      write!(&mut writer, "{}", library)?;
+    }
+    Err(e) => panic!("[ERROR] {:?}", e),
+  }
+  Ok(())
 }

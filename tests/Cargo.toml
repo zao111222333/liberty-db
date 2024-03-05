@@ -17,6 +17,7 @@ colored = "2.0.0"
 criterion = "0.3"
 liberty-io = "0.0.2"
 libertyparse = "0.2.2"
+anyhow = "1.0.80"
 
 
 # [[test]]

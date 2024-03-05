@@ -1,0 +1,12 @@
+library(some){
+    resistance : 0.00001 ;
+    capacitance : 1 ;
+    area : 0
+    slope : 0 ;
+    fanout_length(1,0.0000)
+    fanout_length(2,0.0000)
+    fanout_length(3,0.0000)
+    fanout_length(4,0.0000)
+    fanout_length(5,0.0000)
+    fanout_length(6,0.0000)
+}

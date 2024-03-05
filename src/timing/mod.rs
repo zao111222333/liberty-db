@@ -14,7 +14,7 @@ pub mod items;
 #[cfg(test)]
 mod test;
 use crate::{
-  ast::{GroupComments, GroupId},
+  ast::{GroupComments, GroupId, GroupMap},
   bus::Bus,
   common::items::*,
   expression::{self, BooleanExpression},
@@ -1515,6 +1515,10 @@ pub struct Timing {
   pub propogated_noise_width_high: Option<TableLookUp>,
   #[liberty(group)]
   pub propogated_noise_width_low: Option<TableLookUp>,
+  #[liberty(group(type=Map))]
+  pub receiver_capacitance_fall: GroupMap<TableLookUpMultiSegment>,
+  #[liberty(group(type=Map))]
+  pub receiver_capacitance_rise: GroupMap<TableLookUpMultiSegment>,
   #[liberty(group)]
   pub receiver_capacitance1_fall: Option<TableLookUp>,
   #[liberty(group)]

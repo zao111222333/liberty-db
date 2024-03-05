@@ -9,6 +9,7 @@ pub(crate) enum AutoImplConfig {
   Num(usize),
   #[default]
   Vector,
+  OptionStr,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -167,9 +168,13 @@ pub(crate) fn parse_fields_type(
 /// // GroupComments
 /// #[liberty(comments)]
 /// // Auto vector Id: Vec<String>
-/// #[liberty(id(auto_impl_len=0))]
+/// #[liberty(id(title_len=0))]
+/// // Auto Id: Option<String>
+/// #[liberty(id(title_len=0.5))]
+/// // Auto Id: String
+/// #[liberty(id(title_len=1))]
 /// // Auto slice Id: [String:2]
-/// #[liberty(id(auto_impl_len=2))]
+/// #[liberty(id(title_len=2))]
 /// // GroupId
 /// #[liberty(id)]
 /// // Simple liberty attribute, defualt=Default
@@ -429,7 +434,7 @@ fn parse_group_type(
 fn parse_id_config(
   mut tokens: proc_macro2::token_stream::IntoIter,
 ) -> syn::Result<Option<AutoImplConfig>> {
-  let mut auto_impl_len = None;
+  let mut title_len = None;
   if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
     let mut args = g.stream().into_iter().peekable();
     loop {
@@ -439,7 +444,8 @@ fn parse_id_config(
       }
       if let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
         match arg_id.to_string().as_str() {
-          "auto_impl_len" => {
+          // "option_str" => return Ok(Some(AutoImplConfig::OptionStr)),
+          "title_len" => {
             if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
               if '=' != arg_punct.as_char() {
                 return Err(syn::Error::new(
@@ -454,10 +460,13 @@ fn parse_id_config(
               ));
             }
             if let Some(proc_macro2::TokenTree::Literal(arg_value)) = args.next() {
+              if arg_value.to_string() == "0.5" {
+                return Ok(Some(AutoImplConfig::OptionStr));
+              }
               if let Ok(n) = arg_value.to_string().parse::<usize>() {
                 match n {
-                  0 => auto_impl_len = Some(AutoImplConfig::Vector),
-                  _ => auto_impl_len = Some(AutoImplConfig::Num(n - 1)),
+                  0 => title_len = Some(AutoImplConfig::Vector),
+                  _ => title_len = Some(AutoImplConfig::Num(n - 1)),
                 }
               } else {
                 return Err(syn::Error::new(
@@ -484,7 +493,7 @@ fn parse_id_config(
       }
     }
   }
-  return Ok(auto_impl_len);
+  return Ok(title_len);
 }
 
 #[test]
@@ -495,9 +504,9 @@ fn main() {
 pub struct Foo {
     #[liberty(undefined)]
     undefined: bool,
-    #[liberty(id(auto_impl_len=2))]
+    #[liberty(id(title_len=2))]
     id_2: bool,
-    #[liberty(id(auto_impl_len=0))]
+    #[liberty(id(title_len=0))]
     id_vec: bool,
     #[liberty(id)]
     id_no_impl: bool,
@@ -514,24 +523,6 @@ pub struct Foo {
     #[liberty(group(type=Vec))]
     group_vec: i64,
 }"#;
-  // let want: Vec<(String, syn::Result<Option<AttriType>>)> = vec![
-  //   ("undefined".to_string(), Ok(Some(AttriType::UndefinedAttributeList))),
-  //   ("id_2".to_string(), Ok(Some(AttriType::Id(Some(AutoImplConfig::Num(2)))))),
-  //   ("id_vec".to_string(), Ok(Some(AttriType::Id(Some(AutoImplConfig::Vector))))),
-  //   ("id_no_impl".to_string(), Ok(Some(AttriType::Id(None)))),
-  //   ("simple".to_string(), Ok(Some(AttriType::Simple))),
-  //   ("complex".to_string(), Ok(Some(AttriType::Complex))),
-  //   (
-  //     "other".to_string(),
-  //     Err(syn::Error::new(
-  //       proc_macro2::Span::call_site(),
-  //       format!("Unsupported token {}.", "other"),
-  //     )),
-  //   ),
-  //   ("group_map".to_string(), Ok(Some(AttriType::Group(GroupType::Map)))),
-  //   ("group_option".to_string(), Ok(Some(AttriType::Group(GroupType::Option)))),
-  //   ("group_vec".to_string(), Ok(Some(AttriType::Group(GroupType::Vec)))),
-  // ];
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();
   if let Data::Struct(st) = &ast.data {
     if let syn::Fields::Named(named) = &st.fields {

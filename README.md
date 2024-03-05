@@ -30,3 +30,8 @@ See more in [doc](https://docs.rs/liberty-db)
 + ![](https://progress-bar.dev/90?title=doing) format to `liberty`
 + ![](https://progress-bar.dev/60?title=doing) macros
 + ![](https://progress-bar.dev/0?title=todo) stream input
++ `#[liberty(id(title_len = None))]` `#[liberty(id(title_len = 0.5))]` `#[liberty(id(need))]` for auto impl
++ or `#[liberty(id)]` for self impl
++ fix missing newline at endding
++ recursive parse boolean expression
++ `BooleanExpression` `BooleanExpressionId`

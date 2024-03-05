@@ -19,7 +19,7 @@ use crate::{
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 pub struct Sensitization {
-  #[liberty(id(auto_impl_len = 1))]
+  #[liberty(id(title_len = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,

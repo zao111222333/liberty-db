@@ -2,6 +2,8 @@
 //! All parser utilis.
 //!
 
+use std::f64::consts::E;
+
 use nom::{
   branch::alt,
   bytes::{
@@ -69,6 +71,27 @@ fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
   map(take_while(move |c: char| matches!(c, '\t' | '\n' | '\r' | ' ')), |s: &str| {
     s.chars().filter(|&x| x == '\n').count()
   })(i)
+}
+
+/// must have new line!
+#[inline]
+pub(crate) fn comment_space_newline_many1<'a>(
+  i: &'a str,
+) -> IResult<&'a str, usize, Error<&'a str>> {
+  match map(
+    pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
+    |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
+  )(i)
+  {
+    Ok((s, n)) => {
+      if n == 0 {
+        Err(nom::Err::Error(Error::new(i, ErrorKind::Many1)))
+      } else {
+        Ok((s, n))
+      }
+    }
+    Err(e) => Err(e),
+  }
 }
 
 #[inline]
@@ -214,6 +237,7 @@ fn unquote_test() {
   println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
   println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));
   println!("{:?}", key::<VerboseError<&str>>("iw_w2w';"));
+  println!("{:?}", formula::<VerboseError<&str>>("0.3 * VDD ;"));
 }
 
 pub(crate) fn key<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
@@ -224,7 +248,7 @@ where
 }
 #[inline]
 pub(super) fn char_in_word(c: char) -> bool {
-  c.is_alphanumeric() || "/_.+-".contains(c)
+  c.is_alphanumeric() || "/_.+-:".contains(c)
 }
 
 pub(crate) fn word<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
@@ -232,6 +256,18 @@ where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
 {
   i.split_at_position1(|item| !char_in_word(item), ErrorKind::Alpha)
+}
+
+#[inline]
+pub(super) fn char_in_formula(c: char) -> bool {
+  c.is_ascii_alphanumeric() || " /_.+-*^:".contains(c)
+}
+
+pub(crate) fn formula<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+where
+  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
+{
+  i.split_at_position1(|item| !char_in_formula(item), ErrorKind::Alpha)
 }
 
 pub(crate) fn simple_multi<'a>(
@@ -266,12 +302,15 @@ pub(crate) fn simple<'a>(
       space,
       char(':'),
       space,
-      alt((unquote, word)),
-      space,
-      char(';'),
-      comment_space_newline,
+      alt((
+        tuple((unquote, preceded(terminated(space, char(';')), comment_space_newline))),
+        tuple((unquote, comment_space_newline_many1)),
+        tuple((word, preceded(terminated(space, char(';')), comment_space_newline))),
+        tuple((word, comment_space_newline_many1)),
+        tuple((formula, preceded(terminated(space, char(';')), comment_space_newline))),
+      )),
     )),
-    |(_, _, _, s, _, _, n)| {
+    |(_, _, _, (s, n))| {
       *line_num += n;
       s
     },
@@ -315,10 +354,15 @@ pub(crate) fn complex<'a>(
       )),
       char(')'),
       space,
-      char(';'),
-      comment_space_newline,
+      // TODO: If it is optional?
+      // opt(char(';')),
+      alt((
+        preceded(char(';'), comment_space_newline),
+        // pair(char(';'), comment_space_newline),
+        comment_space_newline_many1,
+      )),
     )),
-    |(_, _, n0, res, last, _, _, _, n1)| {
+    |(_, _, n0, res, last, _, _, n1)| {
       *line_num += n0 + n1;
       let mut vec: Vec<&'a str> = res
         .into_iter()
@@ -346,6 +390,7 @@ fn key_test() {
   println!("{:?}", comment_space_newline("\n\r\t\n : b ; "));
   println!("{:?}", simple(" : b; }", &mut 1));
   println!("{:?}", simple(" : iwww ; ", &mut 1));
+  println!("{:?}", simple(" : 0.3 * VDD ;", &mut 1));
   println!("{:?}", key::<VerboseError<&str>>("iwww "));
   println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
   println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));

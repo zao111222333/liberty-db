@@ -10,9 +10,9 @@ mod group;
 /// // GroupComments
 /// #[liberty(comments)]
 /// // Auto vector Id: Vec<String>
-/// #[liberty(id(auto_impl_len=0))]
+/// #[liberty(id(title_len=0))]
 /// // Auto slice Id: [String:2]
-/// #[liberty(id(auto_impl_len=2))]
+/// #[liberty(id(title_len=2))]
 /// // GroupId
 /// #[liberty(id)]
 /// // Simple liberty attribute, defualt=Default
