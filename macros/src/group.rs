@@ -203,7 +203,8 @@ fn impl_hashed_group(
 ) -> syn::Result<proc_macro2::TokenStream> {
   let toks: proc_macro2::TokenStream = match id_config {
     Some((_, None)) => quote! {},
-    Some((id_attri_name, Some(AutoImplConfig::OptionStr))) => quote! {
+    Some((id_attri_name, Some(AutoImplConfig::NotCare))) => quote! {},
+    Some((id_attri_name, Some(AutoImplConfig::Option))) => quote! {
       impl crate::ast::HashedGroup for #name {
         type Id=Option<String>;
         #[inline]

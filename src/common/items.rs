@@ -109,7 +109,7 @@ pub enum VariableType {
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 pub struct Domain {
-  #[liberty(id(title_len = 1))]
+  #[liberty(id(title = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
@@ -180,17 +180,20 @@ impl std::str::FromStr for WordSet {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
+#[readonly::make]
 pub struct TableLookUpMultiSegment {
-  #[liberty(simple)]
-  // TODO:
-  #[liberty(id(need))]
-  segment: usize,
-  #[liberty(id(title_len = 0.5))]
-  _id: GroupId<Self>,
+  #[liberty(title)]
+  #[liberty(id)]
+  #[readonly]
+  _title: Option<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
+  #[liberty(simple)]
+  #[liberty(id)]
+  #[readonly]
+  segment: usize,
   #[liberty(complex(type=Default))]
   pub index_1: Vec<f64>,
   #[liberty(complex(type=Default))]
@@ -205,8 +208,10 @@ pub struct TableLookUpMultiSegment {
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 pub struct TableLookUp {
-  #[liberty(id(title_len = 0.5))]
+  #[liberty(id)]
   _id: GroupId<Self>,
+  #[liberty(title)]
+  _title: Option<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]

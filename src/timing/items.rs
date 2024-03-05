@@ -206,7 +206,7 @@ impl ComplexAttri for Mode {
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::NameIdx)]
 pub struct CellDegradation {
-  #[liberty(id(title_len = 1))]
+  #[liberty(id(title = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
@@ -264,7 +264,7 @@ pub struct CellDegradation {
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 pub struct CellFall {
-  #[liberty(id(title_len = 0))]
+  #[liberty(id(title = 0))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,

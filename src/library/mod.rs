@@ -15,7 +15,7 @@ use std::fmt::{Display, Write};
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
 pub struct Library {
-  #[liberty(id(title_len = 1))]
+  #[liberty(id(title = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,

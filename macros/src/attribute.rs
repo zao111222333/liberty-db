@@ -9,7 +9,8 @@ pub(crate) enum AutoImplConfig {
   Num(usize),
   #[default]
   Vector,
-  OptionStr,
+  Option,
+  NotCare,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -168,13 +169,13 @@ pub(crate) fn parse_fields_type(
 /// // GroupComments
 /// #[liberty(comments)]
 /// // Auto vector Id: Vec<String>
-/// #[liberty(id(title_len=0))]
+/// #[liberty(id(title=0))]
 /// // Auto Id: Option<String>
-/// #[liberty(id(title_len=0.5))]
+/// #[liberty(id(title=0.5))]
 /// // Auto Id: String
-/// #[liberty(id(title_len=1))]
+/// #[liberty(id(title=1))]
 /// // Auto slice Id: [String:2]
-/// #[liberty(id(title_len=2))]
+/// #[liberty(id(title=2))]
 /// // GroupId
 /// #[liberty(id)]
 /// // Simple liberty attribute, defualt=Default
@@ -434,7 +435,7 @@ fn parse_group_type(
 fn parse_id_config(
   mut tokens: proc_macro2::token_stream::IntoIter,
 ) -> syn::Result<Option<AutoImplConfig>> {
-  let mut title_len = None;
+  let mut title = None;
   if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
     let mut args = g.stream().into_iter().peekable();
     loop {
@@ -445,7 +446,7 @@ fn parse_id_config(
       if let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
         match arg_id.to_string().as_str() {
           // "option_str" => return Ok(Some(AutoImplConfig::OptionStr)),
-          "title_len" => {
+          "title" => {
             if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
               if '=' != arg_punct.as_char() {
                 return Err(syn::Error::new(
@@ -460,20 +461,28 @@ fn parse_id_config(
               ));
             }
             if let Some(proc_macro2::TokenTree::Literal(arg_value)) = args.next() {
-              if arg_value.to_string() == "0.5" {
-                return Ok(Some(AutoImplConfig::OptionStr));
-              }
-              if let Ok(n) = arg_value.to_string().parse::<usize>() {
-                match n {
-                  0 => title_len = Some(AutoImplConfig::Vector),
-                  _ => title_len = Some(AutoImplConfig::Num(n - 1)),
+              match arg_value.to_string().as_str() {
+                "Option" => title = Some(AutoImplConfig::Option),
+                "Vec" => title = Some(AutoImplConfig::Vector),
+                "NotCare" => title = Some(AutoImplConfig::NotCare),
+                s => {
+                  if let Ok(n) = s.parse::<usize>() {
+                    match n {
+                      0 => title = Some(AutoImplConfig::Vector),
+                      _ => title = Some(AutoImplConfig::Num(n - 1)),
+                    }
+                  } else {
+                    return Err(syn::Error::new(
+                      proc_macro2::Span::call_site(),
+                      format!("#[liberty[id(title = `xxx`)]], where `xxx` should be one of `Option`,`NotCare`,`Vec`, of `usize`, find {}.", arg_value.to_string()),
+                    ));
+                  }
                 }
-              } else {
-                return Err(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  format!("id len should be usize, find {}.", arg_value.to_string()),
-                ));
               }
+              return Ok(title);
+              // if arg_value.to_string() == "0.5" {
+              //   title = Some(AutoImplConfig::Option);
+              // }
             } else {
               return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
@@ -493,7 +502,7 @@ fn parse_id_config(
       }
     }
   }
-  return Ok(title_len);
+  return Ok(title);
 }
 
 #[test]
@@ -504,9 +513,9 @@ fn main() {
 pub struct Foo {
     #[liberty(undefined)]
     undefined: bool,
-    #[liberty(id(title_len=2))]
+    #[liberty(id(title=2))]
     id_2: bool,
-    #[liberty(id(title_len=0))]
+    #[liberty(id(title=0))]
     id_vec: bool,
     #[liberty(id)]
     id_no_impl: bool,

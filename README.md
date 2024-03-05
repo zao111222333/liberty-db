@@ -34,4 +34,35 @@ See more in [doc](https://docs.rs/liberty-db)
 + or `#[liberty(id)]` for self impl
 + fix missing newline at endding
 + recursive parse boolean expression
-+ `BooleanExpression` `BooleanExpressionId`
++ merge `readonly` into this macros
++ HashedGroup Bulder;
+
+``` rust
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[readonly::make]
+pub struct TableLookUpMultiSegment {
+  #[liberty(title)]
+  #[liberty(id)]
+  #[readonly]
+  _title: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(simple)]
+  #[liberty(id)]
+  #[readonly]
+  segment: usize,
+  #[liberty(complex(type=Default))]
+  pub index_1: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_2: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_3: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub index_4: Vec<f64>,
+  #[liberty(complex(type=Default))]
+  pub values: Vec<f64>,
+}
+```

@@ -15,7 +15,7 @@ pub use items::*;
 #[derive(Debug, Default)]
 #[derive(liberty_macros::Group)]
 pub struct Cell {
-  #[liberty(id(title_len = 1))]
+  #[liberty(id(title = 1))]
   _id: GroupId<Self>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,

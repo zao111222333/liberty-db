@@ -182,7 +182,7 @@ pub trait ComplexAttri: Sized {
 
 #[derive(Debug, Default)]
 pub struct GroupMap<T: HashedGroup> {
-  map: HashMap<Arc<<T as HashedGroup>::Id>, T>,
+  map: HashMap<u64, T>,
 }
 
 impl<T: HashedGroup> GroupMap<T> {
@@ -207,22 +207,27 @@ impl<T: HashedGroup> DerefMut for GroupMap<T> {
 }
 
 /// Group Id
-pub type GroupId<T> = Arc<<T as HashedGroup>::Id>;
+// pub type GroupId<T> = Arc<<T as HashedGroup>::Id>;
 pub type GroupComments<T> = <T as GroupAttri>::Comments;
 
 /// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
-pub trait HashedGroup {
+pub trait HashedGroup: Hash {
+  type Bulder: Into<Self>;
   /// its Index
-  type Id: Sized + Hash + Eq + Debug + Clone;
+  // type Id: Sized + Hash + Eq + Debug + Clone;
   // type GroupId = Arc<<Self as HashedGroup>::Id>;
   /// generate title for wrapper
-  fn title(&self) -> Vec<String>;
+  // fn title(&self) -> Vec<String>;
   /// generate id from self
-  fn id(&self) -> GroupId<Self>;
+  fn hash(&self) -> u64 {
+      let mut hasher = std::hash::DefaultHasher::new();
+      self.hash(&mut hasher);
+      std::hash::Hasher::finish(&hasher)
+    }
+  }
   // fn idx_box(&self) -> Box<Self::Id>;
   // fn idx_clone(&self) -> Self::Id;
-  /// combine `self` and `title`, generate index
-  fn gen_id(&self, title: Vec<String>) -> Result<Self::Id, IdError>;
+  // fn gen_id(&self, title: Vec<String>) -> Result<Self::Id, IdError>;
 }
 
 /// AttriComment
