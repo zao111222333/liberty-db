@@ -42,17 +42,17 @@ See more in [doc](https://docs.rs/liberty-db)
 #[derive(liberty_macros::Group)]
 #[readonly::make]
 pub struct TableLookUpMultiSegment {
-  #[liberty(title)]
-  #[liberty(id)]
   #[readonly]
-  _title: Option<String>,
+  #[liberty(id)]
+  #[liberty(name)]
+  name: Option<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
-  #[liberty(simple)]
-  #[liberty(id)]
   #[readonly]
+  #[liberty(id)]
+  #[liberty(simple)]
   segment: usize,
   #[liberty(complex(type=Default))]
   pub index_1: Vec<f64>,

@@ -188,11 +188,11 @@ pub struct GroupMap<T: HashedGroup> {
 impl<T: HashedGroup> GroupMap<T> {
   #[inline]
   pub fn insert(&mut self, v: T) -> Option<T> {
-    <Self as DerefMut>::deref_mut(self).insert(v.id(), v)
+    <Self as DerefMut>::deref_mut(self).insert(v.hash(), v)
   }
 }
 impl<T: HashedGroup> Deref for GroupMap<T> {
-  type Target = HashMap<Arc<<T as HashedGroup>::Id>, T>;
+  type Target = HashMap<u64, T>;
   #[inline]
   fn deref(&self) -> &Self::Target {
     &self.map
@@ -212,23 +212,23 @@ pub type GroupComments<T> = <T as GroupAttri>::Comments;
 
 /// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
 pub trait HashedGroup: Hash {
-  type Bulder: Into<Self>;
+  type Bulder: Into<Self> + From<Self>;
   /// its Index
   // type Id: Sized + Hash + Eq + Debug + Clone;
   // type GroupId = Arc<<Self as HashedGroup>::Id>;
   /// generate title for wrapper
   // fn title(&self) -> Vec<String>;
   /// generate id from self
+  #[inline]
   fn hash(&self) -> u64 {
-      let mut hasher = std::hash::DefaultHasher::new();
-      self.hash(&mut hasher);
-      std::hash::Hasher::finish(&hasher)
-    }
+    let mut hasher = std::hash::DefaultHasher::new();
+    self.hash(&mut hasher);
+    std::hash::Hasher::finish(&hasher)
   }
-  // fn idx_box(&self) -> Box<Self::Id>;
-  // fn idx_clone(&self) -> Self::Id;
-  // fn gen_id(&self, title: Vec<String>) -> Result<Self::Id, IdError>;
 }
+// fn idx_box(&self) -> Box<Self::Id>;
+// fn idx_clone(&self) -> Self::Id;
+// fn gen_id(&self, title: Vec<String>) -> Result<Self::Id, IdError>;
 
 /// AttriComment
 pub type AttriComment = Vec<String>;
