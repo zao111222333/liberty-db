@@ -30,12 +30,12 @@ See more in [doc](https://docs.rs/liberty-db)
 + ![](https://progress-bar.dev/90?title=doing) format to `liberty`
 + ![](https://progress-bar.dev/60?title=doing) macros
 + ![](https://progress-bar.dev/0?title=todo) stream input
-+ `#[liberty(id(title = NotCare))]` `#[liberty(id(title = 0.5))]` `#[liberty(id(need))]` for auto impl
-+ or `#[liberty(id)]` for self impl
++ `#[liberty(id)]` for self impl `HashedGroup`
 + fix missing newline at endding
 + recursive parse boolean expression
 + merge `readonly` into this macros
 + HashedGroup Bulder;
++ replace `#[liberty(group(type=Option))]`,`#[liberty(group(type=Vec))]` to `#[liberty(group)]`, since `Option<>` and `Vec<>` should have `Default::default(self)` function
 
 ``` rust
 #[derive(Debug, Default, Clone)]
