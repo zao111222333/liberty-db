@@ -128,10 +128,10 @@ fn group_field_fn(
         *line_num+=n;
       };
     }
-    AttriType::Group(GroupType::Map) => {
+    AttriType::Group(GroupType::Set) => {
       attri_comment = quote! {};
       write_field = quote! {
-        for (_,group) in self.#field_name.iter(){
+        for group in self.#field_name.iter(){
           <crate::ast::AttriComment as crate::ast::Format>::liberty(group.comment(), "", f)?;
           crate::ast::GroupAttri::fmt_liberty(group, #s_field_name, f)?;
         }
@@ -141,7 +141,7 @@ fn group_field_fn(
         (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
         match group_res{
           Ok(group) => {
-            if let Some(_) = res.#field_name.insert(
+            if let Some(_) = res.#field_name.replace(
               group,
             ){
               let e = crate::ast::IdError::RepeatIdx;
@@ -197,108 +197,6 @@ fn group_field_fn(
   ))
 }
 
-fn impl_hashed_group(
-  name: &proc_macro2::Ident,
-  id_config: &Option<IdConfig>,
-) -> syn::Result<proc_macro2::TokenStream> {
-  let toks: proc_macro2::TokenStream = match id_config {
-    Some((_, None)) => quote! {},
-    Some((id_attri_name, Some(AutoImplConfig::NotCare))) => quote! {},
-    Some((id_attri_name, Some(AutoImplConfig::Option))) => quote! {
-      impl crate::ast::HashedGroup for #name {
-        type Id=Option<String>;
-        #[inline]
-        fn title(&self) -> Vec<String> {
-          match Option::as_ref(&self._id) {
-            Some(s) => vec![s.clone()],
-            None => vec![],
-          }
-        }
-        #[inline]
-        fn id(&self) -> crate::ast::GroupId<Self> {
-          self.#id_attri_name.clone()
-          // todo!()
-        }
-        #[inline]
-        fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id,crate::ast::IdError>{
-          Ok(title.pop())
-        }
-      }
-    },
-    Some((id_attri_name, Some(AutoImplConfig::Num(0)))) => quote! {
-      impl crate::ast::HashedGroup for #name {
-        type Id=String;
-        #[inline]
-        fn title(&self) -> Vec<String>{
-          vec![ToString::to_string(&self.#id_attri_name)]
-        }
-        #[inline]
-        fn id(&self) -> crate::ast::GroupId<Self> {
-          self.#id_attri_name.clone()
-        }
-        #[inline]
-        fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id,crate::ast::IdError>{
-          let l=title.len();
-          if l!=1{
-              return Err(crate::ast::IdError::LengthDismatch(1,l,title));
-          }
-          if let Some(name) = title.pop(){
-            Ok(name)
-          }else{
-            return Err(crate::ast::IdError::Other("Unkown pop error".into()));
-          }
-        }
-      }
-    },
-    Some((id_attri_name, Some(AutoImplConfig::Num(n)))) => {
-      let len = n + 1;
-      quote! {
-        impl crate::ast::HashedGroup for #name {
-          type Id=[String;#len];
-          #[inline]
-          fn title(&self) -> Vec<String>{
-            self.#id_attri_name.to_vec()
-          }
-          #[inline]
-          fn id(&self) -> crate::ast::GroupId<Self> {
-            self.#id_attri_name.clone()
-          }
-          #[inline]
-          fn gen_id(&self, title: Vec<String>) -> Result<Self::Id,crate::ast::IdError>{
-            let l=title.len();
-            if l!=#len{
-                return Err(crate::ast::IdError::LengthDismatch(#len,l,title));
-            }
-            match TryInto::<[String; #len ]>::try_into(title){
-              Ok(name) => Ok(name),
-              Err(e) => Err(crate::ast::IdError::Other(format!("try_into error: {:?}",e))),
-            }
-          }
-        }
-      }
-    }
-    Some((id_attri_name, Some(AutoImplConfig::Vector))) => quote! {
-      impl crate::ast::HashedGroup for #name {
-        type Id=Vec<String>;
-        #[inline]
-        fn title(&self) -> Vec<String>{
-          self.#id_attri_name.to_vec()
-        }
-        #[inline]
-        fn id(&self) -> crate::ast::GroupId<Self> {
-          self.#id_attri_name.clone()
-        }
-        #[inline]
-        fn gen_id(&self, title: Vec<String>) -> Result<Self::Id,crate::ast::IdError>{
-          Ok(title)
-        }
-      }
-    },
-    None => quote! {},
-  };
-  Ok(toks)
-}
-
 pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
   let name = &ast.ident;
   let st = match &ast.data {
@@ -310,10 +208,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
 
   if let Fields::Named(named) = &st.fields {
     let fields = &named.named;
-    let (attri_type_map, id_config, undefined_name, comments_name) =
+    let (attri_type_map, name_name, undefined_name, comments_name) =
       parse_fields_type(fields)?;
-    let impl_hashed_group = impl_hashed_group(name, &id_config)?;
-
     let mut attri_comments = quote! {};
     let mut parser_arms = quote! {};
     let mut write_fields = quote! {};
@@ -346,11 +242,11 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         ));
       }
     }
-    let change_id_return = if let Some((id_name, _)) = &id_config {
+    let change_id_return = if let Some(name_name) = name_name {
       quote! {
-        match crate::ast::HashedGroup::gen_id(&res,title){
-          Ok(id) => {
-            res.#id_name = std::sync::Arc::new(id);
+        match crate::ast::NameAttri::parse(title){
+          Ok(name) => {
+            res.#name_name = name;
             return Ok((input,Ok(res)));
           },
           Err(e) => {
@@ -361,16 +257,11 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     } else {
       quote! {return Ok((input, Ok(res)));}
     };
-    let write_title = if let Some(_) = &id_config {
+    let write_title = if let Some(name_name) = name_name {
       quote! {
-        write!(f,"\n{} ({}) {{", key, crate::ast::HashedGroup::title(self).iter().map(
-          |s|
-          if crate::ast::is_word(s){
-            s.clone()
-          }else{
-            "\"".to_owned()+s+"\""
-          }
-        ).join(","))?;
+        write!(f,"\n{} (",key)?;
+        crate::ast::NameAttri::fmt_liberty(&self.#name_name, f)?;
+        write!(f,") {{")?;
       }
     } else {
       quote! {
@@ -459,7 +350,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
     };
     Ok(quote! {
-      #impl_hashed_group
+      // #impl_hashed_group
       #impl_group
     })
   } else {
@@ -472,18 +363,18 @@ fn main() {
   use syn::parse_str;
   let input = r#"
   #[derive(liberty_macros::Group)]
-struct Timing {
-  #[liberty(undefined)]
-  _undefined: AttributeList,
-  #[liberty(comments)]
-  _comments: GroupComments<Self>,
-  #[liberty(complex)]
-  values: Vec<f64>,
-  #[liberty(simple(type=Option))]
-  t1: Option<TimingType>,
-  #[liberty(simple(type=Option))]
-  t2: Option<TimingType>,
-}"#;
+  struct Timing {
+    #[liberty(undefined)]
+    _undefined: AttributeList,
+    #[liberty(comments)]
+    _comments: GroupComments<Self>,
+    #[liberty(complex)]
+    values: Vec<f64>,
+    #[liberty(simple(type=Option))]
+    t1: Option<TimingType>,
+    #[liberty(simple(type=Option))]
+    t2: Option<TimingType>,
+  }"#;
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();
   let out = inner(&ast).unwrap_or_else(|err| err.to_compile_error().into());
   println!("{}", out)

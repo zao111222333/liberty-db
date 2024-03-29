@@ -2,9 +2,10 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use crate::ast::{AttributeList, GroupComments, GroupId, GroupMap, HashedGroup};
+use crate::ast::{AttributeList, GroupComments};
 use crate::expression::{logic, BooleanExpression};
 use crate::timing::Timing;
+use mut_set::MutSet;
 mod items;
 use crate::units;
 pub use items::*;
@@ -26,12 +27,13 @@ pub use items::*;
 /// + An example of the `pin` group syntax showing the attribute
 /// and group statements that you can use within the `pin` group
 /// + Descriptions of the attributes and groups you can use in a `pin` group
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-// #[derive(liberty_macros::NameIdx)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct Pin {
-  #[liberty(id(title = 1))]
-  _id: GroupId<Self>,
+  #[id]
+  #[liberty(name)]
+  pub name: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -800,51 +802,51 @@ pub struct Pin {
   /// =67.43
   /// "
   /// style="width: 90%; height: 600px;"></iframe>
-  #[liberty(group(type=Map))]
-  pub timing: GroupMap<Timing>,
+  #[liberty(group(type=Set))]
+  pub timing: MutSet<Timing>,
 }
 
-#[test]
-fn test_link() {
-  use crate::ast::{LinkError, LinkedGroup};
-  use std::cell::RefCell;
-  use std::collections::HashSet;
-  use std::sync::Arc;
-  let arc_set: Arc<RefCell<GroupMap<Pin>>>;
-  {
-    let mut pin_a = Pin::default();
-    pin_a._id = String::from("A").into();
-    let mut pin_b = Pin::default();
-    pin_b._id = String::from("B").into();
-    let mut set = GroupMap::<Pin>::default();
-    let _ = set.insert(pin_a);
-    let _ = set.insert(pin_b);
-    arc_set = Arc::new(RefCell::new(set));
-  }
-  let pin_a_link = LinkedGroup::<Pin>::new(String::from("A").into(), &arc_set);
-  pin_a_link.get_linked(|r| {
-    println!("{:?}", r);
-  });
-  println!("---------");
-  {
-    let mut pin_a = Pin::default();
-    pin_a._id = String::from("A").into();
-    pin_a.bit_width = 12345;
-    let _ = arc_set.borrow_mut().insert(pin_a);
-    pin_a_link.get_linked(|r| {
-      assert!(matches!(r, Ok(_)));
-      assert_eq!(r.unwrap().bit_width, 12345);
-    });
-  }
-  println!("---------");
-  {
-    let xxx = arc_set.borrow_mut();
-    let pin_a_link__ = LinkedGroup::<Pin>::new(String::from("A").into(), &arc_set);
-    pin_a_link__.get_linked(|r| assert!(matches!(r, Err(LinkError::BorrowError(_)))));
-  }
-  println!("---------");
-  {
-    let pin_c_link__ = LinkedGroup::<Pin>::new(String::from("C").into(), &arc_set);
-    pin_c_link__.get_linked(|r| assert!(matches!(r, Err(LinkError::NotFind))));
-  }
-}
+// #[test]
+// fn test_link() {
+//   use crate::ast::{LinkError, LinkedGroup};
+//   use std::cell::RefCell;
+//   use std::collections::HashSet;
+//   use std::sync::Arc;
+//   let arc_set: Arc<RefCell<GroupMap<Pin>>>;
+//   {
+//     let mut pin_a = Pin::default();
+//     pin_a._id = String::from("A").into();
+//     let mut pin_b = Pin::default();
+//     pin_b._id = String::from("B").into();
+//     let mut set = GroupMap::<Pin>::default();
+//     let _ = set.insert(pin_a);
+//     let _ = set.insert(pin_b);
+//     arc_set = Arc::new(RefCell::new(set));
+//   }
+//   let pin_a_link = LinkedGroup::<Pin>::new(String::from("A").into(), &arc_set);
+//   pin_a_link.get_linked(|r| {
+//     println!("{:?}", r);
+//   });
+//   println!("---------");
+//   {
+//     let mut pin_a = Pin::default();
+//     pin_a._id = String::from("A").into();
+//     pin_a.bit_width = 12345;
+//     let _ = arc_set.borrow_mut().insert(pin_a);
+//     pin_a_link.get_linked(|r| {
+//       assert!(matches!(r, Ok(_)));
+//       assert_eq!(r.unwrap().bit_width, 12345);
+//     });
+//   }
+//   println!("---------");
+//   {
+//     let xxx = arc_set.borrow_mut();
+//     let pin_a_link__ = LinkedGroup::<Pin>::new(String::from("A").into(), &arc_set);
+//     pin_a_link__.get_linked(|r| assert!(matches!(r, Err(LinkError::BorrowError(_)))));
+//   }
+//   println!("---------");
+//   {
+//     let pin_c_link__ = LinkedGroup::<Pin>::new(String::from("C").into(), &arc_set);
+//     pin_c_link__.get_linked(|r| assert!(matches!(r, Err(LinkError::NotFind))));
+//   }
+// }

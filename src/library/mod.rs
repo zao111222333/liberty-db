@@ -5,18 +5,20 @@
 mod items;
 pub use items::*;
 
-use crate::ast::{AttributeList, GroupComments, GroupId, GroupMap, HashedGroup};
+use crate::ast::{AttributeList, GroupComments};
 use crate::cell::Cell;
-use crate::pin::Pin;
 use crate::units;
+use mut_set::MutSet;
 use std::collections::HashMap;
 use std::fmt::{Display, Write};
 #[derive(Debug, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct Library {
-  #[liberty(id(title = 1))]
-  _id: GroupId<Self>,
+  #[id]
+  #[liberty(name)]
+  pub name: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -68,8 +70,8 @@ pub struct Library {
   #[liberty(simple)]
   #[derivative(Default(value = "80.0"))]
   pub slew_upper_threshold_pct_rise: f64,
-  #[liberty(group(type=Map))]
-  pub cell: GroupMap<Cell>,
+  #[liberty(group(type=Set))]
+  pub cell: MutSet<Cell>,
   pub voltage_map: HashMap<String, f64>,
   pub sensitization_map: HashMap<String, Sensitization>,
 }

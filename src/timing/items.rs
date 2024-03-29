@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use crate::{
-  ast::{self, ComplexAttri, GroupComments, GroupId},
+  ast::{self, ComplexAttri, GroupComments},
   common::items::Domain,
   expression::{logic, logic::LogicLike, BooleanExpression},
 };
@@ -204,10 +204,11 @@ impl ComplexAttri for Mode {
 ///
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-// #[derive(liberty_macros::NameIdx)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct CellDegradation {
-  #[liberty(id(title = 1))]
-  _id: GroupId<Self>,
+  #[id]
+  #[liberty(name)]
+  pub name: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -263,9 +264,11 @@ pub struct CellDegradation {
 // #[derive(liberty_macros::NameIdx)]
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct CellFall {
-  #[liberty(id(title = 0))]
-  _id: GroupId<Self>,
+  #[id]
+  #[liberty(name)]
+  name: Vec<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]

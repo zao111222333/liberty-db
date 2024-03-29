@@ -60,4 +60,5 @@ ryu = "1.0.13"
 itoa = "1.0"
 uom = { version = "0.34.0", default-features = false, features = ["autoconvert","f64","si", "std",] }
 biodivine-lib-bdd = "0.5.11"
-readonly = "0.2.12"
+mut_set = "0.2.7"
+mut_set_derive = "0.2.7"

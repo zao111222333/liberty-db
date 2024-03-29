@@ -2,34 +2,21 @@ use std::{collections::HashMap, fmt::Debug};
 
 use proc_macro2::Ident;
 
-#[derive(Debug, Clone, Copy, Default)]
-pub(crate) enum AutoImplConfig {
-  // usize = 0 : id=String
-  // usize = n : id=[String;n+1]
-  Num(usize),
-  #[default]
-  Vector,
-  Option,
-  NotCare,
-}
-
 #[derive(Debug, Clone, Copy)]
 enum InternalType {
-  /// `id`
-  Id(Option<AutoImplConfig>),
+  /// `name`
+  Name,
   /// `undefined`
   UndefinedAttributeList,
   /// `comment`
   Comment,
 }
 
-pub(crate) type IdConfig = (Ident, Option<AutoImplConfig>);
-
 #[derive(Debug, Clone, Copy, Default)]
 pub(crate) enum GroupType {
   #[default]
   Option,
-  Map,
+  Set,
   Vec,
 }
 
@@ -69,14 +56,14 @@ pub(crate) fn parse_fields_type(
   fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
 ) -> syn::Result<(
   HashMap<&Ident, AttriType>,
-  // Id Config
-  Option<IdConfig>,
+  // Name
+  Option<&Ident>,
   // undefined name
   &Ident,
   // comment name
   &Ident,
 )> {
-  let mut id_config = None;
+  let mut _name_name = None;
   let mut _undefined_name = None;
   let mut _comments_name = None;
   let mut err_buf = None;
@@ -86,14 +73,14 @@ pub(crate) fn parse_fields_type(
       if let (Some(field_name), field_attrs) = (&field.ident, &field.attrs) {
         match parse_field_attrs(field_attrs) {
           Ok(Some(t)) => match t {
-            FieldType::Internal(InternalType::Id(config)) => {
-              if let Some((name, _)) = &id_config {
+            FieldType::Internal(InternalType::Name) => {
+              if let Some(name) = &_name_name {
                 err_buf = Some(syn::Error::new(
                   proc_macro2::Span::call_site(),
-                  format!("duplicated id {}.", name),
+                  format!("duplicated name {}.", name),
                 ));
               } else {
-                id_config = Some((field_name.clone(), config));
+                _name_name = Some(field_name);
               }
               None
             }
@@ -157,7 +144,7 @@ pub(crate) fn parse_fields_type(
         ))
       }
       (Some(undefined_name), Some(comments_name)) => {
-        return Ok((attri_type_map, id_config, undefined_name, comments_name))
+        return Ok((attri_type_map, _name_name, undefined_name, comments_name))
       }
     }
   }
@@ -210,9 +197,8 @@ fn parse_field_attrs(
             list.tokens.clone().into_iter();
           if let Some(proc_macro2::TokenTree::Ident(token_id)) = tokens.next() {
             match token_id.to_string().as_str() {
-              "id" => {
-                let id_config = parse_id_config(tokens)?;
-                return Ok(Some(FieldType::Internal(InternalType::Id(id_config))));
+              "name" => {
+                return Ok(Some(FieldType::Internal(InternalType::Name)));
               }
               "undefined" => {
                 return Ok(Some(FieldType::Internal(
@@ -402,7 +388,7 @@ fn parse_group_type(
               match arg_value.to_string().as_str() {
                 "Option" => group_type = GroupType::Option,
                 "Vec" => group_type = GroupType::Vec,
-                "Map" => group_type = GroupType::Map,
+                "Set" => group_type = GroupType::Set,
                 _ => {
                   return Err(syn::Error::new(
                     proc_macro2::Span::call_site(),
@@ -432,78 +418,78 @@ fn parse_group_type(
   return Ok(group_type);
 }
 
-fn parse_id_config(
-  mut tokens: proc_macro2::token_stream::IntoIter,
-) -> syn::Result<Option<AutoImplConfig>> {
-  let mut title = None;
-  if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
-    let mut args = g.stream().into_iter().peekable();
-    loop {
-      if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.peek() {
-        assert_eq!(',', arg_punct.as_char());
-        let _ = args.next();
-      }
-      if let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
-        match arg_id.to_string().as_str() {
-          // "option_str" => return Ok(Some(AutoImplConfig::OptionStr)),
-          "title" => {
-            if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
-              if '=' != arg_punct.as_char() {
-                return Err(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  format!("miss equal."),
-                ));
-              }
-            } else {
-              return Err(syn::Error::new(
-                proc_macro2::Span::call_site(),
-                format!("miss equal."),
-              ));
-            }
-            if let Some(proc_macro2::TokenTree::Literal(arg_value)) = args.next() {
-              match arg_value.to_string().as_str() {
-                "Option" => title = Some(AutoImplConfig::Option),
-                "Vec" => title = Some(AutoImplConfig::Vector),
-                "NotCare" => title = Some(AutoImplConfig::NotCare),
-                s => {
-                  if let Ok(n) = s.parse::<usize>() {
-                    match n {
-                      0 => title = Some(AutoImplConfig::Vector),
-                      _ => title = Some(AutoImplConfig::Num(n - 1)),
-                    }
-                  } else {
-                    return Err(syn::Error::new(
-                      proc_macro2::Span::call_site(),
-                      format!("#[liberty[id(title = `xxx`)]], where `xxx` should be one of `Option`,`NotCare`,`Vec`, of `usize`, find {}.", arg_value.to_string()),
-                    ));
-                  }
-                }
-              }
-              return Ok(title);
-              // if arg_value.to_string() == "0.5" {
-              //   title = Some(AutoImplConfig::Option);
-              // }
-            } else {
-              return Err(syn::Error::new(
-                proc_macro2::Span::call_site(),
-                format!("miss id_len."),
-              ));
-            }
-          }
-          _ => {
-            return Err(syn::Error::new(
-              proc_macro2::Span::call_site(),
-              format!("id not support {} group.", arg_id.to_string().as_str()),
-            ))
-          }
-        }
-      } else {
-        break;
-      }
-    }
-  }
-  return Ok(title);
-}
+// fn parse_id_config(
+//   mut tokens: proc_macro2::token_stream::IntoIter,
+// ) -> syn::Result<Option<AutoImplConfig>> {
+//   let mut title = None;
+//   if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
+//     let mut args = g.stream().into_iter().peekable();
+//     loop {
+//       if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.peek() {
+//         assert_eq!(',', arg_punct.as_char());
+//         let _ = args.next();
+//       }
+//       if let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
+//         match arg_id.to_string().as_str() {
+//           // "option_str" => return Ok(Some(AutoImplConfig::OptionStr)),
+//           "title" => {
+//             if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
+//               if '=' != arg_punct.as_char() {
+//                 return Err(syn::Error::new(
+//                   proc_macro2::Span::call_site(),
+//                   format!("miss equal."),
+//                 ));
+//               }
+//             } else {
+//               return Err(syn::Error::new(
+//                 proc_macro2::Span::call_site(),
+//                 format!("miss equal."),
+//               ));
+//             }
+//             if let Some(proc_macro2::TokenTree::Literal(arg_value)) = args.next() {
+//               match arg_value.to_string().as_str() {
+//                 "Option" => title = Some(AutoImplConfig::Option),
+//                 "Vec" => title = Some(AutoImplConfig::Vector),
+//                 "NotCare" => title = Some(AutoImplConfig::NotCare),
+//                 s => {
+//                   if let Ok(n) = s.parse::<usize>() {
+//                     match n {
+//                       0 => title = Some(AutoImplConfig::Vector),
+//                       _ => title = Some(AutoImplConfig::Num(n - 1)),
+//                     }
+//                   } else {
+//                     return Err(syn::Error::new(
+//                       proc_macro2::Span::call_site(),
+//                       format!("#[liberty[id(title = `xxx`)]], where `xxx` should be one of `Option`,`NotCare`,`Vec`, of `usize`, find {}.", arg_value.to_string()),
+//                     ));
+//                   }
+//                 }
+//               }
+//               return Ok(title);
+//               // if arg_value.to_string() == "0.5" {
+//               //   title = Some(AutoImplConfig::Option);
+//               // }
+//             } else {
+//               return Err(syn::Error::new(
+//                 proc_macro2::Span::call_site(),
+//                 format!("miss id_len."),
+//               ));
+//             }
+//           }
+//           _ => {
+//             return Err(syn::Error::new(
+//               proc_macro2::Span::call_site(),
+//               format!("id not support {} group.", arg_id.to_string().as_str()),
+//             ))
+//           }
+//         }
+//       } else {
+//         break;
+//       }
+//     }
+//   }
+//   return Ok(title);
+// }
 
 #[test]
 fn main() {

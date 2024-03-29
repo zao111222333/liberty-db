@@ -19,50 +19,18 @@ cargo test --package liberty-tests --test tests
 ## Usage
 ```toml
 [dependencies]
-liberty_db = "0.2"
+liberty_db = "0.4"
 ```
 
 See more in [doc](https://docs.rs/liberty-db)
 
 ## ToDo List
-+ ![](https://progress-bar.dev/100?title=done) support comment
-+ ![](https://progress-bar.dev/100?title=done) support multi-line `\`
-+ ![](https://progress-bar.dev/90?title=doing) format to `liberty`
-+ ![](https://progress-bar.dev/60?title=doing) macros
-+ ![](https://progress-bar.dev/0?title=todo) stream input
-+ `#[liberty(id)]` for self impl `HashedGroup`
+
++ stream input
 + fix missing newline at endding
 + recursive parse boolean expression
-+ merge `readonly` into this macros
-+ HashedGroup Bulder;
-+ replace `#[liberty(group(type=Option))]`,`#[liberty(group(type=Vec))]` to `#[liberty(group)]`, since `Option<>` and `Vec<>` should have `Default::default(self)` function
-
-``` rust
-#[derive(Debug, Default, Clone)]
-#[derive(liberty_macros::Group)]
-#[readonly::make]
-pub struct TableLookUpMultiSegment {
-  #[readonly]
-  #[liberty(id)]
-  #[liberty(name)]
-  name: Option<String>,
-  #[liberty(comments)]
-  _comments: GroupComments<Self>,
-  #[liberty(undefined)]
-  _undefined: crate::ast::AttributeList,
-  #[readonly]
-  #[liberty(id)]
-  #[liberty(simple)]
-  segment: usize,
-  #[liberty(complex(type=Default))]
-  pub index_1: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_2: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_3: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_4: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub values: Vec<f64>,
-}
-```
++ ~~macros~~
++ ~~format to `liberty`~~
++ ~~support multi-line `\`~~
++ ~~support comment~~
++ ~~Use `MutSet` to store GroupMap~~

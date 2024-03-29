@@ -1,9 +1,7 @@
 use std::{hash::Hash, str::FromStr, sync::Arc};
 
 use crate::{
-  ast::{GroupComments, GroupId},
-  common::items::WordSet,
-  expression::BooleanExpressionId,
+  ast::GroupComments, common::items::WordSet, expression::BooleanExpressionId,
   timing::items::Mode,
 };
 
@@ -14,22 +12,24 @@ use crate::{
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct LeakagePower {
-  #[liberty(id)]
-  _id: GroupId<Self>,
+  #[id]
+  #[liberty(name)]
+  name: Vec<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
-  // TODO:
+  #[id]
   #[liberty(simple(type=Option))]
   power_level: Option<String>,
-  // TODO:
+  #[id]
   #[liberty(simple)]
   related_pg_pin: WordSet,
-  // TODO:
+  #[id]
   #[liberty(simple(type=Option))]
   when: Option<BooleanExpressionId>,
   #[liberty(simple)]
@@ -45,25 +45,25 @@ pub struct LeakagePowerId {
   when: Option<BooleanExpressionId>,
 }
 
-impl crate::ast::HashedGroup for LeakagePower {
-  type Id = LeakagePowerId;
+// impl crate::ast::HashedGroup for LeakagePower {
+//   type Id = LeakagePowerId;
 
-  fn title(&self) -> Vec<String> {
-    vec![]
-  }
+//   fn title(&self) -> Vec<String> {
+//     vec![]
+//   }
 
-  fn gen_id(&self, _: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
-    Ok(Self::Id {
-      power_level: self.power_level.clone(),
-      related_pg_pin: self.related_pg_pin.clone(),
-      when: self.when.clone(),
-    })
-  }
+//   fn gen_id(&self, _: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
+//     Ok(Self::Id {
+//       power_level: self.power_level.clone(),
+//       related_pg_pin: self.related_pg_pin.clone(),
+//       when: self.when.clone(),
+//     })
+//   }
 
-  fn id(&self) -> GroupId<Self> {
-    self._id.clone()
-  }
-}
+//   fn id(&self) -> GroupId<Self> {
+//     self._id.clone()
+//   }
+// }
 
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
@@ -72,17 +72,19 @@ impl crate::ast::HashedGroup for LeakagePower {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct Statetable {
-  #[liberty(id)]
-  _id: GroupId<Self>,
+  #[id]
+  #[liberty(name)]
+  pub name: [String; 2],
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   #[liberty(simple)]
-  table: Table,
+  pub table: Table,
 }
 
 #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
@@ -91,42 +93,42 @@ pub struct StatetableId {
   pub internal_node: Vec<String>,
 }
 
-impl crate::ast::HashedGroup for Statetable {
-  type Id = StatetableId;
+// impl crate::ast::HashedGroup for Statetable {
+//   type Id = StatetableId;
 
-  fn title(&self) -> Vec<String> {
-    let id = self.id().clone();
-    vec![id.input_npde.join(" "), id.internal_node.join(" ")]
-  }
+//   fn title(&self) -> Vec<String> {
+//     let id = self.id().clone();
+//     vec![id.input_npde.join(" "), id.internal_node.join(" ")]
+//   }
 
-  fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
-    let l = title.len();
-    if l != 2 {
-      return Err(crate::ast::IdError::LengthDismatch(2, l, title));
-    }
-    let internal_node = if let Some(s) = title.pop() {
-      s.split_ascii_whitespace()
-        .map(ToString::to_string)
-        .collect::<Vec<String>>()
-    } else {
-      return Err(crate::ast::IdError::Other("Unkown pop error".into()));
-    };
-    let input_npde = if let Some(s) = title.pop() {
-      s.split_ascii_whitespace()
-        .map(ToString::to_string)
-        .collect::<Vec<String>>()
-    } else {
-      return Err(crate::ast::IdError::Other("Unkown pop error".into()));
-    };
-    Ok(Self::Id { input_npde, internal_node })
-  }
+//   fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
+//     let l = title.len();
+//     if l != 2 {
+//       return Err(crate::ast::IdError::LengthDismatch(2, l, title));
+//     }
+//     let internal_node = if let Some(s) = title.pop() {
+//       s.split_ascii_whitespace()
+//         .map(ToString::to_string)
+//         .collect::<Vec<String>>()
+//     } else {
+//       return Err(crate::ast::IdError::Other("Unkown pop error".into()));
+//     };
+//     let input_npde = if let Some(s) = title.pop() {
+//       s.split_ascii_whitespace()
+//         .map(ToString::to_string)
+//         .collect::<Vec<String>>()
+//     } else {
+//       return Err(crate::ast::IdError::Other("Unkown pop error".into()));
+//     };
+//     Ok(Self::Id { input_npde, internal_node })
+//   }
 
-  fn id(&self) -> GroupId<Self> {
-    self._id.clone()
-  }
-}
+//   fn id(&self) -> GroupId<Self> {
+//     self._id.clone()
+//   }
+// }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct Table {
   pub v: Vec<String>,
 }

@@ -1,13 +1,15 @@
 //! cargo expand common::demo
+use mut_set::MutSet;
+
 use crate::{
-  ast::{AttributeList, GroupAttri, GroupComments, GroupId, GroupMap},
+  ast::{AttributeList, GroupAttri, GroupComments},
   cell::Statetable,
   timing::TimingType,
 };
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-struct Timing {
+pub(crate) struct Timing {
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(comments)]
@@ -20,11 +22,13 @@ struct Timing {
   t2: Option<TimingType>,
 }
 
-#[derive(Default, Debug)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-struct Pin {
-  #[liberty(id(title = 1))]
-  _id: GroupId<Self>,
+pub(crate) struct Pin {
+  #[id]
+  #[liberty(name)]
+  name: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -32,11 +36,14 @@ struct Pin {
   #[liberty(group(type=Vec))]
   timing: Vec<Timing>,
 }
+
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
-struct Ff {
-  #[liberty(id(title = 2))]
-  _id: GroupId<Self>,
+pub(crate) struct Ff {
+  #[id]
+  #[liberty(name)]
+  name: [String; 2],
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -47,19 +54,19 @@ struct Ff {
 
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
-struct Cell {
-  #[liberty(id(title = 1))]
-  _id: GroupId<Self>,
+pub(crate) struct Cell {
+  #[liberty(name)]
+  name: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(simple(type=Option))]
   area: Option<f64>,
-  #[liberty(group(type=Map))]
-  ff: GroupMap<Ff>,
-  #[liberty(group(type=Map))]
-  pin: GroupMap<Pin>,
+  #[liberty(group(type=Set))]
+  ff: MutSet<Ff>,
+  #[liberty(group(type=Set))]
+  pin: MutSet<Pin>,
   #[liberty(group(type=Option))]
   statetable: Option<Statetable>,
 }

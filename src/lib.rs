@@ -36,9 +36,9 @@
     elided_lifetimes_in_paths, // allow anonymous lifetime
     missing_debug_implementations,
     // missing_docs, // TODO: add documents
-    trivial_casts, // TODO: remove trivial casts in code
+    // trivial_casts, // TODO: remove trivial casts in code
     trivial_numeric_casts,
-    unsafe_code,
+    // unsafe_code,
     unstable_features,
     unused_extern_crates,
     unused_import_braces,

@@ -41,6 +41,66 @@ impl super::SimpleAttri for isize {
   }
 }
 
+impl super::NameAttri for Option<String> {
+  #[inline]
+  fn parse(mut v: Vec<String>) -> Result<Self, super::IdError> {
+    Ok(v.pop())
+  }
+  #[inline]
+  fn into_vec(&self) -> Vec<String> {
+    match self {
+      Some(s) => vec![s.clone()],
+      None => vec![],
+    }
+  }
+}
+
+impl super::NameAttri for String {
+  #[inline]
+  fn parse(mut v: Vec<String>) -> Result<Self, super::IdError> {
+    let l = v.len();
+    if l != 1 {
+      return Err(super::IdError::LengthDismatch(1, l, v));
+    }
+    if let Some(name) = v.pop() {
+      Ok(name)
+    } else {
+      return Err(super::IdError::Other("Unkown pop error".into()));
+    }
+  }
+  #[inline]
+  fn into_vec(&self) -> Vec<String> {
+    vec![self.clone()]
+  }
+}
+
+impl super::NameAttri for Vec<String> {
+  fn parse(v: Vec<String>) -> Result<Self, super::IdError> {
+    Ok(v)
+  }
+
+  fn into_vec(&self) -> Vec<String> {
+    self.clone()
+  }
+}
+
+impl<const N: usize> super::NameAttri for [String; N] {
+  fn parse(v: Vec<String>) -> Result<Self, super::IdError> {
+    let l = v.len();
+    if l != N {
+      return Err(crate::ast::IdError::LengthDismatch(N, l, v));
+    }
+    match TryInto::<[String; N]>::try_into(v) {
+      Ok(name) => Ok(name),
+      Err(e) => Err(crate::ast::IdError::Other(format!("try_into error: {:?}", e))),
+    }
+  }
+
+  fn into_vec(&self) -> Vec<String> {
+    self.to_vec()
+  }
+}
+
 impl super::SimpleAttri for String {}
 
 impl super::ComplexAttri for Vec<f64> {

@@ -7,6 +7,7 @@ pub mod impls;
 pub mod parser;
 pub use fmt::CodeFormatter;
 use itertools::Itertools;
+use mut_set::MutSet;
 use nom::{error::Error, IResult};
 use std::{
   cell::RefCell,
@@ -71,36 +72,36 @@ impl PartialEq for LinkError {
   }
 }
 
-/// Reference: https://rustcc.cn/article?id=ac75148b-6eb0-4249-b36d-0a14875b736e
-#[derive(Debug, Clone)]
-pub struct LinkedGroup<LinkTo>
-where
-  LinkTo: HashedGroup + GroupAttri,
-{
-  id: Arc<<LinkTo as HashedGroup>::Id>,
-  from: Arc<RefCell<GroupMap<LinkTo>>>,
-}
+// /// Reference: https://rustcc.cn/article?id=ac75148b-6eb0-4249-b36d-0a14875b736e
+// #[derive(Debug, Clone)]
+// pub struct LinkedGroup<LinkTo>
+// where
+//   LinkTo: HashedGroup + GroupAttri,
+// {
+//   id: Arc<<LinkTo as HashedGroup>::Id>,
+//   from: Arc<RefCell<GroupMap<LinkTo>>>,
+// }
 
-impl<LinkTo: HashedGroup + GroupAttri> LinkedGroup<LinkTo> {
-  pub fn new(
-    id: Arc<<LinkTo as HashedGroup>::Id>,
-    from: &Arc<RefCell<GroupMap<LinkTo>>>,
-  ) -> Self {
-    Self { id: id.clone(), from: from.clone() }
-  }
-  pub fn get_linked<F>(&self, f: F)
-  where
-    F: FnOnce(Result<&LinkTo, LinkError>),
-  {
-    match self.from.as_ref().try_borrow() {
-      Ok(set) => match set.get(&self.id) {
-        Some(linked) => f(Ok(linked)),
-        None => f(Err(LinkError::NotFind)),
-      },
-      Err(err) => f(Err(LinkError::BorrowError(err))),
-    }
-  }
-}
+// impl<LinkTo: HashedGroup + GroupAttri> LinkedGroup<LinkTo> {
+//   pub fn new(
+//     id: Arc<<LinkTo as HashedGroup>::Id>,
+//     from: &Arc<RefCell<GroupMap<LinkTo>>>,
+//   ) -> Self {
+//     Self { id: id.clone(), from: from.clone() }
+//   }
+//   pub fn get_linked<F>(&self, f: F)
+//   where
+//     F: FnOnce(Result<&LinkTo, LinkError>),
+//   {
+//     match self.from.as_ref().try_borrow() {
+//       Ok(set) => match set.get(&self.id) {
+//         Some(linked) => f(Ok(linked)),
+//         None => f(Err(LinkError::NotFind)),
+//       },
+//       Err(err) => f(Err(LinkError::BorrowError(err))),
+//     }
+//   }
+// }
 
 /// Simple Attribute in Liberty
 pub trait SimpleAttri: Sized + Display + FromStr {
@@ -152,6 +153,31 @@ pub enum ComplexParseError {
   UnsupportedWord,
 }
 
+pub trait NameAttri: Sized + Clone {
+  /// basic parser
+  fn parse(v: Vec<String>) -> Result<Self, IdError>;
+  fn into_vec(&self) -> Vec<String>;
+  #[inline]
+  fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    write!(
+      f,
+      "{}",
+      self
+        .into_vec()
+        .iter()
+        .map(|s| if is_word(s) { s.clone() } else { "\"".to_owned() + s + "\"" })
+        .join(",")
+    )
+  }
+}
+
+// impl Format for NameAttri {
+//   #[inline]
+//   fn liberty<T: Write>(&self, _: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+
+//   }
+// }
+
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
   /// basic parser
@@ -180,55 +206,9 @@ pub trait ComplexAttri: Sized {
   }
 }
 
-#[derive(Debug, Default)]
-pub struct GroupMap<T: HashedGroup> {
-  map: HashMap<u64, T>,
-}
-
-impl<T: HashedGroup> GroupMap<T> {
-  #[inline]
-  pub fn insert(&mut self, v: T) -> Option<T> {
-    <Self as DerefMut>::deref_mut(self).insert(v.hash(), v)
-  }
-}
-impl<T: HashedGroup> Deref for GroupMap<T> {
-  type Target = HashMap<u64, T>;
-  #[inline]
-  fn deref(&self) -> &Self::Target {
-    &self.map
-  }
-}
-
-impl<T: HashedGroup> DerefMut for GroupMap<T> {
-  #[inline]
-  fn deref_mut(&mut self) -> &mut Self::Target {
-    &mut self.map
-  }
-}
-
 /// Group Id
 // pub type GroupId<T> = Arc<<T as HashedGroup>::Id>;
 pub type GroupComments<T> = <T as GroupAttri>::Comments;
-
-/// Group Attribute with hased property in Liberty, e.g. [Cell](crate::cell::Cell)
-pub trait HashedGroup: Hash {
-  type Bulder: Into<Self> + From<Self>;
-  /// its Index
-  // type Id: Sized + Hash + Eq + Debug + Clone;
-  // type GroupId = Arc<<Self as HashedGroup>::Id>;
-  /// generate title for wrapper
-  // fn title(&self) -> Vec<String>;
-  /// generate id from self
-  #[inline]
-  fn hash(&self) -> u64 {
-    let mut hasher = std::hash::DefaultHasher::new();
-    self.hash(&mut hasher);
-    std::hash::Hasher::finish(&hasher)
-  }
-}
-// fn idx_box(&self) -> Box<Self::Id>;
-// fn idx_clone(&self) -> Self::Id;
-// fn gen_id(&self, title: Vec<String>) -> Result<Self::Id, IdError>;
 
 /// AttriComment
 pub type AttriComment = Vec<String>;
@@ -355,6 +335,7 @@ impl Format for AttriComment {
     }
   }
 }
+
 impl Format for SimpleWrapper {
   #[inline]
   fn liberty<T: Write>(
@@ -369,6 +350,7 @@ impl Format for SimpleWrapper {
     }
   }
 }
+
 impl Format for ComplexWrapper {
   fn liberty<T: Write>(
     &self,

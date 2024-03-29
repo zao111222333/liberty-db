@@ -7,6 +7,7 @@
 
 use std::collections::HashMap;
 mod timing_type;
+use mut_set::MutSet;
 pub use timing_type::*;
 pub mod builder;
 pub mod impls;
@@ -14,7 +15,7 @@ pub mod items;
 #[cfg(test)]
 mod test;
 use crate::{
-  ast::{GroupComments, GroupId, GroupMap},
+  ast::GroupComments,
   bus::Bus,
   common::items::*,
   expression::{self, BooleanExpression, BooleanExpressionId},
@@ -25,34 +26,34 @@ use crate::{
 
 use self::items::TimingSenseType;
 
-#[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
-pub struct TimingId {
-  related_pin: WordSet,
-  when: Option<BooleanExpressionId>,
-  timing_type: TimingType,
-  timing_sense: Option<TimingSenseType>,
-}
+// #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
+// pub struct TimingId {
+//   related_pin: WordSet,
+//   when: Option<BooleanExpressionId>,
+//   timing_type: TimingType,
+//   timing_sense: Option<TimingSenseType>,
+// }
 
-impl crate::ast::HashedGroup for Timing {
-  type Id = TimingId;
+// impl crate::ast::HashedGroup for Timing {
+//   type Id = TimingId;
 
-  fn title(&self) -> Vec<String> {
-    vec![]
-  }
+//   fn title(&self) -> Vec<String> {
+//     vec![]
+//   }
 
-  fn gen_id(&self, _: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
-    Ok(Self::Id {
-      related_pin: self.related_pin.clone(),
-      when: self.when.clone(),
-      timing_type: self.timing_type,
-      timing_sense: self.timing_sense,
-    })
-  }
+//   fn gen_id(&self, _: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
+//     Ok(Self::Id {
+//       related_pin: self.related_pin.clone(),
+//       when: self.when.clone(),
+//       timing_type: self.timing_type,
+//       timing_sense: self.timing_sense,
+//     })
+//   }
 
-  fn id(&self) -> GroupId<Self> {
-    self._id.clone()
-  }
-}
+//   fn id(&self) -> GroupId<Self> {
+//     self._id.clone()
+//   }
+// }
 
 /// A timing group is defined in a bundle, a bus, or a pin group within a cell.
 /// The timing group can be used to identify the name or names of multiple timing arcs.
@@ -75,11 +76,12 @@ impl crate::ast::HashedGroup for Timing {
 /// =203.29
 /// ">Reference-Instatnce-In-Pin</a>
 ///
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct Timing {
-  #[liberty(id)]
-  _id: GroupId<Self>,
+  #[liberty(name)]
+  pub name: Vec<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -567,6 +569,7 @@ pub struct Timing {
   /// &end
   /// =203.42
   /// ">Reference-Instance</a>
+  #[id]
   #[liberty(simple)]
   pub related_pin: WordSet,
   /// The `rise_resistance` attribute represents the load-dependent output resistance,
@@ -1039,6 +1042,7 @@ pub struct Timing {
   ///
   /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
   /// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
+  #[id]
   #[liberty(simple(type=Option))]
   pub timing_sense: Option<TimingSenseType>,
   /// The `timing_type` attribute distinguishes between combinational
@@ -1271,6 +1275,7 @@ pub struct Timing {
   /// the constrained pin and a positive pulse on the related pin.
   /// + `nochange_low_low` (negative/negative): Indicates a negative pulse on
   /// the constrained pin and a negative pulse on the related pin.
+  #[id]
   #[liberty(simple)]
   pub timing_type: TimingType,
   /// <a name ="reference_link" href="
@@ -1289,6 +1294,7 @@ pub struct Timing {
   /// &end
   /// =203.71
   /// ">Reference-Instance</a>
+  #[id]
   #[liberty(simple(type=Option))]
   pub when: Option<BooleanExpressionId>,
   /// <a name ="reference_link" href="
@@ -1515,10 +1521,10 @@ pub struct Timing {
   pub propogated_noise_width_high: Option<TableLookUp>,
   #[liberty(group)]
   pub propogated_noise_width_low: Option<TableLookUp>,
-  #[liberty(group(type=Map))]
-  pub receiver_capacitance_fall: GroupMap<TableLookUpMultiSegment>,
-  #[liberty(group(type=Map))]
-  pub receiver_capacitance_rise: GroupMap<TableLookUpMultiSegment>,
+  #[liberty(group(type=Set))]
+  pub receiver_capacitance_fall: MutSet<TableLookUpMultiSegment>,
+  #[liberty(group(type=Set))]
+  pub receiver_capacitance_rise: MutSet<TableLookUpMultiSegment>,
   #[liberty(group)]
   pub receiver_capacitance1_fall: Option<TableLookUp>,
   #[liberty(group)]

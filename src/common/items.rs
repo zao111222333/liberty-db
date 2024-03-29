@@ -3,7 +3,7 @@ use std::{collections::HashSet, fmt::Debug, rc::Rc};
 use itertools::Itertools;
 use strum_macros::{Display, EnumString};
 
-use crate::ast::{GroupComments, GroupId};
+use crate::ast::GroupComments;
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -108,9 +108,11 @@ pub enum VariableType {
 /// ">Reference-Definition</a>
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct Domain {
-  #[liberty(id(title = 1))]
-  _id: GroupId<Self>,
+  #[liberty(name)]
+  #[id]
+  pub name: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -180,19 +182,17 @@ impl std::str::FromStr for WordSet {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[readonly::make]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct TableLookUpMultiSegment {
-  #[liberty(title)]
-  #[liberty(id)]
-  #[readonly]
-  _title: Option<String>,
+  #[liberty(name)]
+  #[id]
+  name: Option<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   #[liberty(simple)]
-  #[liberty(id)]
-  #[readonly]
+  #[id]
   segment: usize,
   #[liberty(complex(type=Default))]
   pub index_1: Vec<f64>,
@@ -207,11 +207,11 @@ pub struct TableLookUpMultiSegment {
 }
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
 pub struct TableLookUp {
-  #[liberty(id)]
-  _id: GroupId<Self>,
-  #[liberty(title)]
-  _title: Option<String>,
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
