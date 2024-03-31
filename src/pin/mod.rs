@@ -174,8 +174,8 @@ pub struct Pin {
   /// &end
   /// =228.13
   /// ">Reference-Instance</a>
-  #[liberty(simple)]
-  pub clock: bool,
+  #[liberty(simple(type = Option))]
+  pub clock: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

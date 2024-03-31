@@ -211,6 +211,7 @@ impl ComplexAttri for Mode {
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct CellDegradation {
+  /// name
   #[id]
   #[liberty(name)]
   pub name: String,

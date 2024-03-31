@@ -62,3 +62,4 @@ uom = { version = "0.34.0", default-features = false, features = ["autoconvert",
 biodivine-lib-bdd = "0.5.11"
 mut_set = "0.3.0"
 mut_set_derive = "0.3.0"
+duplicate = "1.0.0"

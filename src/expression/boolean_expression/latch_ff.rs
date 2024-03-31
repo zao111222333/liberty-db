@@ -66,8 +66,8 @@ pub struct FF {
   #[liberty(simple(type = Option))]
   pub clocked_on_also: Option<BooleanExpression>,
   /// The value of `variable1` after the active edge.
-  #[liberty(simple)]
-  pub next_state: BooleanExpression,
+  #[liberty(simple(type = Option))]
+  pub next_state: Option<BooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<BooleanExpression>,
@@ -132,14 +132,149 @@ pub struct FFBank {
   #[liberty(simple(type = Option))]
   pub clocked_on_also: Option<BooleanExpression>,
   /// The value of `variable1` after the active edge.
-  #[liberty(simple)]
-  pub next_state: BooleanExpression,
+  #[liberty(simple(type = Option))]
+  pub next_state: Option<BooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<BooleanExpression>,
 }
 
-impl FFLike for FF {
+/// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=183.3&end=183.5
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Default)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone, Default);)
+)]
+pub struct Latch {
+  /// The `variable1` (`variable[0]`) value is the state of the
+  /// noninverting output of the flip-flop;
+  /// the `variable2` (`variable[1]`) value is the state of the inverting output.
+  /// The `variable1` value can be considered the 1-bit storage of the flip-flop.
+  /// Valid values for `variable1`  and `variable2` are
+  /// anything except a pin name used in the cell being described.
+  /// Both of these variables must be assigned,
+  /// even if one of them is not connected to a primary output pin.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
+  /// ">Reference-Definition</a>
+  #[id]
+  #[liberty(name)]
+  pub variable: [String; 2],
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: AttributeList,
+  /// The clear  attribute gives the active value for the clear input.
+  #[liberty(simple(type = Option))]
+  pub clear: Option<BooleanExpression>,
+  /// The `clear_preset_var1` attribute gives the value that `variable1`
+  ///  has when `clear` and `preset` are both active at the same time.
+  #[liberty(simple(type = Option))]
+  pub clear_preset_var1: Option<ClearPresetState>,
+  /// The `clear_preset_var2` attribute gives the value that `variable2`
+  ///  has when `clear` and `preset` are both active at the same time.
+  #[liberty(simple(type = Option))]
+  pub clear_preset_var2: Option<ClearPresetState>,
+  /// The `enable`  attribute gives the state of the enable input,
+  /// and `data_in`  attribute gives the state of the data input.
+  /// The `enable`  and `data_in`  attributes are optional,
+  /// but if you use one of them, you must also use the other.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.11&end=185.13
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub enable: Option<BooleanExpression>,
+  /// The `enable_also`  attribute gives the state of the `enable`
+  /// input when you are describing master and slave cells.
+  /// The `enable_also`  attribute is optional.
+  /// If you use `enable_also`, you must also use the enable  and data_in  attributes
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.23&end=185.25
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub enable_also: Option<BooleanExpression>,
+  /// The value of `variable1` after the active edge.
+  #[liberty(simple(type = Option))]
+  pub data_in: Option<BooleanExpression>,
+  /// The `preset` attribute gives the active value for the preset input.
+  #[liberty(simple(type = Option))]
+  pub preset: Option<BooleanExpression>,
+}
+
+/// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=183.3&end=183.5
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Default)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone, Default);)
+)]
+pub struct LatchBank {
+  /// The `variable1` (`variable[0]`) value is the state of the
+  /// noninverting output of the flip-flop;
+  /// the `variable2` (`variable[1]`) value is the state of the inverting output.
+  /// The `variable1` value can be considered the 1-bit storage of the flip-flop.
+  /// Valid values for `variable1`  and `variable2` are
+  /// anything except a pin name used in the cell being described.
+  /// Both of these variables must be assigned,
+  /// even if one of them is not connected to a primary output pin.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
+  /// ">Reference-Definition</a>
+  #[id]
+  #[liberty(name)]
+  pub variable: (String, String, usize),
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: AttributeList,
+  /// The clear  attribute gives the active value for the clear input.
+  #[liberty(simple(type = Option))]
+  pub clear: Option<BooleanExpression>,
+  /// The `clear_preset_var1` attribute gives the value that `variable1`
+  ///  has when `clear` and `preset` are both active at the same time.
+  #[liberty(simple(type = Option))]
+  pub clear_preset_var1: Option<ClearPresetState>,
+  /// The `clear_preset_var2` attribute gives the value that `variable2`
+  ///  has when `clear` and `preset` are both active at the same time.
+  #[liberty(simple(type = Option))]
+  pub clear_preset_var2: Option<ClearPresetState>,
+  /// The `enable`  attribute gives the state of the enable input,
+  /// and `data_in`  attribute gives the state of the data input.
+  /// The `enable`  and `data_in`  attributes are optional,
+  /// but if you use one of them, you must also use the other.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.11&end=185.13
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub enable: Option<BooleanExpression>,
+  /// The `enable_also`  attribute gives the state of the `enable`
+  /// input when you are describing master and slave cells.
+  /// The `enable_also`  attribute is optional.
+  /// If you use `enable_also`, you must also use the enable  and data_in  attributes
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.23&end=185.25
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub enable_also: Option<BooleanExpression>,
+  /// The value of `variable1` after the active edge.
+  #[liberty(simple(type = Option))]
+  pub data_in: Option<BooleanExpression>,
+  /// The `preset` attribute gives the active value for the preset input.
+  #[liberty(simple(type = Option))]
+  pub preset: Option<BooleanExpression>,
+}
+
+#[duplicate::duplicate_item(
+  LatchFF_type;
+  [Latch];
+  [FF];
+)]
+impl LatchFF for LatchFF_type {
   #[inline]
   fn variable1(&self) -> &String {
     &self.variable[0]
@@ -149,46 +284,13 @@ impl FFLike for FF {
     &self.variable[1]
   }
 }
-impl __FFLike for FF {
-  #[inline]
-  fn clear(&self) -> &Option<BooleanExpression> {
-    &self.clear
-  }
-  #[inline]
-  fn clear_preset_var1(&self) -> &Option<ClearPresetState> {
-    &self.clear_preset_var1
-  }
-  #[inline]
-  fn clear_preset_var2(&self) -> &Option<ClearPresetState> {
-    &self.clear_preset_var2
-  }
-  #[inline]
-  fn clocked_on(&self) -> &Option<BooleanExpression> {
-    &self.clocked_on
-  }
-  #[inline]
-  fn clocked_on_also(&self) -> &Option<BooleanExpression> {
-    &self.clocked_on_also
-  }
-  #[inline]
-  fn next_state(&self) -> &BooleanExpression {
-    &self.next_state
-  }
-  #[inline]
-  fn preset(&self) -> &Option<BooleanExpression> {
-    &self.preset
-  }
-}
 
-impl FFBank {
-  /// bits for `ff_bank`
-  #[inline]
-  pub fn bits(&self) -> &usize {
-    &self.variable.2
-  }
-}
-
-impl FFLike for FFBank {
+#[duplicate::duplicate_item(
+  LatchFFBank_type;
+  [LatchBank];
+  [FFBank];
+)]
+impl LatchFF for LatchFFBank_type {
   #[inline]
   fn variable1(&self) -> &String {
     &self.variable.0
@@ -198,7 +300,25 @@ impl FFLike for FFBank {
     &self.variable.1
   }
 }
-impl __FFLike for FFBank {
+#[duplicate::duplicate_item(
+  LatchFFBank_type;
+  [LatchBank];
+  [FFBank];
+)]
+impl LatchFFBank_type {
+  /// bits for `ff_bank`
+  #[inline]
+  pub fn bits(&self) -> &usize {
+    &self.variable.2
+  }
+}
+
+#[duplicate::duplicate_item(
+  Latch_type;
+  [LatchBank];
+  [Latch];
+)]
+impl __LatchFF for Latch_type {
   #[inline]
   fn clear(&self) -> &Option<BooleanExpression> {
     &self.clear
@@ -212,15 +332,63 @@ impl __FFLike for FFBank {
     &self.clear_preset_var2
   }
   #[inline]
-  fn clocked_on(&self) -> &Option<BooleanExpression> {
-    &self.clocked_on
+  fn active(&self) -> Option<Box<Expr>> {
+    self.enable.as_ref().and_then(|e| Some(Box::new(e.expr.clone())))
   }
   #[inline]
-  fn clocked_on_also(&self) -> &Option<BooleanExpression> {
-    &self.clocked_on_also
+  fn active_also(&self) -> Option<Box<Expr>> {
+    self.enable_also.as_ref().and_then(|e| Some(Box::new(e.expr.clone())))
   }
   #[inline]
-  fn next_state(&self) -> &BooleanExpression {
+  fn next_state(&self) -> &Option<BooleanExpression> {
+    &self.data_in
+  }
+  #[inline]
+  fn preset(&self) -> &Option<BooleanExpression> {
+    &self.preset
+  }
+}
+
+#[duplicate::duplicate_item(
+  FF_type;
+  [FFBank];
+  [FF];
+)]
+impl __LatchFF for FF_type {
+  #[inline]
+  fn clear(&self) -> &Option<BooleanExpression> {
+    &self.clear
+  }
+  #[inline]
+  fn clear_preset_var1(&self) -> &Option<ClearPresetState> {
+    &self.clear_preset_var1
+  }
+  #[inline]
+  fn clear_preset_var2(&self) -> &Option<ClearPresetState> {
+    &self.clear_preset_var2
+  }
+  #[inline]
+  fn active(&self) -> Option<Box<Expr>> {
+    self.clocked_on.as_ref().and_then(|clocked_on| {
+      let previous_clocked_on = clocked_on.previous();
+      Some(Box::new(Expr::And(
+        Box::new(Expr::Not(Box::new(previous_clocked_on))),
+        Box::new(clocked_on.expr.clone()),
+      )))
+    })
+  }
+  #[inline]
+  fn active_also(&self) -> Option<Box<Expr>> {
+    self.clocked_on_also.as_ref().and_then(|clocked_on_also| {
+      let previous_clocked_on_also = clocked_on_also.previous();
+      Some(Box::new(Expr::And(
+        Box::new(Expr::Not(Box::new(previous_clocked_on_also))),
+        Box::new(clocked_on_also.expr.clone()),
+      )))
+    })
+  }
+  #[inline]
+  fn next_state(&self) -> &Option<BooleanExpression> {
     &self.next_state
   }
   #[inline]
@@ -229,19 +397,19 @@ impl __FFLike for FFBank {
   }
 }
 
-trait __FFLike {
+trait __LatchFF {
   fn clear(&self) -> &Option<BooleanExpression>;
   fn clear_preset_var1(&self) -> &Option<ClearPresetState>;
   fn clear_preset_var2(&self) -> &Option<ClearPresetState>;
-  fn clocked_on(&self) -> &Option<BooleanExpression>;
-  fn clocked_on_also(&self) -> &Option<BooleanExpression>;
-  fn next_state(&self) -> &BooleanExpression;
+  fn active(&self) -> Option<Box<Expr>>;
+  fn active_also(&self) -> Option<Box<Expr>>;
+  fn next_state(&self) -> &Option<BooleanExpression>;
   fn preset(&self) -> &Option<BooleanExpression>;
 }
 
 /// trait for `FF` and `FFBank`
 #[allow(private_bounds)]
-pub trait FFLike: __FFLike {
+pub trait LatchFF: __LatchFF {
   /// The `variable1` value is the state of the
   /// noninverting output of the flip-flop;
   /// <a name ="reference_link" href="
@@ -255,59 +423,35 @@ pub trait FFLike: __FFLike {
   fn variable2(&self) -> &String;
   /// Get the `BooleanExpression` of variable1
   fn variable1_expr(&self) -> BooleanExpression {
-    let next_state = Box::new(self.next_state().expr.clone());
     let present_state = Box::new(Expr::Variable(self.variable1().clone()));
-    let active_edge_variable = match (self.clocked_on(), self.clocked_on_also()) {
-      (None, None) => Expr::Variable(self.variable1().clone()),
-      (None, Some(clocked_on_also)) => {
-        let previous_clocked_on_also = clocked_on_also.previous();
-        condition_box(
-          Box::new(Expr::And(
-            Box::new(clocked_on_also.expr.clone()),
-            Box::new(Expr::Not(Box::new(previous_clocked_on_also))),
-          )),
-          next_state.clone(),
-          present_state.clone(),
-        )
+    let active_edge_variable = match self.next_state() {
+      Some(next_state) => {
+        let next_state = Box::new(next_state.expr.clone());
+        match (self.active(), self.active_also()) {
+          (None, None) => Expr::Variable(self.variable1().clone()),
+          (None, Some(active_also)) => {
+            condition_box(active_also, next_state.clone(), present_state.clone())
+          }
+          (Some(active), None) => {
+            condition_box(active, next_state.clone(), present_state.clone())
+          }
+          (Some(active), Some(active_also)) => {
+            // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
+            condition_box(
+              active,
+              Box::new(condition_box(
+                active_also.clone(),
+                UNKNOWN.clone(),
+                next_state.clone(),
+              )),
+              Box::new(condition_box(active_also, next_state, present_state.clone())),
+            )
+          }
+        }
       }
-      (Some(clocked_on), None) => {
-        let previous_clocked_on = clocked_on.previous();
-        condition_box(
-          Box::new(Expr::And(
-            Box::new(Expr::Not(Box::new(previous_clocked_on))),
-            Box::new(clocked_on.expr.clone()),
-          )),
-          next_state.clone(),
-          present_state.clone(),
-        )
-      }
-      (Some(clocked_on), Some(clocked_on_also)) => {
-        let previous_clocked_on = clocked_on.previous();
-        let previous_clocked_on_also = clocked_on_also.previous();
-        let clocked_on_active = Box::new(Expr::And(
-          Box::new(Expr::Not(Box::new(previous_clocked_on))),
-          Box::new(clocked_on.expr.clone()),
-        ));
-        let clocked_on_also_active = Box::new(Expr::And(
-          Box::new(clocked_on_also.expr.clone()),
-          Box::new(Expr::Not(Box::new(previous_clocked_on_also))),
-        ));
-        // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
-        condition_box(
-          clocked_on_active,
-          Box::new(condition_box(
-            clocked_on_also_active.clone(),
-            UNKNOWN.clone(),
-            next_state.clone(),
-          )),
-          Box::new(condition_box(
-            clocked_on_also_active,
-            next_state,
-            present_state.clone(),
-          )),
-        )
-      }
+      None => Expr::Variable(self.variable1().clone()),
     };
+
     let expr = match (self.preset(), self.clear()) {
       (None, None) => active_edge_variable,
       (None, Some(clear)) => condition_box(
@@ -352,58 +496,33 @@ pub trait FFLike: __FFLike {
 
   /// Get the `BooleanExpression` of variable2
   fn variable2_expr(&self) -> BooleanExpression {
-    let next_state = Box::new(Expr::Not(Box::new(self.next_state().expr.clone())));
     let present_state = Box::new(Expr::Variable(self.variable2().clone()));
-    let active_edge_variable = match (self.clocked_on(), self.clocked_on_also()) {
-      (None, None) => Expr::Variable(self.variable2().clone()),
-      (None, Some(clocked_on_also)) => {
-        let previous_clocked_on_also = clocked_on_also.previous();
-        condition_box(
-          Box::new(Expr::And(
-            Box::new(clocked_on_also.expr.clone()),
-            Box::new(Expr::Not(Box::new(previous_clocked_on_also))),
-          )),
-          next_state.clone(),
-          present_state.clone(),
-        )
+    let active_edge_variable = match self.next_state() {
+      Some(next_state) => {
+        let next_state = Box::new(Expr::Not(Box::new(next_state.expr.clone())));
+        match (self.active(), self.active_also()) {
+          (None, None) => Expr::Variable(self.variable2().clone()),
+          (None, Some(active_also)) => {
+            condition_box(active_also, next_state.clone(), present_state.clone())
+          }
+          (Some(active), None) => {
+            condition_box(active, next_state.clone(), present_state.clone())
+          }
+          (Some(active), Some(active_also)) => {
+            // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
+            condition_box(
+              active,
+              Box::new(condition_box(
+                active_also.clone(),
+                UNKNOWN.clone(),
+                next_state.clone(),
+              )),
+              Box::new(condition_box(active_also, next_state, present_state.clone())),
+            )
+          }
+        }
       }
-      (Some(clocked_on), None) => {
-        let previous_clocked_on = clocked_on.previous();
-        condition_box(
-          Box::new(Expr::And(
-            Box::new(Expr::Not(Box::new(previous_clocked_on))),
-            Box::new(clocked_on.expr.clone()),
-          )),
-          next_state.clone(),
-          present_state.clone(),
-        )
-      }
-      (Some(clocked_on), Some(clocked_on_also)) => {
-        let previous_clocked_on = clocked_on.previous();
-        let previous_clocked_on_also = clocked_on_also.previous();
-        let clocked_on_active = Box::new(Expr::And(
-          Box::new(Expr::Not(Box::new(previous_clocked_on))),
-          Box::new(clocked_on.expr.clone()),
-        ));
-        let clocked_on_also_active = Box::new(Expr::And(
-          Box::new(clocked_on_also.expr.clone()),
-          Box::new(Expr::Not(Box::new(previous_clocked_on_also))),
-        ));
-        // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
-        condition_box(
-          clocked_on_active,
-          Box::new(condition_box(
-            clocked_on_also_active.clone(),
-            UNKNOWN.clone(),
-            next_state.clone(),
-          )),
-          Box::new(condition_box(
-            clocked_on_also_active,
-            next_state,
-            present_state.clone(),
-          )),
-        )
-      }
+      None => Expr::Variable(self.variable2().clone()),
     };
     let expr = match (self.preset(), self.clear()) {
       (None, None) => active_edge_variable,
@@ -448,100 +567,63 @@ pub trait FFLike: __FFLike {
   }
   /// Get the `BooleanExpression` of (variable1,variable2)
   fn variable_expr(&self) -> (BooleanExpression, BooleanExpression) {
-    let next_state1 = Box::new(self.next_state().expr.clone());
-    let next_state2 = Box::new(Expr::Not(next_state1.clone()));
     let present_state1 = Box::new(Expr::Variable(self.variable1().clone()));
     let present_state2 = Box::new(Expr::Variable(self.variable2().clone()));
-    let (active_edge_variable1, active_edge_variable2) =
-      match (self.clocked_on(), self.clocked_on_also()) {
-        (None, None) => (
-          Expr::Variable(self.variable1().clone()),
-          Expr::Variable(self.variable2().clone()),
-        ),
-        (None, Some(clocked_on_also)) => {
-          let previous_clocked_on_also = clocked_on_also.previous();
-          (
+    let (active_edge_variable1, active_edge_variable2) = match self.next_state() {
+      Some(next_state) => {
+        let next_state1 = Box::new(next_state.expr.clone());
+        let next_state2 = Box::new(Expr::Not(next_state1.clone()));
+        match (self.active(), self.active_also()) {
+          (None, None) => (
+            Expr::Variable(self.variable1().clone()),
+            Expr::Variable(self.variable2().clone()),
+          ),
+          (None, Some(active_also)) => (
             condition_box(
-              Box::new(Expr::And(
-                Box::new(clocked_on_also.expr.clone()),
-                Box::new(Expr::Not(Box::new(previous_clocked_on_also.clone()))),
-              )),
+              active_also.clone(),
               next_state1.clone(),
               present_state1.clone(),
             ),
-            condition_box(
-              Box::new(Expr::And(
-                Box::new(clocked_on_also.expr.clone()),
-                Box::new(Expr::Not(Box::new(previous_clocked_on_also))),
-              )),
-              next_state2.clone(),
-              present_state2.clone(),
-            ),
-          )
+            condition_box(active_also, next_state2.clone(), present_state2.clone()),
+          ),
+          (Some(active), None) => (
+            condition_box(active.clone(), next_state1.clone(), present_state1.clone()),
+            condition_box(active, next_state2.clone(), present_state2.clone()),
+          ),
+          (Some(active), Some(active_also)) => {
+            // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
+            (
+              condition_box(
+                active.clone(),
+                Box::new(condition_box(
+                  active_also.clone(),
+                  UNKNOWN.clone(),
+                  next_state1.clone(),
+                )),
+                Box::new(condition_box(
+                  active_also.clone(),
+                  next_state1,
+                  present_state1.clone(),
+                )),
+              ),
+              condition_box(
+                active,
+                Box::new(condition_box(
+                  active_also.clone(),
+                  UNKNOWN.clone(),
+                  next_state2.clone(),
+                )),
+                Box::new(condition_box(active_also, next_state2, present_state2.clone())),
+              ),
+            )
+          }
         }
-        (Some(clocked_on), None) => {
-          let previous_clocked_on = clocked_on.previous();
-          (
-            condition_box(
-              Box::new(Expr::And(
-                Box::new(Expr::Not(Box::new(previous_clocked_on.clone()))),
-                Box::new(clocked_on.expr.clone()),
-              )),
-              next_state1.clone(),
-              present_state1.clone(),
-            ),
-            condition_box(
-              Box::new(Expr::And(
-                Box::new(Expr::Not(Box::new(previous_clocked_on))),
-                Box::new(clocked_on.expr.clone()),
-              )),
-              next_state2.clone(),
-              present_state2.clone(),
-            ),
-          )
-        }
-        (Some(clocked_on), Some(clocked_on_also)) => {
-          let previous_clocked_on = clocked_on.previous();
-          let previous_clocked_on_also = clocked_on_also.previous();
-          let clocked_on_active = Box::new(Expr::And(
-            Box::new(Expr::Not(Box::new(previous_clocked_on))),
-            Box::new(clocked_on.expr.clone()),
-          ));
-          let clocked_on_also_active = Box::new(Expr::And(
-            Box::new(clocked_on_also.expr.clone()),
-            Box::new(Expr::Not(Box::new(previous_clocked_on_also))),
-          ));
-          // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
-          (
-            condition_box(
-              clocked_on_active.clone(),
-              Box::new(condition_box(
-                clocked_on_also_active.clone(),
-                UNKNOWN.clone(),
-                next_state1.clone(),
-              )),
-              Box::new(condition_box(
-                clocked_on_also_active.clone(),
-                next_state1,
-                present_state1.clone(),
-              )),
-            ),
-            condition_box(
-              clocked_on_active,
-              Box::new(condition_box(
-                clocked_on_also_active.clone(),
-                UNKNOWN.clone(),
-                next_state2.clone(),
-              )),
-              Box::new(condition_box(
-                clocked_on_also_active,
-                next_state2,
-                present_state2.clone(),
-              )),
-            ),
-          )
-        }
-      };
+      }
+      None => (
+        Expr::Variable(self.variable1().clone()),
+        Expr::Variable(self.variable2().clone()),
+      ),
+    };
     let (expr1, expr2) = match (self.preset(), self.clear()) {
       (None, None) => (active_edge_variable1, active_edge_variable2),
       (None, Some(clear)) => (
@@ -652,9 +734,8 @@ pub enum ClearPresetState {
 impl crate::ast::SimpleAttri for ClearPresetState {}
 
 mod test {
-  use crate::expression::FFBank;
   #[allow(unused_imports)]
-  use crate::expression::{FFLike, IdBooleanExpression, FF};
+  use crate::expression::{FFBank, IdBooleanExpression, Latch, LatchBank, LatchFF, FF};
   /// In some flip-flops, the next state depends on the current state.
   /// In this case, the first state variable (IQ  in the example)
   /// can be used in the next_state  statement;
@@ -663,7 +744,7 @@ mod test {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=160.25&end=160.29
   /// ">Reference</a>
   #[test]
-  fn test_jk_flip_flop() {
+  fn jk_flip_flop() {
     let (ff, _) = &mut crate::ast::test_parse_group::<FF>(
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
@@ -691,7 +772,7 @@ mod test {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=162.2&end=162.4
   /// ">Reference</a>
   #[test]
-  fn test_example19() {
+  fn example19() {
     let (ff, _) = &mut crate::ast::test_parse_group::<FF>(
       r#"(IQ, IQN) {  
         next_state : "D" ;  
@@ -723,7 +804,7 @@ mod test {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=160.25&end=160.29
   /// ">Reference</a>
   #[test]
-  fn test_example20() {
+  fn example20() {
     let (ff, _) = &mut crate::ast::test_parse_group::<FF>(
       r#"(IQ, IQN) {  
         next_state : "(TE*TI)+(TE’*J*K’)+(TE’*J’*K’*IQ)+(TE’*J*K*IQ’)" ;  
@@ -753,7 +834,7 @@ mod test {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=162.26&end=162.31
   /// ">Reference</a>
   #[test]
-  fn test_example21() {
+  fn example21() {
     let (ff, _) = &mut crate::ast::test_parse_group::<FF>(
       r#"(IQ, IQN) {   
         next_state : "D * CLR’" ;   
@@ -781,7 +862,7 @@ mod test {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=163.11&end=163.13
   /// ">Reference</a>
   #[test]
-  fn test_example22() {
+  fn example22() {
     let (ff, _) = &mut crate::ast::test_parse_group::<FF>(
       r#"(IQ, IQN) {  
         next_state : "D" ;  
@@ -812,7 +893,7 @@ mod test {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=167.32&end=167.33
   /// ">Reference</a>
   #[test]
-  fn test_example23() {
+  fn example23() {
     let (ff, _) = &mut crate::ast::test_parse_group::<FFBank>(
       r#"(IQ, IQN, 4) {    
         next_state : "D" ;    
@@ -831,6 +912,59 @@ mod test {
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
+    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    assert_eq!(id_var1_expr_, id_var1_expr);
+    assert_eq!(id_var2_expr_, id_var2_expr);
+  }
+  /// Example 25 D Latch With Active-High Enable and Negative Clear
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=186.19&end=186.24
+  /// ">Reference</a>
+  #[test]
+  fn example25() {
+    let (latch, _) = &mut crate::ast::test_parse_group::<Latch>(
+      r#"(IQ, IQN) {
+        enable : "G" ;
+        data_in : "D" ;
+        clear : "CD’" ;
+       }
+    "#,
+    );
+    let var1_expr = latch.variable1_expr();
+    let var2_expr = latch.variable2_expr();
+    println!("{:?}", var1_expr);
+    println!("{:?}", var2_expr);
+    let id_var1_expr: IdBooleanExpression = var1_expr.into();
+    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let (var1_expr_, var2_expr_) = latch.variable_expr();
+    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    assert_eq!(id_var1_expr_, id_var1_expr);
+    assert_eq!(id_var2_expr_, id_var2_expr);
+  }
+  /// Example 25 SR latch. The `enable`  and `data_in`  attributes are not required for an SR latch.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=186.25&end=186.33
+  /// ">Reference</a>
+  #[test]
+  fn example26() {
+    let (latch, _) = &mut crate::ast::test_parse_group::<Latch>(
+      r#"(IQ, IQN) {  
+        clear : "S’" ;  
+        preset : "R’" ;  
+        clear_preset_var1 : L ;  
+        clear_preset_var2 : L ;
+      }
+    "#,
+    );
+    let var1_expr = latch.variable1_expr();
+    let var2_expr = latch.variable2_expr();
+    println!("{:?}", var1_expr);
+    println!("{:?}", var2_expr);
+    let id_var1_expr: IdBooleanExpression = var1_expr.into();
+    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let (var1_expr_, var2_expr_) = latch.variable_expr();
     let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
     let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);

@@ -1,8 +1,8 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
-mod ff;
-pub use ff::{FFBank, FFLike, FF};
+mod latch_ff;
+pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 pub mod logic;
 use std::{
   borrow::Borrow,
@@ -115,11 +115,6 @@ impl Into<Expr> for BooleanExpression {
   #[inline]
   fn into(self) -> Expr {
     self.expr
-  }
-}
-impl Default for BooleanExpression {
-  fn default() -> Self {
-    Self { expr: Expr::Const(false) }
   }
 }
 impl crate::ast::SimpleAttri for BooleanExpression {}
