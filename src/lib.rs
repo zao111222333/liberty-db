@@ -94,6 +94,8 @@ pub mod cell;
 pub mod common;
 /// `Boolean Expression`, `SDF Expression`, and so on.
 pub mod expression;
+/// `internal_power` group structure.
+pub mod internal_power;
 /// `Library` group structure, top level of liberty format.
 pub mod library;
 /// `pin` group structure.

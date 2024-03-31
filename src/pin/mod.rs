@@ -1,13 +1,16 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
-
-use crate::ast::{AttributeList, GroupComments};
-use crate::expression::{logic, BooleanExpression};
-use crate::timing::Timing;
+use crate::{
+  ast::{AttributeList, GroupComments},
+  common::items::WordSet,
+  expression::{logic, BooleanExpression},
+  internal_power::InternalPower,
+  timing::Timing,
+};
 use mut_set::MutSet;
 mod items;
-use crate::units;
+// use crate::units;
 pub use items::*;
 /// You can define a `pin` group within a [`cell`](crate::cell::Cell),
 /// [`test_cell`](crate::test_cell), [`model`](crate::model),
@@ -29,8 +32,11 @@ pub use items::*;
 /// + Descriptions of the attributes and groups you can use in a `pin` group
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct Pin {
+  /// Name of the pin
   #[id]
   #[liberty(name)]
   pub name: String,
@@ -38,7 +44,7 @@ pub struct Pin {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
-  /* Simple Attributes in a pin Group */
+  // NOTICE: Simple Attributes in a pin Group
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -47,8 +53,8 @@ pub struct Pin {
   /// &end
   /// =227.33
   /// ">Reference-Instance</a>
-  #[liberty(simple)]
-  pub alive_during_partial_power_down: bool,
+  #[liberty(simple(type = Option))]
+  pub alive_during_partial_power_down: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -57,8 +63,8 @@ pub struct Pin {
   /// &end
   /// =228.2
   /// ">Reference-Instance</a>
-  #[liberty(simple)]
-  pub alive_during_power_up: bool,
+  #[liberty(simple(type = Option))]
+  pub alive_during_power_up: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -67,7 +73,8 @@ pub struct Pin {
   /// &end
   /// =228.3
   /// ">Reference-Instance</a>
-  pub always_on: bool,
+  #[liberty(simple(type = Option))]
+  pub always_on: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -76,6 +83,7 @@ pub struct Pin {
   /// &end
   /// =228.4
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub antenna_diode_type: Option<AntennaDiodeType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -85,8 +93,8 @@ pub struct Pin {
   /// &end
   /// =228.5
   /// ">Reference-Instance</a>
-  // FIXME:
-  // pub antenna_diode_related_ground_pins : "ground_pin1 ground_pin2",
+  #[liberty(simple(type = Option))]
+  pub antenna_diode_related_ground_pins: Option<WordSet>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -95,8 +103,8 @@ pub struct Pin {
   /// &end
   /// =228.6
   /// ">Reference-Instance</a>
-  // FIXME:
-  // pub antenna_diode_related_power_pins : "power_pin1 power_pin2",
+  #[liberty(simple(type = Option))]
+  pub antenna_diode_related_power_pins: Option<WordSet>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -106,7 +114,8 @@ pub struct Pin {
   /// =228.7
   /// ">Reference-Instance</a>
   /* bus cells */
-  pub bit_width: usize,
+  #[liberty(simple(type = Option))]
+  pub bit_width: Option<usize>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -115,7 +124,8 @@ pub struct Pin {
   /// &end
   /// =228.8
   /// ">Reference-Instance</a>
-  pub capacitance: f64,
+  #[liberty(simple(type = Option))]
+  pub capacitance: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -124,6 +134,7 @@ pub struct Pin {
   /// &end
   /// =228.9
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub clamp_0_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -133,6 +144,7 @@ pub struct Pin {
   /// &end
   /// =228.10
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub clamp_1_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -142,6 +154,7 @@ pub struct Pin {
   /// &end
   /// =228.11
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub clamp_latch_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -151,6 +164,7 @@ pub struct Pin {
   /// &end
   /// =228.12
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub clamp_z_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -160,6 +174,7 @@ pub struct Pin {
   /// &end
   /// =228.13
   /// ">Reference-Instance</a>
+  #[liberty(simple)]
   pub clock: bool,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -169,7 +184,8 @@ pub struct Pin {
   /// &end
   /// =228.14
   /// ">Reference-Instance</a>
-  pub clock_gate_clock_pin: bool,
+  #[liberty(simple(type = Option))]
+  pub clock_gate_clock_pin: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -178,7 +194,8 @@ pub struct Pin {
   /// &end
   /// =228.15
   /// ">Reference-Instance</a>
-  pub clock_gate_enable_pin: bool,
+  #[liberty(simple(type = Option))]
+  pub clock_gate_enable_pin: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -187,7 +204,8 @@ pub struct Pin {
   /// &end
   /// =228.16
   /// ">Reference-Instance</a>
-  pub clock_gate_test_pin: bool,
+  #[liberty(simple(type = Option))]
+  pub clock_gate_test_pin: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -196,7 +214,8 @@ pub struct Pin {
   /// &end
   /// =228.17
   /// ">Reference-Instance</a>
-  pub clock_gate_obs_pin: bool,
+  #[liberty(simple(type = Option))]
+  pub clock_gate_obs_pin: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -205,7 +224,8 @@ pub struct Pin {
   /// &end
   /// =228.18
   /// ">Reference-Instance</a>
-  pub clock_gate_out_pin: bool,
+  #[liberty(simple(type = Option))]
+  pub clock_gate_out_pin: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -214,7 +234,8 @@ pub struct Pin {
   /// &end
   /// =228.19
   /// ">Reference-Instance</a>
-  pub clock_isolation_cell_clock_pin: bool,
+  #[liberty(simple(type = Option))]
+  pub clock_isolation_cell_clock_pin: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -223,7 +244,8 @@ pub struct Pin {
   /// &end
   /// =228.20
   /// ">Reference-Instance</a>
-  pub complementary_pin: String,
+  #[liberty(simple(type = Option))]
+  pub complementary_pin: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -232,7 +254,8 @@ pub struct Pin {
   /// &end
   /// =228.21
   /// ">Reference-Instance</a>
-  pub connection_class: Vec<String>,
+  #[liberty(simple(type = Option))]
+  pub connection_class: Option<WordSet>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -241,6 +264,7 @@ pub struct Pin {
   /// &end
   /// =228.22
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub direction: Option<Direction>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -250,6 +274,7 @@ pub struct Pin {
   /// &end
   /// =228.23
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub dont_fault: Option<DontFault>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -259,7 +284,8 @@ pub struct Pin {
   /// &end
   /// =228.24
   /// ">Reference-Instance</a>
-  pub drive_current: f64,
+  #[liberty(simple(type = Option))]
+  pub drive_current: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -268,6 +294,7 @@ pub struct Pin {
   /// &end
   /// =228.27
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub driver_type: Option<DriverType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -277,7 +304,8 @@ pub struct Pin {
   /// &end
   /// =228.28
   /// ">Reference-Instance</a>
-  pub fall_capacitance: f64,
+  #[liberty(simple(type = Option))]
+  pub fall_capacitance: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -286,7 +314,8 @@ pub struct Pin {
   /// &end
   /// =228.29
   /// ">Reference-Instance</a>
-  pub fall_current_slope_after_threshold: f64,
+  #[liberty(simple(type = Option))]
+  pub fall_current_slope_after_threshold: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -295,7 +324,8 @@ pub struct Pin {
   /// &end
   /// =228.30
   /// ">Reference-Instance</a>
-  pub fall_current_slope_before_threshold: f64,
+  #[liberty(simple(type = Option))]
+  pub fall_current_slope_before_threshold: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -304,7 +334,8 @@ pub struct Pin {
   /// &end
   /// =228.31
   /// ">Reference-Instance</a>
-  pub fall_time_after_threshold: f64,
+  #[liberty(simple(type = Option))]
+  pub fall_time_after_threshold: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -313,7 +344,8 @@ pub struct Pin {
   /// &end
   /// =228.32
   /// ">Reference-Instance</a>
-  pub fall_time_before_threshold: f64,
+  #[liberty(simple(type = Option))]
+  pub fall_time_before_threshold: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -322,7 +354,8 @@ pub struct Pin {
   /// &end
   /// =228.33
   /// ">Reference-Instance</a>
-  pub fanout_load: f64,
+  #[liberty(simple(type = Option))]
+  pub fanout_load: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -331,8 +364,8 @@ pub struct Pin {
   /// &end
   /// =228.34
   /// ">Reference-Instance</a>
-  // FIXME:
-  // pub fault_model: "two-value string" ;
+  #[liberty(simple(type = Option))]
+  pub fault_model: Option<TwoValue>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -341,6 +374,7 @@ pub struct Pin {
   /// &end
   /// =228.35
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -350,6 +384,7 @@ pub struct Pin {
   /// &end
   /// =228.36
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub has_builtin_pad: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -359,7 +394,8 @@ pub struct Pin {
   /// &end
   /// =228.37
   /// ">Reference-Instance</a>
-  pub hysteresis: bool,
+  #[liberty(simple(type = Option))]
+  pub hysteresis: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -368,6 +404,7 @@ pub struct Pin {
   /// &end
   /// =228.38
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub illegal_clamp_condition: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -377,7 +414,8 @@ pub struct Pin {
   /// &end
   /// =228.41
   /// ">Reference-Instance</a>
-  pub input_map: Vec<String>,
+  #[liberty(simple(type = Option))]
+  pub input_map: Option<WordSet>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -386,7 +424,8 @@ pub struct Pin {
   /// &end
   /// =228.42
   /// ">Reference-Instance</a>
-  pub input_signal_level: String,
+  #[liberty(simple(type = Option))]
+  pub input_signal_level: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -395,7 +434,8 @@ pub struct Pin {
   /// &end
   /// =228.43
   /// ">Reference-Instance</a>
-  pub input_voltage: String,
+  #[liberty(simple(type = Option))]
+  pub input_voltage: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -404,7 +444,8 @@ pub struct Pin {
   /// &end
   /// =228.46
   /// ">Reference-Instance</a>
-  pub internal_node: String, /* Required in statetable cells */
+  #[liberty(simple(type = Option))]
+  pub internal_node: Option<String>, /* Required in statetable cells */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -413,7 +454,8 @@ pub struct Pin {
   /// &end
   /// =228.47
   /// ">Reference-Instance</a>
-  pub inverted_output: bool, /* Required in statetable cells */
+  #[liberty(simple(type = Option))]
+  pub inverted_output: Option<bool>, /* Required in statetable cells */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -422,7 +464,8 @@ pub struct Pin {
   /// &end
   /// =228.48
   /// ">Reference-Instance</a>
-  pub is_pad: bool,
+  #[liberty(simple(type = Option))]
+  pub is_pad: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -431,7 +474,8 @@ pub struct Pin {
   /// &en7
   /// =228.49
   /// ">Reference-Instance</a>
-  pub is_unconnected: bool,
+  #[liberty(simple(type = Option))]
+  pub is_unconnected: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -440,7 +484,8 @@ pub struct Pin {
   /// &end
   /// =228.50
   /// ">Reference-Instance</a>
-  pub max_capacitance: f64,
+  #[liberty(simple(type = Option))]
+  pub max_capacitance: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -449,7 +494,8 @@ pub struct Pin {
   /// &end
   /// =228.41
   /// ">Reference-Instance</a>
-  pub max_fanout: f64,
+  #[liberty(simple(type = Option))]
+  pub max_fanout: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -458,7 +504,8 @@ pub struct Pin {
   /// &end
   /// =228.52
   /// ">Reference-Instance</a>
-  pub max_input_delta_overdrive_high: f64,
+  #[liberty(simple(type = Option))]
+  pub max_input_delta_overdrive_high: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -467,7 +514,8 @@ pub struct Pin {
   /// &end
   /// =228.53
   /// ">Reference-Instance</a>
-  pub max_input_delta_underdrive_high: f64,
+  #[liberty(simple(type = Option))]
+  pub max_input_delta_underdrive_high: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -476,8 +524,8 @@ pub struct Pin {
   /// &end
   /// =228.54
   /// ">Reference-Instance</a>
-  #[liberty(simple)]
-  pub max_transition: f64,
+  #[liberty(simple(type = Option))]
+  pub max_transition: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -486,7 +534,8 @@ pub struct Pin {
   /// &end
   /// =228.55
   /// ">Reference-Instance</a>
-  pub min_capacitance: f64,
+  #[liberty(simple(type = Option))]
+  pub min_capacitance: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -495,8 +544,8 @@ pub struct Pin {
   /// &end
   /// =228.56
   /// ">Reference-Instance</a>
-  #[liberty(simple)]
-  pub min_fanout: f64,
+  #[liberty(simple(type = Option))]
+  pub min_fanout: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -505,7 +554,8 @@ pub struct Pin {
   /// &end
   /// =228.57
   /// ">Reference-Instance</a>
-  pub min_period: f64,
+  #[liberty(simple(type = Option))]
+  pub min_period: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -514,7 +564,8 @@ pub struct Pin {
   /// &end
   /// =228.58
   /// ">Reference-Instance</a>
-  pub min_pulse_width_high: f64,
+  #[liberty(simple(type = Option))]
+  pub min_pulse_width_high: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -523,7 +574,8 @@ pub struct Pin {
   /// &end
   /// =228.59
   /// ">Reference-Instance</a>
-  pub min_pulse_width_low: f64,
+  #[liberty(simple(type = Option))]
+  pub min_pulse_width_low: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -532,7 +584,8 @@ pub struct Pin {
   /// &end
   /// =228.60
   /// ">Reference-Instance</a>
-  pub min_transition: f64,
+  #[liberty(simple(type = Option))]
+  pub min_transition: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -541,7 +594,8 @@ pub struct Pin {
   /// &end
   /// =228.61
   /// ">Reference-Instance</a>
-  pub multicell_pad_pin: bool,
+  #[liberty(simple(type = Option))]
+  pub multicell_pad_pin: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -550,6 +604,7 @@ pub struct Pin {
   /// &end
   /// =228.62
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub nextstate_type: Option<NextstateType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -559,7 +614,8 @@ pub struct Pin {
   /// &end
   /// =228.63
   /// ">Reference-Instance</a>
-  pub output_signal_level: String,
+  #[liberty(simple(type = Option))]
+  pub output_signal_level: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -568,7 +624,8 @@ pub struct Pin {
   /// &end
   /// =228.64
   /// ">Reference-Instance</a>
-  pub output_signal_level_high: f64,
+  #[liberty(simple(type = Option))]
+  pub output_signal_level_high: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -577,7 +634,8 @@ pub struct Pin {
   /// &end
   /// =228.65
   /// ">Reference-Instance</a>
-  pub output_signal_level_low: f64,
+  #[liberty(simple(type = Option))]
+  pub output_signal_level_low: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -586,7 +644,8 @@ pub struct Pin {
   /// &end
   /// =228.66
   /// ">Reference-Instance</a>
-  pub output_voltage: String,
+  #[liberty(simple(type = Option))]
+  pub output_voltage: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -595,7 +654,10 @@ pub struct Pin {
   /// &end
   /// =229.3
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub pin_func_type: Option<PinFuncType>,
+  /// The prefer_tied attribute describes an input pin of a flip-flop or latch.
+  /// It indicates what the library developer wants this pin connected to.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -604,8 +666,11 @@ pub struct Pin {
   /// &end
   /// =229.4
   /// ">Reference-Instance</a>
-  // FIXME:
-  pub prefer_tied: bool,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=267.24&end=267.26
+  /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
+  pub prefer_tied: Option<PreferTied>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -614,7 +679,8 @@ pub struct Pin {
   /// &end
   /// =229.5
   /// ">Reference-Instance</a>
-  pub primary_output: bool,
+  #[liberty(simple(type = Option))]
+  pub primary_output: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -623,7 +689,9 @@ pub struct Pin {
   /// &end
   /// =229.6
   /// ">Reference-Instance</a>
-  pub pulling_current: Option<units::ElectricCurrent>,
+  #[liberty(simple(type = Option))]
+  pub pulling_current: Option<f64>,
+  // pub pulling_current: Option<units::ElectricCurrent>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -632,7 +700,9 @@ pub struct Pin {
   /// &end
   /// =229.7
   /// ">Reference-Instance</a>
-  pub pulling_resistance: Option<units::ElectricalResistance>,
+  #[liberty(simple(type = Option))]
+  pub pulling_resistance: Option<f64>,
+  // pub pulling_resistance: Option<units::ElectricalResistance>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -641,6 +711,7 @@ pub struct Pin {
   /// &end
   /// =229.8
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub restore_action: Option<logic::Normal>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -650,6 +721,7 @@ pub struct Pin {
   /// &end
   /// =229.9
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub restore_edge_type: Option<RestoreEdgeType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -659,7 +731,9 @@ pub struct Pin {
   /// &end
   /// =229.10
   /// ">Reference-Instance</a>
-  pub rise_capacitance: Option<units::Capacitance>,
+  #[liberty(simple(type = Option))]
+  pub rise_capacitance: Option<f64>,
+  // pub rise_capacitance: Option<units::Capacitance>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -668,7 +742,8 @@ pub struct Pin {
   /// &end
   /// =229.11
   /// ">Reference-Instance</a>
-  pub rise_current_slope_after_threshold: f64,
+  #[liberty(simple(type = Option))]
+  pub rise_current_slope_after_threshold: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -677,7 +752,8 @@ pub struct Pin {
   /// &end
   /// =229.12
   /// ">Reference-Instance</a>
-  pub rise_current_slope_before_threshold: f64,
+  #[liberty(simple(type = Option))]
+  pub rise_current_slope_before_threshold: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -686,7 +762,8 @@ pub struct Pin {
   /// &end
   /// =229.13
   /// ">Reference-Instance</a>
-  pub rise_time_after_threshold: f64,
+  #[liberty(simple(type = Option))]
+  pub rise_time_after_threshold: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -695,7 +772,8 @@ pub struct Pin {
   /// &end
   /// =229.14
   /// ">Reference-Instance</a>
-  pub rise_time_before_threshold: f64,
+  #[liberty(simple(type = Option))]
+  pub rise_time_before_threshold: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -704,6 +782,7 @@ pub struct Pin {
   /// &end
   /// =229.15
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub save_action: Option<logic::Normal>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -713,6 +792,7 @@ pub struct Pin {
   /// &end
   /// =229.19
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub signal_type: Option<SignalType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -722,7 +802,8 @@ pub struct Pin {
   /// &end
   /// =229.20
   /// ">Reference-Instance</a>
-  pub slew_control: SlewControl,
+  #[liberty(simple(type = Option))]
+  pub slew_control: Option<SlewControl>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -731,6 +812,7 @@ pub struct Pin {
   /// &end
   /// =229.21
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub state_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -740,7 +822,8 @@ pub struct Pin {
   /// &end
   /// =229.22
   /// ">Reference-Instance</a>
-  pub test_output_only: bool,
+  #[liberty(simple(type = Option))]
+  pub test_output_only: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -749,6 +832,7 @@ pub struct Pin {
   /// &end
   /// =229.23
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub three_state: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -758,6 +842,7 @@ pub struct Pin {
   /// &end
   /// =229.24
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub x_function: Option<BooleanExpression>,
   // /* Complex Attributes in a pin Group */
   /// <a name ="reference_link" href="
@@ -768,7 +853,10 @@ pub struct Pin {
   /// &end
   /// =229.28
   /// ">Reference-Instance</a>
-  pub fall_capacitance_range: Option<(units::Capacitance, units::Capacitance)>,
+  // NOTICE: Complex Attributes in a pin Group
+  #[liberty(complex(type = Option))]
+  pub fall_capacitance_range: Option<(f64, f64)>,
+  // pub fall_capacitance_range: Option<(units::Capacitance, units::Capacitance)>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -777,31 +865,45 @@ pub struct Pin {
   /// &end
   /// =229.29
   /// ">Reference-Instance</a>
-  // #[liberty(simple(type=Option))]
-  pub rise_capacitance_range: Option<(units::Capacitance, units::Capacitance)>,
-  // /* Group Statements in a pin Group */
+  #[liberty(complex(type = Option))]
+  pub rise_capacitance_range: Option<(f64, f64)>,
+  // NOTICE: Group Attributes in a pin Group
   // electromigration () { }
   // input_ccb (string) { }
-  // internal_power ()  { }
+  #[liberty(group(type=Set))]
+  pub internal_power: MutSet<InternalPower>,
+  // TODO
   // max_trans () { }
+  // TODO
   // min_pulse_width ()  { }
+  // TODO
   // minimum_period ()  { }
+  // TODO
   // output_ccb (string) { }
-  // timing ()  { }
-  // tlatch () {}
-  /// A timing group is defined within a pin group.
-  ///
-  /// Reference:
-  /// <iframe
-  /// src="
+  pub output_ccb: (),
+  // TODO
+  pub tlatch: (),
+  /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
+  /// The timing group can be used to identify the name or names of multiple timing arcs.
+  /// A timing group identifies multiple timing arcs, by identifying a timing arc in a [pin](crate::pin::Pin) group
+  /// that has more than one related pin or when the timing arc is part of a [bundle](crate::bundle::Bundle) or a [bus](crate::bus::Bus).
+  /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
   /// ?field=test
   /// &bgn
   /// =67.26
   /// &end
   /// =67.43
-  /// "
-  /// style="width: 90%; height: 600px;"></iframe>
+  /// ">Reference-Definition</a>
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+  /// ?field=test
+  /// &bgn
+  /// =203.8
+  /// &end
+  /// =203.29
+  /// ">Reference-Instatnce-In-Pin</a>
+  ///
   #[liberty(group(type=Set))]
   pub timing: MutSet<Timing>,
 }

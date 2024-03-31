@@ -3,11 +3,9 @@
 //!
 
 mod fmt;
-pub mod impls;
 pub mod parser;
 pub use fmt::CodeFormatter;
 use itertools::Itertools;
-use mut_set::MutSet;
 use nom::{error::Error, IResult};
 use std::{
   cell::RefCell,
@@ -251,6 +249,8 @@ pub enum IdError {
   /// replace same id
   #[error("replace same id")]
   RepeatIdx,
+  #[error("{0}")]
+  Int(std::num::ParseIntError),
   /// something else
   #[error("{0}")]
   Other(String),

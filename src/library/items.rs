@@ -4,7 +4,7 @@
 // use std::ops::DerefMut;
 
 use crate::{
-  ast::{AttributeList, ComplexAttri, GroupComments},
+  ast::{AttributeList, GroupComments},
   pin::Pin,
 };
 
@@ -18,7 +18,9 @@ use crate::{
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct Sensitization {
   #[id]
   #[liberty(name)]
@@ -27,7 +29,9 @@ pub struct Sensitization {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
+  /// TODO
   pub pin_names: Vec<<Pin as mut_set::Item>::Id>,
+  /// TODO
   #[liberty(complex)]
   pub vector: (usize, String),
 }

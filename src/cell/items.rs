@@ -1,7 +1,7 @@
 use std::{hash::Hash, str::FromStr, sync::Arc};
 
 use crate::{
-  ast::GroupComments, common::items::WordSet, expression::BooleanExpressionId,
+  ast::GroupComments, common::items::WordSet, expression::IdBooleanExpression,
   timing::items::Mode,
 };
 
@@ -14,7 +14,9 @@ use crate::{
 /// </script>
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct LeakagePower {
   #[id]
   #[liberty(name)]
@@ -24,17 +26,17 @@ pub struct LeakagePower {
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   #[id]
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   power_level: Option<String>,
   #[id]
   #[liberty(simple)]
   related_pg_pin: WordSet,
   #[id]
-  #[liberty(simple(type=Option))]
-  when: Option<BooleanExpressionId>,
+  #[liberty(simple(type = Option))]
+  when: Option<IdBooleanExpression>,
   #[liberty(simple)]
   value: f64,
-  #[liberty(complex(type=Option))]
+  #[liberty(complex(type = Option))]
   mode: Option<Mode>,
 }
 
@@ -42,7 +44,7 @@ pub struct LeakagePower {
 pub struct LeakagePowerId {
   power_level: Option<String>,
   related_pg_pin: WordSet,
-  when: Option<BooleanExpressionId>,
+  when: Option<IdBooleanExpression>,
 }
 
 // impl crate::ast::HashedGroup for LeakagePower {
@@ -74,7 +76,9 @@ pub struct LeakagePowerId {
 /// </script>
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct Statetable {
   #[id]
   #[liberty(name)]

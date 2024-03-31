@@ -4,9 +4,12 @@
 use std::collections::HashMap;
 
 use crate::{
-  ast::{self, ComplexAttri, GroupComments},
+  ast::{self, ComplexAttri, GroupComments, SimpleAttri},
   common::items::Domain,
-  expression::{logic, logic::LogicLike, BooleanExpression},
+  expression::{
+    logic::{self, LogicLike},
+    BooleanExpression,
+  },
 };
 
 use strum_macros::{Display, EnumString};
@@ -141,7 +144,7 @@ impl TimingSenseType {
     }
   }
 }
-
+impl SimpleAttri for TimingSenseType {}
 /// You define the mode attribute within a timing group.
 /// A mode attribute pertains to an individual timing arc.
 /// The timing arc is active when mode is instantiated with a name and a value.
@@ -204,7 +207,9 @@ impl ComplexAttri for Mode {
 ///
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct CellDegradation {
   #[id]
   #[liberty(name)]
@@ -234,89 +239,92 @@ pub struct CellDegradation {
   // pub domain: Option<Domain>,
 }
 
-/// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =227.53
-/// +228.27
-/// &end
-/// =228.25
-/// +228.62
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =204.10
-/// &end
-/// =204.10
-/// ">Reference-Instance</a>
-///
-/// **Note:**
-/// The same k-factors that scale the cell_fall and cell_rise values also scale the
-/// retaining_fall and retaining_rise values. There are no separate k-factors for
-/// the retaining_fall and retaining_rise values.
-///
-/// **Used By:**
-/// [Timing](crate::timing::Timing)
-// #[derive(liberty_macros::NameIdx)]
-#[derive(Debug, Clone, Default)]
-#[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
-pub struct CellFall {
-  #[id]
-  #[liberty(name)]
-  name: Vec<String>,
-  #[liberty(comments)]
-  _comments: GroupComments<Self>,
-  #[liberty(undefined)]
-  _undefined: ast::AttributeList,
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =228.22
-  /// &end
-  /// =228.22
-  /// ">Reference</a>
-  pub index_1: Vec<f64>,
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =228.23
-  /// &end
-  /// =228.23
-  /// ">Reference</a>
-  pub index_2: Vec<f64>,
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =228.24
-  /// &end
-  /// =228.24
-  /// ">Reference</a>
-  pub index_3: Vec<f64>,
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =228.25
-  /// &end
-  /// =228.25
-  /// ">Reference</a>
-  pub values: Vec<Vec<Vec<f64>>>,
-  // TODO:
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =228.27
-  /// &end
-  /// =228.62
-  /// ">Reference-Definition</a>
-  pub domain: Domain,
-}
+// /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
+// /// <a name ="reference_link" href="
+// /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+// /// ?field=test
+// /// &bgn
+// /// =227.53
+// /// +228.27
+// /// &end
+// /// =228.25
+// /// +228.62
+// /// ">Reference-Definition</a>
+// /// <a name ="reference_link" href="
+// /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+// /// ?field=test
+// /// &bgn
+// /// =204.10
+// /// &end
+// /// =204.10
+// /// ">Reference-Instance</a>
+// ///
+// /// **Note:**
+// /// The same k-factors that scale the cell_fall and cell_rise values also scale the
+// /// retaining_fall and retaining_rise values. There are no separate k-factors for
+// /// the retaining_fall and retaining_rise values.
+// ///
+// /// **Used By:**
+// /// [Timing](crate::timing::Timing)
+// // #[derive(liberty_macros::NameIdx)]
+// #[derive(Debug, Clone, Default)]
+// #[derive(liberty_macros::Group)]
+// #[mut_set_derive::item(
+//   macro(derive(Debug, Clone,Default);)
+// )]
+// pub struct CellFall {
+//   #[id]
+//   #[liberty(name)]
+//   name: Vec<String>,
+//   #[liberty(comments)]
+//   _comments: GroupComments<Self>,
+//   #[liberty(undefined)]
+//   _undefined: ast::AttributeList,
+//   /// <a name ="reference_link" href="
+//   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+//   /// ?field=test
+//   /// &bgn
+//   /// =228.22
+//   /// &end
+//   /// =228.22
+//   /// ">Reference</a>
+//   pub index_1: Vec<f64>,
+//   /// <a name ="reference_link" href="
+//   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+//   /// ?field=test
+//   /// &bgn
+//   /// =228.23
+//   /// &end
+//   /// =228.23
+//   /// ">Reference</a>
+//   pub index_2: Vec<f64>,
+//   /// <a name ="reference_link" href="
+//   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+//   /// ?field=test
+//   /// &bgn
+//   /// =228.24
+//   /// &end
+//   /// =228.24
+//   /// ">Reference</a>
+//   pub index_3: Vec<f64>,
+//   /// <a name ="reference_link" href="
+//   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+//   /// ?field=test
+//   /// &bgn
+//   /// =228.25
+//   /// &end
+//   /// =228.25
+//   /// ">Reference</a>
+//   pub values: Vec<Vec<Vec<f64>>>,
+//   // TODO:
+//   /// <a name ="reference_link" href="
+//   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+//   /// ?field=test
+//   /// &bgn
+//   /// =228.27
+//   /// &end
+//   /// =228.62
+//   /// ">Reference-Definition</a>
+//   #[liberty(group)]
+//   pub domain: Option<Domain>,
+// }

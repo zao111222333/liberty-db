@@ -20,17 +20,17 @@ mod group;
 /// // Simple liberty attribute, Default
 /// #[liberty(simple(type=Default))]
 /// // Simple liberty attribute, Option
-/// #[liberty(simple(type=Option))]
+/// #[liberty(simple(type = Option))]
 /// // Complex liberty attribute, default=Default
 /// #[liberty(complex)]
 /// // Complex liberty attribute, Default
 /// #[liberty(complex(type=Default))]
 /// // Complex liberty attribute, Option
-/// #[liberty(complex(type=Option))]
+/// #[liberty(complex(type = Option))]
 /// // Complex group attribute, defualt=Option
 /// #[liberty(group)]
 /// // Complex group attribute, Option
-/// #[liberty(group(type=Option))]
+/// #[liberty(group(type = Option))]
 /// // Complex group attribute, Map
 /// #[liberty(group(type=Map))]
 /// // Complex group attribute, Vec

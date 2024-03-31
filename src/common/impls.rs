@@ -2,48 +2,39 @@
 //! implement basic types
 //!
 
-use crate::{
-  common::items::WordSet,
-  expression::{BooleanExpression, BooleanExpressionId},
-  timing::items::TimingSenseType,
+use crate::ast::{
+  ComplexAttri, ComplexParseError, ComplexWrapper, IdError, NameAttri, SimpleAttri,
+  SimpleWrapper,
 };
 
-use super::ComplexParseError;
-
-impl super::SimpleAttri for f64 {
+impl SimpleAttri for f64 {
   #[inline]
-  fn to_wrapper(&self) -> super::SimpleWrapper {
+  fn to_wrapper(&self) -> SimpleWrapper {
     let mut buffer = ryu::Buffer::new();
     buffer.format(*self).to_string()
   }
 }
 
-// impl super::SimpleAttri for BooleanExpression {}
-
-impl super::SimpleAttri for WordSet {}
-impl super::SimpleAttri for BooleanExpression {}
-impl super::SimpleAttri for BooleanExpressionId {}
-impl super::SimpleAttri for TimingSenseType {}
-impl super::SimpleAttri for bool {}
-impl super::SimpleAttri for usize {
+impl SimpleAttri for bool {}
+impl SimpleAttri for usize {
   #[inline]
-  fn to_wrapper(&self) -> super::SimpleWrapper {
+  fn to_wrapper(&self) -> SimpleWrapper {
     let mut buffer = itoa::Buffer::new();
     buffer.format(*self).to_string()
   }
 }
 
-impl super::SimpleAttri for isize {
+impl SimpleAttri for isize {
   #[inline]
-  fn to_wrapper(&self) -> super::SimpleWrapper {
+  fn to_wrapper(&self) -> SimpleWrapper {
     let mut buffer = itoa::Buffer::new();
     buffer.format(*self).to_string()
   }
 }
 
-impl super::NameAttri for Option<String> {
+impl NameAttri for Option<String> {
   #[inline]
-  fn parse(mut v: Vec<String>) -> Result<Self, super::IdError> {
+  fn parse(mut v: Vec<String>) -> Result<Self, IdError> {
     Ok(v.pop())
   }
   #[inline]
@@ -55,17 +46,17 @@ impl super::NameAttri for Option<String> {
   }
 }
 
-impl super::NameAttri for String {
+impl NameAttri for String {
   #[inline]
-  fn parse(mut v: Vec<String>) -> Result<Self, super::IdError> {
+  fn parse(mut v: Vec<String>) -> Result<Self, IdError> {
     let l = v.len();
     if l != 1 {
-      return Err(super::IdError::LengthDismatch(1, l, v));
+      return Err(IdError::LengthDismatch(1, l, v));
     }
     if let Some(name) = v.pop() {
       Ok(name)
     } else {
-      return Err(super::IdError::Other("Unkown pop error".into()));
+      return Err(IdError::Other("Unkown pop error".into()));
     }
   }
   #[inline]
@@ -74,8 +65,8 @@ impl super::NameAttri for String {
   }
 }
 
-impl super::NameAttri for Vec<String> {
-  fn parse(v: Vec<String>) -> Result<Self, super::IdError> {
+impl NameAttri for Vec<String> {
+  fn parse(v: Vec<String>) -> Result<Self, IdError> {
     Ok(v)
   }
 
@@ -83,9 +74,43 @@ impl super::NameAttri for Vec<String> {
     self.clone()
   }
 }
+impl NameAttri for (String, String, usize) {
+  fn parse(mut v: Vec<String>) -> Result<Self, IdError> {
+    let l = v.len();
+    if l != 3 {
+      return Err(crate::ast::IdError::LengthDismatch(3, l, v));
+    }
+    if let Some(s3) = v.pop() {
+      match s3.parse::<usize>() {
+        Ok(s3) => {
+          if let Some(s2) = v.pop() {
+            if let Some(s1) = v.pop() {
+              Ok((s1, s2, s3))
+            } else {
+              Err(IdError::Other("Unkown pop error".into()))
+            }
+          } else {
+            Err(IdError::Other("Unkown pop error".into()))
+          }
+        }
+        Err(e) => Err(IdError::Int(e)),
+      }
+    } else {
+      Err(IdError::Other("Unkown pop error".into()))
+    }
 
-impl<const N: usize> super::NameAttri for [String; N] {
-  fn parse(v: Vec<String>) -> Result<Self, super::IdError> {
+    // match TryInto::<[String; N]>::try_into(v) {
+    //   Ok(name) => Ok(name),
+    //   Err(e) => Err(crate::ast::IdError::Other(format!("try_into error: {:?}", e))),
+    // }
+  }
+
+  fn into_vec(&self) -> Vec<String> {
+    vec![self.0.clone(), self.1.clone(), self.2.to_string()]
+  }
+}
+impl<const N: usize> NameAttri for [String; N] {
+  fn parse(v: Vec<String>) -> Result<Self, IdError> {
     let l = v.len();
     if l != N {
       return Err(crate::ast::IdError::LengthDismatch(N, l, v));
@@ -101,9 +126,9 @@ impl<const N: usize> super::NameAttri for [String; N] {
   }
 }
 
-impl super::SimpleAttri for String {}
+impl SimpleAttri for String {}
 
-impl super::ComplexAttri for Vec<f64> {
+impl ComplexAttri for Vec<f64> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     match v.into_iter().map(|s| s.parse()).collect() {
@@ -112,13 +137,13 @@ impl super::ComplexAttri for Vec<f64> {
     }
   }
   #[inline]
-  fn to_wrapper(&self) -> super::ComplexWrapper {
+  fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = ryu::Buffer::new();
     vec![self.iter().map(|f| buffer.format(*f).to_string()).collect()]
   }
 }
 
-impl super::ComplexAttri for Vec<usize> {
+impl ComplexAttri for Vec<usize> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     match v.into_iter().map(|s| s.parse()).collect() {
@@ -127,13 +152,13 @@ impl super::ComplexAttri for Vec<usize> {
     }
   }
   #[inline]
-  fn to_wrapper(&self) -> super::ComplexWrapper {
+  fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = itoa::Buffer::new();
     vec![self.iter().map(|i| buffer.format(*i).to_string()).collect()]
   }
 }
 
-impl super::ComplexAttri for (usize, String) {
+impl ComplexAttri for (usize, String) {
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let v1: usize = match i.next() {
@@ -158,7 +183,7 @@ impl super::ComplexAttri for (usize, String) {
     vec![vec![buffer.format(self.0).to_string(), self.1.clone()]]
   }
 }
-impl super::ComplexAttri for (f64, f64) {
+impl ComplexAttri for (f64, f64) {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
@@ -182,7 +207,7 @@ impl super::ComplexAttri for (f64, f64) {
     Ok((v1, v2))
   }
   #[inline]
-  fn to_wrapper(&self) -> super::ComplexWrapper {
+  fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = ryu::Buffer::new();
     vec![vec![buffer.format(self.0).to_string(), buffer.format(self.1).to_string()]]
   }

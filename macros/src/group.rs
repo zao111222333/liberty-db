@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::attribute::*;
 use proc_macro2::{Ident, Span};
 use quote::quote;
@@ -272,6 +270,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     let comments_self = Ident::new("_self", Span::call_site());
     let comments_undefined = Ident::new("_undefined", Span::call_site());
     let impl_group = quote! {
+      #[doc(hidden)]
       #[derive(Default,Debug,Clone)]
       pub struct #comments_ident{
         #comments_self: crate::ast::AttriComment,
@@ -370,9 +369,9 @@ fn main() {
     _comments: GroupComments<Self>,
     #[liberty(complex)]
     values: Vec<f64>,
-    #[liberty(simple(type=Option))]
+    #[liberty(simple(type = Option))]
     t1: Option<TimingType>,
-    #[liberty(simple(type=Option))]
+    #[liberty(simple(type = Option))]
     t2: Option<TimingType>,
   }"#;
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();

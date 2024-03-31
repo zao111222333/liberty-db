@@ -2,8 +2,6 @@
 //! All parser utilis.
 //!
 
-use std::f64::consts::E;
-
 use nom::{
   branch::alt,
   bytes::{
@@ -13,7 +11,7 @@ use nom::{
   character::streaming::{char, none_of, one_of},
   combinator::{map, map_opt, opt},
   error::{ContextError, Error, ErrorKind, FromExternalError, ParseError, VerboseError},
-  multi::{many0, many1, separated_list0},
+  multi::{many0, separated_list0},
   sequence::{delimited, pair, preceded, terminated, tuple},
   IResult, InputTakeAtPosition,
 };

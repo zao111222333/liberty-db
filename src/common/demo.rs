@@ -16,13 +16,15 @@ pub(crate) struct Timing {
   _comments: GroupComments<Self>,
   #[liberty(complex)]
   values: Vec<f64>,
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   t1: Option<TimingType>,
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   t2: Option<TimingType>,
 }
 
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct Pin {
@@ -37,7 +39,9 @@ pub(crate) struct Pin {
   timing: Vec<Timing>,
 }
 
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct Ff {
@@ -48,7 +52,7 @@ pub(crate) struct Ff {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   next_state: Option<String>,
 }
 
@@ -61,13 +65,13 @@ pub(crate) struct Cell {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   area: Option<f64>,
   #[liberty(group(type=Set))]
   ff: MutSet<Ff>,
   #[liberty(group(type=Set))]
   pin: MutSet<Pin>,
-  #[liberty(group(type=Option))]
+  #[liberty(group(type = Option))]
   statetable: Option<Statetable>,
 }
 

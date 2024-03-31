@@ -1,20 +1,69 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
+mod ff;
+pub use ff::{FFBank, FFLike, FF};
 pub mod logic;
 use std::{
+  borrow::Borrow,
   collections::{HashSet, VecDeque},
   str::FromStr,
 };
 
 use biodivine_lib_bdd::{
-  boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
-  BddVariableSetBuilder,
+  boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSetBuilder,
 };
 
 mod parser;
 use itertools::Itertools;
 use parser::{BoolExprErr, Token};
+
+lazy_static! {
+  static ref UNKNOWN: Box<Expr> = Box::new(Expr::Variable("_unknown_".to_owned()));
+}
+
+pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
+  #[inline]
+  fn get_nodes(&self) -> HashSet<String> {
+    let mut node_set = HashSet::new();
+    _get_nodes(&self.borrow(), &mut node_set);
+    return node_set;
+  }
+  /// `A & B` -> `A* & B*`
+  #[inline]
+  fn previous(&self) -> Expr {
+    let mut expr: Expr = self.borrow().clone();
+    _previous(&mut expr);
+    return expr;
+  }
+}
+/// `(A)? B : C` <-> `(A & B) | (!A & C)`
+#[inline]
+fn condition(cond: Expr, then_value: Expr, else_value: Expr) -> Expr {
+  let box_cond = Box::new(cond);
+  let box_then = Box::new(then_value);
+  let box_else = Box::new(else_value);
+  let expr = Expr::Or(
+    Box::new(Expr::And(box_cond.clone(), box_then)),
+    Box::new(Expr::And(Box::new(Expr::Not(box_cond)), box_else)),
+  );
+  expr
+}
+#[inline]
+fn condition_box(cond: Box<Expr>, then_value: Box<Expr>, else_value: Box<Expr>) -> Expr {
+  // let box_cond = Box::new(cond);
+  // let box_then = Box::new(then_value);
+  // let box_else = Box::new(else_value);
+  let expr = Expr::Or(
+    Box::new(Expr::And(cond.clone(), then_value)),
+    Box::new(Expr::And(Box::new(Expr::Not(cond)), else_value)),
+  );
+  expr
+}
+
+impl BooleanExpressionLike for Expr {}
+impl BooleanExpressionLike for BooleanExpression {}
+impl BooleanExpressionLike for IdBooleanExpression {}
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -44,61 +93,103 @@ use parser::{BoolExprErr, Token};
 /// function : " \"1A\" + \"1B\" " ;
 /// ```
 ///
-
 #[derive(Debug, Clone)]
 pub struct BooleanExpression {
   /// BooleanExpression itself
   pub expr: Expr,
 }
 
+impl Borrow<Expr> for BooleanExpression {
+  #[inline]
+  fn borrow(&self) -> &Expr {
+    &self.expr
+  }
+}
+impl From<Expr> for BooleanExpression {
+  #[inline]
+  fn from(expr: Expr) -> Self {
+    Self { expr }
+  }
+}
+impl Into<Expr> for BooleanExpression {
+  #[inline]
+  fn into(self) -> Expr {
+    self.expr
+  }
+}
+impl Default for BooleanExpression {
+  fn default() -> Self {
+    Self { expr: Expr::Const(false) }
+  }
+}
+impl crate::ast::SimpleAttri for BooleanExpression {}
+impl crate::ast::SimpleAttri for IdBooleanExpression {}
+
 #[derive(Debug, Clone)]
-pub struct BooleanExpressionId {
+pub struct IdBooleanExpression {
   /// BooleanExpression itself
   pub expr: Expr,
   /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
   /// as `id`, to impl `hash` and `compare`
   pub bdd: Bdd,
 }
-
-impl PartialEq for BooleanExpressionId {
+impl Borrow<Expr> for IdBooleanExpression {
+  #[inline]
+  fn borrow(&self) -> &Expr {
+    &self.expr
+  }
+}
+impl Into<Expr> for IdBooleanExpression {
+  #[inline]
+  fn into(self) -> Expr {
+    self.expr
+  }
+}
+impl From<Expr> for IdBooleanExpression {
+  #[inline]
+  fn from(expr: Expr) -> Self {
+    BooleanExpression::from(expr).into()
+  }
+}
+impl PartialEq for IdBooleanExpression {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
     self.bdd == other.bdd
   }
 }
-impl Eq for BooleanExpressionId {}
-impl std::hash::Hash for BooleanExpressionId {
+impl Eq for IdBooleanExpression {}
+impl std::hash::Hash for IdBooleanExpression {
   #[inline]
   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
     self.bdd.hash(state);
   }
 }
 
-impl TryFrom<BooleanExpression> for BooleanExpressionId {
-  type Error = BoolExprErr;
+impl From<BooleanExpression> for IdBooleanExpression {
+  // type Error = BoolExprErr;
   #[inline]
-  fn try_from(value: BooleanExpression) -> Result<Self, Self::Error> {
+  fn from(value: BooleanExpression) -> Self {
     let mut builder = BddVariableSetBuilder::new();
-    let mut node_set = HashSet::new();
-    parser::get_nodes(&value.expr, &mut node_set);
-    //  println!("{:?}", node_set);
+    let node_set = &value.get_nodes();
     for s in node_set.into_iter().sorted() {
       let _ = builder.make_variable(s.as_str());
     }
     let variables = builder.build();
-    match variables.safe_eval_expression(&value.expr) {
-      Some(bdd) => Ok(Self { expr: value.expr, bdd }),
-      None => Err(BoolExprErr::NoIdea(1)),
-    }
+    let bdd = variables.eval_expression(&value.expr);
+    Self { expr: value.expr, bdd }
+    // match variables.eval_expression(&value.expr) {
+    //   Some(bdd) => Ok(Self { expr: value.expr, bdd }),
+    //   None => Err(BoolExprErr::NoIdea(1)),
+    // }
   }
 }
 
-impl FromStr for BooleanExpressionId {
+impl FromStr for IdBooleanExpression {
   type Err = BoolExprErr;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     let expr = BooleanExpression::from_str(s)?;
-    expr.try_into()
+    Ok(expr.into())
   }
 }
 
@@ -110,7 +201,6 @@ impl FromStr for BooleanExpression {
       Ok((_, vec)) => vec.into_iter().collect(),
       Err(_) => return Err(BoolExprErr::Nom),
     };
-    //  println!("{:?}", tokens);
     let expr = parser::process_tokens(&mut tokens)?;
     Ok(Self { expr })
   }
@@ -123,10 +213,60 @@ impl std::fmt::Display for BooleanExpression {
   }
 }
 
-impl std::fmt::Display for BooleanExpressionId {
+impl std::fmt::Display for IdBooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     parser::_fmt(&self.expr, f)
+  }
+}
+
+#[inline]
+fn _get_nodes(expr: &Expr, node_set: &mut HashSet<String>) {
+  match expr {
+    Expr::Const(_) => (),
+    Expr::Imp(_, _) => todo!(),
+    Expr::Iff(_, _) => todo!(),
+    Expr::Variable(node) => {
+      let _ = node_set.insert(node.to_string());
+    }
+    Expr::Not(e) => _get_nodes(e, node_set),
+    Expr::And(e1, e2) => {
+      _get_nodes(e1, node_set);
+      _get_nodes(e2, node_set);
+    }
+    Expr::Or(e1, e2) => {
+      _get_nodes(e1, node_set);
+      _get_nodes(e2, node_set);
+    }
+    Expr::Xor(e1, e2) => {
+      _get_nodes(e1, node_set);
+      _get_nodes(e2, node_set);
+    }
+  }
+}
+
+#[inline]
+fn _previous(expr: &mut Expr) {
+  match expr {
+    Expr::Const(_) => (),
+    Expr::Imp(_, _) => todo!(),
+    Expr::Iff(_, _) => todo!(),
+    Expr::Variable(node) => {
+      *node += "*";
+    }
+    Expr::Not(e) => _previous(e),
+    Expr::And(e1, e2) => {
+      _previous(e1);
+      _previous(e2);
+    }
+    Expr::Or(e1, e2) => {
+      _previous(e1);
+      _previous(e2);
+    }
+    Expr::Xor(e1, e2) => {
+      _previous(e1);
+      _previous(e2);
+    }
   }
 }
 
@@ -166,12 +306,12 @@ mod test {
     ] {
       println!("----");
       println!("origin:   {}", s);
-      let bool_expr = BooleanExpressionId::from_str(s);
+      let bool_expr = IdBooleanExpression::from_str(s);
       if should_success {
         if let Ok(e) = bool_expr {
           let fmt_s = format!("{e}");
           println!("parsed:   {}", fmt_s);
-          let fmt_bool_expr = BooleanExpressionId::from_str(&fmt_s);
+          let fmt_bool_expr = IdBooleanExpression::from_str(&fmt_s);
           if let Ok(fmt_e) = fmt_bool_expr {
             println!("reparsed: {}", fmt_e);
             assert_eq!(e, fmt_e);
@@ -209,10 +349,10 @@ mod test {
       println!("s2: {s2}");
       if same {
         println!("they should same");
-        assert_eq!(BooleanExpressionId::from_str(s1), BooleanExpressionId::from_str(s2));
+        assert_eq!(IdBooleanExpression::from_str(s1), IdBooleanExpression::from_str(s2));
       } else {
         println!("they are different");
-        assert_ne!(BooleanExpressionId::from_str(s1), BooleanExpressionId::from_str(s2));
+        assert_ne!(IdBooleanExpression::from_str(s1), IdBooleanExpression::from_str(s2));
       }
     }
   }

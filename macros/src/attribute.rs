@@ -170,17 +170,17 @@ pub(crate) fn parse_fields_type(
 /// // Simple liberty attribute, Default
 /// #[liberty(simple(type=Default))]
 /// // Simple liberty attribute, Option
-/// #[liberty(simple(type=Option))]
+/// #[liberty(simple(type = Option))]
 /// // Complex liberty attribute, default=Default
 /// #[liberty(complex)]
 /// // Complex liberty attribute, Default
 /// #[liberty(complex(type=Default))]
 /// // Complex liberty attribute, Option
-/// #[liberty(complex(type=Option))]
+/// #[liberty(complex(type = Option))]
 /// // Complex group attribute, defualt=Option
 /// #[liberty(group)]
 /// // Complex group attribute, Option
-/// #[liberty(group(type=Option))]
+/// #[liberty(group(type = Option))]
 /// // Complex group attribute, Map
 /// #[liberty(group(type=Map))]
 /// // Complex group attribute, Vec
@@ -418,79 +418,6 @@ fn parse_group_type(
   return Ok(group_type);
 }
 
-// fn parse_id_config(
-//   mut tokens: proc_macro2::token_stream::IntoIter,
-// ) -> syn::Result<Option<AutoImplConfig>> {
-//   let mut title = None;
-//   if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
-//     let mut args = g.stream().into_iter().peekable();
-//     loop {
-//       if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.peek() {
-//         assert_eq!(',', arg_punct.as_char());
-//         let _ = args.next();
-//       }
-//       if let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
-//         match arg_id.to_string().as_str() {
-//           // "option_str" => return Ok(Some(AutoImplConfig::OptionStr)),
-//           "title" => {
-//             if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
-//               if '=' != arg_punct.as_char() {
-//                 return Err(syn::Error::new(
-//                   proc_macro2::Span::call_site(),
-//                   format!("miss equal."),
-//                 ));
-//               }
-//             } else {
-//               return Err(syn::Error::new(
-//                 proc_macro2::Span::call_site(),
-//                 format!("miss equal."),
-//               ));
-//             }
-//             if let Some(proc_macro2::TokenTree::Literal(arg_value)) = args.next() {
-//               match arg_value.to_string().as_str() {
-//                 "Option" => title = Some(AutoImplConfig::Option),
-//                 "Vec" => title = Some(AutoImplConfig::Vector),
-//                 "NotCare" => title = Some(AutoImplConfig::NotCare),
-//                 s => {
-//                   if let Ok(n) = s.parse::<usize>() {
-//                     match n {
-//                       0 => title = Some(AutoImplConfig::Vector),
-//                       _ => title = Some(AutoImplConfig::Num(n - 1)),
-//                     }
-//                   } else {
-//                     return Err(syn::Error::new(
-//                       proc_macro2::Span::call_site(),
-//                       format!("#[liberty[id(title = `xxx`)]], where `xxx` should be one of `Option`,`NotCare`,`Vec`, of `usize`, find {}.", arg_value.to_string()),
-//                     ));
-//                   }
-//                 }
-//               }
-//               return Ok(title);
-//               // if arg_value.to_string() == "0.5" {
-//               //   title = Some(AutoImplConfig::Option);
-//               // }
-//             } else {
-//               return Err(syn::Error::new(
-//                 proc_macro2::Span::call_site(),
-//                 format!("miss id_len."),
-//               ));
-//             }
-//           }
-//           _ => {
-//             return Err(syn::Error::new(
-//               proc_macro2::Span::call_site(),
-//               format!("id not support {} group.", arg_id.to_string().as_str()),
-//             ))
-//           }
-//         }
-//       } else {
-//         break;
-//       }
-//     }
-//   }
-//   return Ok(title);
-// }
-
 #[test]
 fn main() {
   use syn::{parse_str, Data};
@@ -513,7 +440,7 @@ pub struct Foo {
     other: i64,
     #[liberty(group(type=Map))]
     group_map: i64,
-    #[liberty(group(type=Option))]
+    #[liberty(group(type = Option))]
     group_option: i64,
     #[liberty(group(type=Vec))]
     group_vec: i64,

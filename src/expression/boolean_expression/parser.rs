@@ -480,29 +480,7 @@ pub(super) fn process_tokens(tokens: &mut VecDeque<Token>) -> Result<Expr, BoolE
   }
 }
 
-pub(super) fn get_nodes(expr: &Expr, node_set: &mut HashSet<String>) {
-  match expr {
-    Expr::Const(_) => (),
-    Expr::Imp(_, _) => todo!(),
-    Expr::Iff(_, _) => todo!(),
-    Expr::Variable(node) => {
-      let _ = node_set.insert(node.to_string());
-    }
-    Expr::Not(e) => get_nodes(e, node_set),
-    Expr::And(e1, e2) => {
-      get_nodes(e1, node_set);
-      get_nodes(e2, node_set);
-    }
-    Expr::Or(e1, e2) => {
-      get_nodes(e1, node_set);
-      get_nodes(e2, node_set);
-    }
-    Expr::Xor(e1, e2) => {
-      get_nodes(e1, node_set);
-      get_nodes(e2, node_set);
-    }
-  }
-}
+#[inline]
 fn pre_process_tokens(
   tokens: &mut VecDeque<Token>,
 ) -> Result<(usize, usize), BoolExprErr> {

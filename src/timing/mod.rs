@@ -15,10 +15,10 @@ pub mod items;
 #[cfg(test)]
 mod test;
 use crate::{
-  ast::GroupComments,
+  ast::{AttributeList, GroupComments},
   bus::Bus,
   common::items::*,
-  expression::{self, BooleanExpression, BooleanExpressionId},
+  expression::{self, BooleanExpression, IdBooleanExpression},
   library::Sensitization,
   pin::Pin,
   units,
@@ -26,39 +26,10 @@ use crate::{
 
 use self::items::TimingSenseType;
 
-// #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
-// pub struct TimingId {
-//   related_pin: WordSet,
-//   when: Option<BooleanExpressionId>,
-//   timing_type: TimingType,
-//   timing_sense: Option<TimingSenseType>,
-// }
-
-// impl crate::ast::HashedGroup for Timing {
-//   type Id = TimingId;
-
-//   fn title(&self) -> Vec<String> {
-//     vec![]
-//   }
-
-//   fn gen_id(&self, _: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
-//     Ok(Self::Id {
-//       related_pin: self.related_pin.clone(),
-//       when: self.when.clone(),
-//       timing_type: self.timing_type,
-//       timing_sense: self.timing_sense,
-//     })
-//   }
-
-//   fn id(&self) -> GroupId<Self> {
-//     self._id.clone()
-//   }
-// }
-
-/// A timing group is defined in a bundle, a bus, or a pin group within a cell.
+/// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
 /// The timing group can be used to identify the name or names of multiple timing arcs.
-/// A timing group identifies multiple timing arcs, by identifying a timing arc in a pin group
-/// that has more than one related pin or when the timing arc is part of a bundle or a bus.
+/// A timing group identifies multiple timing arcs, by identifying a timing arc in a [pin](crate::pin::Pin) group
+/// that has more than one related pin or when the timing arc is part of a [bundle](crate::bundle::Bundle) or a [bus](crate::bus::Bus).
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
 /// ?field=test
@@ -78,14 +49,16 @@ use self::items::TimingSenseType;
 ///
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct Timing {
   #[liberty(name)]
   pub name: Vec<String>,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: crate::ast::AttributeList,
+  _undefined: AttributeList,
   /// Use this attribute to indicate that a constraint arc is for
   /// a clock gating relation between the data and clock pin,
   /// instead of a constraint found in standard sequential devices,
@@ -119,7 +92,7 @@ pub struct Timing {
   /// &end
   /// =320.6
   /// ">Reference-Instance</a>
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   pub clock_gating_flag: Option<bool>,
   /// The `default_timing` attribute allows you to specify one timing arc as the default
   /// in the case of multiple timing arcs with when statements.
@@ -147,7 +120,7 @@ pub struct Timing {
   /// &end
   /// =320.7
   /// ">Reference-Instance</a>
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   pub default_timing: Option<bool>,
   // /// The `fall_resistance` attribute represents the load-dependent output resistance,
   // /// or drive capability, for a logic 1-to-0 transition.
@@ -1043,7 +1016,7 @@ pub struct Timing {
   /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
   /// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
   #[id]
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   pub timing_sense: Option<TimingSenseType>,
   /// The `timing_type` attribute distinguishes between combinational
   /// and sequential cells by defining the type of timing arc.
@@ -1295,8 +1268,8 @@ pub struct Timing {
   /// =203.71
   /// ">Reference-Instance</a>
   #[id]
-  #[liberty(simple(type=Option))]
-  pub when: Option<BooleanExpressionId>,
+  #[liberty(simple(type = Option))]
+  pub when: Option<IdBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

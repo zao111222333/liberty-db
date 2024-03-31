@@ -14,7 +14,12 @@ use std::fmt::{Display, Write};
 #[derive(Debug, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone);
+        derive(derivative::Derivative);
+        derivative(Default);),
+  attr_filter(derivative;)
+)]
 pub struct Library {
   #[id]
   #[liberty(name)]
@@ -36,7 +41,7 @@ pub struct Library {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.7&end=44.19
   /// ">Reference</a>
-  #[liberty(complex(type=Option))]
+  #[liberty(complex(type = Option))]
   pub capacitive_load_unit: Option<units::CapacitiveLoadUnit>,
   /// Valid values are 1mV, 10mV, 100mV, and 1V. The default is 1V.
   /// <a name ="reference_link" href="
@@ -49,14 +54,14 @@ pub struct Library {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.12&end=43.24
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   pub current_unit: Option<units::CurrentUnit>,
   /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm.
   /// **No default exists for `pulling_resistance_unit` if the attribute is omitted.**
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.25&end=44.4
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   pub pulling_resistance_unit: Option<units::PullingResistanceUnit>,
   /// This attribute indicates the units of the power values
   /// in the library. If this attribute is missing, the
@@ -65,7 +70,7 @@ pub struct Library {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.22&end=44.31
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[liberty(simple(type = Option))]
   pub leakage_power_unit: Option<units::LeakagePowerUnit>,
   #[liberty(simple)]
   #[derivative(Default(value = "80.0"))]

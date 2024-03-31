@@ -1,4 +1,8 @@
+use std::{fmt::write, path::Display, str::FromStr};
+
 use strum_macros::{Display, EnumString};
+
+use crate::ast::SimpleAttri;
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum AntennaDiodeType {
   #[strum(serialize = "power")]
@@ -8,7 +12,7 @@ pub enum AntennaDiodeType {
   #[strum(serialize = "power_and_ground")]
   PowerAndGround,
 }
-
+impl SimpleAttri for AntennaDiodeType {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum Direction {
   #[strum(serialize = "input")]
@@ -20,6 +24,7 @@ pub enum Direction {
   #[strum(serialize = "internal")]
   Internal,
 }
+impl SimpleAttri for Direction {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum DontFault {
@@ -30,6 +35,7 @@ pub enum DontFault {
   #[strum(serialize = "sao1")]
   Sao1,
 }
+impl SimpleAttri for DontFault {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum DriverType {
   #[strum(serialize = "pull_up")]
@@ -49,6 +55,7 @@ pub enum DriverType {
   #[strum(serialize = "resistive_1")]
   Resistive1,
 }
+impl SimpleAttri for DriverType {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum NextstateType {
   #[strum(serialize = "data")]
@@ -64,6 +71,7 @@ pub enum NextstateType {
   #[strum(serialize = "scan_enable")]
   ScanEnable,
 }
+impl SimpleAttri for NextstateType {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum PinFuncType {
@@ -78,7 +86,7 @@ pub enum PinFuncType {
   #[strum(serialize = "active_falling")]
   ActiveFalling,
 }
-
+impl SimpleAttri for PinFuncType {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum RestoreEdgeType {
   #[strum(serialize = "edge_trigger")]
@@ -88,6 +96,7 @@ pub enum RestoreEdgeType {
   #[strum(serialize = "trailing")]
   Trailing,
 }
+impl SimpleAttri for RestoreEdgeType {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum SignalType {
@@ -112,7 +121,7 @@ pub enum SignalType {
   #[strum(serialize = "test_clock")]
   TestClock,
 }
-
+impl SimpleAttri for SignalType {}
 #[derive(Default)]
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 pub enum SlewControl {
@@ -125,4 +134,84 @@ pub enum SlewControl {
   #[default]
   #[strum(serialize = "none")]
   None,
+}
+impl SimpleAttri for SlewControl {}
+
+/// The prefer_tied attribute describes an input pin of a flip-flop or latch.
+/// It indicates what the library developer wants this pin connected to.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
+/// ?field=test
+/// &bgn
+/// =229.4
+/// &end
+/// =229.4
+/// ">Reference-Instance</a>
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=267.24&end=267.26
+/// ">Reference-Instance</a>
+#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+pub enum PreferTied {
+  /// 1
+  #[strum(serialize = "1")]
+  One,
+  /// 0
+  #[strum(serialize = "0")]
+  Zero,
+}
+impl SimpleAttri for PreferTied {}
+#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+enum OneValue {
+  #[strum(serialize = "1")]
+  One,
+  #[strum(serialize = "0")]
+  Zero,
+  #[strum(serialize = "x")]
+  Unkown,
+}
+/// Two values that define the value of the differential signals
+/// when both inputs are driven to the same value. The first value
+/// represents the value when both input pins are at logic 0;
+/// the second value represents the value when both input pins are at logic 1.
+/// Valid values for the two-value string are any two-value combinations
+/// made up of 0, 1, and x.
+/// If you do not enter a `fault_model` attribute value, the signal
+/// pin value goes to x when both input pins are 0 or 1.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=248.6&end=248.13
+/// ">Reference-Instance</a>
+#[derive(Debug, Clone, PartialEq, Copy)]
+pub struct TwoValue(OneValue, OneValue);
+impl SimpleAttri for TwoValue {}
+impl std::fmt::Display for TwoValue {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}{}", self.0, self.1)
+  }
+}
+impl FromStr for TwoValue {
+  type Err = strum::ParseError;
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    if s.len() != 2 {
+      return Err(strum::ParseError::VariantNotFound);
+    }
+    let mut i = s.chars().into_iter();
+    if let Some(c1) = i.next() {
+      if let Some(c2) = i.next() {
+        let mut tmp = [0; 1];
+        return Ok(Self(
+          OneValue::from_str(c1.encode_utf8(&mut tmp))?,
+          OneValue::from_str(c2.encode_utf8(&mut tmp))?,
+        ));
+      }
+    }
+    return Err(strum::ParseError::VariantNotFound);
+  }
+}
+#[test]
+fn two_value() {
+  assert_eq!(Ok(TwoValue(OneValue::Unkown, OneValue::One)), TwoValue::from_str("x1"));
+  assert_eq!(Ok(TwoValue(OneValue::Zero, OneValue::One)), TwoValue::from_str("01"));
+  assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1"));
+  assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("111"));
+  assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1-"));
 }

@@ -1,11 +1,14 @@
 use itertools::Itertools;
 
-use std::fmt::Display;
+// use super::BooleanExpression;
+// use super::Port;
+use crate::types::*;
+use crate::units;
+// use crate::util;
+// use std::collections::HashMap;
+// use std::collections::HashSet;
 use std::hash::Hash;
 use std::ops::{Deref, DerefMut};
-use std::str::FromStr;
-
-use crate::ast::SimpleAttri;
 
 /// LogicLike
 pub trait LogicLike: std::fmt::Display + std::fmt::Debug {
@@ -17,6 +20,85 @@ pub trait LogicLike: std::fmt::Display + std::fmt::Debug {
   fn variant_eq(&self, other: &Self) -> bool;
 }
 
+/// ``` text
+/// High:          _______
+///               /│
+///              / │
+///             /  │
+/// Low: ______/   │
+///     │<-  ->│<->│
+///      settle transition
+/// ```
+#[derive(Default)]
+#[derive(Debug, Clone, Copy)]
+#[derive(PartialOrd)]
+// #[derive(PartialEq, Eq)]
+pub struct ChangePattern {
+  /// settle down time
+  pub settle_down_time: units::Time,
+  /// transition time
+  pub transition_time: units::Time,
+}
+
+impl Ord for ChangePattern {
+  fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    match (
+      self.settle_down_time.partial_cmp(&other.settle_down_time),
+      self.transition_time.partial_cmp(&other.transition_time),
+    ) {
+      (Some(c), _) => c,
+      (None, Some(c)) => c,
+      (None, None) => std::cmp::Ordering::Equal,
+    }
+  }
+}
+impl Hash for ChangePattern {
+  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+    float_hash(state, self.settle_down_time.value);
+    float_hash(state, self.transition_time.value);
+  }
+}
+
+impl PartialEq for ChangePattern {
+  fn eq(&self, other: &Self) -> bool {
+    float_eq(self.settle_down_time.value, other.settle_down_time.value)
+      && float_eq(self.transition_time.value, other.transition_time.value)
+  }
+}
+impl Eq for ChangePattern {}
+impl std::fmt::Display for ChangePattern {
+  #[inline]
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    let mut buffer1 = ryu::Buffer::new();
+    let mut buffer2 = ryu::Buffer::new();
+    write!(
+      f,
+      "({}|{})",
+      buffer1.format(self.settle_down_time.value),
+      buffer2.format(self.transition_time.value),
+    )
+  }
+}
+
+impl ChangePattern {
+  #[inline]
+  /// new ChangePattern
+  pub fn new(settle_down_time: units::Time, transition_time: units::Time) -> Self {
+    Self { settle_down_time, transition_time }
+  }
+  /// combine change pattern
+  #[inline]
+  pub fn combine(a: &Option<Self>, b: &Option<Self>) -> Option<Self> {
+    match (a, b) {
+      (None, None) => None,
+      (None, Some(b)) => Some(*b),
+      (Some(a), None) => Some(*a),
+      // FIXME:
+      (Some(a), Some(b)) => Some(*a),
+    }
+  }
+}
+
 /// Level
 #[derive(Ord, PartialOrd)]
 #[derive(Debug, Clone, Copy)]
@@ -24,10 +106,10 @@ pub trait LogicLike: std::fmt::Display + std::fmt::Debug {
 #[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
 pub enum Level {
   /// High
-  #[strum(serialize = "h", serialize = "1", serialize = "H")]
+  #[strum(serialize = "h", serialize = "H", serialize = "1")]
   High,
   /// Low
-  #[strum(serialize = "l", serialize = "0", serialize = "L")]
+  #[strum(serialize = "l", serialize = "L", serialize = "0")]
   Low,
 }
 
@@ -60,36 +142,51 @@ impl LogicLike for Level {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter)]
 pub enum Edge {
   /// Fall
   #[strum(serialize = "f", serialize = "F")]
-  Fall,
+  Fall(Option<ChangePattern>),
   /// Rise
   #[strum(serialize = "r", serialize = "R")]
-  Rise,
+  Rise(Option<ChangePattern>),
 }
 
 impl Edge {
   /// Fall
-  pub const F: Self = Self::Fall;
+  pub const F: Self = Self::Fall(None);
   /// Rise
-  pub const R: Self = Self::Rise;
+  pub const R: Self = Self::Rise(None);
+}
+
+impl std::fmt::Display for Edge {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Edge::Fall(c) => match c {
+        Some(c) => write!(f, "F{c}"),
+        None => write!(f, "F"),
+      },
+      Edge::Rise(c) => match c {
+        Some(c) => write!(f, "R{c}"),
+        None => write!(f, "R"),
+      },
+    }
+  }
 }
 
 impl LogicLike for Edge {
   #[inline]
   fn inverse(&self) -> Self {
     match self {
-      Self::Fall => Self::Rise,
-      Self::Rise => Self::Fall,
+      Self::Fall(c) => Self::Rise(*c),
+      Self::Rise(c) => Self::Fall(*c),
     }
   }
   #[inline]
   fn variant_eq(&self, other: &Self) -> bool {
     match (self, other) {
-      (Self::Fall, Self::Fall) => true,
-      (Self::Rise, Self::Rise) => true,
+      (Edge::Fall(_), Edge::Fall(_)) => true,
+      (Edge::Rise(_), Edge::Rise(_)) => true,
       _ => false,
     }
   }
@@ -200,29 +297,7 @@ pub enum Normal {
   /// H L
   Level(Level),
 }
-impl SimpleAttri for Normal {}
-impl Display for Normal {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    match self {
-      Normal::Edge(Edge::Rise) => write!(f,"R"),
-      Normal::Edge(Edge::Fall) => write!(f,"F"),
-      Normal::Level(Level::High) => write!(f,"H"),
-      Normal::Level(Level::Low) => write!(f,"L"),
-    }
-  }
-}
-impl FromStr for Normal {
-  type Err = strum::ParseError;
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    match s {
-      "R" => Ok(Self::R),
-      "F" => Ok(Self::F),
-      "H" => Ok(Self::H),
-      "L" => Ok(Self::L),
-      _ => Err(strum::ParseError::VariantNotFound),
-    }
-  }
-}
+
 impl Normal {
   /// Rise
   pub const R: Self = Self::Edge(Edge::R);
@@ -330,28 +405,28 @@ impl State {
   pub fn iter() -> impl Iterator<Item = Self> {
     Self::LIST.iter().copied()
   }
-  // /// get_change_pattern
-  // #[inline]
-  // pub fn get_change_pattern(&self) -> Option<ChangePattern> {
-  //   match self {
-  //     State::Edge(s) => match s {
-  //       Edge::Fall(c) => *c,
-  //       Edge::Rise(c) => *c,
-  //     },
-  //     _ => None,
-  //   }
-  // }
-  // /// set_change_pattern
-  // #[inline]
-  // pub fn set_change_pattern(&self, c: &Option<ChangePattern>) -> Self {
-  //   match self {
-  //     State::Edge(s) => match s {
-  //       Edge::Fall(_) => Self::Edge(Edge::Fall(*c)),
-  //       Edge::Rise(_) => Self::Edge(Edge::Rise(*c)),
-  //     },
-  //     _ => *self,
-  //   }
-  // }
+  /// get_change_pattern
+  #[inline]
+  pub fn get_change_pattern(&self) -> Option<ChangePattern> {
+    match self {
+      State::Edge(s) => match s {
+        Edge::Fall(c) => *c,
+        Edge::Rise(c) => *c,
+      },
+      _ => None,
+    }
+  }
+  /// set_change_pattern
+  #[inline]
+  pub fn set_change_pattern(&self, c: &Option<ChangePattern>) -> Self {
+    match self {
+      State::Edge(s) => match s {
+        Edge::Fall(_) => Self::Edge(Edge::Fall(*c)),
+        Edge::Rise(_) => Self::Edge(Edge::Rise(*c)),
+      },
+      _ => *self,
+    }
+  }
   /// get_illegal_type
   #[inline]
   pub fn get_illegal_type(&self) -> Option<IllegalType> {
@@ -381,8 +456,8 @@ impl State {
   pub fn get_bgn(&self) -> Self {
     match self {
       State::Edge(s) => match s {
-        Edge::Fall => Self::Level(Level::High),
-        Edge::Rise => Self::Level(Level::Low),
+        Edge::Fall(_) => Self::Level(Level::High),
+        Edge::Rise(_) => Self::Level(Level::Low),
       },
       _ => *self,
     }
@@ -394,8 +469,8 @@ impl State {
   pub fn get_end(&self) -> Self {
     match self {
       State::Edge(s) => match s {
-        Edge::Fall => Self::Level(Level::Low),
-        Edge::Rise => Self::Level(Level::High),
+        Edge::Fall(_) => Self::Level(Level::Low),
+        Edge::Rise(_) => Self::Level(Level::High),
       },
       _ => *self,
     }
@@ -425,8 +500,8 @@ impl State {
       (Self::Level(_), Self::UnInit(_)) => *end,
       (Self::Level(bgn), Self::Level(end)) => match (bgn, end) {
         (Level::High, Level::High) => Self::Level(Level::High),
-        (Level::High, Level::Low) => Self::Edge(Edge::Fall),
-        (Level::Low, Level::High) => Self::Edge(Edge::Rise),
+        (Level::High, Level::Low) => Self::Edge(Edge::Fall(None)),
+        (Level::Low, Level::High) => Self::Edge(Edge::Rise(None)),
         (Level::Low, Level::Low) => Self::Level(Level::Low),
       },
     }
@@ -478,13 +553,12 @@ impl Into<Vec<State>> for Vector {
 impl std::fmt::Display for Vector {
   #[inline]
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    self.iter().fold(
-      Ok(()),
-      |result, state| result.and_then(|_| write!(f, "{}", state)), // match state.get_change_pattern() {
-                                                                   // Some(c) => result.and_then(|_| write!(f, "{}{}", state, c)),
-                                                                   // None => result.and_then(|_| write!(f, "{}", state)),
-                                                                   // }
-    )
+    self
+      .iter()
+      .fold(Ok(()), |result, state| match state.get_change_pattern() {
+        Some(c) => result.and_then(|_| write!(f, "{}{}", state, c)),
+        None => result.and_then(|_| write!(f, "{}", state)),
+      })
   }
 }
 

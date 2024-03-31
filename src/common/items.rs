@@ -3,7 +3,7 @@ use std::{collections::HashSet, fmt::Debug, rc::Rc};
 use itertools::Itertools;
 use strum_macros::{Display, EnumString};
 
-use crate::ast::GroupComments;
+use crate::ast::{GroupComments, SimpleAttri};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -108,7 +108,9 @@ pub enum VariableType {
 /// ">Reference-Definition</a>
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct Domain {
   #[liberty(name)]
   #[id]
@@ -137,7 +139,7 @@ impl std::fmt::Display for WordSet {
     std::fmt::Display::fmt(&self._set.iter().join(" "), f)
   }
 }
-
+impl SimpleAttri for WordSet {}
 impl std::hash::Hash for WordSet {
   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
     let mut sum = 0_u64;
@@ -160,29 +162,11 @@ impl std::str::FromStr for WordSet {
   }
 }
 
-// impl crate::ast::HashedGroup for TableLookUp {
-//   type Id = Option<String>;
-//   #[inline]
-//   fn title(&self) -> Vec<String> {
-//     match Option::as_ref(&self._id) {
-//       Some(s) => vec![s.clone()],
-//       None => vec![],
-//     }
-//   }
-//   #[inline]
-//   fn id(&self) -> crate::ast::GroupId<Self> {
-//     self._id.clone()
-//   }
-//   #[inline]
-//   fn gen_id(&self, title: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
-//     // Ok(title.pop())
-//     todo!()
-//   }
-// }
-
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct TableLookUpMultiSegment {
   #[liberty(name)]
   #[id]
@@ -207,7 +191,9 @@ pub struct TableLookUpMultiSegment {
 }
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(derive(liberty_macros::Nothing, Debug, Clone))]
+#[mut_set_derive::item(
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct TableLookUp {
   #[id]
   #[liberty(name)]
