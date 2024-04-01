@@ -11,6 +11,7 @@ use crate::units;
 use mut_set::MutSet;
 use std::collections::HashMap;
 use std::fmt::{Display, Write};
+
 #[derive(Debug, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
@@ -75,7 +76,7 @@ pub struct Library {
   #[liberty(simple)]
   #[derivative(Default(value = "80.0"))]
   pub slew_upper_threshold_pct_rise: f64,
-  #[liberty(group(type=Set))]
+  #[liberty(group(type = Set))]
   pub cell: MutSet<Cell>,
   pub voltage_map: HashMap<String, f64>,
   pub sensitization_map: HashMap<String, Sensitization>,

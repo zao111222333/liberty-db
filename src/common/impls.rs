@@ -38,9 +38,9 @@ impl NameAttri for Option<String> {
     Ok(v.pop())
   }
   #[inline]
-  fn into_vec(&self) -> Vec<String> {
+  fn to_vec(self) -> Vec<String> {
     match self {
-      Some(s) => vec![s.clone()],
+      Some(s) => vec![s],
       None => vec![],
     }
   }
@@ -60,21 +60,23 @@ impl NameAttri for String {
     }
   }
   #[inline]
-  fn into_vec(&self) -> Vec<String> {
-    vec![self.clone()]
+  fn to_vec(self) -> Vec<String> {
+    vec![self]
   }
 }
 
 impl NameAttri for Vec<String> {
+  #[inline]
   fn parse(v: Vec<String>) -> Result<Self, IdError> {
     Ok(v)
   }
-
-  fn into_vec(&self) -> Vec<String> {
-    self.clone()
+  #[inline]
+  fn to_vec(self) -> Vec<String> {
+    self
   }
 }
 impl NameAttri for (String, String, usize) {
+  #[inline]
   fn parse(mut v: Vec<String>) -> Result<Self, IdError> {
     let l = v.len();
     if l != 3 {
@@ -98,18 +100,14 @@ impl NameAttri for (String, String, usize) {
     } else {
       Err(IdError::Other("Unkown pop error".into()))
     }
-
-    // match TryInto::<[String; N]>::try_into(v) {
-    //   Ok(name) => Ok(name),
-    //   Err(e) => Err(crate::ast::IdError::Other(format!("try_into error: {:?}", e))),
-    // }
   }
-
-  fn into_vec(&self) -> Vec<String> {
-    vec![self.0.clone(), self.1.clone(), self.2.to_string()]
+  #[inline]
+  fn to_vec(self) -> Vec<String> {
+    vec![self.0, self.1, self.2.to_string()]
   }
 }
 impl<const N: usize> NameAttri for [String; N] {
+  #[inline]
   fn parse(v: Vec<String>) -> Result<Self, IdError> {
     let l = v.len();
     if l != N {
@@ -120,8 +118,8 @@ impl<const N: usize> NameAttri for [String; N] {
       Err(e) => Err(crate::ast::IdError::Other(format!("try_into error: {:?}", e))),
     }
   }
-
-  fn into_vec(&self) -> Vec<String> {
+  #[inline]
+  fn to_vec(self) -> Vec<String> {
     self.to_vec()
   }
 }
@@ -159,6 +157,7 @@ impl ComplexAttri for Vec<usize> {
 }
 
 impl ComplexAttri for (usize, String) {
+  #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let v1: usize = match i.next() {
@@ -177,8 +176,8 @@ impl ComplexAttri for (usize, String) {
     }
     Ok((v1, v2))
   }
-
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  #[inline]
+  fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = itoa::Buffer::new();
     vec![vec![buffer.format(self.0).to_string(), self.1.clone()]]
   }

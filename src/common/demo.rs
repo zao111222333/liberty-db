@@ -2,7 +2,7 @@
 use mut_set::MutSet;
 
 use crate::{
-  ast::{AttributeList, GroupAttri, GroupComments},
+  ast::{AttributeList, GroupAttri, GroupComments, NamedGroup},
   cell::Statetable,
   timing::TimingType,
 };
@@ -47,13 +47,39 @@ pub(crate) struct Pin {
 pub(crate) struct Ff {
   #[id]
   #[liberty(name)]
-  name: [String; 2],
+  var1: String,
+  #[id]
+  #[liberty(name)]
+  var2: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(simple(type = Option))]
   next_state: Option<String>,
+}
+
+impl NamedGroup for Ff {
+  #[inline]
+  fn parse(mut v: Vec<String>) -> Result<Self::Name, crate::ast::IdError> {
+    let l = v.len();
+    if l != 2 {
+      return Err(crate::ast::IdError::LengthDismatch(2, l, v));
+    }
+    if let Some(var2) = v.pop() {
+      if let Some(var1) = v.pop() {
+        Ok(Self::Name { var1, var2 })
+      } else {
+        Err(crate::ast::IdError::Other("Unkown pop error".into()))
+      }
+    } else {
+      Err(crate::ast::IdError::Other("Unkown pop error".into()))
+    }
+  }
+  #[inline]
+  fn name2vec(name: Self::Name) -> Vec<String> {
+    vec![name.var1, name.var2]
+  }
 }
 
 #[derive(Default, Debug)]
@@ -124,6 +150,7 @@ fn pin_test() {
   );
 }
 
+// FIXME!
 #[test]
 fn cell_test() {
   let _ = crate::ast::test_parse_group::<Cell>(

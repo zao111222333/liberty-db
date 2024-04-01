@@ -57,13 +57,13 @@ pub(crate) fn parse_fields_type(
 ) -> syn::Result<(
   HashMap<&Ident, AttriType>,
   // Name
-  Option<&Ident>,
+  Vec<&syn::Field>,
   // undefined name
   &Ident,
   // comment name
   &Ident,
 )> {
-  let mut _name_name = None;
+  let mut _name_vec = Vec::new();
   let mut _undefined_name = None;
   let mut _comments_name = None;
   let mut err_buf = None;
@@ -74,14 +74,15 @@ pub(crate) fn parse_fields_type(
         match parse_field_attrs(field_attrs) {
           Ok(Some(t)) => match t {
             FieldType::Internal(InternalType::Name) => {
-              if let Some(name) = &_name_name {
-                err_buf = Some(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  format!("duplicated name {}.", name),
-                ));
-              } else {
-                _name_name = Some(field_name);
-              }
+              _name_vec.push(field);
+              // if let Some(name) = &_name_name {
+              //   err_buf = Some(syn::Error::new(
+              //     proc_macro2::Span::call_site(),
+              //     format!("duplicated name {}.", name),
+              //   ));
+              // } else {
+              //   _name_name = Some(field_name);
+              // }
               None
             }
             FieldType::Internal(InternalType::UndefinedAttributeList) => {
@@ -144,7 +145,7 @@ pub(crate) fn parse_fields_type(
         ))
       }
       (Some(undefined_name), Some(comments_name)) => {
-        return Ok((attri_type_map, _name_name, undefined_name, comments_name))
+        return Ok((attri_type_map, _name_vec, undefined_name, comments_name))
       }
     }
   }

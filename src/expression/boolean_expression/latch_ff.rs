@@ -3,7 +3,7 @@
 //! </script>
 
 use super::{condition_box, BooleanExpression, BooleanExpressionLike, UNKNOWN};
-use crate::ast::{AttributeList, GroupComments};
+use crate::ast::{AttributeList, GroupComments, IdError, NamedGroup};
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
@@ -29,9 +29,23 @@ pub struct FF {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id]
   #[liberty(name)]
-  pub variable: [String; 2],
+  #[id]
+  pub variable1: String,
+  /// The `variable1` (`variable[0]`) value is the state of the
+  /// noninverting output of the flip-flop;
+  /// the `variable2` (`variable[1]`) value is the state of the inverting output.
+  /// The `variable1` value can be considered the 1-bit storage of the flip-flop.
+  /// Valid values for `variable1`  and `variable2` are
+  /// anything except a pin name used in the cell being described.
+  /// Both of these variables must be assigned,
+  /// even if one of them is not connected to a primary output pin.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
+  /// ">Reference-Definition</a>
+  #[liberty(name)]
+  #[id]
+  pub variable2: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -95,9 +109,26 @@ pub struct FFBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id]
   #[liberty(name)]
-  pub variable: (String, String, usize),
+  #[id]
+  pub variable1: String,
+  /// The `variable1` (`variable[0]`) value is the state of the
+  /// noninverting output of the flip-flop;
+  /// the `variable2` (`variable[1]`) value is the state of the inverting output.
+  /// The `variable1` value can be considered the 1-bit storage of the flip-flop.
+  /// Valid values for `variable1`  and `variable2` are
+  /// anything except a pin name used in the cell being described.
+  /// Both of these variables must be assigned,
+  /// even if one of them is not connected to a primary output pin.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
+  /// ">Reference-Definition</a>
+  #[liberty(name)]
+  #[id]
+  pub variable2: String,
+  /// bits
+  #[liberty(name)]
+  pub bits: usize,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -162,7 +193,21 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable: [String; 2],
+  pub variable1: String,
+  /// The `variable1` (`variable[0]`) value is the state of the
+  /// noninverting output of the flip-flop;
+  /// the `variable2` (`variable[1]`) value is the state of the inverting output.
+  /// The `variable1` value can be considered the 1-bit storage of the flip-flop.
+  /// Valid values for `variable1`  and `variable2` are
+  /// anything except a pin name used in the cell being described.
+  /// Both of these variables must be assigned,
+  /// even if one of them is not connected to a primary output pin.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
+  /// ">Reference-Definition</a>
+  #[id]
+  #[liberty(name)]
+  pub variable2: String,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -227,7 +272,24 @@ pub struct LatchBank {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable: (String, String, usize),
+  pub variable1: String,
+  /// The `variable1` (`variable[0]`) value is the state of the
+  /// noninverting output of the flip-flop;
+  /// the `variable2` (`variable[1]`) value is the state of the inverting output.
+  /// The `variable1` value can be considered the 1-bit storage of the flip-flop.
+  /// Valid values for `variable1`  and `variable2` are
+  /// anything except a pin name used in the cell being described.
+  /// Both of these variables must be assigned,
+  /// even if one of them is not connected to a primary output pin.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
+  /// ">Reference-Definition</a>
+  #[id]
+  #[liberty(name)]
+  pub variable2: String,
+  /// bits
+  #[liberty(name)]
+  pub bits: usize,
   #[liberty(comments)]
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
@@ -274,14 +336,26 @@ pub struct LatchBank {
   [Latch];
   [FF];
 )]
-impl LatchFF for LatchFF_type {
+impl NamedGroup for LatchFF_type {
   #[inline]
-  fn variable1(&self) -> &String {
-    &self.variable[0]
+  fn parse(mut v: Vec<String>) -> Result<Self::Name, IdError> {
+    let l = v.len();
+    if l != 2 {
+      return Err(IdError::LengthDismatch(2, l, v));
+    }
+    if let Some(variable1) = v.pop() {
+      if let Some(variable2) = v.pop() {
+        Ok(Self::Name { variable1, variable2 })
+      } else {
+        Err(IdError::Other("Unkown pop error".into()))
+      }
+    } else {
+      Err(IdError::Other("Unkown pop error".into()))
+    }
   }
   #[inline]
-  fn variable2(&self) -> &String {
-    &self.variable[1]
+  fn name2vec(name: Self::Name) -> Vec<String> {
+    vec![name.variable1, name.variable2]
   }
 }
 
@@ -290,26 +364,35 @@ impl LatchFF for LatchFF_type {
   [LatchBank];
   [FFBank];
 )]
-impl LatchFF for LatchFFBank_type {
+impl NamedGroup for LatchFFBank_type {
   #[inline]
-  fn variable1(&self) -> &String {
-    &self.variable.0
+  fn parse(mut v: Vec<String>) -> Result<Self::Name, IdError> {
+    let l = v.len();
+    if l != 3 {
+      return Err(crate::ast::IdError::LengthDismatch(3, l, v));
+    }
+    if let Some(bits) = v.pop() {
+      match bits.parse::<usize>() {
+        Ok(bits) => {
+          if let Some(variable2) = v.pop() {
+            if let Some(variable1) = v.pop() {
+              Ok(Self::Name { variable1, variable2, bits })
+            } else {
+              Err(IdError::Other("Unkown pop error".into()))
+            }
+          } else {
+            Err(IdError::Other("Unkown pop error".into()))
+          }
+        }
+        Err(e) => Err(IdError::Int(e)),
+      }
+    } else {
+      Err(IdError::Other("Unkown pop error".into()))
+    }
   }
   #[inline]
-  fn variable2(&self) -> &String {
-    &self.variable.1
-  }
-}
-#[duplicate::duplicate_item(
-  LatchFFBank_type;
-  [LatchBank];
-  [FFBank];
-)]
-impl LatchFFBank_type {
-  /// bits for `ff_bank`
-  #[inline]
-  pub fn bits(&self) -> &usize {
-    &self.variable.2
+  fn name2vec(name: Self::Name) -> Vec<String> {
+    vec![name.variable1, name.variable2, name.bits.to_string()]
   }
 }
 
@@ -319,6 +402,14 @@ impl LatchFFBank_type {
   [Latch];
 )]
 impl __LatchFF for Latch_type {
+  #[inline]
+  fn variable1(&self) -> &String {
+    &self.variable1
+  }
+  #[inline]
+  fn variable2(&self) -> &String {
+    &self.variable2
+  }
   #[inline]
   fn clear(&self) -> &Option<BooleanExpression> {
     &self.clear
@@ -355,6 +446,14 @@ impl __LatchFF for Latch_type {
   [FF];
 )]
 impl __LatchFF for FF_type {
+  #[inline]
+  fn variable1(&self) -> &String {
+    &self.variable1
+  }
+  #[inline]
+  fn variable2(&self) -> &String {
+    &self.variable2
+  }
   #[inline]
   fn clear(&self) -> &Option<BooleanExpression> {
     &self.clear
@@ -398,6 +497,8 @@ impl __LatchFF for FF_type {
 }
 
 trait __LatchFF {
+  fn variable1(&self) -> &String;
+  fn variable2(&self) -> &String;
   fn clear(&self) -> &Option<BooleanExpression>;
   fn clear_preset_var1(&self) -> &Option<ClearPresetState>;
   fn clear_preset_var2(&self) -> &Option<ClearPresetState>;
@@ -407,20 +508,18 @@ trait __LatchFF {
   fn preset(&self) -> &Option<BooleanExpression>;
 }
 
+#[duplicate::duplicate_item(
+  AllTypes;
+  [FFBank];
+  [FF];
+  [LatchBank];
+  [Latch];
+)]
+impl LatchFF for AllTypes {}
+
 /// trait for `FF` and `FFBank`
 #[allow(private_bounds)]
 pub trait LatchFF: __LatchFF {
-  /// The `variable1` value is the state of the
-  /// noninverting output of the flip-flop;
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
-  /// ">Reference-Definition</a>
-  fn variable1(&self) -> &String;
-  /// the `variable2` value is the state of the inverting output.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
-  /// ">Reference-Definition</a>
-  fn variable2(&self) -> &String;
   /// Get the `BooleanExpression` of variable1
   fn variable1_expr(&self) -> BooleanExpression {
     let present_state = Box::new(Expr::Variable(self.variable1().clone()));

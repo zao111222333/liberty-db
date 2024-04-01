@@ -172,7 +172,7 @@ pub fn test_all_lib_files() {
     row.add_cell(Cell::new(&r.file_in));
   }
   println!("{}", table);
-  let file = File::create("output.html").expect("msg");
-  let mut writer = std::io::BufWriter::new(file);
-  table.print_html(&mut writer);
+  // let file = File::create("output.html").expect("msg");
+  // let mut writer = std::io::BufWriter::new(file);
+  // table.print_html(&mut writer);
 }

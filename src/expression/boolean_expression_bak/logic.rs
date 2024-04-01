@@ -773,7 +773,7 @@ impl Operator2 {
     let mut combine = a.clone();
     let vec_a_len = a.port_idx.len();
     let vec_combine_to_a =
-      |vec_combine: &Vector| -> Vector { vec_combine[..vec_a_len].to_vec().into() };
+      |vec_combine: &Vector| -> Vector { vec_combine[..vec_a_len].to_vec.into() };
     let idx_vec_combine_to_b: Vec<usize> = b
       .port_idx
       .iter()
@@ -947,7 +947,7 @@ impl std::fmt::Display for Table {
     }));
     for (vec_in, state_out) in self.table.iter().sorted() {
       let _ = table.add_row(Row::from({
-        let mut v: Vec<State> = vec_in.to_vec();
+        let mut v: Vec<State> = vec_in.to_vec;
         v.push(state_out.clone());
         v
       }));

@@ -154,27 +154,8 @@ pub enum ComplexParseError {
 pub trait NameAttri: Sized + Clone {
   /// basic parser
   fn parse(v: Vec<String>) -> Result<Self, IdError>;
-  fn into_vec(&self) -> Vec<String>;
-  #[inline]
-  fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
-    write!(
-      f,
-      "{}",
-      self
-        .into_vec()
-        .iter()
-        .map(|s| if is_word(s) { s.clone() } else { "\"".to_owned() + s + "\"" })
-        .join(",")
-    )
-  }
+  fn to_vec(self) -> Vec<String>;
 }
-
-// impl Format for NameAttri {
-//   #[inline]
-//   fn liberty<T: Write>(&self, _: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
-
-//   }
-// }
 
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
@@ -211,12 +192,11 @@ pub type GroupComments<T> = <T as GroupAttri>::Comments;
 /// AttriComment
 pub type AttriComment = Vec<String>;
 /// Group Attribute in Liberty
-///
-/// Use `#[derive(liberty_macros::Group)]` or
-///
-/// `#[derive(liberty_macros::Group,liberty_macros::NameIdx)]`
 pub trait GroupAttri: Sized {
+  type Name;
   type Comments;
+  fn name(&self) -> Self::Name;
+  fn set_name(&mut self, name: Self::Name);
   fn comment(&self) -> &AttriComment;
   fn comment_mut(&mut self) -> &mut AttriComment;
   fn comments(&self) -> &Self::Comments;
@@ -249,11 +229,33 @@ pub enum IdError {
   /// replace same id
   #[error("replace same id")]
   RepeatIdx,
+  /// Int Error
   #[error("{0}")]
   Int(std::num::ParseIntError),
   /// something else
   #[error("{0}")]
   Other(String),
+}
+
+/// If more than one `#[liberty(name)]`,
+/// need to impl `NamedGroup` manually
+pub trait NamedGroup: GroupAttri {
+  /// parse name from Vec<String>
+  fn parse(v: Vec<String>) -> Result<Self::Name, IdError>;
+  /// name to Vec<String>
+  fn name2vec(name: Self::Name) -> Vec<String>;
+  /// fmt_liberty
+  #[inline]
+  fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    write!(
+      f,
+      "{}",
+      Self::name2vec(self.name())
+        .into_iter()
+        .map(|s| if is_word(&s) { s } else { format!("\"{s}\"") })
+        .join(",")
+    )
+  }
 }
 
 fn display_nom_error(e: &nom::Err<Error<&str>>) -> String {

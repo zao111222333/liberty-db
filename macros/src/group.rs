@@ -1,7 +1,7 @@
 use crate::attribute::*;
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use syn::{Data, DeriveInput, Fields};
+use syn::{parse_quote, Data, DeriveInput, Field, Fields, Token};
 
 fn group_field_fn(
   field_name: &Ident,
@@ -196,7 +196,7 @@ fn group_field_fn(
 }
 
 pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
-  let name = &ast.ident;
+  let ident = &ast.ident;
   let st = match &ast.data {
     Data::Struct(s) => s,
     _ => {
@@ -206,7 +206,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
 
   if let Fields::Named(named) = &st.fields {
     let fields = &named.named;
-    let (attri_type_map, name_name, undefined_name, comments_name) =
+    let (attri_type_map, name_vec, undefined_name, comments_name) =
       parse_fields_type(fields)?;
     let mut attri_comments = quote! {};
     let mut parser_arms = quote! {};
@@ -240,36 +240,123 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         ));
       }
     }
-    let change_id_return = if let Some(name_name) = name_name {
-      quote! {
-        match crate::ast::NameAttri::parse(title){
-          Ok(name) => {
-            res.#name_name = name;
-            return Ok((input,Ok(res)));
-          },
-          Err(e) => {
-            return Ok((input,Err(e)));
-          },
-        }
-      }
+    let (change_id_return, write_title) = if name_vec.len() == 0 {
+      (
+        quote! {return Ok((input, Ok(res)));},
+        quote! {
+          write!(f,"\n{} () {{",key)?;
+        },
+      )
     } else {
-      quote! {return Ok((input, Ok(res)));}
+      (
+        quote! {
+          match <Self as crate::ast::NamedGroup>::parse(title){
+            Ok(name) => {
+              res.set_name(name);
+              return Ok((input,Ok(res)));
+            },
+            Err(e) => {
+              return Ok((input,Err(e)));
+            },
+          }
+        },
+        quote! {
+          write!(f,"\n{} (",key)?;
+          crate::ast::NamedGroup::fmt_liberty(self, f)?;
+          write!(f,") {{")?;
+        },
+      )
     };
-    let write_title = if let Some(name_name) = name_name {
-      quote! {
-        write!(f,"\n{} (",key)?;
-        crate::ast::NameAttri::fmt_liberty(&self.#name_name, f)?;
-        write!(f,") {{")?;
-      }
-    } else {
-      quote! {
-        write!(f,"\n{} () {{",key)?;
-      }
-    };
-    let comments_ident = Ident::new(&format!("{}Comments", name), Span::call_site());
+    let comments_ident = Ident::new(&format!("{}Comments", ident), Span::call_site());
     let comments_self = Ident::new("_self", Span::call_site());
     let comments_undefined = Ident::new("_undefined", Span::call_site());
+    let (name_ident, name_func, name_sturct, named_group_impl) = match name_vec.len() {
+      0 => (
+        quote!(()),
+        quote! {
+          #[inline]
+          fn name(&self) -> Self::Name{()}
+          #[inline]
+          fn set_name(&mut self, name: Self::Name){}
+        },
+        quote!(),
+        quote!(),
+      ),
+      1 => {
+        let t = &name_vec[0].ty;
+        let i = name_vec[0].ident.clone().expect("name has no ident!");
+        (
+          quote!(#t),
+          quote! {
+            #[inline]
+            fn name(&self) -> Self::Name{
+              self.#i.clone()
+            }
+            #[inline]
+            fn set_name(&mut self, name: Self::Name){
+              self.#i = name;
+            }
+          },
+          quote!(),
+          quote! {
+            impl crate::ast::NamedGroup for #ident {
+              #[inline]
+              fn parse(v: Vec<String>) -> Result<Self::Name, crate::ast::IdError>{
+                <Self::Name as crate::ast::NameAttri>::parse(v)
+              }
+              #[inline]
+              fn name2vec(name: Self::Name) -> Vec<String>{
+                <Self::Name as crate::ast::NameAttri>::to_vec(name)
+              }
+            }
+          },
+        )
+      }
+      _ => {
+        let i = Ident::new(&format!("{}Name", ident), Span::call_site());
+        let mut s: DeriveInput = parse_quote! {
+          #[doc(hidden)]
+          #[derive(Debug,Clone)]
+          pub struct #i{
+          }
+        };
+        let s_fileds = fields_of_input(&mut s);
+        let mut _name = quote!();
+        let mut _set_name = quote!();
+        for f in name_vec.into_iter() {
+          let mut f = f.clone();
+          let i = f.ident.clone().expect("name has no ident!");
+          f.attrs.clear();
+          s_fileds.push(f);
+          _name = quote!(#_name
+            #i:self.#i.clone(),
+          );
+          _set_name = quote!(#_set_name
+            self.#i = name.#i;
+          );
+        }
+        (
+          quote!(#i),
+          quote! {
+            #[inline]
+              fn name(&self) -> Self::Name{
+                Self::Name{
+                  #_name
+                }
+              }
+              #[inline]
+              fn set_name(&mut self, name: Self::Name){
+                #_set_name
+              }
+          },
+          quote!(#s),
+          quote!(),
+        )
+      }
+    };
     let impl_group = quote! {
+      #named_group_impl
+      #name_sturct
       #[doc(hidden)]
       #[derive(Default,Debug,Clone)]
       pub struct #comments_ident{
@@ -277,8 +364,10 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         #comments_undefined: crate::ast::AttriComment,
         #attri_comments
       }
-      impl crate::ast::GroupAttri for #name {
+      impl crate::ast::GroupAttri for #ident {
+        type Name=#name_ident;
         type Comments=#comments_ident;
+        #name_func
         #[inline]
         fn comment(&self) -> &crate::ast::AttriComment{
           &self.#comments_name.#comments_self
@@ -354,6 +443,17 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     })
   } else {
     Err(syn::Error::new(Span::call_site(), format!("Can not find NamedField")))
+  }
+}
+type Punctuated = syn::punctuated::Punctuated<Field, Token![,]>;
+fn fields_of_input(input: &mut DeriveInput) -> &mut Punctuated {
+  match &mut input.data {
+    Data::Struct(data) => match &mut data.fields {
+      Fields::Named(fields) => &mut fields.named,
+      Fields::Unnamed(fields) => &mut fields.unnamed,
+      Fields::Unit => unreachable!(),
+    },
+    Data::Enum(_) | Data::Union(_) => unreachable!(),
   }
 }
 
