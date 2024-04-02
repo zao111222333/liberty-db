@@ -41,9 +41,8 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 [features]
 default = []
 
-
-
 [dependencies]
+# liberty-macros = "0.4.1"
 liberty-macros = {path = "macros" }
 log = { version = "0.4", features = ["std", "serde"] }
 nom = "7.1"

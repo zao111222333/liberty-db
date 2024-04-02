@@ -1,4 +1,4 @@
-# cargo publish --registry crates-io -p liberty-macro
+# cargo publish --registry crates-io -p liberty-macros
 [package]
 name = "liberty-macros"
 description = "`liberty` macros"
