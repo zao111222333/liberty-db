@@ -4,11 +4,7 @@
 mod latch_ff;
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 pub mod logic;
-use std::{
-  borrow::Borrow,
-  collections::{HashSet, VecDeque},
-  str::FromStr,
-};
+use std::{borrow::Borrow, collections::HashSet, str::FromStr};
 
 use biodivine_lib_bdd::{
   boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSetBuilder,
@@ -16,7 +12,7 @@ use biodivine_lib_bdd::{
 
 mod parser;
 use itertools::Itertools;
-use parser::{BoolExprErr, Token};
+use parser::BoolExprErr;
 
 lazy_static! {
   static ref UNKNOWN: Box<Expr> = Box::new(Expr::Variable("_unknown_".to_owned()));
@@ -49,6 +45,7 @@ fn condition(cond: Expr, then_value: Expr, else_value: Expr) -> Expr {
   );
   expr
 }
+
 #[inline]
 fn condition_box(cond: Box<Expr>, then_value: Box<Expr>, else_value: Box<Expr>) -> Expr {
   // let box_cond = Box::new(cond);
@@ -161,7 +158,6 @@ impl std::hash::Hash for IdBooleanExpression {
 }
 
 impl From<BooleanExpression> for IdBooleanExpression {
-  // type Error = BoolExprErr;
   #[inline]
   fn from(value: BooleanExpression) -> Self {
     let mut builder = BddVariableSetBuilder::new();
@@ -172,10 +168,6 @@ impl From<BooleanExpression> for IdBooleanExpression {
     let variables = builder.build();
     let bdd = variables.eval_expression(&value.expr);
     Self { expr: value.expr, bdd }
-    // match variables.eval_expression(&value.expr) {
-    //   Some(bdd) => Ok(Self { expr: value.expr, bdd }),
-    //   None => Err(BoolExprErr::NoIdea(1)),
-    // }
   }
 }
 
@@ -185,19 +177,6 @@ impl FromStr for IdBooleanExpression {
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     let expr = BooleanExpression::from_str(s)?;
     Ok(expr.into())
-  }
-}
-
-impl FromStr for BooleanExpression {
-  type Err = BoolExprErr;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    let mut tokens: VecDeque<Token> = match parser::token_vec(s) {
-      Ok((_, vec)) => vec.into_iter().collect(),
-      Err(_) => return Err(BoolExprErr::Nom),
-    };
-    let expr = parser::process_tokens(&mut tokens)?;
-    Ok(Self { expr })
   }
 }
 
