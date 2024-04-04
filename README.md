@@ -49,8 +49,8 @@ cargo test --package liberty-tests --lib -- parser_bench::test_all_lib_files --e
 + use PDFJS
 + stream input
 + fix missing newline at endding
-+ recursive parse boolean expression
 + Linked Group
++ ~~recursive parse boolean expression~~
 + ~~macros~~
 + ~~format to `liberty`~~
 + ~~support multi-line `\`~~

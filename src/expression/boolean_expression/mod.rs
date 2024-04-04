@@ -33,30 +33,30 @@ pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
     return expr;
   }
 }
-/// `(A)? B : C` <-> `(A & B) | (!A & C)`
-#[inline]
-fn condition(cond: Expr, then_value: Expr, else_value: Expr) -> Expr {
-  let box_cond = Box::new(cond);
-  let box_then = Box::new(then_value);
-  let box_else = Box::new(else_value);
-  let expr = Expr::Or(
-    Box::new(Expr::And(box_cond.clone(), box_then)),
-    Box::new(Expr::And(Box::new(Expr::Not(box_cond)), box_else)),
-  );
-  expr
-}
+// /// `(A)? B : C` <-> `(A & B) | (!A & C)`
+// #[inline]
+// fn condition(cond: Expr, then_value: Expr, else_value: Expr) -> Expr {
+//   let box_cond = Box::new(cond);
+//   let box_then = Box::new(then_value);
+//   let box_else = Box::new(else_value);
+//   let expr = Expr::Or(
+//     Box::new(Expr::And(box_cond.clone(), box_then)),
+//     Box::new(Expr::And(Box::new(Expr::Not(box_cond)), box_else)),
+//   );
+//   expr
+// }
 
-#[inline]
-fn condition_box(cond: Box<Expr>, then_value: Box<Expr>, else_value: Box<Expr>) -> Expr {
-  // let box_cond = Box::new(cond);
-  // let box_then = Box::new(then_value);
-  // let box_else = Box::new(else_value);
-  let expr = Expr::Or(
-    Box::new(Expr::And(cond.clone(), then_value)),
-    Box::new(Expr::And(Box::new(Expr::Not(cond)), else_value)),
-  );
-  expr
-}
+// #[inline]
+// fn condition_box(cond: Box<Expr>, then_value: Box<Expr>, else_value: Box<Expr>) -> Expr {
+//   // let box_cond = Box::new(cond);
+//   // let box_then = Box::new(then_value);
+//   // let box_else = Box::new(else_value);
+//   let expr = Expr::Or(
+//     Box::new(Expr::And(cond.clone(), then_value)),
+//     Box::new(Expr::And(Box::new(Expr::Not(cond)), else_value)),
+//   );
+//   expr
+// }
 
 impl BooleanExpressionLike for Expr {}
 impl BooleanExpressionLike for BooleanExpression {}
@@ -216,6 +216,11 @@ fn _get_nodes(expr: &Expr, node_set: &mut HashSet<String>) {
       _get_nodes(e1, node_set);
       _get_nodes(e2, node_set);
     }
+    Expr::Cond(e1, e2, e3) => {
+      _get_nodes(e1, node_set);
+      _get_nodes(e2, node_set);
+      _get_nodes(e3, node_set);
+    }
   }
 }
 
@@ -241,6 +246,7 @@ fn _previous(expr: &mut Expr) {
       _previous(e1);
       _previous(e2);
     }
+    Expr::Cond(_, _, _) => todo!(),
   }
 }
 
@@ -329,5 +335,22 @@ mod test {
         assert_ne!(IdBooleanExpression::from_str(s1), IdBooleanExpression::from_str(s2));
       }
     }
+  }
+  /// `cond ? then_exp : else_exp` is equal to `(cond & then_exp) | (!cond & else_exp)`
+  #[test]
+  fn if_else() {
+    let a = Box::new(Expr::Variable("A".to_string()));
+    let b = Box::new(Expr::Variable("B".to_string()));
+    let c = Box::new(Expr::Variable("C".to_string()));
+    let cond: IdBooleanExpression =
+      BooleanExpression { expr: Expr::Cond(a.clone(), b.clone(), c.clone()) }.into();
+    let or_and: IdBooleanExpression = BooleanExpression {
+      expr: Expr::Or(
+        Box::new(Expr::And(a.clone(), b)),
+        Box::new(Expr::And(Box::new(Expr::Not(a)), c)),
+      ),
+    }
+    .into();
+    assert_eq!(cond, or_and);
   }
 }

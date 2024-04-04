@@ -2,7 +2,7 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use super::{condition_box, BooleanExpression, BooleanExpressionLike, UNKNOWN};
+use super::{BooleanExpression, BooleanExpressionLike, UNKNOWN};
 use crate::ast::{AttributeList, GroupComments, IdError, NamedGroup};
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 
@@ -529,21 +529,21 @@ pub trait LatchFF: __LatchFF {
         match (self.active(), self.active_also()) {
           (None, None) => Expr::Variable(self.variable1().clone()),
           (None, Some(active_also)) => {
-            condition_box(active_also, next_state.clone(), present_state.clone())
+            Expr::Cond(active_also, next_state.clone(), present_state.clone())
           }
           (Some(active), None) => {
-            condition_box(active, next_state.clone(), present_state.clone())
+            Expr::Cond(active, next_state.clone(), present_state.clone())
           }
           (Some(active), Some(active_also)) => {
             // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
-            condition_box(
+            Expr::Cond(
               active,
-              Box::new(condition_box(
+              Box::new(Expr::Cond(
                 active_also.clone(),
                 UNKNOWN.clone(),
                 next_state.clone(),
               )),
-              Box::new(condition_box(active_also, next_state, present_state.clone())),
+              Box::new(Expr::Cond(active_also, next_state, present_state.clone())),
             )
           }
         }
@@ -553,12 +553,12 @@ pub trait LatchFF: __LatchFF {
 
     let expr = match (self.preset(), self.clear()) {
       (None, None) => active_edge_variable,
-      (None, Some(clear)) => condition_box(
+      (None, Some(clear)) => Expr::Cond(
         Box::new(clear.expr.clone()),
         Box::new(Expr::Const(false)),
         Box::new(active_edge_variable),
       ),
-      (Some(preset), None) => condition_box(
+      (Some(preset), None) => Expr::Cond(
         Box::new(preset.expr.clone()),
         Box::new(Expr::Const(true)),
         Box::new(active_edge_variable),
@@ -575,14 +575,14 @@ pub trait LatchFF: __LatchFF {
         let preset = Box::new(preset.expr.clone());
         let clear = Box::new(clear.expr.clone());
         // clear? (preset? clear_preset : 0) : (preset? 1 : active_edge_variable)
-        condition_box(
+        Expr::Cond(
           clear,
-          Box::new(condition_box(
+          Box::new(Expr::Cond(
             preset.clone(),
             clear_preset,
             Box::new(Expr::Const(false)),
           )),
-          Box::new(condition_box(
+          Box::new(Expr::Cond(
             preset,
             Box::new(Expr::Const(true)),
             Box::new(active_edge_variable),
@@ -602,21 +602,21 @@ pub trait LatchFF: __LatchFF {
         match (self.active(), self.active_also()) {
           (None, None) => Expr::Variable(self.variable2().clone()),
           (None, Some(active_also)) => {
-            condition_box(active_also, next_state.clone(), present_state.clone())
+            Expr::Cond(active_also, next_state.clone(), present_state.clone())
           }
           (Some(active), None) => {
-            condition_box(active, next_state.clone(), present_state.clone())
+            Expr::Cond(active, next_state.clone(), present_state.clone())
           }
           (Some(active), Some(active_also)) => {
             // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
-            condition_box(
+            Expr::Cond(
               active,
-              Box::new(condition_box(
+              Box::new(Expr::Cond(
                 active_also.clone(),
                 UNKNOWN.clone(),
                 next_state.clone(),
               )),
-              Box::new(condition_box(active_also, next_state, present_state.clone())),
+              Box::new(Expr::Cond(active_also, next_state, present_state.clone())),
             )
           }
         }
@@ -625,12 +625,12 @@ pub trait LatchFF: __LatchFF {
     };
     let expr = match (self.preset(), self.clear()) {
       (None, None) => active_edge_variable,
-      (None, Some(clear)) => condition_box(
+      (None, Some(clear)) => Expr::Cond(
         Box::new(clear.expr.clone()),
         Box::new(Expr::Const(true)),
         Box::new(active_edge_variable),
       ),
-      (Some(preset), None) => condition_box(
+      (Some(preset), None) => Expr::Cond(
         Box::new(preset.expr.clone()),
         Box::new(Expr::Const(false)),
         Box::new(active_edge_variable),
@@ -647,14 +647,10 @@ pub trait LatchFF: __LatchFF {
         let preset = Box::new(preset.expr.clone());
         let clear = Box::new(clear.expr.clone());
         // clear? (preset? clear_preset : 1) : (preset? 0 : active_edge_variable)
-        condition_box(
+        Expr::Cond(
           clear,
-          Box::new(condition_box(
-            preset.clone(),
-            clear_preset,
-            Box::new(Expr::Const(true)),
-          )),
-          Box::new(condition_box(
+          Box::new(Expr::Cond(preset.clone(), clear_preset, Box::new(Expr::Const(true)))),
+          Box::new(Expr::Cond(
             preset,
             Box::new(Expr::Const(false)),
             Box::new(active_edge_variable),
@@ -678,41 +674,37 @@ pub trait LatchFF: __LatchFF {
             Expr::Variable(self.variable2().clone()),
           ),
           (None, Some(active_also)) => (
-            condition_box(
-              active_also.clone(),
-              next_state1.clone(),
-              present_state1.clone(),
-            ),
-            condition_box(active_also, next_state2.clone(), present_state2.clone()),
+            Expr::Cond(active_also.clone(), next_state1.clone(), present_state1.clone()),
+            Expr::Cond(active_also, next_state2.clone(), present_state2.clone()),
           ),
           (Some(active), None) => (
-            condition_box(active.clone(), next_state1.clone(), present_state1.clone()),
-            condition_box(active, next_state2.clone(), present_state2.clone()),
+            Expr::Cond(active.clone(), next_state1.clone(), present_state1.clone()),
+            Expr::Cond(active, next_state2.clone(), present_state2.clone()),
           ),
           (Some(active), Some(active_also)) => {
             // clocked_on? (clocked_on_also? unknown : next_state) : (clocked_on_also? next_state : present_state)
             (
-              condition_box(
+              Expr::Cond(
                 active.clone(),
-                Box::new(condition_box(
+                Box::new(Expr::Cond(
                   active_also.clone(),
                   UNKNOWN.clone(),
                   next_state1.clone(),
                 )),
-                Box::new(condition_box(
+                Box::new(Expr::Cond(
                   active_also.clone(),
                   next_state1,
                   present_state1.clone(),
                 )),
               ),
-              condition_box(
+              Expr::Cond(
                 active,
-                Box::new(condition_box(
+                Box::new(Expr::Cond(
                   active_also.clone(),
                   UNKNOWN.clone(),
                   next_state2.clone(),
                 )),
-                Box::new(condition_box(active_also, next_state2, present_state2.clone())),
+                Box::new(Expr::Cond(active_also, next_state2, present_state2.clone())),
               ),
             )
           }
@@ -726,24 +718,24 @@ pub trait LatchFF: __LatchFF {
     let (expr1, expr2) = match (self.preset(), self.clear()) {
       (None, None) => (active_edge_variable1, active_edge_variable2),
       (None, Some(clear)) => (
-        condition_box(
+        Expr::Cond(
           Box::new(clear.expr.clone()),
           Box::new(Expr::Const(false)),
           Box::new(active_edge_variable1),
         ),
-        condition_box(
+        Expr::Cond(
           Box::new(clear.expr.clone()),
           Box::new(Expr::Const(true)),
           Box::new(active_edge_variable2),
         ),
       ),
       (Some(preset), None) => (
-        condition_box(
+        Expr::Cond(
           Box::new(preset.expr.clone()),
           Box::new(Expr::Const(true)),
           Box::new(active_edge_variable1),
         ),
-        condition_box(
+        Expr::Cond(
           Box::new(preset.expr.clone()),
           Box::new(Expr::Const(false)),
           Box::new(active_edge_variable2),
@@ -770,27 +762,27 @@ pub trait LatchFF: __LatchFF {
         let clear = Box::new(clear.expr.clone());
         // clear? (preset? clear_preset : 0) : (preset? 1 : active_edge_variable)
         (
-          condition_box(
+          Expr::Cond(
             clear.clone(),
-            Box::new(condition_box(
+            Box::new(Expr::Cond(
               preset.clone(),
               clear_preset1,
               Box::new(Expr::Const(false)),
             )),
-            Box::new(condition_box(
+            Box::new(Expr::Cond(
               preset.clone(),
               Box::new(Expr::Const(true)),
               Box::new(active_edge_variable1),
             )),
           ),
-          condition_box(
+          Expr::Cond(
             clear,
-            Box::new(condition_box(
+            Box::new(Expr::Cond(
               preset.clone(),
               clear_preset2,
               Box::new(Expr::Const(true)),
             )),
-            Box::new(condition_box(
+            Box::new(Expr::Cond(
               preset,
               Box::new(Expr::Const(false)),
               Box::new(active_edge_variable2),
@@ -835,6 +827,27 @@ impl crate::ast::SimpleAttri for ClearPresetState {}
 mod test {
   #[allow(unused_imports)]
   use crate::expression::{FFBank, IdBooleanExpression, Latch, LatchBank, LatchFF, FF};
+  #[test]
+  fn special_boolean_expression() {
+    let (ff, _) = &mut crate::ast::test_parse_group::<FF>(
+      r#"(IQ,IQN) {
+        next_state : "(J K IQ') + (J K') + (J' K' IQ)";
+        clocked_on : "\"1A\" + \"1B\"";
+      }
+    "#,
+    );
+    let var1_expr = ff.variable1_expr();
+    let var2_expr = ff.variable2_expr();
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
+    let id_var1_expr: IdBooleanExpression = var1_expr.into();
+    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let (var1_expr_, var2_expr_) = ff.variable_expr();
+    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    assert_eq!(id_var1_expr_, id_var1_expr);
+    assert_eq!(id_var2_expr_, id_var2_expr);
+  }
   /// In some flip-flops, the next state depends on the current state.
   /// In this case, the first state variable (IQ  in the example)
   /// can be used in the next_state  statement;
@@ -853,8 +866,8 @@ mod test {
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
-    println!("{:?}", var1_expr);
-    println!("{:?}", var2_expr);
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
@@ -885,8 +898,8 @@ mod test {
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
-    println!("{:?}", var1_expr);
-    println!("{:?}", var2_expr);
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
@@ -917,8 +930,8 @@ mod test {
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
-    println!("{:?}", var1_expr);
-    println!("{:?}", var2_expr);
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
@@ -943,8 +956,8 @@ mod test {
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
-    println!("{:?}", var1_expr);
-    println!("{:?}", var2_expr);
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
@@ -976,8 +989,8 @@ mod test {
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
-    println!("{:?}", var1_expr);
-    println!("{:?}", var2_expr);
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
@@ -1006,8 +1019,8 @@ mod test {
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
-    println!("{:?}", var1_expr);
-    println!("{:?}", var2_expr);
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
@@ -1032,8 +1045,8 @@ mod test {
     );
     let var1_expr = latch.variable1_expr();
     let var2_expr = latch.variable2_expr();
-    println!("{:?}", var1_expr);
-    println!("{:?}", var2_expr);
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = latch.variable_expr();
@@ -1059,8 +1072,8 @@ mod test {
     );
     let var1_expr = latch.variable1_expr();
     let var2_expr = latch.variable2_expr();
-    println!("{:?}", var1_expr);
-    println!("{:?}", var2_expr);
+    println!("{}", var1_expr);
+    println!("{}", var2_expr);
     let id_var1_expr: IdBooleanExpression = var1_expr.into();
     let id_var2_expr: IdBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = latch.variable_expr();

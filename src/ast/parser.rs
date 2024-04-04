@@ -4,11 +4,8 @@
 
 use nom::{
   branch::alt,
-  bytes::{
-    complete::tag,
-    streaming::{escaped, take, take_until, take_while},
-  },
-  character::streaming::{char, none_of, one_of},
+  bytes::streaming::{escaped, is_not, tag, take, take_until, take_while},
+  character::streaming::{char, one_of},
   combinator::{map, map_opt, opt},
   error::{ContextError, Error, ErrorKind, FromExternalError, ParseError, VerboseError},
   multi::{many0, separated_list0},
@@ -224,7 +221,7 @@ where
 {
   delimited(
     char('"'),
-    escaped(opt(none_of(r#"\""#)), '\\', one_of(r#"\"rnt"#)),
+    escaped(opt(alt((tag(r#"\""#), is_not(r#"\""#)))), '\\', one_of(r#"\"rnt"#)),
     char('"'),
   )(i)
 }
@@ -248,7 +245,7 @@ where
 pub(super) fn char_in_word(c: char) -> bool {
   c.is_alphanumeric() || "/_.+-:".contains(c)
 }
-
+// \"
 pub(crate) fn word<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
 where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,

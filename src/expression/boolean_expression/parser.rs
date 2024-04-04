@@ -90,6 +90,15 @@ pub(super) fn _fmt(expr: &Expr, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Re
     }
     Expr::Imp(_, _) => todo!(),
     Expr::Iff(_, _) => todo!(),
+    Expr::Cond(e1, e2, e3) => {
+      write!(f, "(")?;
+      _fmt(e1, f)?;
+      write!(f, "?")?;
+      _fmt(e2, f)?;
+      write!(f, ":")?;
+      _fmt(e3, f)?;
+      write!(f, ")")
+    }
   }
 }
 

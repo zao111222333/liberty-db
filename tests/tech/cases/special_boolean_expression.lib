@@ -1,0 +1,8 @@
+library(some){
+    cell(A){
+        ff(IQ,IQN) {
+            next_state : "(J K IQ') + (J K') + (J' K' IQ)";
+            clocked_on : "\"1A\" + \"1B\"";
+        }
+    }
+}
