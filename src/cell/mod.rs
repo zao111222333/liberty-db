@@ -8,8 +8,8 @@ use crate::{
   pin::Pin,
 };
 mod items;
+use crate::GroupSet;
 pub use items::*;
-use mut_set::MutSet;
 
 /// cell
 #[derive(Debug, Default, Clone)]
@@ -28,17 +28,17 @@ pub struct Cell {
   #[liberty(simple(type = Option))]
   pub area: Option<f64>,
   #[liberty(group(type=Set))]
-  pub pin: MutSet<Pin>,
+  pub pin: GroupSet<Pin>,
   #[liberty(group(type=Set))]
-  pub ff: MutSet<FF>,
+  pub ff: GroupSet<FF>,
   #[liberty(group(type=Set))]
-  pub ff_bank: MutSet<FFBank>,
+  pub ff_bank: GroupSet<FFBank>,
   #[liberty(group(type=Set))]
-  pub latch: MutSet<Latch>,
+  pub latch: GroupSet<Latch>,
   #[liberty(group(type=Set))]
-  pub latch_bank: MutSet<LatchBank>,
+  pub latch_bank: GroupSet<LatchBank>,
   #[liberty(group(type=Set))]
-  pub leakage_power: MutSet<LeakagePower>,
+  pub leakage_power: GroupSet<LeakagePower>,
   #[liberty(group(type = Option))]
   pub statetable: Option<Statetable>,
 }

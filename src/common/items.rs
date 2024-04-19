@@ -132,18 +132,18 @@ pub struct Domain {
 /// sth. like "A B C" will save as set{A B C}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub struct WordSet {
-  _set: HashSet<String>,
+  pub inner: HashSet<String>,
 }
 impl std::fmt::Display for WordSet {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    std::fmt::Display::fmt(&self._set.iter().join(" "), f)
+    std::fmt::Display::fmt(&self.inner.iter().join(" "), f)
   }
 }
 impl SimpleAttri for WordSet {}
 impl std::hash::Hash for WordSet {
   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
     let mut sum = 0_u64;
-    for item in &self._set {
+    for item in &self.inner {
       let mut hasher = std::hash::DefaultHasher::new();
       item.hash(&mut hasher);
       sum = sum.wrapping_add(std::hash::Hasher::finish(&hasher));
@@ -157,7 +157,7 @@ impl std::str::FromStr for WordSet {
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(Self {
-      _set: s.split(' ').map(ToString::to_string).collect(),
+      inner: s.split(' ').map(ToString::to_string).collect(),
     })
   }
 }
@@ -180,14 +180,14 @@ pub struct TableLookUpMultiSegment {
   segment: usize,
   #[liberty(complex(type=Default))]
   pub index_1: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_2: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_3: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_4: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub values: Vec<f64>,
+  #[liberty(complex(type=Option))]
+  pub index_2: Option<Vec<f64>>,
+  #[liberty(complex(type=Option))]
+  pub index_3: Option<Vec<f64>>,
+  #[liberty(complex(type=Option))]
+  pub index_4: Option<Vec<f64>>,
+  #[liberty(complex(type=Option))]
+  pub values: Option<Vec<f64>>,
 }
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
@@ -204,12 +204,12 @@ pub struct TableLookUp {
   _undefined: crate::ast::AttributeList,
   #[liberty(complex(type=Default))]
   pub index_1: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_2: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_3: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub index_4: Vec<f64>,
-  #[liberty(complex(type=Default))]
-  pub values: Vec<f64>,
+  #[liberty(complex(type=Option))]
+  pub index_2: Option<Vec<f64>>,
+  #[liberty(complex(type=Option))]
+  pub index_3: Option<Vec<f64>>,
+  #[liberty(complex(type=Option))]
+  pub index_4: Option<Vec<f64>>,
+  #[liberty(complex(type=Option))]
+  pub values: Option<Vec<f64>>,
 }

@@ -1,10 +1,10 @@
 //! cargo expand common::demo
-use mut_set::MutSet;
 
 use crate::{
   ast::{AttributeList, GroupAttri, GroupComments, NamedGroup},
   cell::Statetable,
   timing::TimingType,
+  GroupSet,
 };
 
 #[derive(Default, Debug, Clone)]
@@ -94,9 +94,9 @@ pub(crate) struct Cell {
   #[liberty(simple(type = Option))]
   area: Option<f64>,
   #[liberty(group(type=Set))]
-  ff: MutSet<Ff>,
+  ff: GroupSet<Ff>,
   #[liberty(group(type=Set))]
-  pin: MutSet<Pin>,
+  pin: GroupSet<Pin>,
   #[liberty(group(type = Option))]
   statetable: Option<Statetable>,
 }

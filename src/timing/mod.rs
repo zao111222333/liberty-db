@@ -7,7 +7,6 @@
 
 use std::collections::HashMap;
 mod timing_type;
-use mut_set::MutSet;
 pub use timing_type::*;
 pub mod builder;
 pub mod impls;
@@ -21,7 +20,7 @@ use crate::{
   expression::{self, BooleanExpression, IdBooleanExpression},
   library::Sensitization,
   pin::Pin,
-  units,
+  units, GroupSet,
 };
 
 use self::items::TimingSenseType;
@@ -1495,9 +1494,9 @@ pub struct Timing {
   #[liberty(group)]
   pub propogated_noise_width_low: Option<TableLookUp>,
   #[liberty(group(type=Set))]
-  pub receiver_capacitance_fall: MutSet<TableLookUpMultiSegment>,
+  pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
   #[liberty(group(type=Set))]
-  pub receiver_capacitance_rise: MutSet<TableLookUpMultiSegment>,
+  pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment>,
   #[liberty(group)]
   pub receiver_capacitance1_fall: Option<TableLookUp>,
   #[liberty(group)]

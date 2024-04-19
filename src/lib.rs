@@ -83,13 +83,14 @@ extern crate lazy_static;
 #[macro_use]
 extern crate log;
 // #[macro_use] extern crate prettytable;
-
+pub use mut_set::MutSet as GroupSet;
 /// `bundle` group structure.
 pub mod bundle;
 /// `bus` group structure.
 pub mod bus;
 /// `cell` group structure.
 pub mod cell;
+pub use cell::Cell;
 /// Common items/miscs.
 pub mod common;
 /// `Boolean Expression`, `SDF Expression`, and so on.
@@ -98,8 +99,10 @@ pub mod expression;
 pub mod internal_power;
 /// `Library` group structure, top level of liberty format.
 pub mod library;
+pub use library::Library;
 /// `pin` group structure.
 pub mod pin;
+pub use pin::Pin;
 /// `table` group structure.
 pub mod table;
 /// `timing` group structure.

@@ -7,8 +7,8 @@ use crate::{
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
+  GroupSet,
 };
-use mut_set::MutSet;
 mod items;
 // use crate::units;
 pub use items::*;
@@ -871,7 +871,7 @@ pub struct Pin {
   // electromigration () { }
   // input_ccb (string) { }
   #[liberty(group(type=Set))]
-  pub internal_power: MutSet<InternalPower>,
+  pub internal_power: GroupSet<InternalPower>,
   // TODO
   // max_trans () { }
   // TODO
@@ -905,7 +905,7 @@ pub struct Pin {
   /// ">Reference-Instatnce-In-Pin</a>
   ///
   #[liberty(group(type=Set))]
-  pub timing: MutSet<Timing>,
+  pub timing: GroupSet<Timing>,
 }
 
 // #[test]

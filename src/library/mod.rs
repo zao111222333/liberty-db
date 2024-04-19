@@ -5,14 +5,15 @@
 mod items;
 pub use items::*;
 
-use crate::ast::{AttributeList, GroupComments};
-use crate::cell::Cell;
-use crate::units;
-use mut_set::MutSet;
+use crate::{
+  ast::{AttributeList, GroupComments},
+  cell::Cell,
+  units, GroupSet,
+};
 use std::collections::HashMap;
 use std::fmt::{Display, Write};
 
-#[derive(Debug, derivative::Derivative)]
+#[derive(Debug, Clone, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
@@ -77,28 +78,42 @@ pub struct Library {
   #[derivative(Default(value = "80.0"))]
   pub slew_upper_threshold_pct_rise: f64,
   #[liberty(group(type = Set))]
-  pub cell: MutSet<Cell>,
+  pub cell: GroupSet<Cell>,
   pub voltage_map: HashMap<String, f64>,
   pub sensitization_map: HashMap<String, Sensitization>,
 }
 
 impl Display for Library {
+  /// ```
+  /// use liberty_db::library::Library;
+  /// use std::{
+  /// fs::{self, File},
+  /// io::{BufWriter, Write},
+  /// path::Path};
+  /// let library  = Library::default();
+  /// let mut writer = BufWriter::new(File::create(Path::new("out.lib"))?);
+  /// write!(&mut writer, "{}", library)?;
+  /// ```
+  /// Format [Library] struct as `.lib` file
   #[inline]
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-    self.fmt(f)
+    let ff = &mut crate::ast::CodeFormatter::new(f, "  ");
+    <AttriComment as Format>::liberty(self.comment(), "", ff)?;
+    self.fmt_liberty("library", ff)
   }
 }
 use crate::ast::parser;
-use crate::ast::{AttriComment, CodeFormatter, Format, GroupAttri, ParserError};
+use crate::ast::{AttriComment, Format, GroupAttri, ParserError};
 impl Library {
-  #[inline]
-  /// Format [Library] struct as `.lib` file
-  pub fn fmt<T: Write>(&self, w: &mut T) -> std::fmt::Result {
-    let f = &mut crate::ast::CodeFormatter::new(w, "  ");
-    <AttriComment as Format>::liberty(self.comment(), "", f)?;
-    self.fmt_liberty("library", f)
-  }
+  // /// Format [Library] struct as `.lib` file
+  // #[inline]
+  // pub fn fmt<T: Write>(&self, w: &mut T) -> std::fmt::Result {
+  //   let f = &mut crate::ast::CodeFormatter::new(w, "  ");
+  //   <AttriComment as Format>::liberty(self.comment(), "", f)?;
+  //   self.fmt_liberty("library", f)
+  // }
   /// Parse `.lib` file as a [Library] struct.
+  #[inline]
   pub fn parse<'a>(i: &'a str) -> Result<Self, ParserError<'a>> {
     let mut line_num = 1;
     let input = match parser::comment_space_newline(i) {

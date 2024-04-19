@@ -1,3 +1,5 @@
+use std::fmt::Display as _;
+
 use liberty_db::{ast::GroupAttri, library::Library};
 
 static TEMPLATE: &str = r#"
@@ -59,11 +61,7 @@ fn parse_str() {
       library.comment_mut().push("line1\nline2".to_owned());
       library.comment_mut().push("line3".to_owned());
       println!("{:#?}", library);
-      let mut output = String::new();
-      if let Err(e) = library.fmt(&mut output) {
-        panic!("{e}");
-      }
-      println!("{}", output);
+      println!("{}", library);
     }
     Err(e) => panic!("{:#?}", e),
   }
@@ -78,11 +76,7 @@ fn parse_error() {
   "#;
   match Library::parse(s) {
     Ok(library) => {
-      let mut output = String::new();
-      if let Err(e) = library.fmt(&mut output) {
-        panic!("{e}");
-      }
-      println!("{}", output);
+      println!("{}", library);
     }
     Err(e) => panic!("[ERROR] {}", e),
   }
@@ -102,11 +96,7 @@ fn case_1() {
   "#;
   match Library::parse(s) {
     Ok(library) => {
-      let mut output = String::new();
-      if let Err(e) = library.fmt(&mut output) {
-        panic!("{e}");
-      }
-      println!("{}", output);
+      println!("{}", library);
     }
     Err(e) => panic!("[ERROR] {}", e),
   }
@@ -129,11 +119,7 @@ fn case_2() {
   }  "#;
   match Library::parse(s) {
     Ok(library) => {
-      let mut output = String::new();
-      if let Err(e) = library.fmt(&mut output) {
-        panic!("{e}");
-      }
-      println!("{}", output);
+      println!("{}", library);
     }
     Err(e) => panic!("[ERROR] {:?}", e),
   }
