@@ -92,7 +92,9 @@ use strum_macros::{Display, EnumString};
 /// &end
 /// =203.55
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString, Default, Hash, Eq)]
+#[derive(
+  Debug, Clone, Copy, PartialEq, Display, EnumString, Default, Hash, Eq, PartialOrd, Ord
+)]
 pub enum TimingSenseType {
   /// Combines incoming `rise` delays with local `rise` delays
   /// and compares incoming `fall` delays with local `fall` delays.
@@ -208,6 +210,7 @@ impl ComplexAttri for Mode {
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct CellDegradation {

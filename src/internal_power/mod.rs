@@ -1,6 +1,6 @@
 use crate::{
   ast::{AttributeList, GroupComments},
-  common::items::{Domain, WordSet},
+  common::items::{Domain, TableLookUp, WordSet},
   expression::IdBooleanExpression,
   timing::items::Mode,
 };
@@ -8,6 +8,7 @@ use crate::{
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct InternalPower {
@@ -19,12 +20,12 @@ pub struct InternalPower {
   // equal_or_opposite_output
   // falling_together_group
   // power_level
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   #[id]
-  pub related_pin: Option<WordSet>,
-  #[liberty(simple(type = Option))]
+  pub related_pin: WordSet,
+  #[liberty(simple)]
   #[id]
-  pub related_pg_pin: Option<WordSet>,
+  pub related_pg_pin: WordSet,
   // rising_together_group
   // switching_interval
   // switching_together_group
@@ -40,4 +41,10 @@ pub struct InternalPower {
   // fall_power (template name) {}
   // power (template name) {}
   // rise_power (template name) {}
+  #[liberty(group(type = Option))]
+  pub rise_power: Option<TableLookUp>,
+  #[liberty(group(type = Option))]
+  pub fall_power: Option<TableLookUp>,
+  #[liberty(group(type = Option))]
+  pub power: Option<TableLookUp>,
 }

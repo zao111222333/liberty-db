@@ -8,15 +8,17 @@ pub use items::*;
 use crate::{
   ast::{AttributeList, GroupComments},
   cell::Cell,
+  common::items::DriverWaveform,
   units, GroupSet,
 };
-use std::collections::HashMap;
 use std::fmt::{Display, Write};
+use std::{collections::HashMap, fmt::write};
 
 #[derive(Debug, Clone, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone);
         derive(derivative::Derivative);
         derivative(Default);),
@@ -72,6 +74,8 @@ pub struct Library {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.22&end=44.31
   /// ">Reference</a>
+  #[liberty(group(type = Set))]
+  pub normalized_driver_waveform: GroupSet<DriverWaveform>,
   #[liberty(simple(type = Option))]
   pub leakage_power_unit: Option<units::LeakagePowerUnit>,
   #[liberty(simple)]
@@ -99,7 +103,8 @@ impl Display for Library {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
     let ff = &mut crate::ast::CodeFormatter::new(f, "  ");
     <AttriComment as Format>::liberty(self.comment(), "", ff)?;
-    self.fmt_liberty("library", ff)
+    self.fmt_liberty("library", ff);
+    write!(f, "\n")
   }
 }
 use crate::ast::parser;

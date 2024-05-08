@@ -19,6 +19,7 @@ use crate::{
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct Sensitization {

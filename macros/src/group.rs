@@ -129,7 +129,7 @@ fn group_field_fn(
     AttriType::Group(GroupType::Set) => {
       attri_comment = quote! {};
       write_field = quote! {
-        for group in self.#field_name.iter(){
+        for group in self.#field_name.iter_sort(){
           <crate::ast::AttriComment as crate::ast::Format>::liberty(group.comment(), "", f)?;
           crate::ast::GroupAttri::fmt_liberty(group, #s_field_name, f)?;
         }
@@ -195,7 +195,10 @@ fn group_field_fn(
   ))
 }
 
-pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+pub(crate) fn inner(
+  ast: &DeriveInput,
+  link: bool,
+) -> syn::Result<proc_macro2::TokenStream> {
   let ident = &ast.ident;
   let st = match &ast.data {
     Data::Struct(s) => s,
@@ -240,6 +243,11 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         ));
       }
     }
+    let link_self = if link {
+      quote! {<Self as crate::ast::LinkGroup>::link(&mut res);}
+    } else {
+      quote! {}
+    };
     let (change_id_return, write_title) = if name_vec.len() == 0 {
       (
         quote! {return Ok((input, Ok(res)));},
@@ -269,7 +277,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     };
     let comments_ident = Ident::new(&format!("{}Comments", ident), Span::call_site());
     let comments_self = Ident::new("_self", Span::call_site());
-    let comments_undefined = Ident::new("_undefined", Span::call_site());
+    let comments_undefined_bgn = Ident::new("_undefined_bgn", Span::call_site());
+    let comments_undefined_end = Ident::new("_undefined_end", Span::call_site());
     let (name_ident, name_func, name_sturct, named_group_impl) = match name_vec.len() {
       0 => (
         quote!(()),
@@ -361,7 +370,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       #[derive(Default,Debug,Clone)]
       pub struct #comments_ident{
         #comments_self: crate::ast::AttriComment,
-        #comments_undefined: crate::ast::AttriComment,
+        #comments_undefined_bgn: crate::ast::AttriComment,
+        #comments_undefined_end: crate::ast::AttriComment,
         #attri_comments
       }
       impl crate::ast::GroupAttri for #ident {
@@ -397,11 +407,12 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           use itertools::Itertools;
           #write_title
           f.indent(1);
-          #write_fields
           if !self.undefined_list().is_empty(){
-            <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined, "", f)?;
+            <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_bgn, "", f)?;
             crate::ast::liberty_attr_list(&self.undefined_list(),f)?;
+            <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_end, "", f)?;
           }
+          #write_fields
           f.dedent(1);
           write!(f, "\n}}")
         }
@@ -410,11 +421,13 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
           let (mut input,title) = crate::ast::parser::title(i,line_num)?;
           let mut res = Self::default();
-          res.comments_mut().#comments_undefined.push("Undefined attributes from here".to_string());
+          res.comments_mut().#comments_undefined_bgn.push("Undefined attributes from here".to_string());
+          res.comments_mut().#comments_undefined_end.push("Undefined attributes end here".to_string());
           loop {
             match crate::ast::parser::key(input){
               Err(nom::Err::Error(_)) => {
                 (input,_) = crate::ast::parser::end_group(input)?;
+                #link_self
                 #change_id_return
               },
               Err(e) => return Err(e),
@@ -475,6 +488,6 @@ fn main() {
     t2: Option<TimingType>,
   }"#;
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();
-  let out = inner(&ast).unwrap_or_else(|err| err.to_compile_error().into());
+  let out = inner(&ast, false).unwrap_or_else(|err| err.to_compile_error().into());
   println!("{}", out)
 }

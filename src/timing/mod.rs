@@ -49,6 +49,7 @@ use self::items::TimingSenseType;
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct Timing {
@@ -58,6 +59,7 @@ pub struct Timing {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
+
   /// Use this attribute to indicate that a constraint arc is for
   /// a clock gating relation between the data and clock pin,
   /// instead of a constraint found in standard sequential devices,
@@ -610,6 +612,7 @@ pub struct Timing {
   /// &end
   /// =203.44
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub sdf_cond: Option<SdfExpression>,
   /// The `sdf_cond_end` attribute defines a timing-check condition specific
   /// to the end event in VHDL models. The expression must conform to
@@ -640,6 +643,7 @@ pub struct Timing {
   /// &end
   /// =203.45
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub sdf_cond_end: Option<SdfExpression>,
   /// The `sdf_cond_start` attribute defines a timing-check condition specific
   /// to the start event in full-timing gate-level simulation (FTGS) models.
@@ -671,6 +675,7 @@ pub struct Timing {
   /// &end
   /// =203.46
   /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
   pub sdf_cond_start: Option<SdfExpression>,
   /// The `sdf_edges` attribute defines the edge specification on both
   /// the start pin and the end pin. The default is noedge.
@@ -1526,7 +1531,6 @@ pub struct Timing {
   #[liberty(group)]
   pub steady_state_current_tristate: Option<TableLookUp>,
   #[liberty(group)]
-  #[liberty(group)]
   pub ocv_mean_shift_cell_rise: Option<TableLookUp>,
   #[liberty(group)]
   pub ocv_mean_shift_cell_fall: Option<TableLookUp>,
@@ -1586,4 +1590,22 @@ pub struct Timing {
   pub ocv_skewness_rise_constraint: Option<TableLookUp>,
   #[liberty(group)]
   pub ocv_skewness_fall_constraint: Option<TableLookUp>,
+}
+
+impl __timing::ImmutIdTiming {
+  #[inline]
+  pub fn comment_mut(&mut self) -> &mut crate::ast::AttriComment {
+    let g: &mut Timing = unsafe { &mut *(self as *mut Self as *mut Timing) };
+    crate::ast::GroupAttri::comment_mut(g)
+  }
+  #[inline]
+  pub fn comments_mut(&mut self) -> &mut <Timing as crate::ast::GroupAttri>::Comments {
+    let g: &mut Timing = unsafe { &mut *(self as *mut Self as *mut Timing) };
+    crate::ast::GroupAttri::comments_mut(g)
+  }
+  #[inline]
+  pub fn undefined_list_mut(&mut self) -> &mut AttributeList {
+    let g: &mut Timing = unsafe { &mut *(self as *mut Self as *mut Timing) };
+    crate::ast::GroupAttri::undefined_list_mut(g)
+  }
 }

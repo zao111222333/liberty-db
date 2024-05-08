@@ -13,7 +13,7 @@ pub(crate) fn float_eq(a: f64, b: f64) -> bool {
   approx_eq!(f64, a, b, (0.0000000001, 9))
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum MaxMin {
   Max,
   Min,

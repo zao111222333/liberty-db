@@ -2,6 +2,8 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
+use std::borrow::Borrow;
+
 use crate::{
   ast::{AttributeList, GroupComments},
   expression::{FFBank, Latch, LatchBank, FF},
@@ -15,7 +17,8 @@ pub use items::*;
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
-  macro(derive(Debug, Clone,Default);)
+  sort,
+  macro(derive(Debug, Clone, Default);)
 )]
 pub struct Cell {
   #[id]
@@ -25,7 +28,7 @@ pub struct Cell {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple(type=Option))]
   pub area: Option<f64>,
   #[liberty(group(type=Set))]
   pub pin: GroupSet<Pin>,
@@ -39,7 +42,7 @@ pub struct Cell {
   pub latch_bank: GroupSet<LatchBank>,
   #[liberty(group(type=Set))]
   pub leakage_power: GroupSet<LeakagePower>,
-  #[liberty(group(type = Option))]
+  #[liberty(group(type=Option))]
   pub statetable: Option<Statetable>,
 }
 mod test {

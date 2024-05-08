@@ -3,7 +3,7 @@
 //! </script>
 use crate::{
   ast::{AttributeList, GroupComments},
-  common::items::WordSet,
+  common::items::{DummyGroup, WordSet},
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
@@ -33,6 +33,7 @@ pub use items::*;
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct Pin {
@@ -93,8 +94,8 @@ pub struct Pin {
   /// &end
   /// =228.5
   /// ">Reference-Instance</a>
-  #[liberty(simple(type = Option))]
-  pub antenna_diode_related_ground_pins: Option<WordSet>,
+  #[liberty(simple)]
+  pub antenna_diode_related_ground_pins: WordSet,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -103,8 +104,8 @@ pub struct Pin {
   /// &end
   /// =228.6
   /// ">Reference-Instance</a>
-  #[liberty(simple(type = Option))]
-  pub antenna_diode_related_power_pins: Option<WordSet>,
+  #[liberty(simple)]
+  pub antenna_diode_related_power_pins: WordSet,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -254,8 +255,8 @@ pub struct Pin {
   /// &end
   /// =228.21
   /// ">Reference-Instance</a>
-  #[liberty(simple(type = Option))]
-  pub connection_class: Option<WordSet>,
+  #[liberty(simple)]
+  pub connection_class: WordSet,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -414,8 +415,8 @@ pub struct Pin {
   /// &end
   /// =228.41
   /// ">Reference-Instance</a>
-  #[liberty(simple(type = Option))]
-  pub input_map: Option<WordSet>,
+  #[liberty(simple)]
+  pub input_map: WordSet,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -880,7 +881,7 @@ pub struct Pin {
   // minimum_period ()  { }
   // TODO
   // output_ccb (string) { }
-  pub output_ccb: (),
+  // pub output_ccb: (),
   // TODO
   pub tlatch: (),
   /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
@@ -906,6 +907,13 @@ pub struct Pin {
   ///
   #[liberty(group(type=Set))]
   pub timing: GroupSet<Timing>,
+  #[liberty(group(type=Set))]
+  /// TODO
+  pub receiver_capacitance: GroupSet<DummyGroup>,
+  #[liberty(group(type=Set))]
+  pub input_ccb: GroupSet<DummyGroup>,
+  #[liberty(group(type=Set))]
+  pub output_ccb: GroupSet<DummyGroup>,
 }
 
 // #[test]

@@ -150,6 +150,17 @@ impl PartialEq for IdBooleanExpression {
   }
 }
 impl Eq for IdBooleanExpression {}
+impl PartialOrd for IdBooleanExpression {
+  fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    self.bdd.partial_cmp(&other.bdd)
+  }
+}
+impl Ord for IdBooleanExpression {
+  fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    self.bdd.cmp(&other.bdd)
+  }
+}
+
 impl std::hash::Hash for IdBooleanExpression {
   #[inline]
   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {

@@ -15,6 +15,7 @@ use crate::{
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct LeakagePower {
@@ -77,6 +78,7 @@ pub struct LeakagePowerId {
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct Statetable {

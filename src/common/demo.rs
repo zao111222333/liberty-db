@@ -23,6 +23,7 @@ pub(crate) struct Timing {
 }
 
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 #[derive(Default, Debug, Clone)]
@@ -40,6 +41,7 @@ pub(crate) struct Pin {
 }
 
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 #[derive(Default, Debug)]

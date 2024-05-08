@@ -192,6 +192,9 @@ pub type GroupComments<T> = <T as GroupAttri>::Comments;
 /// AttriComment
 pub type AttriComment = Vec<String>;
 /// Group Attribute in Liberty
+pub trait LinkGroup {
+  fn link(&mut self);
+}
 pub trait GroupAttri: Sized {
   type Name;
   type Comments;
@@ -253,7 +256,7 @@ pub trait NamedGroup: GroupAttri {
       Self::name2vec(self.name())
         .into_iter()
         .map(|s| if is_word(&s) { s } else { format!("\"{s}\"") })
-        .join(",")
+        .join(", ")
     )
   }
 }
@@ -333,7 +336,7 @@ impl Format for AttriComment {
   fn liberty<T: Write>(&self, _: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
     match self.len() {
       0 => Ok(()),
-      _ => write!(f, "\n* {}", self.join("\n").replace("\n", "\n* ")),
+      _ => write!(f, "\n/* {} */", self.join("\n").replace("\n", "\n* ")),
     }
   }
 }
@@ -345,10 +348,14 @@ impl Format for SimpleWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T>,
   ) -> std::fmt::Result {
-    if is_word(self) {
-      write!(f, "\n{key} : {};", self)
+    if self.is_empty() {
+      Ok(())
     } else {
-      write!(f, "\n{key} : \"{}\";", self)
+      if is_word(self) {
+        write!(f, "\n{key} : {};", self)
+      } else {
+        write!(f, "\n{key} : \"{}\";", self)
+      }
     }
   }
 }
@@ -360,19 +367,24 @@ impl Format for ComplexWrapper {
     f: &mut CodeFormatter<'_, T>,
   ) -> std::fmt::Result {
     if self.is_empty() {
-      return write!(f, "\n{key} ();");
+      return Ok(());
+      // return write!(f, "\n{key} ();");
+    };
+    if self.len() == 1 && self[0].is_empty() {
+      return Ok(());
+      // return write!(f, "\n{key} ();");
     };
     if self[0].iter().all(is_word) {
-      write!(f, "\n{key} ({}", self[0].join(","))?;
+      write!(f, "\n{key} ({}", self[0].join(", "))?;
     } else {
-      write!(f, "\n{key} (\"{}\"", self[0].join(","))?;
+      write!(f, "\n{key} (\"{}\"", self[0].join(", "))?;
     }
     f.indent(1);
     for v in self.iter().skip(1) {
       if v.iter().all(is_word) {
-        write!(f, ", \\\n{}", v.join(","))?;
+        write!(f, ", \\\n{}", v.join(", "))?;
       } else {
-        write!(f, ", \\\n\"{}\"", v.join(","))?;
+        write!(f, ", \\\n\"{}\"", v.join(", "))?;
       }
     }
     f.dedent(1);
@@ -410,7 +422,7 @@ impl Format for GroupWrapper {
         .join(",")
     )?;
     f.indent(1);
-    liberty_attr_list(&self.attr_list, f);
+    liberty_attr_list(&self.attr_list, f)?;
     f.dedent(1);
     write!(f, "\n}}")
   }

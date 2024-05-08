@@ -15,6 +15,7 @@ use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone, Default);)
 )]
 pub struct FF {
@@ -95,6 +96,7 @@ pub struct FF {
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone, Default);)
 )]
 pub struct FFBank {
@@ -177,6 +179,7 @@ pub struct FFBank {
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone, Default);)
 )]
 pub struct Latch {
@@ -256,6 +259,7 @@ pub struct Latch {
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone, Default);)
 )]
 pub struct LatchBank {

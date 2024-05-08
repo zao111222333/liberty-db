@@ -1,9 +1,9 @@
-use std::{collections::HashSet, fmt::Debug, rc::Rc};
+use std::{cmp::Ordering, collections::HashSet, fmt::Debug, rc::Rc};
 
 use itertools::Itertools;
 use strum_macros::{Display, EnumString};
 
-use crate::ast::{GroupComments, SimpleAttri};
+use crate::ast::{ComplexAttri, GroupComments, LinkGroup, SimpleAttri};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -29,7 +29,22 @@ use crate::ast::{GroupComments, SimpleAttri};
 /// ">Reference-Instance</a>
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default)]
-pub struct SdfExpression {}
+pub struct SdfExpression {
+  inner: String,
+}
+impl std::fmt::Display for SdfExpression {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    std::fmt::Display::fmt(&self.inner, f)
+  }
+}
+impl std::str::FromStr for SdfExpression {
+  type Err = core::convert::Infallible;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    Ok(Self { inner: String::from_str(s)? })
+  }
+}
+impl SimpleAttri for SdfExpression {}
 /// The `sdf_edges` attribute defines the edge specification on both
 /// the start pin and the end pin. The default is noedge.
 ///
@@ -109,6 +124,7 @@ pub enum VariableType {
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct Domain {
@@ -139,6 +155,34 @@ impl std::fmt::Display for WordSet {
     std::fmt::Display::fmt(&self.inner.iter().join(" "), f)
   }
 }
+impl Ord for WordSet {
+  #[inline]
+  fn cmp(&self, other: &Self) -> Ordering {
+    if self.inner.is_subset(&other.inner) {
+      Ordering::Less
+    } else if self.inner.is_superset(&other.inner) {
+      Ordering::Greater
+    } else {
+      Ordering::Equal
+    }
+  }
+}
+
+impl PartialOrd for WordSet {
+  #[inline]
+  fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+    if self == other {
+      Some(Ordering::Equal)
+    } else if self.inner.is_subset(&other.inner) {
+      Some(Ordering::Less)
+    } else if self.inner.is_superset(&other.inner) {
+      Some(Ordering::Greater)
+    } else {
+      None
+    }
+  }
+}
+
 impl SimpleAttri for WordSet {}
 impl std::hash::Hash for WordSet {
   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -165,6 +209,23 @@ impl std::str::FromStr for WordSet {
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct DummyGroup {
+  #[liberty(name)]
+  #[id]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::LinkGroup)]
+#[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct TableLookUpMultiSegment {
@@ -178,23 +239,87 @@ pub struct TableLookUpMultiSegment {
   #[liberty(simple)]
   #[id]
   segment: usize,
-  #[liberty(complex(type=Default))]
+  #[liberty(complex)]
   pub index_1: Vec<f64>,
-  #[liberty(complex(type=Option))]
-  pub index_2: Option<Vec<f64>>,
-  #[liberty(complex(type=Option))]
-  pub index_3: Option<Vec<f64>>,
-  #[liberty(complex(type=Option))]
-  pub index_4: Option<Vec<f64>>,
-  #[liberty(complex(type=Option))]
-  pub values: Option<Vec<f64>>,
+  #[liberty(complex)]
+  pub index_2: Vec<f64>,
+  #[liberty(complex)]
+  pub index_3: Vec<f64>,
+  #[liberty(complex)]
+  pub index_4: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Values,
 }
+
+// impl LinkGroup for TableLookUpMultiSegment {
+//   fn link(&mut self) {
+//     match (self.index_1.len(), self.index_2.len()) {
+//       (0, 0) => {}
+//       (l1, 0) => {
+//         self.values.inner =
+//           self.values.inner[0].chunks(l1).map(|chunk| chunk.to_vec()).collect();
+//       }
+//       (_, l2) => {
+//         self.values.inner =
+//           self.values.inner[0].chunks(l2).map(|chunk| chunk.to_vec()).collect();
+//       }
+//     }
+//   }
+// }
+
 #[derive(Debug, Default, Clone)]
-#[derive(liberty_macros::Group)]
+#[derive(liberty_macros::LinkGroup)]
 #[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct DriverWaveform {
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[id]
+  #[liberty(simple(type=Option))]
+  driver_waveform_name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(complex)]
+  pub index_1: Vec<f64>,
+  #[liberty(complex)]
+  pub index_2: Vec<f64>,
+  #[liberty(complex)]
+  pub index_3: Vec<f64>,
+  #[liberty(complex)]
+  pub index_4: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Values,
+}
+// impl LinkGroup for DriverWaveform {
+//   fn link(&mut self) {
+//     match (self.index_1.len(), self.index_2.len()) {
+//       (0, 0) => {}
+//       (l1, 0) => {
+//         self.values.inner =
+//           self.values.inner[0].chunks(l1).map(|chunk| chunk.to_vec()).collect();
+//       }
+//       (_, l2) => {
+//         self.values.inner =
+//           self.values.inner[0].chunks(l2).map(|chunk| chunk.to_vec()).collect();
+//       }
+//     }
+//   }
+// }
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::LinkGroup)]
+#[mut_set_derive::item(
+  sort,
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct TableLookUp {
+  // TODO: unit
+  unit: (),
   #[id]
   #[liberty(name)]
   name: Option<String>,
@@ -202,14 +327,69 @@ pub struct TableLookUp {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
-  #[liberty(complex(type=Default))]
+  #[liberty(complex)]
   pub index_1: Vec<f64>,
-  #[liberty(complex(type=Option))]
-  pub index_2: Option<Vec<f64>>,
-  #[liberty(complex(type=Option))]
-  pub index_3: Option<Vec<f64>>,
-  #[liberty(complex(type=Option))]
-  pub index_4: Option<Vec<f64>>,
-  #[liberty(complex(type=Option))]
-  pub values: Option<Vec<f64>>,
+  #[liberty(complex)]
+  pub index_2: Vec<f64>,
+  #[liberty(complex)]
+  pub index_3: Vec<f64>,
+  #[liberty(complex)]
+  pub index_4: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Values,
+}
+#[duplicate::duplicate_item(
+  AllTypes;
+  [TableLookUp];
+  [DriverWaveform];
+  [TableLookUpMultiSegment];
+)]
+impl LinkGroup for AllTypes {
+  fn link(&mut self) {
+    match (self.index_1.len(), self.index_2.len()) {
+      (0, 0) => {
+        self.values.size1 = self.values.inner.len();
+      }
+      (l1, 0) => {
+        // 1-d table
+        // fall_power (passive_power_template_8x1) {
+        //   index_1 (0.0023, 0.0091, 0.0228, 0.0502, 0.105, 0.2145, 0.4335, 0.8715);
+        //   values ("0.000137298, 0.00013122, 0.000128847, 0.000127135, 0.000126483, 0.000125385, 0.000125261, 0.000125493");
+        // }
+        self.values.size1 = l1;
+        self.values.size2 = 1;
+      }
+      (l1, l2) => {
+        self.values.size1 = l2;
+        self.values.size2 = l1;
+      }
+    }
+  }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct Values {
+  pub size1: usize,
+  pub size2: usize,
+  pub inner: Vec<f64>,
+}
+
+impl ComplexAttri for Values {
+  #[inline]
+  fn parse(v: Vec<&str>) -> Result<Self, crate::ast::ComplexParseError> {
+    Ok(Self {
+      size1: 0,
+      size2: 0,
+      inner: <Vec<f64> as ComplexAttri>::parse(v)?,
+    })
+  }
+  #[inline]
+  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+    let mut buffer = ryu::Buffer::new();
+    self
+      .inner
+      .chunks(self.size1)
+      .map(|v| vec![v.iter().map(|f| buffer.format(*f).to_string()).join(", ")])
+      .collect()
+  }
 }
