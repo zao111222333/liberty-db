@@ -3,37 +3,11 @@
 //! </script>
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn, SimpleAttri},
-  common::items::DummyGroup,
+  common::items::{DummyGroup, TableLookUp2D, Vector3DGrpup, Vector4DGrpup},
   expression::IdBooleanExpression,
   timing::items::Mode,
 };
 use std::{fmt::Display, str::FromStr};
-
-// /// In referenced CCS noise modeling,
-// /// use the `input_ccb`  group to specify the CCS noise for
-// /// an input channel-connected block (CCB).
-// /// You must name the `input_ccb`  group so that it can be referenced.
-// /// The `input_ccb`  group includes all the attributes and subgroups
-// /// of the `ccsn_first_stage` Group  on page 283.
-// /// The `input_ccb`  group also includes the `related_ccb_node`  simple attribute.
-// /// <a name ="reference_link" href="
-// /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=296.7&end=296.12
-// /// ">Reference-Instance</a>
-// #[derive(Debug, Default, Clone)]
-// #[derive(liberty_macros::Group)]
-// #[mut_set_derive::item(
-//   sort,
-//   macro(derive(Debug, Clone,Default);)
-// )]
-// pub struct CCB {
-//   #[liberty(name)]
-//   #[id]
-//   pub name: Vec<String>,
-//   #[liberty(comments)]
-//   _comments: GroupComments<Self>,
-//   #[liberty(undefined)]
-//   _undefined: AttributeList,
-// }
 
 /// Use the `ccsn_first_stage` group to specify CCS noise for the first stage of the channel-
 /// connected block (CCB).
@@ -70,6 +44,10 @@ pub struct CCSNStage {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
+  #[liberty(simple(type = Option))]
+  pub load_cap_fall: Option<f64>,
+  #[liberty(simple(type = Option))]
+  pub load_cap_rise: Option<f64>,
   /// Use the `is_inverting`  attribute to specify whether the channel-connecting block is inverting.
   /// This attribute is mandatory if the `is_needed` attribute value is true.
   /// If the channel-connecting block is inverting, set the attribute to true.
@@ -117,6 +95,7 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.15&end=287.17
   /// ">Reference-Definition</a>
+  #[id]
   #[liberty(simple(type = Option))]
   pub related_ccb_node: Option<String>,
   /// Use the `stage_type`  attribute to specify the stage type of the channel-connecting block output voltage.
@@ -141,16 +120,73 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[liberty(complex(type = Option))]
   pub mode: Option<Mode>,
+  /// Use the `dc_current`  group to specify the input and output voltage values
+  /// of a two-dimensional current table for a channel-connecting block.
+  ///
+  /// Use `index_1`  to represent the input voltage
+  /// and `index_2`  to represent the output voltage.
+  /// The `values`  attribute of the group lists the relative
+  /// channel-connecting block DC current values in library units measured
+  /// at the channel-connecting block output node.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
+  /// ">Reference-Definition</a>
   #[liberty(group(type = Option))]
-  pub dc_current: Option<DummyGroup>,
+  pub dc_current: Option<TableLookUp2D>,
+  /// Use the `output_voltage_fall`  group to specify vector groups that describe
+  /// three-dimensional `output_voltage`  tables of the channel-connecting block
+  /// whose output node’s voltage values are falling.
+  ///
+  /// + The `index_1`  attribute lists the `input_net_transition`  (slew) values in library time units.
+  /// + The `index_2`  attribute lists the `total_output_net_capacitance`  (load) values in library capacitance units.
+  /// + The `index_3` attribute lists the sampling time values in library time units.
+  /// + The `values`  attribute lists the voltage values, in library voltage units,
+  /// that are measured at the channel-connecting block output node.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.6&end=289.26
+  /// ">Reference-Definition</a>
   #[liberty(group(type = Option))]
-  pub output_voltage_fall: Option<DummyGroup>,
+  pub output_voltage_fall: Option<Vector3DGrpup>,
+  /// Use the `output_voltage_rise`  group to specify `vector` groups that describe
+  /// three-dimensional `output_voltage`  tables of the channel-connecting block
+  /// whose output node’s voltage values are rising.
+  /// For details, see the `output_voltage_fall`  group description.
+  ///
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.28&end=289.30
+  /// ">Reference-Definition</a>
   #[liberty(group(type = Option))]
-  pub output_voltage_rise: Option<DummyGroup>,
+  pub output_voltage_rise: Option<Vector3DGrpup>,
+  /// The `propagated_noise_low`  group uses `vector` groups to specify the
+  /// three-dimensional `output_voltage`  tables of the channel-connecting block
+  /// whose output node’s voltage values are falling.
+  /// Specify the following attributes in the `vector`  group:
+  ///
+  /// + The `index_1`  attribute lists the `input_noise_height`  values in library voltage units.
+  /// + The `index_2`  attribute lists the `input_noise_width`  values in library time units.
+  /// + The `index_3`  attribute lists the `total_output_net_capacitance`  values in library capacitance units.
+  /// + The `index_4` attribute lists the sampling time values in library time units.
+  /// + The `values`  attribute lists the voltage values, in library voltage units, that are measured at the channel-connecting block output node.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=290.19&end=290.20
+  /// ">Reference-Definition</a>
   #[liberty(group(type = Option))]
-  pub propagated_noise_low: Option<DummyGroup>,
+  pub propagated_noise_low: Option<Vector4DGrpup>,
+  /// The `propagated_noise_high`  group uses `vector` groups to specify the
+  /// three-dimensional `output_voltage`  tables of the channel-connecting block
+  /// whose output node’s voltage values are rising.
+  /// Specify the following attributes in the `vector`  group:
+  ///
+  /// + The `index_1`  attribute lists the `input_noise_height`  values in library voltage units.
+  /// + The `index_2`  attribute lists the `input_noise_width`  values in library time units.
+  /// + The `index_3`  attribute lists the `total_output_net_capacitance`  values in library capacitance units.
+  /// + The `index_4` attribute lists the sampling time values in library time units.
+  /// + The `values`  attribute lists the voltage values, in library voltage units, that are measured at the channel-connecting block output node.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.33&end=289.35
+  /// ">Reference-Definition</a>
   #[liberty(group(type = Option))]
-  pub propagated_noise_rise: Option<DummyGroup>,
+  pub propagated_noise_high: Option<Vector4DGrpup>,
 }
 
 impl GroupFn for CCSNStage {
@@ -191,3 +227,20 @@ pub enum StageType {
   Both,
 }
 impl SimpleAttri for StageType {}
+
+#[test]
+fn parse_file() -> anyhow::Result<()> {
+  use std::fs::File;
+  use std::io::{BufWriter, Write};
+  let filepath = "tests/tech/ccsn.lib";
+  let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
+  match crate::library::Library::parse(&data) {
+    Ok(library) => {
+      let file = File::create("output.lib")?;
+      let mut writer = BufWriter::new(file);
+      write!(&mut writer, "{}", library)?;
+    }
+    Err(e) => panic!("[ERROR] {:?}", e),
+  }
+  Ok(())
+}
