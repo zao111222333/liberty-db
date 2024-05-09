@@ -2,7 +2,8 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 use crate::{
-  ast::{AttributeList, GroupComments},
+  ast::{AttributeList, GroupComments, GroupFn},
+  ccsn::CCSNStage,
   common::items::{DummyGroup, WordSet},
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
@@ -910,11 +911,27 @@ pub struct Pin {
   #[liberty(group(type=Set))]
   /// TODO
   pub receiver_capacitance: GroupSet<DummyGroup>,
+  /// In referenced CCS noise modeling,
+  /// use the `input_ccb`  group to specify the CCS noise for
+  /// an input channel-connected block (CCB).
+  /// You must name the `input_ccb`  group so that it can be referenced.
+  /// The `input_ccb`  group includes all the attributes and subgroups
+  /// of the `ccsn_first_stage` Group  on page 283.
+  /// The `input_ccb`  group also includes the `related_ccb_node`  simple attribute.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=296.7&end=296.12
+  /// ">Reference-Instance</a>
   #[liberty(group(type=Set))]
-  pub input_ccb: GroupSet<DummyGroup>,
+  pub input_ccb: GroupSet<CCSNStage>,
   #[liberty(group(type=Set))]
-  pub output_ccb: GroupSet<DummyGroup>,
+  pub output_ccb: GroupSet<CCSNStage>,
+  #[liberty(group(type=Set))]
+  pub ccsn_first_stage: GroupSet<CCSNStage>,
+  #[liberty(group(type=Set))]
+  pub ccsn_last_stage: GroupSet<CCSNStage>,
 }
+
+impl GroupFn for Pin {}
 
 // #[test]
 // fn test_link() {

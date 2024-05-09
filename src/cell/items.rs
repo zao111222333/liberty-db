@@ -1,7 +1,9 @@
 use std::{hash::Hash, str::FromStr, sync::Arc};
 
 use crate::{
-  ast::GroupComments, common::items::WordSet, expression::IdBooleanExpression,
+  ast::{GroupComments, GroupFn},
+  common::items::WordSet,
+  expression::IdBooleanExpression,
   timing::items::Mode,
 };
 
@@ -40,6 +42,7 @@ pub struct LeakagePower {
   #[liberty(complex(type = Option))]
   mode: Option<Mode>,
 }
+impl GroupFn for LeakagePower {}
 
 #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
 pub struct LeakagePowerId {
@@ -92,6 +95,7 @@ pub struct Statetable {
   #[liberty(simple)]
   pub table: Table,
 }
+impl GroupFn for Statetable {}
 
 #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
 pub struct StatetableId {

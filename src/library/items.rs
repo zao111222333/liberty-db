@@ -4,7 +4,7 @@
 // use std::ops::DerefMut;
 
 use crate::{
-  ast::{AttributeList, GroupComments},
+  ast::{AttributeList, GroupComments, GroupFn},
   pin::Pin,
 };
 
@@ -36,3 +36,5 @@ pub struct Sensitization {
   #[liberty(complex)]
   pub vector: (usize, String),
 }
+
+impl GroupFn for Sensitization {}

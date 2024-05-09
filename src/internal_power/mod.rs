@@ -1,5 +1,5 @@
 use crate::{
-  ast::{AttributeList, GroupComments},
+  ast::{AttributeList, GroupComments, GroupFn},
   common::items::{Domain, TableLookUp, WordSet},
   expression::IdBooleanExpression,
   timing::items::Mode,
@@ -48,3 +48,5 @@ pub struct InternalPower {
   #[liberty(group(type = Option))]
   pub power: Option<TableLookUp>,
 }
+
+impl GroupFn for InternalPower {}

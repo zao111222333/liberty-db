@@ -3,7 +3,7 @@
 //! </script>
 
 use super::{BooleanExpression, BooleanExpressionLike, UNKNOWN};
-use crate::ast::{AttributeList, GroupComments, IdError, NamedGroup};
+use crate::ast::{AttributeList, GroupComments, GroupFn, IdError, NamedGroup};
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
@@ -520,7 +520,14 @@ trait __LatchFF {
   [Latch];
 )]
 impl LatchFF for AllTypes {}
-
+#[duplicate::duplicate_item(
+  AllTypes;
+  [FFBank];
+  [FF];
+  [LatchBank];
+  [Latch];
+)]
+impl GroupFn for AllTypes {}
 /// trait for `FF` and `FFBank`
 #[allow(private_bounds)]
 pub trait LatchFF: __LatchFF {

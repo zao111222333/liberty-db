@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use crate::{
-  ast::{self, ComplexAttri, GroupComments, SimpleAttri},
+  ast::{self, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
   common::items::Domain,
   expression::{
     logic::{self, LogicLike},
@@ -242,7 +242,7 @@ pub struct CellDegradation {
   // TODO:
   // pub domain: Option<Domain>,
 }
-
+impl GroupFn for CellDegradation {}
 // /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
 // /// <a name ="reference_link" href="
 // /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html

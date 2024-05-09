@@ -6,7 +6,7 @@ mod items;
 pub use items::*;
 
 use crate::{
-  ast::{AttributeList, GroupComments},
+  ast::{AttributeList, GroupComments, GroupFn},
   cell::Cell,
   common::items::DriverWaveform,
   units, GroupSet,
@@ -86,6 +86,8 @@ pub struct Library {
   pub voltage_map: HashMap<String, f64>,
   pub sensitization_map: HashMap<String, Sensitization>,
 }
+
+impl GroupFn for Library {}
 
 impl Display for Library {
   /// ```

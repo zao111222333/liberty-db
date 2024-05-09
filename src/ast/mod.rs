@@ -191,9 +191,9 @@ pub type GroupComments<T> = <T as GroupAttri>::Comments;
 
 /// AttriComment
 pub type AttriComment = Vec<String>;
-/// Group Attribute in Liberty
-pub trait LinkGroup {
-  fn link(&mut self);
+/// Group Functions
+pub trait GroupFn {
+  fn post_process(&mut self) {}
 }
 pub trait GroupAttri: Sized {
   type Name;

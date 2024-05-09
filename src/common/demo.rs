@@ -1,7 +1,7 @@
 //! cargo expand common::demo
 
 use crate::{
-  ast::{AttributeList, GroupAttri, GroupComments, NamedGroup},
+  ast::{AttributeList, GroupAttri, GroupComments, GroupFn, NamedGroup},
   cell::Statetable,
   timing::TimingType,
   GroupSet,
@@ -21,7 +21,7 @@ pub(crate) struct Timing {
   #[liberty(simple(type = Option))]
   t2: Option<TimingType>,
 }
-
+impl GroupFn for Timing {}
 #[mut_set_derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
@@ -39,14 +39,14 @@ pub(crate) struct Pin {
   #[liberty(group(type=Vec))]
   timing: Vec<Timing>,
 }
-
+impl GroupFn for Pin {}
 #[mut_set_derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
-pub(crate) struct Ff {
+pub(crate) struct FF {
   #[id]
   #[liberty(name)]
   var1: String,
@@ -60,8 +60,8 @@ pub(crate) struct Ff {
   #[liberty(simple(type = Option))]
   next_state: Option<String>,
 }
-
-impl NamedGroup for Ff {
+impl GroupFn for FF {}
+impl NamedGroup for FF {
   #[inline]
   fn parse(mut v: Vec<String>) -> Result<Self::Name, crate::ast::IdError> {
     let l = v.len();
@@ -96,13 +96,13 @@ pub(crate) struct Cell {
   #[liberty(simple(type = Option))]
   area: Option<f64>,
   #[liberty(group(type=Set))]
-  ff: GroupSet<Ff>,
+  ff: GroupSet<FF>,
   #[liberty(group(type=Set))]
   pin: GroupSet<Pin>,
   #[liberty(group(type = Option))]
   statetable: Option<Statetable>,
 }
-
+impl GroupFn for Cell {}
 #[test]
 fn timing_test() {
   let _ = crate::ast::test_parse_group::<Timing>(

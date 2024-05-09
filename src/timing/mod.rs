@@ -14,7 +14,7 @@ pub mod items;
 #[cfg(test)]
 mod test;
 use crate::{
-  ast::{AttributeList, GroupComments},
+  ast::{AttributeList, GroupComments, GroupFn},
   bus::Bus,
   common::items::*,
   expression::{self, BooleanExpression, IdBooleanExpression},
@@ -185,7 +185,7 @@ pub struct Timing {
   /// &end
   /// =203.34
   /// ">Reference-Instance</a>
-  pub fpga_arc_condition: Option<expression::BooleanExpression>,
+  pub fpga_arc_condition: Option<BooleanExpression>,
   /// Use this attribute to reference a `calc_mode` value in a
   /// [domain](crate::common::items::Domain) group in a polynomial table.
   ///
@@ -1591,6 +1591,8 @@ pub struct Timing {
   #[liberty(group)]
   pub ocv_skewness_fall_constraint: Option<TableLookUp>,
 }
+
+impl GroupFn for Timing {}
 
 impl __timing::ImmutIdTiming {
   #[inline]

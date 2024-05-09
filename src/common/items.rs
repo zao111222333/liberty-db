@@ -3,7 +3,7 @@ use std::{cmp::Ordering, collections::HashSet, fmt::Debug, rc::Rc};
 use itertools::Itertools;
 use strum_macros::{Display, EnumString};
 
-use crate::ast::{ComplexAttri, GroupComments, LinkGroup, SimpleAttri};
+use crate::ast::{ComplexAttri, GroupComments, GroupFn, SimpleAttri};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -144,7 +144,7 @@ pub struct Domain {
   pub index_2: Vec<f64>,
   pub index_3: Vec<f64>,
 }
-
+impl GroupFn for Domain {}
 /// sth. like "A B C" will save as set{A B C}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub struct WordSet {
@@ -221,9 +221,9 @@ pub struct DummyGroup {
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
 }
-
+impl GroupFn for DummyGroup {}
 #[derive(Debug, Default, Clone)]
-#[derive(liberty_macros::LinkGroup)]
+#[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
@@ -251,24 +251,8 @@ pub struct TableLookUpMultiSegment {
   pub values: Values,
 }
 
-// impl LinkGroup for TableLookUpMultiSegment {
-//   fn link(&mut self) {
-//     match (self.index_1.len(), self.index_2.len()) {
-//       (0, 0) => {}
-//       (l1, 0) => {
-//         self.values.inner =
-//           self.values.inner[0].chunks(l1).map(|chunk| chunk.to_vec()).collect();
-//       }
-//       (_, l2) => {
-//         self.values.inner =
-//           self.values.inner[0].chunks(l2).map(|chunk| chunk.to_vec()).collect();
-//       }
-//     }
-//   }
-// }
-
 #[derive(Debug, Default, Clone)]
-#[derive(liberty_macros::LinkGroup)]
+#[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
@@ -295,24 +279,9 @@ pub struct DriverWaveform {
   #[liberty(complex)]
   pub values: Values,
 }
-// impl LinkGroup for DriverWaveform {
-//   fn link(&mut self) {
-//     match (self.index_1.len(), self.index_2.len()) {
-//       (0, 0) => {}
-//       (l1, 0) => {
-//         self.values.inner =
-//           self.values.inner[0].chunks(l1).map(|chunk| chunk.to_vec()).collect();
-//       }
-//       (_, l2) => {
-//         self.values.inner =
-//           self.values.inner[0].chunks(l2).map(|chunk| chunk.to_vec()).collect();
-//       }
-//     }
-//   }
-// }
 
 #[derive(Debug, Default, Clone)]
-#[derive(liberty_macros::LinkGroup)]
+#[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
@@ -344,8 +313,8 @@ pub struct TableLookUp {
   [DriverWaveform];
   [TableLookUpMultiSegment];
 )]
-impl LinkGroup for AllTypes {
-  fn link(&mut self) {
+impl GroupFn for AllTypes {
+  fn post_process(&mut self) {
     match (self.index_1.len(), self.index_2.len()) {
       (0, 0) => {
         self.values.size1 = self.values.inner.len();

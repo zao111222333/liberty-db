@@ -5,7 +5,7 @@
 use std::borrow::Borrow;
 
 use crate::{
-  ast::{AttributeList, GroupComments},
+  ast::{AttributeList, GroupComments, GroupFn},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::Pin,
 };
@@ -45,6 +45,7 @@ pub struct Cell {
   #[liberty(group(type=Option))]
   pub statetable: Option<Statetable>,
 }
+impl GroupFn for Cell {}
 mod test {
   #[allow(unused)]
   use super::Cell;
