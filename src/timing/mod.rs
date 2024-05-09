@@ -1471,9 +1471,9 @@ pub struct Timing {
   #[liberty(group)]
   pub noise_immunity_low: Option<TableLookUp>,
   #[liberty(group)]
-  pub output_current_fall: Option<TableLookUp>,
+  pub output_current_fall: Option<ReferenceTimeVector3DGrpup>,
   #[liberty(group)]
-  pub output_current_rise: Option<TableLookUp>,
+  pub output_current_rise: Option<ReferenceTimeVector3DGrpup>,
   #[liberty(group)]
   pub propogated_noise_height_above_high: Option<TableLookUp>,
   #[liberty(group)]

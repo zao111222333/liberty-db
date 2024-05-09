@@ -3,7 +3,10 @@ use std::{cmp::Ordering, collections::HashSet, fmt::Debug, rc::Rc};
 use itertools::Itertools;
 use strum_macros::{Display, EnumString};
 
-use crate::ast::{ComplexAttri, GroupComments, GroupFn, SimpleAttri};
+use crate::{
+  ast::{ComplexAttri, GroupComments, GroupFn, SimpleAttri},
+  GroupSet,
+};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -286,6 +289,196 @@ pub struct DriverWaveform {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+pub struct TableLookUp2D {
+  // TODO: unit
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(complex)]
+  pub index_1: Vec<f64>,
+  #[liberty(complex)]
+  pub index_2: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Values,
+}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct Vector3D {
+  // TODO: unit
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[id]
+  #[liberty(complex)]
+  pub index_1: ordered_float::OrderedFloat<f64>,
+  #[id]
+  #[liberty(complex)]
+  pub index_2: ordered_float::OrderedFloat<f64>,
+  #[liberty(complex)]
+  pub index_3: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Vec<f64>,
+}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct ReferenceTimeVector3D {
+  // TODO: unit
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[id]
+  #[liberty(complex)]
+  pub index_1: ordered_float::OrderedFloat<f64>,
+  #[id]
+  #[liberty(complex)]
+  pub index_2: ordered_float::OrderedFloat<f64>,
+  #[liberty(complex)]
+  pub index_3: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Vec<f64>,
+}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct Vector4D {
+  // TODO: unit
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[id]
+  #[liberty(complex)]
+  pub index_1: ordered_float::OrderedFloat<f64>,
+  #[id]
+  #[liberty(complex)]
+  pub index_2: ordered_float::OrderedFloat<f64>,
+  #[id]
+  #[liberty(complex)]
+  pub index_3: ordered_float::OrderedFloat<f64>,
+  #[liberty(complex)]
+  pub index_4: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Vec<f64>,
+}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct Vector3DGrpup {
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(group(type = Set))]
+  pub vector: GroupSet<Vector3D>,
+}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct ReferenceTimeVector3DGrpup {
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(group(type = Set))]
+  pub vector: GroupSet<ReferenceTimeVector3D>,
+}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct Vector4DGrpup {
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(group(type = Set))]
+  pub vector: GroupSet<Vector4D>,
+}
+
+impl GroupFn for Vector3DGrpup {}
+impl GroupFn for Vector4DGrpup {}
+impl GroupFn for ReferenceTimeVector3D {}
+impl GroupFn for ReferenceTimeVector3DGrpup {}
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct TableLookUp3D {
+  // TODO: unit
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(complex)]
+  pub index_1: Vec<f64>,
+  #[liberty(complex)]
+  pub index_2: Vec<f64>,
+  #[liberty(complex)]
+  pub index_3: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Values,
+}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct TableLookUp {
   // TODO: unit
   unit: (),
@@ -310,6 +503,8 @@ pub struct TableLookUp {
 #[duplicate::duplicate_item(
   AllTypes;
   [TableLookUp];
+  [TableLookUp2D];
+  [TableLookUp3D];
   [DriverWaveform];
   [TableLookUpMultiSegment];
 )]
@@ -335,6 +530,9 @@ impl GroupFn for AllTypes {
     }
   }
 }
+
+impl GroupFn for Vector3D {}
+impl GroupFn for Vector4D {}
 
 #[derive(Debug, Default, Clone)]
 pub struct Values {

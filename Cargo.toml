@@ -42,9 +42,10 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 default = []
 
 [dependencies]
-liberty-macros = "0.4.4"
-# liberty-macros = {path = "macros" }
+# liberty-macros = "0.4.4"
+liberty-macros = {path = "macros" }
 log = { version = "0.4", features = ["std", "serde"] }
+ordered-float = { version = "4.0", default-features = false }
 nom = "7.1"
 thiserror = "1.0.40"
 lazy_static = "1.4.0"
@@ -58,7 +59,13 @@ itertools = "0.10.5"
 ryu = "1.0.13"
 itoa = "1.0"
 uom = { version = "0.34.0", default-features = false, features = ["autoconvert","f64","si", "std",] }
-biodivine-lib-bdd = "0.5.13"
-mut_set = "0.3.2"
-mut_set_derive = "0.3.2"
+# biodivine-lib-bdd = "0.5.13"
+biodivine-lib-bdd = {path = "../../biodivine-lib-bdd"}
+mut_set = "0.3.3"
+mut_set_derive = "0.3.3"
+# mut_set = {path = "../mut_set"}
+# mut_set_derive = {path = "../mut_set/derive"}
 duplicate = "1.0.0"
+
+[dev-dependencies]
+anyhow = "1.0.80"

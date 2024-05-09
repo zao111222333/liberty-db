@@ -1,6 +1,7 @@
 //!
 //! implement basic types
 //!
+use itertools::Itertools;
 
 use crate::ast::{
   ComplexAttri, ComplexParseError, ComplexWrapper, IdError, NameAttri, SimpleAttri,
@@ -136,11 +137,39 @@ impl ComplexAttri for Vec<f64> {
   }
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
-    let mut buffer = ryu::Buffer::new();
-    vec![self.iter().map(|f| buffer.format(*f).to_string()).collect()]
+    if self.is_empty() {
+      vec![vec![]]
+    } else {
+      let mut buffer = ryu::Buffer::new();
+      vec![vec![format!(
+        "{}",
+        self.iter().map(|f| buffer.format(*f).to_string()).join(",")
+      )]]
+    }
   }
 }
 
+impl ComplexAttri for ordered_float::OrderedFloat<f64> {
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.into_iter();
+    let v1: f64 = match i.next() {
+      Some(s) => match s.parse() {
+        Ok(f) => f,
+        Err(e) => return Err(ComplexParseError::Float(e)),
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if let Some(_) = i.next() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok(ordered_float::OrderedFloat(v1))
+  }
+
+  fn to_wrapper(&self) -> ComplexWrapper {
+    let mut buffer = ryu::Buffer::new();
+    vec![vec![buffer.format(self.0).to_string()]]
+  }
+}
 impl ComplexAttri for Vec<usize> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
