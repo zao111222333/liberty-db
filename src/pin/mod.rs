@@ -3,7 +3,7 @@
 //! </script>
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
-  ccsn::CCSNStage,
+  ccsn::{CCSNStage, ReceiverCapacitance},
   common::items::{DummyGroup, WordSet},
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
@@ -46,6 +46,36 @@ pub struct Pin {
   _comments: GroupComments<Self>,
   #[liberty(undefined)]
   _undefined: AttributeList,
+  /// The `related_power_pin`  and `related_ground_pin`  attributes
+  /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
+  /// The `related_power_pin`  and `related_ground_pin` attributes are used
+  /// to associate a predefined power and ground pin with the signal pin,
+  /// in which they are defined. This behavior only applies to standard cells.
+  /// For special cells, you must specify this relationship explicitly.
+  /// The `pg_pin`  groups are mandatory for each cell.
+  /// Because a cell must have at least one `primary_power`  and
+  /// at least one `primary_ground`  pin,
+  /// a default `related_power_pin`  and `related_ground_pin`  always exists in any cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub related_ground_pin: String,
+  /// The `related_power_pin`  and `related_ground_pin`  attributes
+  /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
+  /// The `related_power_pin`  and `related_ground_pin` attributes are used
+  /// to associate a predefined power and ground pin with the signal pin,
+  /// in which they are defined. This behavior only applies to standard cells.
+  /// For special cells, you must specify this relationship explicitly.
+  /// The `pg_pin`  groups are mandatory for each cell.
+  /// Because a cell must have at least one `primary_power`  and
+  /// at least one `primary_ground`  pin,
+  /// a default `related_power_pin`  and `related_ground_pin`  always exists in any cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub related_power_pin: String,
   // NOTICE: Simple Attributes in a pin Group
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -57,6 +87,9 @@ pub struct Pin {
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
   pub alive_during_partial_power_down: Option<bool>,
+  // TODO
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -909,8 +942,24 @@ pub struct Pin {
   #[liberty(group(type=Set))]
   pub timing: GroupSet<Timing>,
   #[liberty(group(type=Set))]
-  /// TODO
-  pub receiver_capacitance: GroupSet<DummyGroup>,
+  /// Use the `receiver_capacitance`  group to specify capacitance values
+  /// for composite current source (CCS) receiver modeling at the pin level.
+  ///
+  /// Groups
+  ///
+  /// For two-segment receiver capacitance model
+  /// + receiver_capacitance1_fall
+  /// + receiver_capacitance1_rise
+  /// + receiver_capacitance2_fall
+  /// + receiver_capacitance2_rise
+  ///
+  /// For multisegment receiver capacitance model
+  /// + receiver_capacitance_fall
+  /// + receiver_capacitance_rise
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=316.5&end=316.31
+  /// ">Reference-Definition</a>
+  pub receiver_capacitance: GroupSet<ReceiverCapacitance>,
   /// In referenced CCS noise modeling,
   /// use the `input_ccb`  group to specify the CCS noise for
   /// an input channel-connected block (CCB).

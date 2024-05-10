@@ -1326,6 +1326,8 @@ pub struct Timing {
   /// =204.3
   /// ">Reference-Instance</a>
   pub fall_delay_intercept: Option<(i64, f64)>,
+  #[liberty(complex(type=Option))]
+  pub propagating_ccb: Option<[String; 2]>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1367,7 +1369,8 @@ pub struct Timing {
   /// &end
   /// =204.5
   /// ">Reference-Instance</a>
-  pub mode: items::Mode,
+  #[liberty(complex(type = Option))]
+  pub mode: Option<items::Mode>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html

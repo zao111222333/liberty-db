@@ -43,7 +43,7 @@ pub(super) fn _fmt(expr: &Expr, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Re
     },
     Expr::Or(e1, e2) => {
       _fmt(e1, f)?;
-      write!(f, "|")?;
+      write!(f, "+")?;
       _fmt(e2, f)
     }
     Expr::And(e1, e2) => {
@@ -57,7 +57,7 @@ pub(super) fn _fmt(expr: &Expr, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Re
           _fmt(e1, f)?;
         }
       };
-      write!(f, "&")?;
+      write!(f, "*")?;
       match **e2 {
         Expr::Or(_, _) => {
           write!(f, "(")?;

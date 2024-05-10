@@ -171,18 +171,18 @@ impl SimpleAttri for TimingSenseType {}
 /// =204.5
 /// ">Reference-Instance</a>
 ///
-#[derive(Debug, Clone, Copy, Default)]
-pub struct Mode {}
+// #[derive(Debug, Clone, Copy, Default)]
+pub type Mode = [String; 2];
 
-impl ComplexAttri for Mode {
-  fn parse(v: Vec<&str>) -> Result<Self, ast::ComplexParseError> {
-    todo!()
-  }
+// impl ComplexAttri for Mode {
+//   fn parse(v: Vec<&str>) -> Result<Self, ast::ComplexParseError> {
+//     todo!()
+//   }
 
-  fn to_wrapper(&self) -> ast::ComplexWrapper {
-    todo!()
-  }
-}
+//   fn to_wrapper(&self) -> ast::ComplexWrapper {
+//     todo!()
+//   }
+// }
 
 /// The `cell_degradation` group describes a cell performance degradation
 /// design rule for compiling a design. A cell degradation design rule

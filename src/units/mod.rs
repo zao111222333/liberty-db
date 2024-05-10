@@ -437,6 +437,15 @@ pub enum LeakagePowerUnit {
   /// 100nW, 1e-7
   #[strum(serialize = "100nW")]
   _100nW,
+  /// 1uW, 1e-6
+  #[strum(serialize = "1uW")]
+  _1uW,
+  /// 10uW, 1e-5
+  #[strum(serialize = "10uW")]
+  _10uW,
+  /// 100uW, 1e-4
+  #[strum(serialize = "100uW")]
+  _100uW,
   /// 1mW, 1e-3
   #[strum(serialize = "1mW")]
   _1mW,
@@ -451,7 +460,7 @@ pub enum LeakagePowerUnit {
   _1W,
 }
 impl LeakagePowerUnit {
-  const LUT: [<Self as Deref>::Target; 10] = [
+  const LUT: [<Self as Deref>::Target; 13] = [
     // 1pW
     Power {
       dimension: std::marker::PhantomData,
@@ -487,6 +496,24 @@ impl LeakagePowerUnit {
       dimension: std::marker::PhantomData,
       units: std::marker::PhantomData,
       value: 1E-7,
+    },
+    // 1uW
+    Power {
+      dimension: std::marker::PhantomData,
+      units: std::marker::PhantomData,
+      value: 1E-6,
+    },
+    // 10uW
+    Power {
+      dimension: std::marker::PhantomData,
+      units: std::marker::PhantomData,
+      value: 1E-5,
+    },
+    // 100uW
+    Power {
+      dimension: std::marker::PhantomData,
+      units: std::marker::PhantomData,
+      value: 1E-4,
     },
     // 1mW
     Power {

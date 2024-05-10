@@ -129,14 +129,14 @@ fn case_2() {
 fn parse_file() -> anyhow::Result<()> {
   use std::fs::File;
   use std::io::{BufWriter, Write};
-  // let filepath = "/OPT/tech/tsmc/22nm/tcbn22ullbwp30p140_110b/AN61001_20201222/TSMCHOME/digital/Front_End/LVF/CCS/tcbn22ullbwp30p140_110b/tcbn22ullbwp30p140ffg0p88v0c_hm_lvf_p_ccs.lib";
-  let filepath = "tech/cases/ocv.lib";
+  // let filepath = "tech/cases/ocv.lib";
+  let filepath = "tech/ccsn.lib";
   let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
   match liberty_db::library::Library::parse(&data) {
     Ok(library) => {
       let file = File::create("output.lib")?;
       let mut writer = BufWriter::new(file);
-      write!(&mut writer, "{:#?}", library)?;
+      write!(&mut writer, "{}", library)?;
     }
     Err(e) => panic!("[ERROR] {:?}", e),
   }
