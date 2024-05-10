@@ -32,6 +32,8 @@ pub(crate) enum ComplexType {
   #[default]
   Default,
   Option,
+  Vec,
+  Set,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -328,8 +330,10 @@ fn parse_complex_type(
             }
             if let Some(proc_macro2::TokenTree::Ident(arg_value)) = args.next() {
               match arg_value.to_string().as_str() {
-                "Option" => complex_type = ComplexType::Option,
                 "Default" => complex_type = ComplexType::Default,
+                "Option" => complex_type = ComplexType::Option,
+                "Vec" => complex_type = ComplexType::Vec,
+                "Set" => complex_type = ComplexType::Set,
                 _ => {
                   return Err(syn::Error::new(
                     proc_macro2::Span::call_site(),

@@ -102,6 +102,59 @@ fn group_field_fn(
         }
       };
     }
+    // TODO:
+    AttriType::Complex(ComplexType::Vec) => {
+      attri_comment = quote! {};
+      write_field = quote! {
+        for complex in self.#field_name.iter(){
+          crate::ast::ComplexAttri::fmt_liberty(complex, #s_field_name, f)?;
+        }
+      };
+      parser_arm = quote! {
+        let complex_res: _;
+        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, line_num)?;
+        match complex_res{
+          Ok(complex) => {
+            res.#field_name.push(complex);
+          },
+          Err(e) => {
+            println!("Line={}, error={}",line_num,e);
+          },
+        }
+        let n: usize;
+        (input,n) = crate::ast::parser::comment_space_newline(input)?;
+        *line_num+=n;
+      };
+    }
+    // TODO:
+    AttriType::Complex(ComplexType::Set) => {
+      attri_comment = quote! {};
+      write_field = quote! {
+        for complex in self.#field_name.iter_sort(){
+          crate::ast::ComplexAttri::fmt_liberty(complex, #s_field_name, f)?;
+        }
+      };
+      parser_arm = quote! {
+        let complex_res: _;
+        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, line_num)?;
+        match complex_res{
+          Ok(complex) => {
+            if let Some(_) = res.#field_name.replace(
+              complex,
+            ){
+              let e = crate::ast::IdError::RepeatIdx;
+              println!("Line={}, error={}",line_num,e);
+            }
+          },
+          Err(e) => {
+            println!("Line={}, error={}",line_num,e);
+          },
+        }
+        let n: usize;
+        (input,n) = crate::ast::parser::comment_space_newline(input)?;
+        *line_num+=n;
+      };
+    }
     AttriType::Group(GroupType::Vec) => {
       attri_comment = quote! {};
       write_field = quote! {
