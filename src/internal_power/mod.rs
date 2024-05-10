@@ -1,6 +1,9 @@
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
-  common::items::{Domain, TableLookUp, WordSet},
+  common::{
+    items::{Domain, WordSet},
+    table::TableLookUp,
+  },
   expression::IdBooleanExpression,
   timing::items::Mode,
 };

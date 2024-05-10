@@ -3,7 +3,7 @@
 //! </script>
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn, SimpleAttri},
-  common::items::{
+  common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
   },
   expression::IdBooleanExpression,

@@ -8,7 +8,7 @@ pub use items::*;
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   cell::Cell,
-  common::items::DriverWaveform,
+  common::table::{DriverWaveform, TableTemple},
   units, GroupSet,
 };
 use std::fmt::{Display, Write};
@@ -53,6 +53,9 @@ pub struct Library {
   /// ">Reference</a>
   #[liberty(simple)]
   pub voltage_unit: units::VoltageUnit,
+  #[liberty(complex(type = Set))]
+  pub voltage_map: GroupSet<VoltageMap>,
+  // pub voltage_map: HashMap<String, f64>,
   /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
   /// **No default exists for the `current_unit` attribute if the attribute is omitted.**
   /// <a name ="reference_link" href="
@@ -82,8 +85,14 @@ pub struct Library {
   #[derivative(Default(value = "80.0"))]
   pub slew_upper_threshold_pct_rise: f64,
   #[liberty(group(type = Set))]
+  pub output_current_template: GroupSet<TableTemple>,
+  #[liberty(group(type = Set))]
+  pub power_lut_template: GroupSet<TableTemple>,
+  #[liberty(group(type = Set))]
+  pub lu_table_template: GroupSet<TableTemple>,
+  #[liberty(group(type = Set))]
   pub cell: GroupSet<Cell>,
-  pub voltage_map: HashMap<String, f64>,
+
   pub sensitization_map: HashMap<String, Sensitization>,
 }
 

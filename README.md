@@ -46,6 +46,12 @@ cargo test --package liberty-tests --lib -- parser_bench::test_all_lib_files --e
 
 ## ToDo List
 
++ remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter
++ merge fields of `timing` at parse phase
++ mut function for `ImmutIdXxx`'s `_comments` `_undefined` fields, reference to 
+```
+impl __timing::ImmutIdTiming { xxx }
+```
 + use PDFJS
 + stream input
 + fix missing newline at endding

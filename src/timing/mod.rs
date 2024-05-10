@@ -16,7 +16,7 @@ mod test;
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   bus::Bus,
-  common::items::*,
+  common::{items::*, table::*},
   expression::{self, BooleanExpression, IdBooleanExpression},
   library::Sensitization,
   pin::Pin,

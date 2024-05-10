@@ -3,6 +3,7 @@
 //! </script>
 //!
 pub mod items;
+pub mod table;
 // pub use items;
 
 pub mod traits;
