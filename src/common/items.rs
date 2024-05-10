@@ -349,6 +349,9 @@ pub struct ReferenceTimeVector3D {
   #[liberty(undefined)]
   _undefined: crate::ast::AttributeList,
   #[id]
+  #[liberty(simple)]
+  pub reference_time: ordered_float::OrderedFloat<f64>,
+  #[id]
   #[liberty(complex)]
   pub index_1: ordered_float::OrderedFloat<f64>,
   #[id]
@@ -479,6 +482,29 @@ pub struct TableLookUp3D {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+pub struct TableLookUp1D {
+  // TODO: unit
+  unit: (),
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  #[liberty(complex)]
+  pub index_1: Vec<f64>,
+  #[liberty(complex)]
+  pub values: Vec<f64>,
+}
+impl GroupFn for TableLookUp1D {}
+
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
 pub struct TableLookUp {
   // TODO: unit
   unit: (),
@@ -503,10 +529,10 @@ pub struct TableLookUp {
 #[duplicate::duplicate_item(
   AllTypes;
   [TableLookUp];
+  [TableLookUpMultiSegment];
   [TableLookUp2D];
   [TableLookUp3D];
   [DriverWaveform];
-  [TableLookUpMultiSegment];
 )]
 impl GroupFn for AllTypes {
   fn post_process(&mut self) {

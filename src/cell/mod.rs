@@ -30,8 +30,10 @@ pub struct Cell {
   _undefined: AttributeList,
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
+  #[liberty(simple(type=Option))]
+  pub cell_leakage_power: Option<f64>,
   #[liberty(group(type=Set))]
-  pub pin: GroupSet<Pin>,
+  pub pg_pin: GroupSet<PgPin>,
   #[liberty(group(type=Set))]
   pub ff: GroupSet<FF>,
   #[liberty(group(type=Set))]
@@ -44,6 +46,8 @@ pub struct Cell {
   pub leakage_power: GroupSet<LeakagePower>,
   #[liberty(group(type=Option))]
   pub statetable: Option<Statetable>,
+  #[liberty(group(type=Set))]
+  pub pin: GroupSet<Pin>,
 }
 impl GroupFn for Cell {}
 mod test {

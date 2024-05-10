@@ -1,7 +1,7 @@
 use std::{hash::Hash, str::FromStr, sync::Arc};
 
 use crate::{
-  ast::{GroupComments, GroupFn},
+  ast::{GroupComments, GroupFn, SimpleAttri},
   common::items::WordSet,
   expression::IdBooleanExpression,
   timing::items::Mode,
@@ -44,33 +44,6 @@ pub struct LeakagePower {
 }
 impl GroupFn for LeakagePower {}
 
-#[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
-pub struct LeakagePowerId {
-  power_level: Option<String>,
-  related_pg_pin: WordSet,
-  when: Option<IdBooleanExpression>,
-}
-
-// impl crate::ast::HashedGroup for LeakagePower {
-//   type Id = LeakagePowerId;
-
-//   fn title(&self) -> Vec<String> {
-//     vec![]
-//   }
-
-//   fn gen_id(&self, _: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
-//     Ok(Self::Id {
-//       power_level: self.power_level.clone(),
-//       related_pg_pin: self.related_pg_pin.clone(),
-//       when: self.when.clone(),
-//     })
-//   }
-
-//   fn id(&self) -> GroupId<Self> {
-//     self._id.clone()
-//   }
-// }
-
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.4&end=141.5
@@ -102,41 +75,6 @@ pub struct StatetableId {
   pub input_npde: Vec<String>,
   pub internal_node: Vec<String>,
 }
-
-// impl crate::ast::HashedGroup for Statetable {
-//   type Id = StatetableId;
-
-//   fn title(&self) -> Vec<String> {
-//     let id = self.id().clone();
-//     vec![id.input_npde.join(" "), id.internal_node.join(" ")]
-//   }
-
-//   fn gen_id(&self, mut title: Vec<String>) -> Result<Self::Id, crate::ast::IdError> {
-//     let l = title.len();
-//     if l != 2 {
-//       return Err(crate::ast::IdError::LengthDismatch(2, l, title));
-//     }
-//     let internal_node = if let Some(s) = title.pop() {
-//       s.split_ascii_whitespace()
-//         .map(ToString::to_string)
-//         .collect::<Vec<String>>()
-//     } else {
-//       return Err(crate::ast::IdError::Other("Unkown pop error".into()));
-//     };
-//     let input_npde = if let Some(s) = title.pop() {
-//       s.split_ascii_whitespace()
-//         .map(ToString::to_string)
-//         .collect::<Vec<String>>()
-//     } else {
-//       return Err(crate::ast::IdError::Other("Unkown pop error".into()));
-//     };
-//     Ok(Self::Id { input_npde, internal_node })
-//   }
-
-//   fn id(&self) -> GroupId<Self> {
-//     self._id.clone()
-//   }
-// }
 
 #[derive(Default, Debug, Clone)]
 pub struct Table {
@@ -207,3 +145,132 @@ fn statetable_test() {
   "#,
   );
 }
+
+/// Use the `pg_pin` group to specify power and ground pins.
+/// The library cells can have multiple `pg_pin` groups.
+/// A `pg_pin` group is mandatory for each cell.
+/// A cell must have at least one `primary_power` pin
+/// specified in the `pg_type` attribute and
+/// at least one `primary_ground` pin specified in the `pg_type` attribute.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.3&end=209.6
+/// ">Reference-Definition</a>
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+    sort,
+    macro(derive(Debug, Clone,Default);)
+  )]
+pub struct PgPin {
+  #[liberty(name)]
+  #[id]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: crate::ast::AttributeList,
+  /// Use the `voltage_name`  attribute to specify an associated voltage.
+  /// This attribute is optional in the `pg_pin`  group of a level-shifter cell
+  /// not powered by the switching power domains,
+  /// where the `pg_pin`  group has the `std_cell_main_rail`  attribute
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub voltage_name: String,
+  /// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
+  /// The `pg_type`  attribute also supports back-bias modeling.
+  /// The `pg_type`  attribute can have the following values:
+  /// + `primary_power`
+  /// + `primary_ground`
+  /// + `backup_power`
+  /// + `backup_ground`
+  /// + `internal_power`
+  /// + `internal_ground`
+  /// + `pwell`
+  /// + `nwell`
+  /// + `deepnwell`
+  /// + `deeppwell`
+  ///
+  /// The `pwell`  and `nwell`  values specify regular wells,
+  /// and the `deeppwell`  and `deepnwell`  values specify isolation wells.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=210.8&end=210.13
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub pg_type: PgType,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub user_pg_type: String,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub physical_connection: String,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub related_bias_pin: String,
+}
+impl GroupFn for PgPin {}
+
+/// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
+/// The `pg_type`  attribute also supports back-bias modeling.
+/// The `pg_type`  attribute can have the following values:
+/// + `primary_power`
+/// + `primary_ground`
+/// + `backup_power`
+/// + `backup_ground`
+/// + `internal_power`
+/// + `internal_ground`
+/// + `pwell`
+/// + `nwell`
+/// + `deepnwell`
+/// + `deeppwell`
+///
+/// The `pwell`  and `nwell`  values specify regular wells,
+/// and the `deeppwell`  and `deepnwell`  values specify isolation wells.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=210.8&end=210.13
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd, Default)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+pub enum PgType {
+  /// primary_power
+  #[strum(serialize = "primary_power")]
+  PrimaryPower,
+  /// primary_ground
+  #[strum(serialize = "primary_ground")]
+  PrimaryGround,
+  /// backup_power
+  #[strum(serialize = "backup_power")]
+  BackupPower,
+  /// backup_ground
+  #[strum(serialize = "backup_ground")]
+  #[default]
+  BackupGround,
+  /// internal_power
+  #[strum(serialize = "internal_power")]
+  InternalPower,
+  /// internal_ground
+  #[strum(serialize = "internal_ground")]
+  InternalGround,
+  /// pwell
+  #[strum(serialize = "pwell")]
+  Pwell,
+  /// nwell
+  #[strum(serialize = "nwell")]
+  Nwell,
+  /// deepnwell
+  #[strum(serialize = "deepnwell")]
+  DeepNwell,
+  /// deeppwell
+  #[strum(serialize = "deeppwell")]
+  DeepPwell,
+}
+impl SimpleAttri for PgType {}

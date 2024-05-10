@@ -16,6 +16,15 @@ impl SimpleAttri for f64 {
   }
 }
 
+impl SimpleAttri for ordered_float::OrderedFloat<f64> {
+  #[inline]
+  fn to_wrapper(&self) -> SimpleWrapper {
+    let f: f64 = (*self).into();
+    let mut buffer = ryu::Buffer::new();
+    buffer.format(f).to_string()
+  }
+}
+
 impl SimpleAttri for bool {}
 impl SimpleAttri for usize {
   #[inline]
@@ -121,11 +130,31 @@ impl<const N: usize> NameAttri for [String; N] {
   }
   #[inline]
   fn to_vec(self) -> Vec<String> {
-    self.to_vec()
+    self.into_iter().collect_vec()
   }
 }
 
 impl SimpleAttri for String {}
+
+impl<const N: usize> ComplexAttri for [String; N] {
+  #[inline]
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    let l = v.len();
+    if l != N {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    match TryInto::<[String; N]>::try_into(
+      v.into_iter().map(ToString::to_string).collect::<Vec<String>>(),
+    ) {
+      Ok(name) => Ok(name),
+      Err(_) => Err(ComplexParseError::Other),
+    }
+  }
+  #[inline]
+  fn to_wrapper(&self) -> ComplexWrapper {
+    vec![self.clone().into_iter().collect_vec()]
+  }
+}
 
 impl ComplexAttri for Vec<f64> {
   #[inline]
