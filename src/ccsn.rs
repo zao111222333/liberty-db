@@ -3,9 +3,12 @@
 //! </script>
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn, SimpleAttri},
-  common::items::{DummyGroup, TableLookUp2D, Vector3DGrpup, Vector4DGrpup},
+  common::items::{
+    TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
+  },
   expression::IdBooleanExpression,
   timing::items::Mode,
+  GroupSet,
 };
 use std::{fmt::Display, str::FromStr};
 
@@ -227,6 +230,55 @@ pub enum StageType {
   Both,
 }
 impl SimpleAttri for StageType {}
+
+/// Use the `receiver_capacitance`  group to specify capacitance values
+/// for composite current source (CCS) receiver modeling at the pin level.
+///
+/// Groups
+///
+/// For two-segment receiver capacitance model
+/// + receiver_capacitance1_fall
+/// + receiver_capacitance1_rise
+/// + receiver_capacitance2_fall
+/// + receiver_capacitance2_rise
+///
+/// For multisegment receiver capacitance model
+/// + receiver_capacitance_fall
+/// + receiver_capacitance_rise
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=316.5&end=316.31
+/// ">Reference-Definition</a>
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set_derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+pub struct ReceiverCapacitance {
+  #[id]
+  #[liberty(name)]
+  name: Option<String>,
+  #[liberty(comments)]
+  _comments: GroupComments<Self>,
+  #[liberty(undefined)]
+  _undefined: AttributeList,
+  #[id]
+  #[liberty(simple(type=Option))]
+  pub when: Option<IdBooleanExpression>,
+  #[liberty(group(type=Set))]
+  pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
+  #[liberty(group(type=Set))]
+  pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment>,
+  #[liberty(group)]
+  pub receiver_capacitance1_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub receiver_capacitance1_rise: Option<TableLookUp>,
+  #[liberty(group)]
+  pub receiver_capacitance2_fall: Option<TableLookUp>,
+  #[liberty(group)]
+  pub receiver_capacitance2_rise: Option<TableLookUp>,
+}
+impl GroupFn for ReceiverCapacitance {}
 
 #[test]
 fn parse_file() -> anyhow::Result<()> {
