@@ -2,6 +2,7 @@
 //! IFRAME('https://en.wikipedia.org/wiki/International_System_of_Units');
 //! </script>
 
+use ordered_float::NotNan;
 pub use uom::si::f64::{
   Capacitance, ElectricCharge, ElectricCurrent, ElectricPotential, ElectricalResistance,
   Energy, Length, Power, Ratio, ThermodynamicTemperature, Time,
@@ -364,7 +365,7 @@ impl Deref for CapacitiveLoadUnit {
 impl ComplexAttri for CapacitiveLoadUnit {
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
-    let value: f64 = match i.next() {
+    let value: NotNan<f64> = match i.next() {
       Some(s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(ComplexParseError::Float(e)),
@@ -373,8 +374,8 @@ impl ComplexAttri for CapacitiveLoadUnit {
     };
     let (ff_pf, _v): (bool, Capacitance) = match i.next() {
       Some(s) => match s {
-        "ff" => (true, Capacitance::new::<capacitance::femtofarad>(value)),
-        "pf" => (false, Capacitance::new::<capacitance::picofarad>(value)),
+        "ff" => (true, Capacitance::new::<capacitance::femtofarad>(*value)),
+        "pf" => (false, Capacitance::new::<capacitance::picofarad>(*value)),
         _ => return Err(ComplexParseError::UnsupportedWord),
       },
       None => return Err(ComplexParseError::LengthDismatch),
@@ -416,9 +417,12 @@ impl ComplexAttri for CapacitiveLoadUnit {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 #[derive(strum_macros::EnumString, strum_macros::Display)]
 pub enum LeakagePowerUnit {
+  /// No units
+  #[default]
+  None,
   /// 1pW, 1e-12
   #[strum(serialize = "1pW")]
   _1pW,
@@ -460,7 +464,13 @@ pub enum LeakagePowerUnit {
   _1W,
 }
 impl LeakagePowerUnit {
-  const LUT: [<Self as Deref>::Target; 13] = [
+  const LUT: [<Self as Deref>::Target; 14] = [
+    // No Unit
+    Power {
+      dimension: std::marker::PhantomData,
+      units: std::marker::PhantomData,
+      value: 1.0,
+    },
     // 1pW
     Power {
       dimension: std::marker::PhantomData,

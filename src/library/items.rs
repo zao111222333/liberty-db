@@ -60,7 +60,11 @@ impl ComplexAttri for VoltageMap {
     let v2: f64 = match i.next() {
       Some(s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => return Err(ComplexParseError::Float(e)),
+        Err(e) => {
+          return Err(ComplexParseError::Float(
+            ordered_float::ParseNotNanError::ParseFloatError(e),
+          ))
+        }
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };

@@ -2,6 +2,7 @@ use crate::{
   ast::{AttributeList, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
   GroupSet,
 };
+use ordered_float::NotNan;
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
@@ -21,13 +22,13 @@ pub struct TableLookUpMultiSegment {
   #[id]
   segment: usize,
   #[liberty(complex)]
-  pub index_1: Vec<f64>,
+  pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_2: Vec<f64>,
+  pub index_2: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_3: Vec<f64>,
+  pub index_3: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_4: Vec<f64>,
+  pub index_4: Vec<NotNan<f64>>,
   #[liberty(complex)]
   pub values: Values,
 }
@@ -50,13 +51,13 @@ pub struct DriverWaveform {
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(complex)]
-  pub index_1: Vec<f64>,
+  pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_2: Vec<f64>,
+  pub index_2: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_3: Vec<f64>,
+  pub index_3: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_4: Vec<f64>,
+  pub index_4: Vec<NotNan<f64>>,
   #[liberty(complex)]
   pub values: Values,
 }
@@ -77,9 +78,9 @@ pub struct TableLookUp2D {
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(complex)]
-  pub index_1: Vec<f64>,
+  pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_2: Vec<f64>,
+  pub index_2: Vec<NotNan<f64>>,
   #[liberty(complex)]
   pub values: Values,
 }
@@ -101,14 +102,14 @@ pub struct Vector3D {
   _undefined: AttributeList,
   #[id]
   #[liberty(complex)]
-  pub index_1: ordered_float::OrderedFloat<f64>,
+  pub index_1: NotNan<f64>,
   #[id]
   #[liberty(complex)]
-  pub index_2: ordered_float::OrderedFloat<f64>,
+  pub index_2: NotNan<f64>,
   #[liberty(complex)]
-  pub index_3: Vec<f64>,
+  pub index_3: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub values: Vec<f64>,
+  pub values: Vec<NotNan<f64>>,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -128,17 +129,17 @@ pub struct ReferenceTimeVector3D {
   _undefined: AttributeList,
   #[id]
   #[liberty(simple)]
-  pub reference_time: ordered_float::OrderedFloat<f64>,
+  pub reference_time: NotNan<f64>,
   #[id]
   #[liberty(complex)]
-  pub index_1: ordered_float::OrderedFloat<f64>,
+  pub index_1: NotNan<f64>,
   #[id]
   #[liberty(complex)]
-  pub index_2: ordered_float::OrderedFloat<f64>,
+  pub index_2: NotNan<f64>,
   #[liberty(complex)]
-  pub index_3: Vec<f64>,
+  pub index_3: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub values: Vec<f64>,
+  pub values: Vec<NotNan<f64>>,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -158,17 +159,17 @@ pub struct Vector4D {
   _undefined: AttributeList,
   #[id]
   #[liberty(complex)]
-  pub index_1: ordered_float::OrderedFloat<f64>,
+  pub index_1: NotNan<f64>,
   #[id]
   #[liberty(complex)]
-  pub index_2: ordered_float::OrderedFloat<f64>,
+  pub index_2: NotNan<f64>,
   #[id]
   #[liberty(complex)]
-  pub index_3: ordered_float::OrderedFloat<f64>,
+  pub index_3: NotNan<f64>,
   #[liberty(complex)]
-  pub index_4: Vec<f64>,
+  pub index_4: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub values: Vec<f64>,
+  pub values: Vec<NotNan<f64>>,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -245,11 +246,11 @@ pub struct TableLookUp3D {
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(complex)]
-  pub index_1: Vec<f64>,
+  pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_2: Vec<f64>,
+  pub index_2: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_3: Vec<f64>,
+  pub index_3: Vec<NotNan<f64>>,
   #[liberty(complex)]
   pub values: Values,
 }
@@ -271,9 +272,9 @@ pub struct TableLookUp1D {
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(complex)]
-  pub index_1: Vec<f64>,
+  pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub values: Vec<f64>,
+  pub values: Vec<NotNan<f64>>,
 }
 impl GroupFn for TableLookUp1D {}
 
@@ -294,13 +295,13 @@ pub struct TableLookUp {
   #[liberty(undefined)]
   _undefined: AttributeList,
   #[liberty(complex)]
-  pub index_1: Vec<f64>,
+  pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_2: Vec<f64>,
+  pub index_2: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_3: Vec<f64>,
+  pub index_3: Vec<NotNan<f64>>,
   #[liberty(complex)]
-  pub index_4: Vec<f64>,
+  pub index_4: Vec<NotNan<f64>>,
   #[liberty(complex)]
   pub values: Values,
 }
@@ -343,7 +344,7 @@ impl GroupFn for Vector4D {}
 pub struct Values {
   pub size1: usize,
   pub size2: usize,
-  pub inner: Vec<f64>,
+  pub inner: Vec<NotNan<f64>>,
 }
 
 impl ComplexAttri for Values {
@@ -352,7 +353,7 @@ impl ComplexAttri for Values {
     Ok(Self {
       size1: 0,
       size2: 0,
-      inner: <Vec<f64> as ComplexAttri>::parse(v)?,
+      inner: <Vec<NotNan<f64>> as ComplexAttri>::parse(v)?,
     })
   }
   #[inline]
@@ -363,7 +364,7 @@ impl ComplexAttri for Values {
       .chunks(self.size1)
       .map(|v| {
         vec![itertools::Itertools::join(
-          &mut v.iter().map(|f| buffer.format(*f).to_string()),
+          &mut v.iter().map(|f| buffer.format(f.into_inner()).to_string()),
           ", ",
         )]
       })
@@ -394,13 +395,13 @@ pub struct TableTemple {
   #[liberty(simple(type=Option))]
   pub variable_4: Option<Variable>,
   #[liberty(complex(type=Option))]
-  pub index_1: Option<Vec<f64>>,
+  pub index_1: Option<Vec<NotNan<f64>>>,
   #[liberty(complex(type=Option))]
-  pub index_2: Option<Vec<f64>>,
+  pub index_2: Option<Vec<NotNan<f64>>>,
   #[liberty(complex(type=Option))]
-  pub index_3: Option<Vec<f64>>,
+  pub index_3: Option<Vec<NotNan<f64>>>,
   #[liberty(complex(type=Option))]
-  pub index_4: Option<Vec<f64>>,
+  pub index_4: Option<Vec<NotNan<f64>>>,
 }
 impl GroupFn for TableTemple {}
 

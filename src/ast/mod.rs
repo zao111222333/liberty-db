@@ -7,6 +7,7 @@ pub mod parser;
 pub use fmt::CodeFormatter;
 use itertools::Itertools;
 use nom::{error::Error, IResult};
+use ordered_float::ParseNotNanError;
 use std::{
   cell::RefCell,
   collections::HashMap,
@@ -139,8 +140,10 @@ pub trait SimpleAttri: Sized + Display + FromStr {
 
 #[derive(thiserror::Error, Debug)]
 pub enum ComplexParseError {
+  // #[error("{0}")]
+  // Float(std::num::ParseFloatError),
   #[error("{0}")]
-  Float(std::num::ParseFloatError),
+  Float(ParseNotNanError<std::num::ParseFloatError>),
   #[error("{0}")]
   Int(std::num::ParseIntError),
   #[error("title length mismatch")]
