@@ -3,6 +3,7 @@ use crate::{
   GroupSet,
 };
 use ordered_float::NotNan;
+use uom::si::f64::Time;
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
@@ -496,26 +497,143 @@ impl GroupFn for TableTemple {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 pub enum Variable {
-  /// input_voltage
-  #[strum(serialize = "input_voltage")]
-  InputVoltage,
-  /// output_voltage
-  #[strum(serialize = "output_voltage")]
-  OutputVoltage,
+  Time(TimeVariable),
+  Voltage(VoltageVariable),
+  Capacitance(CapacitanceVariable),
+  RcProduct,
+  Length(LengthVariable),
+  Scalar(ScalarVariable),
+}
+impl SimpleAttri for Variable {}
+
+impl std::str::FromStr for Variable {
+  type Err = strum::ParseError;
+  #[inline]
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    Ok(match s {
+      "input_voltage" => Variable::Voltage(VoltageVariable::InputVoltage),
+      "output_voltage" => Variable::Voltage(VoltageVariable::OutputVoltage),
+      "input_noise_height" => Variable::Voltage(VoltageVariable::InputNoiseHeight),
+      "input_transition_time" => Variable::Time(TimeVariable::InputTransitionTime),
+      "input_net_transition" => Variable::Time(TimeVariable::InputNetTransition),
+      "constrained_pin_transition" => {
+        Variable::Time(TimeVariable::ConstrainedPinTransition)
+      }
+      "related_pin_transition" => Variable::Time(TimeVariable::RelatedPinTransition),
+      "driver_slew" => Variable::Time(TimeVariable::DriverSlew),
+      "output_transition" => Variable::Time(TimeVariable::OutputTransition),
+      "output_pin_transition" => Variable::Time(TimeVariable::OutputPinTransition),
+      "connect_delay" => Variable::Time(TimeVariable::ConnectDelay),
+      "input_noise_width" => Variable::Time(TimeVariable::InputNoiseWidth),
+      "time" => Variable::Time(TimeVariable::Time),
+      "total_output_net_capacitance" => {
+        Variable::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance)
+      }
+      "output_net_wire_cap" => {
+        Variable::Capacitance(CapacitanceVariable::OutputNetWireCap)
+      }
+      "output_net_pin_cap" => Variable::Capacitance(CapacitanceVariable::OutputNetPinCap),
+      "related_out_total_output_net_capaci" => {
+        Variable::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance)
+      }
+      "related_out_output_net_wire_cap" => {
+        Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap)
+      }
+      "related_out_output_net_pin_cap" => {
+        Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap)
+      }
+      "fanout_pin_capacitance" => {
+        Variable::Capacitance(CapacitanceVariable::FanoutPinCapacitance)
+      }
+      "output_net_length" => Variable::Length(LengthVariable::OutputNetLength),
+      "related_out_output_net_length" => {
+        Variable::Length(LengthVariable::RelatedOutOutputNetLength)
+      }
+      "fanout_number" => Variable::Scalar(ScalarVariable::FanoutNumber),
+      "rc_product" => Variable::RcProduct,
+      _ => {
+        return Err(strum::ParseError::VariantNotFound);
+      }
+    })
+  }
+}
+
+impl std::fmt::Display for Variable {
+  #[inline]
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Variable::Time(v) => v.fmt(f),
+      Variable::Voltage(v) => v.fmt(f),
+      Variable::Capacitance(v) => v.fmt(f),
+      Variable::Length(v) => v.fmt(f),
+      Variable::Scalar(v) => v.fmt(f),
+      Variable::RcProduct => write!(f, "rc_product"),
+    }
+  }
+}
+
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+pub enum TimeVariable {
   /// input_transition_time
   #[strum(serialize = "input_transition_time")]
   InputTransitionTime,
   /// input_net_transition
   #[strum(serialize = "input_net_transition")]
   InputNetTransition,
+  ///constrained_pin_transition
+  #[strum(serialize = "constrained_pin_transition")]
+  ConstrainedPinTransition,
+  ///related_pin_transition
+  #[strum(serialize = "related_pin_transition")]
+  RelatedPinTransition,
+  /// driver_slew
+  #[strum(serialize = "driver_slew")]
+  DriverSlew,
+  /// output_transition
+  #[strum(serialize = "output_transition")]
+  OutputTransition,
+  /// output_pin_transition
+  #[strum(serialize = "output_pin_transition")]
+  OutputPinTransition,
+  /// connect_delay
+  #[strum(serialize = "connect_delay")]
+  ConnectDelay,
+  /// input_noise_width
+  #[strum(serialize = "input_noise_width")]
+  InputNoiseWidth,
+  /// time
+  #[strum(serialize = "time")]
+  Time,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+pub enum VoltageVariable {
+  /// input_voltage
+  #[strum(serialize = "input_voltage")]
+  InputVoltage,
+  /// output_voltage
+  #[strum(serialize = "output_voltage")]
+  OutputVoltage,
+  /// input_noise_height
+  #[strum(serialize = "input_noise_height")]
+  InputNoiseHeight,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+pub enum CapacitanceVariable {
   /// total_output_net_capacitance
   #[strum(serialize = "total_output_net_capacitance")]
   TotalOutputNetCapacitance,
-  /// output_net_length
-  #[strum(serialize = "output_net_length")]
-  OutputNetLength,
   /// output_net_wire_cap
   #[strum(serialize = "output_net_wire_cap")]
   OutputNetWireCap,
@@ -525,50 +643,36 @@ pub enum Variable {
   /// related_out_total_output_net_capaci
   #[strum(serialize = "related_out_total_output_net_capaci")]
   RelatedOutTotalOutputNetCapacitance,
-  /// related_out_output_net_length
-  #[strum(serialize = "related_out_output_net_length")]
-  RelatedOutOutputNetLength,
   /// related_out_output_net_wire_cap
   #[strum(serialize = "related_out_output_net_wire_cap")]
   RelatedOutOutputNetWireCap,
   /// related_out_output_net_pin_cap
   #[strum(serialize = "related_out_output_net_pin_cap")]
   RelatedOutOutputNetPinCap,
-  ///constrained_pin_transition
-  #[strum(serialize = "constrained_pin_transition")]
-  ConstrainedPinTransition,
-  ///related_pin_transition
-  #[strum(serialize = "related_pin_transition")]
-  RelatedPinTransition,
-  /// fanout_number
-  #[strum(serialize = "fanout_number")]
-  FanoutNumber,
   /// fanout_pin_capacitance
   #[strum(serialize = "fanout_pin_capacitance")]
   FanoutPinCapacitance,
-  /// driver_slew
-  #[strum(serialize = "driver_slew")]
-  DriverSlew,
-  /// output_transition
-  #[strum(serialize = "output_transition")]
-  OutputTransition,
-  /// rc_product
-  #[strum(serialize = "rc_product")]
-  RcProduct,
-  /// output_pin_transition
-  #[strum(serialize = "output_pin_transition")]
-  OutputPinTransition,
-  /// connect_delay
-  #[strum(serialize = "connect_delay")]
-  ConnectDelay,
-  /// input_noise_height
-  #[strum(serialize = "input_noise_height")]
-  InputNoiseHeight,
-  /// input_noise_width
-  #[strum(serialize = "input_noise_width")]
-  InputNoiseWidth,
-  /// time
-  #[strum(serialize = "time")]
-  Time,
 }
-impl SimpleAttri for Variable {}
+
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+pub enum LengthVariable {
+  /// output_net_length
+  #[strum(serialize = "output_net_length")]
+  OutputNetLength,
+  /// related_out_output_net_length
+  #[strum(serialize = "related_out_output_net_length")]
+  RelatedOutOutputNetLength,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+pub enum ScalarVariable {
+  /// fanout_number
+  #[strum(serialize = "fanout_number")]
+  FanoutNumber,
+}
