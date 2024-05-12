@@ -414,5 +414,11 @@ pub(crate) fn title<'a>(
 }
 
 pub(crate) fn end_group<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>> {
-  map(pair(char('}'), space), |_| ())(i)
+  map(char('}'), |_| ())(i)
+}
+
+#[test]
+fn end_group_test() {
+  println!("{:?}", end_group("}"));
+  println!("{:?}", end_group("}\n"));
 }
