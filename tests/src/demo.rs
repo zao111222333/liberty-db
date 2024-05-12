@@ -58,8 +58,8 @@ library(gscl45nm) {
 fn parse_str() {
   match Library::parse(TEMPLATE) {
     Ok(ref mut library) => {
-      library.comment_mut().push("line1\nline2".to_owned());
-      library.comment_mut().push("line3".to_owned());
+      library.comments.name.push("line1\nline2".to_owned());
+      library.comments.name.push("line3".to_owned());
       println!("{:#?}", library);
       println!("{}", library);
     }
@@ -76,16 +76,15 @@ fn parse_error() {
   "#;
   match Library::parse(s) {
     Ok(library) => {
-      println!("{}", library);
+      panic!("{}", library);
     }
-    Err(e) => panic!("[ERROR] {}", e),
+    Err(e) => println!("{:?}", e),
   }
 }
 
 #[test]
 fn case_1() {
-  let s = r#"
-  library(some){    
+  let s = r#"library(some){    
     input_voltage(cmos_schmitt) {
          vil : 0.3 * VDD ;
          vih : 0.7 * VDD ;
@@ -104,8 +103,7 @@ fn case_1() {
 
 #[test]
 fn case_2() {
-  let s = r#"
-  library(some){
+  let s = r#"library(some){
     resistance : 0.00001 ;
     capacitance : 1 ;
     area : 0
@@ -116,7 +114,7 @@ fn case_2() {
     fanout_length(4,0.0000)
     fanout_length(5,0.0000)
     fanout_length(6,0.0000)
-  }  "#;
+  }"#;
   match Library::parse(s) {
     Ok(library) => {
       println!("{}", library);
@@ -129,8 +127,7 @@ fn case_2() {
 fn parse_file() -> anyhow::Result<()> {
   use std::fs::File;
   use std::io::{BufWriter, Write};
-  // let filepath = "tech/cases/ocv.lib";
-  let filepath = "tech/ccsn.lib";
+  let filepath = "tech/cases/ocv.lib";
   let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
   match liberty_db::library::Library::parse(&data) {
     Ok(library) => {

@@ -18,9 +18,9 @@ pub struct Statetable {
   #[liberty(id)]
   _id: GroupId<Self>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::AttributeList,
   #[liberty(simple)]
   table: Table,
 }

@@ -16,9 +16,9 @@ pub struct TableLookUpMultiSegment {
   #[id]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(simple)]
   #[id]
   segment: usize,
@@ -48,9 +48,9 @@ pub struct DriverWaveform {
   #[liberty(simple(type=Option))]
   driver_waveform_name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -75,9 +75,9 @@ pub struct TableLookUp2D {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -98,9 +98,9 @@ pub struct Vector3D {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[id]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
@@ -125,9 +125,9 @@ pub struct ReferenceTimeVector3D {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[id]
   #[liberty(simple)]
   pub reference_time: NotNan<f64>,
@@ -155,9 +155,9 @@ pub struct Vector4D {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[id]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
@@ -184,9 +184,9 @@ pub struct Vector3DGrpup {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<Vector3D>,
 }
@@ -202,9 +202,9 @@ pub struct ReferenceTimeVector3DGrpup {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<ReferenceTimeVector3D>,
 }
@@ -220,9 +220,9 @@ pub struct Vector4DGrpup {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<Vector4D>,
 }
@@ -243,9 +243,9 @@ pub struct TableLookUp3D {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -269,9 +269,9 @@ pub struct TableLookUp1D {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -292,9 +292,9 @@ pub struct TableLookUp {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -384,9 +384,9 @@ pub struct TableTemple {
   #[liberty(name)]
   pub name: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(simple(type=Option))]
   pub variable_1: Option<Variable>,
   #[liberty(simple(type=Option))]

@@ -44,9 +44,9 @@ pub struct CCSNStage {
   #[id]
   pub name: Vec<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(simple(type = Option))]
   pub load_cap_fall: Option<f64>,
   #[liberty(simple(type = Option))]
@@ -259,9 +259,9 @@ pub struct ReceiverCapacitance {
   #[liberty(name)]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[id]
   #[liberty(simple(type=Option))]
   pub when: Option<IdBooleanExpression>,

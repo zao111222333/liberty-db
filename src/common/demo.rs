@@ -11,9 +11,9 @@ use crate::{
 #[derive(liberty_macros::Group)]
 pub(crate) struct Timing {
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  undefined: AttributeList,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  comments: GroupComments<Self>,
   #[liberty(complex)]
   values: Vec<f64>,
   #[liberty(simple(type = Option))]
@@ -33,9 +33,9 @@ pub(crate) struct Pin {
   #[liberty(name)]
   name: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  undefined: AttributeList,
   #[liberty(group(type=Vec))]
   timing: Vec<Timing>,
 }
@@ -54,9 +54,9 @@ pub(crate) struct FF {
   #[liberty(name)]
   var2: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  undefined: AttributeList,
   #[liberty(simple(type = Option))]
   next_state: Option<String>,
 }
@@ -90,9 +90,9 @@ pub(crate) struct Cell {
   #[liberty(name)]
   name: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  undefined: AttributeList,
   #[liberty(simple(type = Option))]
   area: Option<f64>,
   #[liberty(group(type=Set))]
@@ -221,8 +221,8 @@ fn cell_test() {
     }
     "#,
   );
-  g.comments_mut().area.push("xc".to_owned());
-  g.comments_mut().area.push("xc".to_owned());
+  g.comments.area.push("xc".to_owned());
+  g.comments.area.push("xc".to_owned());
   let mut output = String::new();
   let mut f = crate::ast::CodeFormatter::new(&mut output, "| ");
   if let Err(e) = GroupAttri::fmt_liberty(g, std::any::type_name::<Cell>(), &mut f) {

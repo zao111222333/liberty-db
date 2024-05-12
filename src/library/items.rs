@@ -27,9 +27,9 @@ pub struct Sensitization {
   #[liberty(name)]
   pub name: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   /// TODO
   pub pin_names: Vec<<Pin as mut_set::Item>::Id>,
   /// TODO

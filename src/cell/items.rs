@@ -25,9 +25,9 @@ pub struct LeakagePower {
   #[liberty(name)]
   name: Vec<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::AttributeList,
   #[id]
   #[liberty(simple(type = Option))]
   power_level: Option<String>,
@@ -62,9 +62,9 @@ pub struct Statetable {
   #[liberty(name)]
   pub name: [String; 2],
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::AttributeList,
   #[liberty(simple)]
   pub table: Table,
 }
@@ -166,9 +166,9 @@ pub struct PgPin {
   #[id]
   name: Option<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::AttributeList,
   /// Use the `voltage_name`  attribute to specify an associated voltage.
   /// This attribute is optional in the `pg_pin`  group of a level-shifter cell
   /// not powered by the switching power domains,

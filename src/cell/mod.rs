@@ -25,9 +25,9 @@ pub struct Cell {
   #[liberty(name)]
   pub name: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
   #[liberty(simple(type=Option))]

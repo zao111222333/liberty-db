@@ -16,9 +16,9 @@ use crate::{
 )]
 pub struct InternalPower {
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   // NOTICE: Simple Attributes
   // equal_or_opposite_output
   // falling_together_group

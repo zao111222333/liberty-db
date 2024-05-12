@@ -56,9 +56,9 @@ pub struct Timing {
   #[liberty(name)]
   pub name: Vec<String>,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
 
   /// Use this attribute to indicate that a constraint arc is for
   /// a clock gating relation between the data and clock pin,
@@ -1596,21 +1596,3 @@ pub struct Timing {
 }
 
 impl GroupFn for Timing {}
-
-impl __timing::ImmutIdTiming {
-  #[inline]
-  pub fn comment_mut(&mut self) -> &mut crate::ast::AttriComment {
-    let g: &mut Timing = unsafe { &mut *(self as *mut Self as *mut Timing) };
-    crate::ast::GroupAttri::comment_mut(g)
-  }
-  #[inline]
-  pub fn comments_mut(&mut self) -> &mut <Timing as crate::ast::GroupAttri>::Comments {
-    let g: &mut Timing = unsafe { &mut *(self as *mut Self as *mut Timing) };
-    crate::ast::GroupAttri::comments_mut(g)
-  }
-  #[inline]
-  pub fn undefined_list_mut(&mut self) -> &mut AttributeList {
-    let g: &mut Timing = unsafe { &mut *(self as *mut Self as *mut Timing) };
-    crate::ast::GroupAttri::undefined_list_mut(g)
-  }
-}

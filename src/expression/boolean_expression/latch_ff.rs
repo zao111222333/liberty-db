@@ -48,9 +48,9 @@ pub struct FF {
   #[id]
   pub variable2: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
@@ -132,9 +132,9 @@ pub struct FFBank {
   #[liberty(name)]
   pub bits: usize,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
@@ -212,9 +212,9 @@ pub struct Latch {
   #[liberty(name)]
   pub variable2: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
@@ -295,9 +295,9 @@ pub struct LatchBank {
   #[liberty(name)]
   pub bits: usize,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,

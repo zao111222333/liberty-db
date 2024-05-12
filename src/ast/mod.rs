@@ -203,14 +203,6 @@ pub trait GroupAttri: Sized {
   type Comments;
   fn name(&self) -> Self::Name;
   fn set_name(&mut self, name: Self::Name);
-  fn comment(&self) -> &AttriComment;
-  fn comment_mut(&mut self) -> &mut AttriComment;
-  fn comments(&self) -> &Self::Comments;
-  fn comments_mut(&mut self) -> &mut Self::Comments;
-  ///
-  fn undefined_list(&self) -> &AttributeList;
-  fn undefined_list_mut(&mut self) -> &mut AttributeList;
-  // fn add_undefine_attri(&mut self, key: &str, attri: AttriValue);
   /// nom_parse, will be implemented by macros
   fn nom_parse<'a>(
     i: &'a str,

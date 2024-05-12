@@ -43,9 +43,9 @@ pub struct Pin {
   #[liberty(name)]
   pub name: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: AttributeList,
+  pub undefined: AttributeList,
   /// The `related_power_pin`  and `related_ground_pin`  attributes
   /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
   /// The `related_power_pin`  and `related_ground_pin` attributes are used

@@ -219,9 +219,9 @@ pub struct CellDegradation {
   #[liberty(name)]
   pub name: String,
   #[liberty(comments)]
-  _comments: GroupComments<Self>,
+  pub comments: GroupComments<Self>,
   #[liberty(undefined)]
-  _undefined: ast::AttributeList,
+  pub undefined: ast::AttributeList,
   // /* polynomial model */
   // #[arrti_type(complex)]
   // pub coefs: Vec<f64>,
@@ -281,9 +281,9 @@ impl GroupFn for CellDegradation {}
 //   #[liberty(name)]
 //   name: Vec<String>,
 //   #[liberty(comments)]
-//   _comments: GroupComments<Self>,
+//   pub comments: GroupComments<Self>,
 //   #[liberty(undefined)]
-//   _undefined: ast::AttributeList,
+//   pub undefined: ast::AttributeList,
 //   /// <a name ="reference_link" href="
 //   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
 //   /// ?field=test
