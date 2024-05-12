@@ -54,8 +54,8 @@ impl __timing::ImmutIdTiming { xxx }
 ```
 + use PDFJS
 + stream input
-+ fix missing newline at endding
 + Linked Group
++ ~~fix missing newline at endding~~
 + ~~recursive parse boolean expression~~
 + ~~macros~~
 + ~~format to `liberty`~~
