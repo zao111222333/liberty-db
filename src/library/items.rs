@@ -320,11 +320,11 @@ impl SimpleAttri for TreeType {}
 /// which is valid in a `pin`  group:
 ///
 /// Example
-/// ```
+/// ``` liberty
 /// define ("bork", "pin", "string") ;
 /// ```
 /// You give the new library attribute a value by using the simple attribute syntax:
-/// ```
+/// ``` liberty
 /// bork : "nimo" ;
 /// ```
 /// <a name ="reference_link" href="
@@ -595,7 +595,7 @@ pub struct WireLoad {
   /// fanoutAn integer representing the total number of pins, minus one, on the net driven by the given output.lengthA floating-point number representing the estimated amount of metal that is statistically found on a network with the given number of pins.
   ///
   /// Examples
-  /// ```
+  /// ``` liberty
   /// library (example)  
   ///   ...
   ///   wire_load (small) {  
@@ -620,7 +620,7 @@ impl GroupFn for WireLoad {}
 /// fanoutAn integer representing the total number of pins, minus one, on the net driven by the given output.lengthA floating-point number representing the estimated amount of metal that is statistically found on a network with the given number of pins.
 ///
 /// Examples
-/// ```
+/// ``` liberty
 /// library (example)  
 ///   ...
 ///   wire_load (small) {  

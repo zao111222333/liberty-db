@@ -422,6 +422,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
 #[derive(strum_macros::EnumString, strum_macros::Display)]
 pub enum LeakagePowerUnit {
   /// No units
+  #[strum(serialize = "")]
   #[default]
   None,
   /// 1pW, 1e-12

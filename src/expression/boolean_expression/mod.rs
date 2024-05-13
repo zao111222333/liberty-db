@@ -86,7 +86,7 @@ impl BooleanExpressionLike for IdBooleanExpression {}
 /// | 0        | signal tied to logic 0      |
 ///
 /// A pin name beginning with a number must be enclosed in double quotation marks preceded by a backslash (\), as in the following example
-/// ```
+/// ``` liberty
 /// function : " \"1A\" + \"1B\" " ;
 /// ```
 ///

@@ -130,11 +130,11 @@ pub struct Library {
   /// which is valid in a `pin`  group:
   ///
   /// Example
-  /// ```
+  /// ``` liberty
   /// define ("bork", "pin", "string") ;
   /// ```
   /// You give the new library attribute a value by using the simple attribute syntax:
-  /// ```
+  /// ``` liberty
   /// bork : "nimo" ;
   /// ```
   /// <a name ="reference_link" href="
@@ -156,7 +156,7 @@ pub struct Library {
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
   pub define_group: GroupSet<DefineGroup>,
-  /// ```
+  /// ``` liberty
   /// library_features (value_1, value_2, ..., value_n) ;
   /// ```
   /// <a name ="reference_link" href="
@@ -491,6 +491,7 @@ pub struct Library {
 impl GroupFn for Library {}
 
 impl Display for Library {
+  /// Demo
   /// ```
   /// use liberty_db::library::Library;
   /// use std::{
@@ -498,8 +499,8 @@ impl Display for Library {
   /// io::{BufWriter, Write},
   /// path::Path};
   /// let library  = Library::default();
-  /// let mut writer = BufWriter::new(File::create(Path::new("out.lib"))?);
-  /// write!(&mut writer, "{}", library)?;
+  /// let mut writer = BufWriter::new(File::create(Path::new("out.lib")).unwrap());
+  /// write!(&mut writer, "{}", library).unwrap();
   /// ```
   /// Format [Library] struct as `.lib` file
   #[inline]
