@@ -1,7 +1,9 @@
 use std::{hash::Hash, str::FromStr, sync::Arc};
 
+use itertools::Itertools;
+
 use crate::{
-  ast::{GroupComments, GroupFn, SimpleAttri},
+  ast::{AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri, SimpleWrapper},
   common::items::WordSet,
   expression::IdBooleanExpression,
   timing::items::Mode,
@@ -62,7 +64,10 @@ impl GroupFn for LeakagePower {}
 pub struct Statetable {
   #[id]
   #[liberty(name)]
-  pub name: [String; 2],
+  pub input_nodes: Vec<String>,
+  #[id]
+  #[liberty(name)]
+  pub internal_nodes: Vec<String>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -74,11 +79,40 @@ pub struct Statetable {
 }
 impl GroupFn for Statetable {}
 
-#[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
-pub struct StatetableId {
-  pub input_npde: Vec<String>,
-  pub internal_node: Vec<String>,
+impl NamedGroup for Statetable {
+  #[inline]
+  fn parse(mut v: Vec<String>) -> Result<Self::Name, crate::ast::IdError> {
+    let l = v.len();
+    if l != 2 {
+      return Err(crate::ast::IdError::LengthDismatch(2, l, v));
+    }
+    if let Some(var2) = v.pop() {
+      if let Some(var1) = v.pop() {
+        Ok(Self::Name {
+          input_nodes: var1.split_ascii_whitespace().map(ToString::to_string).collect(),
+          internal_nodes: var2
+            .split_ascii_whitespace()
+            .map(ToString::to_string)
+            .collect(),
+        })
+      } else {
+        Err(crate::ast::IdError::Other("Unkown pop error".into()))
+      }
+    } else {
+      Err(crate::ast::IdError::Other("Unkown pop error".into()))
+    }
+  }
+  #[inline]
+  fn name2vec(name: Self::Name) -> Vec<String> {
+    vec![name.input_nodes.join(" "), name.internal_nodes.join(" ")]
+  }
 }
+
+// #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
+// pub struct StatetableId {
+//   pub input_npde: Vec<String>,
+//   pub internal_node: Vec<String>,
+// }
 
 #[derive(Default, Debug, Clone)]
 pub struct Table {
@@ -117,13 +151,14 @@ impl FromStr for Table {
   }
 }
 
-impl crate::ast::SimpleAttri for Table {
+impl SimpleAttri for Table {
+  #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     line_num: &mut usize,
   ) -> nom::IResult<
     &'a str,
-    Result<Self, (Self::Err, crate::ast::AttriValue)>,
+    Result<Self, (Self::Err, AttriValue)>,
     nom::error::Error<&'a str>,
   > {
     let (input, simple_multi) = crate::ast::parser::simple_multi(i, line_num)?;
@@ -133,6 +168,10 @@ impl crate::ast::SimpleAttri for Table {
         Ok((input, Err((e, crate::ast::AttriValue::Simple(simple_multi.to_string())))))
       }
     }
+  }
+  #[inline]
+  fn to_wrapper(&self) -> SimpleWrapper {
+    self.v.join(" ,\\\n")
   }
 }
 
