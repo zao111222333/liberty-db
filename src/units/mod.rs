@@ -410,6 +410,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
 /// This attribute indicates the units of the power values
 /// in the library. If this attribute is missing, the
 /// leakage-power values are expressed without units.
+///
 /// Valid values are 1W, 100mW, 10mW, 1mW, 100nW, 10nW, 1nW, 100pW, 10pW, and 1pW.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.22&end=44.31

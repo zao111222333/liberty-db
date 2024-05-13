@@ -204,6 +204,25 @@ impl ComplexAttri for Vec<NotNan<f64>> {
     }
   }
 }
+
+impl ComplexAttri for String {
+  #[inline]
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.into_iter();
+    let v1: String = match i.next() {
+      Some(s) => s.to_owned(),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if let Some(_) = i.next() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok(v1)
+  }
+  #[inline]
+  fn to_wrapper(&self) -> ComplexWrapper {
+    vec![vec![self.to_string()]]
+  }
+}
 impl ComplexAttri for NotNan<f64> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
@@ -226,6 +245,16 @@ impl ComplexAttri for NotNan<f64> {
     vec![vec![buffer.format(self.into_inner()).to_string()]]
   }
 }
+impl ComplexAttri for Vec<String> {
+  #[inline]
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    Ok(v.into_iter().map(ToString::to_string).collect())
+  }
+  #[inline]
+  fn to_wrapper(&self) -> ComplexWrapper {
+    vec![self.clone()]
+  }
+}
 impl ComplexAttri for Vec<usize> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
@@ -241,6 +270,51 @@ impl ComplexAttri for Vec<usize> {
   }
 }
 
+impl ComplexAttri for (f64, f64, String) {
+  #[inline]
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.into_iter();
+    let v1: f64 = match i.next() {
+      Some(s) => match s.parse() {
+        Ok(f) => f,
+        Err(e) => {
+          return Err(ComplexParseError::Float(
+            ordered_float::ParseNotNanError::ParseFloatError(e),
+          ))
+        }
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let v2: f64 = match i.next() {
+      Some(s) => match s.parse() {
+        Ok(f) => f,
+        Err(e) => {
+          return Err(ComplexParseError::Float(
+            ordered_float::ParseNotNanError::ParseFloatError(e),
+          ))
+        }
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let v3: String = match i.next() {
+      Some(s) => s.to_owned(),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if let Some(_) = i.next() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok((v1, v2, v3))
+  }
+  #[inline]
+  fn to_wrapper(&self) -> ComplexWrapper {
+    let mut buffer = ryu::Buffer::new();
+    vec![vec![
+      buffer.format(self.0).to_owned(),
+      buffer.format(self.1).to_owned(),
+      self.2.clone(),
+    ]]
+  }
+}
 impl ComplexAttri for (usize, String) {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {

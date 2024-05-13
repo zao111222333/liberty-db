@@ -15,8 +15,10 @@ use crate::{
   macro(derive(Debug, Clone,Default);)
 )]
 pub struct InternalPower {
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   // NOTICE: Simple Attributes

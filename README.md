@@ -44,17 +44,17 @@ cargo test --package liberty-tests --lib -- parser_bench::test_all_lib_files --e
 | <span style="color:#4CBB17">**13.69ms**</span>    | <span style="color:#4CBB17">**6.76ms**</span>     | <span style="color:#FF3131">**FAIL**</span>         | [`tests/tech/sky130/sky130_fd_sc_hs__bufinv_8__tt_1p80V_25C_ccsnoise.cell.lib`](tests/tech/sky130/sky130_fd_sc_hs__bufinv_8__tt_1p80V_25C_ccsnoise.cell.lib) |
 | <span style="color:#4CBB17">**2.13s**</span>      | <span style="color:#4CBB17">**870.17ms**</span>   | <span style="color:#4CBB17">**2.85s**</span>        | [`tests/tech/nangate/NangateOpenCellLibrary_typical.lib`](tests/tech/nangate/NangateOpenCellLibrary_typical.lib)                       |
 
-## ToDo List
+## TODO List
 
 + remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter
 + merge fields of `timing` at parse phase
-+ mut function for `ImmutIdXxx`'s `_comments` `_undefined` fields, reference to 
 ```
 impl __timing::ImmutIdTiming { xxx }
 ```
 + use PDFJS
 + stream input
 + Linked Group
++ Timing group
 + ~~fix missing newline at endding~~
 + ~~recursive parse boolean expression~~
 + ~~macros~~

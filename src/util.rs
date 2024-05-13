@@ -25,11 +25,3 @@ pub(crate) mod format {
       .build();
   }
 }
-
-pub(crate) mod misc {
-  pub(crate) fn argsort<T: Ord>(data: &[T]) -> Vec<usize> {
-    let mut indices = (0..data.len()).collect::<Vec<_>>();
-    indices.sort_by_key(|&i| &data[i]);
-    indices
-  }
-}

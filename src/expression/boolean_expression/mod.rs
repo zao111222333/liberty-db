@@ -119,6 +119,8 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {}
 
 #[derive(Debug, Clone)]
 pub struct IdBooleanExpression {
+  /// sorted_nodes
+  pub sorted_nodes: Vec<String>,
   /// BooleanExpression itself
   pub expr: Expr,
   /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
@@ -146,24 +148,38 @@ impl From<Expr> for IdBooleanExpression {
 impl PartialEq for IdBooleanExpression {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
-    self.bdd == other.bdd
+    self.sorted_nodes == other.sorted_nodes && self.bdd == other.bdd
   }
 }
 impl Eq for IdBooleanExpression {}
 impl PartialOrd for IdBooleanExpression {
+  #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-    self.bdd.partial_cmp(&other.bdd)
+    // TODO: bdd compare
+    self.sorted_nodes.partial_cmp(&other.sorted_nodes)
+    // match self.sorted_nodes.partial_cmp(&other.sorted_nodes) {
+    //   Some(ord) => Some(ord),
+    //   None => self.bdd.partial_cmp(&other.bdd),
+    // }
   }
 }
 impl Ord for IdBooleanExpression {
+  #[inline]
   fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-    self.bdd.cmp(&other.bdd)
+    // TODO: bdd compare
+    self.sorted_nodes.cmp(&other.sorted_nodes)
+    // match self.sorted_nodes.cmp(&other.sorted_nodes) {
+    //   std::cmp::Ordering::Equal => self.bdd.cmp(&other.bdd),
+    //   std::cmp::Ordering::Less => std::cmp::Ordering::Less,
+    //   std::cmp::Ordering::Greater => std::cmp::Ordering::Greater,
+    // }
   }
 }
 
 impl std::hash::Hash for IdBooleanExpression {
   #[inline]
   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+    self.sorted_nodes.hash(state);
     self.bdd.hash(state);
   }
 }
@@ -172,13 +188,18 @@ impl From<BooleanExpression> for IdBooleanExpression {
   #[inline]
   fn from(value: BooleanExpression) -> Self {
     let mut builder = BddVariableSetBuilder::new();
-    let node_set = &value.get_nodes();
-    for s in node_set.into_iter().sorted() {
-      let _ = builder.make_variable(s.as_str());
-    }
+    let node_set = value.get_nodes();
+    let sorted_nodes = node_set
+      .into_iter()
+      .sorted()
+      .map(|s| {
+        let _ = builder.make_variable(s.as_str());
+        s
+      })
+      .collect();
     let variables = builder.build();
     let bdd = variables.eval_expression(&value.expr);
-    Self { expr: value.expr, bdd }
+    Self { sorted_nodes, expr: value.expr, bdd }
   }
 }
 
@@ -332,6 +353,7 @@ mod test {
       (true, "B*D+B*C+A*D+A*C", "(A+B)*(C+D)"),
       (false, "A+B^C", "A^B+C"),
       (true, "(A+B)+C", "A+(B+C)"),
+      (false, "A+B+C", "A+B+D"),
       (true, "1A", "1"),
       (true, "1A+B", "1+B"),
     ] {

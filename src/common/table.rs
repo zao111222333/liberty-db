@@ -15,8 +15,10 @@ pub struct TableLookUpMultiSegment {
   #[liberty(name)]
   #[id]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(simple)]
@@ -43,12 +45,27 @@ pub struct TableLookUpMultiSegment {
 pub struct DriverWaveform {
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  pub name: Option<String>,
+  /// The `driver_waveform_name`  string attribute differentiates the driver waveform table
+  /// from other driver waveform tables when multiple tables are defined.
+  /// The cell-specific, rise-specific, and fall-specific driver waveform usage modeling
+  /// depend on this attribute.
+  ///
+  /// The `driver_waveform_name`  attribute is optional.
+  /// You can define a driver waveform table without the attribute, but there can be only one table in a library,
+  /// and that table is regarded as the default driver waveform table for all cells in the library.
+  /// If more than one table is defined without the attribute, the last table is used.
+  /// The other tables are ignored and not stored in the library database file.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=71.24&end=71.31
+  /// ">Reference</a>
   #[id]
   #[liberty(simple(type=Option))]
-  driver_waveform_name: Option<String>,
+  pub driver_waveform_name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(complex)]
@@ -74,8 +91,10 @@ pub struct TableLookUp2D {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(complex)]
@@ -97,8 +116,10 @@ pub struct Vector3D {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[id]
@@ -124,8 +145,10 @@ pub struct ReferenceTimeVector3D {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[id]
@@ -154,8 +177,10 @@ pub struct Vector4D {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[id]
@@ -183,8 +208,10 @@ pub struct Vector3DGrpup {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(group(type = Set))]
@@ -201,8 +228,10 @@ pub struct ReferenceTimeVector3DGrpup {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(group(type = Set))]
@@ -219,8 +248,10 @@ pub struct Vector4DGrpup {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(group(type = Set))]
@@ -242,8 +273,10 @@ pub struct TableLookUp3D {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(complex)]
@@ -268,8 +301,10 @@ pub struct TableLookUp1D {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(complex)]
@@ -291,8 +326,10 @@ pub struct TableLookUp {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(complex)]
@@ -383,8 +420,10 @@ pub struct TableTemple {
   #[id]
   #[liberty(name)]
   pub name: String,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(simple(type=Option))]
@@ -551,6 +590,7 @@ impl std::str::FromStr for Variable {
         Variable::Length(LengthVariable::RelatedOutOutputNetLength)
       }
       "fanout_number" => Variable::Scalar(ScalarVariable::FanoutNumber),
+      "normalized_voltage" => Variable::Scalar(ScalarVariable::NormalizedVoltage),
       "rc_product" => Variable::RcProduct,
       _ => {
         return Err(strum::ParseError::VariantNotFound);
@@ -675,4 +715,15 @@ pub enum ScalarVariable {
   /// fanout_number
   #[strum(serialize = "fanout_number")]
   FanoutNumber,
+  /// The `normalized_voltage`  variable is specified under the
+  /// `lu_table_template`  table to describe a collection of waveforms under
+  /// various input slew values.
+  /// For a given input slew in `index_1`  (for example, index_1[0] = 1.0 ns),
+  /// the `index_2`  values are a set of points that represent how the voltage rises from 0 to VDD in a rise arc,
+  /// or from VDD to 0 in a fall arc.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=65.38&end=65.41
+  /// ">Reference-Definition</a>
+  #[strum(serialize = "normalized_voltage")]
+  NormalizedVoltage,
 }

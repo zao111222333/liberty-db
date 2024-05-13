@@ -143,7 +143,7 @@ fn group_field_fn(
             if let Some(_) = res.#field_name.replace(
               complex,
             ){
-              let e = crate::ast::IdError::RepeatIdx;
+              let e = crate::ast::IdError::RepeatAttri;
               println!("Line={}, error={}",line_num,e);
             }
           },
@@ -193,7 +193,7 @@ fn group_field_fn(
         (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
         match group_res{
           Ok(group) => {
-            if let Some(_) = res.#field_name.replace(
+            if let Some(old) = res.#field_name.replace(
               group,
             ){
               let e = crate::ast::IdError::RepeatIdx;
@@ -223,7 +223,7 @@ fn group_field_fn(
         match group_res{
           Ok(group) => {
             if let Some(old) = res.#field_name{
-              let e = crate::ast::IdError::RepeatIdx;
+              let e = crate::ast::IdError::RepeatAttri;
               println!("Line={}, error={}",line_num,e);
             }
             res.#field_name = Some(group);
@@ -366,6 +366,7 @@ pub(crate) fn inner(
           },
           quote!(),
           quote! {
+            #[doc(hidden)]
             impl crate::ast::NamedGroup for #ident {
               #[inline]
               fn parse(v: Vec<String>) -> Result<Self::Name, crate::ast::IdError>{
@@ -432,6 +433,7 @@ pub(crate) fn inner(
         pub #comments_undefined_end: crate::ast::AttriComment,
         #attri_comments
       }
+      #[doc(hidden)]
       impl crate::ast::GroupAttri for #ident {
         type Name=#name_ident;
         type Comments=#comments_ident;
@@ -441,12 +443,12 @@ pub(crate) fn inner(
           use itertools::Itertools;
           #write_title
           f.indent(1);
+          #write_fields
           if !self.#undefined_name.is_empty(){
             <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_bgn, "", f)?;
             crate::ast::liberty_attr_list(&self.#undefined_name,f)?;
             <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_end, "", f)?;
           }
-          #write_fields
           f.dedent(1);
           write!(f, "\n}}")
         }
@@ -509,9 +511,11 @@ fn main() {
   let input = r#"
   #[derive(liberty_macros::Group)]
   struct Timing {
-    #[liberty(undefined)]
+    /// group undefined attributes
+  #[liberty(undefined)]
     pub undefined: AttributeList,
-    #[liberty(comments)]
+    /// group comments
+  #[liberty(comments)]
     pub comments: GroupComments<Self>,
     #[liberty(complex)]
     values: Vec<f64>,

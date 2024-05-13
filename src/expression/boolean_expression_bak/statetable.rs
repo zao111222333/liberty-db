@@ -17,8 +17,10 @@ use super::logic;
 pub struct Statetable {
   #[liberty(id)]
   _id: GroupId<Self>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
   #[liberty(simple)]

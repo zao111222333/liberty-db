@@ -9,13 +9,10 @@ use itertools::Itertools;
 use nom::{error::Error, IResult};
 use ordered_float::ParseNotNanError;
 use std::{
-  cell::RefCell,
-  collections::HashMap,
+  // cell::RefCell,
+  // sync::Arc,
   fmt::{Debug, Display, Write},
-  hash::Hash,
-  ops::{Deref, DerefMut},
   str::FromStr,
-  sync::Arc,
 };
 /// Wrapper for simple attribute
 pub type SimpleWrapper = String;
@@ -128,6 +125,7 @@ pub trait SimpleAttri: Sized + Display + FromStr {
   fn to_wrapper(&self) -> SimpleWrapper {
     format!("{self}")
   }
+  /// fmt_liberty
   #[inline]
   fn fmt_liberty<T: Write>(
     &self,
@@ -138,10 +136,9 @@ pub trait SimpleAttri: Sized + Display + FromStr {
   }
 }
 
+/// ComplexParseError
 #[derive(thiserror::Error, Debug)]
 pub enum ComplexParseError {
-  // #[error("{0}")]
-  // Float(std::num::ParseFloatError),
   #[error("{0}")]
   Float(ParseNotNanError<std::num::ParseFloatError>),
   #[error("{0}")]
@@ -227,6 +224,9 @@ pub enum IdError {
   /// replace same id
   #[error("replace same id")]
   RepeatIdx,
+  /// replace same attribute
+  #[error("replace same attribute")]
+  RepeatAttri,
   /// Int Error
   #[error("{0}")]
   Int(std::num::ParseIntError),

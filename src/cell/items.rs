@@ -24,8 +24,10 @@ pub struct LeakagePower {
   #[id]
   #[liberty(name)]
   name: Vec<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
   #[id]
@@ -61,8 +63,10 @@ pub struct Statetable {
   #[id]
   #[liberty(name)]
   pub name: [String; 2],
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
   #[liberty(simple)]
@@ -165,8 +169,10 @@ pub struct PgPin {
   #[liberty(name)]
   #[id]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
   /// Use the `voltage_name`  attribute to specify an associated voltage.

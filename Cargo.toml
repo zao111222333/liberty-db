@@ -1,10 +1,10 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # cargo publish --allow-dirty --registry crates-io -p liberty-db
 [workspace]
-members = ["macros","tests"]
+members = ["macros", "tests"]
 
 [workspace.package]
-version = "0.4.6"
+version = "0.4.7"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -43,26 +43,25 @@ default = []
 
 [dependencies]
 # liberty-macros = "0.4.4"
-liberty-macros = {path = "macros" }
+liberty-macros = { path = "macros" }
 log = { version = "0.4", features = ["std", "serde"] }
 ordered-float = { version = "4.0", default-features = false }
 nom = "7.1"
-thiserror = "1.0.40"
+thiserror = "1.0"
 lazy_static = "1.4.0"
 strum = "0.24"
 strum_macros = "0.24"
 enum_dispatch = "0.3.11"
-float-cmp = "0.9.0"
 derivative = "2.2.0"
 prettytable-rs = "^0.10"
 itertools = "0.10.5"
-ryu = "1.0.13"
+ryu = "1.0"
 itoa = "1.0"
-uom = { version = "0.34.0", default-features = false, features = ["autoconvert","f64","si", "std",] }
-# biodivine-lib-bdd = "0.5.13"
-biodivine-lib-bdd = {path = "../../biodivine-lib-bdd"}
-mut_set = "0.3.3"
-mut_set_derive = "0.3.3"
+uom = { version = "0.36.0", default-features = false, features = ["f64","si", "std","serde"] }
+biodivine-lib-bdd = "0.5"
+# biodivine-lib-bdd = {path = "../../biodivine-lib-bdd"}
+mut_set = "0.3.4"
+mut_set_derive = "0.3.4"
 # mut_set = {path = "../mut_set"}
 # mut_set_derive = {path = "../mut_set/derive"}
 duplicate = "1.0.0"

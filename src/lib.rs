@@ -103,8 +103,6 @@ pub use library::Library;
 /// `pin` group structure.
 pub mod pin;
 pub use pin::Pin;
-/// `table` group structure.
-pub mod table;
 /// `timing` group structure.
 pub mod timing;
 /// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units

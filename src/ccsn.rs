@@ -10,7 +10,6 @@ use crate::{
   timing::items::Mode,
   GroupSet,
 };
-use std::{fmt::Display, str::FromStr};
 
 /// Use the `ccsn_first_stage` group to specify CCS noise for the first stage of the channel-
 /// connected block (CCB).
@@ -43,8 +42,10 @@ pub struct CCSNStage {
   #[liberty(name)]
   #[id]
   pub name: Vec<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(simple(type = Option))]
@@ -258,8 +259,10 @@ pub struct ReceiverCapacitance {
   #[id]
   #[liberty(name)]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[id]

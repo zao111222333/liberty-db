@@ -429,7 +429,7 @@ fn main() {
   let input = r#"
 #[derive(liberty_macros::Group)]
 pub struct Foo {
-    #[liberty(undefined)]
+  #[liberty(undefined)]
     undefined: bool,
     #[liberty(id(title=2))]
     id_2: bool,

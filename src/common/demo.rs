@@ -10,8 +10,10 @@ use crate::{
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct Timing {
+  /// group undefined attributes
   #[liberty(undefined)]
   undefined: AttributeList,
+  /// group comments
   #[liberty(comments)]
   comments: GroupComments<Self>,
   #[liberty(complex)]
@@ -32,8 +34,10 @@ pub(crate) struct Pin {
   #[id]
   #[liberty(name)]
   name: String,
+  /// group comments
   #[liberty(comments)]
   comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   undefined: AttributeList,
   #[liberty(group(type=Vec))]
@@ -44,7 +48,7 @@ impl GroupFn for Pin {}
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct FF {
   #[id]
@@ -53,8 +57,10 @@ pub(crate) struct FF {
   #[id]
   #[liberty(name)]
   var2: String,
+  /// group comments
   #[liberty(comments)]
   comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   undefined: AttributeList,
   #[liberty(simple(type = Option))]
@@ -89,8 +95,10 @@ impl NamedGroup for FF {
 pub(crate) struct Cell {
   #[liberty(name)]
   name: String,
+  /// group comments
   #[liberty(comments)]
   comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   undefined: AttributeList,
   #[liberty(simple(type = Option))]

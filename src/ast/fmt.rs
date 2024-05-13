@@ -1,4 +1,5 @@
 use std::fmt::Write;
+/// CodeFormatter with indent
 #[derive(Debug)]
 pub struct CodeFormatter<'a, F> {
   f: &'a mut F,
@@ -7,7 +8,8 @@ pub struct CodeFormatter<'a, F> {
   indentation: String,
 }
 
-impl<'a, F: Write> Write for CodeFormatter<'a, F> {
+impl<F: Write> Write for CodeFormatter<'_, F> {
+  #[inline]
   fn write_str(&mut self, s: &str) -> std::fmt::Result {
     write!(self.f, "{}", s.replace('\n', format!("\n{}", self.repeat).as_str()))
   }
@@ -16,6 +18,7 @@ impl<'a, F: Write> Write for CodeFormatter<'a, F> {
 impl<'a, T: Write> CodeFormatter<'a, T> {
   /// Wrap the formatter `f`, use `indentation` as base string indentation and return a new
   /// formatter that implements `std::fmt::Write` that can be used with the macro `write!()`
+  #[inline]
   pub fn new<S: Into<String>>(f: &'a mut T, indentation: S) -> Self {
     Self {
       f,
@@ -26,18 +29,21 @@ impl<'a, T: Write> CodeFormatter<'a, T> {
   }
 
   /// Set the indentation level to a specific value
+  #[inline]
   pub fn set_level(&mut self, level: usize) {
     self.level = level;
     self.repeat = self.indentation.repeat(self.level);
   }
 
   /// Increase the indentation level by `inc`
+  #[inline]
   pub fn indent(&mut self, inc: usize) {
     self.level = self.level.saturating_add(inc);
     self.repeat += &self.indentation.repeat(inc);
   }
 
   /// Decrease the indentation level by `inc`
+  #[inline]
   pub fn dedent(&mut self, inc: usize) {
     self.level = self.level.saturating_sub(inc);
     self.repeat = self.indentation.repeat(self.level);

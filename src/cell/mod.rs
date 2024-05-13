@@ -24,12 +24,20 @@ pub struct Cell {
   #[id]
   #[liberty(name)]
   pub name: String,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
+  #[liberty(simple(type = Option))]
+  pub driver_waveform_rise: Option<String>,
+  #[liberty(simple(type = Option))]
+  pub driver_waveform_fall: Option<String>,
+  #[liberty(simple(type = Option))]
+  pub cell_footprint: Option<String>,
   #[liberty(simple(type=Option))]
   pub cell_leakage_power: Option<f64>,
   #[liberty(group(type=Set))]

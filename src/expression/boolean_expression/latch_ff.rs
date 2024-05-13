@@ -47,8 +47,10 @@ pub struct FF {
   #[liberty(name)]
   #[id]
   pub variable2: String,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   /// The clear  attribute gives the active value for the clear input.
@@ -131,8 +133,10 @@ pub struct FFBank {
   /// bits
   #[liberty(name)]
   pub bits: usize,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   /// The clear  attribute gives the active value for the clear input.
@@ -211,8 +215,10 @@ pub struct Latch {
   #[id]
   #[liberty(name)]
   pub variable2: String,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   /// The clear  attribute gives the active value for the clear input.
@@ -294,8 +300,10 @@ pub struct LatchBank {
   /// bits
   #[liberty(name)]
   pub bits: usize,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
   /// The clear  attribute gives the active value for the clear input.

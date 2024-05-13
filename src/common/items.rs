@@ -134,8 +134,10 @@ pub struct Domain {
   #[liberty(name)]
   #[id]
   pub name: String,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
   pub group_name: String,
@@ -219,8 +221,10 @@ pub struct DummyGroup {
   #[liberty(name)]
   #[id]
   name: Option<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
 }

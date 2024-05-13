@@ -11,11 +11,8 @@ pub use timing_type::*;
 pub mod builder;
 pub mod impls;
 pub mod items;
-#[cfg(test)]
-mod test;
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
-  bus::Bus,
   common::{items::*, table::*},
   expression::{self, BooleanExpression, IdBooleanExpression},
   library::Sensitization,
@@ -55,8 +52,10 @@ use self::items::TimingSenseType;
 pub struct Timing {
   #[liberty(name)]
   pub name: Vec<String>,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
 
@@ -1429,6 +1428,7 @@ pub struct Timing {
   /// &end
   /// =204.9
   /// ">Reference-Instance</a>
+  // TODO:
   pub cell_degradation: HashMap<String, items::CellDegradation>,
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
   ///

@@ -42,10 +42,16 @@ pub struct Pin {
   #[id]
   #[liberty(name)]
   pub name: String,
+  /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
+  /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
+  #[liberty(simple(type = Option))]
+  pub driver_waveform_rise: Option<String>,
+  #[liberty(simple(type = Option))]
+  pub driver_waveform_fall: Option<String>,
   /// The `related_power_pin`  and `related_ground_pin`  attributes
   /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
   /// The `related_power_pin`  and `related_ground_pin` attributes are used
