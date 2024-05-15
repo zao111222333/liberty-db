@@ -14,6 +14,7 @@ use super::logic;
 /// </script>
 #[derive(Default, Debug)]
 #[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Statetable {
   #[liberty(id)]
   _id: GroupId<Self>,
@@ -36,6 +37,7 @@ pub struct Statetable {
 ///   internal_node = vec!["IQ"]
 /// ```
 #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct StatetableId {
   /// Input node names
   pub input_npde: Vec<String>,
@@ -79,6 +81,7 @@ impl crate::ast::HashedGroup for Statetable {
 }
 
 #[derive(Default, Debug)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Table {
   pub v: Vec<(InputNodeValue, CurrentInternalNodeValue, NextInternalNodeValue)>,
 }
@@ -99,6 +102,7 @@ impl std::fmt::Display for Table {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum InputNodeValue {
   /// Low
   #[strum(serialize = "L")]
@@ -139,6 +143,7 @@ pub enum InputNodeValue {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum CurrentInternalNodeValue {
   /// Low
   #[strum(serialize = "L")]
@@ -174,6 +179,7 @@ pub enum CurrentInternalNodeValue {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum NextInternalNodeValue {
   /// Low
   #[strum(serialize = "L")]

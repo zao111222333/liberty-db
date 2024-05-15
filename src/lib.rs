@@ -111,7 +111,8 @@ pub mod units;
 
 pub mod ast;
 
-mod ccsn;
+/// CCSN relative attributes
+pub mod ccsn;
 mod types;
 mod util;
 

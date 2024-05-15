@@ -34,6 +34,7 @@ impl std::fmt::Display for SubExpression {
 
 /// FunctionExpression is the basic expression
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct ConditionExpression {
   sub_expression_vec: Vec<SubExpression>,
   op1_vec: Vec<Option<logic::Operator1>>,

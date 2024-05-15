@@ -22,6 +22,7 @@ use crate::{
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct LeakagePower {
   #[id]
   #[liberty(name)]
@@ -61,6 +62,7 @@ impl GroupFn for LeakagePower {}
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Statetable {
   #[id]
   #[liberty(name)]
@@ -108,13 +110,9 @@ impl NamedGroup for Statetable {
   }
 }
 
-// #[derive(Debug, Default, Clone, Hash, Eq, PartialEq)]
-// pub struct StatetableId {
-//   pub input_npde: Vec<String>,
-//   pub internal_node: Vec<String>,
-// }
-
+/// StateTable Table
 #[derive(Default, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Table {
   pub v: Vec<String>,
 }
@@ -198,12 +196,16 @@ fn statetable_test() {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.3&end=209.6
 /// ">Reference-Definition</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
     sort,
     macro(derive(Debug, Clone,Default);)
   )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct PgPin {
   #[liberty(name)]
   #[id]
@@ -285,6 +287,7 @@ impl GroupFn for PgPin {}
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd, Default)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum PgType {
   /// primary_power
   #[strum(serialize = "primary_power")]

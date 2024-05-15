@@ -11,6 +11,7 @@ use uom::si::f64::Time;
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUpMultiSegment {
   #[liberty(name)]
   #[id]
@@ -42,6 +43,7 @@ pub struct TableLookUpMultiSegment {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct DriverWaveform {
   #[id]
   #[liberty(name)]
@@ -86,6 +88,7 @@ pub struct DriverWaveform {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp2D {
   // TODO: unit
   #[id]
@@ -111,6 +114,7 @@ pub struct TableLookUp2D {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector3D {
   // TODO: unit
   #[id]
@@ -140,6 +144,7 @@ pub struct Vector3D {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReferenceTimeVector3D {
   // TODO: unit
   #[id]
@@ -172,6 +177,7 @@ pub struct ReferenceTimeVector3D {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector4D {
   // TODO: unit
   #[id]
@@ -204,6 +210,7 @@ pub struct Vector4D {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector3DGrpup {
   #[id]
   #[liberty(name)]
@@ -224,6 +231,7 @@ pub struct Vector3DGrpup {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReferenceTimeVector3DGrpup {
   #[id]
   #[liberty(name)]
@@ -244,6 +252,7 @@ pub struct ReferenceTimeVector3DGrpup {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector4DGrpup {
   #[id]
   #[liberty(name)]
@@ -268,6 +277,7 @@ impl GroupFn for ReferenceTimeVector3DGrpup {}
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp3D {
   // TODO: unit
   #[id]
@@ -295,6 +305,7 @@ pub struct TableLookUp3D {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp1D {
   // TODO: unit
   unit: (),
@@ -320,6 +331,7 @@ impl GroupFn for TableLookUp1D {}
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp {
   // TODO: unit
   unit: (),
@@ -379,6 +391,7 @@ impl GroupFn for Vector3D {}
 impl GroupFn for Vector4D {}
 
 #[derive(Debug, Default, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Values {
   pub size1: usize,
   pub size2: usize,
@@ -416,6 +429,7 @@ impl ComplexAttri for Values {
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableTemple {
   #[id]
   #[liberty(name)]
@@ -536,6 +550,7 @@ impl GroupFn for TableTemple {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum Variable {
   Time(TimeVariable),
   Voltage(VoltageVariable),
@@ -617,6 +632,7 @@ impl std::fmt::Display for Variable {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimeVariable {
   /// input_transition_time
   #[strum(serialize = "input_transition_time")]
@@ -654,6 +670,7 @@ pub enum TimeVariable {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum VoltageVariable {
   /// input_voltage
   #[strum(serialize = "input_voltage")]
@@ -670,6 +687,7 @@ pub enum VoltageVariable {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum CapacitanceVariable {
   /// total_output_net_capacitance
   #[strum(serialize = "total_output_net_capacitance")]
@@ -698,6 +716,7 @@ pub enum CapacitanceVariable {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum LengthVariable {
   /// output_net_length
   #[strum(serialize = "output_net_length")]
@@ -711,6 +730,7 @@ pub enum LengthVariable {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum ScalarVariable {
   /// fanout_number
   #[strum(serialize = "fanout_number")]

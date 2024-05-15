@@ -2,12 +2,14 @@ use super::{logic, BooleanExpression, BooleanExpressionLike};
 use std::fmt;
 
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct LatchFfId {
   var_1: String,
   var_2: String,
 }
 
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Latch {
   name_pair: [String; 2],
   clock_on: BooleanExpression,
@@ -15,6 +17,7 @@ pub struct Latch {
 }
 
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct LatchExpression {
   pub latch: Box<Latch>,
   pub is_inverse: bool,

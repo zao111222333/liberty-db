@@ -1,5 +1,5 @@
 //!
-//!  This crate implement `liberty` data structre in Rust.
+//! `liberty` data structre ast
 //!
 
 mod fmt;
@@ -27,6 +27,7 @@ pub type ComplexWrapper = Vec<Vec<String>>;
 /// }
 /// ```
 #[derive(Debug, Clone, Default)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct GroupWrapper {
   /// title
   pub title: Vec<String>,
@@ -37,6 +38,7 @@ pub struct GroupWrapper {
 pub type AttributeList = Vec<(String, AttriValue)>;
 /// AttriValue for undefined_attribute/serialization
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum AttriValue {
   ///
   Simple(SimpleWrapper),
@@ -70,6 +72,7 @@ impl PartialEq for LinkError {
 
 // /// Reference: https://rustcc.cn/article?id=ac75148b-6eb0-4249-b36d-0a14875b736e
 // #[derive(Debug, Clone)]
+// #[derive(serde::Serialize, serde::Deserialize)]
 // pub struct LinkedGroup<LinkTo>
 // where
 //   LinkTo: HashedGroup + GroupAttri,

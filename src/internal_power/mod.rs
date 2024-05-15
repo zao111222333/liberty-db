@@ -14,6 +14,7 @@ use crate::{
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct InternalPower {
   /// group comments
   #[liberty(comments)]

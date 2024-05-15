@@ -7,6 +7,7 @@ use std::fmt;
 
 /// FunctionExpression is the basic expression
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct FunctionExpression {
   sub_expression_vec: Vec<BooleanExpression>,
   op1_vec: Vec<Option<logic::Operator1>>,

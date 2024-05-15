@@ -95,6 +95,7 @@ use strum_macros::{Display, EnumString};
 #[derive(
   Debug, Clone, Copy, PartialEq, Display, EnumString, Default, Hash, Eq, PartialOrd, Ord
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimingSenseType {
   /// Combines incoming `rise` delays with local `rise` delays
   /// and compares incoming `fall` delays with local `fall` delays.
@@ -213,6 +214,7 @@ pub type Mode = [String; 2];
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct CellDegradation {
   /// name
   #[id]

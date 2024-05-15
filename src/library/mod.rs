@@ -33,6 +33,7 @@ use std::{collections::HashMap, fmt::write};
         derivative(Default);),
   attr_filter(derivative;)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Library {
   /// library name
   #[id]

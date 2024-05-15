@@ -5,6 +5,7 @@ use std::{collections::HashMap, fmt};
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
 #[derive(Ord)]
 #[derive(PartialOrd)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Port {
   name: String,
 }

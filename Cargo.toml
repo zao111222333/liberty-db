@@ -9,7 +9,7 @@ license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
 keywords = [
-    "eda", 
+    "eda",
     "liberty",
     "database",
     "parser",
@@ -42,10 +42,11 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 default = []
 
 [dependencies]
-liberty-macros = "0.4.7"
-# liberty-macros = { path = "macros" }
+# liberty-macros = "0.4.7"
+liberty-macros = { path = "macros" }
 log = { version = "0.4", features = ["std", "serde"] }
-ordered-float = { version = "4.0", default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+ordered-float = { version = "4.0", features = ["serde"] }
 nom = "7.1"
 thiserror = "1.0"
 lazy_static = "1.4.0"
@@ -57,11 +58,11 @@ prettytable-rs = "^0.10"
 itertools = "0.10.5"
 ryu = "1.0"
 itoa = "1.0"
-uom = { version = "0.36.0", default-features = false, features = ["f64","si", "std","serde"] }
-biodivine-lib-bdd = "0.5"
-# biodivine-lib-bdd = {path = "../../biodivine-lib-bdd"}
-mut_set = "0.3.4"
-mut_set_derive = "0.3.4"
+uom = { version = "0.36.0", default-features = false, features = ["f64", "si", "std", "serde"] }
+# biodivine-lib-bdd = "0.5"
+biodivine-lib-bdd = {path = "../../biodivine-lib-bdd" , features = ["serde"]}
+mut_set = "0.3.5"
+mut_set_derive = "0.3.5"
 # mut_set = {path = "../mut_set"}
 # mut_set_derive = {path = "../mut_set/derive"}
 duplicate = "1.0.0"

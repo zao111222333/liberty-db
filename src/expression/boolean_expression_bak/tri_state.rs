@@ -2,6 +2,7 @@ use super::{logic, BooleanExpression, BooleanExpressionLike, BRACKET_L, BRACKET_
 use std::fmt;
 
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TriState {
   enable: Box<BooleanExpression>,
   logic: Box<BooleanExpression>,

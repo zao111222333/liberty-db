@@ -25,6 +25,7 @@ use crate::{
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Sensitization {
   /// name
   #[id]
@@ -37,7 +38,7 @@ pub struct Sensitization {
   #[liberty(undefined)]
   pub undefined: AttributeList,
   /// TODO
-  pub pin_names: Vec<<Pin as mut_set::Item>::Id>,
+  pub pin_names: Vec<String>,
   /// TODO
   #[liberty(complex)]
   pub vector: (usize, String),
@@ -55,6 +56,7 @@ impl GroupFn for Sensitization {}
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct VoltageMap {
   /// name
   #[id]
@@ -104,6 +106,7 @@ impl ComplexAttri for VoltageMap {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct InputVoltage {
   /// name
   #[id]
@@ -153,6 +156,7 @@ impl GroupFn for InputVoltage {}
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct OutputVoltage {
   /// name
   #[id]
@@ -203,6 +207,7 @@ impl GroupFn for OutputVoltage {}
 #[derive(Hash, PartialEq, Eq, Default)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum DelayModel {
   ///     table_lookup
   #[default]
@@ -227,6 +232,7 @@ impl SimpleAttri for DelayModel {}
         derivative(Default);),
   attr_filter(derivative;)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct OperatingConditions {
   /// name
   #[id]
@@ -300,6 +306,7 @@ impl GroupFn for OperatingConditions {}
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum TreeType {
   /// best_case_tree
   #[strum(serialize = "best_case_tree")]
@@ -335,6 +342,7 @@ impl SimpleAttri for TreeType {}
   sort,
   macro(derive(Debug, Clone);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Define {
   /// The name of the attribute you are creating.
   /// <a name ="reference_link" href="
@@ -362,6 +370,7 @@ pub struct Define {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum AttributeType {
   /// Boolean
   #[strum(serialize = "Boolean", serialize = "boolean")]
@@ -420,6 +429,7 @@ impl ComplexAttri for Define {
   sort,
   macro(derive(Debug, Clone);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefineCellArea {
   /// A name of a resource type.
   /// You can associate more than one `area_name` attribute with each of the predefined resource types.
@@ -456,6 +466,7 @@ pub struct DefineCellArea {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum ResourceType {
   /// pad_slots
   #[strum(serialize = "pad_slots")]
@@ -506,6 +517,7 @@ impl ComplexAttri for DefineCellArea {
   sort,
   macro(derive(Debug, Clone);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefineGroup {
   /// The name of the user-defined group.
   /// <a name ="reference_link" href="
@@ -553,6 +565,7 @@ impl ComplexAttri for DefineGroup {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct WireLoad {
   /// name
   #[id]
@@ -640,6 +653,7 @@ impl GroupFn for WireLoad {}
   sort,
   macro(derive(Debug, Clone, Default, Copy);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct FanoutLength {
   /// An integer representing the total number of pins, minus one, on the net driven by the given output
   /// <a name ="reference_link" href="
@@ -740,6 +754,7 @@ impl ComplexAttri for FanoutLength {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct WireLoadSection {
   /// name
   #[id]

@@ -101,6 +101,7 @@ use crate::{
 ///     </tbody>
 /// </table>
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum ArcCombinational {
   /// `combinational`(`Defualt`)/
   /// `combinational_rise`/
@@ -261,6 +262,7 @@ impl PartialEq for ArcCombinational {
 /// } /* end library */
 /// ```
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum ArcSequential {
   /// `rising_edge`/
   /// `falling_edge`
@@ -549,6 +551,7 @@ impl PartialEq for ArcSequential {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum ArcNonSequential {
   /// `non_seq_setup_rising`/
   /// `non_seq_setup_falling`
@@ -638,6 +641,7 @@ impl PartialEq for ArcNonSequential {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum ArcNoChange {
   /// `nochange_high_high`/
   /// `nochange_high_low`/
@@ -754,6 +758,7 @@ impl PartialEq for ArcNoChange {
 /// non_seq_hold_falling | nochange_high_high | nochange_high_low | nochange_low_high | nochange_low_low ;`
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 // #[derive(liberty_macros::SingleSimple)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimingType {
   /// [Combinational](crate::timing::ArcCombinational)
   Combinational(ArcCombinational),

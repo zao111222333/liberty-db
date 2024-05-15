@@ -165,6 +165,7 @@ pub(super) fn token_vec(i: &str) -> IResult<&str, Vec<Token>> {
 
 ///
 #[derive(Clone, Copy, Debug, thiserror::Error, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum BoolExprErr {
   ///
   #[error("Lexing parser, Nom error")]

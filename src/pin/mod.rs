@@ -37,6 +37,7 @@ pub use items::*;
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Pin {
   /// Name of the pin
   #[id]

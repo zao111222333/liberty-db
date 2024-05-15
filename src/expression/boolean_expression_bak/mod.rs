@@ -46,6 +46,7 @@ pub trait BooleanExpressionLike: Display + Debug + Clone {
 /// ">Reference</a>
 #[derive(Debug, Clone)]
 #[enum_dispatch]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum BooleanExpression {
   Port(Port),
   FF(FfExpression),

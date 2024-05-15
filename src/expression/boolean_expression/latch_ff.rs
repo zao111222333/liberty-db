@@ -18,6 +18,7 @@ use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct FF {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -101,6 +102,7 @@ pub struct FF {
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct FFBank {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -186,6 +188,7 @@ pub struct FFBank {
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Latch {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -268,6 +271,7 @@ pub struct Latch {
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct LatchBank {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -823,6 +827,7 @@ pub trait LatchFF: __LatchFF {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum ClearPresetState {
   /// 0
   #[strum(serialize = "L")]

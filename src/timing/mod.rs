@@ -49,6 +49,7 @@ use self::items::TimingSenseType;
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Timing {
   #[liberty(name)]
   pub name: Vec<String>,

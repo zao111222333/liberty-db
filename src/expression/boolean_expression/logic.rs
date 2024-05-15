@@ -22,6 +22,7 @@ pub trait LogicLike: std::fmt::Display + std::fmt::Debug {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum Level {
   /// High
   #[strum(serialize = "h", serialize = "1", serialize = "H")]
@@ -61,6 +62,7 @@ impl LogicLike for Level {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum Edge {
   /// Fall
   #[strum(serialize = "f", serialize = "F")]
@@ -98,6 +100,7 @@ impl LogicLike for Edge {
 /// State
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[derive(strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum IllegalType {
   HighImpedanceInput,
   NoIdea,
@@ -125,6 +128,7 @@ impl IllegalType {
 #[derive(strum_macros::EnumString, strum_macros::EnumIter)]
 #[derive(derivative::Derivative)]
 #[derivative(PartialEq, Hash, Eq)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum UnInit {
   /// Unknown
   #[strum(serialize = "x", serialize = "X")]
@@ -194,6 +198,7 @@ impl LogicLike for UnInit {
 }
 /// H L R F
 #[derive(Debug, Clone, Copy, PartialEq, Hash)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum Normal {
   /// R F
   Edge(Edge),
@@ -236,6 +241,7 @@ impl Normal {
 
 /// H L R F
 #[derive(Debug, Clone, Copy, PartialEq, Hash)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum Static {
   /// R F
   Edge(Edge),
@@ -267,6 +273,7 @@ impl Into<State> for Normal {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum State {
   /// X Z
   UnInit(UnInit),
@@ -438,6 +445,7 @@ impl State {
 #[derive(Debug, Clone)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector {
   value: Vec<State>,
 }
@@ -757,6 +765,7 @@ impl LogicLike for Vector {
 
 // /// Table
 // #[derive(Clone, Debug)]
+// #[derive(serde::Serialize, serde::Deserialize)]
 // pub struct Table {
 //   /// self_node
 //   pub self_node: String,
@@ -766,6 +775,7 @@ impl LogicLike for Vector {
 //   pub port_idx: Vec<Port>,
 // }
 // #[derive(Clone, Debug)]
+// #[derive(serde::Serialize, serde::Deserialize)]
 // pub struct NewTable {
 //   /// self_node
 //   pub self_node: String,
@@ -903,6 +913,7 @@ impl LogicLike for Vector {
 
 // /// Logic Searcher
 // #[derive(Debug, Clone)]
+// #[derive(serde::Serialize, serde::Deserialize)]
 // pub struct Searcher {
 //   include_port_state: HashMap<Port, HashSet<State>>,
 //   include_out_state: Option<HashSet<State>>,

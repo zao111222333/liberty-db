@@ -91,6 +91,7 @@ impl BooleanExpressionLike for IdBooleanExpression {}
 /// ```
 ///
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct BooleanExpression {
   /// BooleanExpression itself
   pub expr: Expr,
@@ -118,6 +119,7 @@ impl crate::ast::SimpleAttri for BooleanExpression {}
 impl crate::ast::SimpleAttri for IdBooleanExpression {}
 
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdBooleanExpression {
   /// sorted_nodes
   pub sorted_nodes: Vec<String>,

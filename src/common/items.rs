@@ -32,6 +32,7 @@ use crate::{
 /// ">Reference-Instance</a>
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Default)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct SdfExpression {
   inner: String,
 }
@@ -81,6 +82,7 @@ impl SimpleAttri for SdfExpression {}
 /// ">Reference-Instance</a>
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[derive(Default, EnumString, Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum SdfEdgeType {
   #[default]
   #[strum(serialize = "noedge")]
@@ -95,6 +97,7 @@ pub enum SdfEdgeType {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[derive(Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum VariableType {
   #[strum(serialize = "input_net_transition")]
   InputNetTransition,
@@ -130,6 +133,7 @@ pub enum VariableType {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Domain {
   #[liberty(name)]
   #[id]
@@ -152,6 +156,7 @@ pub struct Domain {
 impl GroupFn for Domain {}
 /// sth. like "A B C" will save as set{A B C}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct WordSet {
   pub inner: HashSet<String>,
 }
@@ -217,6 +222,7 @@ impl std::str::FromStr for WordSet {
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct DummyGroup {
   #[liberty(name)]
   #[id]

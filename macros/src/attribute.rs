@@ -428,6 +428,7 @@ fn main() {
   use syn::{parse_str, Data};
   let input = r#"
 #[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Foo {
   #[liberty(undefined)]
     undefined: bool,

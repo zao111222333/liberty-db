@@ -383,11 +383,12 @@ pub(crate) fn inner(
       _ => {
         let i = Ident::new(&format!("{}Name", ident), Span::call_site());
         let mut s: DeriveInput = parse_quote! {
-          #[doc(hidden)]
-          #[derive(Debug,Clone)]
-          pub struct #i{
-          }
-        };
+                  #[doc(hidden)]
+                  #[derive(Debug,Clone)]
+                  #[derive(serde::Serialize, serde::Deserialize)]
+        pub struct #i{
+                  }
+                };
         let s_fileds = fields_of_input(&mut s);
         let mut _name = quote!();
         let mut _set_name = quote!();
@@ -423,69 +424,70 @@ pub(crate) fn inner(
       }
     };
     let impl_group = quote! {
-      #named_group_impl
-      #name_sturct
-      #[doc(hidden)]
-      #[derive(Default,Debug,Clone)]
-      pub struct #comments_ident{
-        pub #comments_self: crate::ast::AttriComment,
-        pub #comments_undefined_bgn: crate::ast::AttriComment,
-        pub #comments_undefined_end: crate::ast::AttriComment,
-        #attri_comments
-      }
-      #[doc(hidden)]
-      impl crate::ast::GroupAttri for #ident {
-        type Name=#name_ident;
-        type Comments=#comments_ident;
-        #name_func
-        fn fmt_liberty<T: std::fmt::Write>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T>) -> std::fmt::Result {
-          use std::fmt::Write;
-          use itertools::Itertools;
-          #write_title
-          f.indent(1);
-          #write_fields
-          if !self.#undefined_name.is_empty(){
-            <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_bgn, "", f)?;
-            crate::ast::liberty_attr_list(&self.#undefined_name,f)?;
-            <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_end, "", f)?;
+          #named_group_impl
+          #name_sturct
+          #[doc(hidden)]
+          #[derive(Default,Debug,Clone)]
+          #[derive(serde::Serialize, serde::Deserialize)]
+    pub struct #comments_ident{
+            pub #comments_self: crate::ast::AttriComment,
+            pub #comments_undefined_bgn: crate::ast::AttriComment,
+            pub #comments_undefined_end: crate::ast::AttriComment,
+            #attri_comments
           }
-          f.dedent(1);
-          write!(f, "\n}}")
-        }
-        fn nom_parse<'a>(
-          i: &'a str, line_num: &mut usize
-        ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
-          let (mut input,title) = crate::ast::parser::title(i,line_num)?;
-          let mut res = Self::default();
-          res.#comments_name.#comments_undefined_bgn.push("Undefined attributes from here".to_string());
-          res.#comments_name.#comments_undefined_end.push("Undefined attributes end here".to_string());
-          loop {
-            match crate::ast::parser::key(input){
-              Err(nom::Err::Error(_)) => {
-                (input,_) = crate::ast::parser::end_group(input)?;
-                #link_self
-                #change_id_return
-              },
-              Err(e) => return Err(e),
-              Ok((_input,key)) => {
-                input = _input;
-                match key {
-                  #parser_arms
-                  _ => {
-                    let undefined: crate::ast::AttriValue;
-                    (input,undefined) = crate::ast::parser::undefine(input,line_num)?;
-                    res.#undefined_name.push((key.to_owned(), undefined));
-                    let n: usize;
-                    (input,n) = crate::ast::parser::comment_space_newline(input)?;
-                    *line_num+=n;
+          #[doc(hidden)]
+          impl crate::ast::GroupAttri for #ident {
+            type Name=#name_ident;
+            type Comments=#comments_ident;
+            #name_func
+            fn fmt_liberty<T: std::fmt::Write>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T>) -> std::fmt::Result {
+              use std::fmt::Write;
+              use itertools::Itertools;
+              #write_title
+              f.indent(1);
+              #write_fields
+              if !self.#undefined_name.is_empty(){
+                <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_bgn, "", f)?;
+                crate::ast::liberty_attr_list(&self.#undefined_name,f)?;
+                <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_end, "", f)?;
+              }
+              f.dedent(1);
+              write!(f, "\n}}")
+            }
+            fn nom_parse<'a>(
+              i: &'a str, line_num: &mut usize
+            ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
+              let (mut input,title) = crate::ast::parser::title(i,line_num)?;
+              let mut res = Self::default();
+              res.#comments_name.#comments_undefined_bgn.push("Undefined attributes from here".to_string());
+              res.#comments_name.#comments_undefined_end.push("Undefined attributes end here".to_string());
+              loop {
+                match crate::ast::parser::key(input){
+                  Err(nom::Err::Error(_)) => {
+                    (input,_) = crate::ast::parser::end_group(input)?;
+                    #link_self
+                    #change_id_return
                   },
+                  Err(e) => return Err(e),
+                  Ok((_input,key)) => {
+                    input = _input;
+                    match key {
+                      #parser_arms
+                      _ => {
+                        let undefined: crate::ast::AttriValue;
+                        (input,undefined) = crate::ast::parser::undefine(input,line_num)?;
+                        res.#undefined_name.push((key.to_owned(), undefined));
+                        let n: usize;
+                        (input,n) = crate::ast::parser::comment_space_newline(input)?;
+                        *line_num+=n;
+                      },
+                    }
+                  }
                 }
               }
             }
           }
-        }
-      }
-    };
+        };
     Ok(quote! {
       #impl_group
     })

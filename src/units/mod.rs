@@ -56,6 +56,7 @@ use std::ops::Deref;
 /// </script>
 #[derive(Debug, Default, Clone, Copy)]
 #[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimeUnit {
   /// 1ps, 1e-12
   #[strum(serialize = "1ps")]
@@ -120,6 +121,7 @@ impl SimpleAttri for TimeUnit {}
 /// </script>
 #[derive(Debug, Default, Clone, Copy)]
 #[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum VoltageUnit {
   /// 1mV, 1e-3
   #[strum(serialize = "1mV")]
@@ -185,6 +187,7 @@ impl SimpleAttri for VoltageUnit {}
 /// </script>
 #[derive(Debug, Clone, Copy)]
 #[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum CurrentUnit {
   /// 1uA, 1e-6
   #[strum(serialize = "1uA")]
@@ -276,6 +279,7 @@ impl SimpleAttri for CurrentUnit {}
 /// </script>
 #[derive(Debug, Clone, Copy)]
 #[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum PullingResistanceUnit {
   /// 1ohm, 1
   #[strum(serialize = "1ohm")]
@@ -341,6 +345,7 @@ impl SimpleAttri for PullingResistanceUnit {}
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Default, Clone, Copy)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct CapacitiveLoadUnit {
   ff_pf: bool,
   _v: Capacitance,
@@ -420,6 +425,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
 /// </script>
 #[derive(Debug, Clone, Copy, Default)]
 #[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum LeakagePowerUnit {
   /// No units
   #[strum(serialize = "")]

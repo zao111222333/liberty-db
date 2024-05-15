@@ -4,6 +4,7 @@ use strum_macros::{Display, EnumString};
 
 use crate::ast::SimpleAttri;
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum AntennaDiodeType {
   #[strum(serialize = "power")]
   Power,
@@ -14,6 +15,7 @@ pub enum AntennaDiodeType {
 }
 impl SimpleAttri for AntennaDiodeType {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum Direction {
   #[strum(serialize = "input")]
   Input,
@@ -27,6 +29,7 @@ pub enum Direction {
 impl SimpleAttri for Direction {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum DontFault {
   #[strum(serialize = "sa0")]
   Sa0,
@@ -37,6 +40,7 @@ pub enum DontFault {
 }
 impl SimpleAttri for DontFault {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum DriverType {
   #[strum(serialize = "pull_up")]
   PullUp,
@@ -57,6 +61,7 @@ pub enum DriverType {
 }
 impl SimpleAttri for DriverType {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum NextstateType {
   #[strum(serialize = "data")]
   Data,
@@ -74,6 +79,7 @@ pub enum NextstateType {
 impl SimpleAttri for NextstateType {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum PinFuncType {
   #[strum(serialize = "clock_enable")]
   ClockEnable,
@@ -88,6 +94,7 @@ pub enum PinFuncType {
 }
 impl SimpleAttri for PinFuncType {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum RestoreEdgeType {
   #[strum(serialize = "edge_trigger")]
   EdgeTrigger,
@@ -99,6 +106,7 @@ pub enum RestoreEdgeType {
 impl SimpleAttri for RestoreEdgeType {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum SignalType {
   #[strum(serialize = "test_scan_in")]
   TestScanIn,
@@ -124,6 +132,7 @@ pub enum SignalType {
 impl SimpleAttri for SignalType {}
 #[derive(Default)]
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum SlewControl {
   #[strum(serialize = "low")]
   Low,
@@ -151,6 +160,7 @@ impl SimpleAttri for SlewControl {}
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=267.24&end=267.26
 /// ">Reference-Instance</a>
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum PreferTied {
   /// 1
   #[strum(serialize = "1")]
@@ -161,6 +171,7 @@ pub enum PreferTied {
 }
 impl SimpleAttri for PreferTied {}
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
 enum OneValue {
   #[strum(serialize = "1")]
   One,
@@ -181,6 +192,7 @@ enum OneValue {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=248.6&end=248.13
 /// ">Reference-Instance</a>
 #[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct TwoValue(OneValue, OneValue);
 impl SimpleAttri for TwoValue {}
 impl std::fmt::Display for TwoValue {

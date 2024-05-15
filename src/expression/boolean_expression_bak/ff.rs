@@ -2,6 +2,7 @@ use super::{logic, BooleanExpression, BooleanExpressionLike, FunctionExpression}
 use std::fmt;
 
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Ff {
   name_pair: [String; 2],
   clock_on: FunctionExpression,
@@ -9,6 +10,7 @@ pub struct Ff {
 }
 
 #[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct FfExpression {
   pub ff: Box<Ff>,
   pub is_inverse: bool,
