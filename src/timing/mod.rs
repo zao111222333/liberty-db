@@ -13,6 +13,7 @@ pub mod impls;
 pub mod items;
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
+  ccsn::PropagatingCcb,
   common::{items::*, table::*},
   expression::{self, BooleanExpression, IdBooleanExpression},
   library::Sensitization,
@@ -1327,7 +1328,7 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   pub fall_delay_intercept: Option<(i64, f64)>,
   #[liberty(complex(type=Option))]
-  pub propagating_ccb: Option<[String; 2]>,
+  pub propagating_ccb: Option<PropagatingCcb>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html

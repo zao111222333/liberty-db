@@ -2,7 +2,9 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 use crate::{
-  ast::{AttributeList, GroupComments, GroupFn, SimpleAttri},
+  ast::{
+    AttributeList, ComplexAttri, ComplexParseError, GroupComments, GroupFn, SimpleAttri,
+  },
   common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
   },
@@ -291,6 +293,51 @@ pub struct ReceiverCapacitance {
   pub receiver_capacitance2_rise: Option<TableLookUp>,
 }
 impl GroupFn for ReceiverCapacitance {}
+
+/// The `propagating_ccb`  attribute lists all the channel-connected block noise groups that propagate
+/// the noise to the output pin in a particular timing arc.
+///
+/// In the list, the first name is the `input_ccb`  group of the input pin (specified by the `related_pin`  attribute in the timing  group).
+/// The second name, **if present**, is for the `output_ccb`  group of the output pin
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.33+340.2&end=339.34+340.4
+/// ">Reference</a>
+#[derive(Debug, Clone, Default)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PropagatingCcb {
+  /// input_ccb_name
+  pub input_ccb_name: String,
+  /// output_ccb_name
+  pub output_ccb_name: Option<String>,
+}
+
+impl ComplexAttri for PropagatingCcb {
+  #[inline]
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.into_iter();
+    let input_ccb_name = match i.next() {
+      Some(s) => s.to_owned(),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let output_ccb_name = match i.next() {
+      Some(s) => Some(s.to_owned()),
+      None => None,
+    };
+    if let Some(_) = i.next() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok(Self { input_ccb_name, output_ccb_name })
+  }
+  #[inline]
+  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+    match &self.output_ccb_name {
+      Some(output_ccb_name) => {
+        vec![vec![self.input_ccb_name.clone(), output_ccb_name.clone()]]
+      }
+      None => vec![vec![self.input_ccb_name.clone()]],
+    }
+  }
+}
 
 #[test]
 fn parse_file() -> anyhow::Result<()> {
