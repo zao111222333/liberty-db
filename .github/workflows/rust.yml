@@ -18,5 +18,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose
-    - name: Run tests
+    - name: Run tests1
       run: cargo test --verbose
+    - name: Run tests2
+      run: cargo test --verbose --package liberty-tests
