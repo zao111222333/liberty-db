@@ -1,10 +1,8 @@
 use crate::{
   ast::{AttributeList, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
-  GroupSet,
+  FastStr, GroupSet,
 };
 use ordered_float::NotNan;
-use uom::si::f64::Time;
-
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
@@ -15,7 +13,7 @@ use uom::si::f64::Time;
 pub struct TableLookUpMultiSegment {
   #[liberty(name)]
   #[id]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -47,7 +45,7 @@ pub struct TableLookUpMultiSegment {
 pub struct DriverWaveform {
   #[id]
   #[liberty(name)]
-  pub name: Option<String>,
+  pub name: Option<FastStr>,
   /// The `driver_waveform_name`  string attribute differentiates the driver waveform table
   /// from other driver waveform tables when multiple tables are defined.
   /// The cell-specific, rise-specific, and fall-specific driver waveform usage modeling
@@ -63,7 +61,7 @@ pub struct DriverWaveform {
   /// ">Reference</a>
   #[id]
   #[liberty(simple(type=Option))]
-  pub driver_waveform_name: Option<String>,
+  pub driver_waveform_name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -93,7 +91,7 @@ pub struct TableLookUp2D {
   // TODO: unit
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -119,7 +117,7 @@ pub struct Vector3D {
   // TODO: unit
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -149,7 +147,7 @@ pub struct ReferenceTimeVector3D {
   // TODO: unit
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -182,7 +180,7 @@ pub struct Vector4D {
   // TODO: unit
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -214,7 +212,7 @@ pub struct Vector4D {
 pub struct Vector3DGrpup {
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -235,7 +233,7 @@ pub struct Vector3DGrpup {
 pub struct ReferenceTimeVector3DGrpup {
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -256,7 +254,7 @@ pub struct ReferenceTimeVector3DGrpup {
 pub struct Vector4DGrpup {
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -282,7 +280,7 @@ pub struct TableLookUp3D {
   // TODO: unit
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -311,7 +309,7 @@ pub struct TableLookUp1D {
   unit: (),
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -337,7 +335,7 @@ pub struct TableLookUp {
   unit: (),
   #[id]
   #[liberty(name)]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -417,7 +415,8 @@ impl ComplexAttri for Values {
         vec![itertools::Itertools::join(
           &mut v.iter().map(|f| buffer.format(f.into_inner()).to_string()),
           ", ",
-        )]
+        )
+        .into()]
       })
       .collect()
   }
@@ -433,7 +432,7 @@ impl ComplexAttri for Values {
 pub struct TableTemple {
   #[id]
   #[liberty(name)]
-  pub name: String,
+  pub name: FastStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,

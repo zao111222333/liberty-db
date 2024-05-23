@@ -11,16 +11,16 @@ use biodivine_lib_bdd::{
 };
 
 mod parser;
+use crate::FastStr;
 use itertools::Itertools;
 use parser::BoolExprErr;
-
 lazy_static! {
   static ref UNKNOWN: Box<Expr> = Box::new(Expr::Variable("_unknown_".to_owned()));
 }
 
 pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
   #[inline]
-  fn get_nodes(&self) -> HashSet<String> {
+  fn get_nodes(&self) -> HashSet<FastStr> {
     let mut node_set = HashSet::new();
     _get_nodes(&self.borrow(), &mut node_set);
     return node_set;
@@ -122,7 +122,7 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdBooleanExpression {
   /// sorted_nodes
-  pub sorted_nodes: Vec<String>,
+  pub sorted_nodes: Vec<FastStr>,
   /// BooleanExpression itself
   pub expr: Expr,
   /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
@@ -229,13 +229,13 @@ impl std::fmt::Display for IdBooleanExpression {
 }
 
 #[inline]
-fn _get_nodes(expr: &Expr, node_set: &mut HashSet<String>) {
+fn _get_nodes(expr: &Expr, node_set: &mut HashSet<FastStr>) {
   match expr {
     Expr::Const(_) => (),
     Expr::Imp(_, _) => todo!(),
     Expr::Iff(_, _) => todo!(),
     Expr::Variable(node) => {
-      let _ = node_set.insert(node.to_string());
+      let _ = node_set.insert(FastStr::new(node));
     }
     Expr::Not(e) => _get_nodes(e, node_set),
     Expr::And(e1, e2) => {

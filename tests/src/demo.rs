@@ -58,8 +58,8 @@ library(gscl45nm) {
 fn parse_str() {
   match Library::parse(TEMPLATE) {
     Ok(ref mut library) => {
-      library.comments.name.push("line1\nline2".to_owned());
-      library.comments.name.push("line3".to_owned());
+      library.comments._self.push("line1\nline2".into());
+      library.comments._self.push("line3".into());
       println!("{:#?}", library);
       println!("{}", library);
     }

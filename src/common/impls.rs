@@ -1,18 +1,20 @@
 //!
 //! implement basic types
 //!
-use crate::ast::{
-  ComplexAttri, ComplexParseError, ComplexWrapper, IdError, NameAttri, SimpleAttri,
-  SimpleWrapper,
+use crate::{
+  ast::{
+    ComplexAttri, ComplexParseError, ComplexWrapper, IdError, NameAttri, SimpleAttri,
+    SimpleWrapper,
+  },
+  FastStr,
 };
 use itertools::Itertools;
 use ordered_float::NotNan;
-
 impl SimpleAttri for f64 {
   #[inline]
   fn to_wrapper(&self) -> SimpleWrapper {
     let mut buffer = ryu::Buffer::new();
-    buffer.format(*self).to_string()
+    FastStr::new(buffer.format(*self))
   }
 }
 
@@ -21,7 +23,7 @@ impl SimpleAttri for NotNan<f64> {
   fn to_wrapper(&self) -> SimpleWrapper {
     let f: f64 = (*self).into();
     let mut buffer = ryu::Buffer::new();
-    buffer.format(f).to_string()
+    FastStr::new(buffer.format(f))
   }
 }
 
@@ -30,7 +32,7 @@ impl SimpleAttri for usize {
   #[inline]
   fn to_wrapper(&self) -> SimpleWrapper {
     let mut buffer = itoa::Buffer::new();
-    buffer.format(*self).to_string()
+    FastStr::new(buffer.format(*self))
   }
 }
 
@@ -38,17 +40,17 @@ impl SimpleAttri for isize {
   #[inline]
   fn to_wrapper(&self) -> SimpleWrapper {
     let mut buffer = itoa::Buffer::new();
-    buffer.format(*self).to_string()
+    FastStr::new(buffer.format(*self))
   }
 }
 
-impl NameAttri for Option<String> {
+impl NameAttri for Option<FastStr> {
   #[inline]
-  fn parse(mut v: Vec<String>) -> Result<Self, IdError> {
+  fn parse(mut v: Vec<FastStr>) -> Result<Self, IdError> {
     Ok(v.pop())
   }
   #[inline]
-  fn to_vec(self) -> Vec<String> {
+  fn to_vec(self) -> Vec<FastStr> {
     match self {
       Some(s) => vec![s],
       None => vec![],
@@ -56,9 +58,9 @@ impl NameAttri for Option<String> {
   }
 }
 
-impl NameAttri for String {
+impl NameAttri for FastStr {
   #[inline]
-  fn parse(mut v: Vec<String>) -> Result<Self, IdError> {
+  fn parse(mut v: Vec<FastStr>) -> Result<Self, IdError> {
     let l = v.len();
     if l != 1 {
       return Err(IdError::LengthDismatch(1, l, v));
@@ -70,24 +72,24 @@ impl NameAttri for String {
     }
   }
   #[inline]
-  fn to_vec(self) -> Vec<String> {
+  fn to_vec(self) -> Vec<FastStr> {
     vec![self]
   }
 }
 
-impl NameAttri for Vec<String> {
+impl NameAttri for Vec<FastStr> {
   #[inline]
-  fn parse(v: Vec<String>) -> Result<Self, IdError> {
+  fn parse(v: Vec<FastStr>) -> Result<Self, IdError> {
     Ok(v)
   }
   #[inline]
-  fn to_vec(self) -> Vec<String> {
+  fn to_vec(self) -> Vec<FastStr> {
     self
   }
 }
-impl NameAttri for (String, String, usize) {
+impl NameAttri for (FastStr, FastStr, usize) {
   #[inline]
-  fn parse(mut v: Vec<String>) -> Result<Self, IdError> {
+  fn parse(mut v: Vec<FastStr>) -> Result<Self, IdError> {
     let l = v.len();
     if l != 3 {
       return Err(crate::ast::IdError::LengthDismatch(3, l, v));
@@ -112,39 +114,39 @@ impl NameAttri for (String, String, usize) {
     }
   }
   #[inline]
-  fn to_vec(self) -> Vec<String> {
-    vec![self.0, self.1, self.2.to_string()]
+  fn to_vec(self) -> Vec<FastStr> {
+    vec![self.0, self.1, self.2.to_string().into()]
   }
 }
-impl<const N: usize> NameAttri for [String; N] {
+impl<const N: usize> NameAttri for [FastStr; N] {
   #[inline]
-  fn parse(v: Vec<String>) -> Result<Self, IdError> {
+  fn parse(v: Vec<FastStr>) -> Result<Self, IdError> {
     let l = v.len();
     if l != N {
       return Err(crate::ast::IdError::LengthDismatch(N, l, v));
     }
-    match TryInto::<[String; N]>::try_into(v) {
+    match TryInto::<[FastStr; N]>::try_into(v) {
       Ok(name) => Ok(name),
       Err(e) => Err(crate::ast::IdError::Other(format!("try_into error: {:?}", e))),
     }
   }
   #[inline]
-  fn to_vec(self) -> Vec<String> {
+  fn to_vec(self) -> Vec<FastStr> {
     self.into_iter().collect_vec()
   }
 }
 
-impl SimpleAttri for String {}
+impl SimpleAttri for FastStr {}
 
-impl<const N: usize> ComplexAttri for [String; N] {
+impl<const N: usize> ComplexAttri for [FastStr; N] {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let l = v.len();
     if l != N {
       return Err(ComplexParseError::LengthDismatch);
     }
-    match TryInto::<[String; N]>::try_into(
-      v.into_iter().map(ToString::to_string).collect::<Vec<String>>(),
+    match TryInto::<[FastStr; N]>::try_into(
+      v.into_iter().map(FastStr::new).collect::<Vec<FastStr>>(),
     ) {
       Ok(name) => Ok(name),
       Err(_) => Err(ComplexParseError::Other),
@@ -175,7 +177,8 @@ impl ComplexAttri for Vec<f64> {
       vec![vec![format!(
         "{}",
         self.iter().map(|f| buffer.format(*f).to_string()).join(",")
-      )]]
+      )
+      .into()]]
     }
   }
 }
@@ -200,17 +203,18 @@ impl ComplexAttri for Vec<NotNan<f64>> {
           .iter()
           .map(|f| buffer.format(f.into_inner()).to_string())
           .join(",")
-      )]]
+      )
+      .into()]]
     }
   }
 }
 
-impl ComplexAttri for String {
+impl ComplexAttri for FastStr {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
-    let v1: String = match i.next() {
-      Some(s) => s.to_owned(),
+    let v1: FastStr = match i.next() {
+      Some(s) => FastStr::new(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
@@ -220,7 +224,7 @@ impl ComplexAttri for String {
   }
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
-    vec![vec![self.to_string()]]
+    vec![vec![self.clone()]]
   }
 }
 impl ComplexAttri for NotNan<f64> {
@@ -242,13 +246,13 @@ impl ComplexAttri for NotNan<f64> {
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = ryu::Buffer::new();
-    vec![vec![buffer.format(self.into_inner()).to_string()]]
+    vec![vec![FastStr::new(buffer.format(self.into_inner()))]]
   }
 }
-impl ComplexAttri for Vec<String> {
+impl ComplexAttri for Vec<FastStr> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    Ok(v.into_iter().map(ToString::to_string).collect())
+    Ok(v.into_iter().map(FastStr::new).collect())
   }
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
@@ -266,11 +270,11 @@ impl ComplexAttri for Vec<usize> {
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = itoa::Buffer::new();
-    vec![self.iter().map(|i| buffer.format(*i).to_string()).collect()]
+    vec![self.iter().map(|i| FastStr::new(buffer.format(*i))).collect()]
   }
 }
 
-impl ComplexAttri for (f64, f64, String) {
+impl ComplexAttri for (f64, f64, FastStr) {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
@@ -296,8 +300,8 @@ impl ComplexAttri for (f64, f64, String) {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v3: String = match i.next() {
-      Some(s) => s.to_owned(),
+    let v3: FastStr = match i.next() {
+      Some(s) => FastStr::new(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
@@ -309,13 +313,13 @@ impl ComplexAttri for (f64, f64, String) {
   fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = ryu::Buffer::new();
     vec![vec![
-      buffer.format(self.0).to_owned(),
-      buffer.format(self.1).to_owned(),
+      FastStr::new(buffer.format(self.0)),
+      FastStr::new(buffer.format(self.1)),
       self.2.clone(),
     ]]
   }
 }
-impl ComplexAttri for (usize, String) {
+impl ComplexAttri for (usize, FastStr) {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
@@ -326,8 +330,8 @@ impl ComplexAttri for (usize, String) {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v2: String = match i.next() {
-      Some(s) => s.to_owned(),
+    let v2: FastStr = match i.next() {
+      Some(s) => FastStr::new(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
@@ -338,7 +342,7 @@ impl ComplexAttri for (usize, String) {
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = itoa::Buffer::new();
-    vec![vec![buffer.format(self.0).to_string(), self.1.clone()]]
+    vec![vec![FastStr::new(buffer.format(self.0)), self.1.clone()]]
   }
 }
 impl ComplexAttri for (f64, f64) {
@@ -375,6 +379,6 @@ impl ComplexAttri for (f64, f64) {
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = ryu::Buffer::new();
-    vec![vec![buffer.format(self.0).to_string(), buffer.format(self.1).to_string()]]
+    vec![vec![FastStr::new(buffer.format(self.0)), FastStr::new(buffer.format(self.1))]]
   }
 }

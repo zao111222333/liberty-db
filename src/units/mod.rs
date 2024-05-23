@@ -2,6 +2,7 @@
 //! IFRAME('https://en.wikipedia.org/wiki/International_System_of_Units');
 //! </script>
 
+use crate::FastStr;
 use ordered_float::NotNan;
 pub use uom::si::f64::{
   Capacitance, ElectricCharge, ElectricCurrent, ElectricPotential, ElectricalResistance,
@@ -397,13 +398,13 @@ impl ComplexAttri for CapacitiveLoadUnit {
     let mut buffer = ryu::Buffer::new();
     if self.ff_pf {
       vec![vec![
-        buffer.format(self._v.get::<capacitance::femtofarad>()).to_owned(),
-        "ff".to_owned(),
+        FastStr::new(buffer.format(self._v.get::<capacitance::femtofarad>())),
+        "ff".into(),
       ]]
     } else {
       vec![vec![
-        buffer.format(self._v.get::<capacitance::picofarad>()).to_owned(),
-        "pf".to_owned(),
+        FastStr::new(buffer.format(self._v.get::<capacitance::picofarad>())),
+        "pf".into(),
       ]]
     }
   }

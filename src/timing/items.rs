@@ -1,8 +1,6 @@
 //! All item structure inside
 //! `Timing`.
 
-use std::collections::HashMap;
-
 use crate::{
   ast::{self, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
   common::items::Domain,
@@ -10,6 +8,7 @@ use crate::{
     logic::{self, LogicLike},
     BooleanExpression,
   },
+  FastStr,
 };
 
 use strum_macros::{Display, EnumString};
@@ -173,7 +172,7 @@ impl SimpleAttri for TimingSenseType {}
 /// ">Reference-Instance</a>
 ///
 // #[derive(Debug, Clone, Copy, Default)]
-pub type Mode = [String; 2];
+pub type Mode = [FastStr; 2];
 
 // impl ComplexAttri for Mode {
 //   fn parse(v: Vec<&str>) -> Result<Self, ast::ComplexParseError> {
@@ -219,7 +218,7 @@ pub struct CellDegradation {
   /// name
   #[id]
   #[liberty(name)]
-  pub name: String,
+  pub name: FastStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,

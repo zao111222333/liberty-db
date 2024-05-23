@@ -1,17 +1,35 @@
+use crate::FastStr;
 use std::fmt::Write;
+
+const N: usize = 10;
 /// CodeFormatter with indent
 #[derive(Debug)]
 pub struct CodeFormatter<'a, F> {
   f: &'a mut F,
   level: usize,
-  repeat: String,
-  indentation: String,
+  // repeat: FastStr,
+  indentation_lut: [FastStr; N],
 }
 
 impl<F: Write> Write for CodeFormatter<'_, F> {
   #[inline]
   fn write_str(&mut self, s: &str) -> std::fmt::Result {
-    write!(self.f, "{}", s.replace('\n', format!("\n{}", self.repeat).as_str()))
+    write!(
+      self.f,
+      "{}",
+      s.replace(
+        '\n',
+        format!(
+          "\n{}",
+          if self.level >= N {
+            &self.indentation_lut[N - 1]
+          } else {
+            &self.indentation_lut[self.level]
+          }
+        )
+        .as_str()
+      )
+    )
   }
 }
 
@@ -19,12 +37,29 @@ impl<'a, T: Write> CodeFormatter<'a, T> {
   /// Wrap the formatter `f`, use `indentation` as base string indentation and return a new
   /// formatter that implements `std::fmt::Write` that can be used with the macro `write!()`
   #[inline]
-  pub fn new<S: Into<String>>(f: &'a mut T, indentation: S) -> Self {
+  pub fn new<S: Into<FastStr>>(f: &'a mut T, indentation: S) -> Self {
+    let indentation: FastStr = indentation.into();
     Self {
       f,
       level: 0,
-      indentation: indentation.into(),
-      repeat: "".into(),
+      indentation_lut: [
+        indentation.repeat(0).into(),
+        indentation.repeat(1).into(),
+        indentation.repeat(2).into(),
+        indentation.repeat(3).into(),
+        indentation.repeat(4).into(),
+        indentation.repeat(5).into(),
+        indentation.repeat(6).into(),
+        indentation.repeat(7).into(),
+        indentation.repeat(8).into(),
+        indentation.repeat(9).into(),
+      ],
+      // (0..N)
+      //   .into_iter()
+      //   .map(|i| indentation.repeat(i).into())
+      //   .collect::<Vec<_>>()
+      //   .try_into()
+      //   .unwrap(),
     }
   }
 
@@ -32,20 +67,20 @@ impl<'a, T: Write> CodeFormatter<'a, T> {
   #[inline]
   pub fn set_level(&mut self, level: usize) {
     self.level = level;
-    self.repeat = self.indentation.repeat(self.level);
+    // self.repeat = self.indentation.repeat(self.level);
   }
 
   /// Increase the indentation level by `inc`
   #[inline]
   pub fn indent(&mut self, inc: usize) {
     self.level = self.level.saturating_add(inc);
-    self.repeat += &self.indentation.repeat(inc);
+    // self.repeat += &self.indentation.repeat(inc);
   }
 
   /// Decrease the indentation level by `inc`
   #[inline]
   pub fn dedent(&mut self, inc: usize) {
     self.level = self.level.saturating_sub(inc);
-    self.repeat = self.indentation.repeat(self.level);
+    // self.repeat = self.indentation.repeat(self.level);
   }
 }

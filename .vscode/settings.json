@@ -22,17 +22,17 @@
     //     }
     // },
     "rust-analyzer.server.extraEnv": { 
-        "RUSTUP_TOOLCHAIN": "stable",
+        // "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
         "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
     },
     "terminal.integrated.env.linux": {
-        "RUSTUP_TOOLCHAIN": "stable",
+        // "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
         "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
     },
     "terminal.integrated.env.osx": {
-        "RUSTUP_TOOLCHAIN": "stable",
+        // "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
         "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
     },

@@ -4,7 +4,7 @@
 members = ["macros", "tests"]
 
 [workspace.package]
-version = "0.4.7"
+version = "0.4.8"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -59,13 +59,13 @@ itertools = "0.10.5"
 ryu = "1.0"
 itoa = "1.0"
 uom = { version = "0.36.0", default-features = false, features = ["f64", "si", "std", "serde"] }
-biodivine-lib-bdd = { version = "0.5.17", features = ["serde"]}
-# biodivine-lib-bdd = {path = "../../biodivine-lib-bdd" , features = ["serde"]}
+biodivine-lib-bdd = { version = "0.5.17", features = ["serde"] }
 mut_set = "0.3.5"
 mut_set_derive = "0.3.5"
 # mut_set = {path = "../mut_set"}
 # mut_set_derive = {path = "../mut_set/derive"}
 duplicate = "1.0.0"
+faststr = "0.2.19"
 
 [dev-dependencies]
 anyhow = "1.0.80"

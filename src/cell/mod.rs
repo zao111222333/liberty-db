@@ -2,15 +2,14 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use std::borrow::Borrow;
-
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::Pin,
+  FastStr, GroupSet,
 };
+use std::borrow::Borrow;
 mod items;
-use crate::GroupSet;
 pub use items::*;
 
 /// cell
@@ -24,7 +23,7 @@ pub use items::*;
 pub struct Cell {
   #[id]
   #[liberty(name)]
-  pub name: String,
+  pub name: FastStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -34,11 +33,11 @@ pub struct Cell {
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
   #[liberty(simple(type = Option))]
-  pub driver_waveform_rise: Option<String>,
+  pub driver_waveform_rise: Option<FastStr>,
   #[liberty(simple(type = Option))]
-  pub driver_waveform_fall: Option<String>,
+  pub driver_waveform_fall: Option<FastStr>,
   #[liberty(simple(type = Option))]
-  pub cell_footprint: Option<String>,
+  pub cell_footprint: Option<FastStr>,
   #[liberty(simple(type=Option))]
   pub cell_leakage_power: Option<f64>,
   #[liberty(group(type=Set))]

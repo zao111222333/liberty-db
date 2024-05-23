@@ -38,7 +38,7 @@ fn group_field_fn(
           },
           Err((e,undefined)) => {
             println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
-            res.#undefined_name.push((key.to_owned(), undefined));
+            res.#undefined_name.push((faststr::FastStr::new(key), undefined));
           },
         }
       };
@@ -60,7 +60,7 @@ fn group_field_fn(
           },
           Err((e,undefined)) => {
             println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
-            res.#undefined_name.push((key.to_owned(), undefined));
+            res.#undefined_name.push((faststr::FastStr::new(key), undefined));
           },
         }
       };
@@ -268,7 +268,7 @@ pub(crate) fn inner(
     let mut attri_comments = quote! {};
     let mut parser_arms = quote! {};
     let mut write_fields = quote! {};
-    let comments_self = Ident::new("name", Span::call_site());
+    let comments_self = Ident::new("_self", Span::call_site());
     for field in fields.into_iter() {
       if let Some(field_name) = &field.ident {
         match attri_type_map.get(field_name) {
@@ -335,8 +335,6 @@ pub(crate) fn inner(
       )
     };
     let comments_ident = Ident::new(&format!("{}Comments", ident), Span::call_site());
-    let comments_undefined_bgn = Ident::new("_undefined_bgn", Span::call_site());
-    let comments_undefined_end = Ident::new("_undefined_end", Span::call_site());
     let (name_ident, name_func, name_sturct, named_group_impl) = match name_vec.len() {
       0 => (
         quote!(()),
@@ -369,11 +367,11 @@ pub(crate) fn inner(
             #[doc(hidden)]
             impl crate::ast::NamedGroup for #ident {
               #[inline]
-              fn parse(v: Vec<String>) -> Result<Self::Name, crate::ast::IdError>{
+              fn parse(v: Vec<faststr::FastStr>) -> Result<Self::Name, crate::ast::IdError>{
                 <Self::Name as crate::ast::NameAttri>::parse(v)
               }
               #[inline]
-              fn name2vec(name: Self::Name) -> Vec<String>{
+              fn name2vec(name: Self::Name) -> Vec<faststr::FastStr>{
                 <Self::Name as crate::ast::NameAttri>::to_vec(name)
               }
             }
@@ -431,8 +429,6 @@ pub(crate) fn inner(
           #[derive(serde::Serialize, serde::Deserialize)]
     pub struct #comments_ident{
             pub #comments_self: crate::ast::AttriComment,
-            pub #comments_undefined_bgn: crate::ast::AttriComment,
-            pub #comments_undefined_end: crate::ast::AttriComment,
             #attri_comments
           }
           #[doc(hidden)]
@@ -447,9 +443,9 @@ pub(crate) fn inner(
               f.indent(1);
               #write_fields
               if !self.#undefined_name.is_empty(){
-                <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_bgn, "", f)?;
+                write!(f,"\n/* Undefined attributes from here */")?;
                 crate::ast::liberty_attr_list(&self.#undefined_name,f)?;
-                <crate::ast::AttriComment as crate::ast::Format>::liberty(&self.#comments_name.#comments_undefined_end, "", f)?;
+                write!(f,"\n/* Undefined attributes end here */")?;
               }
               f.dedent(1);
               write!(f, "\n}}")
@@ -459,8 +455,6 @@ pub(crate) fn inner(
             ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
               let (mut input,title) = crate::ast::parser::title(i,line_num)?;
               let mut res = Self::default();
-              res.#comments_name.#comments_undefined_bgn.push("Undefined attributes from here".to_string());
-              res.#comments_name.#comments_undefined_end.push("Undefined attributes end here".to_string());
               loop {
                 match crate::ast::parser::key(input){
                   Err(nom::Err::Error(_)) => {
@@ -476,7 +470,7 @@ pub(crate) fn inner(
                       _ => {
                         let undefined: crate::ast::AttriValue;
                         (input,undefined) = crate::ast::parser::undefine(input,line_num)?;
-                        res.#undefined_name.push((key.to_owned(), undefined));
+                        res.#undefined_name.push((faststr::FastStr::new(key), undefined));
                         let n: usize;
                         (input,n) = crate::ast::parser::comment_space_newline(input)?;
                         *line_num+=n;

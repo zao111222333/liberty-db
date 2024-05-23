@@ -18,10 +18,10 @@ use crate::{
   expression::{self, BooleanExpression, IdBooleanExpression},
   library::Sensitization,
   pin::Pin,
-  units, GroupSet,
+  units, FastStr, GroupSet,
 };
 
-use self::items::TimingSenseType;
+use items::TimingSenseType;
 
 /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
 /// The timing group can be used to identify the name or names of multiple timing arcs.
@@ -53,7 +53,7 @@ use self::items::TimingSenseType;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Timing {
   #[liberty(name)]
-  pub name: Vec<String>,
+  pub name: Vec<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -216,7 +216,7 @@ pub struct Timing {
   /// &end
   /// =203.35
   /// ">Reference-Instance</a>
-  pub fpga_domain_style: Option<String>,
+  pub fpga_domain_style: Option<FastStr>,
   /// Use pairs of `interdependence_id` attributes to identify interdependent pairs
   /// of `setup` and `hold` constraint tables. Interdependence data is supported
   /// in conditional constraint checking, the `interdependence_id` attribute increases
@@ -1431,7 +1431,7 @@ pub struct Timing {
   /// =204.9
   /// ">Reference-Instance</a>
   // TODO:
-  pub cell_degradation: HashMap<String, items::CellDegradation>,
+  pub cell_degradation: HashMap<FastStr, items::CellDegradation>,
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
   ///
   /// **Note:**
@@ -1460,7 +1460,7 @@ pub struct Timing {
   pub cell_fall: Option<TableLookUp>,
   #[liberty(group)]
   pub cell_rise: Option<TableLookUp>,
-  // pub cell_rise: HashMap<String, items::CellFall>,
+  // pub cell_rise: HashMap<FastStr, items::CellFall>,
   #[liberty(group)]
   pub fall_constraint: Option<TableLookUp>,
   #[liberty(group)]

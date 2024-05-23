@@ -3,9 +3,11 @@
 //! </script>
 
 use super::{BooleanExpression, BooleanExpressionLike, UNKNOWN};
-use crate::ast::{AttributeList, GroupComments, GroupFn, IdError, NamedGroup};
+use crate::{
+  ast::{AttributeList, GroupComments, GroupFn, IdError, NamedGroup},
+  FastStr,
+};
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
-
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
 /// TODO: For information about the `test_cell` group, see [test_cell](crate::test_cell) Group
@@ -33,7 +35,7 @@ pub struct FF {
   /// ">Reference-Definition</a>
   #[liberty(name)]
   #[id]
-  pub variable1: String,
+  pub variable1: FastStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -47,7 +49,7 @@ pub struct FF {
   /// ">Reference-Definition</a>
   #[liberty(name)]
   #[id]
-  pub variable2: String,
+  pub variable2: FastStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -117,7 +119,7 @@ pub struct FFBank {
   /// ">Reference-Definition</a>
   #[liberty(name)]
   #[id]
-  pub variable1: String,
+  pub variable1: FastStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -131,7 +133,7 @@ pub struct FFBank {
   /// ">Reference-Definition</a>
   #[liberty(name)]
   #[id]
-  pub variable2: String,
+  pub variable2: FastStr,
   /// bits
   #[liberty(name)]
   pub bits: usize,
@@ -203,7 +205,7 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable1: String,
+  pub variable1: FastStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -217,7 +219,7 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable2: String,
+  pub variable2: FastStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -286,7 +288,7 @@ pub struct LatchBank {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable1: String,
+  pub variable1: FastStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -300,7 +302,7 @@ pub struct LatchBank {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable2: String,
+  pub variable2: FastStr,
   /// bits
   #[liberty(name)]
   pub bits: usize,
@@ -354,7 +356,7 @@ pub struct LatchBank {
 )]
 impl NamedGroup for LatchFF_type {
   #[inline]
-  fn parse(mut v: Vec<String>) -> Result<Self::Name, IdError> {
+  fn parse(mut v: Vec<FastStr>) -> Result<Self::Name, IdError> {
     let l = v.len();
     if l != 2 {
       return Err(IdError::LengthDismatch(2, l, v));
@@ -370,7 +372,7 @@ impl NamedGroup for LatchFF_type {
     }
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<String> {
+  fn name2vec(name: Self::Name) -> Vec<FastStr> {
     vec![name.variable1, name.variable2]
   }
 }
@@ -382,7 +384,7 @@ impl NamedGroup for LatchFF_type {
 )]
 impl NamedGroup for LatchFFBank_type {
   #[inline]
-  fn parse(mut v: Vec<String>) -> Result<Self::Name, IdError> {
+  fn parse(mut v: Vec<FastStr>) -> Result<Self::Name, IdError> {
     let l = v.len();
     if l != 3 {
       return Err(crate::ast::IdError::LengthDismatch(3, l, v));
@@ -407,8 +409,8 @@ impl NamedGroup for LatchFFBank_type {
     }
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<String> {
-    vec![name.variable1, name.variable2, name.bits.to_string()]
+  fn name2vec(name: Self::Name) -> Vec<FastStr> {
+    vec![name.variable1, name.variable2, name.bits.to_string().into()]
   }
 }
 
@@ -419,11 +421,11 @@ impl NamedGroup for LatchFFBank_type {
 )]
 impl __LatchFF for Latch_type {
   #[inline]
-  fn variable1(&self) -> &String {
+  fn variable1(&self) -> &FastStr {
     &self.variable1
   }
   #[inline]
-  fn variable2(&self) -> &String {
+  fn variable2(&self) -> &FastStr {
     &self.variable2
   }
   #[inline]
@@ -463,11 +465,11 @@ impl __LatchFF for Latch_type {
 )]
 impl __LatchFF for FF_type {
   #[inline]
-  fn variable1(&self) -> &String {
+  fn variable1(&self) -> &FastStr {
     &self.variable1
   }
   #[inline]
-  fn variable2(&self) -> &String {
+  fn variable2(&self) -> &FastStr {
     &self.variable2
   }
   #[inline]
@@ -513,8 +515,8 @@ impl __LatchFF for FF_type {
 }
 
 trait __LatchFF {
-  fn variable1(&self) -> &String;
-  fn variable2(&self) -> &String;
+  fn variable1(&self) -> &FastStr;
+  fn variable2(&self) -> &FastStr;
   fn clear(&self) -> &Option<BooleanExpression>;
   fn clear_preset_var1(&self) -> &Option<ClearPresetState>;
   fn clear_preset_var2(&self) -> &Option<ClearPresetState>;
@@ -545,12 +547,12 @@ impl GroupFn for AllTypes {}
 pub trait LatchFF: __LatchFF {
   /// Get the `BooleanExpression` of variable1
   fn variable1_expr(&self) -> BooleanExpression {
-    let present_state = Box::new(Expr::Variable(self.variable1().clone()));
+    let present_state = Box::new(Expr::Variable(self.variable1().to_string()));
     let active_edge_variable = match self.next_state() {
       Some(next_state) => {
         let next_state = Box::new(next_state.expr.clone());
         match (self.active(), self.active_also()) {
-          (None, None) => Expr::Variable(self.variable1().clone()),
+          (None, None) => Expr::Variable(self.variable1().to_string()),
           (None, Some(active_also)) => {
             Expr::Cond(active_also, next_state.clone(), present_state.clone())
           }
@@ -571,7 +573,7 @@ pub trait LatchFF: __LatchFF {
           }
         }
       }
-      None => Expr::Variable(self.variable1().clone()),
+      None => Expr::Variable(self.variable1().to_string()),
     };
 
     let expr = match (self.preset(), self.clear()) {
@@ -618,12 +620,12 @@ pub trait LatchFF: __LatchFF {
 
   /// Get the `BooleanExpression` of variable2
   fn variable2_expr(&self) -> BooleanExpression {
-    let present_state = Box::new(Expr::Variable(self.variable2().clone()));
+    let present_state = Box::new(Expr::Variable(self.variable2().to_string()));
     let active_edge_variable = match self.next_state() {
       Some(next_state) => {
         let next_state = Box::new(Expr::Not(Box::new(next_state.expr.clone())));
         match (self.active(), self.active_also()) {
-          (None, None) => Expr::Variable(self.variable2().clone()),
+          (None, None) => Expr::Variable(self.variable2().to_string()),
           (None, Some(active_also)) => {
             Expr::Cond(active_also, next_state.clone(), present_state.clone())
           }
@@ -644,7 +646,7 @@ pub trait LatchFF: __LatchFF {
           }
         }
       }
-      None => Expr::Variable(self.variable2().clone()),
+      None => Expr::Variable(self.variable2().to_string()),
     };
     let expr = match (self.preset(), self.clear()) {
       (None, None) => active_edge_variable,
@@ -685,16 +687,16 @@ pub trait LatchFF: __LatchFF {
   }
   /// Get the `BooleanExpression` of (variable1,variable2)
   fn variable_expr(&self) -> (BooleanExpression, BooleanExpression) {
-    let present_state1 = Box::new(Expr::Variable(self.variable1().clone()));
-    let present_state2 = Box::new(Expr::Variable(self.variable2().clone()));
+    let present_state1 = Box::new(Expr::Variable(self.variable1().to_string()));
+    let present_state2 = Box::new(Expr::Variable(self.variable2().to_string()));
     let (active_edge_variable1, active_edge_variable2) = match self.next_state() {
       Some(next_state) => {
         let next_state1 = Box::new(next_state.expr.clone());
         let next_state2 = Box::new(Expr::Not(next_state1.clone()));
         match (self.active(), self.active_also()) {
           (None, None) => (
-            Expr::Variable(self.variable1().clone()),
-            Expr::Variable(self.variable2().clone()),
+            Expr::Variable(self.variable1().to_string()),
+            Expr::Variable(self.variable2().to_string()),
           ),
           (None, Some(active_also)) => (
             Expr::Cond(active_also.clone(), next_state1.clone(), present_state1.clone()),
@@ -734,8 +736,8 @@ pub trait LatchFF: __LatchFF {
         }
       }
       None => (
-        Expr::Variable(self.variable1().clone()),
-        Expr::Variable(self.variable2().clone()),
+        Expr::Variable(self.variable1().to_string()),
+        Expr::Variable(self.variable2().to_string()),
       ),
     };
     let (expr1, expr2) = match (self.preset(), self.clear()) {

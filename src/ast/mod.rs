@@ -4,6 +4,7 @@
 
 mod fmt;
 pub mod parser;
+use crate::FastStr;
 pub use fmt::CodeFormatter;
 use itertools::Itertools;
 use nom::{error::Error, IResult};
@@ -15,9 +16,9 @@ use std::{
   str::FromStr,
 };
 /// Wrapper for simple attribute
-pub type SimpleWrapper = String;
+pub type SimpleWrapper = FastStr;
 /// Wrapper for complex attribute
-pub type ComplexWrapper = Vec<Vec<String>>;
+pub type ComplexWrapper = Vec<Vec<FastStr>>;
 /// Wrapper for group attribute
 ///
 /// ``` text
@@ -30,12 +31,12 @@ pub type ComplexWrapper = Vec<Vec<String>>;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct GroupWrapper {
   /// title
-  pub title: Vec<String>,
+  pub title: Vec<FastStr>,
   /// attr_list
   pub attr_list: AttributeList,
 }
 /// type for UndefinedAttributes, same to `attri_list`
-pub type AttributeList = Vec<(String, AttriValue)>;
+pub type AttributeList = Vec<(FastStr, AttriValue)>;
 /// AttriValue for undefined_attribute/serialization
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -120,13 +121,14 @@ pub trait SimpleAttri: Sized + Display + FromStr {
     let (input, simple) = parser::simple(i, line_num)?;
     match Self::parse(simple) {
       Ok(s) => Ok((input, Ok(s))),
-      Err(e) => Ok((input, Err((e, AttriValue::Simple(simple.to_string()))))),
+      Err(e) => Ok((input, Err((e, AttriValue::Simple(FastStr::new(simple)))))),
     }
   }
+  // TODO: efficent?
   /// to_wrapper, auto implement
   #[inline]
   fn to_wrapper(&self) -> SimpleWrapper {
-    format!("{self}")
+    format!("{self}").into()
   }
   /// fmt_liberty
   #[inline]
@@ -156,8 +158,8 @@ pub enum ComplexParseError {
 
 pub trait NameAttri: Sized + Clone {
   /// basic parser
-  fn parse(v: Vec<String>) -> Result<Self, IdError>;
-  fn to_vec(self) -> Vec<String>;
+  fn parse(v: Vec<FastStr>) -> Result<Self, IdError>;
+  fn to_vec(self) -> Vec<FastStr>;
 }
 
 /// Complex Attribute in Liberty
@@ -193,7 +195,7 @@ pub trait ComplexAttri: Sized {
 pub type GroupComments<T> = <T as GroupAttri>::Comments;
 
 /// AttriComment
-pub type AttriComment = Vec<String>;
+pub type AttriComment = Vec<FastStr>;
 /// Group Functions
 pub trait GroupFn {
   fn post_process(&mut self) {}
@@ -223,7 +225,7 @@ pub trait GroupAttri: Sized {
 pub enum IdError {
   /// TitleLenMismatch(want,got,title)
   #[error("title length dismatch (want={0},got={1}), title={2:?}")]
-  LengthDismatch(usize, usize, Vec<String>),
+  LengthDismatch(usize, usize, Vec<FastStr>),
   /// replace same id
   #[error("replace same id")]
   RepeatIdx,
@@ -241,10 +243,10 @@ pub enum IdError {
 /// If more than one `#[liberty(name)]`,
 /// need to impl `NamedGroup` manually
 pub trait NamedGroup: GroupAttri {
-  /// parse name from Vec<String>
-  fn parse(v: Vec<String>) -> Result<Self::Name, IdError>;
-  /// name to Vec<String>
-  fn name2vec(name: Self::Name) -> Vec<String>;
+  /// parse name from Vec<FastStr>
+  fn parse(v: Vec<FastStr>) -> Result<Self::Name, IdError>;
+  /// name to Vec<FastStr>
+  fn name2vec(name: Self::Name) -> Vec<FastStr>;
   /// fmt_liberty
   #[inline]
   fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
@@ -253,13 +255,13 @@ pub trait NamedGroup: GroupAttri {
       "{}",
       Self::name2vec(self.name())
         .into_iter()
-        .map(|s| if is_word(&s) { s } else { format!("\"{s}\"") })
+        .map(|s| if is_word(&s) { s } else { format!("\"{s}\"").into() })
         .join(", ")
     )
   }
 }
 
-fn display_nom_error(e: &nom::Err<Error<&str>>) -> String {
+fn display_nom_error(e: &nom::Err<Error<&str>>) -> FastStr {
   match e {
     nom::Err::Incomplete(_) => e.to_string(),
     nom::Err::Error(e) => format!(
@@ -273,6 +275,7 @@ fn display_nom_error(e: &nom::Err<Error<&str>>) -> String {
       e.input.lines().next().unwrap_or("")
     ),
   }
+  .into()
 }
 /// Error for parser
 #[derive(Debug, thiserror::Error)]
@@ -326,7 +329,7 @@ pub trait Format {
     todo!()
   }
 }
-pub(crate) fn is_word(s: &String) -> bool {
+pub(crate) fn is_word(s: &FastStr) -> bool {
   !s.is_empty() && s.chars().all(parser::char_in_word)
 }
 impl Format for AttriComment {
@@ -416,7 +419,7 @@ impl Format for GroupWrapper {
       self
         .title
         .iter()
-        .map(|s| if is_word(s) { s.clone() } else { "\"".to_owned() + s + "\"" })
+        .map(|s| if is_word(s) { s.clone() } else { format!("\"{s}\"").into() })
         .join(",")
     )?;
     f.indent(1);

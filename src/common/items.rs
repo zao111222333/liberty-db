@@ -1,12 +1,11 @@
-use std::{cmp::Ordering, collections::HashSet, fmt::Debug, rc::Rc};
-
-use itertools::Itertools;
-use strum_macros::{Display, EnumString};
+use std::{cmp::Ordering, collections::HashSet, fmt::Debug};
 
 use crate::{
-  ast::{ComplexAttri, GroupComments, GroupFn, SimpleAttri},
-  GroupSet,
+  ast::{GroupComments, GroupFn, SimpleAttri},
+  FastStr,
 };
+use itertools::Itertools;
+use strum_macros::{Display, EnumString};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -34,7 +33,7 @@ use crate::{
 #[derive(Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SdfExpression {
-  inner: String,
+  inner: FastStr,
 }
 impl std::fmt::Display for SdfExpression {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -45,7 +44,7 @@ impl std::str::FromStr for SdfExpression {
   type Err = core::convert::Infallible;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self { inner: String::from_str(s)? })
+    Ok(Self { inner: FastStr::from_str(s)? })
   }
 }
 impl SimpleAttri for SdfExpression {}
@@ -137,15 +136,15 @@ pub enum VariableType {
 pub struct Domain {
   #[liberty(name)]
   #[id]
-  pub name: String,
+  pub name: FastStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
-  pub group_name: String,
-  pub calc_mode: Option<String>,
+  pub group_name: FastStr,
+  pub calc_mode: Option<FastStr>,
   pub variable_1: Option<VariableType>,
   pub variable_2: Option<VariableType>,
   pub variable_3: Option<VariableType>,
@@ -158,7 +157,7 @@ impl GroupFn for Domain {}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WordSet {
-  pub inner: HashSet<String>,
+  pub inner: HashSet<FastStr>,
 }
 impl std::fmt::Display for WordSet {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -210,9 +209,7 @@ impl std::str::FromStr for WordSet {
   type Err = std::fmt::Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self {
-      inner: s.split(' ').map(ToString::to_string).collect(),
-    })
+    Ok(Self { inner: s.split(' ').map(FastStr::new).collect() })
   }
 }
 
@@ -226,7 +223,7 @@ impl std::str::FromStr for WordSet {
 pub struct DummyGroup {
   #[liberty(name)]
   #[id]
-  name: Option<String>,
+  name: Option<FastStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,

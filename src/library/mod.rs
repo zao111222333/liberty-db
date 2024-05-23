@@ -3,15 +3,14 @@
 //! </script>
 
 mod items;
-pub use items::*;
-use ordered_float::NotNan;
-
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   cell::Cell,
   common::table::{DriverWaveform, TableTemple},
-  units, GroupSet,
+  units, FastStr, GroupSet,
 };
+pub use items::*;
+use ordered_float::NotNan;
 use std::fmt::{Display, Write};
 use std::{collections::HashMap, fmt::write};
 
@@ -38,7 +37,7 @@ pub struct Library {
   /// library name
   #[id]
   #[liberty(name)]
-  pub name: String,
+  pub name: FastStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -53,7 +52,7 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.3&end=39.5
   /// ">Reference</a>
   #[liberty(complex)]
-  pub technology: String,
+  pub technology: FastStr,
   /// Use the `delay_model`  attribute to specify which delay model
   /// to use in the delay calculations.
   /// The `delay_model`  attribute must be the first attribute in the library
@@ -69,20 +68,20 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=23.5&end=23.5
   /// ">Reference</a>
   #[liberty(simple)]
-  pub date: String,
+  pub date: FastStr,
   /// You use the `comment`  attribute to include copyright
   /// or other product information in the library report. You can include only one comment line in a library
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=22.10&end=22.11
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub comment: Option<String>,
+  pub comment: Option<FastStr>,
   /// The optional `revision`  attribute defines a revision number for your library.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=30.17&end=30.18
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub revision: Option<String>,
+  pub revision: Option<FastStr>,
   /// Used in TSMC PDK
   #[liberty(simple(type = Option))]
   pub simulation: Option<bool>,
@@ -123,7 +122,7 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.29+34.32&end=34.31+34.33
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub default_operating_conditions: Option<String>,
+  pub default_operating_conditions: Option<FastStr>,
   /// Use this attribute to define new, temporary, or user-defined attributes
   /// for use in symbol and technology libraries.
   /// You can use either a space or a comma to separate the arguments.
@@ -164,7 +163,7 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=18.40&end=18.41
   /// ">Reference</a>
   #[liberty(complex)]
-  pub library_features: Vec<String>,
+  pub library_features: Vec<FastStr>,
   /// Used in TSMC library
   #[liberty(simple(type = Option))]
   pub default_leakage_power_density: Option<f64>,
@@ -179,7 +178,7 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.7&end=34.8
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub default_connection_class: Option<String>,
+  pub default_connection_class: Option<FastStr>,
   /// Fanout load of input pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.10&end=34.11
@@ -239,7 +238,7 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.41&end=34.41
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub default_wire_load_mode: Option<String>,
+  pub default_wire_load_mode: Option<FastStr>,
   /// Wire load resistance
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.42&end=34.43
@@ -251,7 +250,7 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.45&end=34.45
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub default_wire_load_selection: Option<String>,
+  pub default_wire_load_selection: Option<FastStr>,
   /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=42.25&end=42.30
@@ -273,7 +272,6 @@ pub struct Library {
   /// ">Reference</a>
   #[liberty(simple)]
   pub voltage_unit: units::VoltageUnit,
-  // pub voltage_map: HashMap<String, f64>,
   /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
   /// **No default exists for the `current_unit` attribute if the attribute is omitted.**
   /// <a name ="reference_link" href="
@@ -478,15 +476,15 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.36&end=34.36
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub default_wire_load: Option<String>,
+  pub default_wire_load: Option<FastStr>,
   /// Used in TSMC library
   /// valid: `match_footprint`?
   #[liberty(simple(type = Option))]
-  pub in_place_swap_mode: Option<String>,
+  pub in_place_swap_mode: Option<FastStr>,
   #[liberty(group(type = Set))]
   pub cell: GroupSet<Cell>,
 
-  pub sensitization_map: HashMap<String, Sensitization>,
+  pub sensitization_map: HashMap<FastStr, Sensitization>,
 }
 
 impl GroupFn for Library {}
@@ -507,8 +505,8 @@ impl Display for Library {
   #[inline]
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
     let ff = &mut crate::ast::CodeFormatter::new(f, "  ");
-    if self.comments.name.len() != 0 {
-      write!(ff, "/* {} */", self.comments.name.join("\n").replace("\n", "\n* "))?;
+    if self.comments._self.len() != 0 {
+      write!(ff, "/* {} */", self.comments._self.join("\n").replace("\n", "\n* "))?;
     } else {
       write!(
         ff,
