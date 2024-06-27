@@ -6,7 +6,7 @@
 //   timing::TimingType,
 //   GroupSet,
 // };
-// use crate::FastStr
+// use crate::ArcStr
 
 // #[derive(Default, Debug, Clone)]
 // // #[derive(liberty_macros::Group)]
@@ -157,14 +157,14 @@
 //                     //   line_num, key, undefined, e,
 //                     // ));
 //                   };
-//                   res.undefined.push((FastStr::new(key), undefined));
+//                   res.undefined.push((ArcStr::from(key), undefined));
 //                 }
 //               }
 //             }
 //             _ => {
 //               let undefined: crate::ast::AttriValue;
 //               (input, undefined) = crate::ast::parser::undefine(input, line_num)?;
-//               res.undefined.push((FastStr::new(key), undefined));
+//               res.undefined.push((ArcStr::from(key), undefined));
 //               let n: usize;
 //               (input, n) = crate::ast::parser::comment_space_newline(input)?;
 //               *line_num += n;
@@ -185,7 +185,7 @@
 // // pub(crate) struct Pin {
 // //   #[id]
 // //   #[liberty(name)]
-// //   name: FastStr,
+// //   name: ArcStr,
 // //   /// group comments
 // //   #[liberty(comments)]
 // //   comments: GroupComments<Self>,
@@ -205,10 +205,10 @@
 // // pub(crate) struct FF {
 // //   #[id]
 // //   #[liberty(name)]
-// //   var1: FastStr,
+// //   var1: ArcStr,
 // //   #[id]
 // //   #[liberty(name)]
-// //   var2: FastStr,
+// //   var2: ArcStr,
 // //   /// group comments
 // //   #[liberty(comments)]
 // //   comments: GroupComments<Self>,
@@ -216,12 +216,12 @@
 // //   #[liberty(undefined)]
 // //   undefined: AttributeList,
 // //   #[liberty(simple(type = Option))]
-// //   next_state: Option<FastStr>,
+// //   next_state: Option<ArcStr>,
 // // }
 // // impl GroupFn for FF {}
 // // impl NamedGroup for FF {
 // //   #[inline]
-// //   fn parse(mut v: Vec<FastStr>) -> Result<Self::Name, crate::ast::IdError> {
+// //   fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, crate::ast::IdError> {
 // //     let l = v.len();
 // //     if l != 2 {
 // //       return Err(crate::ast::IdError::LengthDismatch(2, l, v));
@@ -237,7 +237,7 @@
 // //     }
 // //   }
 // //   #[inline]
-// //   fn name2vec(name: Self::Name) -> Vec<FastStr> {
+// //   fn name2vec(name: Self::Name) -> Vec<ArcStr> {
 // //     vec![name.var1, name.var2]
 // //   }
 // // }
@@ -246,7 +246,7 @@
 // // #[derive(liberty_macros::Group)]
 // // pub(crate) struct Cell {
 // //   #[liberty(name)]
-// //   name: FastStr,
+// //   name: ArcStr,
 // //   /// group comments
 // //   #[liberty(comments)]
 // //   comments: GroupComments<Self>,

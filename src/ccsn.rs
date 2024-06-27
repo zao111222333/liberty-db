@@ -10,7 +10,7 @@ use crate::{
   },
   expression::IdBooleanExpression,
   timing::items::Mode,
-  FastStr, GroupSet,
+  ArcStr, GroupSet,
 };
 
 /// Use the `ccsn_first_stage` group to specify CCS noise for the first stage of the channel-
@@ -47,7 +47,7 @@ use crate::{
 pub struct CCSNStage {
   #[liberty(name)]
   #[id]
-  pub name: Vec<FastStr>,
+  pub name: Vec<ArcStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -107,7 +107,7 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(simple(type = Option))]
-  pub related_ccb_node: Option<FastStr>,
+  pub related_ccb_node: Option<ArcStr>,
   /// Use the `stage_type`  attribute to specify the stage type of the channel-connecting block output voltage.
   ///
   /// The valid values are `pull_up`,in which the output voltage of the channel-connecting block is always pulled up (rising);
@@ -269,7 +269,7 @@ impl SimpleAttri for StageType {}
 pub struct ReceiverCapacitance {
   #[id]
   #[liberty(name)]
-  name: Option<FastStr>,
+  name: Option<ArcStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -306,9 +306,9 @@ impl GroupFn for ReceiverCapacitance {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PropagatingCcb {
   /// input_ccb_name
-  pub input_ccb_name: FastStr,
+  pub input_ccb_name: ArcStr,
   /// output_ccb_name
-  pub output_ccb_name: Option<FastStr>,
+  pub output_ccb_name: Option<ArcStr>,
 }
 
 impl ComplexAttri for PropagatingCcb {
@@ -316,11 +316,11 @@ impl ComplexAttri for PropagatingCcb {
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let input_ccb_name = match i.next() {
-      Some(s) => FastStr::new(s),
+      Some(s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let output_ccb_name = match i.next() {
-      Some(s) => Some(FastStr::new(s)),
+      Some(s) => Some(ArcStr::from(s)),
       None => None,
     };
     if let Some(_) = i.next() {

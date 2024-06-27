@@ -12,7 +12,7 @@ use nom::{
   IResult, InputTakeAtPosition,
 };
 
-use crate::{ast::GroupWrapper, FastStr};
+use crate::{ast::GroupWrapper, ArcStr};
 
 fn comment_single<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
   map(
@@ -171,13 +171,13 @@ pub(crate) fn undefine<'a>(
 ) -> IResult<&'a str, super::AttriValue, Error<&'a str>> {
   let line_num_back = line_num.clone();
   if let Ok((input, res)) = simple(i, line_num) {
-    return Ok((input, super::AttriValue::Simple(FastStr::new(res))));
+    return Ok((input, super::AttriValue::Simple(ArcStr::from(res))));
   }
   *line_num = line_num_back;
   if let Ok((input, res)) = complex(i, line_num) {
     return Ok((
       input,
-      super::AttriValue::Complex(vec![res.into_iter().map(FastStr::new).collect()]),
+      super::AttriValue::Complex(vec![res.into_iter().map(ArcStr::from).collect()]),
     ));
   }
   *line_num = line_num_back;
@@ -200,7 +200,7 @@ pub(crate) fn undefine<'a>(
                 (input, n) = comment_space_newline(input)?;
                 *line_num += n;
               }
-              res.attr_list.push((FastStr::new(_key), attri));
+              res.attr_list.push((ArcStr::from(_key), attri));
             }
           }
         }
@@ -391,7 +391,7 @@ fn key_test() {
 pub(crate) fn title<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<FastStr>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<ArcStr>, Error<&'a str>> {
   map(
     tuple((
       space,
@@ -404,7 +404,7 @@ pub(crate) fn title<'a>(
     )),
     |(_, _, v, _, _, _, n)| {
       *line_num += n;
-      v.into_iter().map(FastStr::new).collect()
+      v.into_iter().map(ArcStr::from).collect()
     },
   )(i)
 }

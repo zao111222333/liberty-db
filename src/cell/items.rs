@@ -5,7 +5,7 @@ use crate::{
   common::items::WordSet,
   expression::IdBooleanExpression,
   timing::items::Mode,
-  FastStr,
+  ArcStr,
 };
 use itertools::Itertools;
 
@@ -26,7 +26,7 @@ use itertools::Itertools;
 pub struct LeakagePower {
   #[id]
   #[liberty(name)]
-  name: Vec<FastStr>,
+  name: Vec<ArcStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -35,7 +35,7 @@ pub struct LeakagePower {
   pub undefined: crate::ast::AttributeList,
   #[id]
   #[liberty(simple(type = Option))]
-  power_level: Option<FastStr>,
+  power_level: Option<ArcStr>,
   #[id]
   #[liberty(simple)]
   related_pg_pin: WordSet,
@@ -66,10 +66,10 @@ impl GroupFn for LeakagePower {}
 pub struct Statetable {
   #[id]
   #[liberty(name)]
-  pub input_nodes: Vec<FastStr>,
+  pub input_nodes: Vec<ArcStr>,
   #[id]
   #[liberty(name)]
-  pub internal_nodes: Vec<FastStr>,
+  pub internal_nodes: Vec<ArcStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -83,7 +83,7 @@ impl GroupFn for Statetable {}
 
 impl NamedGroup for Statetable {
   #[inline]
-  fn parse(mut v: Vec<FastStr>) -> Result<Self::Name, crate::ast::IdError> {
+  fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, crate::ast::IdError> {
     let l = v.len();
     if l != 2 {
       return Err(crate::ast::IdError::LengthDismatch(2, l, v));
@@ -91,8 +91,8 @@ impl NamedGroup for Statetable {
     if let Some(var2) = v.pop() {
       if let Some(var1) = v.pop() {
         Ok(Self::Name {
-          input_nodes: var1.split_ascii_whitespace().map(FastStr::new).collect(),
-          internal_nodes: var2.split_ascii_whitespace().map(FastStr::new).collect(),
+          input_nodes: var1.split_ascii_whitespace().map(ArcStr::from).collect(),
+          internal_nodes: var2.split_ascii_whitespace().map(ArcStr::from).collect(),
         })
       } else {
         Err(crate::ast::IdError::Other("Unkown pop error".into()))
@@ -102,7 +102,7 @@ impl NamedGroup for Statetable {
     }
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<FastStr> {
+  fn name2vec(name: Self::Name) -> Vec<ArcStr> {
     vec![name.input_nodes.join(" ").into(), name.internal_nodes.join(" ").into()]
   }
 }
@@ -111,7 +111,7 @@ impl NamedGroup for Statetable {
 #[derive(Default, Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Table {
-  pub v: Vec<FastStr>,
+  pub v: Vec<ArcStr>,
 }
 
 impl std::fmt::Display for Table {
@@ -138,7 +138,7 @@ impl FromStr for Table {
           if _l == "" {
             None
           } else {
-            Some(FastStr::new(_l))
+            Some(ArcStr::from(_l))
           }
         })
         .collect(),
@@ -160,7 +160,7 @@ impl SimpleAttri for Table {
     match Self::parse(simple_multi) {
       Ok(s) => Ok((input, Ok(s))),
       Err(e) => {
-        Ok((input, Err((e, crate::ast::AttriValue::Simple(FastStr::new(simple_multi))))))
+        Ok((input, Err((e, crate::ast::AttriValue::Simple(ArcStr::from(simple_multi))))))
       }
     }
   }
@@ -206,7 +206,7 @@ fn statetable_test() {
 pub struct PgPin {
   #[liberty(name)]
   #[id]
-  name: Option<FastStr>,
+  name: Option<ArcStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -221,7 +221,7 @@ pub struct PgPin {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
   #[liberty(simple)]
-  pub voltage_name: FastStr,
+  pub voltage_name: ArcStr,
   /// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
   /// The `pg_type`  attribute also supports back-bias modeling.
   /// The `pg_type`  attribute can have the following values:
@@ -247,17 +247,17 @@ pub struct PgPin {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
   #[liberty(simple)]
-  pub user_pg_type: FastStr,
+  pub user_pg_type: ArcStr,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
   #[liberty(simple)]
-  pub physical_connection: FastStr,
+  pub physical_connection: ArcStr,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
   #[liberty(simple)]
-  pub related_bias_pin: FastStr,
+  pub related_bias_pin: ArcStr,
 }
 impl GroupFn for PgPin {}
 

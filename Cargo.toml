@@ -4,7 +4,7 @@
 members = ["macros", "tests"]
 
 [workspace.package]
-version = "0.4.8"
+version = "0.4.9"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -65,7 +65,8 @@ mut_set_derive = "0.3.5"
 # mut_set = {path = "../mut_set"}
 # mut_set_derive = {path = "../mut_set/derive"}
 duplicate = "1.0.0"
-faststr = "0.2.19"
+# faststr = "0.2.19"
+arcstr = {version="1.2.0", features=["serde"]}
 
 [dev-dependencies]
 anyhow = "1.0.80"

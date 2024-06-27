@@ -7,20 +7,23 @@ pub mod logic;
 use std::{borrow::Borrow, collections::HashSet, str::FromStr};
 
 use biodivine_lib_bdd::{
-  boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSetBuilder,
+  boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
+  BddVariableSetBuilder,
 };
 
 mod parser;
-use crate::FastStr;
+use crate::ArcStr;
 use itertools::Itertools;
-use parser::BoolExprErr;
+use parser::{as_sdf_str, BoolExprErr};
+
+use super::SdfExpression;
 lazy_static! {
   static ref UNKNOWN: Box<Expr> = Box::new(Expr::Variable("_unknown_".to_owned()));
 }
 
 pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
   #[inline]
-  fn get_nodes(&self) -> HashSet<FastStr> {
+  fn get_nodes(&self) -> HashSet<ArcStr> {
     let mut node_set = HashSet::new();
     _get_nodes(&self.borrow(), &mut node_set);
     return node_set;
@@ -122,7 +125,7 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdBooleanExpression {
   /// sorted_nodes
-  pub sorted_nodes: Vec<FastStr>,
+  pub sorted_nodes: Vec<ArcStr>,
   /// BooleanExpression itself
   pub expr: Expr,
   /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
@@ -153,6 +156,30 @@ impl PartialEq for IdBooleanExpression {
     self.sorted_nodes == other.sorted_nodes && self.bdd == other.bdd
   }
 }
+
+impl IdBooleanExpression {
+  #[inline]
+  pub fn sdf(&self) -> SdfExpression {
+    let variables = BddVariableSet::new(
+      self
+        .sorted_nodes
+        .iter()
+        .map(|s| s.as_str())
+        .collect::<Vec<_>>()
+        .as_slice(),
+    );
+    let s = self
+      .bdd
+      .sat_valuations()
+      .map(|valuation| {
+        let expr = Bdd::from(valuation).to_boolean_expression(&variables);
+        as_sdf_str(&expr)
+      })
+      .join(") || ( ");
+    SdfExpression::new(format!("( {s} )").into())
+  }
+}
+
 impl Eq for IdBooleanExpression {}
 impl PartialOrd for IdBooleanExpression {
   #[inline]
@@ -229,13 +256,13 @@ impl std::fmt::Display for IdBooleanExpression {
 }
 
 #[inline]
-fn _get_nodes(expr: &Expr, node_set: &mut HashSet<FastStr>) {
+fn _get_nodes(expr: &Expr, node_set: &mut HashSet<ArcStr>) {
   match expr {
     Expr::Const(_) => (),
     Expr::Imp(_, _) => todo!(),
     Expr::Iff(_, _) => todo!(),
     Expr::Variable(node) => {
-      let _ = node_set.insert(FastStr::new(node));
+      let _ = node_set.insert(ArcStr::from(node));
     }
     Expr::Not(e) => _get_nodes(e, node_set),
     Expr::And(e1, e2) => {
@@ -387,5 +414,9 @@ mod test {
     }
     .into();
     assert_eq!(cond, or_and);
+  }
+  #[test]
+  fn sdf() {
+    println!("{}", IdBooleanExpression::from_str("(A+B)*C").unwrap().sdf());
   }
 }

@@ -38,7 +38,7 @@ fn group_field_fn(
           },
           Err((e,undefined)) => {
             println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
-            res.#undefined_name.push((faststr::FastStr::new(key), undefined));
+            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
       };
@@ -60,7 +60,7 @@ fn group_field_fn(
           },
           Err((e,undefined)) => {
             println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
-            res.#undefined_name.push((faststr::FastStr::new(key), undefined));
+            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
       };
@@ -367,11 +367,11 @@ pub(crate) fn inner(
             #[doc(hidden)]
             impl crate::ast::NamedGroup for #ident {
               #[inline]
-              fn parse(v: Vec<faststr::FastStr>) -> Result<Self::Name, crate::ast::IdError>{
+              fn parse(v: Vec<crate::ArcStr>) -> Result<Self::Name, crate::ast::IdError>{
                 <Self::Name as crate::ast::NameAttri>::parse(v)
               }
               #[inline]
-              fn name2vec(name: Self::Name) -> Vec<faststr::FastStr>{
+              fn name2vec(name: Self::Name) -> Vec<crate::ArcStr>{
                 <Self::Name as crate::ast::NameAttri>::to_vec(name)
               }
             }
@@ -470,7 +470,7 @@ pub(crate) fn inner(
                       _ => {
                         let undefined: crate::ast::AttriValue;
                         (input,undefined) = crate::ast::parser::undefine(input,line_num)?;
-                        res.#undefined_name.push((faststr::FastStr::new(key), undefined));
+                        res.#undefined_name.push((crate::ArcStr::from(key), undefined));
                         let n: usize;
                         (input,n) = crate::ast::parser::comment_space_newline(input)?;
                         *line_num+=n;

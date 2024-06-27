@@ -2,52 +2,11 @@ use std::{cmp::Ordering, collections::HashSet, fmt::Debug};
 
 use crate::{
   ast::{GroupComments, GroupFn, SimpleAttri},
-  FastStr,
+  ArcStr,
 };
 use itertools::Itertools;
 use strum_macros::{Display, EnumString};
 
-/// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
-///
-/// #### Example
-/// ``` liberty
-/// sdf_cond_end : "SIG_0 == 1’b1" ;
-/// ```
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =210.10
-/// &end
-/// =210.19
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =203.45
-/// &end
-/// =203.45
-/// ">Reference-Instance</a>
-#[derive(Debug, Clone, PartialEq)]
-#[derive(Default)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct SdfExpression {
-  inner: FastStr,
-}
-impl std::fmt::Display for SdfExpression {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    std::fmt::Display::fmt(&self.inner, f)
-  }
-}
-impl std::str::FromStr for SdfExpression {
-  type Err = core::convert::Infallible;
-
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self { inner: FastStr::from_str(s)? })
-  }
-}
-impl SimpleAttri for SdfExpression {}
 /// The `sdf_edges` attribute defines the edge specification on both
 /// the start pin and the end pin. The default is noedge.
 ///
@@ -136,15 +95,15 @@ pub enum VariableType {
 pub struct Domain {
   #[liberty(name)]
   #[id]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
-  pub group_name: FastStr,
-  pub calc_mode: Option<FastStr>,
+  pub group_name: ArcStr,
+  pub calc_mode: Option<ArcStr>,
   pub variable_1: Option<VariableType>,
   pub variable_2: Option<VariableType>,
   pub variable_3: Option<VariableType>,
@@ -157,7 +116,7 @@ impl GroupFn for Domain {}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WordSet {
-  pub inner: HashSet<FastStr>,
+  pub inner: HashSet<ArcStr>,
 }
 impl std::fmt::Display for WordSet {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -209,7 +168,7 @@ impl std::str::FromStr for WordSet {
   type Err = std::fmt::Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self { inner: s.split(' ').map(FastStr::new).collect() })
+    Ok(Self { inner: s.split(' ').map(ArcStr::from).collect() })
   }
 }
 
@@ -223,7 +182,7 @@ impl std::str::FromStr for WordSet {
 pub struct DummyGroup {
   #[liberty(name)]
   #[id]
-  name: Option<FastStr>,
+  name: Option<ArcStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,

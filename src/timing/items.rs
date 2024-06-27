@@ -8,7 +8,7 @@ use crate::{
     logic::{self, LogicLike},
     BooleanExpression,
   },
-  FastStr,
+  ArcStr,
 };
 
 use strum_macros::{Display, EnumString};
@@ -172,7 +172,7 @@ impl SimpleAttri for TimingSenseType {}
 /// ">Reference-Instance</a>
 ///
 // #[derive(Debug, Clone, Copy, Default)]
-pub type Mode = [FastStr; 2];
+pub type Mode = [ArcStr; 2];
 
 // impl ComplexAttri for Mode {
 //   fn parse(v: Vec<&str>) -> Result<Self, ast::ComplexParseError> {
@@ -218,7 +218,7 @@ pub struct CellDegradation {
   /// name
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,

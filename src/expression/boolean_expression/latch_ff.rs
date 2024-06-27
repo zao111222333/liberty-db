@@ -5,7 +5,7 @@
 use super::{BooleanExpression, BooleanExpressionLike, UNKNOWN};
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn, IdError, NamedGroup},
-  FastStr,
+  ArcStr,
 };
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
@@ -35,7 +35,7 @@ pub struct FF {
   /// ">Reference-Definition</a>
   #[liberty(name)]
   #[id]
-  pub variable1: FastStr,
+  pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -49,7 +49,7 @@ pub struct FF {
   /// ">Reference-Definition</a>
   #[liberty(name)]
   #[id]
-  pub variable2: FastStr,
+  pub variable2: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -119,7 +119,7 @@ pub struct FFBank {
   /// ">Reference-Definition</a>
   #[liberty(name)]
   #[id]
-  pub variable1: FastStr,
+  pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -133,7 +133,7 @@ pub struct FFBank {
   /// ">Reference-Definition</a>
   #[liberty(name)]
   #[id]
-  pub variable2: FastStr,
+  pub variable2: ArcStr,
   /// bits
   #[liberty(name)]
   pub bits: usize,
@@ -205,7 +205,7 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable1: FastStr,
+  pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -219,7 +219,7 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable2: FastStr,
+  pub variable2: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -288,7 +288,7 @@ pub struct LatchBank {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable1: FastStr,
+  pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -302,7 +302,7 @@ pub struct LatchBank {
   /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub variable2: FastStr,
+  pub variable2: ArcStr,
   /// bits
   #[liberty(name)]
   pub bits: usize,
@@ -356,7 +356,7 @@ pub struct LatchBank {
 )]
 impl NamedGroup for LatchFF_type {
   #[inline]
-  fn parse(mut v: Vec<FastStr>) -> Result<Self::Name, IdError> {
+  fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, IdError> {
     let l = v.len();
     if l != 2 {
       return Err(IdError::LengthDismatch(2, l, v));
@@ -372,7 +372,7 @@ impl NamedGroup for LatchFF_type {
     }
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<FastStr> {
+  fn name2vec(name: Self::Name) -> Vec<ArcStr> {
     vec![name.variable1, name.variable2]
   }
 }
@@ -384,7 +384,7 @@ impl NamedGroup for LatchFF_type {
 )]
 impl NamedGroup for LatchFFBank_type {
   #[inline]
-  fn parse(mut v: Vec<FastStr>) -> Result<Self::Name, IdError> {
+  fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, IdError> {
     let l = v.len();
     if l != 3 {
       return Err(crate::ast::IdError::LengthDismatch(3, l, v));
@@ -409,7 +409,7 @@ impl NamedGroup for LatchFFBank_type {
     }
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<FastStr> {
+  fn name2vec(name: Self::Name) -> Vec<ArcStr> {
     vec![name.variable1, name.variable2, name.bits.to_string().into()]
   }
 }
@@ -421,11 +421,11 @@ impl NamedGroup for LatchFFBank_type {
 )]
 impl __LatchFF for Latch_type {
   #[inline]
-  fn variable1(&self) -> &FastStr {
+  fn variable1(&self) -> &ArcStr {
     &self.variable1
   }
   #[inline]
-  fn variable2(&self) -> &FastStr {
+  fn variable2(&self) -> &ArcStr {
     &self.variable2
   }
   #[inline]
@@ -465,11 +465,11 @@ impl __LatchFF for Latch_type {
 )]
 impl __LatchFF for FF_type {
   #[inline]
-  fn variable1(&self) -> &FastStr {
+  fn variable1(&self) -> &ArcStr {
     &self.variable1
   }
   #[inline]
-  fn variable2(&self) -> &FastStr {
+  fn variable2(&self) -> &ArcStr {
     &self.variable2
   }
   #[inline]
@@ -515,8 +515,8 @@ impl __LatchFF for FF_type {
 }
 
 trait __LatchFF {
-  fn variable1(&self) -> &FastStr;
-  fn variable2(&self) -> &FastStr;
+  fn variable1(&self) -> &ArcStr;
+  fn variable2(&self) -> &ArcStr;
   fn clear(&self) -> &Option<BooleanExpression>;
   fn clear_preset_var1(&self) -> &Option<ClearPresetState>;
   fn clear_preset_var2(&self) -> &Option<ClearPresetState>;

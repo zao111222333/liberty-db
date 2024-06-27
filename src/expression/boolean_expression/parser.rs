@@ -1,17 +1,42 @@
-// use super::BooleanExpression;
-// use boolean_expression::{Expr, BDD};
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
-use itertools::Itertools;
 use nom::{
   branch::alt,
-  bytes::complete::{tag, take_while, take_while1},
+  bytes::complete::{tag, take_while1},
   character::complete::{alpha1, alphanumeric0, char, digit1},
   combinator::map,
-  multi::{many1, many_till},
-  sequence::{delimited, pair, preceded, terminated, tuple},
+  multi::many1,
+  sequence::{delimited, pair, tuple},
   IResult,
 };
-use std::collections::{HashSet, VecDeque};
+
+// only not(variable) and variable
+#[inline]
+pub(super) fn as_sdf_str(expr: &Expr) -> String {
+  match expr {
+    Expr::Variable(s) => {
+      if s.as_bytes()[0].is_ascii_digit() {
+        format!("\\\"{s}\\\" == 1'b1")
+      } else {
+        format!("{s} == 1'b1")
+      }
+    }
+    Expr::Const(_) => todo!(),
+    Expr::Not(e) => match e.as_ref() {
+      Expr::Variable(s) => {
+        format!("{} == 1'b0", s.clone())
+      }
+      _ => todo!(),
+    },
+    Expr::Or(_, _) => todo!(),
+    Expr::And(e1, e2) => {
+      format!("{} && {}", as_sdf_str(e1), as_sdf_str(e2))
+    }
+    Expr::Xor(_, _) => todo!(),
+    Expr::Imp(_, _) => todo!(),
+    Expr::Iff(_, _) => todo!(),
+    Expr::Cond(_, _, _) => todo!(),
+  }
+}
 
 #[inline]
 pub(super) fn _fmt(expr: &Expr, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -103,7 +128,7 @@ pub(super) fn _fmt(expr: &Expr, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Re
 }
 
 #[derive(Debug, Eq, PartialEq)]
-enum SingleOp {
+pub(crate) enum SingleOp {
   Not,
   // !A = A'
   BackNot,
@@ -111,7 +136,7 @@ enum SingleOp {
   Zero,
 }
 #[derive(Debug, Eq, PartialEq)]
-enum BinaryOp {
+pub(crate) enum BinaryOp {
   Or,
   And,
   Xor,
