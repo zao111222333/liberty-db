@@ -7,7 +7,7 @@ use crate::{
   ast::{
     AttributeList, ComplexAttri, ComplexParseError, GroupComments, GroupFn, SimpleAttri,
   },
-  FastStr, GroupSet,
+  ArcStr, GroupSet,
 };
 
 /// <a name ="reference_link" href="
@@ -29,7 +29,7 @@ pub struct Sensitization {
   /// name
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -37,10 +37,10 @@ pub struct Sensitization {
   #[liberty(undefined)]
   pub undefined: AttributeList,
   /// TODO
-  pub pin_names: Vec<FastStr>,
+  pub pin_names: Vec<ArcStr>,
   /// TODO
   #[liberty(complex)]
-  pub vector: (usize, FastStr),
+  pub vector: (usize, ArcStr),
 }
 
 impl GroupFn for Sensitization {}
@@ -59,7 +59,7 @@ impl GroupFn for Sensitization {}
 pub struct VoltageMap {
   /// name
   #[id]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// voltage
   pub voltage: f64,
 }
@@ -68,7 +68,7 @@ impl ComplexAttri for VoltageMap {
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let name = match i.next() {
-      Some(s) => FastStr::new(s),
+      Some(s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let voltage = match i.next() {
@@ -90,7 +90,7 @@ impl ComplexAttri for VoltageMap {
   #[inline]
   fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
     let mut buffer = ryu::Buffer::new();
-    vec![vec![self.name.clone(), FastStr::new(buffer.format(self.voltage))]]
+    vec![vec![self.name.clone(), ArcStr::from(buffer.format(self.voltage))]]
   }
 }
 
@@ -110,7 +110,7 @@ pub struct InputVoltage {
   /// name
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -122,25 +122,25 @@ pub struct InputVoltage {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.7&end=62.8
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vil: FastStr,
+  pub vil: ArcStr,
   /// The minimum input voltage for which the input to the core is guaranteed to be a logic 1
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.10&end=62.11
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vih: FastStr,
+  pub vih: ArcStr,
   /// The minimum acceptable input voltage.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.13&end=62.13
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vimin: FastStr,
+  pub vimin: ArcStr,
   /// The maximum acceptable input voltage.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.15&end=62.16
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vimax: FastStr,
+  pub vimax: ArcStr,
 }
 impl GroupFn for InputVoltage {}
 
@@ -160,7 +160,7 @@ pub struct OutputVoltage {
   /// name
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -172,25 +172,25 @@ pub struct OutputVoltage {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.45&end=75.46
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vol: FastStr,
+  pub vol: ArcStr,
   /// The minimum output voltage generated to represent a logic 1.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.3&end=76.4
   /// ">Reference</a>
   #[liberty(simple)]
-  pub voh: FastStr,
+  pub voh: ArcStr,
   /// The minimum output voltage the pad can generate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.5&end=76.6
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vomin: FastStr,
+  pub vomin: ArcStr,
   /// The maximum output voltage the pad can generate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.7&end=76.8
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vomax: FastStr,
+  pub vomax: ArcStr,
 }
 impl GroupFn for OutputVoltage {}
 
@@ -236,7 +236,7 @@ pub struct OperatingConditions {
   /// name
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -248,7 +248,7 @@ pub struct OperatingConditions {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.28&end=72.28
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub calc_mode: Option<FastStr>,
+  pub calc_mode: Option<ArcStr>,
   /// Use this optional attribute to specify values for up to five user-defined variables.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.36&end=72.37
@@ -268,7 +268,7 @@ pub struct OperatingConditions {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.9&end=73.10
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
-  pub process_label: Option<FastStr>,
+  pub process_label: Option<ArcStr>,
   /// Use the `temperature`  attribute to specify the ambient temperature in which the design is to operate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.15&end=73.16
@@ -348,13 +348,13 @@ pub struct Define {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.10&end=36.11
   /// ">Reference</a>
   #[id]
-  pub attribute_name: FastStr,
+  pub attribute_name: ArcStr,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.12&end=36.13
   /// ">Reference</a>
   #[id]
-  pub group_name: FastStr,
+  pub group_name: ArcStr,
   /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.14&end=36.15
@@ -389,11 +389,11 @@ impl ComplexAttri for Define {
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let attribute_name = match i.next() {
-      Some(s) => FastStr::new(s),
+      Some(s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let group_name = match i.next() {
-      Some(s) => FastStr::new(s),
+      Some(s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let attribute_type = match i.next() {
@@ -436,7 +436,7 @@ pub struct DefineCellArea {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.28&end=36.29
   /// ">Reference</a>
   #[id]
-  pub area_name: FastStr,
+  pub area_name: ArcStr,
   /// The resource type can be
   /// + pad_slots
   /// + pad_input_driver_sites
@@ -485,7 +485,7 @@ impl ComplexAttri for DefineCellArea {
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let area_name = match i.next() {
-      Some(s) => FastStr::new(s),
+      Some(s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let resource_type = match i.next() {
@@ -523,24 +523,24 @@ pub struct DefineGroup {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.33&end=37.34
   /// ">Reference</a>
   #[id]
-  pub group: FastStr,
+  pub group: ArcStr,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.35&end=37.36
   /// ">Reference</a>
   #[id]
-  pub parent_name: FastStr,
+  pub parent_name: ArcStr,
 }
 impl ComplexAttri for DefineGroup {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
     let mut i = v.into_iter();
     let group = match i.next() {
-      Some(s) => FastStr::new(s),
+      Some(s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let parent_name = match i.next() {
-      Some(s) => FastStr::new(s),
+      Some(s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
@@ -569,7 +569,7 @@ pub struct WireLoad {
   /// name
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -726,17 +726,17 @@ impl ComplexAttri for FanoutLength {
     match (self.average_capacitance, self.standard_deviation, self.number_of_nets) {
       (Some(average_capacitance), Some(standard_deviation), Some(number_of_nets)) => {
         vec![vec![
-          FastStr::new(buffer_i.format(self.fanout)),
-          FastStr::new(buffer_f.format(self.length)),
-          FastStr::new(buffer_f.format(average_capacitance)),
-          FastStr::new(buffer_f.format(standard_deviation)),
-          FastStr::new(buffer_i.format(number_of_nets)),
+          ArcStr::from(buffer_i.format(self.fanout)),
+          ArcStr::from(buffer_f.format(self.length)),
+          ArcStr::from(buffer_f.format(average_capacitance)),
+          ArcStr::from(buffer_f.format(standard_deviation)),
+          ArcStr::from(buffer_i.format(number_of_nets)),
         ]]
       }
       _ => {
         vec![vec![
-          FastStr::new(buffer_i.format(self.fanout)),
-          FastStr::new(buffer_f.format(self.length)),
+          ArcStr::from(buffer_i.format(self.fanout)),
+          ArcStr::from(buffer_f.format(self.length)),
         ]]
       }
     }
@@ -758,7 +758,7 @@ pub struct WireLoadSection {
   /// name
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -770,6 +770,6 @@ pub struct WireLoadSection {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
   /// ">Reference</a>
   #[liberty(complex)]
-  pub wire_load_from_area: (f64, f64, FastStr),
+  pub wire_load_from_area: (f64, f64, ArcStr),
 }
 impl GroupFn for WireLoadSection {}

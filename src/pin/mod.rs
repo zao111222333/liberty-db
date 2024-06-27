@@ -8,7 +8,7 @@ use crate::{
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
-  FastStr, GroupSet,
+  ArcStr, GroupSet,
 };
 mod items;
 // use crate::units;
@@ -42,7 +42,7 @@ pub struct Pin {
   /// Name of the pin
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -50,9 +50,9 @@ pub struct Pin {
   #[liberty(undefined)]
   pub undefined: AttributeList,
   #[liberty(simple(type = Option))]
-  pub driver_waveform_rise: Option<FastStr>,
+  pub driver_waveform_rise: Option<ArcStr>,
   #[liberty(simple(type = Option))]
-  pub driver_waveform_fall: Option<FastStr>,
+  pub driver_waveform_fall: Option<ArcStr>,
   /// The `related_power_pin`  and `related_ground_pin`  attributes
   /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
   /// The `related_power_pin`  and `related_ground_pin` attributes are used
@@ -67,7 +67,7 @@ pub struct Pin {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
   /// ">Reference-Definition</a>
   #[liberty(simple)]
-  pub related_ground_pin: FastStr,
+  pub related_ground_pin: ArcStr,
   /// The `related_power_pin`  and `related_ground_pin`  attributes
   /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
   /// The `related_power_pin`  and `related_ground_pin` attributes are used
@@ -82,7 +82,7 @@ pub struct Pin {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
   /// ">Reference-Definition</a>
   #[liberty(simple)]
-  pub related_power_pin: FastStr,
+  pub related_power_pin: ArcStr,
   // NOTICE: Simple Attributes in a pin Group
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -287,7 +287,7 @@ pub struct Pin {
   /// =228.20
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub complementary_pin: Option<FastStr>,
+  pub complementary_pin: Option<ArcStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -467,7 +467,7 @@ pub struct Pin {
   /// =228.42
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub input_signal_level: Option<FastStr>,
+  pub input_signal_level: Option<ArcStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -477,7 +477,7 @@ pub struct Pin {
   /// =228.43
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub input_voltage: Option<FastStr>,
+  pub input_voltage: Option<ArcStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -487,7 +487,7 @@ pub struct Pin {
   /// =228.46
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub internal_node: Option<FastStr>, /* Required in statetable cells */
+  pub internal_node: Option<ArcStr>, /* Required in statetable cells */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -657,7 +657,7 @@ pub struct Pin {
   /// =228.63
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub output_signal_level: Option<FastStr>,
+  pub output_signal_level: Option<ArcStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -687,7 +687,7 @@ pub struct Pin {
   /// =228.66
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub output_voltage: Option<FastStr>,
+  pub output_voltage: Option<ArcStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

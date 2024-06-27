@@ -158,13 +158,13 @@ pub(crate) fn parse_fields_type(
 /// #[liberty(undefined)]
 /// // GroupComments
 /// #[liberty(comments)]
-/// // Auto vector Id: Vec<FastStr>
+/// // Auto vector Id: Vec<ArcStr>
 /// #[liberty(id(title=0))]
-/// // Auto Id: Option<FastStr>
+/// // Auto Id: Option<ArcStr>
 /// #[liberty(id(title=0.5))]
-/// // Auto Id: FastStr
+/// // Auto Id: ArcStr
 /// #[liberty(id(title=1))]
-/// // Auto slice Id: [FastStr:2]
+/// // Auto slice Id: [ArcStr:2]
 /// #[liberty(id(title=2))]
 /// // GroupId
 /// #[liberty(id)]

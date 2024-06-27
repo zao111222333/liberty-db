@@ -6,7 +6,7 @@ use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::Pin,
-  FastStr, GroupSet,
+  ArcStr, GroupSet,
 };
 use std::borrow::Borrow;
 mod items;
@@ -23,7 +23,7 @@ pub use items::*;
 pub struct Cell {
   #[id]
   #[liberty(name)]
-  pub name: FastStr,
+  pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -33,11 +33,11 @@ pub struct Cell {
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
   #[liberty(simple(type = Option))]
-  pub driver_waveform_rise: Option<FastStr>,
+  pub driver_waveform_rise: Option<ArcStr>,
   #[liberty(simple(type = Option))]
-  pub driver_waveform_fall: Option<FastStr>,
+  pub driver_waveform_fall: Option<ArcStr>,
   #[liberty(simple(type = Option))]
-  pub cell_footprint: Option<FastStr>,
+  pub cell_footprint: Option<ArcStr>,
   #[liberty(simple(type=Option))]
   pub cell_leakage_power: Option<f64>,
   #[liberty(group(type=Set))]

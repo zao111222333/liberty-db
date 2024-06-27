@@ -4,7 +4,7 @@
 
 mod fmt;
 pub mod parser;
-use crate::FastStr;
+use crate::ArcStr;
 pub use fmt::CodeFormatter;
 use itertools::Itertools;
 use nom::{error::Error, IResult};
@@ -16,9 +16,9 @@ use std::{
   str::FromStr,
 };
 /// Wrapper for simple attribute
-pub type SimpleWrapper = FastStr;
+pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
-pub type ComplexWrapper = Vec<Vec<FastStr>>;
+pub type ComplexWrapper = Vec<Vec<ArcStr>>;
 /// Wrapper for group attribute
 ///
 /// ``` text
@@ -31,12 +31,12 @@ pub type ComplexWrapper = Vec<Vec<FastStr>>;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct GroupWrapper {
   /// title
-  pub title: Vec<FastStr>,
+  pub title: Vec<ArcStr>,
   /// attr_list
   pub attr_list: AttributeList,
 }
 /// type for UndefinedAttributes, same to `attri_list`
-pub type AttributeList = Vec<(FastStr, AttriValue)>;
+pub type AttributeList = Vec<(ArcStr, AttriValue)>;
 /// AttriValue for undefined_attribute/serialization
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -121,7 +121,7 @@ pub trait SimpleAttri: Sized + Display + FromStr {
     let (input, simple) = parser::simple(i, line_num)?;
     match Self::parse(simple) {
       Ok(s) => Ok((input, Ok(s))),
-      Err(e) => Ok((input, Err((e, AttriValue::Simple(FastStr::new(simple)))))),
+      Err(e) => Ok((input, Err((e, AttriValue::Simple(ArcStr::from(simple)))))),
     }
   }
   // TODO: efficent?
@@ -158,8 +158,8 @@ pub enum ComplexParseError {
 
 pub trait NameAttri: Sized + Clone {
   /// basic parser
-  fn parse(v: Vec<FastStr>) -> Result<Self, IdError>;
-  fn to_vec(self) -> Vec<FastStr>;
+  fn parse(v: Vec<ArcStr>) -> Result<Self, IdError>;
+  fn to_vec(self) -> Vec<ArcStr>;
 }
 
 /// Complex Attribute in Liberty
@@ -195,7 +195,7 @@ pub trait ComplexAttri: Sized {
 pub type GroupComments<T> = <T as GroupAttri>::Comments;
 
 /// AttriComment
-pub type AttriComment = Vec<FastStr>;
+pub type AttriComment = Vec<ArcStr>;
 /// Group Functions
 pub trait GroupFn {
   fn post_process(&mut self) {}
@@ -225,7 +225,7 @@ pub trait GroupAttri: Sized {
 pub enum IdError {
   /// TitleLenMismatch(want,got,title)
   #[error("title length dismatch (want={0},got={1}), title={2:?}")]
-  LengthDismatch(usize, usize, Vec<FastStr>),
+  LengthDismatch(usize, usize, Vec<ArcStr>),
   /// replace same id
   #[error("replace same id")]
   RepeatIdx,
@@ -243,10 +243,10 @@ pub enum IdError {
 /// If more than one `#[liberty(name)]`,
 /// need to impl `NamedGroup` manually
 pub trait NamedGroup: GroupAttri {
-  /// parse name from Vec<FastStr>
-  fn parse(v: Vec<FastStr>) -> Result<Self::Name, IdError>;
-  /// name to Vec<FastStr>
-  fn name2vec(name: Self::Name) -> Vec<FastStr>;
+  /// parse name from Vec<ArcStr>
+  fn parse(v: Vec<ArcStr>) -> Result<Self::Name, IdError>;
+  /// name to Vec<ArcStr>
+  fn name2vec(name: Self::Name) -> Vec<ArcStr>;
   /// fmt_liberty
   #[inline]
   fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
@@ -261,7 +261,7 @@ pub trait NamedGroup: GroupAttri {
   }
 }
 
-fn display_nom_error(e: &nom::Err<Error<&str>>) -> FastStr {
+fn display_nom_error(e: &nom::Err<Error<&str>>) -> ArcStr {
   match e {
     nom::Err::Incomplete(_) => e.to_string(),
     nom::Err::Error(e) => format!(
@@ -329,7 +329,7 @@ pub trait Format {
     todo!()
   }
 }
-pub(crate) fn is_word(s: &FastStr) -> bool {
+pub(crate) fn is_word(s: &ArcStr) -> bool {
   !s.is_empty() && s.chars().all(parser::char_in_word)
 }
 impl Format for AttriComment {

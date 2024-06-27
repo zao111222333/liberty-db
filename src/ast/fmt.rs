@@ -1,4 +1,4 @@
-use crate::FastStr;
+use crate::ArcStr;
 use std::fmt::Write;
 
 const N: usize = 10;
@@ -7,8 +7,8 @@ const N: usize = 10;
 pub struct CodeFormatter<'a, F> {
   f: &'a mut F,
   level: usize,
-  // repeat: FastStr,
-  indentation_lut: [FastStr; N],
+  // repeat: ArcStr,
+  indentation_lut: [ArcStr; N],
 }
 
 impl<F: Write> Write for CodeFormatter<'_, F> {
@@ -37,8 +37,8 @@ impl<'a, T: Write> CodeFormatter<'a, T> {
   /// Wrap the formatter `f`, use `indentation` as base string indentation and return a new
   /// formatter that implements `std::fmt::Write` that can be used with the macro `write!()`
   #[inline]
-  pub fn new<S: Into<FastStr>>(f: &'a mut T, indentation: S) -> Self {
-    let indentation: FastStr = indentation.into();
+  pub fn new<S: Into<ArcStr>>(f: &'a mut T, indentation: S) -> Self {
+    let indentation: ArcStr = indentation.into();
     Self {
       f,
       level: 0,
