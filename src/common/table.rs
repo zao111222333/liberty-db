@@ -398,7 +398,7 @@ pub struct Values {
 
 impl ComplexAttri for Values {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, crate::ast::ComplexParseError> {
+  fn parse(v: &Vec<&str>) -> Result<Self, crate::ast::ComplexParseError> {
     Ok(Self {
       size1: 0,
       size2: 0,

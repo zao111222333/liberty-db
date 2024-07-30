@@ -78,8 +78,9 @@ fn group_field_fn(
         (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,line_num)?;
         match complex_res {
           Ok(complex) => res.#field_name=complex,
-          Err(e) => {
-            println!("Line={}; Key={}; Err={}",line_num,key,e);
+          Err((e,undefined)) => {
+            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
       };
@@ -99,8 +100,9 @@ fn group_field_fn(
         (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,line_num)?;
         match complex_res {
           Ok(complex) => res.#field_name=Some(complex),
-          Err(e) => {
-            println!("Line={}; Key={}; Err={}",line_num,key,e);
+          Err((e,undefined)) => {
+            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
       };
@@ -119,8 +121,9 @@ fn group_field_fn(
           Ok(complex) => {
             res.#field_name.push(complex);
           },
-          Err(e) => {
-            println!("Line={}, error={}",line_num,e);
+          Err((e,undefined)) => {
+            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
         let n: usize;
@@ -147,8 +150,9 @@ fn group_field_fn(
               println!("Line={}, error={}",line_num,e);
             }
           },
-          Err(e) => {
-            println!("Line={}, error={}",line_num,e);
+          Err((e,undefined)) => {
+            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
         let n: usize;

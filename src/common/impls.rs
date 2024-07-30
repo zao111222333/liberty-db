@@ -6,10 +6,9 @@ use crate::{
     ComplexAttri, ComplexParseError, ComplexWrapper, IdError, NameAttri, SimpleAttri,
     SimpleWrapper,
   },
-  ArcStr,
+  ArcStr, NotNan,
 };
 use itertools::Itertools;
-use crate::NotNan;
 impl SimpleAttri for f64 {
   #[inline]
   fn to_wrapper(&self) -> SimpleWrapper {
@@ -140,13 +139,13 @@ impl SimpleAttri for ArcStr {}
 
 impl<const N: usize> ComplexAttri for [ArcStr; N] {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
     let l = v.len();
     if l != N {
       return Err(ComplexParseError::LengthDismatch);
     }
     match TryInto::<[ArcStr; N]>::try_into(
-      v.into_iter().map(ArcStr::from).collect::<Vec<ArcStr>>(),
+      v.iter().map(|&s| ArcStr::from(s)).collect::<Vec<ArcStr>>(),
     ) {
       Ok(name) => Ok(name),
       Err(_) => Err(ComplexParseError::Other),
@@ -160,8 +159,8 @@ impl<const N: usize> ComplexAttri for [ArcStr; N] {
 
 impl ComplexAttri for Vec<f64> {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    match v.into_iter().map(|s| s.parse()).collect() {
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => {
         Err(ComplexParseError::Float(ordered_float::ParseNotNanError::ParseFloatError(e)))
@@ -185,8 +184,8 @@ impl ComplexAttri for Vec<f64> {
 
 impl ComplexAttri for Vec<NotNan<f64>> {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    match v.into_iter().map(|s| s.parse()).collect() {
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => Err(ComplexParseError::Float(e)),
     }
@@ -211,10 +210,10 @@ impl ComplexAttri for Vec<NotNan<f64>> {
 
 impl ComplexAttri for ArcStr {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let v1: ArcStr = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
@@ -229,10 +228,10 @@ impl ComplexAttri for ArcStr {
 }
 impl ComplexAttri for NotNan<f64> {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let v1: NotNan<f64> = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(ComplexParseError::Float(e)),
       },
@@ -251,8 +250,8 @@ impl ComplexAttri for NotNan<f64> {
 }
 impl ComplexAttri for Vec<ArcStr> {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    Ok(v.into_iter().map(ArcStr::from).collect())
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    Ok(v.iter().map(|&s| ArcStr::from(s)).collect())
   }
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
@@ -261,8 +260,8 @@ impl ComplexAttri for Vec<ArcStr> {
 }
 impl ComplexAttri for Vec<usize> {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    match v.into_iter().map(|s| s.parse()).collect() {
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => Err(ComplexParseError::Int(e)),
     }
@@ -276,10 +275,10 @@ impl ComplexAttri for Vec<usize> {
 
 impl ComplexAttri for (f64, f64, ArcStr) {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let v1: f64 = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => {
           return Err(ComplexParseError::Float(
@@ -290,7 +289,7 @@ impl ComplexAttri for (f64, f64, ArcStr) {
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let v2: f64 = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => {
           return Err(ComplexParseError::Float(
@@ -301,7 +300,7 @@ impl ComplexAttri for (f64, f64, ArcStr) {
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let v3: ArcStr = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
@@ -319,38 +318,12 @@ impl ComplexAttri for (f64, f64, ArcStr) {
     ]]
   }
 }
-impl ComplexAttri for (usize, ArcStr) {
-  #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
-    let v1: usize = match i.next() {
-      Some(s) => match s.parse() {
-        Ok(f) => f,
-        Err(e) => return Err(ComplexParseError::Int(e)),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let v2: ArcStr = match i.next() {
-      Some(s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if let Some(_) = i.next() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok((v1, v2))
-  }
-  #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    let mut buffer = itoa::Buffer::new();
-    vec![vec![ArcStr::from(buffer.format(self.0)), self.1.clone()]]
-  }
-}
 impl ComplexAttri for (f64, f64) {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let v1: f64 = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => {
           return Err(ComplexParseError::Float(
@@ -361,7 +334,7 @@ impl ComplexAttri for (f64, f64) {
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let v2: f64 = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => {
           return Err(ComplexParseError::Float(

@@ -15,7 +15,7 @@ use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   ccsn::PropagatingCcb,
   common::{items::*, table::*},
-  expression::{self, BooleanExpression, IdBooleanExpression, SdfExpression},
+  expression::{BooleanExpression, IdBooleanExpression, SdfExpression},
   library::Sensitization,
   pin::Pin,
   units, ArcStr, GroupSet,
@@ -1291,7 +1291,7 @@ pub struct Timing {
   /// &end
   /// =204.0
   /// ">Reference-Instance</a>
-  pub when_end: Option<expression::BooleanExpression>,
+  pub when_end: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -1308,7 +1308,7 @@ pub struct Timing {
   /// &end
   /// =204.1
   /// ">Reference-Instance</a>
-  pub when_start: Option<expression::BooleanExpression>,
+  pub when_start: Option<BooleanExpression>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1460,7 +1460,6 @@ pub struct Timing {
   pub cell_fall: Option<TableLookUp>,
   #[liberty(group)]
   pub cell_rise: Option<TableLookUp>,
-  // pub cell_rise: HashMap<ArcStr, items::CellFall>,
   #[liberty(group)]
   pub fall_constraint: Option<TableLookUp>,
   #[liberty(group)]
