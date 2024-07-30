@@ -3,7 +3,7 @@
 //! </script>
 
 use crate::ArcStr;
-use ordered_float::NotNan;
+use crate::NotNan;
 pub use uom::si::f64::{
   Capacitance, ElectricCharge, ElectricCurrent, ElectricPotential, ElectricalResistance,
   Energy, Length, Power, Ratio, ThermodynamicTemperature, Time,

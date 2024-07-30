@@ -9,7 +9,7 @@ use crate::{
   ArcStr,
 };
 use itertools::Itertools;
-use ordered_float::NotNan;
+use crate::NotNan;
 impl SimpleAttri for f64 {
   #[inline]
   fn to_wrapper(&self) -> SimpleWrapper {

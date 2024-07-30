@@ -16,15 +16,6 @@ impl Port {
   }
 }
 
-// impl Into<BooleanExpression> for Port{
-//     #[inline]
-//     fn into(self) -> BooleanExpression {
-//         BooleanExpression{
-//             value: Box::new(self)
-//         }
-//     }
-// }
-
 impl fmt::Display for Port {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -32,7 +23,7 @@ impl fmt::Display for Port {
   }
 }
 
-lazy_static! {
+lazy_static::lazy_static! {
   static ref BASIC_MAP: HashMap<logic::Vector, logic::State> = logic::State::iter()
     .map(|state| (vec![state].into(), state))
     .collect();

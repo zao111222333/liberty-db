@@ -4,6 +4,7 @@ use crate::{
   ast::{AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri, SimpleWrapper},
   common::items::WordSet,
   expression::IdBooleanExpression,
+  pin::Direction,
   timing::items::Mode,
   ArcStr,
 };
@@ -213,6 +214,16 @@ pub struct PgPin {
   /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: crate::ast::AttributeList,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
+  /// ?field=test
+  /// &bgn
+  /// =228.22
+  /// &end
+  /// =228.22
+  /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
+  pub direction: Option<Direction>,
   /// Use the `voltage_name`  attribute to specify an associated voltage.
   /// This attribute is optional in the `pg_pin`  group of a level-shifter cell
   /// not powered by the switching power domains,

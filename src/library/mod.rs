@@ -10,7 +10,7 @@ use crate::{
   units, ArcStr, GroupSet,
 };
 pub use items::*;
-use ordered_float::NotNan;
+use crate::NotNan;
 use std::fmt::{Display, Write};
 use std::{collections::HashMap, fmt::write};
 
