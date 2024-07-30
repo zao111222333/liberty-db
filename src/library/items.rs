@@ -3,21 +3,30 @@
 //! </script>
 // use std::ops::DerefMut;
 
+use itertools::Itertools;
+
 use crate::{
   ast::{
-    AttributeList, ComplexAttri, ComplexParseError, GroupComments, GroupFn, SimpleAttri,
+    AttributeList, ComplexAttri, ComplexParseError, ComplexWrapper, GroupComments,
+    GroupFn, SimpleAttri,
   },
+  expression::logic,
   ArcStr, GroupSet,
 };
 
+/// The `sensitization` group defined at the library level describes
+/// the complete state patterns for a specific list of pins (defined by the `pin_names` attribute)
+/// that are referenced and instantiated as stimuli in the timing arc.
+///
+/// Vector attributes in the group define all possible pin states used as stimuli.
+/// Actual stimulus waveforms can be described by a combination of these vectors.
+/// Multiple sensitization groups are allowed in a library. Each `sensitization` group
+/// can be referenced by multiple cells, and each cell can make reference to
+/// multiple `sensitization`  groups.
+///
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =66.4
-/// &end
-/// =66.21
-/// ">Reference-Definition</a>
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.10&end=88.16
+/// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(
@@ -36,11 +45,210 @@ pub struct Sensitization {
   /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: AttributeList,
-  /// TODO
-  pub pin_names: Vec<ArcStr>,
-  /// TODO
+  /// The `pin_names` attribute specified at the library level defines
+  /// a default list of pin names. All vectors in this `sensitization` group
+  /// are the exhaustive list of all possible transitions of the input pins
+  /// and their subsequent output response.
+  ///
+  /// The `pin_names` attribute is required, and it must be declared in
+  /// the `sensitization` group before all vector declarations.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.28&end=88.32
+  /// ">Reference</a>
   #[liberty(complex)]
-  pub vector: (usize, ArcStr),
+  pub pin_names: Vec<ArcStr>,
+  /// # vector Complex Attribute
+  ///
+  /// Similar to the `pin_names` attribute,
+  /// the `vector` attribute describes a transition pattern for the specified pins.
+  /// The stimulus is described by an ordered list of vectors.
+  ///
+  /// The arguments for the `vector` attribute are as follows:
+  ///
+  /// `vector id`
+  ///
+  /// The `vector id`  argument is an identifier to the vector string (a number tag
+  /// that defines the list of possible sensitization combinations in a cell).
+  /// The vector id value must be an integer greater than or equal to zero and
+  /// unique among all vectors in the current `sensitization` group. It is recommended
+  /// that you start numbering from 0 or 1.
+  ///
+  /// `vector string`
+  ///
+  /// The `vector string` argument represents a pin transition state. The string consists
+  /// of the following transition status values: 0, 1, X, and Z where each character is separated by a space.
+  /// The number of elements in the vector string must equal the number of arguments in `pin_names`.
+  ///
+  /// The `vector` attribute can also be declared as:
+  ///
+  /// `vector (positive_integer, "{0|1|X|Z} [0|1|X|Z]…");`
+  ///
+  /// ## Syntax
+  ///
+  /// `vector (integer, string);`
+  ///
+  /// ## Example
+  /// ``` text
+  /// sensitization(sensitization_nand2) {
+  ///   pin_names ( IN1, IN2, OUT1 );
+  ///   vector ( 1, "0 0 1" );
+  ///   vector ( 2, "0 1 1" );
+  ///   vector ( 3, "1 0 1" );
+  ///   vector ( 4, "1 1 0" );
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=89.5&end=89.29
+  /// ">Reference</a>
+  #[liberty(complex(type = Vec))]
+  pub vector: Vec<SensitizationVector>,
+}
+
+/// # vector Complex Attribute
+///
+/// Similar to the `pin_names` attribute,
+/// the `vector` attribute describes a transition pattern for the specified pins.
+/// The stimulus is described by an ordered list of vectors.
+///
+/// The arguments for the `vector` attribute are as follows:
+///
+/// `vector id`
+///
+/// The `vector id`  argument is an identifier to the vector string (a number tag
+/// that defines the list of possible sensitization combinations in a cell).
+/// The vector id value must be an integer greater than or equal to zero and
+/// unique among all vectors in the current `sensitization` group. It is recommended
+/// that you start numbering from 0 or 1.
+///
+/// `vector string`
+///
+/// The `vector string` argument represents a pin transition state. The string consists
+/// of the following transition status values: 0, 1, X, and Z where each character is separated by a space.
+/// The number of elements in the vector string must equal the number of arguments in `pin_names`.
+///
+/// The `vector` attribute can also be declared as:
+///
+/// `vector (positive_integer, "{0|1|X|Z} [0|1|X|Z]…");`
+///
+/// ## Syntax
+///
+/// `vector (integer, string);`
+///
+/// ## Example
+/// ``` text
+/// sensitization(sensitization_nand2) {
+///   pin_names ( IN1, IN2, OUT1 );
+///   vector ( 1, "0 0 1" );
+///   vector ( 2, "0 1 1" );
+///   vector ( 3, "1 0 1" );
+///   vector ( 4, "1 1 0" );
+/// }
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=89.5&end=89.29
+/// ">Reference</a>
+#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct SensitizationVector {
+  id: usize,
+  states: Vec<logic::Static>,
+}
+
+impl ComplexAttri for SensitizationVector {
+  #[inline]
+  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.into_iter();
+    let id: usize = match i.next() {
+      Some(s) => match s.parse() {
+        Ok(f) => f,
+        Err(e) => return Err(ComplexParseError::Int(e)),
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let states = match i.next() {
+      Some(s) => match s
+        .split_ascii_whitespace()
+        .map(|term| term.parse::<logic::Static>())
+        .collect::<Result<Vec<logic::Static>, _>>()
+      {
+        Ok(states) => states,
+        Err(_) => return Err(ComplexParseError::UnsupportedWord),
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if let Some(_) = i.next() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok(Self { id, states })
+  }
+  #[inline]
+  fn to_wrapper(&self) -> ComplexWrapper {
+    let mut buffer = itoa::Buffer::new();
+    vec![vec![
+      ArcStr::from(buffer.format(self.id)),
+      self
+        .states
+        .iter()
+        .map(|state| match state {
+          logic::Static::UnInit(logic::UnInit::HighImpedance) => "Z",
+          logic::Static::UnInit(logic::UnInit::Unknown(_)) => "X",
+          logic::Static::Level(logic::Level::High) => "1",
+          logic::Static::Level(logic::Level::Low) => "0",
+        })
+        .join(" ")
+        .into(),
+    ]]
+  }
+}
+
+#[test]
+fn sensitization() {
+  let (sense, _) = &mut crate::ast::test_parse_group::<Sensitization>(
+    r#"(sensitization_nand2) {
+        pin_names ( IN1, IN2, OUT1 );
+        vector ( 1, "0 0 1" );
+        vector ( 2, "0 X 1" );
+        vector ( 3, "Z 0 1" );
+        vector ( 4, "1 1 0" );
+      }"#,
+  );
+  assert_eq!(
+    sense.vector,
+    vec![
+      SensitizationVector {
+        id: 1,
+        states: vec![
+          logic::Static::Level(logic::Level::Low),
+          logic::Static::Level(logic::Level::Low),
+          logic::Static::Level(logic::Level::High),
+        ]
+      },
+      SensitizationVector {
+        id: 2,
+        states: vec![
+          logic::Static::Level(logic::Level::Low),
+          logic::Static::UnInit(logic::UnInit::Unknown(None)),
+          logic::Static::Level(logic::Level::High),
+        ]
+      },
+      SensitizationVector {
+        id: 3,
+        states: vec![
+          logic::Static::UnInit(logic::UnInit::HighImpedance),
+          logic::Static::Level(logic::Level::Low),
+          logic::Static::Level(logic::Level::High),
+        ]
+      },
+      SensitizationVector {
+        id: 4,
+        states: vec![
+          logic::Static::Level(logic::Level::High),
+          logic::Static::Level(logic::Level::High),
+          logic::Static::Level(logic::Level::Low),
+        ]
+      }
+    ]
+  );
 }
 
 impl GroupFn for Sensitization {}
@@ -88,7 +296,7 @@ impl ComplexAttri for VoltageMap {
     Ok(Self { name, voltage })
   }
   #[inline]
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer = ryu::Buffer::new();
     vec![vec![self.name.clone(), ArcStr::from(buffer.format(self.voltage))]]
   }
@@ -409,7 +617,7 @@ impl ComplexAttri for Define {
     Ok(Self { attribute_name, group_name, attribute_type })
   }
   #[inline]
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  fn to_wrapper(&self) -> ComplexWrapper {
     vec![vec![
       self.attribute_name.clone(),
       self.group_name.clone(),
@@ -501,7 +709,7 @@ impl ComplexAttri for DefineCellArea {
     Ok(Self { area_name, resource_type })
   }
   #[inline]
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  fn to_wrapper(&self) -> ComplexWrapper {
     vec![vec![self.area_name.clone(), self.resource_type.to_string().into()]]
   }
 }
@@ -549,7 +757,7 @@ impl ComplexAttri for DefineGroup {
     Ok(Self { group, parent_name })
   }
   #[inline]
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  fn to_wrapper(&self) -> ComplexWrapper {
     vec![vec![self.group.clone(), self.parent_name.clone()]]
   }
 }
@@ -720,7 +928,7 @@ impl ComplexAttri for FanoutLength {
     })
   }
   #[inline]
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  fn to_wrapper(&self) -> ComplexWrapper {
     let mut buffer_f = ryu::Buffer::new();
     let mut buffer_i = itoa::Buffer::new();
     match (self.average_capacitance, self.standard_deviation, self.number_of_nets) {
