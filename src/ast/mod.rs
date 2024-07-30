@@ -165,7 +165,7 @@ pub trait NameAttri: Sized + Clone {
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
   /// basic parser
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError>;
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError>;
   /// to_wrapper
   fn to_wrapper(&self) -> ComplexWrapper;
   /// nom_parse, auto implement
@@ -173,11 +173,17 @@ pub trait ComplexAttri: Sized {
   fn nom_parse<'a>(
     i: &'a str,
     line_num: &mut usize,
-  ) -> IResult<&'a str, Result<Self, ComplexParseError>, Error<&'a str>> {
+  ) -> IResult<&'a str, Result<Self, (ComplexParseError, AttriValue)>, Error<&'a str>> {
     let (input, complex) = parser::complex(i, line_num)?;
-    match Self::parse(complex) {
+    match Self::parse(&complex) {
       Ok(s) => Ok((input, Ok(s))),
-      Err(e) => Ok((input, Err(e))),
+      Err(e) => Ok((
+        input,
+        Err((
+          e,
+          AttriValue::Complex(vec![complex.into_iter().map(ArcStr::from).collect()]),
+        )),
+      )),
     }
   }
   #[inline]
@@ -211,7 +217,6 @@ pub trait GroupAttri: Sized {
     line_num: &mut usize,
   ) -> IResult<&'a str, Result<Self, IdError>, Error<&'a str>>;
   ///
-  // fn to_wrapper(&self) -> GroupWrapper;
   fn fmt_liberty<T: Write>(
     &self,
     key: &str,

@@ -352,14 +352,6 @@ pub struct CapacitiveLoadUnit {
   _v: Capacitance,
 }
 
-// impl CapacitiveLoadUnit {
-//   const NIL: Capacitance = Capacitance {
-//     dimension: std::marker::PhantomData,
-//     units: std::marker::PhantomData,
-//     value: 0.0,
-//   };
-// }
-
 impl Deref for CapacitiveLoadUnit {
   type Target = Capacitance;
   #[inline]
@@ -369,17 +361,17 @@ impl Deref for CapacitiveLoadUnit {
 }
 
 impl ComplexAttri for CapacitiveLoadUnit {
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let value: NotNan<f64> = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(ComplexParseError::Float(e)),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let (ff_pf, _v): (bool, Capacitance) = match i.next() {
-      Some(s) => match s {
+      Some(&s) => match s {
         "ff" => (true, Capacitance::new::<capacitance::femtofarad>(*value)),
         "pf" => (false, Capacitance::new::<capacitance::picofarad>(*value)),
         _ => return Err(ComplexParseError::UnsupportedWord),
@@ -393,8 +385,6 @@ impl ComplexAttri for CapacitiveLoadUnit {
   }
 
   fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
-    // match self._v {
-    //   Some(cap) => {
     let mut buffer = ryu::Buffer::new();
     if self.ff_pf {
       vec![vec![
@@ -408,9 +398,6 @@ impl ComplexAttri for CapacitiveLoadUnit {
       ]]
     }
   }
-  //   None => None,
-  // }
-  // }
 }
 
 /// This attribute indicates the units of the power values

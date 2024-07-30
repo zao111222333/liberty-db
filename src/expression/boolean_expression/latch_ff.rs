@@ -950,7 +950,7 @@ mod test {
         clear : "CD’" ;  
         preset : "PD’" ;  
         clear_preset_var1 : L ; 
-         clear_preset_var2 : L ;
+        clear_preset_var2 : L ;
       }
     "#,
     );

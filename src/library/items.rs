@@ -156,17 +156,17 @@ pub struct SensitizationVector {
 
 impl ComplexAttri for SensitizationVector {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let id: usize = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(ComplexParseError::Int(e)),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let states = match i.next() {
-      Some(s) => match s
+      Some(&s) => match s
         .split_ascii_whitespace()
         .map(|term| term.parse::<logic::Static>())
         .collect::<Result<Vec<logic::Static>, _>>()
@@ -203,7 +203,7 @@ impl ComplexAttri for SensitizationVector {
 
 #[test]
 fn sensitization() {
-  let (sense, _) = &mut crate::ast::test_parse_group::<Sensitization>(
+  let (sense, _) = crate::ast::test_parse_group::<Sensitization>(
     r#"(sensitization_nand2) {
         pin_names ( IN1, IN2, OUT1 );
         vector ( 1, "0 0 1" );
@@ -249,6 +249,15 @@ fn sensitization() {
       }
     ]
   );
+  let (sense1, _) = crate::ast::test_parse_group::<Sensitization>(
+    r#"(sensitization_nand2) {
+        vector ( 1, "0 0 1" );
+        vector ( 2, "0 X 9" );
+        vector ( 3, "Z 0 1" );
+        vector ( 4, "1 1 0" );
+      }"#,
+  );
+  assert!(sense1.undefined.len() == 1);
 }
 
 impl GroupFn for Sensitization {}
@@ -273,14 +282,14 @@ pub struct VoltageMap {
 }
 impl ComplexAttri for VoltageMap {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let name = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let voltage = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => {
           return Err(ComplexParseError::Float(
@@ -594,18 +603,18 @@ pub enum AttributeType {
 }
 impl ComplexAttri for Define {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let attribute_name = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let group_name = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let attribute_type = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::UnsupportedWord),
       },
@@ -690,14 +699,14 @@ pub enum ResourceType {
 }
 impl ComplexAttri for DefineCellArea {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let area_name = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let resource_type = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::UnsupportedWord),
       },
@@ -741,14 +750,14 @@ pub struct DefineGroup {
 }
 impl ComplexAttri for DefineGroup {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let group = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let parent_name = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if let Some(_) = i.next() {
@@ -883,17 +892,17 @@ pub struct FanoutLength {
 }
 impl ComplexAttri for FanoutLength {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let fanout = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(ComplexParseError::Int(e)),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let length = match i.next() {
-      Some(s) => match s.parse() {
+      Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => {
           return Err(ComplexParseError::Float(

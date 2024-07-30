@@ -1,5 +1,3 @@
-use itertools::Itertools;
-
 use std::fmt::Display;
 use std::hash::Hash;
 use std::ops::{Deref, DerefMut};
@@ -8,7 +6,7 @@ use std::str::FromStr;
 use crate::ast::SimpleAttri;
 
 /// LogicLike
-pub trait LogicLike: std::fmt::Display + std::fmt::Debug {
+pub trait LogicLike: Display + std::fmt::Debug {
   /// inverse
   ///
   /// 0->1, 1->0
@@ -165,7 +163,7 @@ impl Ord for UnInit {
   }
 }
 
-impl std::fmt::Display for UnInit {
+impl Display for UnInit {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
       UnInit::Unknown(c) => match c {
@@ -207,6 +205,7 @@ pub enum Normal {
 }
 impl SimpleAttri for Normal {}
 impl Display for Normal {
+  #[inline]
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
       Normal::Edge(Edge::Rise) => write!(f, "R"),
@@ -218,13 +217,14 @@ impl Display for Normal {
 }
 impl FromStr for Normal {
   type Err = strum::ParseError;
+  #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    match s {
-      "R" => Ok(Self::R),
-      "F" => Ok(Self::F),
-      "H" => Ok(Self::H),
-      "L" => Ok(Self::L),
-      _ => Err(strum::ParseError::VariantNotFound),
+    match s.parse::<Edge>() {
+      Ok(s) => Ok(Self::Edge(s)),
+      _ => match s.parse::<Level>() {
+        Ok(s) => Ok(Self::Level(s)),
+        Err(_) => Err(strum::ParseError::VariantNotFound),
+      },
     }
   }
 }
@@ -238,29 +238,8 @@ impl Normal {
   /// Low
   pub const L: Self = Self::Level(Level::L);
 }
-
-/// H L R F
-#[derive(Debug, Clone, Copy, PartialEq, Hash)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub enum Static {
-  /// R F
-  Edge(Edge),
-  /// H L
-  Level(Level),
-}
-
-impl Static {
-  /// Rise
-  pub const R: Self = Self::Edge(Edge::R);
-  /// Fall
-  pub const F: Self = Self::Edge(Edge::F);
-  /// High
-  pub const H: Self = Self::Level(Level::H);
-  /// Low
-  pub const L: Self = Self::Level(Level::L);
-}
-
 impl Into<State> for Normal {
+  #[inline]
   fn into(self) -> State {
     match self {
       Normal::Edge(s) => State::Edge(s),
@@ -269,6 +248,59 @@ impl Into<State> for Normal {
   }
 }
 
+/// H L R F
+#[derive(Debug, Clone, Copy, PartialEq, Hash)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum Static {
+  /// X Z
+  UnInit(UnInit),
+  /// H L
+  Level(Level),
+}
+
+impl Static {
+  /// Rise
+  pub const X: Self = Self::UnInit(UnInit::Unknown(None));
+  /// Fall
+  pub const Z: Self = Self::UnInit(UnInit::HighImpedance);
+  /// High
+  pub const H: Self = Self::Level(Level::H);
+  /// Low
+  pub const L: Self = Self::Level(Level::L);
+}
+impl Into<State> for Static {
+  #[inline]
+  fn into(self) -> State {
+    match self {
+      Static::UnInit(s) => State::UnInit(s),
+      Static::Level(s) => State::Level(s),
+    }
+  }
+}
+impl FromStr for Static {
+  type Err = strum::ParseError;
+  #[inline]
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s.parse::<UnInit>() {
+      Ok(s) => Ok(Self::UnInit(s)),
+      _ => match s.parse::<Level>() {
+        Ok(s) => Ok(Self::Level(s)),
+        Err(_) => Err(strum::ParseError::VariantNotFound),
+      },
+    }
+  }
+}
+impl Display for Static {
+  #[inline]
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Static::UnInit(UnInit::HighImpedance) => write!(f, "Z"),
+      Static::UnInit(UnInit::Unknown(_)) => write!(f, "X"),
+      Static::Level(Level::High) => write!(f, "H"),
+      Static::Level(Level::Low) => write!(f, "L"),
+    }
+  }
+}
 /// State
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
@@ -282,7 +314,7 @@ pub enum State {
   /// H L
   Level(Level),
 }
-impl std::fmt::Display for State {
+impl Display for State {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
       State::UnInit(s) => s.fmt(f),
@@ -476,14 +508,7 @@ impl Into<Vec<State>> for Vector {
   }
 }
 
-// impl Vector {
-//     #[inline]
-//     pub fn new(value: Vec<State>) -> Self{
-//         Self { value }
-//     }
-// }
-
-impl std::fmt::Display for Vector {
+impl Display for Vector {
   #[inline]
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     self.iter().fold(

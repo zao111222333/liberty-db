@@ -45,6 +45,7 @@ use crate::{
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CCSNStage {
+  /// group name
   #[liberty(name)]
   #[id]
   pub name: Vec<ArcStr>,
@@ -267,6 +268,7 @@ impl SimpleAttri for StageType {}
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReceiverCapacitance {
+  /// group name
   #[id]
   #[liberty(name)]
   name: Option<ArcStr>,
@@ -313,14 +315,14 @@ pub struct PropagatingCcb {
 
 impl ComplexAttri for PropagatingCcb {
   #[inline]
-  fn parse(v: Vec<&str>) -> Result<Self, ComplexParseError> {
-    let mut i = v.into_iter();
+  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
     let input_ccb_name = match i.next() {
-      Some(s) => ArcStr::from(s),
+      Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let output_ccb_name = match i.next() {
-      Some(s) => Some(ArcStr::from(s)),
+      Some(&s) => Some(ArcStr::from(s)),
       None => None,
     };
     if let Some(_) = i.next() {

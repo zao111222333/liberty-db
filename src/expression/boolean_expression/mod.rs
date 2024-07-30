@@ -74,19 +74,19 @@ impl BooleanExpressionLike for IdBooleanExpression {}
 /// =132.38
 /// ">Reference</a>
 ///
-/// | Operator | Description                 |
-/// | -------- | --------------------------- |
-/// | '        | invert previous expression  |
-/// | ’        | invert previous expression(?)|
-/// | !        | invert following expression |
-/// | ^        | logical XOR                 |
-/// | \*       | logical AND                 |
-/// | &        | logical AND                 |
-/// | space    | logical AND                 |
-/// | \+       | logical OR                  |
-/// | 1        | logical OR                  |
-/// | 1        | signal tied to logic 1      |
-/// | 0        | signal tied to logic 0      |
+/// | Operator | Description                           |
+/// | -------- | ------------------------------------- |
+/// | '        | invert previous expression            |
+/// | ’        | invert previous expression(?)         |
+/// | !        | invert following expression           |
+/// | ^        | logical XOR                           |
+/// | \*       | logical AND                           |
+/// | &        | logical AND                           |
+/// | space    | logical AND (when no other separator) |
+/// | \+       | logical OR                            |
+/// | \|       | logical OR                            |
+/// | 1        | signal tied to logic 1                |
+/// | 0        | signal tied to logic 0                |
 ///
 /// A pin name beginning with a number must be enclosed in double quotation marks preceded by a backslash (\), as in the following example
 /// ``` liberty

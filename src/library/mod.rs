@@ -10,9 +10,7 @@ use crate::{
   units, ArcStr, GroupSet,
 };
 pub use items::*;
-use crate::NotNan;
 use std::fmt::{Display, Write};
-use std::{collections::HashMap, fmt::write};
 
 /// The first line of the library group statement names the library.
 /// It is the first executable line in your library.
@@ -481,10 +479,23 @@ pub struct Library {
   /// valid: `match_footprint`?
   #[liberty(simple(type = Option))]
   pub in_place_swap_mode: Option<ArcStr>,
+  /// The `sensitization` group defined at the library level describes
+  /// the complete state patterns for a specific list of pins (defined by the `pin_names` attribute)
+  /// that are referenced and instantiated as stimuli in the timing arc.
+  ///
+  /// Vector attributes in the group define all possible pin states used as stimuli.
+  /// Actual stimulus waveforms can be described by a combination of these vectors.
+  /// Multiple sensitization groups are allowed in a library. Each `sensitization` group
+  /// can be referenced by multiple cells, and each cell can make reference to
+  /// multiple `sensitization`  groups.
+  ///
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.10&end=88.16
+  /// ">Reference</a>
+  #[liberty(group(type = Set))]
+  pub sensitization: GroupSet<Sensitization>,
   #[liberty(group(type = Set))]
   pub cell: GroupSet<Cell>,
-
-  pub sensitization_map: HashMap<ArcStr, Sensitization>,
 }
 
 impl GroupFn for Library {}
@@ -519,8 +530,7 @@ impl Display for Library {
     write!(f, "\n")
   }
 }
-use crate::ast::parser;
-use crate::ast::{AttriComment, Format, GroupAttri, ParserError};
+use crate::ast::{parser, GroupAttri, ParserError};
 impl Library {
   /// Parse `.lib` file as a [Library] struct.
   #[inline]
