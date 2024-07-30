@@ -8,7 +8,7 @@ use crate::{
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
-  ArcStr, GroupSet,
+  ArcStr, GroupSet, NotNan,
 };
 mod items;
 // use crate::units;
@@ -347,7 +347,7 @@ pub struct Pin {
   /// =228.28
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub fall_capacitance: Option<f64>,
+  pub fall_capacitance: Option<NotNan<f64>>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -774,7 +774,7 @@ pub struct Pin {
   /// =229.10
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub rise_capacitance: Option<f64>,
+  pub rise_capacitance: Option<NotNan<f64>>,
   // pub rise_capacitance: Option<units::Capacitance>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

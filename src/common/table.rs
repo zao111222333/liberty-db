@@ -1,8 +1,8 @@
+use crate::NotNan;
 use crate::{
   ast::{AttributeList, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
   ArcStr, GroupSet,
 };
-use ordered_float::NotNan;
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set_derive::item(

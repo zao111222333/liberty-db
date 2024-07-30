@@ -6,7 +6,7 @@ pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 pub mod logic;
 use std::{borrow::Borrow, collections::HashSet, str::FromStr};
 
-use biodivine_lib_bdd::{
+pub use biodivine_lib_bdd::{
   boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
   BddVariableSetBuilder,
 };
@@ -17,7 +17,7 @@ use itertools::Itertools;
 use parser::{as_sdf_str, BoolExprErr};
 
 use super::SdfExpression;
-lazy_static! {
+lazy_static::lazy_static! {
   static ref UNKNOWN: Box<Expr> = Box::new(Expr::Variable("_unknown_".to_owned()));
 }
 

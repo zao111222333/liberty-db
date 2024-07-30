@@ -79,12 +79,11 @@
 )]
 
 #[macro_use]
-extern crate lazy_static;
-#[macro_use]
 extern crate log;
-// #[macro_use] extern crate prettytable;
+pub use arcstr;
 pub use arcstr::ArcStr;
 pub use mut_set::MutSet as GroupSet;
+pub use ordered_float::NotNan;
 /// `bundle` group structure.
 pub mod bundle;
 /// `bus` group structure.
