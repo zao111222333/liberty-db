@@ -8,7 +8,6 @@ use crate::{
   pin::Pin,
   ArcStr, GroupSet,
 };
-use std::borrow::Borrow;
 mod items;
 pub use items::*;
 
@@ -58,8 +57,9 @@ pub struct Cell {
   pub pin: GroupSet<Pin>,
 }
 impl GroupFn for Cell {}
+
+#[allow(dead_code, unused_imports, unused)]
 mod test {
-  #[allow(unused)]
   use super::Cell;
   /// Example 23 A multibit register containing four rising-edge-triggered D flip-flops
   /// with clear  and preset is shown in Figure 1 and Example 23

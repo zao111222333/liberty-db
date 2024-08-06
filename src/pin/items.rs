@@ -1,19 +1,38 @@
-use std::{fmt::write, path::Display, str::FromStr};
-
+use crate::ast::SimpleAttri;
+use std::str::FromStr;
 use strum_macros::{Display, EnumString};
 
-use crate::ast::SimpleAttri;
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
+/// ?field=test
+/// &bgn
+/// =228.4
+/// &end
+/// =228.4
+/// ">Reference-Instance</a>
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum AntennaDiodeType {
+  /// power
   #[strum(serialize = "power")]
   Power,
+  /// ground
   #[strum(serialize = "ground")]
   Ground,
+  /// power_and_ground
   #[strum(serialize = "power_and_ground")]
   PowerAndGround,
 }
 impl SimpleAttri for AntennaDiodeType {}
+
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
+/// ?field=test
+/// &bgn
+/// =228.22
+/// &end
+/// =228.22
+/// ">Reference-Instance</a>
 #[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Direction {

@@ -114,7 +114,7 @@ impl IllegalType {
       (Some(a_t), Some(b_t)) => {
         match (a_t, b_t) {
           // FIXME:
-          (a_vaild, b_vaild) => Some(*a_vaild),
+          (a_vaild, _b_vaild) => Some(*a_vaild),
         }
       }
     }

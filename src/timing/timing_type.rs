@@ -3,12 +3,7 @@
 //! </script>
 use std::{fmt::Display, str::FromStr};
 
-use crate::{
-  ast::SimpleAttri,
-  expression::logic,
-  // expression::{logic::Edge, logic::Level},
-  types::MaxMin,
-};
+use crate::{ast::SimpleAttri, expression::logic, types::MaxMin};
 
 /// # Combinational Timing Arcs
 ///

@@ -121,6 +121,34 @@ impl Into<Expr> for BooleanExpression {
 impl crate::ast::SimpleAttri for BooleanExpression {}
 impl crate::ast::SimpleAttri for IdBooleanExpression {}
 
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
+/// ?field=test
+/// &bgn
+/// =132.36
+/// &end
+/// =132.38
+/// ">Reference</a>
+///
+/// | Operator | Description                           |
+/// | -------- | ------------------------------------- |
+/// | '        | invert previous expression            |
+/// | ’        | invert previous expression(?)         |
+/// | !        | invert following expression           |
+/// | ^        | logical XOR                           |
+/// | \*       | logical AND                           |
+/// | &        | logical AND                           |
+/// | space    | logical AND (when no other separator) |
+/// | \+       | logical OR                            |
+/// | \|       | logical OR                            |
+/// | 1        | signal tied to logic 1                |
+/// | 0        | signal tied to logic 0                |
+///
+/// A pin name beginning with a number must be enclosed in double quotation marks preceded by a backslash (\), as in the following example
+/// ``` liberty
+/// function : " \"1A\" + \"1B\" " ;
+/// ```
+///
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdBooleanExpression {
@@ -158,6 +186,7 @@ impl PartialEq for IdBooleanExpression {
 }
 
 impl IdBooleanExpression {
+  /// convert BooleanExpression to sdf
   #[inline]
   pub fn sdf(&self) -> SdfExpression {
     let variables = BddVariableSet::new(
@@ -184,24 +213,19 @@ impl Eq for IdBooleanExpression {}
 impl PartialOrd for IdBooleanExpression {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-    // TODO: bdd compare
-    self.sorted_nodes.partial_cmp(&other.sorted_nodes)
-    // match self.sorted_nodes.partial_cmp(&other.sorted_nodes) {
-    //   Some(ord) => Some(ord),
-    //   None => self.bdd.partial_cmp(&other.bdd),
-    // }
+    match self.sorted_nodes.partial_cmp(&other.sorted_nodes) {
+      Some(core::cmp::Ordering::Equal) | None => self.bdd.partial_cmp(&other.bdd),
+      ord => ord,
+    }
   }
 }
 impl Ord for IdBooleanExpression {
   #[inline]
   fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-    // TODO: bdd compare
-    self.sorted_nodes.cmp(&other.sorted_nodes)
-    // match self.sorted_nodes.cmp(&other.sorted_nodes) {
-    //   std::cmp::Ordering::Equal => self.bdd.cmp(&other.bdd),
-    //   std::cmp::Ordering::Less => std::cmp::Ordering::Less,
-    //   std::cmp::Ordering::Greater => std::cmp::Ordering::Greater,
-    // }
+    match self.sorted_nodes.cmp(&other.sorted_nodes) {
+      std::cmp::Ordering::Equal => self.bdd.cmp(&other.bdd),
+      ord => ord,
+    }
   }
 }
 
@@ -311,7 +335,7 @@ fn _previous(expr: &mut Expr) {
   }
 }
 
-#[allow(dead_code, unused_imports)]
+#[allow(dead_code, unused_imports, unused)]
 mod test {
   use super::*;
   use itertools::Itertools;
@@ -417,6 +441,24 @@ mod test {
   }
   #[test]
   fn sdf() {
-    println!("{}", IdBooleanExpression::from_str("(A+B)*C").unwrap().sdf());
+    assert_eq!(
+      SdfExpression::new("( A == 1'b0 && B == 1'b1 && C == 1'b1) || ( A == 1'b1 && B == 1'b0 && C == 1'b1) || ( A == 1'b1 && B == 1'b1 && C == 1'b1 )".into()), 
+      IdBooleanExpression::from_str("(A+B)*C").unwrap().sdf(),
+    );
+  }
+  #[test]
+  fn lid_bdd() {
+    let mut builder = BddVariableSetBuilder::new();
+    let [a, b, c, d] = builder.make(&["A", "B", "C", "D"]);
+    let variables: BddVariableSet = builder.build();
+    let x1 = variables.eval_expression_string("(A|B)&(C|D)");
+    let x2 = variables.eval_expression_string("B&D | B&C | A&D | A&C");
+    assert_eq!(x1, x2);
+
+    println!("{}", variables);
+    for valuation in x1.sat_valuations() {
+      println!("{}", valuation);
+      assert!(x1.eval_in(&valuation));
+    }
   }
 }

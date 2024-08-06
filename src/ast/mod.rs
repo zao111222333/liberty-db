@@ -144,21 +144,28 @@ pub trait SimpleAttri: Sized + Display + FromStr {
 /// ComplexParseError
 #[derive(thiserror::Error, Debug)]
 pub enum ComplexParseError {
+  /// ParseFloatError
   #[error("{0}")]
   Float(ParseNotNanError<std::num::ParseFloatError>),
+  /// ParseIntError
   #[error("{0}")]
   Int(std::num::ParseIntError),
+  /// title length mismatch
   #[error("title length mismatch")]
   LengthDismatch,
+  /// other error
   #[error("other")]
   Other,
+  /// unsurpport word
   #[error("unsurpport word")]
   UnsupportedWord,
 }
 
+/// NameAttri
 pub trait NameAttri: Sized + Clone {
   /// basic parser
   fn parse(v: Vec<ArcStr>) -> Result<Self, IdError>;
+  /// name to_vec
   fn to_vec(self) -> Vec<ArcStr>;
 }
 
@@ -186,6 +193,7 @@ pub trait ComplexAttri: Sized {
       )),
     }
   }
+  /// fmt_liberty
   #[inline]
   fn fmt_liberty<T: Write>(
     &self,
@@ -204,12 +212,18 @@ pub type GroupComments<T> = <T as GroupAttri>::Comments;
 pub type AttriComment = Vec<ArcStr>;
 /// Group Functions
 pub trait GroupFn {
+  /// post_process call back
   fn post_process(&mut self) {}
 }
+/// GroupAttri
 pub trait GroupAttri: Sized {
+  /// group Name
   type Name;
+  /// group Comments
   type Comments;
+  /// return name
   fn name(&self) -> Self::Name;
+  /// get name
   fn set_name(&mut self, name: Self::Name);
   /// nom_parse, will be implemented by macros
   fn nom_parse<'a>(
@@ -291,13 +305,12 @@ pub enum ParserError<'a> {
   /// replace same id
   #[error("Line#{0}, {}", display_nom_error(.1))]
   NomError(usize, nom::Err<Error<&'a str>>),
-  // NomError(usize,Error<&'a str>),
   /// something else
-  // #[error("{0}")]
   #[error("Line#{0}, {1}")]
   Other(usize, String),
 }
 
+#[allow(unused)]
 pub(crate) fn test_parse_group<G: GroupAttri + Debug>(s: &str) -> (G, usize) {
   let mut n = 1;
   match G::nom_parse(s, &mut n) {
@@ -327,10 +340,14 @@ pub trait Format {
   ) -> std::fmt::Result;
   /// `.db` format
   fn db<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    _ = key;
+    _ = f;
     todo!()
   }
   /// `.json` format
   fn json<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+    _ = key;
+    _ = f;
     todo!()
   }
 }

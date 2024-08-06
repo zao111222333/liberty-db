@@ -2,12 +2,8 @@
 //! `Timing`.
 
 use crate::{
-  ast::{self, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
-  common::items::Domain,
-  expression::{
-    logic::{self, LogicLike},
-    BooleanExpression,
-  },
+  ast::{self, GroupComments, GroupFn, SimpleAttri},
+  expression::logic::{self, LogicLike},
   ArcStr,
 };
 

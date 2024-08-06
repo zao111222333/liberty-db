@@ -6,7 +6,7 @@ use nom::{
   bytes::streaming::{escaped, is_not, tag, take, take_until, take_while},
   character::streaming::{char, one_of},
   combinator::{map, map_opt, opt},
-  error::{ContextError, Error, ErrorKind, FromExternalError, ParseError, VerboseError},
+  error::{ContextError, Error, ErrorKind, FromExternalError, ParseError},
   multi::{many0, separated_list0},
   sequence::{delimited, pair, preceded, terminated, tuple},
   IResult, InputTakeAtPosition,
@@ -224,6 +224,7 @@ where
 
 #[test]
 fn unquote_test() {
+  use nom::error::VerboseError;
   println!("{:?}", unquote::<VerboseError<&str>>("\"iwww\" "));
   println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
   println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));
@@ -241,7 +242,7 @@ where
 pub(super) fn char_in_word(c: char) -> bool {
   c.is_alphanumeric() || "/_.+-:".contains(c)
 }
-// \"
+
 pub(crate) fn word<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
 where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
@@ -345,13 +346,7 @@ pub(crate) fn complex<'a>(
       )),
       char(')'),
       space,
-      // TODO: If it is optional?
-      // opt(char(';')),
-      alt((
-        preceded(char(';'), comment_space_newline),
-        // pair(char(';'), comment_space_newline),
-        comment_space_newline_many1,
-      )),
+      alt((preceded(char(';'), comment_space_newline), comment_space_newline_many1)),
     )),
     |(_, _, n0, res, last, _, _, n1)| {
       *line_num += n0 + n1;
@@ -366,10 +361,6 @@ pub(crate) fn complex<'a>(
       if let Some((last_vec, n)) = last {
         *line_num += n;
         vec.extend(last_vec);
-        // if let Some(l) = vec.last_mut(){
-        // }else{
-        //   vec = vec![last_vec];
-        // }
       }
       vec
     },
@@ -378,6 +369,7 @@ pub(crate) fn complex<'a>(
 
 #[test]
 fn key_test() {
+  use nom::error::VerboseError;
   println!("{:?}", comment_space_newline("\n\r\t\n : b ; "));
   println!("{:?}", simple(" : b; }", &mut 1));
   println!("{:?}", simple(" : iwww ; ", &mut 1));

@@ -4,7 +4,7 @@
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   ccsn::{CCSNStage, ReceiverCapacitance},
-  common::items::{DummyGroup, WordSet},
+  common::items::WordSet,
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
@@ -911,7 +911,6 @@ pub struct Pin {
   pub rise_capacitance_range: Option<(f64, f64)>,
   // NOTICE: Group Attributes in a pin Group
   // electromigration () { }
-  // input_ccb (string) { }
   #[liberty(group(type=Set))]
   pub internal_power: GroupSet<InternalPower>,
   // TODO
@@ -920,9 +919,6 @@ pub struct Pin {
   // min_pulse_width ()  { }
   // TODO
   // minimum_period ()  { }
-  // TODO
-  // output_ccb (string) { }
-  // pub output_ccb: (),
   // TODO
   pub tlatch: (),
   /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.

@@ -141,6 +141,8 @@ impl PartialOrd for WordSet {
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
     if self == other {
       Some(Ordering::Equal)
+    } else if self.inner.len() == other.inner.len() {
+      self.inner.iter().sorted().partial_cmp(other.inner.iter().sorted())
     } else if self.inner.is_subset(&other.inner) {
       Some(Ordering::Less)
     } else if self.inner.is_superset(&other.inner) {

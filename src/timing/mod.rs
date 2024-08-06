@@ -1489,7 +1489,7 @@ pub struct Timing {
   #[liberty(group)]
   pub propogated_noise_peak_time_ratio_above_high: Option<TableLookUp>,
   #[liberty(group)]
-  pub propogated_noise_peak_time_ratio__below_low: Option<TableLookUp>,
+  pub propogated_noise_peak_time_ratio_below_low: Option<TableLookUp>,
   #[liberty(group)]
   pub propogated_noise_peak_time_ratio_high: Option<TableLookUp>,
   #[liberty(group)]

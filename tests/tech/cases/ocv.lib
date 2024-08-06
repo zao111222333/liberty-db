@@ -1,10 +1,4 @@
 library(tcbn22ullbwp30p140tt0p8v25c){  
-  
-  v_d_d_voltage : 0.8 ;  
-  v_s_s_voltage : 0 ;  
-  g_n_d_voltage : 0 ;  
-  temp : 25 ;  
-  voltage : 0 ;  
   current_unit : "1mA" ;  
   delay_model : "table_lookup" ;  
   em_temp_degradation_factor : 0 ;  
@@ -13,10 +7,6 @@ library(tcbn22ullbwp30p140tt0p8v25c){
   input_threshold_pct_rise : 50 ;  
   output_threshold_pct_fall : 50 ;  
   output_threshold_pct_rise : 50 ;  
-  measure_slew_lower_fall : 30 ;  
-  measure_slew_lower_rise : 30 ;  
-  measure_slew_upper_fall : 70 ;  
-  measure_slew_upper_rise : 70 ;  
   slew_lower_threshold_pct_rise : 30 ;  
   slew_lower_threshold_pct_fall : 30 ;  
   slew_upper_threshold_pct_rise : 70 ;  
@@ -59,8 +49,6 @@ library(tcbn22ullbwp30p140tt0p8v25c){
   default_wire_load_mode : "segmented" ;  
   default_wire_load_resistance : 0 ;  
   default_wire_load_selection : "WireAreaForZero" ;  
-  tran_step : 0 ;  
-  tran_end_time : 0 ;
   capacitive_load_unit(1, pf);
   voltage_map(VDDGR, 0.8);
   voltage_map(VDDSRC, 0.8);

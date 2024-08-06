@@ -74,7 +74,7 @@
     dead_code,
     missing_copy_implementations, // Copy may cause unnecessary memory copy
     missing_docs,
-    single_use_lifetimes, // TODO: fix lifetime names only used once
+    // single_use_lifetimes, // TODO: fix lifetime names only used once
     unused_qualifications,
 )]
 

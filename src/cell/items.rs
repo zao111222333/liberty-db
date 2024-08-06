@@ -1,4 +1,4 @@
-use std::{hash::Hash, str::FromStr, sync::Arc};
+use std::{hash::Hash, str::FromStr};
 
 use crate::{
   ast::{AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri, SimpleWrapper},
@@ -8,8 +8,6 @@ use crate::{
   timing::items::Mode,
   ArcStr,
 };
-use itertools::Itertools;
-
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=199.5&end=199.6
@@ -50,6 +48,70 @@ pub struct LeakagePower {
 }
 impl GroupFn for LeakagePower {}
 
+#[test]
+fn test_leakage_sort() {
+  let (cell, _) = crate::ast::test_parse_group::<super::Cell>(
+    r#"(CELL) {
+      leakage_power () {
+        related_pg_pin : VDD;
+        value : 1;
+      }
+      leakage_power () {
+        related_pg_pin : VDD;
+        when : "A*B*Y";
+        value : 2;
+      }
+      leakage_power () {
+        related_pg_pin : VDD;
+        when : "!A*B*!Y";
+        value : 3;
+      }
+      leakage_power () {
+        related_pg_pin : VDD;
+        when : "A*!B*!Y";
+        value : 4;
+      }
+      leakage_power () {
+        related_pg_pin : VDD;
+        when : "!A*!B*!Y";
+        value : 5;
+      }
+      leakage_power () {
+        related_pg_pin : VSS;
+        value : 6;
+      }
+      leakage_power () {
+        related_pg_pin : VSS;
+        when : "A*B*Y";
+        value : 7;
+      }
+      leakage_power () {
+        related_pg_pin : VSS;
+        when : "!A*B*!Y";
+        value : 8;
+      }
+      leakage_power () {
+        related_pg_pin : VSS;
+        when : "A*!B*!Y";
+        value : 9;
+      }
+      leakage_power () {
+        related_pg_pin : VSS;
+        when : "!A*!B*!Y";
+        value : 10;
+      }
+    }
+  "#,
+  );
+  assert_eq!(
+    vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    cell
+      .leakage_power
+      .into_iter_sort()
+      .map(|leakage| leakage.value as i8)
+      .collect::<Vec<_>>()
+  );
+}
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.4&end=141.5
