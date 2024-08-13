@@ -70,7 +70,7 @@ jobs:
     needs: check
     name: Clippy
     runs-on: ubuntu-latest
-    env:
+    # env:
       # RUSTFLAGS: "-D warnings -A clippy::todo"
     steps:
       - uses: actions/checkout@v4
