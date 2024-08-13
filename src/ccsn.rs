@@ -12,6 +12,7 @@ use crate::{
   timing::items::Mode,
   ArcStr, GroupSet,
 };
+use num_traits::Zero;
 
 /// Use the `ccsn_first_stage` group to specify CCS noise for the first stage of the channel-
 /// connected block (CCB).
@@ -201,13 +202,14 @@ pub struct CCSNStage {
 }
 
 impl GroupFn for CCSNStage {
+  #[inline]
   fn post_process(&mut self) {
-    if self.miller_cap_fall < 0.0 {
-      self.miller_cap_fall = 0.0;
+    if self.miller_cap_fall.is_sign_negative() {
+      self.miller_cap_fall.set_zero();
       warn!("miller_cap_fall is negative!");
     }
-    if self.miller_cap_rise < 0.0 {
-      self.miller_cap_rise = 0.0;
+    if self.miller_cap_rise.is_sign_negative() {
+      self.miller_cap_rise.set_zero();
       warn!("miller_cap_rise is negative!");
     }
   }
@@ -307,36 +309,32 @@ impl GroupFn for ReceiverCapacitance {}
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PropagatingCcb {
-  /// input_ccb_name
+  /// `input_ccb_name`
   pub input_ccb_name: ArcStr,
-  /// output_ccb_name
+  /// `output_ccb_name`
   pub output_ccb_name: Option<ArcStr>,
 }
 
 impl ComplexAttri for PropagatingCcb {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let input_ccb_name = match i.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let output_ccb_name = match i.next() {
-      Some(&s) => Some(ArcStr::from(s)),
-      None => None,
-    };
-    if let Some(_) = i.next() {
+    let output_ccb_name = i.next().map(|&s| ArcStr::from(s));
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { input_ccb_name, output_ccb_name })
   }
   #[inline]
   fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
-    match &self.output_ccb_name {
-      Some(output_ccb_name) => {
-        vec![vec![self.input_ccb_name.clone(), output_ccb_name.clone()]]
-      }
-      None => vec![vec![self.input_ccb_name.clone()]],
+    if let Some(output_ccb_name) = &self.output_ccb_name {
+      vec![vec![self.input_ccb_name.clone(), output_ccb_name.clone()]]
+    } else {
+      vec![vec![self.input_ccb_name.clone()]]
     }
   }
 }

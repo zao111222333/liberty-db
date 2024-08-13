@@ -233,7 +233,7 @@ fn cell_test() {
   g.comments.area.push("xc".into());
   g.comments.area.push("xc".into());
   let mut output = String::new();
-  let mut f = crate::ast::CodeFormatter::new(&mut output, "| ");
+  let mut f = crate::ast::CodeFormatter::new(&mut output);
   if let Err(e) = GroupAttri::fmt_liberty(g, std::any::type_name::<Cell>(), &mut f) {
     panic!("{e}");
   }

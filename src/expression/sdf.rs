@@ -24,18 +24,18 @@ use crate::ast::SimpleAttri;
 /// &end
 /// =203.45
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[derive(Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SdfExpression {
   inner: ArcStr,
 }
-impl std::fmt::Display for SdfExpression {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    std::fmt::Display::fmt(&self.inner, f)
+impl core::fmt::Display for SdfExpression {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    core::fmt::Display::fmt(&self.inner, f)
   }
 }
-impl std::str::FromStr for SdfExpression {
+impl core::str::FromStr for SdfExpression {
   type Err = core::convert::Infallible;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {

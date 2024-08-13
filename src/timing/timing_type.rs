@@ -1,7 +1,7 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
-use std::{fmt::Display, str::FromStr};
+use core::{fmt::Display, str::FromStr};
 
 use crate::{ast::SimpleAttri, expression::logic, types::MaxMin};
 
@@ -157,7 +157,7 @@ impl ArcCombinational {
 
 impl Display for ArcCombinational {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Self::Combinational(edge) => match edge {
         Some(_edge) => match _edge {
@@ -470,7 +470,7 @@ impl ArcSequential {
 
 impl Display for ArcSequential {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Self::Edge(edge) => match edge {
         logic::Edge::Fall => write!(f, "{}", Self::FALLING_EDGE),
@@ -593,7 +593,7 @@ impl ArcNonSequential {
 
 impl Display for ArcNonSequential {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Self::NonSeqSetup(edge) => match edge {
         logic::Edge::Fall => write!(f, "{}", Self::NON_SEQ_SETUP_FALLING),
@@ -671,7 +671,7 @@ impl ArcNoChange {
 
 impl Display for ArcNoChange {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Self::NoChange(s1, s2) => match (s1, s2) {
         (logic::Level::High, logic::Level::High) => {
@@ -776,7 +776,7 @@ impl Default for TimingType {
 impl SimpleAttri for TimingType {}
 
 impl FromStr for TimingType {
-  type Err = std::fmt::Error;
+  type Err = core::fmt::Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s {
@@ -815,14 +815,14 @@ impl FromStr for TimingType {
       ArcNoChange::NOCHANGE_HIGH_LOW => Ok(Self::NOCHANGE_HIGH_LOW),
       ArcNoChange::NOCHANGE_LOW_HIGH => Ok(Self::NOCHANGE_LOW_HIGH),
       ArcNoChange::NOCHANGE_LOW_LOW => Ok(Self::NOCHANGE_LOW_LOW),
-      _ => Err(std::fmt::Error),
+      _ => Err(core::fmt::Error),
     }
   }
 }
 
 impl Display for TimingType {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       TimingType::Combinational(t) => t.fmt(f),
       TimingType::Sequential(t) => t.fmt(f),
@@ -928,9 +928,6 @@ impl TimingType {
   /// NOCHANGE_LOW_LOW
   pub const NOCHANGE_LOW_LOW: Self =
     Self::NoChange(ArcNoChange::NoChange(logic::Level::Low, logic::Level::Low));
-}
-
-impl TimingType {
   const LIST: [Self; 35] = [
     Self::COMBINATIONAL,
     Self::COMBINATIONAL_RISE,

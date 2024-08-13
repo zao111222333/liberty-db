@@ -7,7 +7,7 @@ use crate::units;
 // use crate::util;
 // use std::collections::HashMap;
 // use std::collections::HashSet;
-use std::hash::Hash;
+use core::hash::Hash;
 use std::ops::{Deref, DerefMut};
 
 /// LogicLike
@@ -54,7 +54,7 @@ impl Ord for ChangePattern {
   }
 }
 impl Hash for ChangePattern {
-  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+  fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
     float_hash(state, self.settle_down_time.value);
     float_hash(state, self.transition_time.value);
   }
@@ -839,299 +839,299 @@ impl LogicLike for Vector {
 // }
 
 // /// Table
-// #[derive(Clone, Debug)]
-// #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Table {
-//   /// self_node
-//   pub self_node: String,
-//   /// table
-//   pub table: HashMap<Vector, State>,
-//   /// port_idx
-//   pub port_idx: Vec<Port>,
-// }
-// #[derive(Clone, Debug)]
-// #[derive(serde::Serialize, serde::Deserialize)]
-pub struct NewTable {
-//   /// self_node
-//   pub self_node: String,
-//   /// port_idx
-//   pub port_idx: Vec<Port>,
-//   /// table
-//   pub table: HashMap<Vec<Normal>, HashMap<Vec<Static>, Vec<Static>>>,
-// }
+// // #[derive(Clone, Debug)]
+// // #[derive(serde::Serialize, serde::Deserialize)]
+// pub struct Table {
+// //   /// self_node
+// //   pub self_node: String,
+// //   /// table
+// //   pub table: HashMap<Vector, State>,
+// //   /// port_idx
+// //   pub port_idx: Vec<Port>,
+// // }
+// // #[derive(Clone, Debug)]
+// // #[derive(serde::Serialize, serde::Deserialize)]
+// pub struct NewTable {
+// //   /// self_node
+// //   pub self_node: String,
+// //   /// port_idx
+// //   pub port_idx: Vec<Port>,
+// //   /// table
+// //   pub table: HashMap<Vec<Normal>, HashMap<Vec<Static>, Vec<Static>>>,
+// // }
 
-// impl PartialEq for Table {
-//   #[inline]
-//   fn eq(&self, other: &Self) -> bool {
-//     if self.port_idx.len() != other.port_idx.len() {
-//       return false;
-//     }
-//     let mut other_mapping_self = vec![];
-//     for port in other.port_idx.iter() {
-//       match self.port_idx.iter().position(|v| v == port) {
-//         Some(self_idx) => other_mapping_self.push(self_idx),
-//         None => return false,
-//       }
-//     }
-//     for (other_vec, other_state) in other.table.iter() {
-//       let self_vec: Vector = other_mapping_self
-//         .iter()
-//         .map(|self_idx| other_vec[*self_idx])
-//         .collect::<Vec<State>>()
-//         .into();
-//       match self.table.get(&self_vec) {
-//         Some(self_state) => {
-//           if !self_state.variant_eq(other_state) {
-//             return false;
-//           }
-//         }
-//         None => return false,
-//       }
-//     }
-//     return true;
-//   }
-// }
+// // impl PartialEq for Table {
+// //   #[inline]
+// //   fn eq(&self, other: &Self) -> bool {
+// //     if self.port_idx.len() != other.port_idx.len() {
+// //       return false;
+// //     }
+// //     let mut other_mapping_self = vec![];
+// //     for port in other.port_idx.iter() {
+// //       match self.port_idx.iter().position(|v| v == port) {
+// //         Some(self_idx) => other_mapping_self.push(self_idx),
+// //         None => return false,
+// //       }
+// //     }
+// //     for (other_vec, other_state) in other.table.iter() {
+// //       let self_vec: Vector = other_mapping_self
+// //         .iter()
+// //         .map(|self_idx| other_vec[*self_idx])
+// //         .collect::<Vec<State>>()
+// //         .into();
+// //       match self.table.get(&self_vec) {
+// //         Some(self_state) => {
+// //           if !self_state.variant_eq(other_state) {
+// //             return false;
+// //           }
+// //         }
+// //         None => return false,
+// //       }
+// //     }
+// //     return true;
+// //   }
+// // }
 
-// impl Hash for Table {
-//   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-//     let sorted_table = self.sort();
-//     _ = sorted_table.table.iter().map(|xy| xy.hash(state));
-//     sorted_table.port_idx.hash(state);
-//   }
-// }
+// // impl Hash for Table {
+// //   fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+// //     let sorted_table = self.sort();
+// //     _ = sorted_table.table.iter().map(|xy| xy.hash(state));
+// //     sorted_table.port_idx.hash(state);
+// //   }
+// // }
 
-// impl Table {
-//   /// new `Table`
-//   #[inline]
-//   pub fn new(
-//     self_node: &str,
-//     table: HashMap<Vector, State>,
-//     port_idx: Vec<Port>,
-//   ) -> Self {
-//     Self { self_node: self_node.to_string(), table, port_idx }
-//   }
-//   /// sort
-//   pub fn sort(&self) -> Self {
-//     let idx_map = util::misc::argsort(&self.port_idx);
-//     Self::new(
-//       &self.self_node,
-//       self
-//         .table
-//         .iter()
-//         .map(|(vec,s)|
-//                 // self.port_idx[idx_map[idx]]
-//                 (vec.iter().enumerate().map(|(idx,_)|
-//                 vec[idx_map[idx]].clone()
-//             ).collect::<Vec<State>>().into(),
-//                     s.clone()))
-//         .collect(),
-//       self
-//         .port_idx
-//         .iter()
-//         .enumerate()
-//         .map(|(idx, _)| self.port_idx[idx_map[idx]].clone())
-//         .collect(),
-//     )
-//   }
-//   /// TODO: simplify
-//   pub fn simplify(&self) -> Self {
-//     todo!()
-//   }
-//   /// TODO: to_expression
-//   pub fn to_expression(&self) -> BooleanExpression {
-//     let table = self.simplify();
-//     let _ = table;
-//     todo!()
-//   }
-// }
+// // impl Table {
+// //   /// new `Table`
+// //   #[inline]
+// //   pub fn new(
+// //     self_node: &str,
+// //     table: HashMap<Vector, State>,
+// //     port_idx: Vec<Port>,
+// //   ) -> Self {
+// //     Self { self_node: self_node.to_string(), table, port_idx }
+// //   }
+// //   /// sort
+// //   pub fn sort(&self) -> Self {
+// //     let idx_map = util::misc::argsort(&self.port_idx);
+// //     Self::new(
+// //       &self.self_node,
+// //       self
+// //         .table
+// //         .iter()
+// //         .map(|(vec,s)|
+// //                 // self.port_idx[idx_map[idx]]
+// //                 (vec.iter().enumerate().map(|(idx,_)|
+// //                 vec[idx_map[idx]].clone()
+// //             ).collect::<Vec<State>>().into(),
+// //                     s.clone()))
+// //         .collect(),
+// //       self
+// //         .port_idx
+// //         .iter()
+// //         .enumerate()
+// //         .map(|(idx, _)| self.port_idx[idx_map[idx]].clone())
+// //         .collect(),
+// //     )
+// //   }
+// //   /// TODO: simplify
+// //   pub fn simplify(&self) -> Self {
+// //     todo!()
+// //   }
+// //   /// TODO: to_expression
+// //   pub fn to_expression(&self) -> BooleanExpression {
+// //     let table = self.simplify();
+// //     let _ = table;
+// //     todo!()
+// //   }
+// // }
 
-// impl std::fmt::Display for Table {
-//   #[inline]
-//   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//     use prettytable::{Row, Table};
-//     let mut table = Table::new();
-//     table.set_format(*util::format::FORMAT_NO_BORDER_BOX_CHARS);
-//     table.set_titles(Row::from({
-//       let mut v = self.port_idx.clone();
-//       v.push(Port::new(&self.self_node));
-//       v
-//     }));
-//     for (vec_in, state_out) in self.table.iter().sorted() {
-//       let _ = table.add_row(Row::from({
-//         let mut v: Vec<State> = vec_in.to_vec;
-//         v.push(state_out.clone());
-//         v
-//       }));
-//     }
-//     table.fmt(f)
-//   }
-// }
+// // impl std::fmt::Display for Table {
+// //   #[inline]
+// //   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+// //     use prettytable::{Row, Table};
+// //     let mut table = Table::new();
+// //     table.set_format(*util::format::FORMAT_NO_BORDER_BOX_CHARS);
+// //     table.set_titles(Row::from({
+// //       let mut v = self.port_idx.clone();
+// //       v.push(Port::new(&self.self_node));
+// //       v
+// //     }));
+// //     for (vec_in, state_out) in self.table.iter().sorted() {
+// //       let _ = table.add_row(Row::from({
+// //         let mut v: Vec<State> = vec_in.to_vec;
+// //         v.push(state_out.clone());
+// //         v
+// //       }));
+// //     }
+// //     table.fmt(f)
+// //   }
+// // }
 
-// impl LogicLike for Table {
-//   #[inline]
-//   fn inverse(&self) -> Self {
-//     Self::new(
-//       &self.self_node,
-//       self
-//         .table
-//         .iter()
-//         .map(|(k_vec, v_state)| (k_vec.clone(), v_state.inverse()))
-//         .collect(),
-//       self.port_idx.clone(),
-//     )
-//   }
-//   #[inline]
-//   fn variant_eq(&self, other: &Self) -> bool {
-//     todo!()
-//   }
-// }
+// // impl LogicLike for Table {
+// //   #[inline]
+// //   fn inverse(&self) -> Self {
+// //     Self::new(
+// //       &self.self_node,
+// //       self
+// //         .table
+// //         .iter()
+// //         .map(|(k_vec, v_state)| (k_vec.clone(), v_state.inverse()))
+// //         .collect(),
+// //       self.port_idx.clone(),
+// //     )
+// //   }
+// //   #[inline]
+// //   fn variant_eq(&self, other: &Self) -> bool {
+// //     todo!()
+// //   }
+// // }
 
-// /// Logic Searcher
-// #[derive(Debug, Clone)]
-// #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Searcher {
-//   include_port_state: HashMap<Port, HashSet<State>>,
-//   include_out_state: Option<HashSet<State>>,
-//   exclude_port_state: HashMap<Port, HashSet<State>>,
-//   exclude_out_state: Option<HashSet<State>>,
-// }
+// // /// Logic Searcher
+// // #[derive(Debug, Clone)]
+// // #[derive(serde::Serialize, serde::Deserialize)]
+// pub struct Searcher {
+// //   include_port_state: HashMap<Port, HashSet<State>>,
+// //   include_out_state: Option<HashSet<State>>,
+// //   exclude_port_state: HashMap<Port, HashSet<State>>,
+// //   exclude_out_state: Option<HashSet<State>>,
+// // }
 
-// impl std::fmt::Display for Searcher {
-//   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//     let print_hash_set = |name: &str, set: &HashSet<State>| -> String {
-//       let s = set
-//         .iter()
-//         .fold("".to_string(), |result, pair| format!("{result}/{pair}"));
-//       if s != "" {
-//         format!("{name}=({})", s.chars().skip(1).collect::<String>())
-//       } else {
-//         s
-//       }
-//     };
-//     write!(
-//       f,
-//       "searcher-[include:{}]-[exclude:{}]",
-//       self.include_port_state.iter().fold(
-//         {
-//           match &self.include_out_state {
-//             Some(s) => print_hash_set("Out", s),
-//             None => format!("Out=All"),
-//           }
-//         },
-//         |result, pair| {
-//           format!("{},{}", result, print_hash_set(&pair.0.to_string(), &pair.1))
-//         }
-//       ),
-//       self.exclude_port_state.iter().fold(
-//         {
-//           match &self.exclude_out_state {
-//             Some(s) => print_hash_set("Out", s),
-//             None => format!("Out=None"),
-//           }
-//         },
-//         |result, pair| {
-//           format!("{},{}", result, print_hash_set(&pair.0.to_string(), &pair.1))
-//         }
-//       )
-//     )
-//   }
-// }
+// // impl std::fmt::Display for Searcher {
+// //   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+// //     let print_hash_set = |name: &str, set: &HashSet<State>| -> String {
+// //       let s = set
+// //         .iter()
+// //         .fold("".to_string(), |result, pair| format!("{result}/{pair}"));
+// //       if s != "" {
+// //         format!("{name}=({})", s.chars().skip(1).collect::<String>())
+// //       } else {
+// //         s
+// //       }
+// //     };
+// //     write!(
+// //       f,
+// //       "searcher-[include:{}]-[exclude:{}]",
+// //       self.include_port_state.iter().fold(
+// //         {
+// //           match &self.include_out_state {
+// //             Some(s) => print_hash_set("Out", s),
+// //             None => format!("Out=All"),
+// //           }
+// //         },
+// //         |result, pair| {
+// //           format!("{},{}", result, print_hash_set(&pair.0.to_string(), &pair.1))
+// //         }
+// //       ),
+// //       self.exclude_port_state.iter().fold(
+// //         {
+// //           match &self.exclude_out_state {
+// //             Some(s) => print_hash_set("Out", s),
+// //             None => format!("Out=None"),
+// //           }
+// //         },
+// //         |result, pair| {
+// //           format!("{},{}", result, print_hash_set(&pair.0.to_string(), &pair.1))
+// //         }
+// //       )
+// //     )
+// //   }
+// // }
 
-// impl Searcher {
-//   /// New Searcher
-//   pub fn new(
-//     include_port_state: Vec<(Port, Vec<State>)>,
-//     include_out_state: Option<Vec<State>>,
-//     exclude_port_state: Vec<(Port, Vec<State>)>,
-//     exclude_out_state: Option<Vec<State>>,
-//   ) -> Self {
-//     let port_state2map =
-//       |port_state: Vec<(Port, Vec<State>)>| -> HashMap<Port, HashSet<State>> {
-//         let mut map: HashMap<Port, HashSet<State>> = HashMap::new();
-//         for (p, v) in port_state.iter() {
-//           match map.get(p) {
-//             Some(set) => {
-//               let mut _set = set.clone();
-//               _set.extend(v.iter());
-//               let _ = map.insert(p.clone(), _set);
-//             }
-//             None => {
-//               let _ = map.insert(p.clone(), v.iter().copied().collect());
-//             }
-//           }
-//         }
-//         map
-//       };
-//     Self {
-//       include_port_state: port_state2map(include_port_state),
-//       include_out_state: match include_out_state {
-//         Some(v) => Some(v.iter().copied().collect()),
-//         None => None,
-//       },
-//       exclude_port_state: port_state2map(exclude_port_state),
-//       exclude_out_state: match exclude_out_state {
-//         Some(v) => Some(v.iter().copied().collect()),
-//         None => None,
-//       },
-//     }
-//   }
-//   /// search `Table` by port-state-pair
-//   pub fn search(&self, table: &Table) -> Table {
-//     let get_port_idx =
-//       |port: &Port| -> Option<usize> { table.port_idx.iter().position(|v| v == port) };
-//     let include_state_idx = self
-//       .include_port_state
-//       .iter()
-//       .filter_map(|(port, state_want)| match get_port_idx(port) {
-//         Some(u) => Some((u, state_want)),
-//         None => {
-//           error!("Can Not Find {}, auto skip it.", port);
-//           None
-//         }
-//       })
-//       .collect::<Vec<(usize, &HashSet<State>)>>();
-//     let exclude_state_idx = self
-//       .exclude_port_state
-//       .iter()
-//       .filter_map(|(port, state_want)| match get_port_idx(port) {
-//         Some(u) => Some((u, state_want)),
-//         None => {
-//           error!("Can Not Find {}, auto skip it.", port);
-//           None
-//         }
-//       })
-//       .collect::<Vec<(usize, &HashSet<State>)>>();
-//     Table::new(
-//       &format!("[{}]-[{self}]", table.self_node),
-//       table
-//         .table
-//         .iter()
-//         .filter_map(|(k_vec, v_state)| {
-//           if let Some(_include_out_state) = &self.include_out_state {
-//             if !_include_out_state.contains(v_state) {
-//               return None;
-//             }
-//           }
+// // impl Searcher {
+// //   /// New Searcher
+// //   pub fn new(
+// //     include_port_state: Vec<(Port, Vec<State>)>,
+// //     include_out_state: Option<Vec<State>>,
+// //     exclude_port_state: Vec<(Port, Vec<State>)>,
+// //     exclude_out_state: Option<Vec<State>>,
+// //   ) -> Self {
+// //     let port_state2map =
+// //       |port_state: Vec<(Port, Vec<State>)>| -> HashMap<Port, HashSet<State>> {
+// //         let mut map: HashMap<Port, HashSet<State>> = HashMap::new();
+// //         for (p, v) in port_state.iter() {
+// //           match map.get(p) {
+// //             Some(set) => {
+// //               let mut _set = set.clone();
+// //               _set.extend(v.iter());
+// //               let _ = map.insert(p.clone(), _set);
+// //             }
+// //             None => {
+// //               let _ = map.insert(p.clone(), v.iter().copied().collect());
+// //             }
+// //           }
+// //         }
+// //         map
+// //       };
+// //     Self {
+// //       include_port_state: port_state2map(include_port_state),
+// //       include_out_state: match include_out_state {
+// //         Some(v) => Some(v.iter().copied().collect()),
+// //         None => None,
+// //       },
+// //       exclude_port_state: port_state2map(exclude_port_state),
+// //       exclude_out_state: match exclude_out_state {
+// //         Some(v) => Some(v.iter().copied().collect()),
+// //         None => None,
+// //       },
+// //     }
+// //   }
+// //   /// search `Table` by port-state-pair
+// //   pub fn search(&self, table: &Table) -> Table {
+// //     let get_port_idx =
+// //       |port: &Port| -> Option<usize> { table.port_idx.iter().position(|v| v == port) };
+// //     let include_state_idx = self
+// //       .include_port_state
+// //       .iter()
+// //       .filter_map(|(port, state_want)| match get_port_idx(port) {
+// //         Some(u) => Some((u, state_want)),
+// //         None => {
+// //           error!("Can Not Find {}, auto skip it.", port);
+// //           None
+// //         }
+// //       })
+// //       .collect::<Vec<(usize, &HashSet<State>)>>();
+// //     let exclude_state_idx = self
+// //       .exclude_port_state
+// //       .iter()
+// //       .filter_map(|(port, state_want)| match get_port_idx(port) {
+// //         Some(u) => Some((u, state_want)),
+// //         None => {
+// //           error!("Can Not Find {}, auto skip it.", port);
+// //           None
+// //         }
+// //       })
+// //       .collect::<Vec<(usize, &HashSet<State>)>>();
+// //     Table::new(
+// //       &format!("[{}]-[{self}]", table.self_node),
+// //       table
+// //         .table
+// //         .iter()
+// //         .filter_map(|(k_vec, v_state)| {
+// //           if let Some(_include_out_state) = &self.include_out_state {
+// //             if !_include_out_state.contains(v_state) {
+// //               return None;
+// //             }
+// //           }
 
-//           if let Some(_exclude_out_state) = &self.exclude_out_state {
-//             if _exclude_out_state.contains(v_state) {
-//               return None;
-//             }
-//           }
-//           for (port_idx, state) in include_state_idx.iter() {
-//             if !state.contains(&k_vec[*port_idx]) {
-//               return None;
-//             }
-//           }
-//           for (port_idx, state) in exclude_state_idx.iter() {
-//             if state.contains(&k_vec[*port_idx]) {
-//               return None;
-//             }
-//           }
-//           return Some((k_vec.clone(), v_state.clone()));
-//         })
-//         .collect::<HashMap<Vector, State>>(),
-//       table.port_idx.clone(),
-//     )
-//   }
-// }
+// //           if let Some(_exclude_out_state) = &self.exclude_out_state {
+// //             if _exclude_out_state.contains(v_state) {
+// //               return None;
+// //             }
+// //           }
+// //           for (port_idx, state) in include_state_idx.iter() {
+// //             if !state.contains(&k_vec[*port_idx]) {
+// //               return None;
+// //             }
+// //           }
+// //           for (port_idx, state) in exclude_state_idx.iter() {
+// //             if state.contains(&k_vec[*port_idx]) {
+// //               return None;
+// //             }
+// //           }
+// //           return Some((k_vec.clone(), v_state.clone()));
+// //         })
+// //         .collect::<HashMap<Vector, State>>(),
+// //       table.port_idx.clone(),
+// //     )
+// //   }
+// // }

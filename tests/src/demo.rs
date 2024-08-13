@@ -1,4 +1,4 @@
-use std::fmt::Display as _;
+use core::fmt::Display as _;
 
 use liberty_db::{ast::GroupAttri, library::Library};
 
@@ -58,8 +58,8 @@ library(gscl45nm) {
 fn parse_str() {
   match Library::parse(TEMPLATE) {
     Ok(ref mut library) => {
-      library.comments._self.push("line1\nline2".into());
-      library.comments._self.push("line3".into());
+      library.comments.this.push("line1\nline2".into());
+      library.comments.this.push("line3".into());
       println!("{:#?}", library);
       println!("{}", library);
     }

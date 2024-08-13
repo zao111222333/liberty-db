@@ -156,7 +156,7 @@ pub struct SensitizationVector {
 
 impl ComplexAttri for SensitizationVector {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let id: usize = match i.next() {
       Some(&s) => match s.parse() {
@@ -176,7 +176,7 @@ impl ComplexAttri for SensitizationVector {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { id, states })
@@ -282,7 +282,7 @@ pub struct VoltageMap {
 }
 impl ComplexAttri for VoltageMap {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let name = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -299,7 +299,7 @@ impl ComplexAttri for VoltageMap {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { name, voltage })
@@ -320,7 +320,7 @@ impl ComplexAttri for VoltageMap {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
   sort,
-  macro(derive(Debug, Clone,Default);)
+  macro(derive(Debug, Clone, Default);)
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct InputVoltage {
@@ -370,7 +370,7 @@ impl GroupFn for InputVoltage {}
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
   sort,
-  macro(derive(Debug, Clone,Default);)
+  macro(derive(Debug, Clone, Default);)
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct OutputVoltage {
@@ -603,7 +603,7 @@ pub enum AttributeType {
 }
 impl ComplexAttri for Define {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let attribute_name = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -620,7 +620,7 @@ impl ComplexAttri for Define {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { attribute_name, group_name, attribute_type })
@@ -699,7 +699,7 @@ pub enum ResourceType {
 }
 impl ComplexAttri for DefineCellArea {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let area_name = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -712,7 +712,7 @@ impl ComplexAttri for DefineCellArea {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { area_name, resource_type })
@@ -750,7 +750,7 @@ pub struct DefineGroup {
 }
 impl ComplexAttri for DefineGroup {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let group = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -760,7 +760,7 @@ impl ComplexAttri for DefineGroup {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { group, parent_name })
@@ -892,7 +892,7 @@ pub struct FanoutLength {
 }
 impl ComplexAttri for FanoutLength {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let fanout = match i.next() {
       Some(&s) => match s.parse() {
@@ -925,7 +925,7 @@ impl ComplexAttri for FanoutLength {
       Err(_) => None,
     });
 
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self {

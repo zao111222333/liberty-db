@@ -398,7 +398,7 @@ pub struct Values {
 
 impl ComplexAttri for Values {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, crate::ast::ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, crate::ast::ComplexParseError> {
     Ok(Self {
       size1: 0,
       size2: 0,
@@ -613,9 +613,9 @@ impl std::str::FromStr for Variable {
   }
 }
 
-impl std::fmt::Display for Variable {
+impl core::fmt::Display for Variable {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Variable::Time(v) => v.fmt(f),
       Variable::Voltage(v) => v.fmt(f),

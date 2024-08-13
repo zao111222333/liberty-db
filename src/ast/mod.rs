@@ -5,16 +5,15 @@
 mod fmt;
 pub mod parser;
 use crate::ArcStr;
+use core::{
+  fmt::{Debug, Display, Write},
+  num::{ParseFloatError, ParseIntError},
+  str::FromStr,
+};
 pub use fmt::CodeFormatter;
 use itertools::Itertools;
 use nom::{error::Error, IResult};
 use ordered_float::ParseNotNanError;
-use std::{
-  // cell::RefCell,
-  // sync::Arc,
-  fmt::{Debug, Display, Write},
-  str::FromStr,
-};
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
@@ -136,7 +135,7 @@ pub trait SimpleAttri: Sized + Display + FromStr {
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T>,
-  ) -> std::fmt::Result {
+  ) -> core::fmt::Result {
     <SimpleWrapper as Format>::liberty(&self.to_wrapper(), key, f)
   }
 }
@@ -146,10 +145,10 @@ pub trait SimpleAttri: Sized + Display + FromStr {
 pub enum ComplexParseError {
   /// ParseFloatError
   #[error("{0}")]
-  Float(ParseNotNanError<std::num::ParseFloatError>),
+  Float(ParseNotNanError<ParseFloatError>),
   /// ParseIntError
   #[error("{0}")]
-  Int(std::num::ParseIntError),
+  Int(ParseIntError),
   /// title length mismatch
   #[error("title length mismatch")]
   LengthDismatch,
@@ -172,7 +171,7 @@ pub trait NameAttri: Sized + Clone {
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
   /// basic parser
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError>;
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError>;
   /// to_wrapper
   fn to_wrapper(&self) -> ComplexWrapper;
   /// nom_parse, auto implement
@@ -199,7 +198,7 @@ pub trait ComplexAttri: Sized {
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T>,
-  ) -> std::fmt::Result {
+  ) -> core::fmt::Result {
     <ComplexWrapper as Format>::liberty(&self.to_wrapper(), key, f)
   }
 }
@@ -230,12 +229,12 @@ pub trait GroupAttri: Sized {
     i: &'a str,
     line_num: &mut usize,
   ) -> IResult<&'a str, Result<Self, IdError>, Error<&'a str>>;
-  ///
+  /// fmt_liberty
   fn fmt_liberty<T: Write>(
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T>,
-  ) -> std::fmt::Result;
+  ) -> core::fmt::Result;
 }
 
 /// Error for parser Group Index
@@ -253,7 +252,7 @@ pub enum IdError {
   RepeatAttri,
   /// Int Error
   #[error("{0}")]
-  Int(std::num::ParseIntError),
+  Int(ParseIntError),
   /// something else
   #[error("{0}")]
   Other(String),
@@ -268,7 +267,7 @@ pub trait NamedGroup: GroupAttri {
   fn name2vec(name: Self::Name) -> Vec<ArcStr>;
   /// fmt_liberty
   #[inline]
-  fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
     write!(
       f,
       "{}",
@@ -283,12 +282,7 @@ pub trait NamedGroup: GroupAttri {
 fn display_nom_error(e: &nom::Err<Error<&str>>) -> ArcStr {
   match e {
     nom::Err::Incomplete(_) => e.to_string(),
-    nom::Err::Error(e) => format!(
-      "type[{}] at[{}]",
-      e.code.description(),
-      e.input.lines().next().unwrap_or("")
-    ),
-    nom::Err::Failure(e) => format!(
+    nom::Err::Failure(e) | nom::Err::Error(e) => format!(
       "type[{}] at[{}]",
       e.code.description(),
       e.input.lines().next().unwrap_or("")
@@ -315,19 +309,19 @@ pub(crate) fn test_parse_group<G: GroupAttri + Debug>(s: &str) -> (G, usize) {
   let mut n = 1;
   match G::nom_parse(s, &mut n) {
     Ok((_, Ok(group))) => {
-      println!("{:#?}", group);
+      println!("{group:#?}");
       println!("{n}");
       let mut output = String::new();
-      let mut f = CodeFormatter::new(&mut output, "| ");
-      if let Err(e) = GroupAttri::fmt_liberty(&group, std::any::type_name::<G>(), &mut f)
+      let mut f = CodeFormatter::new(&mut output);
+      if let Err(e) = GroupAttri::fmt_liberty(&group, core::any::type_name::<G>(), &mut f)
       {
         panic!("{e}");
       }
-      println!("{}", output);
-      return (group, n);
+      println!("{output}");
+      (group, n)
     }
-    Ok((_, Err(e))) => panic!("{:#?}", e),
-    Err(e) => panic!("{:#?}", e),
+    Ok((_, Err(e))) => panic!("{e:#?}"),
+    Err(e) => panic!("{e:#?}"),
   }
 }
 /// For basic formatter
@@ -337,15 +331,15 @@ pub trait Format {
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T>,
-  ) -> std::fmt::Result;
+  ) -> core::fmt::Result;
   /// `.db` format
-  fn db<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  fn db<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
     _ = key;
     _ = f;
     todo!()
   }
   /// `.json` format
-  fn json<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  fn json<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
     _ = key;
     _ = f;
     todo!()
@@ -356,10 +350,14 @@ pub(crate) fn is_word(s: &ArcStr) -> bool {
 }
 impl Format for AttriComment {
   #[inline]
-  fn liberty<T: Write>(&self, _: &str, f: &mut CodeFormatter<'_, T>) -> std::fmt::Result {
+  fn liberty<T: Write>(
+    &self,
+    _: &str,
+    f: &mut CodeFormatter<'_, T>,
+  ) -> core::fmt::Result {
     match self.len() {
       0 => Ok(()),
-      _ => write!(f, "\n/* {} */", self.join("\n").replace("\n", "\n* ")),
+      _ => write!(f, "\n/* {} */", self.join("\n").replace('\n', "\n* ")),
     }
   }
 }
@@ -370,32 +368,27 @@ impl Format for SimpleWrapper {
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T>,
-  ) -> std::fmt::Result {
+  ) -> core::fmt::Result {
     if self.is_empty() {
       Ok(())
+    } else if is_word(self) {
+      write!(f, "\n{key} : {self};")
     } else {
-      if is_word(self) {
-        write!(f, "\n{key} : {};", self)
-      } else {
-        write!(f, "\n{key} : \"{}\";", self)
-      }
+      write!(f, "\n{key} : \"{self}\";")
     }
   }
 }
 
 impl Format for ComplexWrapper {
+  #[allow(clippy::indexing_slicing)]
+  #[inline]
   fn liberty<T: Write>(
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T>,
-  ) -> std::fmt::Result {
-    if self.is_empty() {
+  ) -> core::fmt::Result {
+    if self.is_empty() || (self.len() == 1 && self[0].is_empty()) {
       return Ok(());
-      // return write!(f, "\n{key} ();");
-    };
-    if self.len() == 1 && self[0].is_empty() {
-      return Ok(());
-      // return write!(f, "\n{key} ();");
     };
     if self[0].iter().all(is_word) {
       write!(f, "\n{key} ({}", self[0].join(", "))?;
@@ -415,11 +408,12 @@ impl Format for ComplexWrapper {
   }
 }
 
+#[inline]
 pub(crate) fn liberty_attr_list<T: Write>(
   attr_list: &AttributeList,
   f: &mut CodeFormatter<'_, T>,
-) -> std::fmt::Result {
-  for (key, attr) in attr_list.iter() {
+) -> core::fmt::Result {
+  for (key, attr) in attr_list {
     match attr {
       AttriValue::Simple(a) => Format::liberty(a, key, f)?,
       AttriValue::Complex(a) => Format::liberty(a, key, f)?,
@@ -430,11 +424,12 @@ pub(crate) fn liberty_attr_list<T: Write>(
 }
 
 impl Format for GroupWrapper {
+  #[inline]
   fn liberty<T: Write>(
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T>,
-  ) -> std::fmt::Result {
+  ) -> core::fmt::Result {
     write!(
       f,
       "\n{key} ({}) {{",

@@ -1,5 +1,5 @@
 #[cfg(test)]
-use std::hash::Hash;
+use core::hash::Hash;
 use std::{collections::HashMap, hash::Hasher};
 
 use crate::{expression::*, units};
@@ -324,7 +324,7 @@ fn expression_nand_table() {
 }
 // #[test]
 // fn expression_length_check() {
-//     use std::fmt::{self, write};
+//     use core::fmt::{self, write};
 //     let right: BooleanExpression = FunctionExpression::new (
 //         vec![Port::new("A").into(),Port::new("B").into()],
 //         vec![logic::Operator2::And],

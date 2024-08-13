@@ -15,9 +15,9 @@ fn group_field_fn(
   proc_macro2::TokenStream,
 )> {
   let s_field_name = field_name.to_string();
-  let attri_comment: _;
-  let write_field: _;
-  let parser_arm: _;
+  let attri_comment: proc_macro2::TokenStream;
+  let write_field: proc_macro2::TokenStream;
+  let parser_arm: proc_macro2::TokenStream;
   match arrti_type {
     AttriType::Simple(SimpleType::Option) => {
       attri_comment = quote! {
@@ -272,7 +272,7 @@ pub(crate) fn inner(
     let mut attri_comments = quote! {};
     let mut parser_arms = quote! {};
     let mut write_fields = quote! {};
-    let comments_self = Ident::new("_self", Span::call_site());
+    let comments_self = Ident::new("this", Span::call_site());
     for field in fields.into_iter() {
       if let Some(field_name) = &field.ident {
         match attri_type_map.get(field_name) {
@@ -302,7 +302,7 @@ pub(crate) fn inner(
       } else {
         return Err(syn::Error::new(
           proc_macro2::Span::call_site(),
-          format!("Can not find field ident!"),
+          "Can not find field ident!".to_string(),
         ));
       }
     }
@@ -311,7 +311,7 @@ pub(crate) fn inner(
     } else {
       quote! {}
     };
-    let (change_id_return, write_title) = if name_vec.len() == 0 {
+    let (change_id_return, write_title) = if name_vec.is_empty() {
       (
         quote! {return Ok((input, Ok(res)));},
         quote! {
@@ -440,8 +440,8 @@ pub(crate) fn inner(
             type Name=#name_ident;
             type Comments=#comments_ident;
             #name_func
-            fn fmt_liberty<T: std::fmt::Write>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T>) -> std::fmt::Result {
-              use std::fmt::Write;
+            fn fmt_liberty<T: core::fmt::Write>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T>) -> core::fmt::Result {
+              use core::fmt::Write;
               use itertools::Itertools;
               #write_title
               f.indent(1);
@@ -490,7 +490,7 @@ pub(crate) fn inner(
       #impl_group
     })
   } else {
-    Err(syn::Error::new(Span::call_site(), format!("Can not find NamedField")))
+    Err(syn::Error::new(Span::call_site(), "Can not find NamedField".to_string()))
   }
 }
 type Punctuated = syn::punctuated::Punctuated<Field, Token![,]>;

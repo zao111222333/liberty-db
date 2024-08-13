@@ -57,13 +57,13 @@ pub enum BooleanExpression {
 
 impl Display for BooleanExpression {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
-      BooleanExpression::Port(exp) => std::fmt::Display::fmt(&exp, f),
-      BooleanExpression::FF(exp) => std::fmt::Display::fmt(&exp, f),
-      BooleanExpression::Latch(exp) => std::fmt::Display::fmt(&exp, f),
-      BooleanExpression::Function(exp) => std::fmt::Display::fmt(&exp, f),
-      BooleanExpression::TriState(exp) => std::fmt::Display::fmt(&exp, f),
+      BooleanExpression::Port(exp) => core::fmt::Display::fmt(&exp, f),
+      BooleanExpression::FF(exp) => core::fmt::Display::fmt(&exp, f),
+      BooleanExpression::Latch(exp) => core::fmt::Display::fmt(&exp, f),
+      BooleanExpression::Function(exp) => core::fmt::Display::fmt(&exp, f),
+      BooleanExpression::TriState(exp) => core::fmt::Display::fmt(&exp, f),
     }
   }
 }
@@ -79,12 +79,12 @@ impl Eq for BooleanExpression {}
 
 impl Hash for BooleanExpression {
   #[inline]
-  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+  fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
     self.table().hash(state);
   }
 }
 impl std::str::FromStr for BooleanExpression {
-  type Err = std::fmt::Error;
+  type Err = core::fmt::Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     todo!()
@@ -98,13 +98,13 @@ impl BooleanExpression {
     s: &str,
     ff_map: &HashMap<LatchFfId, Ff>,
     latch_map: &HashMap<LatchFfId, Latch>,
-  ) -> Result<Self, std::fmt::Error> {
+  ) -> Result<Self, core::fmt::Error> {
     let l_pos_list = s.match_indices(BRACKET_L).map(|(i, _)| i).collect::<Vec<usize>>();
     let r_pos_list = s.match_indices(BRACKET_R).map(|(i, _)| i).collect::<Vec<usize>>();
     // match (s.find(Self::BRACKET_L),s.find(Self::BRACKET_R)){
     //     (None, None) => todo!(),
-    //     (None, Some(_)) => Err(std::fmt::Error),
-    //     (Some(_), None) => Err(std::fmt::Error),
+    //     (None, Some(_)) => Err(core::fmt::Error),
+    //     (Some(_), None) => Err(core::fmt::Error),
     //     (Some(idx_l), Some(idx_r)) => todo!(),
     // }
     todo!()

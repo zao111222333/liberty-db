@@ -18,9 +18,11 @@ pub(crate) mod format {
   ///  1 │ F │ R
   /// ```
   pub static ref FORMAT_NO_BORDER_BOX_CHARS: TableFormat = FormatBuilder::new()
-      .column_separator('│')
+      .column_separator('\u{2502}')
+      // .column_separator('│')
       .separators(&[LinePosition::Title],
-      LineSeparator::new('─','┼','┼','┼'))
+        // LineSeparator::new('─','┼','┼','┼'))
+      LineSeparator::new('\u{2500}','\u{253c}','\u{253c}','\u{253c}'))
       .padding(1, 1)
       .build();
   }

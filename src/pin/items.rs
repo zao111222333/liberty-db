@@ -1,5 +1,5 @@
 use crate::ast::SimpleAttri;
-use std::str::FromStr;
+use core::str::FromStr;
 use strum_macros::{Display, EnumString};
 
 /// <a name ="reference_link" href="
@@ -10,7 +10,7 @@ use strum_macros::{Display, EnumString};
 /// &end
 /// =228.4
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum AntennaDiodeType {
   /// power
@@ -33,7 +33,7 @@ impl SimpleAttri for AntennaDiodeType {}
 /// &end
 /// =228.22
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Direction {
   #[strum(serialize = "input")]
@@ -47,7 +47,7 @@ pub enum Direction {
 }
 impl SimpleAttri for Direction {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DontFault {
   #[strum(serialize = "sa0")]
@@ -58,7 +58,7 @@ pub enum DontFault {
   Sao1,
 }
 impl SimpleAttri for DontFault {}
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DriverType {
   #[strum(serialize = "pull_up")]
@@ -79,7 +79,7 @@ pub enum DriverType {
   Resistive1,
 }
 impl SimpleAttri for DriverType {}
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum NextstateType {
   #[strum(serialize = "data")]
@@ -97,7 +97,7 @@ pub enum NextstateType {
 }
 impl SimpleAttri for NextstateType {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PinFuncType {
   #[strum(serialize = "clock_enable")]
@@ -112,7 +112,7 @@ pub enum PinFuncType {
   ActiveFalling,
 }
 impl SimpleAttri for PinFuncType {}
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum RestoreEdgeType {
   #[strum(serialize = "edge_trigger")]
@@ -124,7 +124,7 @@ pub enum RestoreEdgeType {
 }
 impl SimpleAttri for RestoreEdgeType {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SignalType {
   #[strum(serialize = "test_scan_in")]
@@ -150,7 +150,7 @@ pub enum SignalType {
 }
 impl SimpleAttri for SignalType {}
 #[derive(Default)]
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SlewControl {
   #[strum(serialize = "low")]
@@ -178,7 +178,7 @@ impl SimpleAttri for SlewControl {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=267.24&end=267.26
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PreferTied {
   /// 1
@@ -189,7 +189,7 @@ pub enum PreferTied {
   Zero,
 }
 impl SimpleAttri for PreferTied {}
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 enum OneValue {
   #[strum(serialize = "1")]
@@ -210,12 +210,12 @@ enum OneValue {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=248.6&end=248.13
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TwoValue(OneValue, OneValue);
 impl SimpleAttri for TwoValue {}
-impl std::fmt::Display for TwoValue {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for TwoValue {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     write!(f, "{}{}", self.0, self.1)
   }
 }
@@ -225,7 +225,7 @@ impl FromStr for TwoValue {
     if s.len() != 2 {
       return Err(strum::ParseError::VariantNotFound);
     }
-    let mut i = s.chars().into_iter();
+    let mut i = s.chars();
     if let Some(c1) = i.next() {
       if let Some(c2) = i.next() {
         let mut tmp = [0; 1];

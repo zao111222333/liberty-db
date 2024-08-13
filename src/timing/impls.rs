@@ -18,11 +18,11 @@ mod check {
   /// =214.5
   /// ">Reference</a>
   fn need_timing_sense_when_timing_type_is_clear_or_preset(timing: &Timing) {
-    if timing.timing_sense == None {}
+    if timing.timing_sense.is_none() {}
   }
 
   // TODO:
-  /// If related_pin is an output pin, you must define a timing_sense attribute for that pin.
+  /// If `related_pin` is an output pin, you must define a timing_sense attribute for that pin.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
   /// ?field=test

@@ -118,9 +118,9 @@ impl GroupFn for Domain {}
 pub struct WordSet {
   pub inner: HashSet<ArcStr>,
 }
-impl std::fmt::Display for WordSet {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    std::fmt::Display::fmt(&self.inner.iter().join(" "), f)
+impl core::fmt::Display for WordSet {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    core::fmt::Display::fmt(&self.inner.iter().join(" "), f)
   }
 }
 impl Ord for WordSet {
@@ -154,20 +154,20 @@ impl PartialOrd for WordSet {
 }
 
 impl SimpleAttri for WordSet {}
-impl std::hash::Hash for WordSet {
-  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+impl core::hash::Hash for WordSet {
+  fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
     let mut sum = 0_u64;
     for item in &self.inner {
       let mut hasher = std::hash::DefaultHasher::new();
       item.hash(&mut hasher);
-      sum = sum.wrapping_add(std::hash::Hasher::finish(&hasher));
+      sum = sum.wrapping_add(core::hash::Hasher::finish(&hasher));
     }
     state.write_u64(sum);
   }
 }
 
 impl std::str::FromStr for WordSet {
-  type Err = std::fmt::Error;
+  type Err = core::fmt::Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(Self { inner: s.split(' ').map(ArcStr::from).collect() })

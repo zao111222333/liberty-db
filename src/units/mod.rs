@@ -2,18 +2,18 @@
 //! IFRAME('https://en.wikipedia.org/wiki/International_System_of_Units');
 //! </script>
 
-use crate::ArcStr;
-use crate::NotNan;
-pub use uom::si::f64::{
-  Capacitance, ElectricCharge, ElectricCurrent, ElectricPotential, ElectricalResistance,
-  Energy, Length, Power, Ratio, ThermodynamicTemperature, Time,
-};
-
-pub use uom::fmt::DisplayStyle;
-pub use uom::si::Unit;
-pub use uom::si::{
-  capacitance, electric_current, electric_potential, electrical_resistance, ratio,
-  thermodynamic_temperature,
+use crate::{ArcStr, NotNan};
+use core::marker::PhantomData;
+pub use uom::{
+  fmt::DisplayStyle,
+  si::{
+    capacitance, electric_current, electric_potential, electrical_resistance,
+    f64::{
+      Capacitance, ElectricCharge, ElectricCurrent, ElectricPotential,
+      ElectricalResistance, Energy, Length, Power, Ratio, ThermodynamicTemperature, Time,
+    },
+    ratio, thermodynamic_temperature, Unit,
+  },
 };
 pub mod electric_charge;
 pub mod energy;
@@ -46,7 +46,7 @@ pub fn nanosecond(v: f64) -> Time {
 }
 
 use crate::ast::{ComplexAttri, ComplexParseError, SimpleAttri};
-use std::ops::Deref;
+use core::ops::Deref;
 
 /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
 /// <a name ="reference_link" href="
@@ -78,27 +78,27 @@ impl TimeUnit {
   const LUT: [<Self as Deref>::Target; 4] = [
     // 1ps
     Time {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-12,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-12f64,
     },
     // 10ps
     Time {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-11,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-11f64,
     },
     // 100ps
     Time {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-10,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-10f64,
     },
     // 1ns
     Time {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-9,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-9f64,
     },
   ];
 }
@@ -143,27 +143,27 @@ impl VoltageUnit {
   const LUT: [<Self as Deref>::Target; 4] = [
     // 1mV
     ElectricPotential {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-3,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-3f64,
     },
     // 10mV
     ElectricPotential {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-2,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-2f64,
     },
     // 100mV
     ElectricPotential {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-1,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-1f64,
     },
     // 1V
     ElectricPotential {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E0,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E0f64,
     },
   ];
 }
@@ -217,45 +217,45 @@ impl CurrentUnit {
   const LUT: [<Self as Deref>::Target; 7] = [
     // 1uA
     ElectricCurrent {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-6,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-6f64,
     },
     // 10uA
     ElectricCurrent {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-5,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-5f64,
     },
     // 100uA
     ElectricCurrent {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-4,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-4f64,
     },
     // 1mA
     ElectricCurrent {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-3,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-3f64,
     },
     // 10mA
     ElectricCurrent {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-2,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-2f64,
     },
     // 100mA
     ElectricCurrent {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-1,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-1f64,
     },
     // 1A
     ElectricCurrent {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E0,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E0f64,
     },
   ];
 }
@@ -300,27 +300,27 @@ impl PullingResistanceUnit {
   const LUT: [<Self as Deref>::Target; 4] = [
     // 1ohm
     ElectricalResistance {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E0,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E0f64,
     },
     // 10ohm
     ElectricalResistance {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E1,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E1f64,
     },
     // 100ohm
     ElectricalResistance {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E2,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E2f64,
     },
     // 1kohm
     ElectricalResistance {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E3,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E3f64,
     },
   ];
 }
@@ -361,7 +361,7 @@ impl Deref for CapacitiveLoadUnit {
 }
 
 impl ComplexAttri for CapacitiveLoadUnit {
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let value: NotNan<f64> = match i.next() {
       Some(&s) => match s.parse() {
@@ -378,7 +378,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { ff_pf, _v })
@@ -463,87 +463,87 @@ impl LeakagePowerUnit {
   const LUT: [<Self as Deref>::Target; 14] = [
     // No Unit
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1.0,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1.0f64,
     },
     // 1pW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-12,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-12f64,
     },
     // 10pW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-11,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-11f64,
     },
     // 100pW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-10,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-10f64,
     },
     // 1nW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-9,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-9f64,
     },
     // 10nW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-8,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-8f64,
     },
     // 100nW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-7,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-7f64,
     },
     // 1uW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-6,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-6f64,
     },
     // 10uW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-5,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-5f64,
     },
     // 100uW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-4,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-4f64,
     },
     // 1mW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-3,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-3f64,
     },
     // 10mW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-2,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-2f64,
     },
     // 100mW
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E-1,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E-1f64,
     },
     // 1W
     Power {
-      dimension: std::marker::PhantomData,
-      units: std::marker::PhantomData,
-      value: 1E0,
+      dimension: PhantomData,
+      units: PhantomData,
+      value: 1E0f64,
     },
   ];
 }

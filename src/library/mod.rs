@@ -9,8 +9,8 @@ use crate::{
   common::table::{DriverWaveform, TableTemple},
   units, ArcStr, GroupSet,
 };
+use core::fmt::{Display, Write};
 pub use items::*;
-use std::fmt::{Display, Write};
 
 /// The first line of the library group statement names the library.
 /// It is the first executable line in your library.
@@ -514,10 +514,10 @@ impl Display for Library {
   /// ```
   /// Format [Library] struct as `.lib` file
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-    let ff = &mut crate::ast::CodeFormatter::new(f, "  ");
-    if self.comments._self.len() != 0 {
-      write!(ff, "/* {} */", self.comments._self.join("\n").replace("\n", "\n* "))?;
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> Result<(), core::fmt::Error> {
+    let ff = &mut crate::ast::CodeFormatter::new(f);
+    if !self.comments.this.is_empty() {
+      write!(ff, "/* {} */", self.comments.this.join("\n").replace("\n", "\n* "))?;
     } else {
       write!(
         ff,

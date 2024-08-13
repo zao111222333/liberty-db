@@ -171,7 +171,7 @@ impl SimpleAttri for TimingSenseType {}
 pub type Mode = [ArcStr; 2];
 
 // impl ComplexAttri for Mode {
-//   fn parse(v: &Vec<&str>) -> Result<Self, ast::ComplexParseError> {
+//   fn parse(v: &[&str]) -> Result<Self, ast::ComplexParseError> {
 //     todo!()
 //   }
 

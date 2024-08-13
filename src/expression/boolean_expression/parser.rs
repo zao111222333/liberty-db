@@ -9,37 +9,37 @@ use nom::{
   IResult,
 };
 
-// only not(variable) and variable
+/// only not(variable) and variable
 #[inline]
 pub(super) fn as_sdf_str(expr: &Expr) -> String {
   match expr {
-    Expr::Variable(s) => {
-      if s.as_bytes()[0].is_ascii_digit() {
+    Expr::Variable(s) => s.as_bytes().first().map_or(String::new(), |s1| {
+      if s1.is_ascii_digit() {
         format!("\\\"{s}\\\" == 1'b1")
       } else {
         format!("{s} == 1'b1")
       }
-    }
-    Expr::Const(_) => todo!(),
+    }),
     Expr::Not(e) => match e.as_ref() {
       Expr::Variable(s) => {
         format!("{} == 1'b0", s.clone())
       }
-      _ => todo!(),
+      _ => unreachable!(),
     },
-    Expr::Or(_, _) => todo!(),
     Expr::And(e1, e2) => {
       format!("{} && {}", as_sdf_str(e1), as_sdf_str(e2))
     }
-    Expr::Xor(_, _) => todo!(),
-    Expr::Imp(_, _) => todo!(),
-    Expr::Iff(_, _) => todo!(),
-    Expr::Cond(_, _, _) => todo!(),
+    Expr::Const(_)
+    | Expr::Xor(_, _)
+    | Expr::Imp(_, _)
+    | Expr::Or(_, _)
+    | Expr::Iff(_, _)
+    | Expr::Cond(_, _, _) => unreachable!(),
   }
 }
 
 #[inline]
-pub(super) fn _fmt(expr: &Expr, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+pub(super) fn _fmt(expr: &Expr, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
   match expr {
     Expr::Variable(s) => {
       if s.as_bytes()[0].is_ascii_digit() {

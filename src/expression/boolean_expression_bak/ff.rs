@@ -1,5 +1,5 @@
 use super::{logic, BooleanExpression, BooleanExpressionLike, FunctionExpression};
-use std::fmt;
+use core::fmt;
 
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]

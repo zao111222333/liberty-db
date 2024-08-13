@@ -139,7 +139,7 @@ impl SimpleAttri for ArcStr {}
 
 impl<const N: usize> ComplexAttri for [ArcStr; N] {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let l = v.len();
     if l != N {
       return Err(ComplexParseError::LengthDismatch);
@@ -159,7 +159,7 @@ impl<const N: usize> ComplexAttri for [ArcStr; N] {
 
 impl ComplexAttri for Vec<f64> {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => {
@@ -184,7 +184,7 @@ impl ComplexAttri for Vec<f64> {
 
 impl ComplexAttri for Vec<NotNan<f64>> {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => Err(ComplexParseError::Float(e)),
@@ -210,13 +210,13 @@ impl ComplexAttri for Vec<NotNan<f64>> {
 
 impl ComplexAttri for ArcStr {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let v1: ArcStr = match i.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(v1)
@@ -228,7 +228,7 @@ impl ComplexAttri for ArcStr {
 }
 impl ComplexAttri for NotNan<f64> {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let v1: NotNan<f64> = match i.next() {
       Some(&s) => match s.parse() {
@@ -237,7 +237,7 @@ impl ComplexAttri for NotNan<f64> {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(v1)
@@ -250,7 +250,7 @@ impl ComplexAttri for NotNan<f64> {
 }
 impl ComplexAttri for Vec<ArcStr> {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     Ok(v.iter().map(|&s| ArcStr::from(s)).collect())
   }
   #[inline]
@@ -260,7 +260,7 @@ impl ComplexAttri for Vec<ArcStr> {
 }
 impl ComplexAttri for Vec<usize> {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => Err(ComplexParseError::Int(e)),
@@ -275,7 +275,7 @@ impl ComplexAttri for Vec<usize> {
 
 impl ComplexAttri for (f64, f64, ArcStr) {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let v1: f64 = match i.next() {
       Some(&s) => match s.parse() {
@@ -303,7 +303,7 @@ impl ComplexAttri for (f64, f64, ArcStr) {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok((v1, v2, v3))
@@ -320,7 +320,7 @@ impl ComplexAttri for (f64, f64, ArcStr) {
 }
 impl ComplexAttri for (f64, f64) {
   #[inline]
-  fn parse(v: &Vec<&str>) -> Result<Self, ComplexParseError> {
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let v1: f64 = match i.next() {
       Some(&s) => match s.parse() {
@@ -344,7 +344,7 @@ impl ComplexAttri for (f64, f64) {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if let Some(_) = i.next() {
+    if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok((v1, v2))

@@ -5,7 +5,7 @@
 use super::{
   logic, BooleanExpression, BooleanExpressionLike, Port, BRACKET_L, BRACKET_R,
 };
-use std::fmt;
+use core::fmt;
 
 #[derive(Debug, Clone)]
 enum SubExpression {
@@ -22,12 +22,12 @@ impl BooleanExpressionLike for SubExpression {
     }
   }
 }
-impl std::fmt::Display for SubExpression {
+impl core::fmt::Display for SubExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      SubExpression::Port(exp) => std::fmt::Display::fmt(&exp, f),
-      SubExpression::Condition(exp) => std::fmt::Display::fmt(&exp, f),
+      SubExpression::Port(exp) => core::fmt::Display::fmt(&exp, f),
+      SubExpression::Condition(exp) => core::fmt::Display::fmt(&exp, f),
     }
   }
 }
@@ -162,14 +162,14 @@ impl PartialEq for ConditionExpression {
 
 impl Eq for ConditionExpression {}
 
-impl std::hash::Hash for ConditionExpression {
+impl core::hash::Hash for ConditionExpression {
   #[inline]
-  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+  fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
     self.table().hash(state);
   }
 }
 impl std::str::FromStr for ConditionExpression {
-  type Err = std::fmt::Error;
+  type Err = core::fmt::Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     todo!()
@@ -183,7 +183,7 @@ impl std::str::FromStr for ConditionExpression {
 //     s: &str,
 //     ff_map: &HashMap<LatchFfId, Ff>,
 //     latch_map: &HashMap<LatchFfId, Latch>,
-//   ) -> Result<Self, std::fmt::Error> {
+//   ) -> Result<Self, core::fmt::Error> {
 //     let l_pos_list = s
 //       .match_indices(Self::BRACKET_L)
 //       .map(|(i, _)| i)
@@ -194,8 +194,8 @@ impl std::str::FromStr for ConditionExpression {
 //       .collect::<Vec<usize>>();
 //     // match (s.find(Self::BRACKET_L),s.find(Self::BRACKET_R)){
 //     //     (None, None) => todo!(),
-//     //     (None, Some(_)) => Err(std::fmt::Error),
-//     //     (Some(_), None) => Err(std::fmt::Error),
+//     //     (None, Some(_)) => Err(core::fmt::Error),
+//     //     (Some(_), None) => Err(core::fmt::Error),
 //     //     (Some(idx_l), Some(idx_r)) => todo!(),
 //     // }
 //     todo!()

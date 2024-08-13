@@ -55,6 +55,12 @@
 )]
 #![allow(
     // Some explicitly allowed Clippy lints, must have clear reason to allow
+    clippy::pattern_type_mismatch, // TODO: 
+    clippy::partial_pub_fields,
+    clippy::pub_with_shorthand,
+    clippy::missing_trait_methods,
+    clippy::min_ident_chars,
+    clippy::missing_docs_in_private_items,
     clippy::blanket_clippy_restriction_lints, // allow clippy::restriction
     clippy::implicit_return, // actually omitting the return keyword is idiomatic Rust code
     clippy::module_name_repetitions, // repeation of module name in a struct name is not big deal
@@ -67,13 +73,25 @@
     clippy::missing_panics_doc, // TODO: add panic docs
     clippy::panic_in_result_fn,
     clippy::print_stdout,
-    clippy::use_debug
+    clippy::absolute_paths,
+    clippy::use_debug,
+    clippy::question_mark_used,
+    clippy::used_underscore_binding,
 )]
 #![warn(
     clippy::todo,
+    clippy::manual_map,
+    clippy::shadow_reuse,
+    clippy::option_if_let_else,
+    clippy::wildcard_enum_match_arm,
+    clippy::needless_return,
+    clippy::same_name_method,
+    clippy::missing_inline_in_public_items,
+    clippy::single_call_fn,
+    clippy::doc_markdown,
     dead_code,
     missing_copy_implementations, // Copy may cause unnecessary memory copy
-    missing_docs,
+    // missing_docs,
     // single_use_lifetimes, // TODO: fix lifetime names only used once
     unused_qualifications,
 )]

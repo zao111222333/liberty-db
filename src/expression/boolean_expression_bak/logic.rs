@@ -5,13 +5,13 @@ use super::Port;
 use crate::types::*;
 use crate::units;
 use crate::util;
+use core::hash::Hash;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::hash::Hash;
 use std::ops::{Deref, DerefMut};
 
 /// LogicLike
-pub trait LogicLike: std::fmt::Display + std::fmt::Debug {
+pub trait LogicLike: core::fmt::Display + core::fmt::Debug {
   /// inverse
   ///
   /// 0->1, 1->0
@@ -54,7 +54,7 @@ impl Ord for ChangePattern {
   }
 }
 impl Hash for ChangePattern {
-  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+  fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
     float_hash(state, self.settle_down_time.value);
     float_hash(state, self.transition_time.value);
   }
@@ -67,9 +67,9 @@ impl PartialEq for ChangePattern {
   }
 }
 impl Eq for ChangePattern {}
-impl std::fmt::Display for ChangePattern {
+impl core::fmt::Display for ChangePattern {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut buffer1 = ryu::Buffer::new();
     let mut buffer2 = ryu::Buffer::new();
     write!(
@@ -162,8 +162,8 @@ impl Edge {
   pub const R: Self = Self::Rise(None);
 }
 
-impl std::fmt::Display for Edge {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Edge {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Edge::Fall(c) => match c {
         Some(c) => write!(f, "F{c}"),
@@ -263,8 +263,8 @@ impl Ord for UnInit {
   }
 }
 
-impl std::fmt::Display for UnInit {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for UnInit {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       UnInit::Unknown(c) => match c {
         Some(c) => write!(f, "X({})", c),
@@ -358,8 +358,8 @@ pub enum State {
   /// H L
   Level(Level),
 }
-impl std::fmt::Display for State {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for State {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       State::UnInit(s) => s.fmt(f),
       State::Edge(s) => s.fmt(f),
@@ -559,9 +559,9 @@ impl Into<Vec<State>> for Vector {
 //     }
 // }
 
-impl std::fmt::Display for Vector {
+impl core::fmt::Display for Vector {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     self
       .iter()
       .fold(Ok(()), |result, state| match state.get_change_pattern() {
@@ -607,8 +607,8 @@ pub enum Operator1 {
   Logic0,
 }
 
-impl std::fmt::Display for Operator1 {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Operator1 {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Operator1::Not => write!(f, "{}", Self::NOT_LIST[0]),
       Operator1::Logic1 => write!(f, "{}", Self::LOGIC1_LIST[0]),
@@ -672,8 +672,8 @@ pub enum Operator2 {
   Xor,
 }
 
-impl std::fmt::Display for Operator2 {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Operator2 {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Operator2::And => write!(f, "{}", Self::AND_LIST[0]),
       Operator2::Or => write!(f, "{}", Self::OR_LIST[0]),
@@ -895,7 +895,7 @@ impl PartialEq for Table {
 }
 
 impl Hash for Table {
-  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+  fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
     let sorted_table = self.sort();
     _ = sorted_table.table.iter().map(|xy| xy.hash(state));
     sorted_table.port_idx.hash(state);
@@ -947,9 +947,9 @@ impl Table {
   }
 }
 
-impl std::fmt::Display for Table {
+impl core::fmt::Display for Table {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     use prettytable::{Row, Table};
     let mut table = Table::new();
     table.set_format(*util::format::FORMAT_NO_BORDER_BOX_CHARS);
@@ -998,8 +998,8 @@ pub struct Searcher {
   exclude_out_state: Option<HashSet<State>>,
 }
 
-impl std::fmt::Display for Searcher {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Searcher {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let print_hash_set = |name: &str, set: &HashSet<State>| -> String {
       let s = set
         .iter()

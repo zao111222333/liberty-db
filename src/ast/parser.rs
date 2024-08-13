@@ -69,7 +69,7 @@ fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
 
 /// must have new line!
 #[inline]
-pub(crate) fn comment_space_newline_many1<'a>(
+pub(in crate) fn comment_space_newline_many1<'a>(
   i: &'a str,
 ) -> IResult<&'a str, usize, Error<&'a str>> {
   match map(
@@ -89,7 +89,7 @@ pub(crate) fn comment_space_newline_many1<'a>(
 }
 
 #[inline]
-pub(crate) fn comment_space_newline<'a>(
+pub(in crate) fn comment_space_newline<'a>(
   i: &'a str,
 ) -> IResult<&'a str, usize, Error<&'a str>> {
   map(
@@ -165,7 +165,7 @@ fn space_test() {
 }
 
 #[inline]
-pub(crate) fn undefine<'a>(
+pub(in crate) fn undefine<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, super::AttriValue, Error<&'a str>> {
@@ -232,7 +232,7 @@ fn unquote_test() {
   println!("{:?}", formula::<VerboseError<&str>>("0.3 * VDD ;"));
 }
 
-pub(crate) fn key<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+pub(in crate) fn key<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
 where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
 {
@@ -243,7 +243,7 @@ pub(super) fn char_in_word(c: char) -> bool {
   c.is_alphanumeric() || "/_.+-:".contains(c)
 }
 
-pub(crate) fn word<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+pub(in crate) fn word<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
 where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
 {
@@ -255,14 +255,14 @@ pub(super) fn char_in_formula(c: char) -> bool {
   c.is_ascii_alphanumeric() || " /_.+-*^:".contains(c)
 }
 
-pub(crate) fn formula<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+pub(in crate) fn formula<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
 where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
 {
   i.split_at_position1(|item| !char_in_formula(item), ErrorKind::Alpha)
 }
 
-pub(crate) fn simple_multi<'a>(
+pub(in crate) fn simple_multi<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, &'a str, Error<&'a str>> {
@@ -285,7 +285,7 @@ pub(crate) fn simple_multi<'a>(
   )(i)
 }
 
-pub(crate) fn simple<'a>(
+pub(in crate) fn simple<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, &'a str, Error<&'a str>> {
@@ -327,7 +327,7 @@ fn complex_complex<'a>(i: &'a str) -> IResult<&'a str, Vec<&'a str>, Error<&'a s
   ))
 }
 
-pub(crate) fn complex<'a>(
+pub(in crate) fn complex<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>> {
@@ -380,7 +380,7 @@ fn key_test() {
   println!("{:?}", key::<VerboseError<&str>>("iw_w2w';"));
 }
 
-pub(crate) fn title<'a>(
+pub(in crate) fn title<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, Vec<ArcStr>, Error<&'a str>> {
@@ -401,7 +401,7 @@ pub(crate) fn title<'a>(
   )(i)
 }
 
-pub(crate) fn end_group<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>> {
+pub(in crate) fn end_group<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>> {
   map(char('}'), |_| ())(i)
 }
 

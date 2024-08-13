@@ -1,6 +1,6 @@
 use colored::Colorize;
 use std::ffi::OsStr;
-use std::fmt::Display;
+use core::fmt::Display;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 use std::{fs, fs::metadata};
@@ -38,7 +38,7 @@ enum ReturnState {
 }
 
 impl Display for ReturnState {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       ReturnState::PASS(d) => write!(f, "{}", format!("{:.2?}", d).green().bold()),
       ReturnState::FAIL => write!(f, "{}", "FAIL".bold().bright_red()),
@@ -54,12 +54,12 @@ struct TestResult {
   // duration: Duration,
 }
 impl Display for TestResult {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     write!(f, "{}\t{}", self.state, self.file_in)
   }
 }
 
-type ParserFn = fn(PathBuf) -> Result<(), std::fmt::Error>;
+type ParserFn = fn(PathBuf) -> Result<(), core::fmt::Error>;
 struct ParserCtx {
   name: &'static str,
   info: &'static str,
@@ -67,7 +67,7 @@ struct ParserCtx {
 }
 
 impl Display for ParserCtx {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     // write!(f,
     //     "\u{1b}]8;;{}\u{1b}\\{}\u{1b}]8;;\u{1b}\\",
     //     self.info, self.name,
@@ -112,7 +112,7 @@ const PARSER_LIBERTY_DB: ParserCtx = ParserCtx {
     let result = liberty_db::library::Library::parse(&data);
     match result {
       Ok(_) => Ok(()),
-      Err(_) => Err(std::fmt::Error),
+      Err(_) => Err(core::fmt::Error),
     }
   },
 };
@@ -126,7 +126,7 @@ const PARSER_LIBERTY_IO: ParserCtx = ParserCtx {
     let result = liberty_io::read_liberty_bytes(&mut buf);
     match result {
       Ok(_) => Ok(()),
-      Err(_) => Err(std::fmt::Error),
+      Err(_) => Err(core::fmt::Error),
     }
   },
 };
@@ -140,7 +140,7 @@ const PARSER_LIBERTYPARSE: ParserCtx = ParserCtx {
     let parsed = Liberty::parse_str(&data);
     match parsed {
       Ok(_) => Ok(()),
-      Err(_) => Err(std::fmt::Error),
+      Err(_) => Err(core::fmt::Error),
     }
   },
 };

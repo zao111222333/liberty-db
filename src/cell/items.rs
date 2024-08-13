@@ -177,14 +177,14 @@ pub struct Table {
   pub v: Vec<ArcStr>,
 }
 
-impl std::fmt::Display for Table {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    std::fmt::Debug::fmt(&self.v, f)
+impl core::fmt::Display for Table {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    core::fmt::Debug::fmt(&self.v, f)
   }
 }
 
 impl FromStr for Table {
-  type Err = std::fmt::Error;
+  type Err = core::fmt::Error;
   /// To prevent syntax errors, the line continuation character
   /// must be followed immediately by the next line character.
   /// <a name ="reference_link" href="

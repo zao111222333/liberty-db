@@ -1,12 +1,12 @@
-use std::fmt::Display;
-use std::hash::Hash;
+use core::fmt::Display;
+use core::hash::Hash;
 use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
 use crate::ast::SimpleAttri;
 
 /// LogicLike
-pub trait LogicLike: Display + std::fmt::Debug {
+pub trait LogicLike: Display + core::fmt::Debug {
   /// inverse
   ///
   /// 0->1, 1->0
@@ -164,7 +164,7 @@ impl Ord for UnInit {
 }
 
 impl Display for UnInit {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       UnInit::Unknown(c) => match c {
         Some(c) => write!(f, "X({})", c),
@@ -206,7 +206,7 @@ pub enum Normal {
 impl SimpleAttri for Normal {}
 impl Display for Normal {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
       Normal::Edge(Edge::Rise) => write!(f, "R"),
       Normal::Edge(Edge::Fall) => write!(f, "F"),
@@ -249,7 +249,7 @@ impl Into<State> for Normal {
 }
 
 /// H L R F
-#[derive(Debug, Clone, Copy, PartialEq, Hash)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Static {
   /// X Z
@@ -268,36 +268,37 @@ impl Static {
   /// Low
   pub const L: Self = Self::Level(Level::L);
 }
-impl Into<State> for Static {
+impl From<Static> for State {
   #[inline]
-  fn into(self) -> State {
-    match self {
-      Static::UnInit(s) => State::UnInit(s),
-      Static::Level(s) => State::Level(s),
+  fn from(value: Static) -> Self {
+    match value {
+      Static::UnInit(s) => Self::UnInit(s),
+      Static::Level(s) => Self::Level(s),
     }
   }
 }
+
 impl FromStr for Static {
   type Err = strum::ParseError;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    match s.parse::<UnInit>() {
-      Ok(s) => Ok(Self::UnInit(s)),
-      _ => match s.parse::<Level>() {
+    s.parse::<UnInit>().map_or(
+      match s.parse::<Level>() {
         Ok(s) => Ok(Self::Level(s)),
         Err(_) => Err(strum::ParseError::VariantNotFound),
       },
-    }
+      |s| Ok(Self::UnInit(s)),
+    )
   }
 }
 impl Display for Static {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
-      Static::UnInit(UnInit::HighImpedance) => write!(f, "Z"),
-      Static::UnInit(UnInit::Unknown(_)) => write!(f, "X"),
-      Static::Level(Level::High) => write!(f, "H"),
-      Static::Level(Level::Low) => write!(f, "L"),
+      Self::UnInit(UnInit::HighImpedance) => write!(f, "Z"),
+      Self::UnInit(UnInit::Unknown(_)) => write!(f, "X"),
+      Self::Level(Level::High) => write!(f, "H"),
+      Self::Level(Level::Low) => write!(f, "L"),
     }
   }
 }
@@ -315,22 +316,25 @@ pub enum State {
   Level(Level),
 }
 impl Display for State {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  #[inline]
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
-      State::UnInit(s) => s.fmt(f),
-      State::Edge(s) => s.fmt(f),
-      State::Level(s) => s.fmt(f),
+      Self::UnInit(s) => s.fmt(f),
+      Self::Edge(s) => s.fmt(f),
+      Self::Level(s) => s.fmt(f),
     }
   }
 }
 
 impl Default for State {
+  #[inline]
   fn default() -> Self {
-    return Self::X;
+    Self::X
   }
 }
 
 impl LogicLike for State {
+  #[must_use]
   #[inline]
   fn inverse(&self) -> Self {
     match self {
@@ -339,6 +343,7 @@ impl LogicLike for State {
       Self::Level(s) => Self::Level(s.inverse()),
     }
   }
+  #[must_use]
   #[inline]
   fn variant_eq(&self, other: &Self) -> bool {
     match (self, other) {
@@ -351,20 +356,20 @@ impl LogicLike for State {
 }
 
 impl State {
-  /// Unknown
+  /// `Unknown`
   pub const X: Self = Self::UnInit(UnInit::X);
-  /// HighImpedance
+  /// `HighImpedance`
   pub const Z: Self = Self::UnInit(UnInit::Z);
-  /// Fall
+  /// `Fall`
   pub const F: Self = Self::Edge(Edge::F);
-  /// Rise
+  /// `Rise`
   pub const R: Self = Self::Edge(Edge::R);
-  /// High
+  /// `High`
   pub const H: Self = Self::Level(Level::H);
-  /// Low
+  /// `Low`
   pub const L: Self = Self::Level(Level::L);
   const LIST: [Self; 6] = [Self::X, Self::Z, Self::F, Self::R, Self::H, Self::L];
-  /// iter
+  /// `iter`
   #[inline]
   pub fn iter() -> impl Iterator<Item = Self> {
     Self::LIST.iter().copied()
@@ -392,51 +397,49 @@ impl State {
   //   }
   // }
   /// get_illegal_type
+  #[must_use]
   #[inline]
-  pub fn get_illegal_type(&self) -> Option<IllegalType> {
+  pub const fn get_illegal_type(&self) -> Option<IllegalType> {
     match self {
-      Self::UnInit(uninit) => match uninit {
-        UnInit::Unknown(t) => *t,
-        _ => None,
-      },
+      Self::UnInit(UnInit::Unknown(t)) => *t,
       _ => None,
     }
   }
-  /// set_illegal_type
+  /// `set_illegal_type`
+  #[must_use]
   #[inline]
-  pub fn set_illegal_type(&self, t: &Option<IllegalType>) -> Self {
+  pub const fn set_illegal_type(&self, t: &Option<IllegalType>) -> Self {
     match (self, t) {
-      (Self::UnInit(uninit), _) => match uninit {
-        UnInit::Unknown(_) => Self::UnInit(UnInit::Unknown(*t)),
-        _ => *self,
-      },
+      (Self::UnInit(UnInit::Unknown(_)), _) => Self::UnInit(UnInit::Unknown(*t)),
       _ => *self,
     }
   }
-  /// get_bgn state
+  /// `get_bgn` state
   ///
   /// R -> 0, F -> 1, otherwise not change
+  #[must_use]
   #[inline]
-  pub fn get_bgn(&self) -> Self {
+  pub const fn get_bgn(&self) -> Self {
     match self {
-      State::Edge(s) => match s {
+      Self::Edge(s) => match s {
         Edge::Fall => Self::Level(Level::High),
         Edge::Rise => Self::Level(Level::Low),
       },
-      _ => *self,
+      Self::UnInit(_) | Self::Level(_) => *self,
     }
   }
-  /// get_end state
+  /// `get_end` state
   ///
   /// R -> 1, F -> 1, otherwise not change
+  #[must_use]
   #[inline]
-  pub fn get_end(&self) -> Self {
+  pub const fn get_end(&self) -> Self {
     match self {
-      State::Edge(s) => match s {
+      Self::Edge(s) => match s {
         Edge::Fall => Self::Level(Level::Low),
         Edge::Rise => Self::Level(Level::High),
       },
-      _ => *self,
+      Self::UnInit(_) | Self::Level(_) => *self,
     }
   }
 
@@ -450,18 +453,16 @@ impl State {
   /// | Z         | 1    | 1       |
   /// | Any       | F/R  | Illegal |
   /// | F/R       | Any  | Illegal |
+  #[must_use]
   #[inline]
-  pub fn combine_bgn_end(bgn: &Self, end: &Self) -> Self {
+  pub const fn combine_bgn_end(bgn: &Self, end: &Self) -> Self {
     match (bgn, end) {
-      (_, Self::Edge(_)) => {
+      (_, Self::Edge(_)) | (Self::Edge(_), _) => {
         Self::UnInit(UnInit::Unknown(Some(IllegalType::RiseFallAtLevel)))
       }
-      (Self::Edge(_), _) => {
-        Self::UnInit(UnInit::Unknown(Some(IllegalType::RiseFallAtLevel)))
-      }
-      (Self::UnInit(_), Self::UnInit(_)) => *end,
-      (Self::UnInit(_), Self::Level(_)) => *end,
-      (Self::Level(_), Self::UnInit(_)) => *end,
+      (Self::UnInit(_), Self::UnInit(_))
+      | (Self::UnInit(_), Self::Level(_))
+      | (Self::Level(_), Self::UnInit(_)) => *end,
       (Self::Level(bgn), Self::Level(end)) => match (bgn, end) {
         (Level::High, Level::High) => Self::Level(Level::High),
         (Level::High, Level::Low) => Self::Edge(Edge::Fall),
@@ -497,26 +498,28 @@ impl Deref for Vector {
 }
 
 impl From<Vec<State>> for Vector {
+  #[inline]
   fn from(value: Vec<State>) -> Self {
     Self { value }
   }
 }
 
-impl Into<Vec<State>> for Vector {
-  fn into(self) -> Vec<State> {
-    self.value
+impl From<Vector> for Vec<State> {
+  #[inline]
+  fn from(value: Vector) -> Self {
+    value.value
   }
 }
 
 impl Display for Vector {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     self.iter().fold(
       Ok(()),
-      |result, state| result.and_then(|_| write!(f, "{}", state)), // match state.get_change_pattern() {
-                                                                   // Some(c) => result.and_then(|_| write!(f, "{}{}", state, c)),
-                                                                   // None => result.and_then(|_| write!(f, "{}", state)),
-                                                                   // }
+      |result, state| result.and_then(|_| state.fmt(f)), // match state.get_change_pattern() {
+                                                         // Some(c) => result.and_then(|_| write!(f, "{}{}", state, c)),
+                                                         // None => result.and_then(|_| write!(f, "{}", state)),
+                                                         // }
     )
   }
 }
@@ -524,13 +527,10 @@ impl Display for Vector {
 impl LogicLike for Vector {
   #[inline]
   fn inverse(&self) -> Self {
-    self
-      .iter()
-      .map(|v_state| v_state.inverse())
-      .collect::<Vec<State>>()
-      .into()
+    self.iter().map(State::inverse).collect::<Vec<State>>().into()
   }
   #[inline]
+  #[allow(clippy::indexing_slicing)]
   fn variant_eq(&self, other: &Self) -> bool {
     if self.len() != other.len() {
       return false;
@@ -540,7 +540,7 @@ impl LogicLike for Vector {
         return false;
       }
     }
-    return true;
+    true
   }
 }
 
@@ -556,8 +556,8 @@ impl LogicLike for Vector {
 //   Logic0,
 // }
 
-// impl std::fmt::Display for Operator1 {
-//   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+// impl core::fmt::Display for Operator1 {
+//   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 //     match self {
 //       Operator1::Not => write!(f, "{}", Self::NOT_LIST[0]),
 //       Operator1::Logic1 => write!(f, "{}", Self::LOGIC1_LIST[0]),
@@ -620,8 +620,8 @@ impl LogicLike for Vector {
 //   Xor,
 // }
 
-// impl std::fmt::Display for Operator2 {
-//   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+// impl core::fmt::Display for Operator2 {
+//   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 //     match self {
 //       Operator2::And => write!(f, "{}", Self::AND_LIST[0]),
 //       Operator2::Or => write!(f, "{}", Self::OR_LIST[0]),
@@ -843,7 +843,7 @@ impl LogicLike for Vector {
 // }
 
 // impl Hash for Table {
-//   fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+//   fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
 //     let sorted_table = self.sort();
 //     _ = sorted_table.table.iter().map(|xy| xy.hash(state));
 //     sorted_table.port_idx.hash(state);
@@ -895,9 +895,9 @@ impl LogicLike for Vector {
 //   }
 // }
 
-// impl std::fmt::Display for Table {
+// impl core::fmt::Display for Table {
 //   #[inline]
-//   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 //     use prettytable::{Row, Table};
 //     let mut table = Table::new();
 //     table.set_format(*util::format::FORMAT_NO_BORDER_BOX_CHARS);
@@ -946,8 +946,8 @@ impl LogicLike for Vector {
 //   exclude_out_state: Option<HashSet<State>>,
 // }
 
-// impl std::fmt::Display for Searcher {
-//   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+// impl core::fmt::Display for Searcher {
+//   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 //     let print_hash_set = |name: &str, set: &HashSet<State>| -> String {
 //       let s = set
 //         .iter()

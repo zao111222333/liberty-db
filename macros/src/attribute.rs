@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fmt::Debug};
+use core::fmt::Debug;
+use std::collections::HashMap;
 
 use proc_macro2::Ident;
 
@@ -77,14 +78,6 @@ pub(crate) fn parse_fields_type(
           Ok(Some(t)) => match t {
             FieldType::Internal(InternalType::Name) => {
               _name_vec.push(field);
-              // if let Some(name) = &_name_name {
-              //   err_buf = Some(syn::Error::new(
-              //     proc_macro2::Span::call_site(),
-              //     format!("duplicated name {}.", name),
-              //   ));
-              // } else {
-              //   _name_name = Some(field_name);
-              // }
               None
             }
             FieldType::Internal(InternalType::UndefinedAttributeList) => {
@@ -118,8 +111,10 @@ pub(crate) fn parse_fields_type(
           }
         }
       } else {
-        err_buf =
-          Some(syn::Error::new(proc_macro2::Span::call_site(), format!("field error.")));
+        err_buf = Some(syn::Error::new(
+          proc_macro2::Span::call_site(),
+          "field error.".to_string(),
+        ));
         None
       }
     })
@@ -131,19 +126,19 @@ pub(crate) fn parse_fields_type(
       (None, None) => {
         return Err(syn::Error::new(
           proc_macro2::Span::call_site(),
-          format!("Can not find undefined & comment"),
+          "Can not find undefined & comment".to_string(),
         ))
       }
       (None, Some(_)) => {
         return Err(syn::Error::new(
           proc_macro2::Span::call_site(),
-          format!("Can not find undefined"),
+          "Can not find undefined".to_string(),
         ))
       }
       (Some(_), None) => {
         return Err(syn::Error::new(
           proc_macro2::Span::call_site(),
-          format!("Can not find comment"),
+          "Can not find comment".to_string(),
         ))
       }
       (Some(undefined_name), Some(comments_name)) => {
@@ -231,13 +226,13 @@ fn parse_field_attrs(
           } else {
             return Err(syn::Error::new(
               proc_macro2::Span::call_site(),
-              format!("No token."),
+              "No token.".to_string(),
             ));
           }
         } else {
           return Err(syn::Error::new(
             proc_macro2::Span::call_site(),
-            format!("Incorrect format for using the `liberty` attribute."),
+            "Incorrect format for using the `liberty` attribute.".to_string(),
           ));
         }
       }
@@ -260,13 +255,13 @@ fn parse_simple_type(
               if '=' != arg_punct.as_char() {
                 return Err(syn::Error::new(
                   proc_macro2::Span::call_site(),
-                  format!("miss equal."),
+                  "miss equal.".to_string(),
                 ));
               }
             } else {
               return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                format!("miss equal."),
+                "miss equal.".to_string(),
               ));
             }
             if let Some(proc_macro2::TokenTree::Ident(arg_value)) = args.next() {
@@ -286,7 +281,7 @@ fn parse_simple_type(
             } else {
               return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                format!("miss simple_type."),
+                "miss simple_type.".to_string(),
               ));
             }
           }
@@ -302,7 +297,7 @@ fn parse_simple_type(
       }
     }
   }
-  return Ok(simple_type);
+  Ok(simple_type)
 }
 
 fn parse_complex_type(
@@ -311,59 +306,52 @@ fn parse_complex_type(
   let mut complex_type = ComplexType::default();
   if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
     let mut args = g.stream().into_iter();
-    loop {
-      if let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
-        match arg_id.to_string().as_str() {
-          "type" => {
-            if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
-              if '=' != arg_punct.as_char() {
-                return Err(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  format!("miss equal."),
-                ));
-              }
-            } else {
+    while let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
+      match arg_id.to_string().as_str() {
+        "type" => {
+          if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
+            if '=' != arg_punct.as_char() {
               return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                format!("miss equal."),
+                "miss equal.".to_string(),
               ));
             }
-            if let Some(proc_macro2::TokenTree::Ident(arg_value)) = args.next() {
-              match arg_value.to_string().as_str() {
-                "Default" => complex_type = ComplexType::Default,
-                "Option" => complex_type = ComplexType::Option,
-                "Vec" => complex_type = ComplexType::Vec,
-                "Set" => complex_type = ComplexType::Set,
-                _ => {
-                  return Err(syn::Error::new(
-                    proc_macro2::Span::call_site(),
-                    format!(
-                      "complex_type not support {}.",
-                      arg_value.to_string().as_str()
-                    ),
-                  ))
-                }
-              }
-            } else {
-              return Err(syn::Error::new(
-                proc_macro2::Span::call_site(),
-                format!("miss simple_type."),
-              ));
-            }
-          }
-          _ => {
+          } else {
             return Err(syn::Error::new(
               proc_macro2::Span::call_site(),
-              format!("simple_type not support {} group.", arg_id.to_string().as_str()),
-            ))
+              "miss equal.".to_string(),
+            ));
+          }
+          if let Some(proc_macro2::TokenTree::Ident(arg_value)) = args.next() {
+            match arg_value.to_string().as_str() {
+              "Default" => complex_type = ComplexType::Default,
+              "Option" => complex_type = ComplexType::Option,
+              "Vec" => complex_type = ComplexType::Vec,
+              "Set" => complex_type = ComplexType::Set,
+              _ => {
+                return Err(syn::Error::new(
+                  proc_macro2::Span::call_site(),
+                  format!("complex_type not support {}.", arg_value.to_string().as_str()),
+                ))
+              }
+            }
+          } else {
+            return Err(syn::Error::new(
+              proc_macro2::Span::call_site(),
+              "miss simple_type.".to_string(),
+            ));
           }
         }
-      } else {
-        break;
+        _ => {
+          return Err(syn::Error::new(
+            proc_macro2::Span::call_site(),
+            format!("simple_type not support {} group.", arg_id.to_string().as_str()),
+          ))
+        }
       }
     }
   }
-  return Ok(complex_type);
+  Ok(complex_type)
 }
 
 fn parse_group_type(
@@ -372,55 +360,51 @@ fn parse_group_type(
   let mut group_type = GroupType::default();
   if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
     let mut args = g.stream().into_iter();
-    loop {
-      if let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
-        match arg_id.to_string().as_str() {
-          "type" => {
-            if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
-              if '=' != arg_punct.as_char() {
-                return Err(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  format!("miss equal."),
-                ));
-              }
-            } else {
+    while let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
+      match arg_id.to_string().as_str() {
+        "type" => {
+          if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
+            if '=' != arg_punct.as_char() {
               return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                format!("miss equal."),
+                "miss equal.".to_string(),
               ));
             }
-            if let Some(proc_macro2::TokenTree::Ident(arg_value)) = args.next() {
-              match arg_value.to_string().as_str() {
-                "Option" => group_type = GroupType::Option,
-                "Vec" => group_type = GroupType::Vec,
-                "Set" => group_type = GroupType::Set,
-                _ => {
-                  return Err(syn::Error::new(
-                    proc_macro2::Span::call_site(),
-                    format!("group_type not support {}.", arg_value.to_string().as_str()),
-                  ))
-                }
-              }
-            } else {
-              return Err(syn::Error::new(
-                proc_macro2::Span::call_site(),
-                format!("miss group_type."),
-              ));
-            }
-          }
-          _ => {
+          } else {
             return Err(syn::Error::new(
               proc_macro2::Span::call_site(),
-              format!("group_type not support {} group.", arg_id.to_string().as_str()),
-            ))
+              "miss equal.".to_string(),
+            ));
+          }
+          if let Some(proc_macro2::TokenTree::Ident(arg_value)) = args.next() {
+            match arg_value.to_string().as_str() {
+              "Option" => group_type = GroupType::Option,
+              "Vec" => group_type = GroupType::Vec,
+              "Set" => group_type = GroupType::Set,
+              _ => {
+                return Err(syn::Error::new(
+                  proc_macro2::Span::call_site(),
+                  format!("group_type not support {}.", arg_value.to_string().as_str()),
+                ))
+              }
+            }
+          } else {
+            return Err(syn::Error::new(
+              proc_macro2::Span::call_site(),
+              "miss group_type.".to_string(),
+            ));
           }
         }
-      } else {
-        break;
+        _ => {
+          return Err(syn::Error::new(
+            proc_macro2::Span::call_site(),
+            format!("group_type not support {} group.", arg_id.to_string().as_str()),
+          ))
+        }
       }
     }
   }
-  return Ok(group_type);
+  Ok(group_type)
 }
 
 #[test]

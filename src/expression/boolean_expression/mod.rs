@@ -4,7 +4,8 @@
 mod latch_ff;
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 pub mod logic;
-use std::{borrow::Borrow, collections::HashSet, str::FromStr};
+use core::{borrow::Borrow, str::FromStr};
+use std::collections::HashSet;
 
 pub use biodivine_lib_bdd::{
   boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
@@ -210,6 +211,7 @@ impl IdBooleanExpression {
 }
 
 impl Eq for IdBooleanExpression {}
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for IdBooleanExpression {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -224,16 +226,13 @@ impl PartialOrd for IdBooleanExpression {
 impl Ord for IdBooleanExpression {
   #[inline]
   fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-    match self.sorted_nodes.cmp(&other.sorted_nodes) {
-      std::cmp::Ordering::Equal => Bdd::cmp_structural(&self.bdd, &other.bdd),
-      ord => ord,
-    }
+    self.partial_cmp(other).unwrap_or(std::cmp::Ordering::Equal)
   }
 }
 
-impl std::hash::Hash for IdBooleanExpression {
+impl core::hash::Hash for IdBooleanExpression {
   #[inline]
-  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+  fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
     self.sorted_nodes.hash(state);
     self.bdd.hash(state);
   }
@@ -267,16 +266,16 @@ impl FromStr for IdBooleanExpression {
   }
 }
 
-impl std::fmt::Display for BooleanExpression {
+impl core::fmt::Display for BooleanExpression {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     parser::_fmt(&self.expr, f)
   }
 }
 
-impl std::fmt::Display for IdBooleanExpression {
+impl core::fmt::Display for IdBooleanExpression {
   #[inline]
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     parser::_fmt(&self.expr, f)
   }
 }
@@ -340,8 +339,8 @@ fn _previous(expr: &mut Expr) {
 #[allow(dead_code, unused_imports, unused)]
 mod test {
   use super::*;
+  use core::{f64::consts::E, str::FromStr};
   use itertools::Itertools;
-  use std::{f64::consts::E, str::FromStr};
   #[test]
   fn parse_fmt_self_check() {
     for (should_success, s) in [

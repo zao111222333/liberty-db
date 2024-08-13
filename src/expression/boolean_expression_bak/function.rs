@@ -3,7 +3,7 @@
 //! </script>
 //!
 use super::{logic, BooleanExpression, BooleanExpressionLike, BRACKET_L, BRACKET_R};
-use std::fmt;
+use core::fmt;
 
 /// FunctionExpression is the basic expression
 #[derive(Debug, Clone)]
