@@ -22,24 +22,28 @@ pub mod power;
 pub mod time;
 
 /// Create `Length` quantity with `meter` unit
+#[must_use]
 #[inline]
 pub fn meter(v: f64) -> Length {
   Length::new::<length::meter>(v)
 }
 
 /// Create `Time` quantity with `second` unit
+#[must_use]
 #[inline]
 pub fn second(v: f64) -> Time {
   Time::new::<time::second>(v)
 }
 
 /// Create `Time` quantity with `microsecond` unit
+#[must_use]
 #[inline]
 pub fn microsecond(v: f64) -> Time {
   Time::new::<time::microsecond>(v)
 }
 
 /// Create `Time` quantity with `nanosecond` unit
+#[must_use]
 #[inline]
 pub fn nanosecond(v: f64) -> Time {
   Time::new::<time::nanosecond>(v)
@@ -80,31 +84,32 @@ impl TimeUnit {
     Time {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-12f64,
+      value: 1E-12_f64,
     },
     // 10ps
     Time {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-11f64,
+      value: 1E-11_f64,
     },
     // 100ps
     Time {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-10f64,
+      value: 1E-10_f64,
     },
     // 1ns
     Time {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-9f64,
+      value: 1E-9_f64,
     },
   ];
 }
 
 impl Deref for TimeUnit {
   type Target = Time;
+  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -145,31 +150,32 @@ impl VoltageUnit {
     ElectricPotential {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-3f64,
+      value: 1E-3_f64,
     },
     // 10mV
     ElectricPotential {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-2f64,
+      value: 1E-2_f64,
     },
     // 100mV
     ElectricPotential {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-1f64,
+      value: 1E-1_f64,
     },
     // 1V
     ElectricPotential {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E0f64,
+      value: 1E0___f64,
     },
   ];
 }
 
 impl Deref for VoltageUnit {
   type Target = ElectricPotential;
+  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -179,7 +185,7 @@ impl Deref for VoltageUnit {
 impl SimpleAttri for VoltageUnit {}
 
 /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
-/// **No default exists for the current_unit attribute if the attribute is omitted.**
+/// **No default exists for the `current_unit` attribute if the attribute is omitted.**
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.12&end=43.24
 /// ">Reference</a>
@@ -219,49 +225,50 @@ impl CurrentUnit {
     ElectricCurrent {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-6f64,
+      value: 1E-6_f64,
     },
     // 10uA
     ElectricCurrent {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-5f64,
+      value: 1E-5_f64,
     },
     // 100uA
     ElectricCurrent {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-4f64,
+      value: 1E-4_f64,
     },
     // 1mA
     ElectricCurrent {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-3f64,
+      value: 1E-3_f64,
     },
     // 10mA
     ElectricCurrent {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-2f64,
+      value: 1E-2_f64,
     },
     // 100mA
     ElectricCurrent {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-1f64,
+      value: 1E-1_f64,
     },
     // 1A
     ElectricCurrent {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E0f64,
+      value: 1E0_f64,
     },
   ];
 }
 
 impl Deref for CurrentUnit {
   type Target = ElectricCurrent;
+  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -302,31 +309,32 @@ impl PullingResistanceUnit {
     ElectricalResistance {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E0f64,
+      value: 1E0_f64,
     },
     // 10ohm
     ElectricalResistance {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E1f64,
+      value: 1E1_f64,
     },
     // 100ohm
     ElectricalResistance {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E2f64,
+      value: 1E2_f64,
     },
     // 1kohm
     ElectricalResistance {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E3f64,
+      value: 1E3_f64,
     },
   ];
 }
 
 impl Deref for PullingResistanceUnit {
   type Target = ElectricalResistance;
+  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -337,7 +345,7 @@ impl SimpleAttri for PullingResistanceUnit {}
 
 /// This attribute specifies the unit for all capacitance
 /// values within the logic library, including
-/// default capacitances, max_fanout capacitances,
+/// default capacitances, `max_fanout` capacitances,
 /// pin capacitances, and wire capacitances.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.7&end=44.19
@@ -354,6 +362,7 @@ pub struct CapacitiveLoadUnit {
 
 impl Deref for CapacitiveLoadUnit {
   type Target = Capacitance;
+  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &self._v
@@ -361,6 +370,7 @@ impl Deref for CapacitiveLoadUnit {
 }
 
 impl ComplexAttri for CapacitiveLoadUnit {
+  #[inline]
   fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let value: NotNan<f64> = match i.next() {
@@ -383,7 +393,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
     }
     Ok(Self { ff_pf, _v })
   }
-
+  #[inline]
   fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
     let mut buffer = ryu::Buffer::new();
     if self.ff_pf {
@@ -465,91 +475,92 @@ impl LeakagePowerUnit {
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1.0f64,
+      value: 1.0_f64,
     },
     // 1pW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-12f64,
+      value: 1E-12_f64,
     },
     // 10pW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-11f64,
+      value: 1E-11_f64,
     },
     // 100pW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-10f64,
+      value: 1E-10_f64,
     },
     // 1nW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-9f64,
+      value: 1E-9_f64,
     },
     // 10nW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-8f64,
+      value: 1E-8_f64,
     },
     // 100nW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-7f64,
+      value: 1E-7_f64,
     },
     // 1uW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-6f64,
+      value: 1E-6_f64,
     },
     // 10uW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-5f64,
+      value: 1E-5_f64,
     },
     // 100uW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-4f64,
+      value: 1E-4_f64,
     },
     // 1mW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-3f64,
+      value: 1E-3_f64,
     },
     // 10mW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-2f64,
+      value: 1E-2_f64,
     },
     // 100mW
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E-1f64,
+      value: 1E-1_f64,
     },
     // 1W
     Power {
       dimension: PhantomData,
       units: PhantomData,
-      value: 1E0f64,
+      value: 1E0_f64,
     },
   ];
 }
 
 impl Deref for LeakagePowerUnit {
   type Target = Power;
+  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]

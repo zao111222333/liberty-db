@@ -13,13 +13,13 @@ use strum_macros::{Display, EnumString};
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum AntennaDiodeType {
-  /// power
+  /// `power`
   #[strum(serialize = "power")]
   Power,
-  /// ground
+  /// `ground`
   #[strum(serialize = "ground")]
   Ground,
-  /// power_and_ground
+  /// `power_and_ground`
   #[strum(serialize = "power_and_ground")]
   PowerAndGround,
 }
@@ -165,7 +165,7 @@ pub enum SlewControl {
 }
 impl SimpleAttri for SlewControl {}
 
-/// The prefer_tied attribute describes an input pin of a flip-flop or latch.
+/// The `prefer_tied` attribute describes an input pin of a flip-flop or latch.
 /// It indicates what the library developer wants this pin connected to.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -215,12 +215,14 @@ enum OneValue {
 pub struct TwoValue(OneValue, OneValue);
 impl SimpleAttri for TwoValue {}
 impl core::fmt::Display for TwoValue {
+  #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     write!(f, "{}{}", self.0, self.1)
   }
 }
 impl FromStr for TwoValue {
   type Err = strum::ParseError;
+  #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     if s.len() != 2 {
       return Err(strum::ParseError::VariantNotFound);
@@ -235,14 +237,19 @@ impl FromStr for TwoValue {
         ));
       }
     }
-    return Err(strum::ParseError::VariantNotFound);
+    Err(strum::ParseError::VariantNotFound)
   }
 }
-#[test]
-fn two_value() {
-  assert_eq!(Ok(TwoValue(OneValue::Unkown, OneValue::One)), TwoValue::from_str("x1"));
-  assert_eq!(Ok(TwoValue(OneValue::Zero, OneValue::One)), TwoValue::from_str("01"));
-  assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1"));
-  assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("111"));
-  assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1-"));
+
+#[cfg(test)]
+mod test {
+  use super::*;
+  #[test]
+  fn two_value() {
+    assert_eq!(Ok(TwoValue(OneValue::Unkown, OneValue::One)), TwoValue::from_str("x1"));
+    assert_eq!(Ok(TwoValue(OneValue::Zero, OneValue::One)), TwoValue::from_str("01"));
+    assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1"));
+    assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("111"));
+    assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1-"));
+  }
 }

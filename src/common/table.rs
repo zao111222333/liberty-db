@@ -413,7 +413,7 @@ impl ComplexAttri for Values {
       .chunks(self.size1)
       .map(|v| {
         vec![itertools::Itertools::join(
-          &mut v.iter().map(|f| buffer.format(f.into_inner()).to_string()),
+          &mut v.iter().map(|f| buffer.format(f.into_inner()).to_owned()),
           ", ",
         )
         .into()]
@@ -462,15 +462,15 @@ impl GroupFn for TableTemple {}
 ///
 /// Following are the values that you can assign for `variable_1`, `variable_2`, and `variable_3`  
 /// to the templates for timing delay tables:
-/// + input_net_transition
-/// + total_output_net_capacitance
-/// + output_net_length
-/// + output_net_wire_cap
-/// + output_net_pin_cap
-/// + related_out_total_output_net_capacitance
-/// + related_out_output_net_length
-/// + related_out_output_net_wire_cap
-/// + related_out_output_net_pin_cap
+/// + `input_net_transition`
+/// + `total_output_net_capacitance`
+/// + `output_net_length`
+/// + `output_net_wire_cap`
+/// + `output_net_pin_cap`
+/// + `related_out_total_output_net_capacitance`
+/// + `related_out_output_net_length`
+/// + `related_out_output_net_wire_cap`
+/// + `related_out_output_net_pin_cap`
 ///
 /// The values that you can assign to the variables of a table specifying timing delay
 /// depend on whether the table is one-, two-, or three-dimensional.
@@ -482,12 +482,12 @@ impl GroupFn for TableTemple {}
 ///
 /// You can assign the following values to the `variable_1`, `variable_2`, and `variable_3` variables
 /// in the templates for constraint tables:
-/// + constrained_pin_transition
-/// + related_pin_transition
-/// + related_out_total_output_net_capacitance
-/// + related_out_output_net_length
-/// + related_out_output_net_wire_cap
-/// + related_out_output_net_pin_cap
+/// + `constrained_pin_transition`
+/// + `related_pin_transition`
+/// + `related_out_total_output_net_capacitance`
+/// + `related_out_output_net_length`
+/// + `related_out_output_net_wire_cap`
+/// + `related_out_output_net_pin_cap`
 ///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=67.21&end=67.28
@@ -497,9 +497,9 @@ impl GroupFn for TableTemple {}
 ///
 /// The following is the value set that you can assign for `variable_1`, `variable_2`, and `variable_3`  
 /// to the templates for wire delay tables:
-/// + fanout_number
-/// + fanout_pin_capacitance
-/// + driver_slew
+/// + `fanout_number`
+/// + `fanout_pin_capacitance`
+/// + `driver_slew`
 ///
 /// The values that you can assign to the variables of a table specifying wire delay depends on whether the table is one-, two-, or three-dimensional.
 /// <a name ="reference_link" href="
@@ -510,8 +510,8 @@ impl GroupFn for TableTemple {}
 ///
 /// The following is the value set that you can assign for `variable_1`  and `variable_2`  
 /// to the templates for net delay tables:
-/// + output_transition
-/// + rc_product
+/// + `output_transition`
+/// + `rc_product`
 ///
 /// The values that you can assign to the variables of a table specifying net delay depend on whether the table is one- or two-dimensional.
 /// <a name ="reference_link" href="
@@ -531,6 +531,7 @@ impl GroupFn for TableTemple {}
 /// + If you have `variable_1`, you must have `index_1`.
 /// + If you have `variable_1`  and `variable_2`, you must have `index_1`  and `index_2`.
 /// + If you have `variable_1`, `variable_2`, and `variable_3`, you must have `index_1`, `index_2`, and `index_3`.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=68.4&end=68.16
 /// ">Reference-Definition</a>
@@ -560,52 +561,48 @@ pub enum Variable {
 }
 impl SimpleAttri for Variable {}
 
-impl std::str::FromStr for Variable {
+impl core::str::FromStr for Variable {
   type Err = strum::ParseError;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(match s {
-      "input_voltage" => Variable::Voltage(VoltageVariable::InputVoltage),
-      "output_voltage" => Variable::Voltage(VoltageVariable::OutputVoltage),
-      "input_noise_height" => Variable::Voltage(VoltageVariable::InputNoiseHeight),
-      "input_transition_time" => Variable::Time(TimeVariable::InputTransitionTime),
-      "input_net_transition" => Variable::Time(TimeVariable::InputNetTransition),
-      "constrained_pin_transition" => {
-        Variable::Time(TimeVariable::ConstrainedPinTransition)
-      }
-      "related_pin_transition" => Variable::Time(TimeVariable::RelatedPinTransition),
-      "driver_slew" => Variable::Time(TimeVariable::DriverSlew),
-      "output_transition" => Variable::Time(TimeVariable::OutputTransition),
-      "output_pin_transition" => Variable::Time(TimeVariable::OutputPinTransition),
-      "connect_delay" => Variable::Time(TimeVariable::ConnectDelay),
-      "input_noise_width" => Variable::Time(TimeVariable::InputNoiseWidth),
-      "time" => Variable::Time(TimeVariable::Time),
+      "input_voltage" => Self::Voltage(VoltageVariable::InputVoltage),
+      "output_voltage" => Self::Voltage(VoltageVariable::OutputVoltage),
+      "input_noise_height" => Self::Voltage(VoltageVariable::InputNoiseHeight),
+      "input_transition_time" => Self::Time(TimeVariable::InputTransitionTime),
+      "input_net_transition" => Self::Time(TimeVariable::InputNetTransition),
+      "constrained_pin_transition" => Self::Time(TimeVariable::ConstrainedPinTransition),
+      "related_pin_transition" => Self::Time(TimeVariable::RelatedPinTransition),
+      "driver_slew" => Self::Time(TimeVariable::DriverSlew),
+      "output_transition" => Self::Time(TimeVariable::OutputTransition),
+      "output_pin_transition" => Self::Time(TimeVariable::OutputPinTransition),
+      "connect_delay" => Self::Time(TimeVariable::ConnectDelay),
+      "input_noise_width" => Self::Time(TimeVariable::InputNoiseWidth),
+      "time" => Self::Time(TimeVariable::Time),
       "total_output_net_capacitance" => {
-        Variable::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance)
+        Self::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance)
       }
-      "output_net_wire_cap" => {
-        Variable::Capacitance(CapacitanceVariable::OutputNetWireCap)
-      }
-      "output_net_pin_cap" => Variable::Capacitance(CapacitanceVariable::OutputNetPinCap),
+      "output_net_wire_cap" => Self::Capacitance(CapacitanceVariable::OutputNetWireCap),
+      "output_net_pin_cap" => Self::Capacitance(CapacitanceVariable::OutputNetPinCap),
       "related_out_total_output_net_capaci" => {
-        Variable::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance)
+        Self::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance)
       }
       "related_out_output_net_wire_cap" => {
-        Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap)
+        Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap)
       }
       "related_out_output_net_pin_cap" => {
-        Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap)
+        Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap)
       }
       "fanout_pin_capacitance" => {
-        Variable::Capacitance(CapacitanceVariable::FanoutPinCapacitance)
+        Self::Capacitance(CapacitanceVariable::FanoutPinCapacitance)
       }
-      "output_net_length" => Variable::Length(LengthVariable::OutputNetLength),
+      "output_net_length" => Self::Length(LengthVariable::OutputNetLength),
       "related_out_output_net_length" => {
-        Variable::Length(LengthVariable::RelatedOutOutputNetLength)
+        Self::Length(LengthVariable::RelatedOutOutputNetLength)
       }
-      "fanout_number" => Variable::Scalar(ScalarVariable::FanoutNumber),
-      "normalized_voltage" => Variable::Scalar(ScalarVariable::NormalizedVoltage),
-      "rc_product" => Variable::RcProduct,
+      "fanout_number" => Self::Scalar(ScalarVariable::FanoutNumber),
+      "normalized_voltage" => Self::Scalar(ScalarVariable::NormalizedVoltage),
+      "rc_product" => Self::RcProduct,
       _ => {
         return Err(strum::ParseError::VariantNotFound);
       }
@@ -617,12 +614,12 @@ impl core::fmt::Display for Variable {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
-      Variable::Time(v) => v.fmt(f),
-      Variable::Voltage(v) => v.fmt(f),
-      Variable::Capacitance(v) => v.fmt(f),
-      Variable::Length(v) => v.fmt(f),
-      Variable::Scalar(v) => v.fmt(f),
-      Variable::RcProduct => write!(f, "rc_product"),
+      Self::Time(v) => v.fmt(f),
+      Self::Voltage(v) => v.fmt(f),
+      Self::Capacitance(v) => v.fmt(f),
+      Self::Length(v) => v.fmt(f),
+      Self::Scalar(v) => v.fmt(f),
+      Self::RcProduct => write!(f, "rc_product"),
     }
   }
 }
@@ -633,34 +630,34 @@ impl core::fmt::Display for Variable {
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimeVariable {
-  /// input_transition_time
+  /// `input_transition_time`
   #[strum(serialize = "input_transition_time")]
   InputTransitionTime,
-  /// input_net_transition
+  /// `input_net_transition`
   #[strum(serialize = "input_net_transition")]
   InputNetTransition,
-  ///constrained_pin_transition
+  ///`constrained_pin_transition`
   #[strum(serialize = "constrained_pin_transition")]
   ConstrainedPinTransition,
-  ///related_pin_transition
+  ///`related_pin_transition`
   #[strum(serialize = "related_pin_transition")]
   RelatedPinTransition,
-  /// driver_slew
+  /// `driver_slew`
   #[strum(serialize = "driver_slew")]
   DriverSlew,
-  /// output_transition
+  /// `output_transition`
   #[strum(serialize = "output_transition")]
   OutputTransition,
-  /// output_pin_transition
+  /// `output_pin_transition`
   #[strum(serialize = "output_pin_transition")]
   OutputPinTransition,
-  /// connect_delay
+  /// `connect_delay`
   #[strum(serialize = "connect_delay")]
   ConnectDelay,
-  /// input_noise_width
+  /// `input_noise_width`
   #[strum(serialize = "input_noise_width")]
   InputNoiseWidth,
-  /// time
+  /// `time`
   #[strum(serialize = "time")]
   Time,
 }
@@ -671,13 +668,13 @@ pub enum TimeVariable {
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VoltageVariable {
-  /// input_voltage
+  /// `input_voltage`
   #[strum(serialize = "input_voltage")]
   InputVoltage,
-  /// output_voltage
+  /// `output_voltage`
   #[strum(serialize = "output_voltage")]
   OutputVoltage,
-  /// input_noise_height
+  /// `input_noise_height`
   #[strum(serialize = "input_noise_height")]
   InputNoiseHeight,
 }
@@ -688,25 +685,25 @@ pub enum VoltageVariable {
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum CapacitanceVariable {
-  /// total_output_net_capacitance
+  /// `total_output_net_capacitance`
   #[strum(serialize = "total_output_net_capacitance")]
   TotalOutputNetCapacitance,
-  /// output_net_wire_cap
+  /// `output_net_wire_cap`
   #[strum(serialize = "output_net_wire_cap")]
   OutputNetWireCap,
-  /// output_net_pin_cap
+  /// `output_net_pin_cap`
   #[strum(serialize = "output_net_pin_cap")]
   OutputNetPinCap,
-  /// related_out_total_output_net_capaci
+  /// `related_out_total_output_net_capaci`
   #[strum(serialize = "related_out_total_output_net_capaci")]
   RelatedOutTotalOutputNetCapacitance,
-  /// related_out_output_net_wire_cap
+  /// `related_out_output_net_wire_cap`
   #[strum(serialize = "related_out_output_net_wire_cap")]
   RelatedOutOutputNetWireCap,
-  /// related_out_output_net_pin_cap
+  /// `related_out_output_net_pin_cap`
   #[strum(serialize = "related_out_output_net_pin_cap")]
   RelatedOutOutputNetPinCap,
-  /// fanout_pin_capacitance
+  /// `fanout_pin_capacitance`
   #[strum(serialize = "fanout_pin_capacitance")]
   FanoutPinCapacitance,
 }
@@ -717,10 +714,10 @@ pub enum CapacitanceVariable {
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LengthVariable {
-  /// output_net_length
+  /// `output_net_length`
   #[strum(serialize = "output_net_length")]
   OutputNetLength,
-  /// related_out_output_net_length
+  /// `related_out_output_net_length`
   #[strum(serialize = "related_out_output_net_length")]
   RelatedOutOutputNetLength,
 }
@@ -731,13 +728,13 @@ pub enum LengthVariable {
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ScalarVariable {
-  /// fanout_number
+  /// `fanout_number`
   #[strum(serialize = "fanout_number")]
   FanoutNumber,
   /// The `normalized_voltage`  variable is specified under the
   /// `lu_table_template`  table to describe a collection of waveforms under
   /// various input slew values.
-  /// For a given input slew in `index_1`  (for example, index_1[0] = 1.0 ns),
+  /// For a given input slew in `index_1`  (for example, `index_1`[0] = 1.0 ns),
   /// the `index_2`  values are a set of points that represent how the voltage rises from 0 to VDD in a rise arc,
   /// or from VDD to 0 in a fall arc.
   /// <a name ="reference_link" href="

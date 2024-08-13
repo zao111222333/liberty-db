@@ -1,5 +1,3 @@
-use std::{hash::Hash, str::FromStr};
-
 use crate::{
   ast::{AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri, SimpleWrapper},
   common::items::WordSet,
@@ -8,6 +6,7 @@ use crate::{
   timing::items::Mode,
   ArcStr,
 };
+use core::{fmt, hash::Hash, str::FromStr};
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=199.5&end=199.6
@@ -48,10 +47,14 @@ pub struct LeakagePower {
 }
 impl GroupFn for LeakagePower {}
 
-#[test]
-fn test_leakage_sort() {
-  let (cell, _) = crate::ast::test_parse_group::<super::Cell>(
-    r#"(CELL) {
+#[cfg(test)]
+mod test_sort {
+  use super::*;
+
+  #[test]
+  fn test_leakage_sort() {
+    let (cell, _) = crate::ast::test_parse_group::<crate::Cell>(
+      r#"(CELL) {
       leakage_power () {
         related_pg_pin : VDD;
         value : 1;
@@ -102,15 +105,16 @@ fn test_leakage_sort() {
       }
     }
   "#,
-  );
-  assert_eq!(
-    vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    cell
-      .leakage_power
-      .into_iter_sort()
-      .map(|leakage| leakage.value as i8)
-      .collect::<Vec<_>>()
-  );
+    );
+    assert_eq!(
+      vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      cell
+        .leakage_power
+        .into_iter_sort()
+        .map(|leakage| leakage.value as i8)
+        .collect::<Vec<_>>()
+    );
+  }
 }
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
@@ -151,18 +155,18 @@ impl NamedGroup for Statetable {
     if l != 2 {
       return Err(crate::ast::IdError::LengthDismatch(2, l, v));
     }
-    if let Some(var2) = v.pop() {
-      if let Some(var1) = v.pop() {
-        Ok(Self::Name {
-          input_nodes: var1.split_ascii_whitespace().map(ArcStr::from).collect(),
-          internal_nodes: var2.split_ascii_whitespace().map(ArcStr::from).collect(),
-        })
-      } else {
-        Err(crate::ast::IdError::Other("Unkown pop error".into()))
-      }
-    } else {
-      Err(crate::ast::IdError::Other("Unkown pop error".into()))
-    }
+    v.pop()
+      .map_or(Err(crate::ast::IdError::Other("Unkown pop error".into())), |var2| {
+        v.pop().map_or(
+          Err(crate::ast::IdError::Other("Unkown pop error".into())),
+          |var1| {
+            Ok(Self::Name {
+              input_nodes: var1.split_ascii_whitespace().map(ArcStr::from).collect(),
+              internal_nodes: var2.split_ascii_whitespace().map(ArcStr::from).collect(),
+            })
+          },
+        )
+      })
   }
   #[inline]
   fn name2vec(name: Self::Name) -> Vec<ArcStr> {
@@ -170,26 +174,28 @@ impl NamedGroup for Statetable {
   }
 }
 
-/// StateTable Table
+/// `StateTable` Table
 #[derive(Default, Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Table {
   pub v: Vec<ArcStr>,
 }
 
-impl core::fmt::Display for Table {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    core::fmt::Debug::fmt(&self.v, f)
+impl fmt::Display for Table {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fmt::Debug::fmt(&self.v, f)
   }
 }
 
 impl FromStr for Table {
-  type Err = core::fmt::Error;
+  type Err = fmt::Error;
   /// To prevent syntax errors, the line continuation character
   /// must be followed immediately by the next line character.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.18&end=141.21
   /// ">Reference</a>
+  #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(Self {
       v: s
@@ -198,7 +204,7 @@ impl FromStr for Table {
           let _l = line
             .trim_start()
             .trim_end_matches(|c: char| c == ',' || c.is_ascii_whitespace());
-          if _l == "" {
+          if _l.is_empty() {
             None
           } else {
             Some(ArcStr::from(_l))
@@ -231,10 +237,13 @@ impl SimpleAttri for Table {
   }
 }
 
-#[test]
-fn statetable_test() {
-  let _ = crate::ast::test_parse_group::<Statetable>(
-    r#"(" CLK EN SE",ENL) {
+#[cfg(test)]
+mod test_statetable {
+  use super::*;
+  #[test]
+  fn statetable_test() {
+    _ = crate::ast::test_parse_group::<Statetable>(
+      r#"(" CLK EN SE",ENL) {
         table : "	H   L  L : - : L ,\
         H   L  H : - : H ,\
         H   H  L : - : H ,\
@@ -242,7 +251,8 @@ fn statetable_test() {
         L   -  - : - : N ";
     }
   "#,
-  );
+    );
+  }
 }
 
 /// Use the `pg_pin` group to specify power and ground pins.
@@ -357,35 +367,35 @@ impl GroupFn for PgPin {}
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PgType {
-  /// primary_power
+  /// `primary_power`
   #[strum(serialize = "primary_power")]
   PrimaryPower,
-  /// primary_ground
+  /// `primary_ground`
   #[strum(serialize = "primary_ground")]
   PrimaryGround,
-  /// backup_power
+  /// `backup_power`
   #[strum(serialize = "backup_power")]
   BackupPower,
-  /// backup_ground
+  /// `backup_ground`
   #[strum(serialize = "backup_ground")]
   #[default]
   BackupGround,
-  /// internal_power
+  /// `internal_power`
   #[strum(serialize = "internal_power")]
   InternalPower,
-  /// internal_ground
+  /// `internal_ground`
   #[strum(serialize = "internal_ground")]
   InternalGround,
-  /// pwell
+  /// `pwell`
   #[strum(serialize = "pwell")]
   Pwell,
-  /// nwell
+  /// `nwell`
   #[strum(serialize = "nwell")]
   Nwell,
-  /// deepnwell
+  /// `deepnwell`
   #[strum(serialize = "deepnwell")]
   DeepNwell,
-  /// deeppwell
+  /// `deeppwell`
   #[strum(serialize = "deeppwell")]
   DeepPwell,
 }

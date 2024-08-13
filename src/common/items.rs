@@ -1,10 +1,10 @@
-use std::{cmp::Ordering, collections::HashSet, fmt::Debug};
-
 use crate::{
   ast::{GroupComments, GroupFn, SimpleAttri},
   ArcStr,
 };
+use core::{cmp::Ordering, fmt, hash, str::FromStr};
 use itertools::Itertools;
+use std::collections::HashSet;
 use strum_macros::{Display, EnumString};
 
 /// The `sdf_edges` attribute defines the edge specification on both
@@ -38,7 +38,7 @@ use strum_macros::{Display, EnumString};
 /// &end
 /// =203.47
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[derive(Default, EnumString, Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SdfEdgeType {
@@ -53,7 +53,7 @@ pub enum SdfEdgeType {
   BothEdges,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[derive(Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VariableType {
@@ -118,9 +118,10 @@ impl GroupFn for Domain {}
 pub struct WordSet {
   pub inner: HashSet<ArcStr>,
 }
-impl core::fmt::Display for WordSet {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    core::fmt::Display::fmt(&self.inner.iter().join(" "), f)
+impl fmt::Display for WordSet {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fmt::Display::fmt(&self.inner.iter().join(" "), f)
   }
 }
 impl Ord for WordSet {
@@ -136,12 +137,11 @@ impl Ord for WordSet {
   }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for WordSet {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-    if self == other {
-      Some(Ordering::Equal)
-    } else if self.inner.len() == other.inner.len() {
+    if self.inner.len() == other.inner.len() {
       self.inner.iter().sorted().partial_cmp(other.inner.iter().sorted())
     } else if self.inner.is_subset(&other.inner) {
       Some(Ordering::Less)
@@ -154,21 +154,23 @@ impl PartialOrd for WordSet {
 }
 
 impl SimpleAttri for WordSet {}
-impl core::hash::Hash for WordSet {
-  fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+impl hash::Hash for WordSet {
+  #[inline]
+  fn hash<H: hash::Hasher>(&self, state: &mut H) {
     let mut sum = 0_u64;
     for item in &self.inner {
       let mut hasher = std::hash::DefaultHasher::new();
       item.hash(&mut hasher);
-      sum = sum.wrapping_add(core::hash::Hasher::finish(&hasher));
+      sum = sum.wrapping_add(hash::Hasher::finish(&hasher));
     }
     state.write_u64(sum);
   }
 }
 
-impl std::str::FromStr for WordSet {
-  type Err = core::fmt::Error;
+impl FromStr for WordSet {
+  type Err = fmt::Error;
 
+  #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(Self { inner: s.split(' ').map(ArcStr::from).collect() })
   }

@@ -50,10 +50,7 @@ impl NameAttri for Option<ArcStr> {
   }
   #[inline]
   fn to_vec(self) -> Vec<ArcStr> {
-    match self {
-      Some(s) => vec![s],
-      None => vec![],
-    }
+    self.map_or(vec![], |s| vec![s])
   }
 }
 
@@ -64,11 +61,7 @@ impl NameAttri for ArcStr {
     if l != 1 {
       return Err(IdError::LengthDismatch(1, l, v));
     }
-    if let Some(name) = v.pop() {
-      Ok(name)
-    } else {
-      return Err(IdError::Other("Unkown pop error".into()));
-    }
+    v.pop().ok_or(IdError::Other("Unkown pop error".into()))
   }
   #[inline]
   fn to_vec(self) -> Vec<ArcStr> {
@@ -93,24 +86,18 @@ impl NameAttri for (ArcStr, ArcStr, usize) {
     if l != 3 {
       return Err(IdError::LengthDismatch(3, l, v));
     }
-    if let Some(s3) = v.pop() {
+    v.pop().map_or(Err(IdError::Other("Unkown pop error".into())), |s3| {
       match s3.parse::<usize>() {
-        Ok(s3) => {
-          if let Some(s2) = v.pop() {
-            if let Some(s1) = v.pop() {
-              Ok((s1, s2, s3))
-            } else {
-              Err(IdError::Other("Unkown pop error".into()))
-            }
-          } else {
-            Err(IdError::Other("Unkown pop error".into()))
-          }
+        Ok(s3_i) => {
+          v.pop().map_or(Err(IdError::Other("Unkown pop error".into())), |s2| {
+            v.pop().map_or(Err(IdError::Other("Unkown pop error".into())), |s1| {
+              Ok((s1, s2, s3_i))
+            })
+          })
         }
         Err(e) => Err(IdError::Int(e)),
       }
-    } else {
-      Err(IdError::Other("Unkown pop error".into()))
-    }
+    })
   }
   #[inline]
   fn to_vec(self) -> Vec<ArcStr> {
@@ -126,7 +113,7 @@ impl<const N: usize> NameAttri for [ArcStr; N] {
     }
     match TryInto::<[ArcStr; N]>::try_into(v) {
       Ok(name) => Ok(name),
-      Err(e) => Err(IdError::Other(format!("try_into error: {:?}", e))),
+      Err(e) => Err(IdError::Other(format!("try_into error: {e:?}"))),
     }
   }
   #[inline]
@@ -144,12 +131,10 @@ impl<const N: usize> ComplexAttri for [ArcStr; N] {
     if l != N {
       return Err(ComplexParseError::LengthDismatch);
     }
-    match TryInto::<[ArcStr; N]>::try_into(
+    TryInto::<[ArcStr; N]>::try_into(
       v.iter().map(|&s| ArcStr::from(s)).collect::<Vec<ArcStr>>(),
-    ) {
-      Ok(name) => Ok(name),
-      Err(_) => Err(ComplexParseError::Other),
-    }
+    )
+    .map_or(Err(ComplexParseError::Other), Ok)
   }
   #[inline]
   fn to_wrapper(&self) -> ComplexWrapper {
@@ -173,11 +158,7 @@ impl ComplexAttri for Vec<f64> {
       vec![vec![]]
     } else {
       let mut buffer = ryu::Buffer::new();
-      vec![vec![format!(
-        "{}",
-        self.iter().map(|f| buffer.format(*f).to_string()).join(",")
-      )
-      .into()]]
+      vec![vec![self.iter().map(|f| buffer.format(*f).to_owned()).join(",").into()]]
     }
   }
 }
@@ -196,14 +177,11 @@ impl ComplexAttri for Vec<NotNan<f64>> {
       vec![vec![]]
     } else {
       let mut buffer = ryu::Buffer::new();
-      vec![vec![format!(
-        "{}",
-        self
-          .iter()
-          .map(|f| buffer.format(f.into_inner()).to_string())
-          .join(",")
-      )
-      .into()]]
+      vec![vec![self
+        .iter()
+        .map(|f| buffer.format(f.into_inner()).to_owned())
+        .join(",")
+        .into()]]
     }
   }
 }
@@ -212,8 +190,8 @@ impl ComplexAttri for ArcStr {
   #[inline]
   fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
-    let v1: ArcStr = match i.next() {
-      Some(&s) => ArcStr::from(s),
+    let v1 = match i.next() {
+      Some(&s) => Self::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if i.next().is_some() {
@@ -230,7 +208,7 @@ impl ComplexAttri for NotNan<f64> {
   #[inline]
   fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
-    let v1: NotNan<f64> = match i.next() {
+    let v1: Self = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(ComplexParseError::Float(e)),

@@ -176,7 +176,7 @@ fn logic_vecter_as_key() {
       units::second(0.1),
     )))));
     v_k1.push(logic::State::F);
-    let _ = pin_map.insert(v_k1, v);
+     _ = pin_map.insert(v_k1, v);
   }
   {
     let mut v_k2: logic::Vector = vec![].into();
@@ -214,7 +214,7 @@ fn port_as_key() {
   println!("{:?}", port_a1.table());
   let mut map = HashMap::new();
   let v = 1;
-  let _ = map.insert(port_a1, v);
+   _ = map.insert(port_a1, v);
   assert_eq!(Some(&v), map.get(&port_a2));
 }
 #[test]

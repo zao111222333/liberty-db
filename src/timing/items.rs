@@ -51,14 +51,10 @@ use strum_macros::{Display, EnumString};
 /// You can specify half-unate sequential timing arcs if the `timing_type` value is either
 /// `rising_edge` or `falling_edge` and the `timing_sense` value is either `positive_unate`
 /// or `negative_unate`.
-/// + In the case of `rising_edge` and `positive_unate` values, only the `cell_rise` and `rise_transition`
-/// information is required.
-/// + In the case of `rising_edge` and `negative_unate` values, only the `cell_fall` and `fall_transition`
-/// information is required.
-/// + In the case of `falling_edge` and `positive_unate` values, only the `cell_rise` and `rise_transition`
-/// information is required.
-/// + In the case of `falling_edge` and `negative_unate` values, only the `cell_fall` and `fall_transition`
-/// information is required.
+/// + In the case of `rising_edge` and `positive_unate` values, only the `cell_rise` and `rise_transition` information is required.
+/// + In the case of `rising_edge` and `negative_unate` values, only the `cell_fall` and `fall_transition` information is required.
+/// + In the case of `falling_edge` and `positive_unate` values, only the `cell_rise` and `rise_transition` information is required.
+/// + In the case of `falling_edge` and `negative_unate` values, only the `cell_fall` and `fall_transition` information is required.
 ///
 /// Do not define the `timing_sense` value of a pin, except when you need to override the derived value
 /// or when you are characterizing a noncombinational gate such as a three-state component. For example,
@@ -70,7 +66,7 @@ use strum_macros::{Display, EnumString};
 /// designation.
 ///
 /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
-/// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
+/// If `related_pin` is an output pin, you must define a `timing_sense` attribute for that pin.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
 /// ?field=test
@@ -134,11 +130,13 @@ pub enum TimingSenseType {
 }
 
 impl TimingSenseType {
+  #[must_use]
+  #[inline]
   pub fn compute_edge(&self, pin_edge: &logic::Edge) -> Option<logic::Edge> {
     match self {
-      TimingSenseType::PositiveUnate => Some(*pin_edge),
-      TimingSenseType::NegativeUnate => Some(pin_edge.inverse()),
-      TimingSenseType::NonUnate => None,
+      Self::PositiveUnate => Some(*pin_edge),
+      Self::NegativeUnate => Some(pin_edge.inverse()),
+      Self::NonUnate => None,
     }
   }
 }

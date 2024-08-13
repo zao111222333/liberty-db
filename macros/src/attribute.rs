@@ -55,6 +55,7 @@ enum FieldType {
   Attri(AttriType),
 }
 
+#[allow(clippy::type_complexity)]
 pub(crate) fn parse_fields_type(
   fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
 ) -> syn::Result<(
@@ -120,29 +121,23 @@ pub(crate) fn parse_fields_type(
     })
     .collect();
   if let Some(e) = err_buf {
-    return Err(e);
+    Err(e)
   } else {
     match (_undefined_name, _comments_name) {
-      (None, None) => {
-        return Err(syn::Error::new(
-          proc_macro2::Span::call_site(),
-          "Can not find undefined & comment".to_string(),
-        ))
-      }
-      (None, Some(_)) => {
-        return Err(syn::Error::new(
-          proc_macro2::Span::call_site(),
-          "Can not find undefined".to_string(),
-        ))
-      }
-      (Some(_), None) => {
-        return Err(syn::Error::new(
-          proc_macro2::Span::call_site(),
-          "Can not find comment".to_string(),
-        ))
-      }
+      (None, None) => Err(syn::Error::new(
+        proc_macro2::Span::call_site(),
+        "Can not find undefined & comment".to_string(),
+      )),
+      (None, Some(_)) => Err(syn::Error::new(
+        proc_macro2::Span::call_site(),
+        "Can not find undefined".to_string(),
+      )),
+      (Some(_), None) => Err(syn::Error::new(
+        proc_macro2::Span::call_site(),
+        "Can not find comment".to_string(),
+      )),
       (Some(undefined_name), Some(comments_name)) => {
-        return Ok((attri_type_map, _name_vec, undefined_name, comments_name))
+        Ok((attri_type_map, _name_vec, undefined_name, comments_name))
       }
     }
   }
@@ -184,10 +179,8 @@ pub(crate) fn parse_fields_type(
 /// // Complex group attribute, Vec
 /// #[liberty(group(type=Vec))]
 /// ```
-fn parse_field_attrs(
-  field_attrs: &Vec<syn::Attribute>,
-) -> syn::Result<Option<FieldType>> {
-  for attri in field_attrs.into_iter() {
+fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<FieldType>> {
+  for attri in field_attrs.iter() {
     if let Some(seg_title) = attri.path().segments.first() {
       if "liberty" == &seg_title.ident.to_string() {
         if let syn::Meta::List(list) = &attri.meta {
@@ -247,53 +240,46 @@ fn parse_simple_type(
   let mut simple_type = SimpleType::default();
   if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
     let mut args = g.stream().into_iter();
-    loop {
-      if let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
-        match arg_id.to_string().as_str() {
-          "type" => {
-            if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
-              if '=' != arg_punct.as_char() {
-                return Err(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  "miss equal.".to_string(),
-                ));
-              }
-            } else {
+    while let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
+      match arg_id.to_string().as_str() {
+        "type" => {
+          if let Some(proc_macro2::TokenTree::Punct(arg_punct)) = args.next() {
+            if '=' != arg_punct.as_char() {
               return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
                 "miss equal.".to_string(),
               ));
             }
-            if let Some(proc_macro2::TokenTree::Ident(arg_value)) = args.next() {
-              match arg_value.to_string().as_str() {
-                "Option" => simple_type = SimpleType::Option,
-                "Default" => simple_type = SimpleType::Default,
-                _ => {
-                  return Err(syn::Error::new(
-                    proc_macro2::Span::call_site(),
-                    format!(
-                      "simple_type not support {}.",
-                      arg_value.to_string().as_str()
-                    ),
-                  ))
-                }
-              }
-            } else {
-              return Err(syn::Error::new(
-                proc_macro2::Span::call_site(),
-                "miss simple_type.".to_string(),
-              ));
-            }
-          }
-          _ => {
+          } else {
             return Err(syn::Error::new(
               proc_macro2::Span::call_site(),
-              format!("simple_type not support {} group.", arg_id.to_string().as_str()),
-            ))
+              "miss equal.".to_string(),
+            ));
+          }
+          if let Some(proc_macro2::TokenTree::Ident(arg_value)) = args.next() {
+            match arg_value.to_string().as_str() {
+              "Option" => simple_type = SimpleType::Option,
+              "Default" => simple_type = SimpleType::Default,
+              _ => {
+                return Err(syn::Error::new(
+                  proc_macro2::Span::call_site(),
+                  format!("simple_type not support {}.", arg_value.to_string().as_str()),
+                ))
+              }
+            }
+          } else {
+            return Err(syn::Error::new(
+              proc_macro2::Span::call_site(),
+              "miss simple_type.".to_string(),
+            ));
           }
         }
-      } else {
-        break;
+        _ => {
+          return Err(syn::Error::new(
+            proc_macro2::Span::call_site(),
+            format!("simple_type not support {} group.", arg_id.to_string().as_str()),
+          ))
+        }
       }
     }
   }

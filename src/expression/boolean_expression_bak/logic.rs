@@ -942,7 +942,7 @@ impl Table {
   /// TODO: to_expression
   pub fn to_expression(&self) -> BooleanExpression {
     let table = self.simplify();
-    let _ = table;
+     _ = table;
     todo!()
   }
 }
@@ -959,7 +959,7 @@ impl core::fmt::Display for Table {
       v
     }));
     for (vec_in, state_out) in self.table.iter().sorted() {
-      let _ = table.add_row(Row::from({
+       _ = table.add_row(Row::from({
         let mut v: Vec<State> = vec_in.to_vec;
         v.push(state_out.clone());
         v
@@ -1055,10 +1055,10 @@ impl Searcher {
             Some(set) => {
               let mut _set = set.clone();
               _set.extend(v.iter());
-              let _ = map.insert(p.clone(), _set);
+               _ = map.insert(p.clone(), _set);
             }
             None => {
-              let _ = map.insert(p.clone(), v.iter().copied().collect());
+               _ = map.insert(p.clone(), v.iter().copied().collect());
             }
           }
         }

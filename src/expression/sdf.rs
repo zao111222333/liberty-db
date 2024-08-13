@@ -31,19 +31,22 @@ pub struct SdfExpression {
   inner: ArcStr,
 }
 impl core::fmt::Display for SdfExpression {
+  #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     core::fmt::Display::fmt(&self.inner, f)
   }
 }
 impl core::str::FromStr for SdfExpression {
   type Err = core::convert::Infallible;
-
+  #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(Self { inner: ArcStr::from_str(s)? })
   }
 }
 impl SimpleAttri for SdfExpression {}
 impl SdfExpression {
+  #[must_use]
+  #[inline]
   pub fn new(s: ArcStr) -> Self {
     Self { inner: s }
   }

@@ -14,10 +14,12 @@ pub mod items;
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   ccsn::PropagatingCcb,
-  common::{items::*, table::*},
+  common::{
+    items::{SdfEdgeType, WordSet},
+    table::{ReferenceTimeVector3DGrpup, TableLookUp, TableLookUpMultiSegment},
+  },
   expression::{BooleanExpression, IdBooleanExpression, SdfExpression},
   library::Sensitization,
-  pin::Pin,
   units, ArcStr, GroupSet,
 };
 
@@ -410,7 +412,8 @@ pub struct Timing {
   /// &end
   /// =203.39
   /// ">Reference-Instance</a>
-  pub related_bus_equivalent: Vec<Box<Pin>>,
+  #[liberty(simple)]
+  pub related_bus_equivalent: WordSet,
   /// The `related_bus_pins` attribute defines the pin or pins that
   /// are the startpoint of the timing arc. The primary use of
   /// `related_bus_pins` is for module generators.
@@ -445,6 +448,7 @@ pub struct Timing {
   /// &end
   /// =203.40
   /// ">Reference-Instance</a>
+  #[liberty(simple)]
   pub related_bus_pins: WordSet,
   /// The `related_output_pin` attribute specifies the output or inout pin used
   /// to describe a load-dependent constraint. This is an attribute in the timing group

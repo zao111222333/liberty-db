@@ -1,4 +1,5 @@
-//! cargo expand common::demo
+#![allow(clippy::redundant_pub_crate)]
+//! cargo expand `common::demo`
 
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn, NamedGroup},
@@ -75,15 +76,13 @@ impl NamedGroup for FF {
     if l != 2 {
       return Err(crate::ast::IdError::LengthDismatch(2, l, v));
     }
-    if let Some(var2) = v.pop() {
-      if let Some(var1) = v.pop() {
-        Ok(Self::Name { var1, var2 })
-      } else {
-        Err(crate::ast::IdError::Other("Unkown pop error".into()))
-      }
-    } else {
-      Err(crate::ast::IdError::Other("Unkown pop error".into()))
-    }
+    v.pop()
+      .map_or(Err(crate::ast::IdError::Other("Unkown pop error".into())), |var2| {
+        v.pop()
+          .map_or(Err(crate::ast::IdError::Other("Unkown pop error".into())), |var1| {
+            Ok(Self::Name { var1, var2 })
+          })
+      })
   }
   #[inline]
   fn name2vec(name: Self::Name) -> Vec<ArcStr> {
@@ -112,10 +111,14 @@ pub(crate) struct Cell {
   statetable: Option<Statetable>,
 }
 impl GroupFn for Cell {}
-#[test]
-fn timing_test() {
-  let _ = crate::ast::test_parse_group::<Timing>(
-    r#"(w){
+
+#[cfg(test)]
+mod test {
+  use super::*;
+  #[test]
+  fn timing_test() {
+    _ = crate::ast::test_parse_group::<Timing>(
+      r#"(w){
         // www
         /* com
         ment2 */
@@ -127,9 +130,9 @@ fn timing_test() {
         );
     }
     "#,
-  );
-  let _ = crate::ast::test_parse_group::<Timing>(
-    r#"( w ){
+    );
+    _ = crate::ast::test_parse_group::<Timing>(
+      r#"( w ){
         t1: ombinational;
         t2: combinational;
         values ( \
@@ -138,34 +141,34 @@ fn timing_test() {
         );
         }
     "#,
-  );
-}
+    );
+  }
 
-#[test]
-fn pin_test() {
-  let _ = crate::ast::test_parse_group::<Pin>(
-    r#"(A){
+  #[test]
+  fn pin_test() {
+    _ = crate::ast::test_parse_group::<Pin>(
+      r#"(A){
         timing(w){
             t1: combinational;
         }
     }
     "#,
-  );
-  let _ = crate::ast::test_parse_group::<Pin>(
-    r#"(B){
+    );
+    _ = crate::ast::test_parse_group::<Pin>(
+      r#"(B){
         timing(w){
             t1: combinational;
         }
     }
     "#,
-  );
-}
+    );
+  }
 
-#[test]
-fn cell_test() {
-  use crate::ast::GroupAttri;
-  let _ = crate::ast::test_parse_group::<Cell>(
-    r#"(INV){
+  #[test]
+  fn cell_test() {
+    use crate::ast::GroupAttri;
+    _ = crate::ast::test_parse_group::<Cell>(
+      r#"(INV){
         // should ok
         area : 5.4;
         // should ok
@@ -198,9 +201,9 @@ fn cell_test() {
         }
       }
     "#,
-  );
-  let (g, _) = &mut crate::ast::test_parse_group::<Cell>(
-    r#"(INV){
+    );
+    let (g, _) = &mut crate::ast::test_parse_group::<Cell>(
+      r#"(INV){
         // should error
         area : 5.4;
         undefine_area : 5.4;
@@ -229,13 +232,14 @@ fn cell_test() {
         }
     }
     "#,
-  );
-  g.comments.area.push("xc".into());
-  g.comments.area.push("xc".into());
-  let mut output = String::new();
-  let mut f = crate::ast::CodeFormatter::new(&mut output);
-  if let Err(e) = GroupAttri::fmt_liberty(g, std::any::type_name::<Cell>(), &mut f) {
-    panic!("{e}");
+    );
+    g.comments.area.push("xc".into());
+    g.comments.area.push("xc".into());
+    let mut output = String::new();
+    let mut f = crate::ast::CodeFormatter::new(&mut output);
+    if let Err(e) = GroupAttri::fmt_liberty(g, core::any::type_name::<Cell>(), &mut f) {
+      panic!("{e}");
+    }
+    println!("{output}");
   }
-  println!("{}", output);
 }

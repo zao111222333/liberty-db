@@ -3,4 +3,4 @@
 /// </script>
 #[derive(Debug, Clone, Copy)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Bundle {}
+pub struct Bundle;

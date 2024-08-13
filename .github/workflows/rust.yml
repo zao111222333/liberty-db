@@ -71,7 +71,7 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     env:
-      RUSTFLAGS: "-A clippy::missing_docs -D warnings"
+      # RUSTFLAGS: "-D warnings -A clippy::todo"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

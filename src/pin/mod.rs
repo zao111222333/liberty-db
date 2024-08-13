@@ -998,8 +998,8 @@ impl GroupFn for Pin {}
 //     let mut pin_b = Pin::default();
 //     pin_b._id = String::from("B").into();
 //     let mut set = GroupMap::<Pin>::default();
-//     let _ = set.insert(pin_a);
-//     let _ = set.insert(pin_b);
+//      _ = set.insert(pin_a);
+//      _ = set.insert(pin_b);
 //     arc_set = Arc::new(RefCell::new(set));
 //   }
 //   let pin_a_link = LinkedGroup::<Pin>::new(String::from("A").into(), &arc_set);
@@ -1011,7 +1011,7 @@ impl GroupFn for Pin {}
 //     let mut pin_a = Pin::default();
 //     pin_a._id = String::from("A").into();
 //     pin_a.bit_width = 12345;
-//     let _ = arc_set.borrow_mut().insert(pin_a);
+//      _ = arc_set.borrow_mut().insert(pin_a);
 //     pin_a_link.get_linked(|r| {
 //       assert!(matches!(r, Ok(_)));
 //       assert_eq!(r.unwrap().bit_width, 12345);

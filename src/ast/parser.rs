@@ -1,3 +1,4 @@
+#![allow(clippy::arithmetic_side_effects)]
 //!
 //! All parser utilis.
 //!
@@ -14,54 +15,60 @@ use nom::{
 
 use crate::{ast::GroupWrapper, ArcStr};
 
-fn comment_single<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
+#[inline]
+fn comment_single(i: &str) -> IResult<&str, usize, Error<&str>> {
   map(
     tuple((
       alt((tag("*"), tag("//"))),
       take_while(move |c: char| c != '\n'),
-      take(1usize),
+      take(1_usize),
       space,
     )),
     |_| 1,
   )(i)
 }
 
-fn comment_multi<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
-  map(tuple((tag("/*"), take_until("*/"), take(2usize), space)), |(_, s, _, _)| {
+#[inline]
+fn comment_multi(i: &str) -> IResult<&str, usize, Error<&str>> {
+  map(tuple((tag("/*"), take_until("*/"), take(2_usize), space)), |(_, s, _, _)| {
     s.chars().filter(|&x| x == '\n').count()
   })(i)
 }
 
-#[test]
-fn comment_test() {
-  println!("{:?}", comment_single("iwww\" \n \nw"));
-  println!("{:?}", comment_single("*iwww\" \n \nw"));
-  println!("{:?}", comment_single("//iwww\" \n \nw"));
-  println!("{:?}", comment_multi("//iwww\" \n \nw"));
-  println!(
-    "{:?}",
-    comment_multi(
-      r#"/*iwww\
+#[cfg(test)]
+mod test_comment {
+  use super::*;
+  #[test]
+  fn test1() {
+    println!("{:?}", comment_single("iwww\" \n \nw"));
+    println!("{:?}", comment_single("*iwww\" \n \nw"));
+    println!("{:?}", comment_single("//iwww\" \n \nw"));
+    println!("{:?}", comment_multi("//iwww\" \n \nw"));
+    println!(
+      "{:?}",
+      comment_multi(
+        r#"/*iwww\
 
   */
   w"#
-    )
-  );
-  println!(
-    "{:?}",
-    comment_multi(
-      r#"/*iwww\ */
+      )
+    );
+    println!(
+      "{:?}",
+      comment_multi(
+        r#"/*iwww\ */
   w"#
-    )
-  );
+      )
+    );
+  }
 }
 
 #[inline]
-fn space<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>> {
+fn space(i: &str) -> IResult<&str, (), Error<&str>> {
   map(take_while(move |c: char| matches!(c, '\t' | '\r' | ' ')), |_| ())(i)
 }
 #[inline]
-fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
+fn space_newline(i: &str) -> IResult<&str, usize, Error<&str>> {
   map(take_while(move |c: char| matches!(c, '\t' | '\n' | '\r' | ' ')), |s: &str| {
     s.chars().filter(|&x| x == '\n').count()
   })(i)
@@ -69,9 +76,7 @@ fn space_newline<'a>(i: &'a str) -> IResult<&'a str, usize, Error<&'a str>> {
 
 /// must have new line!
 #[inline]
-pub(in crate) fn comment_space_newline_many1<'a>(
-  i: &'a str,
-) -> IResult<&'a str, usize, Error<&'a str>> {
+pub(crate) fn comment_space_newline_many1(i: &str) -> IResult<&str, usize, Error<&str>> {
   match map(
     pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
@@ -89,9 +94,7 @@ pub(in crate) fn comment_space_newline_many1<'a>(
 }
 
 #[inline]
-pub(in crate) fn comment_space_newline<'a>(
-  i: &'a str,
-) -> IResult<&'a str, usize, Error<&'a str>> {
+pub(crate) fn comment_space_newline(i: &str) -> IResult<&str, usize, Error<&str>> {
   map(
     pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
@@ -99,9 +102,7 @@ pub(in crate) fn comment_space_newline<'a>(
 }
 
 #[inline]
-fn comment_space_newline_slash<'a>(
-  i: &'a str,
-) -> IResult<&'a str, usize, Error<&'a str>> {
+fn comment_space_newline_slash(i: &str) -> IResult<&str, usize, Error<&str>> {
   map(
     pair(
       space,
@@ -112,8 +113,7 @@ fn comment_space_newline_slash<'a>(
             pair(opt(comment_multi), space_newline),
             |(n_comment, n_newline)| match (n_comment, n_newline) {
               (_, 0) => None,
-              (Some(0), _) => Some(n_newline),
-              (None, _) => Some(n_newline),
+              (None | Some(0), _) => Some(n_newline),
               (_, _) => None,
             },
           ),
@@ -121,55 +121,55 @@ fn comment_space_newline_slash<'a>(
         )),
       )),
     ),
-    |(_, n)| match n {
-      Some(n) => n,
-      None => 0,
-    },
+    |(_, n)| n.unwrap_or(0),
   )(i)
 }
 
-#[test]
-fn space_test() {
-  println!("{:?}", comment_space_newline_slash(r#" w"#));
-  println!("{:?}", comment_space_newline_slash(r#" );"#));
-  println!(
-    "{:?}",
-    comment_space_newline_slash(
-      r#"/*iwww\
+#[cfg(test)]
+mod space_test {
+  use super::*;
+  #[test]
+  fn space_test() {
+    println!("{:?}", comment_space_newline_slash(r#" w"#));
+    println!("{:?}", comment_space_newline_slash(r#" );"#));
+    println!(
+      "{:?}",
+      comment_space_newline_slash(
+        r#"/*iwww\
   
   */
   w"#
-    )
-  );
-  println!(
-    "{:?}",
-    comment_space_newline_slash(
-      r#"\ /*iwww\*/
+      )
+    );
+    println!(
+      "{:?}",
+      comment_space_newline_slash(
+        r#"\ /*iwww\*/
   w"#
-    )
-  );
-  println!(
-    "{:?}",
-    comment_space_newline_slash(
-      r#"\
+      )
+    );
+    println!(
+      "{:?}",
+      comment_space_newline_slash(
+        r#"\
   w"#
-    )
-  );
-  println!(
-    "{:?}",
-    comment_space_newline_slash(
-      r#"\ //www
+      )
+    );
+    println!(
+      "{:?}",
+      comment_space_newline_slash(
+        r#"\ //www
   w"#
-    )
-  );
+      )
+    );
+  }
 }
-
 #[inline]
-pub(in crate) fn undefine<'a>(
+pub(crate) fn undefine<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, super::AttriValue, Error<&'a str>> {
-  let line_num_back = line_num.clone();
+  let line_num_back = *line_num;
   if let Ok((input, res)) = simple(i, line_num) {
     return Ok((input, super::AttriValue::Simple(ArcStr::from(res))));
   }
@@ -191,13 +191,13 @@ pub(in crate) fn undefine<'a>(
             return Ok((input, super::AttriValue::Group(res)));
           }
           Err(e) => return Err(e),
-          Ok((_input, _key)) => {
-            input = _input;
-            if let Ok((_input, attri)) = undefine(_input, line_num) {
-              input = _input;
+          Ok((input1, _key)) => {
+            input = input1;
+            if let Ok((input2, attri)) = undefine(input, line_num) {
+              input = input2;
               if let super::AttriValue::Group(_) = attri {
-                let n: usize;
-                (input, n) = comment_space_newline(input)?;
+                let (input3, n) = comment_space_newline(input)?;
+                input = input3;
                 *line_num += n;
               }
               res.attr_list.push((ArcStr::from(_key), attri));
@@ -206,7 +206,7 @@ pub(in crate) fn undefine<'a>(
         }
       }
     }
-    Err(e) => return Err(e),
+    Err(e) => Err(e),
   }
 }
 
@@ -222,17 +222,22 @@ where
   )(i)
 }
 
-#[test]
-fn unquote_test() {
-  use nom::error::VerboseError;
-  println!("{:?}", unquote::<VerboseError<&str>>("\"iwww\" "));
-  println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
-  println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));
-  println!("{:?}", key::<VerboseError<&str>>("iw_w2w';"));
-  println!("{:?}", formula::<VerboseError<&str>>("0.3 * VDD ;"));
+#[cfg(test)]
+mod test_unquote {
+  use super::*;
+  #[test]
+  fn test1() {
+    use nom::error::VerboseError;
+    println!("{:?}", unquote::<VerboseError<&str>>("\"iwww\" "));
+    println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
+    println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));
+    println!("{:?}", key::<VerboseError<&str>>("iw_w2w';"));
+    println!("{:?}", formula::<VerboseError<&str>>("0.3 * VDD ;"));
+  }
 }
 
-pub(in crate) fn key<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+#[inline]
+pub(crate) fn key<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
 where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
 {
@@ -243,7 +248,8 @@ pub(super) fn char_in_word(c: char) -> bool {
   c.is_alphanumeric() || "/_.+-:".contains(c)
 }
 
-pub(in crate) fn word<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+#[inline]
+pub(crate) fn word<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
 where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
 {
@@ -255,14 +261,16 @@ pub(super) fn char_in_formula(c: char) -> bool {
   c.is_ascii_alphanumeric() || " /_.+-*^:".contains(c)
 }
 
-pub(in crate) fn formula<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+#[inline]
+pub(crate) fn formula<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
 where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
 {
   i.split_at_position1(|item| !char_in_formula(item), ErrorKind::Alpha)
 }
 
-pub(in crate) fn simple_multi<'a>(
+#[inline]
+pub(crate) fn simple_multi<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, &'a str, Error<&'a str>> {
@@ -273,7 +281,7 @@ pub(in crate) fn simple_multi<'a>(
       space,
       char('"'),
       take_while(move |c| c != '"'),
-      take(1usize),
+      take(1_usize),
       space,
       char(';'),
       comment_space_newline,
@@ -285,7 +293,8 @@ pub(in crate) fn simple_multi<'a>(
   )(i)
 }
 
-pub(in crate) fn simple<'a>(
+#[inline]
+pub(crate) fn simple<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, &'a str, Error<&'a str>> {
@@ -309,7 +318,8 @@ pub(in crate) fn simple<'a>(
   )(i)
 }
 
-fn complex_complex<'a>(i: &'a str) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>> {
+#[inline]
+fn complex_complex(i: &str) -> IResult<&str, Vec<&str>, Error<&str>> {
   let (input, words) = unquote(i)?;
   Ok((
     input,
@@ -317,7 +327,7 @@ fn complex_complex<'a>(i: &'a str) -> IResult<&'a str, Vec<&'a str>, Error<&'a s
       .split(',')
       .filter_map(|s| {
         let _s = s.trim();
-        if _s == "" {
+        if _s.is_empty() {
           None
         } else {
           Some(_s)
@@ -327,7 +337,8 @@ fn complex_complex<'a>(i: &'a str) -> IResult<&'a str, Vec<&'a str>, Error<&'a s
   ))
 }
 
-pub(in crate) fn complex<'a>(
+#[inline]
+pub(crate) fn complex<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>> {
@@ -352,11 +363,10 @@ pub(in crate) fn complex<'a>(
       *line_num += n0 + n1;
       let mut vec: Vec<&'a str> = res
         .into_iter()
-        .map(|(v, (_, _, n))| {
+        .flat_map(|(v, (_, _, n))| {
           *line_num += n;
           v
         })
-        .flatten()
         .collect();
       if let Some((last_vec, n)) = last {
         *line_num += n;
@@ -367,20 +377,25 @@ pub(in crate) fn complex<'a>(
   )(i)
 }
 
-#[test]
-fn key_test() {
-  use nom::error::VerboseError;
-  println!("{:?}", comment_space_newline("\n\r\t\n : b ; "));
-  println!("{:?}", simple(" : b; }", &mut 1));
-  println!("{:?}", simple(" : iwww ; ", &mut 1));
-  println!("{:?}", simple(" : 0.3 * VDD ;", &mut 1));
-  println!("{:?}", key::<VerboseError<&str>>("iwww "));
-  println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
-  println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));
-  println!("{:?}", key::<VerboseError<&str>>("iw_w2w';"));
+#[cfg(test)]
+mod test_key {
+  use super::*;
+  #[test]
+  fn test1() {
+    use nom::error::VerboseError;
+    println!("{:?}", comment_space_newline("\n\r\t\n : b ; "));
+    println!("{:?}", simple(" : b; }", &mut 1));
+    println!("{:?}", simple(" : iwww ; ", &mut 1));
+    println!("{:?}", simple(" : 0.3 * VDD ;", &mut 1));
+    println!("{:?}", key::<VerboseError<&str>>("iwww "));
+    println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
+    println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));
+    println!("{:?}", key::<VerboseError<&str>>("iw_w2w';"));
+  }
 }
 
-pub(in crate) fn title<'a>(
+#[inline]
+pub(crate) fn title<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, Vec<ArcStr>, Error<&'a str>> {
@@ -401,12 +416,17 @@ pub(in crate) fn title<'a>(
   )(i)
 }
 
-pub(in crate) fn end_group<'a>(i: &'a str) -> IResult<&'a str, (), Error<&'a str>> {
+#[inline]
+pub(crate) fn end_group(i: &str) -> IResult<&str, (), Error<&str>> {
   map(char('}'), |_| ())(i)
 }
 
-#[test]
-fn end_group_test() {
-  println!("{:?}", end_group("}"));
-  println!("{:?}", end_group("}\n"));
+#[cfg(test)]
+mod test_end_group {
+  use super::*;
+  #[test]
+  fn test1() {
+    println!("{:?}", end_group("}"));
+    println!("{:?}", end_group("}\n"));
+  }
 }

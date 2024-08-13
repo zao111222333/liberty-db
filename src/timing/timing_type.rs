@@ -95,7 +95,7 @@ use crate::{ast::SimpleAttri, expression::logic, types::MaxMin};
 ///         </tr>
 ///     </tbody>
 /// </table>
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ArcCombinational {
   /// `combinational`(`Defualt`)/
@@ -184,18 +184,6 @@ impl Display for ArcCombinational {
   }
 }
 
-impl PartialEq for ArcCombinational {
-  #[inline]
-  fn eq(&self, other: &Self) -> bool {
-    match (self, other) {
-      (Self::Combinational(l0), Self::Combinational(r0)) => l0 == r0,
-      (Self::ThreeStateDisable(l0), Self::ThreeStateDisable(r0)) => l0 == r0,
-      (Self::ThreeStateEnable(l0), Self::ThreeStateEnable(r0)) => l0 == r0,
-      _ => false,
-    }
-  }
-}
-
 /// # Sequential Timing Arcs
 ///
 /// <a name ="reference_link" href="
@@ -211,7 +199,7 @@ impl PartialEq for ArcCombinational {
 /// </script>
 ///
 /// ## Example
-/// A sample library with the timing_type attribute and minimum_pulse_width and minimum_period values.
+/// A sample library with the `timing_type` attribute and `minimum_pulse_width` and `minimum_period` values.
 /// ``` liberty
 /// library(ASIC) {  
 ///     ...  
@@ -256,7 +244,7 @@ impl PartialEq for ArcCombinational {
 ///     } /* end cell */
 /// } /* end library */
 /// ```
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ArcSequential {
   /// `rising_edge`/
@@ -279,7 +267,7 @@ pub enum ArcSequential {
   ///
   /// Preset arcs affect only the rise arrival time of the arc’s endpoint pin.
   /// A preset arc implies that you are asserting a logic 1 on the output pin
-  /// when the designated related_pin is asserted.
+  /// when the designated `related_pin` is asserted.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -293,7 +281,7 @@ pub enum ArcSequential {
   ///
   /// Clear arcs affect only the fall arrival time of the arc’s endpoint pin.
   /// A clear arc implies that you are asserting a logic 0 on the output pin
-  /// when the designated related_pin is asserted.
+  /// when the designated `related_pin` is asserted.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -508,26 +496,6 @@ impl Display for ArcSequential {
   }
 }
 
-impl PartialEq for ArcSequential {
-  #[inline]
-  fn eq(&self, other: &Self) -> bool {
-    match (self, other) {
-      (Self::Edge(l0), Self::Edge(r0)) => l0 == r0,
-      (Self::Preset, Self::Preset) => true,
-      (Self::Clear, Self::Clear) => true,
-      (Self::Hold(l0), Self::Hold(r0)) => l0 == r0,
-      (Self::Setup(l0), Self::Setup(r0)) => l0 == r0,
-      (Self::Recovery(l0), Self::Recovery(r0)) => l0 == r0,
-      (Self::Skew(l0), Self::Skew(r0)) => l0 == r0,
-      (Self::Removal(l0), Self::Removal(r0)) => l0 == r0,
-      (Self::MinPulseWidth, Self::MinPulseWidth) => true,
-      (Self::MinimumPeriod, Self::MinimumPeriod) => true,
-      (Self::ClockTreePath(l0), Self::ClockTreePath(r0)) => l0 == r0,
-      _ => false,
-    }
-  }
-}
-
 /// # Nonsequential Timing Arcs
 ///
 /// In some nonsequential cells, the setup and hold timing constraints are specified
@@ -545,7 +513,7 @@ impl PartialEq for ArcSequential {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ArcNonSequential {
   /// `non_seq_setup_rising`/
@@ -607,17 +575,6 @@ impl Display for ArcNonSequential {
   }
 }
 
-impl PartialEq for ArcNonSequential {
-  #[inline]
-  fn eq(&self, other: &Self) -> bool {
-    match (self, other) {
-      (Self::NonSeqSetup(l0), Self::NonSeqSetup(r0)) => l0 == r0,
-      (Self::NonSeqHold(l0), Self::NonSeqHold(r0)) => l0 == r0,
-      _ => false,
-    }
-  }
-}
-
 /// # No-Change Timing Arcs
 ///
 /// This feature models the timing requirement of latch devices with latch-enable signals.
@@ -635,7 +592,7 @@ impl PartialEq for ArcNonSequential {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ArcNoChange {
   /// `nochange_high_high`/
@@ -691,15 +648,6 @@ impl Display for ArcNoChange {
   }
 }
 
-impl PartialEq for ArcNoChange {
-  #[inline]
-  fn eq(&self, other: &Self) -> bool {
-    match (self, other) {
-      (Self::NoChange(l0, l1), Self::NoChange(r0, r1)) => l0 == r0 && l1 == r1,
-    }
-  }
-}
-
 /// The `timing_type` attribute distinguishes between combinational
 /// and sequential cells by defining the type of timing arc.
 /// If this attribute is not assigned, the cell is considered combinational (Default).
@@ -738,10 +686,10 @@ impl PartialEq for ArcNoChange {
 /// timing arcs. For information about when to use the different types, see the
 /// *Synopsys Liberty User Guide*.
 ///
-/// + [Combinational](crate::timing::ArcCombinational)
-/// + [Sequential](crate::timing::ArcSequential)
-/// + [NonSequential](crate::timing::ArcNonSequential)
-/// + [NoChange](crate::timing::ArcNoChange)
+/// + [`Combinational`](crate::timing::ArcCombinational)
+/// + [`Sequential`](crate::timing::ArcSequential)
+/// + [`NonSequential`](crate::timing::ArcNonSequential)
+/// + [`NoChange`](crate::timing::ArcNoChange)
 ///
 /// #### Syntax
 /// `timing_type : combinational | combinational_rise | combinational_fall | three_state_disable |
@@ -755,13 +703,13 @@ impl PartialEq for ArcNoChange {
 // #[derive(liberty_macros::SingleSimple)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimingType {
-  /// [Combinational](crate::timing::ArcCombinational)
+  /// [`Combinational`](crate::timing::ArcCombinational)
   Combinational(ArcCombinational),
-  /// [Sequential](crate::timing::ArcSequential)
+  /// [`Sequential`](crate::timing::ArcSequential)
   Sequential(ArcSequential),
-  /// [NonSequential](crate::timing::ArcNonSequential)
+  /// [`NonSequential`](crate::timing::ArcNonSequential)
   NonSequential(ArcNonSequential),
-  /// [NoChange](crate::timing::ArcNoChange)
+  /// [`NoChange`](crate::timing::ArcNoChange)
   NoChange(ArcNoChange),
 }
 
@@ -777,7 +725,7 @@ impl SimpleAttri for TimingType {}
 
 impl FromStr for TimingType {
   type Err = core::fmt::Error;
-
+  #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s {
       ArcCombinational::COMBINATIONAL => Ok(Self::COMBINATIONAL),
@@ -824,108 +772,108 @@ impl Display for TimingType {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     match self {
-      TimingType::Combinational(t) => t.fmt(f),
-      TimingType::Sequential(t) => t.fmt(f),
-      TimingType::NonSequential(t) => t.fmt(f),
-      TimingType::NoChange(t) => t.fmt(f),
+      Self::Combinational(t) => t.fmt(f),
+      Self::Sequential(t) => t.fmt(f),
+      Self::NonSequential(t) => t.fmt(f),
+      Self::NoChange(t) => t.fmt(f),
     }
   }
 }
 
 impl TimingType {
-  /// COMBINATIONAL
+  /// `COMBINATIONAL`
   pub const COMBINATIONAL: Self =
     Self::Combinational(ArcCombinational::Combinational(None));
-  /// COMBINATIONAL_RISE
+  /// `COMBINATIONAL_RISE`
   pub const COMBINATIONAL_RISE: Self =
     Self::Combinational(ArcCombinational::Combinational(Some(logic::Edge::Rise)));
-  /// COMBINATIONAL_FALL
+  /// `COMBINATIONAL_FALL`
   pub const COMBINATIONAL_FALL: Self =
     Self::Combinational(ArcCombinational::Combinational(Some(logic::Edge::Fall)));
-  /// THREE_STATE_DISABLE
+  /// `THREE_STATE_DISABLE`
   pub const THREE_STATE_DISABLE: Self =
     Self::Combinational(ArcCombinational::ThreeStateDisable(None));
-  /// THREE_STATE_DISABLE_RISE
+  /// `THREE_STATE_DISABLE_RISE`
   pub const THREE_STATE_DISABLE_RISE: Self =
     Self::Combinational(ArcCombinational::ThreeStateDisable(Some(logic::Edge::Rise)));
-  /// THREE_STATE_DISABLE_FALL
+  /// `THREE_STATE_DISABLE_FALL`
   pub const THREE_STATE_DISABLE_FALL: Self =
     Self::Combinational(ArcCombinational::ThreeStateDisable(Some(logic::Edge::Fall)));
-  /// THREE_STATE_ENABLE
+  /// `THREE_STATE_ENABLE`
   pub const THREE_STATE_ENABLE: Self =
     Self::Combinational(ArcCombinational::ThreeStateEnable(None));
-  /// THREE_STATE_ENABLE_RISE
+  /// `THREE_STATE_ENABLE_RISE`
   pub const THREE_STATE_ENABLE_RISE: Self =
     Self::Combinational(ArcCombinational::ThreeStateEnable(Some(logic::Edge::Rise)));
-  /// THREE_STATE_ENABLE_FALL
+  /// `THREE_STATE_ENABLE_FALL`
   pub const THREE_STATE_ENABLE_FALL: Self =
     Self::Combinational(ArcCombinational::ThreeStateEnable(Some(logic::Edge::Fall)));
-  /// RISING_EDGE
+  /// `RISING_EDGE`
   pub const RISING_EDGE: Self = Self::Sequential(ArcSequential::Edge(logic::Edge::Rise));
-  /// FALLING_EDGE
+  /// `FALLING_EDGE`
   pub const FALLING_EDGE: Self = Self::Sequential(ArcSequential::Edge(logic::Edge::Fall));
-  /// PRESET
+  /// `PRESET`
   pub const PRESET: Self = Self::Sequential(ArcSequential::Preset);
-  /// CLEAR
+  /// `CLEAR`
   pub const CLEAR: Self = Self::Sequential(ArcSequential::Clear);
-  /// HOLD_RISING
+  /// `HOLD_RISING`
   pub const HOLD_RISING: Self = Self::Sequential(ArcSequential::Hold(logic::Edge::Rise));
-  /// HOLD_FALLING
+  /// `HOLD_FALLING`
   pub const HOLD_FALLING: Self = Self::Sequential(ArcSequential::Hold(logic::Edge::Fall));
-  /// SETUP_RISING
+  /// `SETUP_RISING`
   pub const SETUP_RISING: Self =
     Self::Sequential(ArcSequential::Setup(logic::Edge::Rise));
-  /// SETUP_FALLING
+  /// `SETUP_FALLING`
   pub const SETUP_FALLING: Self =
     Self::Sequential(ArcSequential::Setup(logic::Edge::Fall));
-  /// RECOVERY_RISING
+  /// `RECOVERY_RISING`
   pub const RECOVERY_RISING: Self =
     Self::Sequential(ArcSequential::Recovery(logic::Edge::Rise));
-  /// RECOVERY_FALLING
+  /// `RECOVERY_FALLING`
   pub const RECOVERY_FALLING: Self =
     Self::Sequential(ArcSequential::Recovery(logic::Edge::Fall));
-  /// SKEW_RISING
+  /// `SKEW_RISING`
   pub const SKEW_RISING: Self = Self::Sequential(ArcSequential::Skew(logic::Edge::Rise));
-  /// SKEW_FALLING
+  /// `SKEW_FALLING`
   pub const SKEW_FALLING: Self = Self::Sequential(ArcSequential::Skew(logic::Edge::Fall));
-  /// REMOVAL_RISING
+  /// `REMOVAL_RISING`
   pub const REMOVAL_RISING: Self =
     Self::Sequential(ArcSequential::Removal(logic::Edge::Rise));
-  /// REMOVAL_FALLING
+  /// `REMOVAL_FALLING`
   pub const REMOVAL_FALLING: Self =
     Self::Sequential(ArcSequential::Removal(logic::Edge::Fall));
-  /// MIN_PULSE_WIDTH
+  /// `MIN_PULSE_WIDTH`
   pub const MIN_PULSE_WIDTH: Self = Self::Sequential(ArcSequential::MinPulseWidth);
-  /// MINIMUM_PERIOD
+  /// `MINIMUM_PERIOD`
   pub const MINIMUM_PERIOD: Self = Self::Sequential(ArcSequential::MinimumPeriod);
-  /// MAX_CLOCK_TREE_PATH
+  /// `MAX_CLOCK_TREE_PATH`
   pub const MAX_CLOCK_TREE_PATH: Self =
     Self::Sequential(ArcSequential::ClockTreePath(MaxMin::Max));
-  /// MIN_CLOCK_TREE_PATH
+  /// `MIN_CLOCK_TREE_PATH`
   pub const MIN_CLOCK_TREE_PATH: Self =
     Self::Sequential(ArcSequential::ClockTreePath(MaxMin::Min));
-  /// NON_SEQ_SETUP_RISING
+  /// `NON_SEQ_SETUP_RISING`
   pub const NON_SEQ_SETUP_RISING: Self =
     Self::NonSequential(ArcNonSequential::NonSeqSetup(logic::Edge::Rise));
-  /// NON_SEQ_SETUP_FALLING
+  /// `NON_SEQ_SETUP_FALLING`
   pub const NON_SEQ_SETUP_FALLING: Self =
     Self::NonSequential(ArcNonSequential::NonSeqSetup(logic::Edge::Fall));
-  /// NON_SEQ_HOLD_RISING
+  /// `NON_SEQ_HOLD_RISING`
   pub const NON_SEQ_HOLD_RISING: Self =
     Self::NonSequential(ArcNonSequential::NonSeqHold(logic::Edge::Rise));
-  /// NON_SEQ_HOLD_FALLING
+  /// `NON_SEQ_HOLD_FALLING`
   pub const NON_SEQ_HOLD_FALLING: Self =
     Self::NonSequential(ArcNonSequential::NonSeqHold(logic::Edge::Fall));
-  /// NOCHANGE_HIGH_HIGH
+  /// `NOCHANGE_HIGH_HIGH`
   pub const NOCHANGE_HIGH_HIGH: Self =
     Self::NoChange(ArcNoChange::NoChange(logic::Level::High, logic::Level::High));
-  /// NOCHANGE_HIGH_LOW
+  /// `NOCHANGE_HIGH_LOW`
   pub const NOCHANGE_HIGH_LOW: Self =
     Self::NoChange(ArcNoChange::NoChange(logic::Level::High, logic::Level::Low));
-  /// NOCHANGE_LOW_HIGH
+  /// `NOCHANGE_LOW_HIGH`
   pub const NOCHANGE_LOW_HIGH: Self =
     Self::NoChange(ArcNoChange::NoChange(logic::Level::Low, logic::Level::High));
-  /// NOCHANGE_LOW_LOW
+  /// `NOCHANGE_LOW_LOW`
   pub const NOCHANGE_LOW_LOW: Self =
     Self::NoChange(ArcNoChange::NoChange(logic::Level::Low, logic::Level::Low));
   const LIST: [Self; 35] = [
@@ -965,7 +913,7 @@ impl TimingType {
     Self::NOCHANGE_LOW_HIGH,
     Self::NOCHANGE_LOW_LOW,
   ];
-  /// iter
+  /// `iter`
   #[inline]
   pub fn iter() -> impl Iterator<Item = Self> {
     Self::LIST.iter().copied()

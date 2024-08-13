@@ -1,15 +1,18 @@
-use core::fmt::Display;
-use core::hash::Hash;
-use std::ops::{Deref, DerefMut};
-use std::str::FromStr;
-
 use crate::ast::SimpleAttri;
+use core::{
+  cmp::Ordering,
+  fmt,
+  hash::Hash,
+  ops::{Deref, DerefMut},
+  str::FromStr,
+};
 
-/// LogicLike
-pub trait LogicLike: Display + core::fmt::Debug {
+/// `LogicLike`
+pub trait LogicLike: fmt::Display + fmt::Debug {
   /// inverse
   ///
   /// 0->1, 1->0
+  #[must_use]
   fn inverse(&self) -> Self;
   /// Fall(_) == Fall(_)
   fn variant_eq(&self, other: &Self) -> bool;
@@ -45,11 +48,11 @@ impl LogicLike for Level {
       Self::High => Self::Low,
     }
   }
+  #[allow(clippy::match_like_matches_macro)]
   #[inline]
   fn variant_eq(&self, other: &Self) -> bool {
     match (self, other) {
-      (Level::High, Level::High) => true,
-      (Level::Low, Level::Low) => true,
+      (Self::High, Self::High) | (Self::Low, Self::Low) => true,
       _ => false,
     }
   }
@@ -85,6 +88,7 @@ impl LogicLike for Edge {
       Self::Rise => Self::Fall,
     }
   }
+  #[allow(clippy::match_like_matches_macro)]
   #[inline]
   fn variant_eq(&self, other: &Self) -> bool {
     match (self, other) {
@@ -96,7 +100,7 @@ impl LogicLike for Edge {
 }
 
 /// State
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[derive(strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum IllegalType {
@@ -105,77 +109,83 @@ pub enum IllegalType {
   RiseFallAtLevel,
 }
 impl IllegalType {
+  #[must_use]
   #[inline]
-  pub fn combine(a: &Option<Self>, b: &Option<Self>) -> Option<Self> {
+  pub const fn combine(a: &Option<Self>, b: &Option<Self>) -> Option<Self> {
     match (a, b) {
       (None, None) => None,
       (None, Some(b_t)) => Some(*b_t),
       (Some(a_t), None) => Some(*a_t),
-      (Some(a_t), Some(b_t)) => {
-        match (a_t, b_t) {
-          // FIXME:
-          (a_vaild, _b_vaild) => Some(*a_vaild),
-        }
+      (Some(a_t), Some(_)) => {
+        Some(*a_t)
+        // match (a_t, b_t) {
+        //   // FIXME:
+        //   (a_vaild, _b_vaild) => Some(*a_vaild),
+        // }
       }
     }
   }
 }
 
-/// UnInit
+/// `UnInit`
 #[derive(Debug, Clone, Copy)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter)]
 #[derive(derivative::Derivative)]
 #[derivative(PartialEq, Hash, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum UnInit {
-  /// Unknown
+  /// `Unknown`
   #[strum(serialize = "x", serialize = "X")]
   Unknown(
     #[derivative(Hash = "ignore")]
     #[derivative(PartialEq = "ignore")]
     Option<IllegalType>,
   ),
-  /// HighImpedance
+  /// `HighImpedance`
   #[strum(serialize = "z", serialize = "Z")]
   HighImpedance,
 }
 
 impl UnInit {
-  /// Unknown
+  /// `Unknown`
   pub const X: Self = Self::Unknown(None);
-  /// Unknown
+  /// `HighImpedance`
   pub const Z: Self = Self::HighImpedance;
 }
 
 impl PartialOrd for UnInit {
-  fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+  #[inline]
+  fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
     Some(self.cmp(other))
   }
 }
 impl Ord for UnInit {
-  fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+  #[inline]
+  fn cmp(&self, other: &Self) -> Ordering {
     match (self, other) {
-      (UnInit::Unknown(_), UnInit::Unknown(_)) => std::cmp::Ordering::Equal,
-      (UnInit::Unknown(_), UnInit::HighImpedance) => std::cmp::Ordering::Greater,
-      (UnInit::HighImpedance, UnInit::Unknown(_)) => std::cmp::Ordering::Less,
-      (UnInit::HighImpedance, UnInit::HighImpedance) => std::cmp::Ordering::Equal,
+      (Self::Unknown(_), Self::HighImpedance) => Ordering::Greater,
+      (Self::HighImpedance, Self::Unknown(_)) => Ordering::Less,
+      (Self::Unknown(_), Self::Unknown(_))
+      | (Self::HighImpedance, Self::HighImpedance) => Ordering::Equal,
     }
   }
 }
 
-impl Display for UnInit {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+impl fmt::Display for UnInit {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      UnInit::Unknown(c) => match c {
-        Some(c) => write!(f, "X({})", c),
+      Self::Unknown(c) => match c {
+        Some(_c) => write!(f, "X({_c})"),
         None => write!(f, "X"),
       },
-      UnInit::HighImpedance => write!(f, "Z"),
+      Self::HighImpedance => write!(f, "Z"),
     }
   }
 }
 
 impl Default for UnInit {
+  #[inline]
   fn default() -> Self {
     Self::X
   }
@@ -185,17 +195,18 @@ impl LogicLike for UnInit {
   fn inverse(&self) -> Self {
     *self
   }
+  #[allow(clippy::match_like_matches_macro)]
   #[inline]
   fn variant_eq(&self, other: &Self) -> bool {
     match (self, other) {
-      (UnInit::Unknown(_), UnInit::Unknown(_)) => true,
-      (UnInit::HighImpedance, UnInit::HighImpedance) => true,
+      (Self::Unknown(_), Self::Unknown(_)) => true,
+      (Self::HighImpedance, Self::HighImpedance) => true,
       _ => false,
     }
   }
 }
 /// H L R F
-#[derive(Debug, Clone, Copy, PartialEq, Hash)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Normal {
   /// R F
@@ -204,14 +215,14 @@ pub enum Normal {
   Level(Level),
 }
 impl SimpleAttri for Normal {}
-impl Display for Normal {
+impl fmt::Display for Normal {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      Normal::Edge(Edge::Rise) => write!(f, "R"),
-      Normal::Edge(Edge::Fall) => write!(f, "F"),
-      Normal::Level(Level::High) => write!(f, "H"),
-      Normal::Level(Level::Low) => write!(f, "L"),
+      Self::Edge(Edge::Rise) => write!(f, "R"),
+      Self::Edge(Edge::Fall) => write!(f, "F"),
+      Self::Level(Level::High) => write!(f, "H"),
+      Self::Level(Level::Low) => write!(f, "L"),
     }
   }
 }
@@ -219,13 +230,11 @@ impl FromStr for Normal {
   type Err = strum::ParseError;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    match s.parse::<Edge>() {
-      Ok(s) => Ok(Self::Edge(s)),
-      _ => match s.parse::<Level>() {
-        Ok(s) => Ok(Self::Level(s)),
-        Err(_) => Err(strum::ParseError::VariantNotFound),
-      },
-    }
+    s.parse::<Edge>().map_or(
+      s.parse::<Level>()
+        .map_or(Err(strum::ParseError::VariantNotFound), |level| Ok(Self::Level(level))),
+      |edge| Ok(Self::Edge(edge)),
+    )
   }
 }
 impl Normal {
@@ -238,12 +247,12 @@ impl Normal {
   /// Low
   pub const L: Self = Self::Level(Level::L);
 }
-impl Into<State> for Normal {
+impl From<Normal> for State {
   #[inline]
-  fn into(self) -> State {
-    match self {
-      Normal::Edge(s) => State::Edge(s),
-      Normal::Level(s) => State::Level(s),
+  fn from(value: Normal) -> Self {
+    match value {
+      Normal::Edge(s) => Self::Edge(s),
+      Normal::Level(s) => Self::Level(s),
     }
   }
 }
@@ -283,17 +292,15 @@ impl FromStr for Static {
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     s.parse::<UnInit>().map_or(
-      match s.parse::<Level>() {
-        Ok(s) => Ok(Self::Level(s)),
-        Err(_) => Err(strum::ParseError::VariantNotFound),
-      },
-      |s| Ok(Self::UnInit(s)),
+      s.parse::<Level>()
+        .map_or(Err(strum::ParseError::VariantNotFound), |level| Ok(Self::Level(level))),
+      |uninit| Ok(Self::UnInit(uninit)),
     )
   }
 }
-impl Display for Static {
+impl fmt::Display for Static {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::UnInit(UnInit::HighImpedance) => write!(f, "Z"),
       Self::UnInit(UnInit::Unknown(_)) => write!(f, "X"),
@@ -315,9 +322,9 @@ pub enum State {
   /// H L
   Level(Level),
 }
-impl Display for State {
+impl fmt::Display for State {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::UnInit(s) => s.fmt(f),
       Self::Edge(s) => s.fmt(f),
@@ -396,7 +403,8 @@ impl State {
   //     _ => *self,
   //   }
   // }
-  /// get_illegal_type
+  /// `get_illegal_type`
+  #[allow(clippy::wildcard_enum_match_arm)]
   #[must_use]
   #[inline]
   pub const fn get_illegal_type(&self) -> Option<IllegalType> {
@@ -460,10 +468,9 @@ impl State {
       (_, Self::Edge(_)) | (Self::Edge(_), _) => {
         Self::UnInit(UnInit::Unknown(Some(IllegalType::RiseFallAtLevel)))
       }
-      (Self::UnInit(_), Self::UnInit(_))
-      | (Self::UnInit(_), Self::Level(_))
-      | (Self::Level(_), Self::UnInit(_)) => *end,
-      (Self::Level(bgn), Self::Level(end)) => match (bgn, end) {
+      (Self::UnInit(_) | Self::Level(_), Self::UnInit(_))
+      | (Self::UnInit(_), Self::Level(_)) => *end,
+      (Self::Level(_bgn), Self::Level(_end)) => match (_bgn, _end) {
         (Level::High, Level::High) => Self::Level(Level::High),
         (Level::High, Level::Low) => Self::Edge(Edge::Fall),
         (Level::Low, Level::High) => Self::Edge(Edge::Rise),
@@ -511,9 +518,9 @@ impl From<Vector> for Vec<State> {
   }
 }
 
-impl Display for Vector {
+impl fmt::Display for Vector {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     self.iter().fold(
       Ok(()),
       |result, state| result.and_then(|_| state.fmt(f)), // match state.get_change_pattern() {
@@ -556,8 +563,8 @@ impl LogicLike for Vector {
 //   Logic0,
 // }
 
-// impl core::fmt::Display for Operator1 {
-//   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+// impl fmt::Display for Operator1 {
+//   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 //     match self {
 //       Operator1::Not => write!(f, "{}", Self::NOT_LIST[0]),
 //       Operator1::Logic1 => write!(f, "{}", Self::LOGIC1_LIST[0]),
@@ -620,8 +627,8 @@ impl LogicLike for Vector {
 //   Xor,
 // }
 
-// impl core::fmt::Display for Operator2 {
-//   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+// impl fmt::Display for Operator2 {
+//   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 //     match self {
 //       Operator2::And => write!(f, "{}", Self::AND_LIST[0]),
 //       Operator2::Or => write!(f, "{}", Self::OR_LIST[0]),
@@ -890,14 +897,14 @@ impl LogicLike for Vector {
 //   /// TODO: to_expression
 //   pub fn to_expression(&self) -> BooleanExpression {
 //     let table = self.simplify();
-//     let _ = table;
+//      _ = table;
 //     todo!()
 //   }
 // }
 
-// impl core::fmt::Display for Table {
+// impl fmt::Display for Table {
 //   #[inline]
-//   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+//   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 //     use prettytable::{Row, Table};
 //     let mut table = Table::new();
 //     table.set_format(*util::format::FORMAT_NO_BORDER_BOX_CHARS);
@@ -907,7 +914,7 @@ impl LogicLike for Vector {
 //       v
 //     }));
 //     for (vec_in, state_out) in self.table.iter().sorted() {
-//       let _ = table.add_row(Row::from({
+//        _ = table.add_row(Row::from({
 //         let mut v: Vec<State> = vec_in.to_vec;
 //         v.push(state_out.clone());
 //         v
@@ -946,8 +953,8 @@ impl LogicLike for Vector {
 //   exclude_out_state: Option<HashSet<State>>,
 // }
 
-// impl core::fmt::Display for Searcher {
-//   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+// impl fmt::Display for Searcher {
+//   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 //     let print_hash_set = |name: &str, set: &HashSet<State>| -> String {
 //       let s = set
 //         .iter()
@@ -1003,10 +1010,10 @@ impl LogicLike for Vector {
 //             Some(set) => {
 //               let mut _set = set.clone();
 //               _set.extend(v.iter());
-//               let _ = map.insert(p.clone(), _set);
+//                _ = map.insert(p.clone(), _set);
 //             }
 //             None => {
-//               let _ = map.insert(p.clone(), v.iter().copied().collect());
+//                _ = map.insert(p.clone(), v.iter().copied().collect());
 //             }
 //           }
 //         }

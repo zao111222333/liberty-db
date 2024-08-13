@@ -58,7 +58,7 @@ pub struct Cell {
 }
 impl GroupFn for Cell {}
 
-#[allow(dead_code, unused_imports, unused)]
+#[cfg(test)]
 mod test {
   use super::Cell;
   /// Example 23 A multibit register containing four rising-edge-triggered D flip-flops
@@ -205,7 +205,7 @@ mod test {
     "#,
     );
   }
-  /// Example 27 shows a latch_bank  group for a multibit register containing four rising-edge-triggered D latches
+  /// Example 27 shows a `latch_bank`  group for a multibit register containing four rising-edge-triggered D latches
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=187.42&end=187.43
   /// ">Reference</a>

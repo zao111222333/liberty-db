@@ -147,7 +147,7 @@ pub struct Sensitization {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=89.5&end=89.29
 /// ">Reference</a>
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SensitizationVector {
   id: usize,
@@ -168,7 +168,7 @@ impl ComplexAttri for SensitizationVector {
     let states = match i.next() {
       Some(&s) => match s
         .split_ascii_whitespace()
-        .map(|term| term.parse::<logic::Static>())
+        .map(str::parse)
         .collect::<Result<Vec<logic::Static>, _>>()
       {
         Ok(states) => states,
@@ -201,65 +201,69 @@ impl ComplexAttri for SensitizationVector {
   }
 }
 
-#[test]
-fn sensitization() {
-  let (sense, _) = crate::ast::test_parse_group::<Sensitization>(
-    r#"(sensitization_nand2) {
+#[cfg(test)]
+mod test_sensitization {
+  use super::*;
+
+  #[test]
+  fn sensitization() {
+    let (sense, _) = crate::ast::test_parse_group::<Sensitization>(
+      r#"(sensitization_nand2) {
         pin_names ( IN1, IN2, OUT1 );
         vector ( 1, "0 0 1" );
         vector ( 2, "0 X 1" );
         vector ( 3, "Z 0 1" );
         vector ( 4, "1 1 0" );
       }"#,
-  );
-  assert_eq!(
-    sense.vector,
-    vec![
-      SensitizationVector {
-        id: 1,
-        states: vec![
-          logic::Static::Level(logic::Level::Low),
-          logic::Static::Level(logic::Level::Low),
-          logic::Static::Level(logic::Level::High),
-        ]
-      },
-      SensitizationVector {
-        id: 2,
-        states: vec![
-          logic::Static::Level(logic::Level::Low),
-          logic::Static::UnInit(logic::UnInit::Unknown(None)),
-          logic::Static::Level(logic::Level::High),
-        ]
-      },
-      SensitizationVector {
-        id: 3,
-        states: vec![
-          logic::Static::UnInit(logic::UnInit::HighImpedance),
-          logic::Static::Level(logic::Level::Low),
-          logic::Static::Level(logic::Level::High),
-        ]
-      },
-      SensitizationVector {
-        id: 4,
-        states: vec![
-          logic::Static::Level(logic::Level::High),
-          logic::Static::Level(logic::Level::High),
-          logic::Static::Level(logic::Level::Low),
-        ]
-      }
-    ]
-  );
-  let (sense1, _) = crate::ast::test_parse_group::<Sensitization>(
-    r#"(sensitization_nand2) {
+    );
+    assert_eq!(
+      sense.vector,
+      vec![
+        SensitizationVector {
+          id: 1,
+          states: vec![
+            logic::Static::Level(logic::Level::Low),
+            logic::Static::Level(logic::Level::Low),
+            logic::Static::Level(logic::Level::High),
+          ]
+        },
+        SensitizationVector {
+          id: 2,
+          states: vec![
+            logic::Static::Level(logic::Level::Low),
+            logic::Static::UnInit(logic::UnInit::Unknown(None)),
+            logic::Static::Level(logic::Level::High),
+          ]
+        },
+        SensitizationVector {
+          id: 3,
+          states: vec![
+            logic::Static::UnInit(logic::UnInit::HighImpedance),
+            logic::Static::Level(logic::Level::Low),
+            logic::Static::Level(logic::Level::High),
+          ]
+        },
+        SensitizationVector {
+          id: 4,
+          states: vec![
+            logic::Static::Level(logic::Level::High),
+            logic::Static::Level(logic::Level::High),
+            logic::Static::Level(logic::Level::Low),
+          ]
+        }
+      ]
+    );
+    let (sense1, _) = crate::ast::test_parse_group::<Sensitization>(
+      r#"(sensitization_nand2) {
         vector ( 1, "0 0 1" );
         vector ( 2, "0 X 9" );
         vector ( 3, "Z 0 1" );
         vector ( 4, "1 1 0" );
       }"#,
-  );
-  assert!(sense1.undefined.len() == 1);
+    );
+    assert!(sense1.undefined.len() == 1);
+  }
 }
-
 impl GroupFn for Sensitization {}
 
 /// Use the `voltage_map`  attribute to associate a voltage name
@@ -425,7 +429,7 @@ impl GroupFn for OutputVoltage {}
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DelayModel {
-  ///     table_lookup
+  /// `table_lookup`
   #[default]
   #[strum(serialize = "table_lookup")]
   TableLookup,
@@ -524,13 +528,13 @@ impl GroupFn for OperatingConditions {}
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TreeType {
-  /// best_case_tree
+  /// `best_case_tree`
   #[strum(serialize = "best_case_tree")]
   BestCaseTree,
-  /// balanced_tree
+  /// `balanced_tree`
   #[strum(serialize = "balanced_tree")]
   BalancedTree,
-  /// worst_case_tree
+  /// `worst_case_tree`
   #[strum(serialize = "worst_case_tree")]
   WorstCaseTree,
 }
@@ -655,10 +659,10 @@ pub struct DefineCellArea {
   #[id]
   pub area_name: ArcStr,
   /// The resource type can be
-  /// + pad_slots
-  /// + pad_input_driver_sites
-  /// + pad_output_driver_sites
-  /// + pad_driver_sites
+  /// + `pad_slots`
+  /// + `pad_input_driver_sites`
+  /// + `pad_output_driver_sites`
+  /// + `pad_driver_sites`
   ///
   /// Use the `pad_driver_sites` type when you do not need to discriminate between
   /// input and output pad driver sites.
@@ -668,10 +672,10 @@ pub struct DefineCellArea {
   pub resource_type: ResourceType,
 }
 /// The resource type can be
-/// + pad_slots
-/// + pad_input_driver_sites
-/// + pad_output_driver_sites
-/// + pad_driver_sites
+/// + `pad_slots`
+/// + `pad_input_driver_sites`
+/// + `pad_output_driver_sites`
+/// + `pad_driver_sites`
 ///
 /// Use the `pad_driver_sites` type when you do not need to discriminate between
 /// input and output pad driver sites.
@@ -684,16 +688,16 @@ pub struct DefineCellArea {
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ResourceType {
-  /// pad_slots
+  /// `pad_slots`
   #[strum(serialize = "pad_slots")]
   PadSlots,
-  /// pad_input_driver_sites
+  /// `pad_input_driver_sites`
   #[strum(serialize = "pad_input_driver_sites")]
   PadInputDriverSites,
-  /// pad_output_driver_sites
+  /// `pad_output_driver_sites`
   #[strum(serialize = "pad_output_driver_sites")]
   PadOutputDriverSites,
-  /// pad_driver_sites
+  /// `pad_driver_sites`
   #[strum(serialize = "pad_driver_sites")]
   PadDriverSites,
 }
@@ -912,18 +916,9 @@ impl ComplexAttri for FanoutLength {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let average_capacitance = i.next().and_then(|s| match s.parse() {
-      Ok(f) => Some(f),
-      Err(_) => None,
-    });
-    let standard_deviation = i.next().and_then(|s| match s.parse() {
-      Ok(f) => Some(f),
-      Err(_) => None,
-    });
-    let number_of_nets = i.next().and_then(|s| match s.parse() {
-      Ok(f) => Some(f),
-      Err(_) => None,
-    });
+    let average_capacitance = i.next().and_then(|s| s.parse().ok());
+    let standard_deviation = i.next().and_then(|s| s.parse().ok());
+    let number_of_nets = i.next().and_then(|s| s.parse().ok());
 
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);

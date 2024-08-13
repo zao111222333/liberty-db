@@ -57,7 +57,15 @@
     // Some explicitly allowed Clippy lints, must have clear reason to allow
     clippy::pattern_type_mismatch, // TODO: 
     clippy::partial_pub_fields,
+    clippy::single_char_lifetime_names,
+    clippy::iter_over_hash_type,
+    clippy::separated_literal_suffix,
+    clippy::single_call_fn,
+    clippy::pub_use,
     clippy::pub_with_shorthand,
+    clippy::ignored_unit_patterns,
+    clippy::mod_module_files,
+    clippy::unreachable,
     clippy::missing_trait_methods,
     clippy::min_ident_chars,
     clippy::missing_docs_in_private_items,
@@ -87,13 +95,28 @@
     clippy::needless_return,
     clippy::same_name_method,
     clippy::missing_inline_in_public_items,
-    clippy::single_call_fn,
     clippy::doc_markdown,
     dead_code,
     missing_copy_implementations, // Copy may cause unnecessary memory copy
     // missing_docs,
     // single_use_lifetimes, // TODO: fix lifetime names only used once
     unused_qualifications,
+)]
+#![cfg_attr(
+  test,
+  allow(
+    dead_code,
+    unused_imports,
+    unused,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::too_many_lines,
+    clippy::non_ascii_literal,
+    clippy::needless_raw_strings,
+    clippy::cast_possible_truncation,
+    clippy::as_conversions,
+    clippy::needless_raw_string_hashes,
+  )
 )]
 
 #[macro_use]

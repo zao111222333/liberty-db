@@ -13,7 +13,7 @@ const INDENTATION_LUT: [&str; 10] = [
   "                ",
   "                  ",
 ];
-/// CodeFormatter with indent
+/// `CodeFormatter` with indent
 #[derive(Debug)]
 pub struct CodeFormatter<'a, F> {
   f: &'a mut F,
@@ -31,11 +31,7 @@ impl<F: Write> Write for CodeFormatter<'_, F> {
         '\n',
         format!(
           "\n{}",
-          if self.level >= N {
-            &INDENTATION_LUT[N - 1]
-          } else {
-            &INDENTATION_LUT[self.level]
-          }
+          INDENTATION_LUT.get(self.level).unwrap_or(&INDENTATION_LUT[N - 1])
         )
         .as_str()
       )

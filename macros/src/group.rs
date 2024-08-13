@@ -436,6 +436,7 @@ pub(crate) fn inner(
             #attri_comments
           }
           #[doc(hidden)]
+          #[allow(clippy::unused_unit)]
           impl crate::ast::GroupAttri for #ident {
             type Name=#name_ident;
             type Comments=#comments_ident;
@@ -525,6 +526,6 @@ fn main() {
     t2: Option<TimingType>,
   }"#;
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();
-  let out = inner(&ast, false).unwrap_or_else(|err| err.to_compile_error().into());
+  let out = inner(ast, false).unwrap_or_else(|err| err.to_compile_error());
   println!("{}", out)
 }

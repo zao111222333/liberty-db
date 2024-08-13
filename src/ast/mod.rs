@@ -31,40 +31,43 @@ pub type ComplexWrapper = Vec<Vec<ArcStr>>;
 pub struct GroupWrapper {
   /// title
   pub title: Vec<ArcStr>,
-  /// attr_list
+  /// `attr_list`
   pub attr_list: AttributeList,
 }
-/// type for UndefinedAttributes, same to `attri_list`
+/// type for Undefined `AttributeList`
 pub type AttributeList = Vec<(ArcStr, AttriValue)>;
-/// AttriValue for undefined_attribute/serialization
+/// `AttriValue` for `undefined_attribute/serialization`
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum AttriValue {
-  ///
+  /// `Simple`
   Simple(SimpleWrapper),
-  ///
+  /// `Complex`
   Complex(ComplexWrapper),
-  ///
+  /// `Group`
   Group(GroupWrapper),
 }
 
-/// Error for LinkedGroup
+/// Error for `LinkedGroup`
 #[derive(Debug)]
 #[derive(thiserror::Error)]
 pub enum LinkError {
-  /// Not Find
+  /// `Not Find`
   #[error("Can not find in hashset!")]
   NotFind,
-  /// BorrowError
+  /// `BorrowError`
   #[error("{0}")]
   BorrowError(core::cell::BorrowError),
 }
 
 impl PartialEq for LinkError {
+  #[allow(clippy::match_like_matches_macro)]
+  #[inline]
   fn eq(&self, other: &Self) -> bool {
     match (self, other) {
-      (Self::BorrowError(_), Self::BorrowError(_)) => true,
-      (LinkError::NotFind, LinkError::NotFind) => true,
+      (Self::NotFind, Self::NotFind) | (Self::BorrowError(_), Self::BorrowError(_)) => {
+        true
+      }
       _ => false,
     }
   }
@@ -102,21 +105,19 @@ impl PartialEq for LinkError {
 //   }
 // }
 
+type SimpleParseErr<'a, T> =
+  IResult<&'a str, Result<T, (<T as FromStr>::Err, AttriValue)>, Error<&'a str>>;
+
 /// Simple Attribute in Liberty
 pub trait SimpleAttri: Sized + Display + FromStr {
-  /// Parser error
-  /// basic parser
+  /// basic `parser`
   #[inline]
   fn parse(s: &str) -> Result<Self, <Self as FromStr>::Err> {
     FromStr::from_str(s)
   }
-  /// nom_parse, auto implement
+  /// `nom_parse`, auto implement
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    line_num: &mut usize,
-  ) -> IResult<&'a str, Result<Self, (<Self as FromStr>::Err, AttriValue)>, Error<&'a str>>
-  {
+  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> SimpleParseErr<'a, Self> {
     let (input, simple) = parser::simple(i, line_num)?;
     match Self::parse(simple) {
       Ok(s) => Ok((input, Ok(s))),
@@ -124,12 +125,12 @@ pub trait SimpleAttri: Sized + Display + FromStr {
     }
   }
   // TODO: efficent?
-  /// to_wrapper, auto implement
+  /// `to_wrapper`, auto implement
   #[inline]
   fn to_wrapper(&self) -> SimpleWrapper {
-    format!("{self}").into()
+    self.to_string().into()
   }
-  /// fmt_liberty
+  /// `fmt_liberty`
   #[inline]
   fn fmt_liberty<T: Write>(
     &self,
@@ -140,13 +141,13 @@ pub trait SimpleAttri: Sized + Display + FromStr {
   }
 }
 
-/// ComplexParseError
+/// `ComplexParseError`
 #[derive(thiserror::Error, Debug)]
 pub enum ComplexParseError {
-  /// ParseFloatError
+  /// `ParseFloatError`
   #[error("{0}")]
   Float(ParseNotNanError<ParseFloatError>),
-  /// ParseIntError
+  /// `ParseIntError`
   #[error("{0}")]
   Int(ParseIntError),
   /// title length mismatch
@@ -160,21 +161,21 @@ pub enum ComplexParseError {
   UnsupportedWord,
 }
 
-/// NameAttri
+/// `NameAttri`
 pub trait NameAttri: Sized + Clone {
   /// basic parser
   fn parse(v: Vec<ArcStr>) -> Result<Self, IdError>;
-  /// name to_vec
+  /// name `to_vec`
   fn to_vec(self) -> Vec<ArcStr>;
 }
 
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
-  /// basic parser
+  /// basic `parser`
   fn parse(v: &[&str]) -> Result<Self, ComplexParseError>;
-  /// to_wrapper
+  /// `to_wrapper`
   fn to_wrapper(&self) -> ComplexWrapper;
-  /// nom_parse, auto implement
+  /// `nom_parse`, auto implement
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -192,7 +193,7 @@ pub trait ComplexAttri: Sized {
       )),
     }
   }
-  /// fmt_liberty
+  /// `fmt_liberty`
   #[inline]
   fn fmt_liberty<T: Write>(
     &self,
@@ -203,18 +204,18 @@ pub trait ComplexAttri: Sized {
   }
 }
 
-/// Group Id
-// pub type GroupId<T> = Arc<<T as HashedGroup>::Id>;
+/// `GroupComments`
 pub type GroupComments<T> = <T as GroupAttri>::Comments;
 
-/// AttriComment
+/// `AttriComment`
 pub type AttriComment = Vec<ArcStr>;
 /// Group Functions
 pub trait GroupFn {
-  /// post_process call back
+  /// `post_process` call back
+  #[inline]
   fn post_process(&mut self) {}
 }
-/// GroupAttri
+/// `GroupAttri`
 pub trait GroupAttri: Sized {
   /// group Name
   type Name;
@@ -224,12 +225,12 @@ pub trait GroupAttri: Sized {
   fn name(&self) -> Self::Name;
   /// get name
   fn set_name(&mut self, name: Self::Name);
-  /// nom_parse, will be implemented by macros
+  /// `nom_parse`, will be implemented by macros
   fn nom_parse<'a>(
     i: &'a str,
     line_num: &mut usize,
   ) -> IResult<&'a str, Result<Self, IdError>, Error<&'a str>>;
-  /// fmt_liberty
+  /// `fmt_liberty`
   fn fmt_liberty<T: Write>(
     &self,
     key: &str,
@@ -265,7 +266,7 @@ pub trait NamedGroup: GroupAttri {
   fn parse(v: Vec<ArcStr>) -> Result<Self::Name, IdError>;
   /// name to Vec<ArcStr>
   fn name2vec(name: Self::Name) -> Vec<ArcStr>;
-  /// fmt_liberty
+  /// `fmt_liberty`
   #[inline]
   fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
     write!(
@@ -282,10 +283,10 @@ pub trait NamedGroup: GroupAttri {
 fn display_nom_error(e: &nom::Err<Error<&str>>) -> ArcStr {
   match e {
     nom::Err::Incomplete(_) => e.to_string(),
-    nom::Err::Failure(e) | nom::Err::Error(e) => format!(
+    nom::Err::Failure(_e) | nom::Err::Error(_e) => format!(
       "type[{}] at[{}]",
-      e.code.description(),
-      e.input.lines().next().unwrap_or("")
+      _e.code.description(),
+      _e.input.lines().next().unwrap_or("")
     ),
   }
   .into()
@@ -333,12 +334,14 @@ pub trait Format {
     f: &mut CodeFormatter<'_, T>,
   ) -> core::fmt::Result;
   /// `.db` format
+  #[inline]
   fn db<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
     _ = key;
     _ = f;
     todo!()
   }
   /// `.json` format
+  #[inline]
   fn json<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
     _ = key;
     _ = f;
@@ -355,9 +358,11 @@ impl Format for AttriComment {
     _: &str,
     f: &mut CodeFormatter<'_, T>,
   ) -> core::fmt::Result {
-    match self.len() {
-      0 => Ok(()),
-      _ => write!(f, "\n/* {} */", self.join("\n").replace('\n', "\n* ")),
+    if self.is_empty() {
+      Ok(())
+    } else {
+      // TODO: NOT use replace
+      write!(f, "\n/* {} */", self.join("\n").replace('\n', "\n* "))
     }
   }
 }

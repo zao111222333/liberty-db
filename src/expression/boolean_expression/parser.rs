@@ -1,3 +1,9 @@
+#![allow(
+  clippy::non_ascii_literal,
+  clippy::indexing_slicing,
+  clippy::arithmetic_side_effects,
+  clippy::wildcard_enum_match_arm
+)]
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use nom::{
   branch::alt,
@@ -113,8 +119,6 @@ pub(super) fn _fmt(expr: &Expr, f: &mut core::fmt::Formatter<'_>) -> core::fmt::
         _ => _fmt(e2, f),
       }
     }
-    Expr::Imp(_, _) => todo!(),
-    Expr::Iff(_, _) => todo!(),
     Expr::Cond(e1, e2, e3) => {
       write!(f, "(")?;
       _fmt(e1, f)?;
@@ -124,11 +128,12 @@ pub(super) fn _fmt(expr: &Expr, f: &mut core::fmt::Formatter<'_>) -> core::fmt::
       _fmt(e3, f)?;
       write!(f, ")")
     }
+    Expr::Imp(_, _) | Expr::Iff(_, _) => unreachable!(),
   }
 }
 
 #[derive(Debug, Eq, PartialEq)]
-pub(crate) enum SingleOp {
+enum SingleOp {
   Not,
   // !A = A'
   BackNot,
@@ -136,13 +141,13 @@ pub(crate) enum SingleOp {
   Zero,
 }
 #[derive(Debug, Eq, PartialEq)]
-pub(crate) enum BinaryOp {
+enum BinaryOp {
   Or,
   And,
   Xor,
 }
 #[derive(Debug, Eq, PartialEq)]
-pub(super) enum Token {
+enum Token {
   Space,
   SingleOp(SingleOp),
   BinaryOp(BinaryOp),
@@ -225,34 +230,34 @@ fn token_vec(i: &str) -> IResult<&str, Vec<Token>> {
   map(many1(alt((space, open_b, single_op, binary_op, node))), space_and)(i)
 }
 
-///
-#[derive(Clone, Copy, Debug, thiserror::Error, PartialEq)]
+/// `BoolExprErr`
+#[derive(Clone, Copy, Debug, thiserror::Error, PartialEq, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum BoolExprErr {
-  ///
+  /// `Nom`
   #[error("Lexing parser, Nom error")]
   Nom,
-  ///
+  /// `SingleOp`
   #[error("right of single op is not {{signle op / expr}}")]
   SingleOp,
-  ///
+  /// `BinaryOp`
   #[error("binary_op left / right is not expr")]
   BinaryOp,
-  ///
+  /// `Bracket`
   #[error("left-right Bracket mismatch")]
   Bracket,
-  ///
+  /// `NoIdea`
   #[error("something go wrong, {0}")]
   NoIdea(u8),
-  ///
+  /// `BackNot`
   #[error("Can not move back-not")]
   BackNot,
 }
 
 /// **(internal)** Utility method to find first occurrence of a specific token in the token tree.
 #[inline]
-fn index_of_first(data: &[Token], token: Token) -> Option<usize> {
-  data.iter().position(|t| *t == token)
+fn index_of_first(data: &[Token], token: &Token) -> Option<usize> {
+  data.iter().position(|t| t == token)
 }
 
 /// **(internal)** Parse a `ExprToken` tree into a `BooleanExpression` (or error if invalid).
@@ -263,8 +268,7 @@ fn parse_formula(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
 /// **(internal)** Recursive parsing step 4: extract `|` operators.
 #[inline]
 fn or(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
-  let or_token = index_of_first(data, Token::BinaryOp(BinaryOp::Or));
-  Ok(if let Some(or_token) = or_token {
+  Ok(if let Some(or_token) = index_of_first(data, &Token::BinaryOp(BinaryOp::Or)) {
     Box::new(Expr::Or(and(&data[..or_token])?, or(&data[(or_token + 1)..])?))
   } else {
     and(data)?
@@ -274,21 +278,22 @@ fn or(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
 /// **(internal)** Recursive parsing step 5: extract `&` operators.
 #[inline]
 fn and(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
-  let and_token = data
-    .iter()
-    .position(|t| matches!(*t, Token::BinaryOp(BinaryOp::And) | Token::Space));
-  Ok(if let Some(and_token) = and_token {
-    Box::new(Expr::And(xor(&data[..and_token])?, and(&data[(and_token + 1)..])?))
-  } else {
-    xor(data)?
-  })
+  Ok(
+    if let Some(and_token) = data
+      .iter()
+      .position(|t| matches!(*t, Token::BinaryOp(BinaryOp::And) | Token::Space))
+    {
+      Box::new(Expr::And(xor(&data[..and_token])?, and(&data[(and_token + 1)..])?))
+    } else {
+      xor(data)?
+    },
+  )
 }
 
 /// **(internal)** Recursive parsing step 6: extract `^` operators.
 #[inline]
 fn xor(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
-  let xor_token = index_of_first(data, Token::BinaryOp(BinaryOp::Xor));
-  Ok(if let Some(xor_token) = xor_token {
+  Ok(if let Some(xor_token) = index_of_first(data, &Token::BinaryOp(BinaryOp::Xor)) {
     Box::new(Expr::Xor(terminal(&data[..xor_token])?, xor(&data[(xor_token + 1)..])?))
   } else {
     terminal(data)?
@@ -304,11 +309,11 @@ fn terminal(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
       Ok(Box::new(Expr::Not(terminal(&data[1..])?)))
     }
     (Some(Token::SingleOp(SingleOp::Zero)), _) => {
-      let _ = terminal(&data[1..]);
+      _ = terminal(&data[1..]);
       Ok(Box::new(Expr::Const(false)))
     }
     (Some(Token::SingleOp(SingleOp::One)), _) => {
-      let _ = terminal(&data[1..]);
+      _ = terminal(&data[1..]);
       Ok(Box::new(Expr::Const(true)))
     }
     (_, Some(Token::SingleOp(SingleOp::BackNot))) => {
@@ -332,19 +337,19 @@ fn terminal(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
   }
 }
 
-impl std::str::FromStr for super::BooleanExpression {
+impl core::str::FromStr for super::BooleanExpression {
   type Err = BoolExprErr;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    let tokens: Vec<Token> = match token_vec(s) {
-      Ok((s, vec)) => {
-        if s != "" {
-          return Err(BoolExprErr::Nom);
+    match token_vec(s) {
+      Ok((_s, tokens)) => {
+        if _s.is_empty() {
+          Ok(Self { expr: *(parse_formula(&tokens)?) })
+        } else {
+          Err(BoolExprErr::Nom)
         }
-        vec
       }
-      Err(_) => return Err(BoolExprErr::Nom),
-    };
-    Ok(Self { expr: *(parse_formula(&tokens)?) })
+      Err(_) => Err(BoolExprErr::Nom),
+    }
   }
 }

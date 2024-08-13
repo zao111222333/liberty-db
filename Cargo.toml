@@ -4,7 +4,7 @@
 members = ["macros", "tests"]
 
 [workspace.package]
-version = "0.4.12"
+version = "0.4.13"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -17,6 +17,7 @@ keywords = [
 readme = "README.md"
 repository = "https://github.com/zao111222333/liberty-db/"
 documentation = "https://docs.rs/liberty-db"
+categories = ["development-tools"]
 
 [package]
 name = "liberty-db"
@@ -30,6 +31,7 @@ authors.workspace = true
 readme.workspace = true
 repository.workspace = true
 documentation.workspace = true
+categories.workspace = true
 
 
 # Enable katex in documentation
@@ -64,7 +66,7 @@ biodivine-lib-bdd = { version = "0.5.19", features = ["serde"] }
 mut_set = "0.4.0"
 # mut_set = {path = "../mut_set"}
 duplicate = "1.0.0"
-arcstr = { version="1.2.0", features=["serde"] }
+arcstr = { version = "1.2.0", features = ["serde"] }
 num-traits = "0.2.19"
 
 [dev-dependencies]

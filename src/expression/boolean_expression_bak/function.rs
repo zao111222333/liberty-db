@@ -109,7 +109,7 @@ impl fmt::Display for FunctionExpression {
     if self.len_not_match() {
       return Err(fmt::Error);
     }
-    if self.op2_vec.len() == 0 {
+    if self.op2_vec.is_empty() {
       append_sub(0, f)
     } else {
       self.sub_expression_vec[1..]

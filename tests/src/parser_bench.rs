@@ -1,6 +1,7 @@
+#![allow(clippy::field_reassign_with_default)]
 use colored::Colorize;
-use std::ffi::OsStr;
 use core::fmt::Display;
+use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 use std::{fs, fs::metadata};
@@ -30,6 +31,7 @@ fn all_lib_files() -> Vec<PathBuf> {
 }
 
 #[derive(Default, Clone, Copy, Debug)]
+#[allow(clippy::upper_case_acronyms)]
 enum ReturnState {
   PASS(Duration),
   #[default]
@@ -85,7 +87,7 @@ fn parse_lib_files(lib_files: Vec<PathBuf>, parser: ParserFn) -> Vec<TestResult>
       out.file_in = String::from(filepath.to_str().unwrap());
       let panic_result = panic::catch_unwind(|| {
         let result = parser(filepath.to_path_buf());
-        return (result, bgn.elapsed());
+        (result, bgn.elapsed())
       });
       match panic_result {
         Ok((r, d)) => match r {
@@ -153,7 +155,7 @@ pub fn test_all_lib_files() {
   let results: Vec<Vec<TestResult>> = all_parser
     .iter()
     .map(|ctx| {
-      println!("");
+      println!();
       println!("{}:", ctx.name);
       parse_lib_files(all_lib_files(), ctx.parser)
     })

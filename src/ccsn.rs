@@ -229,7 +229,7 @@ impl GroupFn for CCSNStage {
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum StageType {
-  /// pull_up,in which the output voltage of the channel-connecting block is always pulled up (rising);
+  /// `pull_up`, in which the output voltage of the channel-connecting block is always pulled up (rising);
   #[strum(serialize = "pull_up")]
   PullUp,
   /// in which the output voltage of the channel-connecting block is always pulled down (falling)
@@ -329,29 +329,35 @@ impl ComplexAttri for PropagatingCcb {
     }
     Ok(Self { input_ccb_name, output_ccb_name })
   }
+  #[allow(clippy::or_fun_call)]
   #[inline]
   fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
-    if let Some(output_ccb_name) = &self.output_ccb_name {
-      vec![vec![self.input_ccb_name.clone(), output_ccb_name.clone()]]
-    } else {
-      vec![vec![self.input_ccb_name.clone()]]
-    }
+    self
+      .output_ccb_name
+      .as_ref()
+      .map_or(vec![vec![self.input_ccb_name.clone()]], |output_ccb_name| {
+        vec![vec![self.input_ccb_name.clone(), output_ccb_name.clone()]]
+      })
   }
 }
 
-#[test]
-fn parse_file() -> anyhow::Result<()> {
-  use std::fs::File;
-  use std::io::{BufWriter, Write};
-  let filepath = "tests/tech/ccsn.lib";
-  let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
-  match crate::library::Library::parse(&data) {
-    Ok(library) => {
-      let file = File::create("output.lib")?;
-      let mut writer = BufWriter::new(file);
-      write!(&mut writer, "{}", library)?;
+#[cfg(test)]
+mod test {
+  use super::*;
+  #[test]
+  fn parse_file() -> anyhow::Result<()> {
+    use std::fs::File;
+    use std::io::{BufWriter, Write};
+    let filepath = "tests/tech/ccsn.lib";
+    let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
+    match crate::library::Library::parse(&data) {
+      Ok(library) => {
+        let file = File::create("output.lib")?;
+        let mut writer = BufWriter::new(file);
+        write!(&mut writer, "{library}")?;
+      }
+      Err(e) => panic!("[ERROR] {e:?}"),
     }
-    Err(e) => panic!("[ERROR] {:?}", e),
+    Ok(())
   }
-  Ok(())
 }
