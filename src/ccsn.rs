@@ -39,7 +39,7 @@ use crate::{
 /// </script>
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -262,7 +262,7 @@ impl SimpleAttri for StageType {}
 /// </script>
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]

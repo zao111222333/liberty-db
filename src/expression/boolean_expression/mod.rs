@@ -214,7 +214,9 @@ impl PartialOrd for IdBooleanExpression {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
     match self.sorted_nodes.partial_cmp(&other.sorted_nodes) {
-      Some(core::cmp::Ordering::Equal) | None => self.bdd.partial_cmp(&other.bdd),
+      Some(core::cmp::Ordering::Equal) | None => {
+        Some(Bdd::cmp_structural(&self.bdd, &other.bdd))
+      }
       ord => ord,
     }
   }
@@ -223,7 +225,7 @@ impl Ord for IdBooleanExpression {
   #[inline]
   fn cmp(&self, other: &Self) -> std::cmp::Ordering {
     match self.sorted_nodes.cmp(&other.sorted_nodes) {
-      std::cmp::Ordering::Equal => self.bdd.cmp(&other.bdd),
+      std::cmp::Ordering::Equal => Bdd::cmp_structural(&self.bdd, &other.bdd),
       ord => ord,
     }
   }
@@ -455,7 +457,7 @@ mod test {
     let x2 = variables.eval_expression_string("B&D | B&C | A&D | A&C");
     assert_eq!(x1, x2);
 
-    println!("{}", variables);
+    // println!("{}", variables);
     for valuation in x1.sat_valuations() {
       println!("{}", valuation);
       assert!(x1.eval_in(&valuation));

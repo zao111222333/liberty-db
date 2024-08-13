@@ -91,7 +91,7 @@ impl NameAttri for (ArcStr, ArcStr, usize) {
   fn parse(mut v: Vec<ArcStr>) -> Result<Self, IdError> {
     let l = v.len();
     if l != 3 {
-      return Err(crate::ast::IdError::LengthDismatch(3, l, v));
+      return Err(IdError::LengthDismatch(3, l, v));
     }
     if let Some(s3) = v.pop() {
       match s3.parse::<usize>() {
@@ -122,11 +122,11 @@ impl<const N: usize> NameAttri for [ArcStr; N] {
   fn parse(v: Vec<ArcStr>) -> Result<Self, IdError> {
     let l = v.len();
     if l != N {
-      return Err(crate::ast::IdError::LengthDismatch(N, l, v));
+      return Err(IdError::LengthDismatch(N, l, v));
     }
     match TryInto::<[ArcStr; N]>::try_into(v) {
       Ok(name) => Ok(name),
-      Err(e) => Err(crate::ast::IdError::Other(format!("try_into error: {:?}", e))),
+      Err(e) => Err(IdError::Other(format!("try_into error: {:?}", e))),
     }
   }
   #[inline]

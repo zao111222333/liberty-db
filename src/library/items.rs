@@ -29,7 +29,7 @@ use crate::{
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -268,7 +268,7 @@ impl GroupFn for Sensitization {}
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.15&end=39.16
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -318,7 +318,7 @@ impl ComplexAttri for VoltageMap {
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -368,7 +368,7 @@ impl GroupFn for InputVoltage {}
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -441,7 +441,7 @@ impl SimpleAttri for DelayModel {}
 #[derive(Debug, Clone, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone);
         derive(derivative::Derivative);
@@ -554,7 +554,7 @@ impl SimpleAttri for TreeType {}
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.5&end=36.21
 /// ">Reference</a>
 #[derive(Debug, Clone)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone);)
 )]
@@ -641,7 +641,7 @@ impl ComplexAttri for Define {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.23&end=36.24
 /// ">Reference</a>
 #[derive(Debug, Clone)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone);)
 )]
@@ -729,7 +729,7 @@ impl ComplexAttri for DefineCellArea {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.24&end=37.25
 /// ">Reference</a>
 #[derive(Debug, Clone)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone);)
 )]
@@ -777,7 +777,7 @@ impl ComplexAttri for DefineGroup {
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -865,7 +865,7 @@ impl GroupFn for WireLoad {}
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
 /// ">Reference</a>
 #[derive(Debug, Clone, Default, Copy)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone, Default, Copy);)
 )]
@@ -966,7 +966,7 @@ impl ComplexAttri for FanoutLength {
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]

@@ -5,7 +5,7 @@ use crate::{
 };
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -37,7 +37,7 @@ pub struct TableLookUpMultiSegment {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -82,7 +82,7 @@ pub struct DriverWaveform {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -108,7 +108,7 @@ pub struct TableLookUp2D {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -138,7 +138,7 @@ pub struct Vector3D {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -171,7 +171,7 @@ pub struct ReferenceTimeVector3D {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -204,7 +204,7 @@ pub struct Vector4D {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -225,7 +225,7 @@ pub struct Vector3DGrpup {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -246,7 +246,7 @@ pub struct ReferenceTimeVector3DGrpup {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -271,7 +271,7 @@ impl GroupFn for ReferenceTimeVector3D {}
 impl GroupFn for ReferenceTimeVector3DGrpup {}
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -299,7 +299,7 @@ pub struct TableLookUp3D {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -325,7 +325,7 @@ impl GroupFn for TableLookUp1D {}
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -424,7 +424,7 @@ impl ComplexAttri for Values {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone, Default);)
 )]

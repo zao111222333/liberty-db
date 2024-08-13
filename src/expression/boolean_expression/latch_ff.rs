@@ -16,7 +16,7 @@ use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
@@ -100,7 +100,7 @@ pub struct FF {
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
@@ -186,7 +186,7 @@ pub struct FFBank {
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
@@ -269,7 +269,7 @@ pub struct Latch {
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone, Default);)
 )]
@@ -387,7 +387,7 @@ impl NamedGroup for LatchFFBank_type {
   fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, IdError> {
     let l = v.len();
     if l != 3 {
-      return Err(crate::ast::IdError::LengthDismatch(3, l, v));
+      return Err(IdError::LengthDismatch(3, l, v));
     }
     if let Some(bits) = v.pop() {
       match bits.parse::<usize>() {

@@ -59,14 +59,12 @@ itertools = "0.10.5"
 ryu = "1.0"
 itoa = "1.0"
 uom = { version = "0.36.0", default-features = false, features = ["f64", "si", "std", "serde"] }
-biodivine-lib-bdd = { path = "../../biodivine-lib-bdd", features = ["serde"] }
-# biodivine-lib-bdd = { version = "0.5.17", features = ["serde"] }
-mut_set = "0.3.7"
-mut_set_derive = "0.3.7"
+# biodivine-lib-bdd = { path = "../../biodivine-lib-bdd", features = ["serde"] }
+biodivine-lib-bdd = { version = "0.5.18", features = ["serde"] }
+mut_set = "0.3.8"
 # mut_set = {path = "../mut_set"}
-# mut_set_derive = {path = "../mut_set/derive"}
 duplicate = "1.0.0"
-arcstr = {version="1.2.0", features=["serde"]}
+arcstr = { version="1.2.0", features=["serde"] }
 num-traits = "0.2.19"
 
 [dev-dependencies]

@@ -17,7 +17,7 @@ use crate::{
 /// </script>
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -121,7 +121,7 @@ fn test_leakage_sort() {
 /// </script>
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -222,9 +222,7 @@ impl SimpleAttri for Table {
     let (input, simple_multi) = crate::ast::parser::simple_multi(i, line_num)?;
     match Self::parse(simple_multi) {
       Ok(s) => Ok((input, Ok(s))),
-      Err(e) => {
-        Ok((input, Err((e, crate::ast::AttriValue::Simple(ArcStr::from(simple_multi))))))
-      }
+      Err(e) => Ok((input, Err((e, AttriValue::Simple(ArcStr::from(simple_multi)))))),
     }
   }
   #[inline]
@@ -261,7 +259,7 @@ fn statetable_test() {
 /// </script>
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set_derive::item(
+#[mut_set::derive::item(
     sort,
     macro(derive(Debug, Clone,Default);)
   )]

@@ -25,7 +25,7 @@ pub(crate) struct Timing {
   t2: Option<TimingType>,
 }
 impl GroupFn for Timing {}
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
@@ -45,7 +45,7 @@ pub(crate) struct Pin {
   timing: Vec<Timing>,
 }
 impl GroupFn for Pin {}
-#[mut_set_derive::item(
+#[mut_set::derive::item(
   sort,
   macro(derive(Debug, Clone,Default);)
 )]
