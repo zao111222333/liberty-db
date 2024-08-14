@@ -10,7 +10,10 @@ use core::{
   num::{ParseFloatError, ParseIntError},
   str::FromStr,
 };
-pub use fmt::CodeFormatter;
+pub use fmt::{
+  CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation,
+  TestCodeFormatter, TestIndentation,
+};
 use itertools::Itertools;
 use nom::{error::Error, IResult};
 use ordered_float::ParseNotNanError;
@@ -132,10 +135,10 @@ pub trait SimpleAttri: Sized + Display + FromStr {
   }
   /// `fmt_liberty`
   #[inline]
-  fn fmt_liberty<T: Write>(
+  fn fmt_liberty<T: Write, I: Indentation>(
     &self,
     key: &str,
-    f: &mut CodeFormatter<'_, T>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     <SimpleWrapper as Format>::liberty(&self.to_wrapper(), key, f)
   }
@@ -195,10 +198,10 @@ pub trait ComplexAttri: Sized {
   }
   /// `fmt_liberty`
   #[inline]
-  fn fmt_liberty<T: Write>(
+  fn fmt_liberty<T: Write, I: Indentation>(
     &self,
     key: &str,
-    f: &mut CodeFormatter<'_, T>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     <ComplexWrapper as Format>::liberty(&self.to_wrapper(), key, f)
   }
@@ -231,10 +234,10 @@ pub trait GroupAttri: Sized {
     line_num: &mut usize,
   ) -> IResult<&'a str, Result<Self, IdError>, Error<&'a str>>;
   /// `fmt_liberty`
-  fn fmt_liberty<T: Write>(
+  fn fmt_liberty<T: Write, I: Indentation>(
     &self,
     key: &str,
-    f: &mut CodeFormatter<'_, T>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result;
 }
 
@@ -268,7 +271,10 @@ pub trait NamedGroup: GroupAttri {
   fn name2vec(name: Self::Name) -> Vec<ArcStr>;
   /// `fmt_liberty`
   #[inline]
-  fn fmt_liberty<T: Write>(&self, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
+  fn fmt_liberty<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
     write!(
       f,
       "{}",
@@ -306,20 +312,20 @@ pub enum ParserError<'a> {
 }
 
 #[allow(unused)]
-pub(crate) fn test_parse_group<G: GroupAttri + Debug>(s: &str) -> (G, usize) {
+pub(crate) fn test_parse_group<G: GroupAttri + Debug>(s: &str) -> (G, String, usize) {
   let mut n = 1;
   match G::nom_parse(s, &mut n) {
     Ok((_, Ok(group))) => {
       println!("{group:#?}");
       println!("{n}");
       let mut output = String::new();
-      let mut f = CodeFormatter::new(&mut output);
+      let mut f = TestCodeFormatter::new(&mut output);
       if let Err(e) = GroupAttri::fmt_liberty(&group, core::any::type_name::<G>(), &mut f)
       {
         panic!("{e}");
       }
       println!("{output}");
-      (group, n)
+      (group, output, n)
     }
     Ok((_, Err(e))) => panic!("{e:#?}"),
     Err(e) => panic!("{e:#?}"),
@@ -328,21 +334,29 @@ pub(crate) fn test_parse_group<G: GroupAttri + Debug>(s: &str) -> (G, usize) {
 /// For basic formatter
 pub trait Format {
   /// `.lib` format
-  fn liberty<T: Write>(
+  fn liberty<T: Write, I: Indentation>(
     &self,
     key: &str,
-    f: &mut CodeFormatter<'_, T>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result;
   /// `.db` format
   #[inline]
-  fn db<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
+  fn db<T: Write, I: Indentation>(
+    &self,
+    key: &str,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
     _ = key;
     _ = f;
     todo!()
   }
   /// `.json` format
   #[inline]
-  fn json<T: Write>(&self, key: &str, f: &mut CodeFormatter<'_, T>) -> core::fmt::Result {
+  fn json<T: Write, I: Indentation>(
+    &self,
+    key: &str,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
     _ = key;
     _ = f;
     todo!()
@@ -353,33 +367,38 @@ pub(crate) fn is_word(s: &ArcStr) -> bool {
 }
 impl Format for AttriComment {
   #[inline]
-  fn liberty<T: Write>(
+  fn liberty<T: Write, I: Indentation>(
     &self,
     _: &str,
-    f: &mut CodeFormatter<'_, T>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     if self.is_empty() {
       Ok(())
     } else {
       // TODO: NOT use replace
-      write!(f, "\n/* {} */", self.join("\n").replace('\n', "\n* "))
+      let indent = f.indentation();
+      write!(
+        f,
+        "\n{indent}/* {} */",
+        self.join("\n").replace('\n', format!("\n{indent}* ").as_str())
+      )
     }
   }
 }
 
 impl Format for SimpleWrapper {
   #[inline]
-  fn liberty<T: Write>(
+  fn liberty<T: Write, I: Indentation>(
     &self,
     key: &str,
-    f: &mut CodeFormatter<'_, T>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     if self.is_empty() {
       Ok(())
     } else if is_word(self) {
-      write!(f, "\n{key} : {self};")
+      write!(f, "\n{}{key} : {self};", f.indentation())
     } else {
-      write!(f, "\n{key} : \"{self}\";")
+      write!(f, "\n{}{key} : \"{self}\";", f.indentation())
     }
   }
 }
@@ -387,25 +406,27 @@ impl Format for SimpleWrapper {
 impl Format for ComplexWrapper {
   #[allow(clippy::indexing_slicing)]
   #[inline]
-  fn liberty<T: Write>(
+  fn liberty<T: Write, I: Indentation>(
     &self,
     key: &str,
-    f: &mut CodeFormatter<'_, T>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     if self.is_empty() || (self.len() == 1 && self[0].is_empty()) {
       return Ok(());
     };
+    let indent1 = f.indentation();
     if self[0].iter().all(is_word) {
-      write!(f, "\n{key} ({}", self[0].join(", "))?;
+      write!(f, "\n{indent1}{key} ({}", self[0].join(", "))?;
     } else {
-      write!(f, "\n{key} (\"{}\"", self[0].join(", "))?;
+      write!(f, "\n{indent1}{key} (\"{}\"", self[0].join(", "))?;
     }
     f.indent(1);
+    let indent2 = f.indentation();
     for v in self.iter().skip(1) {
       if v.iter().all(is_word) {
-        write!(f, ", \\\n{}", v.join(", "))?;
+        write!(f, ", \\\n{indent2}{}", v.join(", "))?;
       } else {
-        write!(f, ", \\\n\"{}\"", v.join(", "))?;
+        write!(f, ", \\\n{indent2}\"{}\"", v.join(", "))?;
       }
     }
     f.dedent(1);
@@ -414,9 +435,9 @@ impl Format for ComplexWrapper {
 }
 
 #[inline]
-pub(crate) fn liberty_attr_list<T: Write>(
+pub(crate) fn liberty_attr_list<T: Write, I: Indentation>(
   attr_list: &AttributeList,
-  f: &mut CodeFormatter<'_, T>,
+  f: &mut CodeFormatter<'_, T, I>,
 ) -> core::fmt::Result {
   for (key, attr) in attr_list {
     match attr {
@@ -430,14 +451,15 @@ pub(crate) fn liberty_attr_list<T: Write>(
 
 impl Format for GroupWrapper {
   #[inline]
-  fn liberty<T: Write>(
+  fn liberty<T: Write, I: Indentation>(
     &self,
     key: &str,
-    f: &mut CodeFormatter<'_, T>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
+    let indent = f.indentation();
     write!(
       f,
-      "\n{key} ({}) {{",
+      "\n{indent}{key} ({}) {{",
       self
         .title
         .iter()
@@ -447,6 +469,6 @@ impl Format for GroupWrapper {
     f.indent(1);
     liberty_attr_list(&self.attr_list, f)?;
     f.dedent(1);
-    write!(f, "\n}}")
+    write!(f, "\n{indent}}}")
   }
 }

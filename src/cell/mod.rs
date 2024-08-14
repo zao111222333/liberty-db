@@ -68,7 +68,7 @@ mod test {
   /// ">Reference</a>
   #[test]
   fn example23() {
-    let (cell, _) = &mut crate::ast::test_parse_group::<Cell>(
+    let (mut cell, fmt_str, _) = crate::ast::test_parse_group::<Cell>(
       r#"(dff4) {
         area : 1 ;
         pin (CLK) {
@@ -204,6 +204,145 @@ mod test {
     } /* end of cell dff4 */
     "#,
     );
+    assert_eq!(
+      fmt_str,
+      r#"
+liberty_db::cell::Cell (dff4) {
+| area : 1.0;
+| ff_bank (IQ, IQN, 4) {
+| | clear : "!CLR";
+| | clear_preset_var1 : L;
+| | clear_preset_var2 : L;
+| | clocked_on : CLK;
+| | next_state : D;
+| | preset : "!PRE";
+| }
+| pin (CLK) {
+| | capacitance : 0.0;
+| | direction : input;
+| | min_pulse_width_high : 3.0;
+| | min_pulse_width_low : 3.0;
+| }
+| pin (CLR) {
+| | capacitance : 0.0;
+| | direction : input;
+| | timing () {
+| | | related_pin : CLK;
+| | | timing_type : recovery_rising;
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| pin (PRE) {
+| | capacitance : 0.0;
+| | direction : input;
+| | timing () {
+| | | related_pin : CLK;
+| | | timing_type : recovery_rising;
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| /* Undefined attributes from here */
+| bundle (D) {
+| | members (D1, D2, D3, D4);
+| | nextstate_type : data;
+| | direction : input;
+| | capacitance : 0;
+| | timing () {
+| | | related_pin : CLK;
+| | | timing_type : setup_rising;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : CLK;
+| | | timing_type : hold_rising;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| bundle (Q) {
+| | members (Q1, Q2, Q3, Q4);
+| | direction : output;
+| | function : "(IQ)";
+| | timing () {
+| | | related_pin : CLK;
+| | | timing_type : rising_edge;
+| | | cell_rise (scalar) {
+| | | | values (2.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (2.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : PRE;
+| | | timing_type : preset;
+| | | timing_sense : negative_unate;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : CLR;
+| | | timing_type : clear;
+| | | timing_sense : positive_unate;
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| bundle (QN) {
+| | members (Q1N, Q2N, Q3N, Q4N);
+| | direction : output;
+| | function : IQN;
+| | timing () {
+| | | related_pin : CLK;
+| | | timing_type : rising_edge;
+| | | cell_rise (scalar) {
+| | | | values (2.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (2.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : PRE;
+| | | timing_type : clear;
+| | | timing_sense : positive_unate;
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : CLR;
+| | | timing_type : preset;
+| | | timing_sense : negative_unate;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| /* Undefined attributes end here */
+}"#
+    );
   }
   /// Example 27 shows a `latch_bank`  group for a multibit register containing four rising-edge-triggered D latches
   /// <a name ="reference_link" href="
@@ -211,7 +350,7 @@ mod test {
   /// ">Reference</a>
   #[test]
   fn example27() {
-    let (cell, _) = &mut crate::ast::test_parse_group::<Cell>(
+    let (mut cell, fmt_str, _) = crate::ast::test_parse_group::<Cell>(
       r#"(latch4) {
         area: 16;
         pin (G) {     /* gate enable signal, active-high */
@@ -238,6 +377,36 @@ mod test {
     }
     "#,
     );
+    assert_eq!(
+      fmt_str,
+      r#"
+liberty_db::cell::Cell (latch4) {
+| area : 16.0;
+| latch_bank (IQ, IQN, 4) {
+| | enable : G;
+| | data_in : D;
+| }
+| pin (G) {
+| | direction : input;
+| }
+| /* Undefined attributes from here */
+| bundle (D) {
+| | members (D1, D2, D3, D4);
+| | direction : input;
+| }
+| bundle (Q) {
+| | members (Q1, Q2, Q3, Q4);
+| | direction : output;
+| | function : IQ;
+| }
+| bundle (QN) {
+| | members (Q1N, Q2N, Q3N, Q4N);
+| | direction : output;
+| | function : IQN;
+| }
+| /* Undefined attributes end here */
+}"#
+    );
   }
   /// Example 28 a multibit register containing four high-enable D latches with the clear  attribute.
   /// <a name ="reference_link" href="
@@ -245,7 +414,7 @@ mod test {
   /// ">Reference</a>
   #[test]
   fn example28() {
-    let (cell, _) = &mut crate::ast::test_parse_group::<Cell>(
+    let (mut cell, fmt_str, _) = crate::ast::test_parse_group::<Cell>(
       r#"(DLT2) {/* note: 0 hold time */
         area : 1 ;
         single_bit_degenerate : FDB ;
@@ -400,6 +569,165 @@ mod test {
         }
     } /* end of cell DLT2
     "#,
+    );
+    assert_eq!(
+      fmt_str,
+      r#"
+liberty_db::cell::Cell (DLT2) {
+| area : 1.0;
+| latch_bank (IQ, IQN, 4) {
+| | clear : "!CLR";
+| | clear_preset_var1 : H;
+| | clear_preset_var2 : H;
+| | enable : EN;
+| | data_in : D;
+| | preset : "!PRE";
+| }
+| pin (EN) {
+| | capacitance : 0.0;
+| | direction : input;
+| | min_pulse_width_high : 3.0;
+| | min_pulse_width_low : 3.0;
+| }
+| /* Undefined attributes from here */
+| single_bit_degenerate : FDB;
+| bundle (D) {
+| | members (DA, DB, DC, DD);
+| | direction : input;
+| | capacitance : 0;
+| | timing () {
+| | | related_pin : EN;
+| | | timing_type : setup_falling;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : EN;
+| | | timing_type : hold_falling;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| bundle (CLR) {
+| | members (CLRA, CLRB, CLRC, CLRD);
+| | direction : input;
+| | capacitance : 0;
+| | timing () {
+| | | related_pin : EN;
+| | | timing_type : recovery_falling;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| bundle (PRE) {
+| | members (PREA, PREB, PREC, PRED);
+| | direction : input;
+| | capacitance : 0;
+| | timing () {
+| | | related_pin : EN;
+| | | timing_type : recovery_falling;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| bundle (Q) {
+| | members (QA, QB, QC, QD);
+| | direction : output;
+| | function : IQ;
+| | timing () {
+| | | related_pin : D;
+| | | cell_rise (scalar) {
+| | | | values (2.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (2.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : EN;
+| | | timing_type : rising_edge;
+| | | cell_rise (scalar) {
+| | | | values (2.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (2.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : CLR;
+| | | timing_type : clear;
+| | | timing_sense : positive_unate;
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : PRE;
+| | | timing_type : preset;
+| | | timing_sense : negative_unate;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| bundle (QN) {
+| | members (QNA, QNB, QNC, QND);
+| | direction : output;
+| | function : IQN;
+| | timing () {
+| | | related_pin : D;
+| | | cell_rise (scalar) {
+| | | | values (2.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (2.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : EN;
+| | | timing_type : rising_edge;
+| | | cell_rise (scalar) {
+| | | | values (2.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (2.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : CLR;
+| | | timing_type : preset;
+| | | timing_sense : negative_unate;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| | timing () {
+| | | related_pin : PRE;
+| | | timing_type : clear;
+| | | timing_sense : positive_unate;
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| }
+| /* Undefined attributes end here */
+}"#
     );
   }
 }

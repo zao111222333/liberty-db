@@ -315,7 +315,7 @@ pub(crate) fn inner(
       (
         quote! {return Ok((input, Ok(res)));},
         quote! {
-          write!(f,"\n{} () {{",key)?;
+          write!(f,"\n{indent}{key} () {{")?;
         },
       )
     } else {
@@ -332,7 +332,7 @@ pub(crate) fn inner(
           }
         },
         quote! {
-          write!(f,"\n{} (",key)?;
+          write!(f,"\n{indent}{key} (")?;
           crate::ast::NamedGroup::fmt_liberty(self, f)?;
           write!(f,") {{")?;
         },
@@ -441,19 +441,21 @@ pub(crate) fn inner(
             type Name=#name_ident;
             type Comments=#comments_ident;
             #name_func
-            fn fmt_liberty<T: core::fmt::Write>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T>) -> core::fmt::Result {
+            fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
               use core::fmt::Write;
               use itertools::Itertools;
+              let indent = f.indentation();
               #write_title
               f.indent(1);
               #write_fields
               if !self.#undefined_name.is_empty(){
-                write!(f,"\n/* Undefined attributes from here */")?;
+                let indent1 = f.indentation();
+                write!(f,"\n{indent1}/* Undefined attributes from here */")?;
                 crate::ast::liberty_attr_list(&self.#undefined_name,f)?;
-                write!(f,"\n/* Undefined attributes end here */")?;
+                write!(f,"\n{indent1}/* Undefined attributes end here */")?;
               }
               f.dedent(1);
-              write!(f, "\n}}")
+              write!(f, "\n{indent}}}")
             }
             fn nom_parse<'a>(
               i: &'a str, line_num: &mut usize

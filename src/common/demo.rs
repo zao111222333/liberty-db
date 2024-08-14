@@ -114,6 +114,8 @@ impl GroupFn for Cell {}
 
 #[cfg(test)]
 mod test {
+  use crate::ast::DefaultIndentation;
+
   use super::*;
   #[test]
   fn timing_test() {
@@ -202,7 +204,7 @@ mod test {
       }
     "#,
     );
-    let (g, _) = &mut crate::ast::test_parse_group::<Cell>(
+    let (g, _, _) = &mut crate::ast::test_parse_group::<Cell>(
       r#"(INV){
         // should error
         area : 5.4;
@@ -236,7 +238,8 @@ mod test {
     g.comments.area.push("xc".into());
     g.comments.area.push("xc".into());
     let mut output = String::new();
-    let mut f = crate::ast::CodeFormatter::new(&mut output);
+    let mut f =
+      crate::ast::CodeFormatter::<'_, String, DefaultIndentation>::new(&mut output);
     if let Err(e) = GroupAttri::fmt_liberty(g, core::any::type_name::<Cell>(), &mut f) {
       panic!("{e}");
     }

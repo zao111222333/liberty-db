@@ -207,7 +207,8 @@ mod test_sensitization {
 
   #[test]
   fn sensitization() {
-    let (sense, _) = crate::ast::test_parse_group::<Sensitization>(
+    // FIXME: quote should not cover first word
+    let (sense, _, _) = crate::ast::test_parse_group::<Sensitization>(
       r#"(sensitization_nand2) {
         pin_names ( IN1, IN2, OUT1 );
         vector ( 1, "0 0 1" );
@@ -253,7 +254,7 @@ mod test_sensitization {
         }
       ]
     );
-    let (sense1, _) = crate::ast::test_parse_group::<Sensitization>(
+    let (sense1, _, _) = crate::ast::test_parse_group::<Sensitization>(
       r#"(sensitization_nand2) {
         vector ( 1, "0 0 1" );
         vector ( 2, "0 X 9" );

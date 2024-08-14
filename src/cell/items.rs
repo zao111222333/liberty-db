@@ -53,7 +53,7 @@ mod test_sort {
 
   #[test]
   fn test_leakage_sort() {
-    let (cell, _) = crate::ast::test_parse_group::<crate::Cell>(
+    let (cell, _, _) = crate::ast::test_parse_group::<crate::Cell>(
       r#"(CELL) {
       leakage_power () {
         related_pg_pin : VDD;
