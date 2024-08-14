@@ -13,7 +13,7 @@
 
 ```toml
 [dependencies]
-liberty_db = "0.4"
+liberty_db = "0.5"
 ```
 
 See more in [doc](https://docs.rs/liberty-db)
