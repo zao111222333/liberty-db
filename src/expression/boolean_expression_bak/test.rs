@@ -324,7 +324,7 @@ fn expression_nand_table() {
 }
 // #[test]
 // fn expression_length_check() {
-//     use core::fmt::{self, write};
+//     use fmt::{self, write};
 //     let right: BooleanExpression = FunctionExpression::new (
 //         vec![Port::new("A").into(),Port::new("B").into()],
 //         vec![logic::Operator2::And],

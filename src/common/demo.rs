@@ -7,10 +7,9 @@ use crate::{
   timing::TimingType,
   ArcStr, GroupSet,
 };
-
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::Nothing)]
+// #[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing {
   /// group undefined attributes
   #[liberty(undefined)]
@@ -119,7 +118,7 @@ mod test {
   use super::*;
   #[test]
   fn timing_test() {
-    _ = crate::ast::test_parse_group::<Timing>(
+    _ = crate::ast::test_parse_fmt::<Timing>(
       r#"(w){
         // www
         /* com
@@ -132,8 +131,13 @@ mod test {
         );
     }
     "#,
+      r#"
+liberty_db::common::demo::Timing () {
+| values ("1.0,2.0,3.0,4.0,5.0,6.0");
+| t1 : combinational;
+}"#,
     );
-    _ = crate::ast::test_parse_group::<Timing>(
+    _ = crate::ast::test_parse_fmt::<Timing>(
       r#"( w ){
         t1: ombinational;
         t2: combinational;
@@ -143,33 +147,53 @@ mod test {
         );
         }
     "#,
+      r#"
+liberty_db::common::demo::Timing () {
+| values ("-100.0,2.0,3.0,1.0,2.0,3.0");
+| t2 : combinational;
+| /* Undefined attributes from here */
+| t1 : ombinational;
+| /* Undefined attributes end here */
+}"#,
     );
   }
 
   #[test]
   fn pin_test() {
-    _ = crate::ast::test_parse_group::<Pin>(
+    _ = crate::ast::test_parse_fmt::<Pin>(
       r#"(A){
         timing(w){
             t1: combinational;
         }
     }
     "#,
+      r#"
+liberty_db::common::demo::Pin (A) {
+| timing () {
+| | t1 : combinational;
+| }
+}"#,
     );
-    _ = crate::ast::test_parse_group::<Pin>(
+    _ = crate::ast::test_parse_fmt::<Pin>(
       r#"(B){
         timing(w){
             t1: combinational;
         }
     }
     "#,
+      r#"
+liberty_db::common::demo::Pin (B) {
+| timing () {
+| | t1 : combinational;
+| }
+}"#,
     );
   }
 
   #[test]
   fn cell_test() {
     use crate::ast::GroupAttri;
-    _ = crate::ast::test_parse_group::<Cell>(
+    _ = crate::ast::test_parse_fmt::<Cell>(
       r#"(INV){
         // should ok
         area : 5.4;
@@ -203,8 +227,35 @@ mod test {
         }
       }
     "#,
+      r#"
+liberty_db::common::demo::Cell (INV) {
+| area : 5.4;
+| ff (IQ, IQN) {
+| | next_state : "!A";
+| }
+| pin (A) {
+| | timing () {
+| | | t1 : combinational;
+| | }
+| }
+| pin (Y) {
+| | timing () {
+| | | /* Undefined attributes from here */
+| | | t1 : foo_error;
+| | | test_table (1, 2, 4, 5, 6, 4, 5, 6);
+| | | /* Undefined attributes end here */
+| | }
+| }
+| statetable ("CLK EN SE", ENL) {
+| | table : "H   L  L : - : L ,\
+H   L  H : - : H ,\
+H   H  L : - : H ,\
+H   H  H : - : H ,\
+L   -  - : - : N";
+| }
+}"#,
     );
-    let (g, _, _) = &mut crate::ast::test_parse_group::<Cell>(
+    let mut cell = crate::ast::test_parse_fmt::<Cell>(
       r#"(INV){
         // should error
         area : 5.4;
@@ -234,15 +285,26 @@ mod test {
         }
     }
     "#,
+      r#"
+liberty_db::common::demo::Cell (INV) {
+| area : 5.4;
+| pin (A) {
+| | timing () {
+| | | t2 : combinational;
+| | }
+| }
+| /* Undefined attributes from here */
+| undefine_area : 5.4;
+| undefine_pin (C) {
+| | timing (w) {
+| | | t1 : combinational;
+| | }
+| }
+| /* Undefined attributes end here */
+}"#,
     );
-    g.comments.area.push("xc".into());
-    g.comments.area.push("xc".into());
-    let mut output = String::new();
-    let mut f =
-      crate::ast::CodeFormatter::<'_, String, DefaultIndentation>::new(&mut output);
-    if let Err(e) = GroupAttri::fmt_liberty(g, core::any::type_name::<Cell>(), &mut f) {
-      panic!("{e}");
-    }
-    println!("{output}");
+    cell.comments.area.push("xc".into());
+    cell.comments.area.push("xc".into());
+    println!("{}", cell.test_wrapper());
   }
 }

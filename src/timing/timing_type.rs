@@ -1,7 +1,7 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
-use core::{fmt::Display, str::FromStr};
+use core::{fmt, str::FromStr};
 
 use crate::{ast::SimpleAttri, expression::logic, types::MaxMin};
 
@@ -155,9 +155,9 @@ impl ArcCombinational {
   const THREE_STATE_ENABLE_FALL: &'static str = "three_state_enable_fall";
 }
 
-impl Display for ArcCombinational {
+impl fmt::Display for ArcCombinational {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::Combinational(edge) => match edge {
         Some(_edge) => match _edge {
@@ -456,9 +456,9 @@ impl ArcSequential {
   const MIN_CLOCK_TREE_PATH: &'static str = "min_clock_tree_path";
 }
 
-impl Display for ArcSequential {
+impl fmt::Display for ArcSequential {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::Edge(edge) => match edge {
         logic::Edge::Fall => write!(f, "{}", Self::FALLING_EDGE),
@@ -559,9 +559,9 @@ impl ArcNonSequential {
   const NON_SEQ_HOLD_FALLING: &'static str = "non_seq_hold_falling";
 }
 
-impl Display for ArcNonSequential {
+impl fmt::Display for ArcNonSequential {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::NonSeqSetup(edge) => match edge {
         logic::Edge::Fall => write!(f, "{}", Self::NON_SEQ_SETUP_FALLING),
@@ -626,9 +626,9 @@ impl ArcNoChange {
   const NOCHANGE_LOW_LOW: &'static str = "nochange_low_low";
 }
 
-impl Display for ArcNoChange {
+impl fmt::Display for ArcNoChange {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::NoChange(s1, s2) => match (s1, s2) {
         (logic::Level::High, logic::Level::High) => {
@@ -724,7 +724,7 @@ impl Default for TimingType {
 impl SimpleAttri for TimingType {}
 
 impl FromStr for TimingType {
-  type Err = core::fmt::Error;
+  type Err = fmt::Error;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s {
@@ -763,14 +763,14 @@ impl FromStr for TimingType {
       ArcNoChange::NOCHANGE_HIGH_LOW => Ok(Self::NOCHANGE_HIGH_LOW),
       ArcNoChange::NOCHANGE_LOW_HIGH => Ok(Self::NOCHANGE_LOW_HIGH),
       ArcNoChange::NOCHANGE_LOW_LOW => Ok(Self::NOCHANGE_LOW_LOW),
-      _ => Err(core::fmt::Error),
+      _ => Err(fmt::Error),
     }
   }
 }
 
-impl Display for TimingType {
+impl fmt::Display for TimingType {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::Combinational(t) => t.fmt(f),
       Self::Sequential(t) => t.fmt(f),

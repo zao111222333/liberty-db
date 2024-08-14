@@ -1,5 +1,5 @@
 use crate::ast::SimpleAttri;
-use core::str::FromStr;
+use core::{fmt, str::FromStr};
 use strum_macros::{Display, EnumString};
 
 /// <a name ="reference_link" href="
@@ -214,9 +214,9 @@ enum OneValue {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TwoValue(OneValue, OneValue);
 impl SimpleAttri for TwoValue {}
-impl core::fmt::Display for TwoValue {
+impl fmt::Display for TwoValue {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{}{}", self.0, self.1)
   }
 }

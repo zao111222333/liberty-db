@@ -5,6 +5,7 @@
   clippy::wildcard_enum_match_arm
 )]
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
+use core::fmt;
 use nom::{
   branch::alt,
   bytes::complete::{tag, take_while1},
@@ -45,7 +46,7 @@ pub(super) fn as_sdf_str(expr: &Expr) -> String {
 }
 
 #[inline]
-pub(super) fn _fmt(expr: &Expr, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+pub(super) fn _fmt(expr: &Expr, f: &mut fmt::Formatter<'_>) -> fmt::Result {
   match expr {
     Expr::Variable(s) => {
       if s.as_bytes()[0].is_ascii_digit() {

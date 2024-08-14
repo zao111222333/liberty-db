@@ -1,5 +1,4 @@
-use core::fmt::Display as _;
-
+use core::fmt::Display;
 use liberty_db::{ast::GroupAttri, library::Library};
 
 static TEMPLATE: &str = r#"
@@ -56,10 +55,12 @@ library(gscl45nm) {
     "#;
 #[test]
 fn parse_str() {
-  match Library::parse(TEMPLATE) {
+  match Library::parse_lib(TEMPLATE) {
     Ok(ref mut library) => {
       library.comments.this.push("line1\nline2".into());
       library.comments.this.push("line3".into());
+      library.comments.time_unit.push("line4\nline5".into());
+      library.comments.time_unit.push("line6".into());
       println!("{:#?}", library);
       println!("{}", library);
     }
@@ -74,7 +75,7 @@ fn parse_error() {
     type :  ;  
   }
   "#;
-  match Library::parse(s) {
+  match Library::parse_lib(s) {
     Ok(library) => {
       panic!("{}", library);
     }
@@ -93,7 +94,7 @@ fn case_1() {
     }
   }
   "#;
-  match Library::parse(s) {
+  match Library::parse_lib(s) {
     Ok(library) => {
       println!("{}", library);
     }
@@ -115,7 +116,7 @@ fn case_2() {
     fanout_length(5,0.0000)
     fanout_length(6,0.0000)
   }"#;
-  match Library::parse(s) {
+  match Library::parse_lib(s) {
     Ok(library) => {
       println!("{}", library);
     }
@@ -129,7 +130,7 @@ fn parse_file() -> anyhow::Result<()> {
   use std::io::{BufWriter, Write};
   let filepath = "tech/cases/ocv.lib";
   let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
-  match liberty_db::library::Library::parse(&data) {
+  match liberty_db::library::Library::parse_lib(&data) {
     Ok(library) => {
       let file = File::create("output.lib")?;
       let mut writer = BufWriter::new(file);

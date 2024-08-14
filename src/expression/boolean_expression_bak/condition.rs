@@ -22,12 +22,12 @@ impl BooleanExpressionLike for SubExpression {
     }
   }
 }
-impl core::fmt::Display for SubExpression {
+impl fmt::Display for SubExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      SubExpression::Port(exp) => core::fmt::Display::fmt(&exp, f),
-      SubExpression::Condition(exp) => core::fmt::Display::fmt(&exp, f),
+      SubExpression::Port(exp) => fmt::Display::fmt(&exp, f),
+      SubExpression::Condition(exp) => fmt::Display::fmt(&exp, f),
     }
   }
 }
@@ -169,7 +169,7 @@ impl core::hash::Hash for ConditionExpression {
   }
 }
 impl std::str::FromStr for ConditionExpression {
-  type Err = core::fmt::Error;
+  type Err = fmt::Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     todo!()
@@ -183,7 +183,7 @@ impl std::str::FromStr for ConditionExpression {
 //     s: &str,
 //     ff_map: &HashMap<LatchFfId, Ff>,
 //     latch_map: &HashMap<LatchFfId, Latch>,
-//   ) -> Result<Self, core::fmt::Error> {
+//   ) -> Result<Self, fmt::Error> {
 //     let l_pos_list = s
 //       .match_indices(Self::BRACKET_L)
 //       .map(|(i, _)| i)
@@ -194,8 +194,8 @@ impl std::str::FromStr for ConditionExpression {
 //       .collect::<Vec<usize>>();
 //     // match (s.find(Self::BRACKET_L),s.find(Self::BRACKET_R)){
 //     //     (None, None) => todo!(),
-//     //     (None, Some(_)) => Err(core::fmt::Error),
-//     //     (Some(_), None) => Err(core::fmt::Error),
+//     //     (None, Some(_)) => Err(fmt::Error),
+//     //     (Some(_), None) => Err(fmt::Error),
 //     //     (Some(idx_l), Some(idx_r)) => todo!(),
 //     // }
 //     todo!()

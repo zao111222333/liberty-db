@@ -37,7 +37,7 @@ fn group_field_fn(
             res.#field_name=Some(simple);
           },
           Err((e,undefined)) => {
-            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            log::error!("line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
             res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
@@ -59,7 +59,7 @@ fn group_field_fn(
             res.#field_name=simple;
           },
           Err((e,undefined)) => {
-            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
             res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
@@ -79,7 +79,7 @@ fn group_field_fn(
         match complex_res {
           Ok(complex) => res.#field_name=complex,
           Err((e,undefined)) => {
-            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
             res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
@@ -101,7 +101,7 @@ fn group_field_fn(
         match complex_res {
           Ok(complex) => res.#field_name=Some(complex),
           Err((e,undefined)) => {
-            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
             res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
@@ -122,7 +122,7 @@ fn group_field_fn(
             res.#field_name.push(complex);
           },
           Err((e,undefined)) => {
-            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
             res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
@@ -147,11 +147,11 @@ fn group_field_fn(
               complex,
             ){
               let e = crate::ast::IdError::RepeatAttri;
-              println!("Line={}, error={}",line_num,e);
+              log::error!("Line={}, error={}",line_num,e);
             }
           },
           Err((e,undefined)) => {
-            println!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
             res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
@@ -176,7 +176,7 @@ fn group_field_fn(
             res.#field_name.push(group);
           },
           Err(e) => {
-            println!("Line={}, error={}",line_num,e);
+            log::error!("Line={}, error={}",line_num,e);
           },
         }
         let n: usize;
@@ -201,11 +201,11 @@ fn group_field_fn(
               group,
             ){
               let e = crate::ast::IdError::RepeatIdx;
-              println!("Line={}, error={}",line_num,e);
+              log::error!("Line={}, error={}",line_num,e);
             }
           },
           Err(e) => {
-            println!("Line={}, error={}",line_num,e);
+            log::error!("Line={}, error={}",line_num,e);
           },
         }
         let n: usize;
@@ -228,12 +228,12 @@ fn group_field_fn(
           Ok(group) => {
             if let Some(old) = res.#field_name{
               let e = crate::ast::IdError::RepeatAttri;
-              println!("Line={}, error={}",line_num,e);
+              log::error!("Line={}, error={}",line_num,e);
             }
             res.#field_name = Some(group);
           },
           Err(e) => {
-            println!("Line={}, error={}",line_num,e);
+            log::error!("Line={}, error={}",line_num,e);
           },
         }
         let n: usize;
@@ -344,7 +344,7 @@ pub(crate) fn inner(
         quote!(()),
         quote! {
           #[inline]
-          fn name(&self) -> Self::Name{()}
+          fn name(&self) -> Self::Name{}
           #[inline]
           fn set_name(&mut self, name: Self::Name){}
         },
@@ -385,12 +385,11 @@ pub(crate) fn inner(
       _ => {
         let i = Ident::new(&format!("{}Name", ident), Span::call_site());
         let mut s: DeriveInput = parse_quote! {
-                  #[doc(hidden)]
-                  #[derive(Debug,Clone)]
-                  #[derive(serde::Serialize, serde::Deserialize)]
-        pub struct #i{
-                  }
-                };
+          #[doc(hidden)]
+          #[derive(Debug,Clone)]
+          #[derive(serde::Serialize, serde::Deserialize)]
+          pub struct #i{}
+        };
         let s_fileds = fields_of_input(&mut s);
         let mut _name = quote!();
         let mut _set_name = quote!();
@@ -426,69 +425,70 @@ pub(crate) fn inner(
       }
     };
     let impl_group = quote! {
-          #named_group_impl
-          #name_sturct
-          #[doc(hidden)]
-          #[derive(Default,Debug,Clone)]
-          #[derive(serde::Serialize, serde::Deserialize)]
-    pub struct #comments_ident{
-            pub #comments_self: crate::ast::AttriComment,
-            #attri_comments
+      #named_group_impl
+      #name_sturct
+      #[doc(hidden)]
+      #[derive(Default,Debug,Clone)]
+      #[derive(serde::Serialize, serde::Deserialize)]
+      pub struct #comments_ident{
+        pub #comments_self: crate::ast::AttriComment,
+        #attri_comments
+      }
+      #[doc(hidden)]
+      #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
+      impl crate::ast::GroupAttri for #ident {
+        type Name=#name_ident;
+        type Comments=#comments_ident;
+        #name_func
+        fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
+          use core::fmt::Write;
+          use itertools::Itertools;
+          let indent = f.indentation();
+          #write_title
+          f.indent(1);
+          #write_fields
+          if !self.#undefined_name.is_empty(){
+            let indent1 = f.indentation();
+            write!(f,"\n{indent1}/* Undefined attributes from here */")?;
+            crate::ast::liberty_attr_list(&self.#undefined_name,f)?;
+            write!(f,"\n{indent1}/* Undefined attributes end here */")?;
           }
-          #[doc(hidden)]
-          #[allow(clippy::unused_unit)]
-          impl crate::ast::GroupAttri for #ident {
-            type Name=#name_ident;
-            type Comments=#comments_ident;
-            #name_func
-            fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
-              use core::fmt::Write;
-              use itertools::Itertools;
-              let indent = f.indentation();
-              #write_title
-              f.indent(1);
-              #write_fields
-              if !self.#undefined_name.is_empty(){
-                let indent1 = f.indentation();
-                write!(f,"\n{indent1}/* Undefined attributes from here */")?;
-                crate::ast::liberty_attr_list(&self.#undefined_name,f)?;
-                write!(f,"\n{indent1}/* Undefined attributes end here */")?;
-              }
-              f.dedent(1);
-              write!(f, "\n{indent}}}")
-            }
-            fn nom_parse<'a>(
-              i: &'a str, line_num: &mut usize
-            ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
-              let (mut input,title) = crate::ast::parser::title(i,line_num)?;
-              let mut res = Self::default();
-              loop {
-                match crate::ast::parser::key(input){
-                  Err(nom::Err::Error(_)) => {
-                    (input,_) = crate::ast::parser::end_group(input)?;
-                    #link_self
-                    #change_id_return
+          f.dedent(1);
+          write!(f, "\n{indent}}}")
+        }
+        fn nom_parse<'a>(
+          i: &'a str, line_num: &mut usize
+        ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
+          let (mut input,title) = crate::ast::parser::title(i,line_num)?;
+          let mut res = Self::default();
+          loop {
+            match crate::ast::parser::key(input){
+              Err(nom::Err::Error(_)) => {
+                (input,_) = crate::ast::parser::end_group(input)?;
+                #link_self
+                #change_id_return
+              },
+              Err(e) => return Err(e),
+              Ok((_input,key)) => {
+                input = _input;
+                match key {
+                  #parser_arms
+                  _ => {
+                    let undefined: crate::ast::AttriValue;
+                    (input,undefined) = crate::ast::parser::undefine(input,line_num)?;
+                    log::warn!("line={}; undefined {}",line_num,key);
+                    res.#undefined_name.push((crate::ArcStr::from(key), undefined));
+                    let n: usize;
+                    (input,n) = crate::ast::parser::comment_space_newline(input)?;
+                    *line_num+=n;
                   },
-                  Err(e) => return Err(e),
-                  Ok((_input,key)) => {
-                    input = _input;
-                    match key {
-                      #parser_arms
-                      _ => {
-                        let undefined: crate::ast::AttriValue;
-                        (input,undefined) = crate::ast::parser::undefine(input,line_num)?;
-                        res.#undefined_name.push((crate::ArcStr::from(key), undefined));
-                        let n: usize;
-                        (input,n) = crate::ast::parser::comment_space_newline(input)?;
-                        *line_num+=n;
-                      },
-                    }
-                  }
                 }
               }
             }
           }
-        };
+        }
+      }
+    };
     Ok(quote! {
       #impl_group
     })

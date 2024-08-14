@@ -126,7 +126,7 @@ fn comment_space_newline_slash(i: &str) -> IResult<&str, usize, Error<&str>> {
 }
 
 #[cfg(test)]
-mod space_test {
+mod test_space {
   use super::*;
   #[test]
   fn space_test() {

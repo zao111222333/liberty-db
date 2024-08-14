@@ -106,12 +106,14 @@
   test,
   allow(
     dead_code,
-    unused_imports,
     unused,
+    unused_imports,
+    unused_results,
     clippy::unwrap_used,
     clippy::expect_used,
     clippy::too_many_lines,
     clippy::non_ascii_literal,
+    clippy::must_use_candidate,
     clippy::needless_raw_strings,
     clippy::cast_possible_truncation,
     clippy::as_conversions,
@@ -119,8 +121,6 @@
   )
 )]
 
-#[macro_use]
-extern crate log;
 pub use arcstr;
 pub use arcstr::ArcStr;
 pub use mut_set::MutSet as GroupSet;

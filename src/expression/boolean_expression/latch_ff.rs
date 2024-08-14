@@ -852,20 +852,17 @@ mod test {
   use crate::expression::{FFBank, IdBooleanExpression, Latch, LatchBank, LatchFF, FF};
   #[test]
   fn special_boolean_expression() {
-    let (mut ff, fmt_str, _) = crate::ast::test_parse_group::<FF>(
+    let ff = crate::ast::test_parse_fmt::<FF>(
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
         clocked_on : "\"1A\" + \"1B\"";
       }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clocked_on : "\"1A\"+\"1B\"";
 | next_state : "J*K*!IQ+J*!K+!J*!K*IQ";
-}"#
+}"#,
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
@@ -888,20 +885,17 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
   /// ">Reference</a>
   #[test]
   fn jk_flip_flop() {
-    let (mut ff, fmt_str, _) = crate::ast::test_parse_group::<FF>(
+    let ff = crate::ast::test_parse_fmt::<FF>(
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
         clocked_on : "CP";
       }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clocked_on : CP;
 | next_state : "J*K*!IQ+J*!K+!J*!K*IQ";
-}"#
+}"#,
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
@@ -924,7 +918,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
   /// ">Reference</a>
   #[test]
   fn example19() {
-    let (mut ff, fmt_str, _) = crate::ast::test_parse_group::<FF>(
+    let ff = crate::ast::test_parse_fmt::<FF>(
       r#"(IQ, IQN) {  
         next_state : "D" ;  
         clocked_on : "CP" ;  
@@ -934,9 +928,6 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
         clear_preset_var2 : L ;
     }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clear : "!CD";
@@ -945,7 +936,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clocked_on : CP;
 | next_state : D;
 | preset : "!PD";
-}"#
+}"#,
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
@@ -968,7 +959,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
   /// ">Reference</a>
   #[test]
   fn example20() {
-    let (mut ff, fmt_str, _) = crate::ast::test_parse_group::<FF>(
+    let ff = crate::ast::test_parse_fmt::<FF>(
       r#"(IQ, IQN) {  
         next_state : "(TE*TI)+(TE’*J*K’)+(TE’*J’*K’*IQ)+(TE’*J*K*IQ’)" ;  
         clocked_on : "CP" ;  
@@ -978,9 +969,6 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
         clear_preset_var2 : L ;
       }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clear : "!CD";
@@ -989,7 +977,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clocked_on : CP;
 | next_state : "TE*TI+!TE*J*!K+!TE*!J*!K*IQ+!TE*J*K*!IQ";
 | preset : "!PD";
-}"#
+}"#,
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
@@ -1010,20 +998,17 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
   /// ">Reference</a>
   #[test]
   fn example21() {
-    let (mut ff, fmt_str, _) = crate::ast::test_parse_group::<FF>(
+    let ff = crate::ast::test_parse_fmt::<FF>(
       r#"(IQ, IQN) {   
         next_state : "D * CLR’" ;   
         clocked_on : "CP" ;
     }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clocked_on : CP;
 | next_state : "D*!CLR";
-}"#
+}"#,
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
@@ -1046,7 +1031,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
   /// ">Reference</a>
   #[test]
   fn example22() {
-    let (mut ff, fmt_str, _) = crate::ast::test_parse_group::<FF>(
+    let ff = crate::ast::test_parse_fmt::<FF>(
       r#"(IQ, IQN) {  
         next_state : "D" ;  
         clocked_on : "CLK" ;  
@@ -1057,9 +1042,6 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
         clear_preset_var2 : H ;
     }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clear : "!CDN";
@@ -1069,7 +1051,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
 | clocked_on_also : "!CLKN";
 | next_state : D;
 | preset : "!PDN";
-}"#
+}"#,
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
@@ -1090,7 +1072,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
   /// ">Reference</a>
   #[test]
   fn example23() {
-    let (mut ff, fmt_str, _) = crate::ast::test_parse_group::<FFBank>(
+    let ff = crate::ast::test_parse_fmt::<FFBank>(
       r#"(IQ, IQN, 4) {    
         next_state : "D" ;    
         clocked_on : "CLK" ;    
@@ -1100,9 +1082,6 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
         clear_preset_var2 : L ;   
       }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
 | clear : "!CLR";
@@ -1111,7 +1090,7 @@ liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
 | clocked_on : CLK;
 | next_state : D;
 | preset : "!PRE";
-}"#
+}"#,
     );
     let var1_expr = ff.variable1_expr();
     let var2_expr = ff.variable2_expr();
@@ -1131,22 +1110,19 @@ liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
   /// ">Reference</a>
   #[test]
   fn example25() {
-    let (mut latch, fmt_str, _) = crate::ast::test_parse_group::<Latch>(
+    let latch = crate::ast::test_parse_fmt::<Latch>(
       r#"(IQ, IQN) {
         enable : "G" ;
         data_in : "D" ;
         clear : "CD’" ;
        }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::Latch (IQN, IQ) {
 | clear : "!CD";
 | enable : G;
 | data_in : D;
-}"#
+}"#,
     );
     let var1_expr = latch.variable1_expr();
     let var2_expr = latch.variable2_expr();
@@ -1166,7 +1142,7 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQN, IQ) {
   /// ">Reference</a>
   #[test]
   fn example26() {
-    let (mut latch, fmt_str, _) = crate::ast::test_parse_group::<Latch>(
+    let latch = crate::ast::test_parse_fmt::<Latch>(
       r#"(IQ, IQN) {  
         clear : "S’" ;  
         preset : "R’" ;  
@@ -1174,16 +1150,13 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQN, IQ) {
         clear_preset_var2 : L ;
       }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::expression::boolean_expression::latch_ff::Latch (IQN, IQ) {
 | clear : "!S";
 | clear_preset_var1 : L;
 | clear_preset_var2 : L;
 | preset : "!R";
-}"#
+}"#,
     );
     let var1_expr = latch.variable1_expr();
     let var2_expr = latch.variable2_expr();

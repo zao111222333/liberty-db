@@ -53,7 +53,7 @@ mod test_sort {
 
   #[test]
   fn test_leakage_sort() {
-    let (cell, _, _) = crate::ast::test_parse_group::<crate::Cell>(
+    let cell = crate::ast::test_parse::<crate::Cell>(
       r#"(CELL) {
       leakage_power () {
         related_pg_pin : VDD;
@@ -242,7 +242,7 @@ mod test_statetable {
   use super::*;
   #[test]
   fn statetable_test() {
-    _ = crate::ast::test_parse_group::<Statetable>(
+    _ = crate::ast::test_parse::<Statetable>(
       r#"(" CLK EN SE",ENL) {
         table : "	H   L  L : - : L ,\
         H   L  H : - : H ,\

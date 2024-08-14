@@ -68,7 +68,7 @@ mod test {
   /// ">Reference</a>
   #[test]
   fn example23() {
-    let (mut cell, fmt_str, _) = crate::ast::test_parse_group::<Cell>(
+    let cell = crate::ast::test_parse_fmt::<Cell>(
       r#"(dff4) {
         area : 1 ;
         pin (CLK) {
@@ -203,9 +203,6 @@ mod test {
         }
     } /* end of cell dff4 */
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::cell::Cell (dff4) {
 | area : 1.0;
@@ -341,7 +338,7 @@ liberty_db::cell::Cell (dff4) {
 | | }
 | }
 | /* Undefined attributes end here */
-}"#
+}"#,
     );
   }
   /// Example 27 shows a `latch_bank`  group for a multibit register containing four rising-edge-triggered D latches
@@ -350,7 +347,7 @@ liberty_db::cell::Cell (dff4) {
   /// ">Reference</a>
   #[test]
   fn example27() {
-    let (mut cell, fmt_str, _) = crate::ast::test_parse_group::<Cell>(
+    let cell = crate::ast::test_parse_fmt::<Cell>(
       r#"(latch4) {
         area: 16;
         pin (G) {     /* gate enable signal, active-high */
@@ -376,9 +373,6 @@ liberty_db::cell::Cell (dff4) {
         }
     }
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::cell::Cell (latch4) {
 | area : 16.0;
@@ -405,7 +399,7 @@ liberty_db::cell::Cell (latch4) {
 | | function : IQN;
 | }
 | /* Undefined attributes end here */
-}"#
+}"#,
     );
   }
   /// Example 28 a multibit register containing four high-enable D latches with the clear  attribute.
@@ -414,7 +408,7 @@ liberty_db::cell::Cell (latch4) {
   /// ">Reference</a>
   #[test]
   fn example28() {
-    let (mut cell, fmt_str, _) = crate::ast::test_parse_group::<Cell>(
+    let cell = crate::ast::test_parse_fmt::<Cell>(
       r#"(DLT2) {/* note: 0 hold time */
         area : 1 ;
         single_bit_degenerate : FDB ;
@@ -569,9 +563,6 @@ liberty_db::cell::Cell (latch4) {
         }
     } /* end of cell DLT2
     "#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::cell::Cell (DLT2) {
 | area : 1.0;
@@ -727,7 +718,7 @@ liberty_db::cell::Cell (DLT2) {
 | | }
 | }
 | /* Undefined attributes end here */
-}"#
+}"#,
     );
   }
 }

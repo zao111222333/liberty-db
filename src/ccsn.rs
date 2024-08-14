@@ -206,11 +206,11 @@ impl GroupFn for CCSNStage {
   fn post_process(&mut self) {
     if self.miller_cap_fall.is_sign_negative() {
       self.miller_cap_fall.set_zero();
-      warn!("miller_cap_fall is negative!");
+      log::warn!("miller_cap_fall is negative!");
     }
     if self.miller_cap_rise.is_sign_negative() {
       self.miller_cap_rise.set_zero();
-      warn!("miller_cap_rise is negative!");
+      log::warn!("miller_cap_rise is negative!");
     }
   }
 }
@@ -350,7 +350,7 @@ mod test {
     use std::io::{BufWriter, Write};
     let filepath = "tests/tech/ccsn.lib";
     let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
-    match crate::library::Library::parse(&data) {
+    match crate::library::Library::parse_lib(&data) {
       Ok(library) => {
         let file = File::create("output.lib")?;
         let mut writer = BufWriter::new(file);

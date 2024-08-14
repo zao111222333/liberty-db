@@ -1,6 +1,5 @@
-use crate::ArcStr;
-
-use crate::ast::SimpleAttri;
+use crate::{ast::SimpleAttri, ArcStr};
+use core::fmt;
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -30,10 +29,10 @@ use crate::ast::SimpleAttri;
 pub struct SdfExpression {
   inner: ArcStr,
 }
-impl core::fmt::Display for SdfExpression {
+impl fmt::Display for SdfExpression {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    core::fmt::Display::fmt(&self.inner, f)
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fmt::Display::fmt(&self.inner, f)
   }
 }
 impl core::str::FromStr for SdfExpression {

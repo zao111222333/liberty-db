@@ -1,23 +1,20 @@
-use core::fmt::Write;
-use core::marker::PhantomData;
+use core::{fmt, marker::PhantomData, ops::Deref};
 
+/// See more at [`DefaultIndentation`]
 pub trait Indentation {
   const LUT: &'static [&'static str];
 
-  #[allow(clippy::indexing_slicing)]
-  #[allow(clippy::arithmetic_side_effects)]
+  /// Get indentation
   #[must_use]
   #[inline]
   fn indentation(level: usize) -> &'static str {
-    if let Some(&i1) = Self::LUT.get(level) {
-      i1
-    } else if let Some(&i2) = Self::LUT.last() {
-      i2
-    } else {
-      ""
-    }
+    Self::LUT
+      .get(level)
+      .map_or(Self::LUT.last().map_or("", Deref::deref), Deref::deref)
   }
 }
+
+/// The Default Indentation implemt
 #[derive(Debug, Clone, Copy)]
 pub struct DefaultIndentation;
 impl Indentation for DefaultIndentation {
@@ -61,16 +58,16 @@ pub struct CodeFormatter<'a, F, I> {
 pub type DefaultCodeFormatter<'a, F> = CodeFormatter<'a, F, DefaultIndentation>;
 pub type TestCodeFormatter<'a, F> = CodeFormatter<'a, F, TestIndentation>;
 
-impl<F: Write, I> Write for CodeFormatter<'_, F, I> {
+impl<F: fmt::Write, I> fmt::Write for CodeFormatter<'_, F, I> {
   #[inline]
-  fn write_str(&mut self, s: &str) -> core::fmt::Result {
+  fn write_str(&mut self, s: &str) -> fmt::Result {
     self.f.write_str(s)
   }
 }
 
-impl<'a, T: Write, I: Indentation> CodeFormatter<'a, T, I> {
+impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
   /// Wrap the formatter `f`, use `indentation` as base string indentation and return a new
-  /// formatter that implements `core::fmt::Write` that can be used with the macro `write!()`
+  /// formatter that implements `fmt::Write` that can be used with the macro `write!()`
   #[inline]
   pub fn new(f: &'a mut T) -> Self {
     Self { f, level: 0, __i: PhantomData }
@@ -108,7 +105,7 @@ mod test {
   use crate::common::items::DummyGroup;
   #[test]
   fn more_than_10() {
-    let (_, fmt_str, _) = crate::ast::test_parse_group::<DummyGroup>(
+    crate::ast::test_parse_fmt::<DummyGroup>(
       r#"(0){
         /* comment1 */
         level(1){
@@ -150,9 +147,6 @@ mod test {
           }
         }
       }"#,
-    );
-    assert_eq!(
-      fmt_str,
       r#"
 liberty_db::common::items::DummyGroup (0) {
 | /* Undefined attributes from here */
@@ -183,7 +177,7 @@ liberty_db::common::items::DummyGroup (0) {
 | | }
 | }
 | /* Undefined attributes end here */
-}"#
+}"#,
     );
   }
 }

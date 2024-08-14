@@ -3,20 +3,19 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 mod latch_ff;
-pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 pub mod logic;
-use core::{borrow::Borrow, cmp::Ordering, str::FromStr};
-use std::collections::HashSet;
+mod parser;
+use crate::ArcStr;
+pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
+use parser::{as_sdf_str, BoolExprErr};
 
 pub use biodivine_lib_bdd::{
   boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
   BddVariableSetBuilder,
 };
-
-mod parser;
-use crate::ArcStr;
+use core::{borrow::Borrow, cmp::Ordering, fmt, str::FromStr};
 use itertools::Itertools;
-use parser::{as_sdf_str, BoolExprErr};
+use std::collections::HashSet;
 
 use super::SdfExpression;
 lazy_static::lazy_static! {
@@ -266,16 +265,16 @@ impl FromStr for IdBooleanExpression {
   }
 }
 
-impl core::fmt::Display for BooleanExpression {
+impl fmt::Display for BooleanExpression {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     parser::_fmt(&self.expr, f)
   }
 }
 
-impl core::fmt::Display for IdBooleanExpression {
+impl fmt::Display for IdBooleanExpression {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     parser::_fmt(&self.expr, f)
   }
 }

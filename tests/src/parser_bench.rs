@@ -1,15 +1,14 @@
 #![allow(clippy::field_reassign_with_default)]
 use colored::Colorize;
-use core::fmt::Display;
+use core::fmt;
 use std::ffi::OsStr;
+use std::fs::File;
+use std::io::BufReader;
+use std::panic;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 use std::{fs, fs::metadata};
 use walkdir::WalkDir;
-
-use std::fs::File;
-use std::io::BufReader;
-use std::panic;
 
 fn all_lib_files() -> Vec<PathBuf> {
   WalkDir::new("tech")
@@ -39,8 +38,8 @@ enum ReturnState {
   PANIC,
 }
 
-impl Display for ReturnState {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+impl fmt::Display for ReturnState {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       ReturnState::PASS(d) => write!(f, "{}", format!("{:.2?}", d).green().bold()),
       ReturnState::FAIL => write!(f, "{}", "FAIL".bold().bright_red()),
@@ -55,21 +54,21 @@ struct TestResult {
   state: ReturnState,
   // duration: Duration,
 }
-impl Display for TestResult {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+impl fmt::Display for TestResult {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{}\t{}", self.state, self.file_in)
   }
 }
 
-type ParserFn = fn(PathBuf) -> Result<(), core::fmt::Error>;
+type ParserFn = fn(PathBuf) -> Result<(), fmt::Error>;
 struct ParserCtx {
   name: &'static str,
   info: &'static str,
   parser: ParserFn,
 }
 
-impl Display for ParserCtx {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+impl fmt::Display for ParserCtx {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     // write!(f,
     //     "\u{1b}]8;;{}\u{1b}\\{}\u{1b}]8;;\u{1b}\\",
     //     self.info, self.name,
@@ -111,10 +110,10 @@ const PARSER_LIBERTY_DB: ParserCtx = ParserCtx {
   info: "https://crates.io/crates/liberty-db",
   parser: |filepath| {
     let data = fs::read_to_string(filepath.clone()).expect("Failed to open file.");
-    let result = liberty_db::library::Library::parse(&data);
+    let result = liberty_db::library::Library::parse_lib(&data);
     match result {
       Ok(_) => Ok(()),
-      Err(_) => Err(core::fmt::Error),
+      Err(_) => Err(fmt::Error),
     }
   },
 };
@@ -128,7 +127,7 @@ const PARSER_LIBERTY_IO: ParserCtx = ParserCtx {
     let result = liberty_io::read_liberty_bytes(&mut buf);
     match result {
       Ok(_) => Ok(()),
-      Err(_) => Err(core::fmt::Error),
+      Err(_) => Err(fmt::Error),
     }
   },
 };
@@ -142,7 +141,7 @@ const PARSER_LIBERTYPARSE: ParserCtx = ParserCtx {
     let parsed = Liberty::parse_str(&data);
     match parsed {
       Ok(_) => Ok(()),
-      Err(_) => Err(core::fmt::Error),
+      Err(_) => Err(fmt::Error),
     }
   },
 };

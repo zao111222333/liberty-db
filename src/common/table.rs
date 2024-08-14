@@ -1,8 +1,8 @@
-use crate::NotNan;
 use crate::{
   ast::{AttributeList, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
-  ArcStr, GroupSet,
+  ArcStr, GroupSet, NotNan,
 };
+use core::fmt;
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
@@ -610,9 +610,9 @@ impl core::str::FromStr for Variable {
   }
 }
 
-impl core::fmt::Display for Variable {
+impl fmt::Display for Variable {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::Time(v) => v.fmt(f),
       Self::Voltage(v) => v.fmt(f),
