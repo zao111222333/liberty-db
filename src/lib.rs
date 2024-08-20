@@ -58,6 +58,7 @@
     clippy::pattern_type_mismatch, // TODO: 
     clippy::partial_pub_fields,
     clippy::single_char_lifetime_names,
+    clippy::while_let_on_iterator,
     clippy::iter_over_hash_type,
     clippy::separated_literal_suffix,
     clippy::single_call_fn,

@@ -2,9 +2,14 @@ use crate::{
   ast::{CodeFormatter, GroupComments, GroupFn, Indentation, SimpleAttri},
   ArcStr,
 };
-use core::{cmp::Ordering, fmt, hash, str::FromStr};
+use core::{
+  cmp::Ordering,
+  fmt::{self, Write},
+  hash,
+  str::FromStr,
+};
 use itertools::Itertools;
-use std::{collections::HashSet, fmt::Write};
+use std::collections::HashSet;
 use strum_macros::{Display, EnumString};
 
 /// The `sdf_edges` attribute defines the edge specification on both
