@@ -1,5 +1,8 @@
-use crate::{ast::SimpleAttri, ArcStr};
-use core::fmt;
+use crate::{
+  ast::{CodeFormatter, Indentation, SimpleAttri},
+  ArcStr,
+};
+use core::fmt::{self, Write};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -42,7 +45,15 @@ impl core::str::FromStr for SdfExpression {
     Ok(Self { inner: ArcStr::from_str(s)? })
   }
 }
-impl SimpleAttri for SdfExpression {}
+impl SimpleAttri for SdfExpression {
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    f.write_fmt(format_args!("\"{self}\""))
+  }
+}
 impl SdfExpression {
   #[must_use]
   #[inline]

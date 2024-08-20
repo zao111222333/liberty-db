@@ -1,45 +1,59 @@
 //!
 //! implement basic types
 //!
+use core::fmt::{self, Write};
+
 use crate::{
   ast::{
-    ComplexAttri, ComplexParseError, ComplexWrapper, IdError, NameAttri, SimpleAttri,
-    SimpleWrapper,
+    is_word, CodeFormatter, ComplexAttri, ComplexParseError, ComplexWrapper, IdError,
+    Indentation, NameAttri, SimpleAttri,
   },
   ArcStr, NotNan,
 };
 use itertools::Itertools;
 impl SimpleAttri for f64 {
   #[inline]
-  fn to_wrapper(&self) -> SimpleWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
-    ArcStr::from(buffer.format(*self))
+    f.write_str(buffer.format(*self))
   }
 }
 
 impl SimpleAttri for NotNan<f64> {
   #[inline]
-  fn to_wrapper(&self) -> SimpleWrapper {
-    let f: f64 = (*self).into();
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let float: f64 = (*self).into();
     let mut buffer = ryu::Buffer::new();
-    ArcStr::from(buffer.format(f))
+    f.write_str(buffer.format(float))
   }
 }
 
 impl SimpleAttri for bool {}
 impl SimpleAttri for usize {
   #[inline]
-  fn to_wrapper(&self) -> SimpleWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = itoa::Buffer::new();
-    ArcStr::from(buffer.format(*self))
+    f.write_str(buffer.format(*self))
   }
 }
 
 impl SimpleAttri for isize {
   #[inline]
-  fn to_wrapper(&self) -> SimpleWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = itoa::Buffer::new();
-    ArcStr::from(buffer.format(*self))
+    f.write_str(buffer.format(*self))
   }
 }
 
@@ -122,7 +136,23 @@ impl<const N: usize> NameAttri for [ArcStr; N] {
   }
 }
 
-impl SimpleAttri for ArcStr {}
+impl SimpleAttri for ArcStr {
+  #[inline]
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    if is_word(self) {
+      f.write_fmt(format_args!("{self}"))
+    } else {
+      f.write_fmt(format_args!("\"{self}\""))
+    }
+  }
+}
 
 impl<const N: usize> ComplexAttri for [ArcStr; N] {
   #[inline]

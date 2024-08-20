@@ -4,9 +4,9 @@
         "editor.defaultFormatter": "rust-lang.rust-analyzer",
         "editor.formatOnSave": true,
     },
-    "rust-analyzer.checkOnSave": true,
-    "rust-analyzer.check.command": "clippy",
-    "rust-analyzer.check.extraArgs": ["--all-features"],
+    // "rust-analyzer.checkOnSave": true,
+    // "rust-analyzer.check.command": "clippy",
+    // "rust-analyzer.check.extraArgs": ["--all-features"],
     "rust-analyzer.procMacro.enable": true,
     // vscode-lldb need glibc 2.28
     "rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
@@ -25,17 +25,17 @@
     //     }
     // },
     "rust-analyzer.server.extraEnv": { 
-        // "RUSTUP_TOOLCHAIN": "stable",
+        "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
         "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
     },
     "terminal.integrated.env.linux": {
-        // "RUSTUP_TOOLCHAIN": "stable",
+        "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
         "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
     },
     "terminal.integrated.env.osx": {
-        // "RUSTUP_TOOLCHAIN": "stable",
+        "RUSTUP_TOOLCHAIN": "stable",
         "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
         "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
     },

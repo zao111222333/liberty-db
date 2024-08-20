@@ -1,10 +1,10 @@
 use crate::{
-  ast::{GroupComments, GroupFn, SimpleAttri},
+  ast::{CodeFormatter, GroupComments, GroupFn, Indentation, SimpleAttri},
   ArcStr,
 };
 use core::{cmp::Ordering, fmt, hash, str::FromStr};
 use itertools::Itertools;
-use std::collections::HashSet;
+use std::{collections::HashSet, fmt::Write};
 use strum_macros::{Display, EnumString};
 
 /// The `sdf_edges` attribute defines the edge specification on both
@@ -121,7 +121,14 @@ pub struct WordSet {
 impl fmt::Display for WordSet {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    fmt::Display::fmt(&self.inner.iter().join(" "), f)
+    let mut iter = self.inner.iter();
+    if let Some(first) = iter.next() {
+      write!(f, "{first}")?;
+      while let Some(next) = iter.next() {
+        write!(f, " {next}")?;
+      }
+    }
+    Ok(())
   }
 }
 impl Ord for WordSet {
@@ -153,7 +160,28 @@ impl PartialOrd for WordSet {
   }
 }
 
-impl SimpleAttri for WordSet {}
+impl SimpleAttri for WordSet {
+  #[inline]
+  fn is_set(&self) -> bool {
+    !self.inner.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let mut iter = self.inner.iter();
+    if let Some(first) = iter.next() {
+      write!(f, "\"{first}")?;
+      while let Some(next) = iter.next() {
+        write!(f, " {next}")?;
+      }
+      write!(f, "\"")
+    } else {
+      Ok(())
+    }
+  }
+}
 impl hash::Hash for WordSet {
   #[inline]
   fn hash<H: hash::Hasher>(&self, state: &mut H) {

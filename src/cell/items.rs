@@ -1,12 +1,16 @@
 use crate::{
-  ast::{AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri, SimpleWrapper},
+  ast::{AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri},
   common::items::WordSet,
   expression::IdBooleanExpression,
   pin::Direction,
   timing::items::Mode,
   ArcStr,
 };
-use core::{fmt, hash::Hash, str::FromStr};
+use core::{
+  fmt::{self, Write},
+  hash::Hash,
+  str::FromStr,
+};
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=199.5&end=199.6
@@ -217,6 +221,10 @@ impl FromStr for Table {
 
 impl SimpleAttri for Table {
   #[inline]
+  fn is_set(&self) -> bool {
+    !self.v.is_empty()
+  }
+  #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     line_num: &mut usize,
@@ -232,8 +240,21 @@ impl SimpleAttri for Table {
     }
   }
   #[inline]
-  fn to_wrapper(&self) -> SimpleWrapper {
-    self.v.join(" ,\\\n").into()
+  fn fmt_self<T: Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let indent = f.indentation();
+    let mut iter = self.v.iter();
+    if let Some(first) = iter.next() {
+      write!(f, "\"{first}")?;
+      while let Some(next) = iter.next() {
+        write!(f, " ,\\\n{indent}         {next}")?;
+      }
+      write!(f, "\"")
+    } else {
+      Ok(())
+    }
   }
 }
 

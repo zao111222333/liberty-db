@@ -5,7 +5,10 @@
 mod latch_ff;
 pub mod logic;
 mod parser;
-use crate::ArcStr;
+use crate::{
+  ast::{CodeFormatter, Indentation},
+  ArcStr,
+};
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 use parser::{as_sdf_str, BoolExprErr};
 
@@ -13,7 +16,12 @@ pub use biodivine_lib_bdd::{
   boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
   BddVariableSetBuilder,
 };
-use core::{borrow::Borrow, cmp::Ordering, fmt, str::FromStr};
+use core::{
+  borrow::Borrow,
+  cmp::Ordering,
+  fmt::{self, Write},
+  str::FromStr,
+};
 use itertools::Itertools;
 use std::collections::HashSet;
 
@@ -119,8 +127,24 @@ impl From<BooleanExpression> for Expr {
     val.expr
   }
 }
-impl crate::ast::SimpleAttri for BooleanExpression {}
-impl crate::ast::SimpleAttri for IdBooleanExpression {}
+impl crate::ast::SimpleAttri for BooleanExpression {
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    f.write_fmt(format_args!("\"{self}\""))
+  }
+}
+impl crate::ast::SimpleAttri for IdBooleanExpression {
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    f.write_fmt(format_args!("\"{self}\""))
+  }
+}
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
