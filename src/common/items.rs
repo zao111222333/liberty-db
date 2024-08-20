@@ -177,14 +177,18 @@ impl SimpleAttri for WordSet {
   ) -> fmt::Result {
     let mut iter = self.inner.iter();
     if let Some(first) = iter.next() {
-      write!(f, "\"{first}")?;
+      if self.inner.len() != 1 {
+        write!(f, "\"")?;
+      }
+      write!(f, "{first}")?;
       while let Some(next) = iter.next() {
         write!(f, " {next}")?;
       }
-      write!(f, "\"")
-    } else {
-      Ok(())
+      if self.inner.len() != 1 {
+        write!(f, "\"")?;
+      }
     }
+    Ok(())
   }
 }
 impl hash::Hash for WordSet {

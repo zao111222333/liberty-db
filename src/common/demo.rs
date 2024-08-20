@@ -248,10 +248,10 @@ liberty_db::common::demo::Cell (INV) {
 | }
 | statetable ("CLK EN SE", ENL) {
 | | table : "H   L  L : - : L ,\
-H   L  H : - : H ,\
-H   H  L : - : H ,\
-H   H  H : - : H ,\
-L   -  - : - : N";
+| |          H   L  H : - : H ,\
+| |          H   H  L : - : H ,\
+| |          H   H  H : - : H ,\
+| |          L   -  - : - : N";
 | }
 }"#,
     );

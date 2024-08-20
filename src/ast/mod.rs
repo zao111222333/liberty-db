@@ -25,7 +25,7 @@ pub type ComplexWrapper = Vec<Vec<ArcStr>>;
 
 // pub enum ComplexShape {
 //   SingleLine,
-//   Multi2D(usize, usize),
+//   Table { size1: usize, size2: usize },
 //   Arbitrary(Vec<usize>),
 // }
 /// Wrapper for group attribute
@@ -221,6 +221,26 @@ pub trait ComplexAttri: Sized {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
+    // if self.is_empty() || (self.len() == 1 && self[0].is_empty()) {
+    //   return Ok(());
+    // };
+    // let indent1 = f.indentation();
+    // if self[0].iter().all(is_word) {
+    //   write!(f, "\n{indent1}{key} ({}", self[0].join(", "))?;
+    // } else {
+    //   write!(f, "\n{indent1}{key} (\"{}\"", self[0].join(", "))?;
+    // }
+    // f.indent(1);
+    // let indent2 = f.indentation();
+    // for v in self.iter().skip(1) {
+    //   if v.iter().all(is_word) {
+    //     write!(f, ", \\\n{indent2}{}", v.join(", "))?;
+    //   } else {
+    //     write!(f, ", \\\n{indent2}\"{}\"", v.join(", "))?;
+    //   }
+    // }
+    // f.dedent(1);
+    // write!(f, ");")
     <ComplexWrapper as Format>::liberty(&self.to_wrapper(), key, f)
   }
 }

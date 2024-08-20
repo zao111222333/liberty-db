@@ -4,6 +4,7 @@
 
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
+  common::items::DummyGroup,
   expression::{FFBank, Latch, LatchBank, FF},
   pin::Pin,
   ArcStr, GroupSet,
@@ -55,6 +56,9 @@ pub struct Cell {
   pub statetable: Option<Statetable>,
   #[liberty(group(type=Set))]
   pub pin: GroupSet<Pin>,
+  #[liberty(group(type=Set))]
+  // TODO:
+  pub bundle: GroupSet<DummyGroup>,
 }
 impl GroupFn for Cell {}
 
@@ -210,8 +214,8 @@ liberty_db::cell::Cell (dff4) {
 | | clear : "!CLR";
 | | clear_preset_var1 : L;
 | | clear_preset_var2 : L;
-| | clocked_on : CLK;
-| | next_state : D;
+| | clocked_on : "CLK";
+| | next_state : "D";
 | | preset : "!PRE";
 | }
 | pin (CLK) {
@@ -248,8 +252,8 @@ liberty_db::cell::Cell (dff4) {
 | | | }
 | | }
 | }
-| /* Undefined attributes from here */
 | bundle (D) {
+| | /* Undefined attributes from here */
 | | members (D1, D2, D3, D4);
 | | nextstate_type : data;
 | | direction : input;
@@ -274,8 +278,10 @@ liberty_db::cell::Cell (dff4) {
 | | | | values (1.0);
 | | | }
 | | }
+| | /* Undefined attributes end here */
 | }
 | bundle (Q) {
+| | /* Undefined attributes from here */
 | | members (Q1, Q2, Q3, Q4);
 | | direction : output;
 | | function : "(IQ)";
@@ -305,8 +311,10 @@ liberty_db::cell::Cell (dff4) {
 | | | | values (1.0);
 | | | }
 | | }
+| | /* Undefined attributes end here */
 | }
 | bundle (QN) {
+| | /* Undefined attributes from here */
 | | members (Q1N, Q2N, Q3N, Q4N);
 | | direction : output;
 | | function : IQN;
@@ -336,8 +344,8 @@ liberty_db::cell::Cell (dff4) {
 | | | | values (1.0);
 | | | }
 | | }
+| | /* Undefined attributes end here */
 | }
-| /* Undefined attributes end here */
 }"#,
     );
   }
@@ -377,28 +385,32 @@ liberty_db::cell::Cell (dff4) {
 liberty_db::cell::Cell (latch4) {
 | area : 16.0;
 | latch_bank (IQ, IQN, 4) {
-| | enable : G;
-| | data_in : D;
+| | enable : "G";
+| | data_in : "D";
 | }
 | pin (G) {
 | | direction : input;
 | }
-| /* Undefined attributes from here */
 | bundle (D) {
+| | /* Undefined attributes from here */
 | | members (D1, D2, D3, D4);
 | | direction : input;
+| | /* Undefined attributes end here */
 | }
 | bundle (Q) {
+| | /* Undefined attributes from here */
 | | members (Q1, Q2, Q3, Q4);
 | | direction : output;
 | | function : IQ;
+| | /* Undefined attributes end here */
 | }
 | bundle (QN) {
+| | /* Undefined attributes from here */
 | | members (Q1N, Q2N, Q3N, Q4N);
 | | direction : output;
 | | function : IQN;
+| | /* Undefined attributes end here */
 | }
-| /* Undefined attributes end here */
 }"#,
     );
   }
@@ -570,8 +582,8 @@ liberty_db::cell::Cell (DLT2) {
 | | clear : "!CLR";
 | | clear_preset_var1 : H;
 | | clear_preset_var2 : H;
-| | enable : EN;
-| | data_in : D;
+| | enable : "EN";
+| | data_in : "D";
 | | preset : "!PRE";
 | }
 | pin (EN) {
@@ -580,9 +592,25 @@ liberty_db::cell::Cell (DLT2) {
 | | min_pulse_width_high : 3.0;
 | | min_pulse_width_low : 3.0;
 | }
-| /* Undefined attributes from here */
-| single_bit_degenerate : FDB;
+| bundle (CLR) {
+| | /* Undefined attributes from here */
+| | members (CLRA, CLRB, CLRC, CLRD);
+| | direction : input;
+| | capacitance : 0;
+| | timing () {
+| | | related_pin : EN;
+| | | timing_type : recovery_falling;
+| | | cell_rise (scalar) {
+| | | | values (1.0);
+| | | }
+| | | cell_fall (scalar) {
+| | | | values (1.0);
+| | | }
+| | }
+| | /* Undefined attributes end here */
+| }
 | bundle (D) {
+| | /* Undefined attributes from here */
 | | members (DA, DB, DC, DD);
 | | direction : input;
 | | capacitance : 0;
@@ -606,23 +634,10 @@ liberty_db::cell::Cell (DLT2) {
 | | | | values (1.0);
 | | | }
 | | }
-| }
-| bundle (CLR) {
-| | members (CLRA, CLRB, CLRC, CLRD);
-| | direction : input;
-| | capacitance : 0;
-| | timing () {
-| | | related_pin : EN;
-| | | timing_type : recovery_falling;
-| | | cell_rise (scalar) {
-| | | | values (1.0);
-| | | }
-| | | cell_fall (scalar) {
-| | | | values (1.0);
-| | | }
-| | }
+| | /* Undefined attributes end here */
 | }
 | bundle (PRE) {
+| | /* Undefined attributes from here */
 | | members (PREA, PREB, PREC, PRED);
 | | direction : input;
 | | capacitance : 0;
@@ -636,8 +651,10 @@ liberty_db::cell::Cell (DLT2) {
 | | | | values (1.0);
 | | | }
 | | }
+| | /* Undefined attributes end here */
 | }
 | bundle (Q) {
+| | /* Undefined attributes from here */
 | | members (QA, QB, QC, QD);
 | | direction : output;
 | | function : IQ;
@@ -676,8 +693,10 @@ liberty_db::cell::Cell (DLT2) {
 | | | | values (1.0);
 | | | }
 | | }
+| | /* Undefined attributes end here */
 | }
 | bundle (QN) {
+| | /* Undefined attributes from here */
 | | members (QNA, QNB, QNC, QND);
 | | direction : output;
 | | function : IQN;
@@ -716,7 +735,10 @@ liberty_db::cell::Cell (DLT2) {
 | | | | values (1.0);
 | | | }
 | | }
+| | /* Undefined attributes end here */
 | }
+| /* Undefined attributes from here */
+| single_bit_degenerate : FDB;
 | /* Undefined attributes end here */
 }"#,
     );
