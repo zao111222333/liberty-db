@@ -223,14 +223,15 @@ mod test_sensitization {
         vector ( 2, "0 X 1" );
         vector ( 3, "Z 0 1" );
         vector ( 4, "1 1 0" );
-      }"#,r#"
+      }"#,
+      r#"
 liberty_db::library::items::Sensitization (sensitization_nand2) {
 | pin_names ("IN1, IN2, OUT1");
 | vector (1, "0 0 1");
 | vector (2, "0 X 1");
 | vector (3, "Z 0 1");
 | vector (4, "1 1 0");
-}"#
+}"#,
     );
     assert_eq!(
       sense.vector,
@@ -275,7 +276,8 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
         vector ( 2, "0 X 9" );
         vector ( 3, "Z 0 1" );
         vector ( 4, "1 1 0" );
-      }"#,r#"
+      }"#,
+      r#"
 liberty_db::library::items::Sensitization (sensitization_nand2) {
 | vector (1, "0 0 1");
 | vector (3, "Z 0 1");
@@ -283,7 +285,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
 | /* Undefined attributes from here */
 | vector ("2, 0 X 9");
 | /* Undefined attributes end here */
-}"#
+}"#,
     );
     assert!(sense1.undefined.len() == 1);
   }
