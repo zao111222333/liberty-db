@@ -1,9 +1,11 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
+
 use crate::{
   ast::{
-    AttributeList, ComplexAttri, ComplexParseError, GroupComments, GroupFn, SimpleAttri,
+    AttributeList, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
+    GroupFn, Indentation, SimpleAttri,
   },
   common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
@@ -12,6 +14,7 @@ use crate::{
   timing::items::Mode,
   ArcStr, GroupSet,
 };
+use core::fmt::{self, Write};
 use num_traits::Zero;
 
 /// Use the `ccsn_first_stage` group to specify CCS noise for the first stage of the channel-
@@ -331,12 +334,15 @@ impl ComplexAttri for PropagatingCcb {
   }
   #[allow(clippy::or_fun_call)]
   #[inline]
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     self
       .output_ccb_name
       .as_ref()
-      .map_or(vec![vec![self.input_ccb_name.clone()]], |output_ccb_name| {
-        vec![vec![self.input_ccb_name.clone(), output_ccb_name.clone()]]
+      .map_or(write!(f, "{}", self.input_ccb_name), |output_ccb_name| {
+        write!(f, "{}, {}", self.input_ccb_name, output_ccb_name)
       })
   }
 }

@@ -2,8 +2,14 @@
 //! IFRAME('https://en.wikipedia.org/wiki/International_System_of_Units');
 //! </script>
 
-use crate::{ArcStr, NotNan};
-use core::marker::PhantomData;
+use crate::{
+  ast::{CodeFormatter, Indentation},
+  NotNan,
+};
+use core::{
+  fmt::{self, Write},
+  marker::PhantomData,
+};
 pub use uom::{
   fmt::DisplayStyle,
   si::{
@@ -394,18 +400,15 @@ impl ComplexAttri for CapacitiveLoadUnit {
     Ok(Self { ff_pf, _v })
   }
   #[inline]
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
     if self.ff_pf {
-      vec![vec![
-        ArcStr::from(buffer.format(self._v.get::<capacitance::femtofarad>())),
-        "ff".into(),
-      ]]
+      write!(f, "{}ff", buffer.format(self._v.get::<capacitance::femtofarad>()))
     } else {
-      vec![vec![
-        ArcStr::from(buffer.format(self._v.get::<capacitance::picofarad>())),
-        "pf".into(),
-      ]]
+      write!(f, "{}pf", buffer.format(self._v.get::<capacitance::picofarad>()))
     }
   }
 }

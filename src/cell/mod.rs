@@ -231,10 +231,10 @@ liberty_db::cell::Cell (dff4) {
 | | | related_pin : CLK;
 | | | timing_type : recovery_rising;
 | | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
 | | | }
 | | | cell_rise (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
 | | | }
 | | }
 | }
@@ -245,10 +245,10 @@ liberty_db::cell::Cell (dff4) {
 | | | related_pin : CLK;
 | | | timing_type : recovery_rising;
 | | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
 | | | }
 | | | cell_rise (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
 | | | }
 | | }
 | }

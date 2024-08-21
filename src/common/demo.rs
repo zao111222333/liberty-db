@@ -133,7 +133,7 @@ mod test {
     "#,
       r#"
 liberty_db::common::demo::Timing () {
-| values ("1.0,2.0,3.0,4.0,5.0,6.0");
+| values ("1.0, 2.0, 3.0, 4.0, 5.0, 6.0");
 | t1 : combinational;
 }"#,
     );
@@ -149,7 +149,7 @@ liberty_db::common::demo::Timing () {
     "#,
       r#"
 liberty_db::common::demo::Timing () {
-| values ("-100.0,2.0,3.0,1.0,2.0,3.0");
+| values ("-100.0, 2.0, 3.0, 1.0, 2.0, 3.0");
 | t2 : combinational;
 | /* Undefined attributes from here */
 | t1 : ombinational;

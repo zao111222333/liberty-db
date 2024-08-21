@@ -1,5 +1,5 @@
 use crate::{
-  ast::{AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri},
+  ast::{join_fmt, AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri},
   common::items::WordSet,
   expression::IdBooleanExpression,
   pin::Direction,
@@ -245,16 +245,22 @@ impl SimpleAttri for Table {
     f: &mut crate::ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let indent = f.indentation();
-    let mut iter = self.v.iter();
-    if let Some(first) = iter.next() {
-      write!(f, "\"{first}")?;
-      while let Some(next) = iter.next() {
-        write!(f, " ,\\\n{indent}         {next}")?;
-      }
-      write!(f, "\"")
-    } else {
-      Ok(())
-    }
+    join_fmt(
+      self.v.iter(),
+      f,
+      |i, ff| write!(ff, "{i}"),
+      format!(" ,\\\n{indent}         ").as_str(),
+    )
+    // let mut iter = self.v.iter();
+    // if let Some(first) = iter.next() {
+    //   write!(f, "\"{first}")?;
+    //   while let Some(next) = iter.next() {
+    //     write!(f, " ,\\\n{indent}         {next}")?;
+    //   }
+    //   write!(f, "\"")
+    // } else {
+    //   Ok(())
+    // }
   }
 }
 

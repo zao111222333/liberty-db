@@ -3,12 +3,14 @@
 //! </script>
 // use std::ops::DerefMut;
 
+use core::fmt::{self, Write};
+
 use itertools::Itertools;
 
 use crate::{
   ast::{
-    AttributeList, ComplexAttri, ComplexParseError, ComplexWrapper, GroupComments,
-    GroupFn, SimpleAttri,
+    AttributeList, CodeFormatter, ComplexAttri, ComplexParseError, ComplexWrapper,
+    GroupComments, GroupFn, Indentation, SimpleAttri,
   },
   expression::logic,
   ArcStr, GroupSet,
@@ -182,22 +184,29 @@ impl ComplexAttri for SensitizationVector {
     Ok(Self { id, states })
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = itoa::Buffer::new();
-    vec![vec![
-      ArcStr::from(buffer.format(self.id)),
-      self
-        .states
-        .iter()
-        .map(|state| match state {
-          logic::Static::UnInit(logic::UnInit::HighImpedance) => "Z",
-          logic::Static::UnInit(logic::UnInit::Unknown(_)) => "X",
-          logic::Static::Level(logic::Level::High) => "1",
-          logic::Static::Level(logic::Level::Low) => "0",
-        })
-        .join(" ")
-        .into(),
-    ]]
+    write!(f, "{}, ", buffer.format(self.id))?;
+    crate::ast::join_fmt(
+      self.states.iter(),
+      f,
+      |state, ff| {
+        write!(
+          ff,
+          "{}",
+          match state {
+            logic::Static::UnInit(logic::UnInit::HighImpedance) => "Z",
+            logic::Static::UnInit(logic::UnInit::Unknown(_)) => "X",
+            logic::Static::Level(logic::Level::High) => "1",
+            logic::Static::Level(logic::Level::Low) => "0",
+          }
+        )
+      },
+      " ",
+    )
   }
 }
 
@@ -207,15 +216,21 @@ mod test_sensitization {
 
   #[test]
   fn sensitization() {
-    // FIXME: quote should not cover first word
-    let sense = crate::ast::test_parse::<Sensitization>(
+    let sense = crate::ast::test_parse_fmt::<Sensitization>(
       r#"(sensitization_nand2) {
         pin_names ( IN1, IN2, OUT1 );
         vector ( 1, "0 0 1" );
         vector ( 2, "0 X 1" );
         vector ( 3, "Z 0 1" );
         vector ( 4, "1 1 0" );
-      }"#,
+      }"#,r#"
+liberty_db::library::items::Sensitization (sensitization_nand2) {
+| pin_names ("IN1, IN2, OUT1");
+| vector (1, "0 0 1");
+| vector (2, "0 X 1");
+| vector (3, "Z 0 1");
+| vector (4, "1 1 0");
+}"#
     );
     assert_eq!(
       sense.vector,
@@ -254,13 +269,21 @@ mod test_sensitization {
         }
       ]
     );
-    let sense1 = crate::ast::test_parse::<Sensitization>(
+    let sense1 = crate::ast::test_parse_fmt::<Sensitization>(
       r#"(sensitization_nand2) {
         vector ( 1, "0 0 1" );
         vector ( 2, "0 X 9" );
         vector ( 3, "Z 0 1" );
         vector ( 4, "1 1 0" );
-      }"#,
+      }"#,r#"
+liberty_db::library::items::Sensitization (sensitization_nand2) {
+| vector (1, "0 0 1");
+| vector (3, "Z 0 1");
+| vector (4, "1 1 0");
+| /* Undefined attributes from here */
+| vector ("2, 0 X 9");
+| /* Undefined attributes end here */
+}"#
     );
     assert!(sense1.undefined.len() == 1);
   }
@@ -310,9 +333,12 @@ impl ComplexAttri for VoltageMap {
     Ok(Self { name, voltage })
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
-    vec![vec![self.name.clone(), ArcStr::from(buffer.format(self.voltage))]]
+    write!(f, "{}, {}", self.name, buffer.format(self.voltage))
   }
 }
 
@@ -631,12 +657,11 @@ impl ComplexAttri for Define {
     Ok(Self { attribute_name, group_name, attribute_type })
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    vec![vec![
-      self.attribute_name.clone(),
-      self.group_name.clone(),
-      self.attribute_type.to_string().into(),
-    ]]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{}, {}, {}", self.attribute_name, self.group_name, self.attribute_type)
   }
 }
 
@@ -723,8 +748,11 @@ impl ComplexAttri for DefineCellArea {
     Ok(Self { area_name, resource_type })
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    vec![vec![self.area_name.clone(), self.resource_type.to_string().into()]]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{}, {}", self.area_name, self.resource_type)
   }
 }
 
@@ -771,8 +799,11 @@ impl ComplexAttri for DefineGroup {
     Ok(Self { group, parent_name })
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    vec![vec![self.group.clone(), self.parent_name.clone()]]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{}, {}", self.group, self.parent_name)
   }
 }
 
@@ -933,24 +964,30 @@ impl ComplexAttri for FanoutLength {
     })
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer_f = ryu::Buffer::new();
     let mut buffer_i = itoa::Buffer::new();
     match (self.average_capacitance, self.standard_deviation, self.number_of_nets) {
       (Some(average_capacitance), Some(standard_deviation), Some(number_of_nets)) => {
-        vec![vec![
-          ArcStr::from(buffer_i.format(self.fanout)),
-          ArcStr::from(buffer_f.format(self.length)),
-          ArcStr::from(buffer_f.format(average_capacitance)),
-          ArcStr::from(buffer_f.format(standard_deviation)),
-          ArcStr::from(buffer_i.format(number_of_nets)),
-        ]]
+        write!(
+          f,
+          "{}, {}, ",
+          buffer_i.format(self.fanout),
+          buffer_f.format(self.length),
+        )?;
+        write!(f, "{}, ", buffer_f.format(average_capacitance),)?;
+        write!(
+          f,
+          "{}, {}",
+          buffer_f.format(standard_deviation),
+          buffer_i.format(number_of_nets),
+        )
       }
       _ => {
-        vec![vec![
-          ArcStr::from(buffer_i.format(self.fanout)),
-          ArcStr::from(buffer_f.format(self.length)),
-        ]]
+        write!(f, "{}, {}", buffer_i.format(self.fanout), buffer_f.format(self.length))
       }
     }
   }

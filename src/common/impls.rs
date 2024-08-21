@@ -5,8 +5,8 @@ use core::fmt::{self, Write};
 
 use crate::{
   ast::{
-    is_word, CodeFormatter, ComplexAttri, ComplexParseError, ComplexWrapper, IdError,
-    Indentation, NameAttri, SimpleAttri,
+    is_word, CodeFormatter, ComplexAttri, ComplexParseError, IdError, Indentation,
+    NameAttri, SimpleAttri,
   },
   ArcStr, NotNan,
 };
@@ -147,9 +147,9 @@ impl SimpleAttri for ArcStr {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     if is_word(self) {
-      f.write_fmt(format_args!("{self}"))
+      write!(f, "{self}")
     } else {
-      f.write_fmt(format_args!("\"{self}\""))
+      write!(f, "\"{self}\"")
     }
   }
 }
@@ -167,8 +167,15 @@ impl<const N: usize> ComplexAttri for [ArcStr; N] {
     .map_or(Err(ComplexParseError::Other), Ok)
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    vec![self.clone().into_iter().collect_vec()]
+  fn is_set(&self) -> bool {
+    N == 0
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    crate::ast::join_fmt(self.iter(), f, |s, ff| write!(ff, "{s}"), ", ")
   }
 }
 
@@ -183,13 +190,21 @@ impl ComplexAttri for Vec<f64> {
     }
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    if self.is_empty() {
-      vec![vec![]]
-    } else {
-      let mut buffer = ryu::Buffer::new();
-      vec![vec![self.iter().map(|f| buffer.format(*f).to_owned()).join(",").into()]]
-    }
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let mut buffer = ryu::Buffer::new();
+    crate::ast::join_fmt(
+      self.iter(),
+      f,
+      |float, ff| write!(ff, "{}", buffer.format(*float)),
+      ", ",
+    )
   }
 }
 
@@ -202,17 +217,24 @@ impl ComplexAttri for Vec<NotNan<f64>> {
     }
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    if self.is_empty() {
-      vec![vec![]]
-    } else {
-      let mut buffer = ryu::Buffer::new();
-      vec![vec![self
-        .iter()
-        .map(|f| buffer.format(f.into_inner()).to_owned())
-        .join(",")
-        .into()]]
-    }
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let mut buffer = ryu::Buffer::new();
+    crate::ast::join_fmt(
+      self.iter(),
+      f,
+      |float, ff| {
+        let float: f64 = (*float).into();
+        write!(ff, "{}", buffer.format(float))
+      },
+      ", ",
+    )
   }
 }
 
@@ -230,8 +252,15 @@ impl ComplexAttri for ArcStr {
     Ok(v1)
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    vec![vec![self.clone()]]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    if is_word(self) {
+      write!(f, "{self}")
+    } else {
+      write!(f, "\"{self}\"")
+    }
   }
 }
 impl ComplexAttri for NotNan<f64> {
@@ -251,9 +280,13 @@ impl ComplexAttri for NotNan<f64> {
     Ok(v1)
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
-    vec![vec![ArcStr::from(buffer.format(self.into_inner()))]]
+    let float: f64 = (*self).into();
+    write!(f, "{}", buffer.format(float))
   }
 }
 impl ComplexAttri for Vec<ArcStr> {
@@ -262,8 +295,15 @@ impl ComplexAttri for Vec<ArcStr> {
     Ok(v.iter().map(|&s| ArcStr::from(s)).collect())
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
-    vec![self.clone()]
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    crate::ast::join_fmt(self.iter(), f, |s, ff| write!(ff, "{s}"), ", ")
   }
 }
 impl ComplexAttri for Vec<usize> {
@@ -275,9 +315,21 @@ impl ComplexAttri for Vec<usize> {
     }
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = itoa::Buffer::new();
-    vec![self.iter().map(|i| ArcStr::from(buffer.format(*i))).collect()]
+    crate::ast::join_fmt(
+      self.iter(),
+      f,
+      |i, ff| write!(ff, "{}", buffer.format(*i)),
+      ", ",
+    )
   }
 }
 
@@ -317,13 +369,13 @@ impl ComplexAttri for (f64, f64, ArcStr) {
     Ok((v1, v2, v3))
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
-    vec![vec![
-      ArcStr::from(buffer.format(self.0)),
-      ArcStr::from(buffer.format(self.1)),
-      self.2.clone(),
-    ]]
+    write!(f, "{}, ", buffer.format(self.0))?;
+    write!(f, "{}, {}", buffer.format(self.1), self.2)
   }
 }
 impl ComplexAttri for (f64, f64) {
@@ -358,8 +410,12 @@ impl ComplexAttri for (f64, f64) {
     Ok((v1, v2))
   }
   #[inline]
-  fn to_wrapper(&self) -> ComplexWrapper {
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
-    vec![vec![ArcStr::from(buffer.format(self.0)), ArcStr::from(buffer.format(self.1))]]
+    write!(f, "{}, ", buffer.format(self.0))?;
+    write!(f, "{}", buffer.format(self.1))
   }
 }

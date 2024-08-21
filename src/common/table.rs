@@ -2,7 +2,7 @@ use crate::{
   ast::{AttributeList, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
   ArcStr, GroupSet, NotNan,
 };
-use core::fmt;
+use core::fmt::{self, Write};
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
@@ -406,19 +406,41 @@ impl ComplexAttri for Values {
     })
   }
   #[inline]
-  fn to_wrapper(&self) -> crate::ast::ComplexWrapper {
+  fn is_set(&self) -> bool {
+    !self.inner.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let indent = f.indentation();
     let mut buffer = ryu::Buffer::new();
-    self
-      .inner
-      .chunks(self.size1)
-      .map(|v| {
-        vec![itertools::Itertools::join(
-          &mut v.iter().map(|f| buffer.format(f.into_inner()).to_owned()),
-          ", ",
-        )
-        .into()]
-      })
-      .collect()
+    let mut iter = self.inner.chunks(self.size1);
+    if let Some(v) = iter.next() {
+      crate::ast::join_fmt(
+        v.iter(),
+        f,
+        |float, ff| {
+          let float: f64 = (*float).into();
+          write!(ff, "{}", buffer.format(float))
+        },
+        ", ",
+      )?;
+    }
+    while let Some(v) = iter.next() {
+      write!(f, ", \\\n{indent}")?;
+      crate::ast::join_fmt(
+        v.iter(),
+        f,
+        |float, ff| {
+          let float: f64 = (*float).into();
+          write!(ff, "{}", buffer.format(float))
+        },
+        ", ",
+      )?;
+    }
+    Ok(())
   }
 }
 

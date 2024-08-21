@@ -125,6 +125,11 @@ pub trait SimpleAttri: Sized + core::fmt::Display + FromStr {
   fn parse(s: &str) -> Result<Self, <Self as FromStr>::Err> {
     FromStr::from_str(s)
   }
+  // TODO!
+  #[inline]
+  fn parse_self<'a>(i: &'a str, line_num: &mut usize) -> SimpleParseErr<'a, Self> {
+    todo!()
+  }
   /// `nom_parse`, auto implement
   #[inline]
   fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> SimpleParseErr<'a, Self> {
@@ -190,12 +195,30 @@ pub trait NameAttri: Sized + Clone {
   fn to_vec(self) -> Vec<ArcStr>;
 }
 
+#[inline]
+pub fn join_fmt<T, W: Write, F: FnMut(&T, &mut W) -> core::fmt::Result>(
+  mut iter: core::slice::Iter<'_, T>,
+  f: &mut W,
+  mut func: F,
+  sep: &str,
+) -> core::fmt::Result {
+  write!(f, "\"")?;
+  if let Some(first) = iter.next() {
+    func(first, f)?;
+    while let Some(t) = iter.next() {
+      write!(f, "{sep}")?;
+      func(t, f)?;
+    }
+  }
+  write!(f, "\"")
+}
+
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
   /// basic `parser`
   fn parse(v: &[&str]) -> Result<Self, ComplexParseError>;
-  /// `to_wrapper`
-  fn to_wrapper(&self) -> ComplexWrapper;
+  // / `to_wrapper`
+  // fn to_wrapper(&self) -> ComplexWrapper;
   /// `nom_parse`, auto implement
   #[inline]
   fn nom_parse<'a>(
@@ -214,6 +237,14 @@ pub trait ComplexAttri: Sized {
       )),
     }
   }
+  #[inline]
+  fn is_set(&self) -> bool {
+    true
+  }
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result;
   /// `fmt_liberty`
   #[inline]
   fn fmt_liberty<T: Write, I: Indentation>(
@@ -221,27 +252,25 @@ pub trait ComplexAttri: Sized {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    // if self.is_empty() || (self.len() == 1 && self[0].is_empty()) {
-    //   return Ok(());
-    // };
-    // let indent1 = f.indentation();
-    // if self[0].iter().all(is_word) {
-    //   write!(f, "\n{indent1}{key} ({}", self[0].join(", "))?;
-    // } else {
-    //   write!(f, "\n{indent1}{key} (\"{}\"", self[0].join(", "))?;
-    // }
-    // f.indent(1);
-    // let indent2 = f.indentation();
-    // for v in self.iter().skip(1) {
-    //   if v.iter().all(is_word) {
-    //     write!(f, ", \\\n{indent2}{}", v.join(", "))?;
-    //   } else {
-    //     write!(f, ", \\\n{indent2}\"{}\"", v.join(", "))?;
-    //   }
-    // }
-    // f.dedent(1);
-    // write!(f, ");")
-    <ComplexWrapper as Format>::liberty(&self.to_wrapper(), key, f)
+    if self.is_set() {
+      let indent1 = f.indentation();
+      write!(f, "\n{indent1}{key} (")?;
+      f.indent(1);
+      self.fmt_self(f)?;
+      // let indent2 = f.indentation();
+      // for v in self.iter().skip(1) {
+      //   if v.iter().all(is_word) {
+      //     write!(f, ", \\\n{indent2}{}", v.join(", "))?;
+      //   } else {
+      //     write!(f, ", \\\n{indent2}\"{}\"", v.join(", "))?;
+      //   }
+      // }
+      f.dedent(1);
+      write!(f, ");")
+    // <ComplexWrapper as Format>::liberty(&self.to_wrapper(), key, f)
+    } else {
+      Ok(())
+    }
   }
 }
 
