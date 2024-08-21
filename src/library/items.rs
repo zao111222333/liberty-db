@@ -3,18 +3,15 @@
 //! </script>
 // use std::ops::DerefMut;
 
-use core::fmt::{self, Write};
-
-use itertools::Itertools;
-
 use crate::{
   ast::{
-    AttributeList, CodeFormatter, ComplexAttri, ComplexParseError, ComplexWrapper,
-    GroupComments, GroupFn, Indentation, SimpleAttri,
+    AttributeList, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
+    GroupFn, Indentation, SimpleAttri,
   },
   expression::logic,
   ArcStr, GroupSet,
 };
+use core::fmt::{self, Write};
 
 /// The `sensitization` group defined at the library level describes
 /// the complete state patterns for a specific list of pins (defined by the `pin_names` attribute)

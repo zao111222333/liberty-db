@@ -128,6 +128,8 @@ pub trait SimpleAttri: Sized + core::fmt::Display + FromStr {
   // TODO!
   #[inline]
   fn parse_self<'a>(i: &'a str, line_num: &mut usize) -> SimpleParseErr<'a, Self> {
+    _ = i;
+    _ = line_num;
     todo!()
   }
   /// `nom_parse`, auto implement
