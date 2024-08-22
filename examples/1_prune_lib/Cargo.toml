@@ -1,0 +1,9 @@
+[package]
+name = "example1_prune_lib"
+edition = "2021"
+publish = false
+
+[dependencies]
+liberty-db = { path = "../.." }
+simple_logger = "5.0"
+log = { version = "0.4", features = ["std", "serde"] }

@@ -18,6 +18,15 @@ liberty_db = "0.5"
 
 See more in [doc](https://docs.rs/liberty-db)
 
+## Demo
+
+``` shell
+# example0
+cargo run --package example0_parse_fmt -- tests/tech/cases/ocv.lib
+# example1
+cargo run --package example1_prune_lib -- tests/tech/cases/ocv.lib
+```
+
 
 ## Test
 
@@ -46,7 +55,6 @@ cargo test --package liberty-tests --lib -- parser_bench::test_all_lib_files --e
 
 ## TODO List
 
-+ remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter
 + merge fields of `timing` at parse phase
 ```
 impl __timing::ImmutIdTiming { xxx }
@@ -54,7 +62,7 @@ impl __timing::ImmutIdTiming { xxx }
 + use PDFJS
 + stream input
 + Linked Group
-+ Timing group
++ ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~
 + ~~fix missing newline at endding~~
 + ~~recursive parse boolean expression~~
 + ~~macros~~
