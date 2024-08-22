@@ -198,8 +198,14 @@ pub trait NameAttri: Sized + Clone {
 }
 
 #[inline]
-pub fn join_fmt<T, W: Write, F: FnMut(&T, &mut W) -> core::fmt::Result>(
-  mut iter: core::slice::Iter<'_, T>,
+pub fn join_fmt<
+  'a,
+  T: Sized + 'a,
+  I: Iterator<Item = T>,
+  W: Write,
+  F: FnMut(T, &mut W) -> core::fmt::Result,
+>(
+  mut iter: I,
   f: &mut W,
   mut func: F,
   sep: &str,

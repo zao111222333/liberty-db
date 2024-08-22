@@ -1,5 +1,5 @@
 use crate::{
-  ast::{CodeFormatter, GroupComments, GroupFn, Indentation, SimpleAttri},
+  ast::{join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, SimpleAttri},
   ArcStr,
 };
 use core::{
@@ -124,18 +124,18 @@ pub struct WordSet {
   pub inner: HashSet<ArcStr>,
 }
 impl fmt::Display for WordSet {
+  #[allow(clippy::unwrap_in_result)]
+  #[allow(clippy::unwrap_used)]
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let mut iter = self.inner.iter();
-    if let Some(first) = iter.next() {
-      write!(f, "{first}")?;
-      while let Some(next) = iter.next() {
-        write!(f, " {next}")?;
-      }
+    match self.inner.len() {
+      0 => Ok(()),
+      1 => f.write_str(self.inner.iter().next().unwrap().as_str()),
+      _ => join_fmt(self.inner.iter(), f, |s, ff| ff.write_str(s.as_str()), " "),
     }
-    Ok(())
   }
 }
+
 impl Ord for WordSet {
   #[inline]
   fn cmp(&self, other: &Self) -> Ordering {
@@ -175,20 +175,7 @@ impl SimpleAttri for WordSet {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut iter = self.inner.iter();
-    if let Some(first) = iter.next() {
-      if self.inner.len() != 1 {
-        write!(f, "\"")?;
-      }
-      write!(f, "{first}")?;
-      while let Some(next) = iter.next() {
-        write!(f, " {next}")?;
-      }
-      if self.inner.len() != 1 {
-        write!(f, "\"")?;
-      }
-    }
-    Ok(())
+    write!(f, "{self}")
   }
 }
 impl hash::Hash for WordSet {

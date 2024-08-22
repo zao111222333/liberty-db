@@ -230,8 +230,8 @@ impl ComplexAttri for Vec<NotNan<f64>> {
       self.iter(),
       f,
       |float, ff| {
-        let float: f64 = (*float).into();
-        write!(ff, "{}", buffer.format(float))
+        let float64: f64 = (*float).into();
+        write!(ff, "{}", buffer.format(float64))
       },
       ", ",
     )

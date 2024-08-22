@@ -1,10 +1,10 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # cargo publish --allow-dirty --registry crates-io -p liberty-db
 [workspace]
-members = ["macros", "tests"]
+members = ["macros", "tests", "examples/*"]
 
 [workspace.package]
-version = "0.5.2"
+version = "0.5.3"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -22,7 +22,7 @@ categories = ["development-tools"]
 [package]
 name = "liberty-db"
 description = "`liberty` data structre"
-include = ["/src", "/tests", "/docs/header.html", "/build.rs", "README.md"]
+include = ["/src", "/tests", "/examples", "/docs/header.html", "README.md"]
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -44,7 +44,7 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 default = []
 
 [dependencies]
-liberty-macros = "0.5.2"
+liberty-macros = "0.5.3"
 # liberty-macros = { path = "macros" }
 log = { version = "0.4", features = ["std", "serde"] }
 serde = { version = "1.0", features = ["derive"] }
