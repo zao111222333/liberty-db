@@ -524,7 +524,7 @@ impl Library {
   #[allow(clippy::arithmetic_side_effects)]
   #[inline]
   pub fn parse_lib(i: &str) -> Result<Self, ParserError<'_>> {
-    let mut line_num = 1;
+    let mut line_num = 0;
     let input1 = match parser::comment_space_newline(i) {
       Ok((input1, n)) => {
         line_num += n;
