@@ -72,7 +72,7 @@ fn main() {
     }
   }
   let out_file_name =
-    format!("example1_{}", input_lib.file_name().unwrap().to_str().unwrap());
+    format!("example2_{}", input_lib.file_name().unwrap().to_str().unwrap());
   log::info!("Output to [file] {} ...", out_file_name);
   let out_file = File::create(out_file_name).unwrap();
   let mut writer = BufWriter::new(out_file);

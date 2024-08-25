@@ -17,7 +17,7 @@ fn main() {
   log::info!("Parsing [file] {} ...", input_lib.display());
   let library = Library::parse_lib(read_to_string(input_lib).unwrap().as_str()).unwrap();
   let out_file_name =
-    format!("example0_{}", input_lib.file_name().unwrap().to_str().unwrap());
+    format!("example1_{}", input_lib.file_name().unwrap().to_str().unwrap());
   log::info!("Output to [file] {} ...", out_file_name);
   let out_file = File::create(out_file_name).unwrap();
   let mut writer = BufWriter::new(out_file);

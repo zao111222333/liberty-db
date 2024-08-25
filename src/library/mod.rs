@@ -49,6 +49,7 @@ pub struct Library {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.3&end=39.5
   /// ">Reference</a>
+  #[derivative(Default(value = "arcstr::literal!(\"cmos\")"))]
   #[liberty(complex)]
   pub technology: ArcStr,
   /// Use the `delay_model`  attribute to specify which delay model
