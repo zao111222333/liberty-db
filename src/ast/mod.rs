@@ -115,32 +115,25 @@ impl PartialEq for LinkError {
 //   }
 // }
 
-type SimpleParseErr<'a, T> =
-  IResult<&'a str, Result<T, (<T as FromStr>::Err, AttriValue)>, Error<&'a str>>;
+pub(crate) type SimpleParseErr<'a, T> =
+  IResult<&'a str, Result<T, AttriValue>, Error<&'a str>>;
+
+#[inline]
+pub fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
+  i: &'a str,
+  line_num: &mut usize,
+) -> SimpleParseErr<'a, T> {
+  let (input, s) = parser::simple(i, line_num)?;
+  s.parse()
+    .map_or(Ok((input, Err(AttriValue::Simple(ArcStr::from(s))))), |simple| {
+      Ok((input, Ok(simple)))
+    })
+}
 
 /// Simple Attribute in Liberty
-pub trait SimpleAttri: Sized + core::fmt::Display + FromStr {
-  /// basic `parser`
-  #[inline]
-  fn parse(s: &str) -> Result<Self, <Self as FromStr>::Err> {
-    FromStr::from_str(s)
-  }
-  // TODO!
-  #[inline]
-  fn parse_self<'a>(i: &'a str, line_num: &mut usize) -> SimpleParseErr<'a, Self> {
-    _ = i;
-    _ = line_num;
-    todo!()
-  }
+pub trait SimpleAttri: Sized + core::fmt::Display {
   /// `nom_parse`, auto implement
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> SimpleParseErr<'a, Self> {
-    let (input, simple) = parser::simple(i, line_num)?;
-    match Self::parse(simple) {
-      Ok(s) => Ok((input, Ok(s))),
-      Err(e) => Ok((input, Err((e, AttriValue::Simple(ArcStr::from(simple)))))),
-    }
-  }
+  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> SimpleParseErr<'a, Self>;
   #[inline]
   fn is_set(&self) -> bool {
     true
@@ -150,7 +143,7 @@ pub trait SimpleAttri: Sized + core::fmt::Display + FromStr {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    f.write_fmt(format_args!("{self}"))
+    write!(f, "{self}")
   }
   /// `fmt_liberty`
   #[inline]
@@ -174,10 +167,10 @@ pub trait SimpleAttri: Sized + core::fmt::Display + FromStr {
 pub enum ComplexParseError {
   /// `ParseFloatError`
   #[error("{0}")]
-  Float(ParseNotNanError<ParseFloatError>),
+  Float(#[from] ParseNotNanError<ParseFloatError>),
   /// `ParseIntError`
   #[error("{0}")]
-  Int(ParseIntError),
+  Int(#[from] ParseIntError),
   /// title length mismatch
   #[error("title length mismatch")]
   LengthDismatch,

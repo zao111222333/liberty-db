@@ -122,7 +122,15 @@ impl Deref for TimeUnit {
   }
 }
 
-impl SimpleAttri for TimeUnit {}
+impl SimpleAttri for TimeUnit {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// Valid values are 1mV, 10mV, 100mV, and 1V. The default is 1V.
 /// <a name ="reference_link" href="
@@ -188,7 +196,15 @@ impl Deref for VoltageUnit {
   }
 }
 
-impl SimpleAttri for VoltageUnit {}
+impl SimpleAttri for VoltageUnit {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
 /// **No default exists for the `current_unit` attribute if the attribute is omitted.**
@@ -281,7 +297,15 @@ impl Deref for CurrentUnit {
   }
 }
 
-impl SimpleAttri for CurrentUnit {}
+impl SimpleAttri for CurrentUnit {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm.
 /// **No default exists for `pulling_resistance_unit` if the attribute is omitted.**
@@ -347,7 +371,15 @@ impl Deref for PullingResistanceUnit {
   }
 }
 
-impl SimpleAttri for PullingResistanceUnit {}
+impl SimpleAttri for PullingResistanceUnit {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// This attribute specifies the unit for all capacitance
 /// values within the logic library, including
@@ -570,4 +602,12 @@ impl Deref for LeakagePowerUnit {
   }
 }
 
-impl SimpleAttri for LeakagePowerUnit {}
+impl SimpleAttri for LeakagePowerUnit {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}

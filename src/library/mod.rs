@@ -445,6 +445,32 @@ pub struct Library {
   /// ">Reference</a>
   #[liberty(group(type = Set))]
   pub lu_table_template: GroupSet<TableTemple>,
+  /// The `base_curves`  group is a library-level group that contains
+  /// the detailed description of normalized base curves.
+  ///
+  /// **Syntax**
+  /// ``` text
+  /// library (my_compact_ccs_lib) {
+  ///   …
+  ///   base_curves (base_curves_name) {
+  ///     …
+  ///   }
+  /// }
+  /// ```
+  /// **Example**
+  /// ``` text
+  /// library(my_lib) {
+  ///   …
+  ///   base_curves (ctbct1) {
+  ///     …
+  ///   }
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.32+40.2&end=39.33+40.15
+  /// ">Reference</a>
+  #[liberty(group(type = Set))]
+  pub base_curves: GroupSet<BaseCurves>,
   /// The library-level `normalized_driver_waveform`  group represents a collection
   /// of driver waveforms under various input slew values.
   /// The `index_1`  specifies the input slew and `index_2`  specifies the normalized voltage.

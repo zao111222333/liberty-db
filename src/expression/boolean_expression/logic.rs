@@ -214,7 +214,15 @@ pub enum Normal {
   /// H L
   Level(Level),
 }
-impl SimpleAttri for Normal {}
+impl SimpleAttri for Normal {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 impl fmt::Display for Normal {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

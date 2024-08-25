@@ -8,8 +8,9 @@ use crate::{
     AttributeList, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
     GroupFn, Indentation, SimpleAttri,
   },
+  common::items::Formula,
   expression::logic,
-  ArcStr, GroupSet,
+  ArcStr, GroupSet, NotNan,
 };
 use core::fmt::{self, Write};
 
@@ -369,25 +370,25 @@ pub struct InputVoltage {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.7&end=62.8
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vil: ArcStr,
+  pub vil: Formula,
   /// The minimum input voltage for which the input to the core is guaranteed to be a logic 1
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.10&end=62.11
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vih: ArcStr,
+  pub vih: Formula,
   /// The minimum acceptable input voltage.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.13&end=62.13
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vimin: ArcStr,
+  pub vimin: Formula,
   /// The maximum acceptable input voltage.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.15&end=62.16
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vimax: ArcStr,
+  pub vimax: Formula,
 }
 impl GroupFn for InputVoltage {}
 
@@ -460,7 +461,15 @@ pub enum DelayModel {
   #[strum(serialize = "table_lookup")]
   TableLookup,
 }
-impl SimpleAttri for DelayModel {}
+impl SimpleAttri for DelayModel {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// Use this group to define operating conditions;
 /// that is, `process`, `voltage`, and `temperature`.
@@ -564,7 +573,15 @@ pub enum TreeType {
   #[strum(serialize = "worst_case_tree")]
   WorstCaseTree,
 }
-impl SimpleAttri for TreeType {}
+impl SimpleAttri for TreeType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// Use this attribute to define new, temporary, or user-defined attributes
 /// for use in symbol and technology libraries.
@@ -1022,3 +1039,171 @@ pub struct WireLoadSection {
   pub wire_load_from_area: (f64, f64, ArcStr),
 }
 impl GroupFn for WireLoadSection {}
+
+/// The `base_curve_type` attribute specifies the type of base curve.
+/// The valid values for `base_curve_type`  are `ccs_timing_half_curve`  and `ccs_half_curve`.
+/// The `ccs_half_curve`  value allows you to model compact CCS power
+/// and compact CCS timing data within the same `base_curves`  group.
+/// You must specify `ccs_half_curve` before specifying `ccs_timing_half_curve`.
+///
+/// **Syntax**
+/// ``` text
+/// base_curve_type: enum (ccs_half_curve, ccs_timing_half_curve);
+/// ```
+/// **Example**
+/// ``` text
+/// base_curve_type : ccs_timing_half_curve ;
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=40.21+40.26&end=40.25+40.29
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd, Default)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum BaseCurveType {
+  /// The `ccs_half_curve`  value allows you to model compact CCS power
+  #[strum(serialize = "ccs_half_curve")]
+  #[default]
+  CcsHalfCurve,
+  /// You must specify `ccs_half_curve` before specifying `ccs_timing_half_curve`.
+  #[strum(serialize = "ccs_timing_half_curve")]
+  CcsTimingHalfCurve,
+}
+
+impl SimpleAttri for BaseCurveType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+
+/// The `base_curves`  group is a library-level group that contains
+/// the detailed description of normalized base curves.
+///
+/// **Syntax**
+/// ``` text
+/// library (my_compact_ccs_lib) {
+///   …
+///   base_curves (base_curves_name) {
+///     …
+///   }
+/// }
+/// ```
+/// **Example**
+/// ``` text
+/// library(my_lib) {
+///   …
+///   base_curves (ctbct1) {
+///     …
+///   }
+/// }
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.32+40.2&end=39.33+40.15
+/// ">Reference</a>
+#[derive(Debug, Clone, Default)]
+#[derive(liberty_macros::Group)]
+#[mut_set::derive::item(
+  sort,
+  macro(derive(Debug, Clone, Default);)
+)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct BaseCurves {
+  /// name
+  #[id]
+  #[liberty(name)]
+  pub name: ArcStr,
+  /// group comments
+  #[liberty(comments)]
+  pub comments: GroupComments<Self>,
+  /// group undefined attributes
+  #[liberty(undefined)]
+  pub undefined: AttributeList,
+  /// The `base_curve_type` attribute specifies the type of base curve.
+  /// The valid values for `base_curve_type`  are `ccs_timing_half_curve`  and `ccs_half_curve`.
+  /// The `ccs_half_curve`  value allows you to model compact CCS power
+  /// and compact CCS timing data within the same `base_curves`  group.
+  /// You must specify `ccs_half_curve` before specifying `ccs_timing_half_curve`.
+  ///
+  /// **Syntax**
+  /// ``` text
+  /// base_curve_type: enum (ccs_half_curve, ccs_timing_half_curve);
+  /// ```
+  /// **Example**
+  /// ``` text
+  /// base_curve_type : ccs_timing_half_curve ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=40.21+40.26&end=40.25+40.29
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub base_curve_type: BaseCurveType,
+  #[liberty(complex)]
+  pub curve_x: Vec<NotNan<f64>>,
+  #[liberty(complex(type = Set))]
+  pub curve_y: GroupSet<crate::common::items::IdVector>,
+}
+
+impl GroupFn for BaseCurves {}
+
+#[cfg(test)]
+mod test {
+
+  #[test]
+  fn input_voltage() {
+    let g = crate::ast::test_parse_fmt::<super::InputVoltage>(
+      r#"(cmos_schmitt) {
+        vil : 0.3 * VDD ;
+        vih : 0.7 * VDD ;
+        vimin : -0.5 ;
+        vimax : VDD + 0.5 ;
+      }"#,
+      r#"
+liberty_db::library::items::InputVoltage (cmos_schmitt) {
+| vil : 0.3 * VDD ;
+| vih : 0.7 * VDD ;
+| vimin : -0.5 ;
+| vimax : VDD + 0.5 ;
+}"#,
+    );
+  }
+  #[test]
+  fn base_curves() {
+    let g = crate::ast::test_parse_fmt::<super::BaseCurves>(
+      r#"("nc_compact_ccs_curve_1") {
+      base_curve_type : "ccs_timing_half_curve";
+      curve_x("0.1000000, 0.2000000, 0.3000000, 0.4000000, 0.5000000, 0.6000000, 0.7000000, 0.8000000, 0.9000000");
+      curve_y(1, \
+        "0.9965371, 0.9930742, 0.9584770, 0.9165637, 0.8271961, 0.7425452, 0.6009643, 0.4459254, 0.2653107");
+      curve_y(2, \
+        "0.9887274, 0.9695129, 0.9443244, 0.9183546, 0.8705093, 0.8062681, 0.6984753, 0.5213233, 0.2657268");
+      curve_y(3, \
+        "0.9895478, 0.9774914, 0.9389569, 0.8934003, 0.8125975, 0.7144581, 0.5786802, 0.4298566, 0.2542494");
+      curve_y(4, \
+        "0.9944934, 0.9784088, 0.9620733, 0.9304195, 0.8888662, 0.8329558, 0.7240709, 0.5580780, 0.3037784");
+      curve_y(5, \
+        "0.9922672, 0.9664605, 0.9307680, 0.8888898, 0.8146837, 0.7076250, 0.5811826, 0.4366006, 0.2619239");   
+    }"#,
+      r#"
+liberty_db::library::items::BaseCurves (nc_compact_ccs_curve_1) {
+| base_curve_type : ccs_timing_half_curve;
+| curve_x ("0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9");
+| curve_y (1, \
+| | "0.9965371, 0.9930742, 0.958477, 0.9165637, 0.8271961, 0.7425452, 0.6009643, 0.4459254, 0.2653107");
+| curve_y (2, \
+| | "0.9887274, 0.9695129, 0.9443244, 0.9183546, 0.8705093, 0.8062681, 0.6984753, 0.5213233, 0.2657268");
+| curve_y (3, \
+| | "0.9895478, 0.9774914, 0.9389569, 0.8934003, 0.8125975, 0.7144581, 0.5786802, 0.4298566, 0.2542494");
+| curve_y (4, \
+| | "0.9944934, 0.9784088, 0.9620733, 0.9304195, 0.8888662, 0.8329558, 0.7240709, 0.558078, 0.3037784");
+| curve_y (5, \
+| | "0.9922672, 0.9664605, 0.930768, 0.8888898, 0.8146837, 0.707625, 0.5811826, 0.4366006, 0.2619239");
+}"#,
+    );
+  }
+}

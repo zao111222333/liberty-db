@@ -721,7 +721,15 @@ impl Default for TimingType {
     Self::Combinational(ArcCombinational::Combinational(None))
   }
 }
-impl SimpleAttri for TimingType {}
+impl SimpleAttri for TimingType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 impl FromStr for TimingType {
   type Err = fmt::Error;

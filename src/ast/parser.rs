@@ -294,6 +294,33 @@ pub(crate) fn simple_multi<'a>(
 }
 
 #[inline]
+pub(crate) fn simple_custom<'a, T>(
+  i: &'a str,
+  line_num: &mut usize,
+  func: fn(&'a str) -> IResult<&'a str, T, Error<&'a str>>,
+) -> super::SimpleParseErr<'a, T> {
+  map(
+    tuple((
+      space,
+      char(':'),
+      space,
+      alt((
+        map(alt((func, delimited(char('"'), func, char('"')))), Ok),
+        map(alt((word, unquote)), |s| Err(super::AttriValue::Simple(ArcStr::from(s)))),
+      )),
+      alt((
+        preceded(terminated(space, char(';')), comment_space_newline),
+        comment_space_newline_many1,
+      )),
+    )),
+    |(_, _, _, s, n)| {
+      *line_num += n;
+      s
+    },
+  )(i)
+}
+
+#[inline]
 pub(crate) fn simple<'a>(
   i: &'a str,
   line_num: &mut usize,
@@ -303,15 +330,13 @@ pub(crate) fn simple<'a>(
       space,
       char(':'),
       space,
+      alt((unquote, word)),
       alt((
-        tuple((unquote, preceded(terminated(space, char(';')), comment_space_newline))),
-        tuple((unquote, comment_space_newline_many1)),
-        tuple((word, preceded(terminated(space, char(';')), comment_space_newline))),
-        tuple((word, comment_space_newline_many1)),
-        tuple((formula, preceded(terminated(space, char(';')), comment_space_newline))),
+        preceded(terminated(space, char(';')), comment_space_newline),
+        comment_space_newline_many1,
       )),
     )),
-    |(_, _, _, (s, n))| {
+    |(_, _, _, s, n)| {
       *line_num += n;
       s
     },

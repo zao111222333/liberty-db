@@ -9,6 +9,7 @@ use core::{
   str::FromStr,
 };
 use itertools::Itertools;
+use ordered_float::NotNan;
 use std::collections::HashSet;
 use strum_macros::{Display, EnumString};
 
@@ -57,6 +58,20 @@ pub enum SdfEdgeType {
   #[strum(serialize = "both_edges")]
   BothEdges,
 }
+
+#[derive(Debug, Clone, Default)]
+#[mut_set::derive::item(
+  sort,
+  macro(derive(Debug, Clone, Default);)
+)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct IdVector {
+  #[id]
+  pub id: usize,
+  pub vec: Vec<NotNan<f64>>,
+}
+
+impl Copy for __id_vector::IdVectorId {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[derive(Display, EnumString)]
@@ -167,6 +182,13 @@ impl PartialOrd for WordSet {
 
 impl SimpleAttri for WordSet {
   #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+  #[inline]
   fn is_set(&self) -> bool {
     !self.inner.is_empty()
   }
@@ -219,3 +241,21 @@ pub struct DummyGroup {
   pub undefined: crate::ast::AttributeList,
 }
 impl GroupFn for DummyGroup {}
+
+#[derive(Debug, Default, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct Formula(pub ArcStr);
+// type Aaa = mexprp::Expression<f64>;
+
+// /// Recursive type for boolean expression tree.
+// #[derive(serde::Serialize, serde::Deserialize)]
+// #[derive(Clone, Debug, Eq, PartialEq)]
+// pub enum _Formula {
+//   Float(NotNan<f64>),
+//   Variable(ArcStr),
+//   Neg(Box<_Formula>),
+//   Add(Box<_Formula>, Box<_Formula>),
+//   Sub(Box<_Formula>, Box<_Formula>),
+//   Mul(Box<_Formula>, Box<_Formula>),
+//   Div(Box<_Formula>, Box<_Formula>),
+// }

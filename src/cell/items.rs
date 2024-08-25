@@ -228,16 +228,13 @@ impl SimpleAttri for Table {
   fn nom_parse<'a>(
     i: &'a str,
     line_num: &mut usize,
-  ) -> nom::IResult<
-    &'a str,
-    Result<Self, (Self::Err, AttriValue)>,
-    nom::error::Error<&'a str>,
-  > {
+  ) -> nom::IResult<&'a str, Result<Self, AttriValue>, nom::error::Error<&'a str>> {
     let (input, simple_multi) = crate::ast::parser::simple_multi(i, line_num)?;
-    match Self::parse(simple_multi) {
-      Ok(s) => Ok((input, Ok(s))),
-      Err(e) => Ok((input, Err((e, AttriValue::Simple(ArcStr::from(simple_multi)))))),
-    }
+    simple_multi
+      .parse()
+      .map_or(Ok((input, Err(AttriValue::Simple(ArcStr::from(simple_multi))))), |s| {
+        Ok((input, Ok(s)))
+      })
   }
   #[inline]
   fn fmt_self<T: Write, I: crate::ast::Indentation>(
@@ -426,4 +423,12 @@ pub enum PgType {
   #[strum(serialize = "deeppwell")]
   DeepPwell,
 }
-impl SimpleAttri for PgType {}
+impl SimpleAttri for PgType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}

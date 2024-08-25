@@ -1,25 +1,66 @@
-use liberty_db::Library;
-use std::{
-  env,
-  fs::{read_to_string, File},
-  io::{BufWriter, Write},
-  path::Path,
-};
+use core::fmt::Display;
+use liberty_db::{ast::GroupAttri, library::Library};
 
-// cargo run /path/to/xxx.lib
-// Use the first arg as input file name,
-// parse it, and then write it into example1_xxx.lib
+static TEMPLATE: &str = r#"
+library(gscl45nm) {
+
+    delay_model : table_lookup;
+    in_place_swap_mode : match_footprint;
+
+    time_unit : "1ps";
+    voltage_unit : "10mV";
+    current_unit : "1uA";
+    pulling_resistance_unit : "1kohm";
+    leakage_power_unit : "1nW";
+    capacitive_load_unit (1,pf);
+
+    slew_upper_threshold_pct_rise : 80;
+    slew_lower_threshold_pct_rise : 20;
+    slew_upper_threshold_pct_fall : 70;
+    slew_lower_threshold_pct_fall : 20;
+    input_threshold_pct_rise : 50;
+    input_threshold_pct_fall : 50;
+    output_threshold_pct_rise : 50;
+    output_threshold_pct_fall : 50;
+    nom_process : 1;
+    nom_voltage : 1.1;
+    nom_temperature : 27;
+    operating_conditions ( typical ) {
+        process : 1;
+        voltage : 1.1;
+        temperature : 27;
+    }
+    default_operating_conditions : typical;
+
+    lu_table_template(delay_template_4x5) {
+    variable_1 : total_output_net_capacitance;
+    variable_2 : input_net_transition;
+    index_1 ("1000.0, 1001.0, 1002.0, 1003.0");
+    index_2 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0");
+    }
+
+    cell (SDFFRS_X2) {
+    
+    
+    ff ("IQ","IQN") {
+        next_state         	: "((SE * SI) + (D * !SE))";
+        clocked_on         	: "CK";
+        preset             	: "!SN";
+        clear              	: "!RN";
+        clear_preset_var1  	: L;
+        clear_preset_var2  	: L;
+    }
+  }
+}"#;
 fn main() {
-  simple_logger::SimpleLogger::new().init().unwrap();
-  let args: Vec<String> = env::args().collect();
-
-  let input_lib = Path::new(&args[1]);
-  log::info!("Parsing [file] {} ...", input_lib.display());
-  let library = Library::parse_lib(read_to_string(input_lib).unwrap().as_str()).unwrap();
-  let out_file_name =
-    format!("example0_{}", input_lib.file_name().unwrap().to_str().unwrap());
-  log::info!("Output to [file] {} ...", out_file_name);
-  let out_file = File::create(out_file_name).unwrap();
-  let mut writer = BufWriter::new(out_file);
-  write!(&mut writer, "{}", library).unwrap();
+  match Library::parse_lib(TEMPLATE) {
+    Ok(ref mut library) => {
+      library.comments.this.push("line1\nline2".into());
+      library.comments.this.push("line3".into());
+      library.comments.time_unit.push("line4\nline5".into());
+      library.comments.time_unit.push("line6".into());
+      println!("{}", library);
+    }
+    Err(e) => panic!("{:#?}", e),
+  }
 }

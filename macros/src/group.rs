@@ -36,8 +36,8 @@ fn group_field_fn(
           Ok(simple) => {
             res.#field_name=Some(simple);
           },
-          Err((e,undefined)) => {
-            log::error!("line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+          Err(undefined) => {
+            log::error!("line={}; Key={}; Value={:?}",line_num,key,undefined);
             res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }
@@ -58,8 +58,8 @@ fn group_field_fn(
           Ok(simple) => {
             res.#field_name=simple;
           },
-          Err((e,undefined)) => {
-            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
+          Err(undefined) => {
+            log::error!("Line={}; Key={}; Value={:?}",line_num,key,undefined);
             res.#undefined_name.push((crate::ArcStr::from(key), undefined));
           },
         }

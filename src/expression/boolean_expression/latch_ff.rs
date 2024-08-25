@@ -844,7 +844,15 @@ pub enum ClearPresetState {
   X,
 }
 
-impl crate::ast::SimpleAttri for ClearPresetState {}
+impl crate::ast::SimpleAttri for ClearPresetState {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 #[cfg(test)]
 mod test {

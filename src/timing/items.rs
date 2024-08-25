@@ -140,7 +140,12 @@ impl TimingSenseType {
     }
   }
 }
-impl SimpleAttri for TimingSenseType {}
+impl SimpleAttri for TimingSenseType {
+  #[inline]
+  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> ast::SimpleParseErr<'a, Self> {
+    ast::nom_parse_from_str(i, line_num)
+  }
+}
 /// You define the mode attribute within a timing group.
 /// A mode attribute pertains to an individual timing arc.
 /// The timing arc is active when mode is instantiated with a name and a value.

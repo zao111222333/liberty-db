@@ -22,9 +22,11 @@ See more in [doc](https://docs.rs/liberty-db)
 
 ``` shell
 # example0
-cargo run --package example0_parse_fmt -- tests/tech/cases/ocv.lib
+cargo run --package example0_parse_fmt
 # example1
-cargo run --package example1_prune_lib -- tests/tech/cases/ocv.lib
+cargo run --package example1_parse_fmt_file -- tests/tech/cases/ocv.lib
+# example2
+cargo run --package example2_prune_lib -- tests/tech/cases/ocv.lib
 ```
 
 

@@ -5,13 +5,22 @@ use core::fmt::{self, Write};
 
 use crate::{
   ast::{
-    is_word, CodeFormatter, ComplexAttri, ComplexParseError, IdError, Indentation,
-    NameAttri, SimpleAttri,
+    is_word, parser::simple_custom, CodeFormatter, ComplexAttri, ComplexParseError,
+    IdError, Indentation, NameAttri, SimpleAttri,
   },
   ArcStr, NotNan,
 };
 use itertools::Itertools;
+
+use super::items::Formula;
 impl SimpleAttri for f64 {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    simple_custom(i, line_num, nom::number::complete::double)
+  }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
@@ -24,6 +33,20 @@ impl SimpleAttri for f64 {
 
 impl SimpleAttri for NotNan<f64> {
   #[inline]
+  #[allow(clippy::undocumented_unsafe_blocks)]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    #[inline]
+    fn f(i: &str) -> nom::IResult<&str, NotNan<f64>, nom::error::Error<&str>> {
+      nom::combinator::map(nom::number::complete::double, |f| unsafe {
+        NotNan::<f64>::new_unchecked(f)
+      })(i)
+    }
+    simple_custom(i, line_num, f)
+  }
+  #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
@@ -34,8 +57,23 @@ impl SimpleAttri for NotNan<f64> {
   }
 }
 
-impl SimpleAttri for bool {}
+impl SimpleAttri for bool {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 impl SimpleAttri for usize {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
@@ -47,6 +85,13 @@ impl SimpleAttri for usize {
 }
 
 impl SimpleAttri for isize {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
@@ -138,6 +183,13 @@ impl<const N: usize> NameAttri for [ArcStr; N] {
 
 impl SimpleAttri for ArcStr {
   #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+  #[inline]
   fn is_set(&self) -> bool {
     !self.is_empty()
   }
@@ -208,6 +260,37 @@ impl ComplexAttri for Vec<f64> {
   }
 }
 
+impl ComplexAttri for super::items::IdVector {
+  #[inline]
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+    let mut iter = v.iter();
+    let id = if let Some(&id_str) = iter.next() {
+      id_str.parse()?
+    } else {
+      return Err(ComplexParseError::LengthDismatch);
+    };
+    let vec = match iter.map(|&s| s.parse()).collect() {
+      Ok(r) => r,
+      Err(e) => return Err(ComplexParseError::Float(e)),
+    };
+    Ok(Self { id, vec })
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{}, \\\n{}", itoa::Buffer::new().format(self.id), f.indentation())?;
+    let mut buffer = ryu::Buffer::new();
+    crate::ast::join_fmt(
+      self.vec.iter(),
+      f,
+      |float, ff| write!(ff, "{}", buffer.format(Into::<f64>::into(*float))),
+      ", ",
+    )
+  }
+}
+
 impl ComplexAttri for Vec<NotNan<f64>> {
   #[inline]
   fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
@@ -229,10 +312,7 @@ impl ComplexAttri for Vec<NotNan<f64>> {
     crate::ast::join_fmt(
       self.iter(),
       f,
-      |float, ff| {
-        let float64: f64 = (*float).into();
-        write!(ff, "{}", buffer.format(float64))
-      },
+      |float, ff| write!(ff, "{}", buffer.format(Into::<f64>::into(*float))),
       ", ",
     )
   }
@@ -417,5 +497,25 @@ impl ComplexAttri for (f64, f64) {
     let mut buffer = ryu::Buffer::new();
     write!(f, "{}, ", buffer.format(self.0))?;
     write!(f, "{}", buffer.format(self.1))
+  }
+}
+
+impl fmt::Display for Formula {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    self.0.fmt(f)
+  }
+}
+impl SimpleAttri for Formula {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    #[inline]
+    fn f(i: &str) -> nom::IResult<&str, Formula, nom::error::Error<&str>> {
+      nom::combinator::map(crate::ast::parser::formula, |s| Formula(ArcStr::from(s)))(i)
+    }
+    simple_custom(i, line_num, f)
   }
 }

@@ -23,7 +23,15 @@ pub enum AntennaDiodeType {
   #[strum(serialize = "power_and_ground")]
   PowerAndGround,
 }
-impl SimpleAttri for AntennaDiodeType {}
+impl SimpleAttri for AntennaDiodeType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -45,7 +53,15 @@ pub enum Direction {
   #[strum(serialize = "internal")]
   Internal,
 }
-impl SimpleAttri for Direction {}
+impl SimpleAttri for Direction {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -57,7 +73,15 @@ pub enum DontFault {
   #[strum(serialize = "sao1")]
   Sao1,
 }
-impl SimpleAttri for DontFault {}
+impl SimpleAttri for DontFault {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DriverType {
@@ -78,7 +102,15 @@ pub enum DriverType {
   #[strum(serialize = "resistive_1")]
   Resistive1,
 }
-impl SimpleAttri for DriverType {}
+impl SimpleAttri for DriverType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum NextstateType {
@@ -95,7 +127,15 @@ pub enum NextstateType {
   #[strum(serialize = "scan_enable")]
   ScanEnable,
 }
-impl SimpleAttri for NextstateType {}
+impl SimpleAttri for NextstateType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -111,7 +151,15 @@ pub enum PinFuncType {
   #[strum(serialize = "active_falling")]
   ActiveFalling,
 }
-impl SimpleAttri for PinFuncType {}
+impl SimpleAttri for PinFuncType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum RestoreEdgeType {
@@ -122,7 +170,15 @@ pub enum RestoreEdgeType {
   #[strum(serialize = "trailing")]
   Trailing,
 }
-impl SimpleAttri for RestoreEdgeType {}
+impl SimpleAttri for RestoreEdgeType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -148,7 +204,15 @@ pub enum SignalType {
   #[strum(serialize = "test_clock")]
   TestClock,
 }
-impl SimpleAttri for SignalType {}
+impl SimpleAttri for SignalType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 #[derive(Default)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -163,7 +227,15 @@ pub enum SlewControl {
   #[strum(serialize = "none")]
   None,
 }
-impl SimpleAttri for SlewControl {}
+impl SimpleAttri for SlewControl {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// The `prefer_tied` attribute describes an input pin of a flip-flop or latch.
 /// It indicates what the library developer wants this pin connected to.
@@ -188,7 +260,15 @@ pub enum PreferTied {
   #[strum(serialize = "0")]
   Zero,
 }
-impl SimpleAttri for PreferTied {}
+impl SimpleAttri for PreferTied {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 enum OneValue {
@@ -213,7 +293,15 @@ enum OneValue {
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TwoValue(OneValue, OneValue);
-impl SimpleAttri for TwoValue {}
+impl SimpleAttri for TwoValue {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 impl fmt::Display for TwoValue {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

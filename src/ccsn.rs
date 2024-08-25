@@ -243,7 +243,15 @@ pub enum StageType {
   #[default]
   Both,
 }
-impl SimpleAttri for StageType {}
+impl SimpleAttri for StageType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 /// Use the `receiver_capacitance`  group to specify capacitance values
 /// for composite current source (CCS) receiver modeling at the pin level.

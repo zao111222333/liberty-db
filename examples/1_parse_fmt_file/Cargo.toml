@@ -1,5 +1,5 @@
 [package]
-name = "example1_prune_lib"
+name = "example1_parse_fmt_file"
 edition = "2021"
 publish = false
 

@@ -421,10 +421,7 @@ impl ComplexAttri for Values {
       crate::ast::join_fmt(
         v.iter(),
         f,
-        |float, ff| {
-          let float: f64 = (*float).into();
-          write!(ff, "{}", buffer.format(float))
-        },
+        |float, ff| write!(ff, "{}", buffer.format(Into::<f64>::into(*float))),
         ", ",
       )?;
     }
@@ -433,10 +430,7 @@ impl ComplexAttri for Values {
       crate::ast::join_fmt(
         v.iter(),
         f,
-        |float, ff| {
-          let float: f64 = (*float).into();
-          write!(ff, "{}", buffer.format(float))
-        },
+        |float, ff| write!(ff, "{}", buffer.format(Into::<f64>::into(*float))),
         ", ",
       )?;
     }
@@ -581,7 +575,15 @@ pub enum Variable {
   Length(LengthVariable),
   Scalar(ScalarVariable),
 }
-impl SimpleAttri for Variable {}
+impl SimpleAttri for Variable {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
 
 impl core::str::FromStr for Variable {
   type Err = strum::ParseError;

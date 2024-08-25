@@ -34,6 +34,7 @@ fn all_lib_files() -> Vec<PathBuf> {
 enum ReturnState {
   PASS(Duration),
   #[default]
+  Pending,
   FAIL,
   PANIC,
 }
@@ -44,6 +45,7 @@ impl fmt::Display for ReturnState {
       ReturnState::PASS(d) => write!(f, "{}", format!("{:.2?}", d).green().bold()),
       ReturnState::FAIL => write!(f, "{}", "FAIL".bold().bright_red()),
       ReturnState::PANIC => write!(f, "{}", "PANIC".red().bold()),
+      ReturnState::Pending => write!(f, "{}", "begin".green().bold()),
     }
   }
 }
@@ -84,6 +86,7 @@ fn parse_lib_files(lib_files: Vec<PathBuf>, parser: ParserFn) -> Vec<TestResult>
       let bgn = Instant::now();
       let mut out = TestResult::default();
       out.file_in = String::from(filepath.to_str().unwrap());
+      println!("{}", out);
       let panic_result = panic::catch_unwind(|| {
         let result = parser(filepath.to_path_buf());
         (result, bgn.elapsed())
@@ -148,6 +151,7 @@ const PARSER_LIBERTYPARSE: ParserCtx = ParserCtx {
 
 #[test]
 pub fn test_all_lib_files() {
+  simple_logger::SimpleLogger::new().init().unwrap();
   use prettytable::{Cell, Row, Table};
   let all_parser: Vec<ParserCtx> =
     vec![PARSER_LIBERTY_DB, PARSER_LIBERTY_IO, PARSER_LIBERTYPARSE];

@@ -129,6 +129,13 @@ impl From<BooleanExpression> for Expr {
 }
 impl crate::ast::SimpleAttri for BooleanExpression {
   #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+  #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
@@ -137,6 +144,13 @@ impl crate::ast::SimpleAttri for BooleanExpression {
   }
 }
 impl crate::ast::SimpleAttri for IdBooleanExpression {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,

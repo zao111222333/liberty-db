@@ -7,7 +7,7 @@ publish = false
 
 [dependencies]
 liberty-db = { path = ".." }
-env_logger = "0.10"
+simple_logger = "5.0"
 test-log = { version = "0.2.11", features = ["trace"], default-features = false }
 walkdir = "2"
 prettytable-rs = "^0.10"
