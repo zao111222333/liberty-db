@@ -284,7 +284,7 @@ pub struct ReceiverCapacitance {
   /// group name
   #[id]
   #[liberty(name)]
-  name: Option<ArcStr>,
+  pub name: Option<ArcStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,

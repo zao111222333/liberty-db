@@ -1,33 +1,14 @@
 #![allow(clippy::field_reassign_with_default)]
 use colored::Colorize;
 use core::fmt;
-use std::ffi::OsStr;
-use std::fs::File;
-use std::io::BufReader;
-use std::panic;
-use std::path::PathBuf;
-use std::time::{Duration, Instant};
-use std::{fs, fs::metadata};
-use walkdir::WalkDir;
-
-fn all_lib_files() -> Vec<PathBuf> {
-  WalkDir::new("tech")
-    .into_iter()
-    .filter_map(|e| match e {
-      Ok(entry) => {
-        let path = entry.path();
-        let extension = path.extension().and_then(OsStr::to_str);
-        let md = metadata(path).unwrap();
-        if md.is_file() && extension == Some("lib") {
-          Some(entry.into_path())
-        } else {
-          None
-        }
-      }
-      Err(_) => None,
-    })
-    .collect::<Vec<PathBuf>>()
-}
+use std::{
+  ffi::OsStr,
+  fs::{self, File},
+  io::BufReader,
+  panic,
+  path::PathBuf,
+  time::{Duration, Instant},
+};
 
 #[derive(Default, Clone, Copy, Debug)]
 #[allow(clippy::upper_case_acronyms)]
@@ -160,7 +141,7 @@ pub fn test_all_lib_files() {
     .map(|ctx| {
       println!();
       println!("{}:", ctx.name);
-      parse_lib_files(all_lib_files(), ctx.parser)
+      parse_lib_files(crate::all_lib_files(), ctx.parser)
     })
     .collect();
   let mut table = Table::new();

@@ -8,6 +8,7 @@ use crate::{
   ArcStr,
 };
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
+use core::fmt::Write;
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
 /// TODO: For information about the `test_cell` group, see [test_cell](crate::test_cell) Group
@@ -356,22 +357,27 @@ pub struct LatchBank {
 )]
 impl NamedGroup for LatchFF_type {
   #[inline]
-  fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, IdError> {
+  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), IdError> {
     let l = v.len();
     if l != 2 {
-      return Err(IdError::LengthDismatch(2, l, v));
+      return Err(IdError::length_dismatch(2, l, v));
     }
     v.pop()
-      .map_or(Err(IdError::Other("Unkown pop error".into())), |variable1| {
+      .map_or(Err(IdError::Other("Unkown pop error".into())), |variable2| {
         v.pop()
-          .map_or(Err(IdError::Other("Unkown pop error".into())), |variable2| {
-            Ok(Self::Name { variable1, variable2 })
+          .map_or(Err(IdError::Other("Unkown pop error".into())), |variable1| {
+            self.variable1 = variable1.into();
+            self.variable2 = variable2.into();
+            Ok(())
           })
       })
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<ArcStr> {
-    vec![name.variable1, name.variable2]
+  fn fmt_name<T: Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    write!(f, "{}, {}", self.variable1, self.variable2)
   }
 }
 
@@ -382,10 +388,10 @@ impl NamedGroup for LatchFF_type {
 )]
 impl NamedGroup for LatchFFBank_type {
   #[inline]
-  fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, IdError> {
+  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), IdError> {
     let l = v.len();
     if l != 3 {
-      return Err(IdError::LengthDismatch(3, l, v));
+      return Err(IdError::length_dismatch(3, l, v));
     }
     v.pop()
       .map_or(Err(IdError::Other("Unkown pop error".into())), |bits_str| {
@@ -393,10 +399,15 @@ impl NamedGroup for LatchFFBank_type {
           Ok(bits) => {
             v.pop()
               .map_or(Err(IdError::Other("Unkown pop error".into())), |variable2| {
-                v.pop()
-                  .map_or(Err(IdError::Other("Unkown pop error".into())), |variable1| {
-                    Ok(Self::Name { variable1, variable2, bits })
-                  })
+                v.pop().map_or(
+                  Err(IdError::Other("Unkown pop error".into())),
+                  |variable1| {
+                    self.variable1 = variable1.into();
+                    self.variable2 = variable2.into();
+                    self.bits = bits;
+                    Ok(())
+                  },
+                )
               })
           }
           Err(e) => Err(IdError::Int(e)),
@@ -404,8 +415,11 @@ impl NamedGroup for LatchFFBank_type {
       })
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<ArcStr> {
-    vec![name.variable1, name.variable2, name.bits.to_string().into()]
+  fn fmt_name<T: Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    write!(f, "{}, {}, {}", self.variable1, self.variable2, self.bits)
   }
 }
 
@@ -867,7 +881,7 @@ mod test {
       }
     "#,
       r#"
-liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
+liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clocked_on : "\"1A\"+\"1B\"";
 | next_state : "J*K*!IQ+J*!K+!J*!K*IQ";
 }"#,
@@ -900,7 +914,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
       }
     "#,
       r#"
-liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
+liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clocked_on : "CP";
 | next_state : "J*K*!IQ+J*!K+!J*!K*IQ";
 }"#,
@@ -937,7 +951,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
     }
     "#,
       r#"
-liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
+liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clear : "!CD";
 | clear_preset_var1 : L;
 | clear_preset_var2 : L;
@@ -978,7 +992,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
       }
     "#,
       r#"
-liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
+liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clear : "!CD";
 | clear_preset_var1 : L;
 | clear_preset_var2 : L;
@@ -1013,7 +1027,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
     }
     "#,
       r#"
-liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
+liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clocked_on : "CP";
 | next_state : "D*!CLR";
 }"#,
@@ -1051,7 +1065,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
     }
     "#,
       r#"
-liberty_db::expression::boolean_expression::latch_ff::FF (IQN, IQ) {
+liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clear : "!CDN";
 | clear_preset_var1 : H;
 | clear_preset_var2 : H;
@@ -1126,7 +1140,7 @@ liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
        }
     "#,
       r#"
-liberty_db::expression::boolean_expression::latch_ff::Latch (IQN, IQ) {
+liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
 | clear : "!CD";
 | enable : "G";
 | data_in : "D";
@@ -1159,7 +1173,7 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQN, IQ) {
       }
     "#,
       r#"
-liberty_db::expression::boolean_expression::latch_ff::Latch (IQN, IQ) {
+liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
 | clear : "!S";
 | clear_preset_var1 : L;
 | clear_preset_var2 : L;

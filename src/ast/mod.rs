@@ -14,7 +14,6 @@ pub use fmt::{
   CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation,
   TestCodeFormatter, TestIndentation,
 };
-use itertools::Itertools;
 use nom::{error::Error, IResult};
 use ordered_float::ParseNotNanError;
 /// Wrapper for simple attribute
@@ -182,16 +181,26 @@ pub enum ComplexParseError {
   UnsupportedWord,
 }
 
-/// `NameAttri`
-pub trait NameAttri: Sized + Clone {
-  /// basic parser
-  fn parse(v: Vec<ArcStr>) -> Result<Self, IdError>;
-  /// name `to_vec`
-  fn to_vec(self) -> Vec<ArcStr>;
+#[inline]
+pub fn join_fmt<
+  'a,
+  T: Sized + 'a,
+  I: Iterator<Item = T>,
+  W: Write,
+  F: FnMut(T, &mut W) -> core::fmt::Result,
+>(
+  iter: I,
+  f: &mut W,
+  func: F,
+  sep: &str,
+) -> core::fmt::Result {
+  write!(f, "\"")?;
+  join_fmt_no_quote(iter, f, func, sep)?;
+  write!(f, "\"")
 }
 
 #[inline]
-pub fn join_fmt<
+pub fn join_fmt_no_quote<
   'a,
   T: Sized + 'a,
   I: Iterator<Item = T>,
@@ -203,7 +212,6 @@ pub fn join_fmt<
   mut func: F,
   sep: &str,
 ) -> core::fmt::Result {
-  write!(f, "\"")?;
   if let Some(first) = iter.next() {
     func(first, f)?;
     while let Some(t) = iter.next() {
@@ -211,15 +219,13 @@ pub fn join_fmt<
       func(t, f)?;
     }
   }
-  write!(f, "\"")
+  Ok(())
 }
 
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
   /// basic `parser`
   fn parse(v: &[&str]) -> Result<Self, ComplexParseError>;
-  // / `to_wrapper`
-  // fn to_wrapper(&self) -> ComplexWrapper;
   /// `nom_parse`, auto implement
   #[inline]
   fn nom_parse<'a>(
@@ -258,17 +264,8 @@ pub trait ComplexAttri: Sized {
       write!(f, "\n{indent1}{key} (")?;
       f.indent(1);
       self.fmt_self(f)?;
-      // let indent2 = f.indentation();
-      // for v in self.iter().skip(1) {
-      //   if v.iter().all(is_word) {
-      //     write!(f, ", \\\n{indent2}{}", v.join(", "))?;
-      //   } else {
-      //     write!(f, ", \\\n{indent2}\"{}\"", v.join(", "))?;
-      //   }
-      // }
       f.dedent(1);
       write!(f, ");")
-    // <ComplexWrapper as Format>::liberty(&self.to_wrapper(), key, f)
     } else {
       Ok(())
     }
@@ -288,8 +285,6 @@ pub trait GroupFn {
 }
 /// `GroupAttri`
 pub trait GroupAttri: Sized {
-  /// group Name
-  type Name;
   /// group Comments
   type Comments;
   /// `test_wrapper`
@@ -297,10 +292,6 @@ pub trait GroupAttri: Sized {
   fn test_wrapper(self) -> TestWrapper<Self> {
     TestWrapper { inner: self, line_count: 0 }
   }
-  /// return name
-  fn name(&self) -> Self::Name;
-  /// get name
-  fn set_name(&mut self, name: Self::Name);
   /// `nom_parse`, will be implemented by macros
   fn nom_parse<'a>(
     i: &'a str,
@@ -319,8 +310,8 @@ pub trait GroupAttri: Sized {
 #[derive(thiserror::Error)]
 pub enum IdError {
   /// TitleLenMismatch(want,got,title)
-  #[error("title length dismatch (want={0},got={1}), title={2:?}")]
-  LengthDismatch(usize, usize, Vec<ArcStr>),
+  #[error("title length dismatch (want={want},got={got}), title={title:?}")]
+  LengthDismatch { want: usize, got: usize, title: Vec<ArcStr> },
   /// replace same id
   #[error("replace same id")]
   RepeatIdx,
@@ -335,28 +326,38 @@ pub enum IdError {
   Other(String),
 }
 
+impl IdError {
+  #[inline]
+  pub(crate) fn length_dismatch(want: usize, got: usize, v: Vec<&str>) -> Self {
+    Self::LengthDismatch {
+      want,
+      got,
+      title: v.into_iter().map(ArcStr::from).collect(),
+    }
+  }
+}
+
 /// If more than one `#[liberty(name)]`,
 /// need to impl `NamedGroup` manually
 pub trait NamedGroup: GroupAttri {
-  /// parse name from Vec<ArcStr>
-  fn parse(v: Vec<ArcStr>) -> Result<Self::Name, IdError>;
-  /// name to Vec<ArcStr>
-  fn name2vec(name: Self::Name) -> Vec<ArcStr>;
+  /// parse name from `v: &[&str]` and then set self
+  fn parse_set_name(&mut self, v: Vec<&str>) -> Result<(), IdError>;
   /// `fmt_liberty`
-  #[inline]
-  fn fmt_liberty<T: Write, I: Indentation>(
+  fn fmt_name<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
-  ) -> core::fmt::Result {
-    write!(
-      f,
-      "{}",
-      Self::name2vec(self.name())
-        .into_iter()
-        .map(|s| if is_word(&s) { s } else { format!("\"{s}\"").into() })
-        .join(", ")
-    )
-  }
+  ) -> core::fmt::Result;
+}
+
+/// `NameAttri`
+pub trait NameAttri: Sized {
+  /// basic parser
+  fn parse(v: Vec<&str>) -> Result<Self, IdError>;
+  /// name `to_vec`
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result;
 }
 
 fn display_nom_error(e: &nom::Err<Error<&str>>) -> ArcStr {
@@ -618,15 +619,14 @@ impl Format for GroupWrapper {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     let indent = f.indentation();
-    write!(
+    write!(f, "\n{indent}{key} (")?;
+    join_fmt_no_quote(
+      self.title.iter(),
       f,
-      "\n{indent}{key} ({}) {{",
-      self
-        .title
-        .iter()
-        .map(|s| if is_word(s) { s.clone() } else { format!("\"{s}\"").into() })
-        .join(",")
+      |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
+      ", ",
     )?;
+    write!(f, ") {{")?;
     f.indent(1);
     liberty_attr_list(&self.attr_list, f)?;
     f.dedent(1);

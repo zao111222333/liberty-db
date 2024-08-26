@@ -1,5 +1,4 @@
-use core::fmt::Display;
-use liberty_db::{ast::GroupAttri, library::Library};
+use liberty_db::library::Library;
 
 static TEMPLATE: &str = r#"
 library(gscl45nm) {

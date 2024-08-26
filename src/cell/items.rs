@@ -28,7 +28,7 @@ use core::{
 pub struct LeakagePower {
   #[id]
   #[liberty(name)]
-  name: Vec<ArcStr>,
+  pub name: Vec<ArcStr>,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -154,27 +154,43 @@ impl GroupFn for Statetable {}
 
 impl NamedGroup for Statetable {
   #[inline]
-  fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, crate::ast::IdError> {
+  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), crate::ast::IdError> {
     let l = v.len();
-    if l != 2 {
-      return Err(crate::ast::IdError::LengthDismatch(2, l, v));
+    if l == 2 {
+      v.pop()
+        .map_or(Err(crate::ast::IdError::Other("Unkown pop error".into())), |var2| {
+          v.pop().map_or(
+            Err(crate::ast::IdError::Other("Unkown pop error".into())),
+            |var1| {
+              self.input_nodes =
+                var1.split_ascii_whitespace().map(ArcStr::from).collect();
+              self.internal_nodes =
+                var2.split_ascii_whitespace().map(ArcStr::from).collect();
+              Ok(())
+            },
+          )
+        })
+    } else {
+      Err(crate::ast::IdError::length_dismatch(2, l, v))
     }
-    v.pop()
-      .map_or(Err(crate::ast::IdError::Other("Unkown pop error".into())), |var2| {
-        v.pop().map_or(
-          Err(crate::ast::IdError::Other("Unkown pop error".into())),
-          |var1| {
-            Ok(Self::Name {
-              input_nodes: var1.split_ascii_whitespace().map(ArcStr::from).collect(),
-              internal_nodes: var2.split_ascii_whitespace().map(ArcStr::from).collect(),
-            })
-          },
-        )
-      })
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<ArcStr> {
-    vec![name.input_nodes.join(" ").into(), name.internal_nodes.join(" ").into()]
+  #[allow(clippy::indexing_slicing)]
+  fn fmt_name<T: Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    if self.input_nodes.len() == 1 {
+      write!(f, "{}", self.input_nodes[0])?;
+    } else {
+      join_fmt(self.input_nodes.iter(), f, |s, ff| write!(ff, "{s}"), " ")?;
+    }
+    write!(f, ", ")?;
+    if self.internal_nodes.len() == 1 {
+      write!(f, "{}", self.internal_nodes[0])
+    } else {
+      join_fmt(self.internal_nodes.iter(), f, |s, ff| write!(ff, "{s}"), " ")
+    }
   }
 }
 

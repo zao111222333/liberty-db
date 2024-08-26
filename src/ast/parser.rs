@@ -183,7 +183,10 @@ pub(crate) fn undefine<'a>(
   *line_num = line_num_back;
   match title(i, line_num) {
     Ok((mut input, title)) => {
-      let mut res = GroupWrapper { title, attr_list: vec![] };
+      let mut res = GroupWrapper {
+        title: title.into_iter().map(ArcStr::from).collect(),
+        attr_list: vec![],
+      };
       loop {
         match key(input) {
           Err(nom::Err::Error(_)) => {
@@ -423,7 +426,7 @@ mod test_key {
 pub(crate) fn title<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<ArcStr>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>> {
   map(
     tuple((
       space,
@@ -436,7 +439,7 @@ pub(crate) fn title<'a>(
     )),
     |(_, _, v, _, _, _, n)| {
       *line_num += n;
-      v.into_iter().map(ArcStr::from).collect()
+      v
     },
   )(i)
 }

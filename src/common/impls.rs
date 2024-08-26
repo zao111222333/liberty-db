@@ -10,7 +10,6 @@ use crate::{
   },
   ArcStr, NotNan,
 };
-use itertools::Itertools;
 
 use super::items::Formula;
 impl SimpleAttri for f64 {
@@ -104,80 +103,96 @@ impl SimpleAttri for isize {
 
 impl NameAttri for Option<ArcStr> {
   #[inline]
-  fn parse(mut v: Vec<ArcStr>) -> Result<Self, IdError> {
-    Ok(v.pop())
+  fn parse(mut v: Vec<&str>) -> Result<Self, IdError> {
+    let l = v.len();
+    if l > 1 {
+      Err(IdError::length_dismatch(1, l, v))
+    } else {
+      Ok(v.pop().map(ArcStr::from))
+    }
   }
   #[inline]
-  fn to_vec(self) -> Vec<ArcStr> {
-    self.map_or(vec![], |s| vec![s])
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    self.as_ref().map_or(Ok(()), |s| {
+      if is_word(s) {
+        write!(f, "{s}")
+      } else {
+        write!(f, "\"{s}\"")
+      }
+    })
   }
 }
 
 impl NameAttri for ArcStr {
   #[inline]
-  fn parse(mut v: Vec<ArcStr>) -> Result<Self, IdError> {
+  fn parse(mut v: Vec<&str>) -> Result<Self, IdError> {
     let l = v.len();
     if l != 1 {
-      return Err(IdError::LengthDismatch(1, l, v));
+      return Err(IdError::length_dismatch(1, l, v));
     }
-    v.pop().ok_or(IdError::Other("Unkown pop error".into()))
+    v.pop()
+      .map_or(Err(IdError::Other("Unkown pop error".into())), |s| Ok(s.into()))
   }
   #[inline]
-  fn to_vec(self) -> Vec<ArcStr> {
-    vec![self]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    if is_word(self) {
+      write!(f, "{self}")
+    } else {
+      write!(f, "\"{self}\"")
+    }
   }
 }
 
 impl NameAttri for Vec<ArcStr> {
   #[inline]
-  fn parse(v: Vec<ArcStr>) -> Result<Self, IdError> {
-    Ok(v)
+  fn parse(v: Vec<&str>) -> Result<Self, IdError> {
+    Ok(v.into_iter().map(ArcStr::from).collect())
   }
   #[inline]
-  fn to_vec(self) -> Vec<ArcStr> {
-    self
-  }
-}
-impl NameAttri for (ArcStr, ArcStr, usize) {
-  #[inline]
-  fn parse(mut v: Vec<ArcStr>) -> Result<Self, IdError> {
-    let l = v.len();
-    if l != 3 {
-      return Err(IdError::LengthDismatch(3, l, v));
-    }
-    v.pop().map_or(Err(IdError::Other("Unkown pop error".into())), |s3| {
-      match s3.parse::<usize>() {
-        Ok(s3_i) => {
-          v.pop().map_or(Err(IdError::Other("Unkown pop error".into())), |s2| {
-            v.pop().map_or(Err(IdError::Other("Unkown pop error".into())), |s1| {
-              Ok((s1, s2, s3_i))
-            })
-          })
-        }
-        Err(e) => Err(IdError::Int(e)),
-      }
-    })
-  }
-  #[inline]
-  fn to_vec(self) -> Vec<ArcStr> {
-    vec![self.0, self.1, self.2.to_string().into()]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    crate::ast::join_fmt_no_quote(
+      self.iter(),
+      f,
+      |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
+      ", ",
+    )
   }
 }
 impl<const N: usize> NameAttri for [ArcStr; N] {
   #[inline]
-  fn parse(v: Vec<ArcStr>) -> Result<Self, IdError> {
+  fn parse(v: Vec<&str>) -> Result<Self, IdError> {
     let l = v.len();
-    if l != N {
-      return Err(IdError::LengthDismatch(N, l, v));
-    }
-    match TryInto::<[ArcStr; N]>::try_into(v) {
-      Ok(name) => Ok(name),
-      Err(e) => Err(IdError::Other(format!("try_into error: {e:?}"))),
+    if l == N {
+      match TryInto::<[ArcStr; N]>::try_into(
+        v.into_iter().map(ArcStr::from).collect::<Vec<ArcStr>>(),
+      ) {
+        Ok(name) => Ok(name),
+        Err(e) => Err(IdError::Other(format!("try_into error: {e:?}"))),
+      }
+    } else {
+      Err(IdError::length_dismatch(N, l, v))
     }
   }
   #[inline]
-  fn to_vec(self) -> Vec<ArcStr> {
-    self.into_iter().collect_vec()
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    crate::ast::join_fmt_no_quote(
+      self.iter(),
+      f,
+      |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
+      ", ",
+    )
   }
 }
 

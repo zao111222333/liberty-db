@@ -7,6 +7,7 @@ use crate::{
   timing::TimingType,
   ArcStr, GroupSet,
 };
+use core::fmt::Write;
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::Nothing)]
@@ -54,10 +55,10 @@ impl GroupFn for Pin {}
 pub(crate) struct FF {
   #[id]
   #[liberty(name)]
-  var1: ArcStr,
+  variable1: ArcStr,
   #[id]
   #[liberty(name)]
-  var2: ArcStr,
+  variable2: ArcStr,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments<Self>,
@@ -70,22 +71,31 @@ pub(crate) struct FF {
 impl GroupFn for FF {}
 impl NamedGroup for FF {
   #[inline]
-  fn parse(mut v: Vec<ArcStr>) -> Result<Self::Name, crate::ast::IdError> {
+  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), crate::ast::IdError> {
     let l = v.len();
     if l != 2 {
-      return Err(crate::ast::IdError::LengthDismatch(2, l, v));
+      return Err(crate::ast::IdError::length_dismatch(2, l, v));
     }
-    v.pop()
-      .map_or(Err(crate::ast::IdError::Other("Unkown pop error".into())), |var2| {
-        v.pop()
-          .map_or(Err(crate::ast::IdError::Other("Unkown pop error".into())), |var1| {
-            Ok(Self::Name { var1, var2 })
-          })
-      })
+    v.pop().map_or(
+      Err(crate::ast::IdError::Other("Unkown pop error".into())),
+      |variable2| {
+        v.pop().map_or(
+          Err(crate::ast::IdError::Other("Unkown pop error".into())),
+          |variable1| {
+            self.variable1 = variable1.into();
+            self.variable2 = variable2.into();
+            Ok(())
+          },
+        )
+      },
+    )
   }
   #[inline]
-  fn name2vec(name: Self::Name) -> Vec<ArcStr> {
-    vec![name.var1, name.var2]
+  fn fmt_name<T: Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    write!(f, "{}, {}", self.variable1, self.variable2)
   }
 }
 
