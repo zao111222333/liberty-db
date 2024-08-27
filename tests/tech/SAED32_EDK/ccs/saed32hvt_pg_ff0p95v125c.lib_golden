@@ -6929,7 +6929,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.0133168, 0.0267472, 0.0531843, 0.106593, 0.2127951, 0.4255187, 0.8548167");
 | | | | | index_2 ("0.1, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002, 81.9999992");
@@ -7144,7 +7143,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.0133264, 0.0266382, 0.0531227, 0.1066189, 0.2132574, 0.4280215, 0.8507489");
 | | | | | index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
@@ -7359,7 +7357,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.013375, 0.0267947, 0.05319, 0.1065467, 0.2130729, 0.4254056, 0.8563694");
 | | | | | index_2 ("0.1, 8.0, 16.0000001, 32.0000001, 64.0000002, 128.0000005, 167.9999998");
@@ -7574,7 +7571,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.0134006, 0.0267363, 0.0535328, 0.106414, 0.2126421, 0.4267612, 0.8492302");
 | | | | | index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
@@ -7789,7 +7785,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.0133359, 0.0267306, 0.0531861, 0.1066448, 0.2129552, 0.4259113, 0.8555998");
 | | | | | index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
@@ -8594,7 +8589,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.0133005, 0.026777, 0.0531429, 0.1066832, 0.2138799, 0.4263948, 0.8511784");
 | | | | | index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
@@ -8809,7 +8803,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.013304, 0.0267659, 0.0531272, 0.1067626, 0.2130365, 0.4255274, 0.8501349");
 | | | | | index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
@@ -9024,7 +9017,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.0133013, 0.0267757, 0.0531379, 0.1065425, 0.2138356, 0.4272925, 0.8512136");
 | | | | | index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
@@ -9239,7 +9231,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.0132998, 0.0267761, 0.0531098, 0.1063325, 0.2133159, 0.4255066, 0.8508348");
 | | | | | index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
@@ -9454,7 +9445,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 | | | timing () {
 | | | | related_pin : SLEEP;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | receiver_capacitance1_fall (CCS_RCV_TEMPLATE_0) {
 | | | | | index_1 ("0.0132993, 0.0267672, 0.0531345, 0.1063898, 0.2137479, 0.4254972, 0.8507816");
 | | | | | index_2 ("0.1, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002, 81.9999992");

@@ -713,14 +713,6 @@ pub enum TimingType {
   NoChange(ArcNoChange),
 }
 
-// impl Eq for TimingType {}
-
-impl Default for TimingType {
-  #[inline]
-  fn default() -> Self {
-    Self::Combinational(ArcCombinational::Combinational(None))
-  }
-}
 impl SimpleAttri for TimingType {
   #[inline]
   fn nom_parse<'a>(

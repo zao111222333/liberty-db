@@ -5097,7 +5097,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | timing () {
 | | | | related_pin : A;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | cell_fall (del_1_7_7) {
 | | | | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 | | | | | index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
@@ -5226,7 +5225,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | timing () {
 | | | | related_pin : A;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | cell_fall (del_1_7_7) {
 | | | | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 | | | | | index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0");
@@ -5355,7 +5353,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | timing () {
 | | | | related_pin : A;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | cell_fall (del_1_7_7) {
 | | | | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 | | | | | index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0");
@@ -5484,7 +5481,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | timing () {
 | | | | related_pin : A;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | cell_fall (del_1_7_7) {
 | | | | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 | | | | | index_2 ("0.1, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0");
@@ -5617,7 +5613,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | timing () {
 | | | | related_pin : A;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | cell_fall (del_1_7_7) {
 | | | | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 | | | | | index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
@@ -5750,7 +5745,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | timing () {
 | | | | related_pin : A;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | cell_fall (del_1_7_7) {
 | | | | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 | | | | | index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0");
@@ -5883,7 +5877,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | timing () {
 | | | | related_pin : A;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | cell_fall (del_1_7_7) {
 | | | | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 | | | | | index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0");
@@ -6016,7 +6009,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | timing () {
 | | | | related_pin : A;
 | | | | timing_sense : positive_unate;
-| | | | timing_type : combinational;
 | | | | cell_fall (del_1_7_7) {
 | | | | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 | | | | | index_2 ("0.1, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0");

@@ -31,7 +31,7 @@ fn main() {
         // Log timing_id
         let timing_id = timing.id();
         log::info!(
-          "Loop to [timing] related_pin={} {} {} timing_type={}",
+          "Loop to [timing] related_pin={} {} {} {}",
           timing_id.related_pin,
           if let Some(timing_sense) = timing_id.timing_sense {
             format!("timing_sense={timing_sense}")
@@ -43,7 +43,11 @@ fn main() {
           } else {
             String::new()
           },
-          timing_id.timing_type
+          if let Some(timing_type) = &timing_id.timing_type {
+            format!("timing_type={timing_type}")
+          } else {
+            String::new()
+          },
         );
         // Add `sdf_cond` from `when`
         if let Some(when) = &timing.id().when {

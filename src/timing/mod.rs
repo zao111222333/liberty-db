@@ -1260,8 +1260,8 @@ pub struct Timing {
   /// + `nochange_low_low` (negative/negative): Indicates a negative pulse on
   /// the constrained pin and a negative pulse on the related pin.
   #[id]
-  #[liberty(simple)]
-  pub timing_type: TimingType,
+  #[liberty(simple(type = Option))]
+  pub timing_type: Option<TimingType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
