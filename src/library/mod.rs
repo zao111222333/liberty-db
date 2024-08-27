@@ -425,6 +425,19 @@ pub struct Library {
   #[liberty(simple)]
   #[derivative(Default(value = "50.00"))]
   pub output_threshold_pct_fall: f64,
+  /// The `is_soi`  attribute specifies that the cell is a
+  /// silicon-on-insulator (SOI) cell.
+  /// The default is false, which means that the cell is a
+  /// bulk-CMOS cell.
+  ///
+  /// If the `is_soi`  attribute is specified at both the
+  /// library and cell levels,
+  /// the cell-level value overrides the library-level value
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=114.25&end=114.28
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub is_soi: Option<bool>,
   /// The `soft_error_rate_confidence`  attribute specifies the confidence level
   /// at which the cell soft error rate is sampled in the library. The value range is from 0 to 1.
   /// <a name ="reference_link" href="
@@ -518,6 +531,25 @@ pub struct Library {
   /// valid: `match_footprint`?
   #[liberty(simple(type = Option))]
   pub in_place_swap_mode: Option<ArcStr>,
+  /// You can define one or more `fpga_isd`  groups at the library level
+  /// to specify the drive current, I/O voltages, and slew rates for FPGA parts and cells
+  ///
+  /// When you specify more than one `fpga_isd`  group, you **must** also define
+  /// the library-level `default_fpga_isd`  attribute to specify which `fpga_isd`
+  /// group is the default
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=63.22+63.25&end=63.23+63.27
+  /// ">Reference</a>
+  #[liberty(group(type = Set))]
+  pub fpga_isd: GroupSet<FpgaIsd>,
+  /// When you specify more than one `fpga_isd`  group, you **must** also define
+  /// the library-level `default_fpga_isd`  attribute to specify which `fpga_isd`
+  /// group is the default
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=63.22+63.25&end=63.23+63.27
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub default_fpga_isd: Option<ArcStr>,
   /// The `sensitization` group defined at the library level describes
   /// the complete state patterns for a specific list of pins (defined by the `pin_names` attribute)
   /// that are referenced and instantiated as stimuli in the timing arc.

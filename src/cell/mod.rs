@@ -81,6 +81,135 @@ pub struct Cell {
   pub cell_footprint: Option<ArcStr>,
   #[liberty(simple(type=Option))]
   pub cell_leakage_power: Option<f64>,
+  /// The `em_temp_degradation_factor` attribute specifies the electromigration
+  /// exponential degradation factor
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=109.17&end=109.18
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub em_temp_degradation_factor: Option<f64>,
+  /// interprets a combination timing arc between the clock pin and the output pin as a rising edge arc or as a falling edge arc
+  ///
+  /// Valid values are `rising_edge_clock_cell`  and `falling_edge_clock_cell`.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=109.29+109.36&end=109.30+109.37
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub fpga_cell_type: Option<FpgaCellType>,
+  /// Use the `fpga_isd`  attribute to reference the drive,
+  /// `io_type`, and `slew`  information contained in a library-level `fpga_isd`  group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=110.3&end=110.4
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub fpga_isd: Option<ArcStr>,
+  /// Indicates that the `timing` arcs are interpreted according
+  ///  to interface `timing` specifications semantics.
+  /// If this attribute is missing or its value is set to false,
+  /// the `timing` relationships are interpreted as those of
+  /// a regular cell rather than according to interface timing
+  /// specification semantics.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=110.14&end=110.17
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub interface_timing: Option<bool>,
+  /// Use the io_type  attribute to define the I/O standard used by this I/O cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=110.25&end=110.26
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub io_type: Option<ArcStr>,
+  /// The `is_pad`  attribute identifies a pad pin on
+  /// any I/O cell. You can also specify the `is_pad` attribute
+  /// on PG pins.
+  /// The valid values are true  and false.
+  /// If the cell-level `pad_cell` attribute is specified on
+  /// a I/O cell, the `is_pad`  attribute must be set to true
+  /// in either a `pg_pin`  group or on a signal pin for that cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=111.5&end=111.8
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_pad: Option<bool>,
+  /// The `is_pll_cell`  Boolean attribute identifies a phase-locked loop
+  /// cell. A phase-locked loop (PLL) is a feedback control system
+  /// that automatically adjusts the phase of a locally-generated signal
+  /// to match the phase of an input signal.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=111.5&end=111.8
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_pll_cell: Option<bool>,
+  /// The cell-level `is_clock_gating_cell` attribute specifies that a cell is for clock gating.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=113.8&end=113.9
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_clock_gating_cell: Option<bool>,
+  /// The `is_clock_isolation_cell`  attribute identifies a cell as a clock-isolation cell.
+  /// The default is false, meaning that the cell is a standard cell.
+  /// For information about pin-level attributes of the clock-isolation cell,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=113.18&end=113.20
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub is_clock_isolation_cell: Option<bool>,
+  /// The cell-level `is_isolation_cell`  attribute specifies that a
+  /// cell is an isolation cell.
+  /// The pin-level `isolation_cell_enable_pin`  attribute specifies
+  /// the enable input pin for the isolation cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=113.27&end=113.29
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_isolation_cell: Option<bool>,
+  /// The cell-level `is_level_shifter`  attribute specifies
+  /// that a cell is a level shifter cell.
+  /// The pin-level `level_shifter_enable_pin`  
+  /// attribute specifies the enable input pin for
+  /// the level shifter cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=114.5&end=114.7
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_level_shifter: Option<bool>,
+  /// The `is_macro_cell`  simple Boolean attribute identifies
+  /// whether a cell is a macro cell.
+  /// If the attribute is set to true, the cell is a macro cell.
+  /// If it is set to false, the cell is not a macro cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=114.15&end=114.17
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_macro_cell: Option<bool>,
+  /// The `is_soi`  attribute specifies that the cell is a
+  /// silicon-on-insulator (SOI) cell.
+  /// The default is false, which means that the cell is a
+  /// bulk-CMOS cell.
+  ///
+  /// If the `is_soi`  attribute is specified at both the
+  /// library and cell levels,
+  /// the cell-level value overrides the library-level value
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=114.25&end=114.28
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub is_soi: Option<bool>,
+  /// The `level_shifter_type`  attribute specifies the
+  /// voltage conversion type that is supported.
+  /// Valid values are:
+  ///
+  /// + `LH`: Low to High
+  /// + `HL`: High to Low
+  /// + `HL_LH`: High to Low and Low to HighThe
+  ///
+  /// `level_shifter_type`  attribute is optional
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=115.9&end=115.17
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub level_shifter_type: Option<LevelShifterType>,
   /// The `switch_cell_type`  cell-level attribute specifies
   /// the type of the switch cell for direct inference.
   ///
@@ -536,6 +665,68 @@ liberty_db::cell::Cell (latch4) {
 | | function : "IQN";
 | }
 }"#,
+    );
+  }
+  /// Example PLL
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=112.3+113.2&end=112.53+113.6
+  /// ">Reference</a>
+  #[test]
+  fn example_pll() {
+    let cell = crate::ast::test_parse_fmt::<Cell>(
+      r#"
+    (my_pll) {
+        is_pll_cell : true;
+        pin( REFCLK ) {
+            direction : input;
+            is_pll_reference_pin : true;
+        }
+        pin( FBKCLK ) {
+            direction : input;
+            is_pll_feedback_pin : true;
+        }
+        pin (OUTCLK1) {
+            direction : output;
+            is_pll_output_pin : true;
+            timing() { /*Timing Arc*/
+                related_pin: "REFCLK";
+                timing_type: combinational_rise;
+                timing_sense: positive_unate;
+                cell_rise(scalar) { /*Can be a LUT as well to support NLDM and CCS models*/
+                    values("0.0")
+                }
+            }
+            timing() { /*Timing Arc*/
+                related_pin: "REFCLK";
+                timing_type: combinational_fall;
+                timing_sense: positive_unate;
+                cell_fall(scalar) {
+                    values("0.0")
+                }
+            }
+        }
+        pin (OUTCLK2) {
+            direction : output;
+            is_pll_output_pin : true;
+            timing() { /*Timing Arc*/
+                related_pin: "REFCLK";
+                timing_type: combinational_rise;
+                timing_sense: positive_unate;
+                cell_rise(scalar) { /*Can be a LUT as well to support NLDM and CCS models*/
+                    values("0.0")
+                }
+            }
+            timing() { /*Timing Arc*/
+                related_pin: "REFCLK";
+                timing_type: combinational_fall;
+                timing_sense: positive_unate;
+                cell_fall(scalar) {
+                    values("0.0")
+                }
+            }
+        }
+    }"#,
+      r#""#,
     );
   }
   /// Example 28 a multibit register containing four high-enable D latches with the clear  attribute.

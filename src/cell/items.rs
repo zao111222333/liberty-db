@@ -525,6 +525,74 @@ impl SimpleAttri for SwitchCellType {
   }
 }
 
+/// interprets a combination timing arc between the clock pin and the output pin as a rising edge arc or as a falling edge arc
+///
+/// Valid values are `rising_edge_clock_cell`  and `falling_edge_clock_cell`.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=109.29+109.36&end=109.30+109.37
+/// ">Reference</a>
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum FpgaCellType {
+  /// `rising_edge_clock_cell`
+  #[strum(serialize = "rising_edge_clock_cell")]
+  RisingEdgeClockCell,
+  /// `falling_edge_clock_cell`
+  #[strum(serialize = "falling_edge_clock_cell")]
+  FallingEdgeClockCell,
+}
+impl SimpleAttri for FpgaCellType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+/// The `level_shifter_type`  attribute specifies the
+/// voltage conversion type that is supported.
+/// Valid values are:
+///
+/// + `LH`: Low to High
+/// + `HL`: High to Low
+/// + `HL_LH`: High to Low and Low to High
+///
+/// The `level_shifter_type`  attribute is optional
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=115.9&end=115.17
+/// ">Reference</a>
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum LevelShifterType {
+  /// `LH`: Low to High
+  #[strum(serialize = "LH")]
+  LH,
+  /// `HL`: High to Low
+  #[strum(serialize = "HL")]
+  HL,
+  /// `HL_LH`: High to Low and Low to High
+  #[strum(serialize = "HL_LH")]
+  HL_LH,
+}
+impl SimpleAttri for LevelShifterType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+
 /// You can use the `clock_gating_integrated_cell` attribute to enter specific
 /// values that determine which integrated cell functionality the clock-gating tool uses.
 ///

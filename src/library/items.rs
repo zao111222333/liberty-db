@@ -551,6 +551,85 @@ pub struct OperatingConditions {
 }
 impl GroupFn for OperatingConditions {}
 
+/// You can define one or more `fpga_isd`  groups at the library level
+/// to specify the drive current, I/O voltages, and slew rates for FPGA parts and cells
+///
+/// When you specify more than one `fpga_isd`  group, you **must** also define
+/// the library-level `default_fpga_isd`  attribute to specify which `fpga_isd`
+/// group is the default
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=63.22+63.25&end=63.23+63.27
+/// ">Reference</a>
+#[derive(Debug, Clone, derivative::Derivative)]
+#[derivative(Default)]
+#[derive(liberty_macros::Group)]
+#[mut_set::derive::item(
+  sort,
+  macro(derive(Debug, Clone);
+        derive(derivative::Derivative);
+        derivative(Default);),
+  attr_filter(derivative;)
+)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct FpgaIsd {
+  /// name
+  #[id]
+  #[liberty(name)]
+  pub name: ArcStr,
+  /// group comments
+  #[liberty(comments)]
+  pub comments: GroupComments<Self>,
+  /// group undefined attributes
+  #[liberty(undefined)]
+  pub undefined: AttributeList,
+  /// The `drive`  attribute is optional and specifies the output current of the FPGA part or the FPGA cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.7&end=64.8
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub drive: ArcStr,
+  /// The `io_type`  attribute is required and specifies the input or output voltage of the FPGA part or the FPGA cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.17&end=64.18
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub io_type: ArcStr,
+  /// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.27&end=64.28
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub slew: Option<FPGASlew>,
+}
+impl GroupFn for FpgaIsd {}
+
+/// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.27&end=64.28
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum FPGASlew {
+  /// `FAST`
+  #[strum(serialize = "FAST")]
+  FAST,
+  /// `SLOW`
+  #[strum(serialize = "SLOW")]
+  SLOW,
+}
+impl SimpleAttri for FPGASlew {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+
 /// Use the `tree_type`  attribute to specify the environment interconnect model.
 ///
 /// Valid values are `best_case_tree`, `balanced_tree`, and `worst_case_tree`.
@@ -681,6 +760,57 @@ impl ComplexAttri for Define {
   }
 }
 
+/// Use this special attribute to define new, temporary, or user-defined groups
+/// for use in technology libraries.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.24&end=37.25
+/// ">Reference</a>
+#[derive(Debug, Clone)]
+#[mut_set::derive::item(
+  sort,
+  macro(derive(Debug, Clone);)
+)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct DefineGroup {
+  /// The name of the user-defined group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.33&end=37.34
+  /// ">Reference</a>
+  #[id]
+  pub group: ArcStr,
+  /// The name of the group statement in which the attribute is to be used.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.35&end=37.36
+  /// ">Reference</a>
+  #[id]
+  pub parent_name: ArcStr,
+}
+impl ComplexAttri for DefineGroup {
+  #[inline]
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
+    let group = match i.next() {
+      Some(&s) => ArcStr::from(s),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let parent_name = match i.next() {
+      Some(&s) => ArcStr::from(s),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if i.next().is_some() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok(Self { group, parent_name })
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{}, {}", self.group, self.parent_name)
+  }
+}
+
 /// The `define_cell_area`  attribute defines the area resources a `cell` uses,
 /// such as the number of pad slots.
 /// <a name ="reference_link" href="
@@ -769,57 +899,6 @@ impl ComplexAttri for DefineCellArea {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     write!(f, "{}, {}", self.area_name, self.resource_type)
-  }
-}
-
-/// Use this special attribute to define new, temporary, or user-defined groups
-/// for use in technology libraries.
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.24&end=37.25
-/// ">Reference</a>
-#[derive(Debug, Clone)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone);)
-)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct DefineGroup {
-  /// The name of the user-defined group.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.33&end=37.34
-  /// ">Reference</a>
-  #[id]
-  pub group: ArcStr,
-  /// The name of the group statement in which the attribute is to be used.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.35&end=37.36
-  /// ">Reference</a>
-  #[id]
-  pub parent_name: ArcStr,
-}
-impl ComplexAttri for DefineGroup {
-  #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
-    let mut i = v.iter();
-    let group = match i.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let parent_name = match i.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if i.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(Self { group, parent_name })
-  }
-  #[inline]
-  fn fmt_self<T: Write, I: Indentation>(
-    &self,
-    f: &mut CodeFormatter<'_, T, I>,
-  ) -> fmt::Result {
-    write!(f, "{}, {}", self.group, self.parent_name)
   }
 }
 
