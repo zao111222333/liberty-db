@@ -36,6 +36,18 @@ pub struct Cell {
   pub single_bit_degenerate: Option<ArcStr>,
   #[liberty(simple(type = Option))]
   pub driver_waveform_rise: Option<ArcStr>,
+  /// You can use the `clock_gating_integrated_cell` attribute to enter specific
+  /// values that determine which integrated cell functionality the clock-gating tool uses.
+  ///
+  /// Syntax:
+  /// ```text
+  /// clock_gating_integrated_cell:generic|value_id;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=103.19&end=103.24
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub clock_gating_integrated_cell: Option<ClockGatingIntegratedCell>,
   #[liberty(simple(type = Option))]
   pub driver_waveform_fall: Option<ArcStr>,
   #[liberty(simple(type = Option))]

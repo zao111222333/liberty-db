@@ -491,3 +491,64 @@ impl SimpleAttri for PgType {
     crate::ast::nom_parse_from_str(i, line_num)
   }
 }
+
+/// You can use the `clock_gating_integrated_cell` attribute to enter specific
+/// values that determine which integrated cell functionality the clock-gating tool uses.
+///
+/// Syntax:
+/// ```text
+/// clock_gating_integrated_cell:generic|value_id;
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=103.19&end=103.24
+/// ">Reference</a>
+#[derive(Debug, Clone)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum ClockGatingIntegratedCell {
+  ContainlatchNegedge,
+  RegisterslatchPosedgePostcontrol,
+  LatchlatchNegedgePrecontrol,
+  LatchnonePosedgeControlObs,
+  /// by accessing the state tables and state functions of the library cell pins
+  Generic(ArcStr),
+}
+impl FromStr for ClockGatingIntegratedCell {
+  type Err = ();
+  #[inline]
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
+      "containlatch_negedge" => Ok(Self::ContainlatchNegedge),
+      "registerslatch_posedge_postcontrol" => Ok(Self::RegisterslatchPosedgePostcontrol),
+      "latchlatch_negedge_precontrol" => Ok(Self::LatchlatchNegedgePrecontrol),
+      "latchnone_posedge_control_obs" => Ok(Self::LatchnonePosedgeControlObs),
+      _ => Ok(Self::Generic(s.into())),
+    }
+  }
+}
+
+impl fmt::Display for ClockGatingIntegratedCell {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::ContainlatchNegedge => write!(f, "containlatch_negedge"),
+      Self::RegisterslatchPosedgePostcontrol => {
+        write!(f, "registerslatch_posedge_postcontrol")
+      }
+      Self::LatchlatchNegedgePrecontrol => write!(f, "latchlatch_negedge_precontrol"),
+      Self::LatchnonePosedgeControlObs => write!(f, "latchnone_posedge_control_obs"),
+      Self::Generic(s) => write!(f, "{s}"),
+    }
+  }
+}
+
+impl SimpleAttri for ClockGatingIntegratedCell {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
