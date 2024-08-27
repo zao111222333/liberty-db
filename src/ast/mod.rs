@@ -19,14 +19,9 @@ use ordered_float::ParseNotNanError;
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
-pub type ComplexWrapper = Vec<Vec<ArcStr>>;
-// pub type ComplexWrapper = (Vec<ArcStr>, ComplexShape);
-
-// pub enum ComplexShape {
-//   SingleLine,
-//   Table { size1: usize, size2: usize },
-//   Arbitrary(Vec<usize>),
-// }
+#[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct ComplexWrapper(Vec<ArcStr>);
 /// Wrapper for group attribute
 ///
 /// ``` text
@@ -239,7 +234,9 @@ pub trait ComplexAttri: Sized {
         input,
         Err((
           e,
-          AttriValue::Complex(vec![complex.into_iter().map(ArcStr::from).collect()]),
+          AttriValue::Complex(ComplexWrapper(
+            complex.into_iter().map(ArcStr::from).collect(),
+          )),
         )),
       )),
     }
@@ -279,9 +276,9 @@ pub type GroupComments<T> = <T as GroupAttri>::Comments;
 pub type AttriComment = Vec<ArcStr>;
 /// Group Functions
 pub trait GroupFn {
-  /// `post_process` call back
+  /// `post_parse_process` call back
   #[inline]
-  fn post_process(&mut self) {}
+  fn post_parse_process(&mut self) {}
 }
 /// `GroupAttri`
 pub trait GroupAttri: Sized {
@@ -572,33 +569,30 @@ impl Format for SimpleWrapper {
 }
 
 impl Format for ComplexWrapper {
-  #[allow(clippy::indexing_slicing)]
   #[inline]
   fn liberty<T: Write, I: Indentation>(
     &self,
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    if self.is_empty() || (self.len() == 1 && self[0].is_empty()) {
-      return Ok(());
-    };
-    let indent1 = f.indentation();
-    if self[0].iter().all(is_word) {
-      write!(f, "\n{indent1}{key} ({}", self[0].join(", "))?;
+    if self.0.is_empty() {
+      Ok(())
     } else {
-      write!(f, "\n{indent1}{key} (\"{}\"", self[0].join(", "))?;
-    }
-    f.indent(1);
-    let indent2 = f.indentation();
-    for v in self.iter().skip(1) {
-      if v.iter().all(is_word) {
-        write!(f, ", \\\n{indent2}{}", v.join(", "))?;
+      let indent1 = f.indentation();
+      write!(f, "\n{indent1}{key} (")?;
+      if self.0.len() == 1 {
+        #[allow(clippy::indexing_slicing)]
+        let s = &self.0[0];
+        if is_word(s) {
+          write!(f, "{s}")?;
+        } else {
+          write!(f, "\"{s}\"")?;
+        }
       } else {
-        write!(f, ", \\\n{indent2}\"{}\"", v.join(", "))?;
+        join_fmt(self.0.iter(), f, |s, ff| write!(ff, "{s}"), ", ")?;
       }
+      write!(f, ");")
     }
-    f.dedent(1);
-    write!(f, ");")
   }
 }
 

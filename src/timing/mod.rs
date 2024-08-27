@@ -16,7 +16,9 @@ use crate::{
   ccsn::PropagatingCcb,
   common::{
     items::{SdfEdgeType, WordSet},
-    table::{ReferenceTimeVector3DGrpup, TableLookUp, TableLookUpMultiSegment},
+    table::{
+      CompactCcsTable, ReferenceTimeVector3DGrpup, TableLookUp, TableLookUpMultiSegment,
+    },
   },
   expression::{BooleanExpression, IdBooleanExpression, SdfExpression},
   library::Sensitization,
@@ -1598,6 +1600,18 @@ pub struct Timing {
   pub ocv_skewness_rise_constraint: Option<TableLookUp>,
   #[liberty(group)]
   pub ocv_skewness_fall_constraint: Option<TableLookUp>,
+  /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
+  /// ">Reference-Definition</a>
+  #[liberty(group)]
+  pub compact_ccs_rise: Option<CompactCcsTable>,
+  /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
+  /// ">Reference-Definition</a>
+  #[liberty(group)]
+  pub compact_ccs_fall: Option<CompactCcsTable>,
 }
 
 impl GroupFn for Timing {}

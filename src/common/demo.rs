@@ -252,7 +252,7 @@ liberty_db::common::demo::Cell (INV) {
 | | timing () {
 | | | /* Undefined attributes from here */
 | | | t1 : foo_error;
-| | | test_table (1, 2, 4, 5, 6, 4, 5, 6);
+| | | test_table ("1, 2, 4, 5, 6, 4, 5, 6");
 | | | /* Undefined attributes end here */
 | | }
 | }

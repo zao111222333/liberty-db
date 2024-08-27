@@ -4,10 +4,9 @@
 
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
-  common::items::DummyGroup,
   expression::{FFBank, Latch, LatchBank, FF},
-  pin::Pin,
-  ArcStr, GroupSet,
+  pin::{Bundle, Pin},
+  ArcStr, GroupSet, NotNan,
 };
 mod items;
 pub use items::*;
@@ -32,6 +31,9 @@ pub struct Cell {
   pub undefined: AttributeList,
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
+  /// CellId
+  #[liberty(simple(type=Option))]
+  pub single_bit_degenerate: Option<ArcStr>,
   #[liberty(simple(type = Option))]
   pub driver_waveform_rise: Option<ArcStr>,
   #[liberty(simple(type = Option))]
@@ -40,6 +42,35 @@ pub struct Cell {
   pub cell_footprint: Option<ArcStr>,
   #[liberty(simple(type=Option))]
   pub cell_leakage_power: Option<f64>,
+  /// The `input_voltage_range`  attribute specifies the allowed
+  /// voltage range of the level-shifter input pin and the voltage
+  /// range for all input pins of the cell under all possible operating conditions
+  /// (defined across multiple libraries).
+  ///
+  /// The attribute defines two floating values:
+  ///  the first is the lower bound, and second is the upper bound.
+  ///
+  /// The `input_voltage_range`  syntax differs from the pin-level
+  /// `input_signal_level_low` and `input_signal_level_high`  syntax in the following ways:
+  ///
+  /// + The `input_signal_level_low`  and `input_signal_level_high`  attributes are defined
+  /// on the input pins under one operating condition.
+  /// + The `input_signal_level_low`  and `input_signal_level_high`  attributes are used
+  /// to specify the partial voltage swing of an input pin (that is, to prevent from
+  /// swinging from ground rail VSS to full power rail VDD).
+  /// Note that `input_voltage_range`  is not related to the voltage swing.
+  ///
+  /// Note:
+  ///
+  /// The `input_voltage_range`  and `output_voltage_range`  attributes
+  /// should always be defined together.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=122.7&end=122.23
+  /// ">Reference</a>
+  #[liberty(complex(type=Option))]
+  pub input_voltage_range: Option<(NotNan<f64>, NotNan<f64>)>,
+  #[liberty(complex(type=Option))]
+  pub output_voltage_range: Option<(NotNan<f64>, NotNan<f64>)>,
   #[liberty(group(type=Set))]
   pub pg_pin: GroupSet<PgPin>,
   #[liberty(group(type=Set))]
@@ -58,7 +89,7 @@ pub struct Cell {
   pub pin: GroupSet<Pin>,
   #[liberty(group(type=Set))]
   // TODO:
-  pub bundle: GroupSet<DummyGroup>,
+  pub bundle: GroupSet<Bundle>,
 }
 impl GroupFn for Cell {}
 
@@ -253,98 +284,92 @@ liberty_db::cell::Cell (dff4) {
 | | }
 | }
 | bundle (D) {
-| | /* Undefined attributes from here */
 | | members (D1, D2, D3, D4);
-| | nextstate_type : data;
 | | direction : input;
-| | capacitance : 0;
-| | timing () {
-| | | related_pin : CLK;
-| | | timing_type : setup_rising;
-| | | cell_rise (scalar) {
-| | | | values (1.0);
-| | | }
-| | | cell_fall (scalar) {
-| | | | values (1.0);
-| | | }
-| | }
+| | capacitance : 0.0;
+| | nextstate_type : data;
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : hold_rising;
-| | | cell_rise (scalar) {
-| | | | values (1.0);
-| | | }
 | | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
+| | | }
+| | | cell_rise (scalar) {
+| | | | values ("1.0");
 | | | }
 | | }
-| | /* Undefined attributes end here */
+| | timing () {
+| | | related_pin : CLK;
+| | | timing_type : setup_rising;
+| | | cell_fall (scalar) {
+| | | | values ("1.0");
+| | | }
+| | | cell_rise (scalar) {
+| | | | values ("1.0");
+| | | }
+| | }
 | }
 | bundle (Q) {
-| | /* Undefined attributes from here */
 | | members (Q1, Q2, Q3, Q4);
 | | direction : output;
-| | function : "(IQ)";
+| | function : "IQ";
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : rising_edge;
-| | | cell_rise (scalar) {
-| | | | values (2.0);
-| | | }
 | | | cell_fall (scalar) {
-| | | | values (2.0);
+| | | | values ("2.0");
 | | | }
-| | }
-| | timing () {
-| | | related_pin : PRE;
-| | | timing_type : preset;
-| | | timing_sense : negative_unate;
 | | | cell_rise (scalar) {
-| | | | values (1.0);
+| | | | values ("2.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : CLR;
-| | | timing_type : clear;
 | | | timing_sense : positive_unate;
+| | | timing_type : clear;
 | | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
 | | | }
 | | }
-| | /* Undefined attributes end here */
+| | timing () {
+| | | related_pin : PRE;
+| | | timing_sense : negative_unate;
+| | | timing_type : preset;
+| | | cell_rise (scalar) {
+| | | | values ("1.0");
+| | | }
+| | }
 | }
 | bundle (QN) {
-| | /* Undefined attributes from here */
 | | members (Q1N, Q2N, Q3N, Q4N);
 | | direction : output;
-| | function : IQN;
+| | function : "IQN";
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : rising_edge;
+| | | cell_fall (scalar) {
+| | | | values ("2.0");
+| | | }
 | | | cell_rise (scalar) {
-| | | | values (2.0);
-| | | }
-| | | cell_fall (scalar) {
-| | | | values (2.0);
-| | | }
-| | }
-| | timing () {
-| | | related_pin : PRE;
-| | | timing_type : clear;
-| | | timing_sense : positive_unate;
-| | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("2.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : CLR;
-| | | timing_type : preset;
 | | | timing_sense : negative_unate;
+| | | timing_type : preset;
 | | | cell_rise (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
 | | | }
 | | }
-| | /* Undefined attributes end here */
+| | timing () {
+| | | related_pin : PRE;
+| | | timing_sense : positive_unate;
+| | | timing_type : clear;
+| | | cell_fall (scalar) {
+| | | | values ("1.0");
+| | | }
+| | }
 | }
 }"#,
     );
@@ -392,24 +417,18 @@ liberty_db::cell::Cell (latch4) {
 | | direction : input;
 | }
 | bundle (D) {
-| | /* Undefined attributes from here */
 | | members (D1, D2, D3, D4);
 | | direction : input;
-| | /* Undefined attributes end here */
 | }
 | bundle (Q) {
-| | /* Undefined attributes from here */
 | | members (Q1, Q2, Q3, Q4);
 | | direction : output;
-| | function : IQ;
-| | /* Undefined attributes end here */
+| | function : "IQ";
 | }
 | bundle (QN) {
-| | /* Undefined attributes from here */
 | | members (Q1N, Q2N, Q3N, Q4N);
 | | direction : output;
-| | function : IQN;
-| | /* Undefined attributes end here */
+| | function : "IQN";
 | }
 }"#,
     );
@@ -578,6 +597,7 @@ liberty_db::cell::Cell (latch4) {
       r#"
 liberty_db::cell::Cell (DLT2) {
 | area : 1.0;
+| single_bit_degenerate : FDB;
 | latch_bank (IQ, IQN, 4) {
 | | clear : "!CLR";
 | | clear_preset_var1 : H;
@@ -593,153 +613,142 @@ liberty_db::cell::Cell (DLT2) {
 | | min_pulse_width_low : 3.0;
 | }
 | bundle (CLR) {
-| | /* Undefined attributes from here */
 | | members (CLRA, CLRB, CLRC, CLRD);
 | | direction : input;
-| | capacitance : 0;
+| | capacitance : 0.0;
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : recovery_falling;
-| | | cell_rise (scalar) {
-| | | | values (1.0);
-| | | }
 | | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
+| | | }
+| | | cell_rise (scalar) {
+| | | | values ("1.0");
 | | | }
 | | }
-| | /* Undefined attributes end here */
 | }
 | bundle (D) {
-| | /* Undefined attributes from here */
 | | members (DA, DB, DC, DD);
 | | direction : input;
-| | capacitance : 0;
-| | timing () {
-| | | related_pin : EN;
-| | | timing_type : setup_falling;
-| | | cell_rise (scalar) {
-| | | | values (1.0);
-| | | }
-| | | cell_fall (scalar) {
-| | | | values (1.0);
-| | | }
-| | }
+| | capacitance : 0.0;
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : hold_falling;
-| | | cell_rise (scalar) {
-| | | | values (1.0);
-| | | }
 | | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
+| | | }
+| | | cell_rise (scalar) {
+| | | | values ("1.0");
 | | | }
 | | }
-| | /* Undefined attributes end here */
+| | timing () {
+| | | related_pin : EN;
+| | | timing_type : setup_falling;
+| | | cell_fall (scalar) {
+| | | | values ("1.0");
+| | | }
+| | | cell_rise (scalar) {
+| | | | values ("1.0");
+| | | }
+| | }
 | }
 | bundle (PRE) {
-| | /* Undefined attributes from here */
 | | members (PREA, PREB, PREC, PRED);
 | | direction : input;
-| | capacitance : 0;
+| | capacitance : 0.0;
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : recovery_falling;
-| | | cell_rise (scalar) {
-| | | | values (1.0);
-| | | }
 | | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
+| | | }
+| | | cell_rise (scalar) {
+| | | | values ("1.0");
 | | | }
 | | }
-| | /* Undefined attributes end here */
 | }
 | bundle (Q) {
-| | /* Undefined attributes from here */
 | | members (QA, QB, QC, QD);
 | | direction : output;
-| | function : IQ;
+| | function : "IQ";
+| | timing () {
+| | | related_pin : CLR;
+| | | timing_sense : positive_unate;
+| | | timing_type : clear;
+| | | cell_fall (scalar) {
+| | | | values ("1.0");
+| | | }
+| | }
 | | timing () {
 | | | related_pin : D;
-| | | cell_rise (scalar) {
-| | | | values (2.0);
-| | | }
+| | | timing_type : combinational;
 | | | cell_fall (scalar) {
-| | | | values (2.0);
+| | | | values ("2.0");
+| | | }
+| | | cell_rise (scalar) {
+| | | | values ("2.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : rising_edge;
+| | | cell_fall (scalar) {
+| | | | values ("2.0");
+| | | }
 | | | cell_rise (scalar) {
-| | | | values (2.0);
-| | | }
-| | | cell_fall (scalar) {
-| | | | values (2.0);
-| | | }
-| | }
-| | timing () {
-| | | related_pin : CLR;
-| | | timing_type : clear;
-| | | timing_sense : positive_unate;
-| | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("2.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : PRE;
-| | | timing_type : preset;
 | | | timing_sense : negative_unate;
+| | | timing_type : preset;
 | | | cell_rise (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
 | | | }
 | | }
-| | /* Undefined attributes end here */
 | }
 | bundle (QN) {
-| | /* Undefined attributes from here */
 | | members (QNA, QNB, QNC, QND);
 | | direction : output;
-| | function : IQN;
+| | function : "IQN";
+| | timing () {
+| | | related_pin : CLR;
+| | | timing_sense : negative_unate;
+| | | timing_type : preset;
+| | | cell_rise (scalar) {
+| | | | values ("1.0");
+| | | }
+| | }
 | | timing () {
 | | | related_pin : D;
-| | | cell_rise (scalar) {
-| | | | values (2.0);
-| | | }
+| | | timing_type : combinational;
 | | | cell_fall (scalar) {
-| | | | values (2.0);
+| | | | values ("2.0");
+| | | }
+| | | cell_rise (scalar) {
+| | | | values ("2.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : rising_edge;
-| | | cell_rise (scalar) {
-| | | | values (2.0);
-| | | }
 | | | cell_fall (scalar) {
-| | | | values (2.0);
+| | | | values ("2.0");
 | | | }
-| | }
-| | timing () {
-| | | related_pin : CLR;
-| | | timing_type : preset;
-| | | timing_sense : negative_unate;
 | | | cell_rise (scalar) {
-| | | | values (1.0);
+| | | | values ("2.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : PRE;
-| | | timing_type : clear;
 | | | timing_sense : positive_unate;
+| | | timing_type : clear;
 | | | cell_fall (scalar) {
-| | | | values (1.0);
+| | | | values ("1.0");
 | | | }
 | | }
-| | /* Undefined attributes end here */
 | }
-| /* Undefined attributes from here */
-| single_bit_degenerate : FDB;
-| /* Undefined attributes end here */
 }"#,
     );
   }

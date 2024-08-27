@@ -177,7 +177,9 @@ pub(crate) fn undefine<'a>(
   if let Ok((input, res)) = complex(i, line_num) {
     return Ok((
       input,
-      super::AttriValue::Complex(vec![res.into_iter().map(ArcStr::from).collect()]),
+      super::AttriValue::Complex(super::ComplexWrapper(
+        res.into_iter().map(ArcStr::from).collect(),
+      )),
     ));
   }
   *line_num = line_num_back;

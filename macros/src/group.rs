@@ -307,7 +307,7 @@ pub(crate) fn inner(
       }
     }
     let link_self = if link {
-      quote! {<Self as crate::ast::GroupFn>::post_process(&mut res);}
+      quote! {<Self as crate::ast::GroupFn>::post_parse_process(&mut res);}
     } else {
       quote! {}
     };

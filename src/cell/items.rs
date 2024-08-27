@@ -387,6 +387,41 @@ pub struct PgPin {
   /// ">Reference-Definition</a>
   #[liberty(simple)]
   pub related_bias_pin: ArcStr,
+  /// The `std_cell_main_rail`  Boolean attribute is defined in a `primary_power`
+  /// power pin. When the attribute is set to true, the power and ground pin
+  /// is used to determine which side of the voltage boundary
+  /// the power and ground pin is connected.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=278.29&end=278.31
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub std_cell_main_rail: Option<bool>,
+  /// The `pg_function`  attribute models the logical function
+  /// of a virtual or derived power and ground (PG) pin as a Boolean expression
+  /// involving the cells input signal pins, internal signal pins, PG pins.
+  /// The attribute Boolean expression is checked during library compile to
+  /// ensure that only one `pg_pin`  is always active at this virtual or derived PG pin.
+  /// If more than one `pg_pin`  is found to be active at the virtual or the derived
+  /// pg_pin  output, the `read_lib` command generates an error
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=266.21&end=266.26
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub pg_function: Option<IdBooleanExpression>,
+  /// The `switch_function`  string attribute identifies the condition
+  /// when the attached design partition is turned off by the input `switch_pin`.
+  /// For a coarse-grain switch cell, the `switch_function`  attribute can be defined
+  /// at both controlled power and ground pins (virtual VDD and virtual VSS for `pg_pin`) and
+  /// the output pins.
+  /// When the `switch_function`  attribute is defined in the controlled power and ground pin,
+  /// it is used to specify the Boolean condition under which the cell switches off
+  /// (or drives an X to) the controlled design partitions, including the traditional signal
+  /// input pins only (with no related power pins to this output).
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=279.5&end=279.13
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub switch_function: Option<IdBooleanExpression>,
 }
 impl GroupFn for PgPin {}
 

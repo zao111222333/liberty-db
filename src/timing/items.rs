@@ -4,7 +4,7 @@
 use crate::{
   ast::{self, GroupComments, GroupFn, SimpleAttri},
   expression::logic::{self, LogicLike},
-  ArcStr,
+  ArcStr, NotNan,
 };
 
 use strum_macros::{Display, EnumString};
@@ -173,38 +173,13 @@ impl SimpleAttri for TimingSenseType {
 // #[derive(Debug, Clone, Copy, Default)]
 pub type Mode = [ArcStr; 2];
 
-// impl ComplexAttri for Mode {
-//   fn parse(v: &[&str]) -> Result<Self, ast::ComplexParseError> {
-//     todo!()
-//   }
-
-//   fn to_wrapper(&self) -> ast::ComplexWrapper {
-//     todo!()
-//   }
-// }
-
-/// The `cell_degradation` group describes a cell performance degradation
-/// design rule for compiling a design. A cell degradation design rule
-/// specifies the maximum capacitive load a cell can drive without causing
-/// cell performance degradation during the fall transition.
+/// The `cell_degradation`  group describes a cell performance degradation
+/// design rule for compiling a design.
+/// A cell degradation design rule specifies the maximum capacitive load
+/// a cell can drive without causing cell performance degradation during the fall transition.
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =225.4
-/// +225.27
-/// &end
-/// =225.25
-/// +227.51
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =204.9
-/// &end
-/// =204.9
-/// ">Reference-Instance</a>
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33&end=347.35
+/// ">Reference</a>
 ///
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
@@ -224,24 +199,17 @@ pub struct CellDegradation {
   /// group undefined attributes
   #[liberty(undefined)]
   pub undefined: ast::AttributeList,
-  // /* polynomial model */
-  // #[arrti_type(complex)]
-  // pub coefs: Vec<f64>,
-  // /* polynomial model */
-  // #[arrti_type(complex)]
-  // pub orders: Vec<usize>,
-  // /* lookup table */
-  // #[arrti_type(complex)]
-  // pub index_1: Vec<f64>,
-  // /* lookup table */
-  // #[arrti_type(complex)]
-  // pub values: Vec<f64>,
-  // /* polynomial model */
-  // #[arrti_type(complex)]
-  // pub variable_n_range: Option<(f64,f64)>,
-  // #[arrti_type(group)]
-  // pub domain: HashMap<<Domain as ast::HashedGroup>::Id,Domain>,
-  // TODO:
-  // pub domain: Option<Domain>,
+  /// /* lookup table */
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7
+  /// ">Reference</a>
+  #[liberty(complex)]
+  pub index_1: Vec<NotNan<f64>>,
+  /// /* lookup table */
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7
+  /// ">Reference</a>
+  #[liberty(complex)]
+  pub values: Vec<NotNan<f64>>,
 }
 impl GroupFn for CellDegradation {}

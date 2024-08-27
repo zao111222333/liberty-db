@@ -323,6 +323,43 @@ pub struct TableLookUp1D {
 }
 impl GroupFn for TableLookUp1D {}
 
+/// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
+/// ">Reference-Definition</a>
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set::derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct CompactCcsTable {
+  // TODO: unit
+  unit: (),
+  #[id]
+  #[liberty(name)]
+  name: Option<ArcStr>,
+  /// group comments
+  #[liberty(comments)]
+  pub comments: GroupComments<Self>,
+  /// group undefined attributes
+  #[liberty(undefined)]
+  pub undefined: AttributeList,
+  #[liberty(simple)]
+  pub base_curves_group: ArcStr,
+  #[liberty(complex)]
+  pub values: Values,
+}
+impl GroupFn for CompactCcsTable {
+  #[inline]
+  fn post_parse_process(&mut self) {
+    // TODO
+    self.values.size1 = self.values.inner.len();
+    self.values.size2 = 1;
+  }
+}
+
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
@@ -363,7 +400,7 @@ pub struct TableLookUp {
 )]
 impl GroupFn for AllTypes {
   #[inline]
-  fn post_process(&mut self) {
+  fn post_parse_process(&mut self) {
     match (self.index_1.len(), self.index_2.len()) {
       (0, 0) => {
         self.values.size1 = self.values.inner.len();

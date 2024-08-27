@@ -104,7 +104,7 @@ mod test {
   use super::*;
   use crate::common::items::DummyGroup;
   #[test]
-  fn more_than_10() {
+  fn more_than_10_indent() {
     crate::ast::test_parse_fmt::<DummyGroup>(
       r#"(0){
         /* comment1 */
@@ -176,6 +176,28 @@ liberty_db::common::items::DummyGroup (0) {
 | | | }
 | | }
 | }
+| /* Undefined attributes end here */
+}"#,
+    );
+  }
+  #[test]
+  fn unknown_complex() {
+    crate::ast::test_parse_fmt::<DummyGroup>(
+      r#"(){
+        unknown_complex (1,2,3,4,5);
+        unknown_complex (1,2,3, \
+          4,5);
+        unknown_complex ("1,2",3,4,5);
+        unknown_complex (1,2,\
+          3,"4,5");
+      }"#,
+      r#"
+liberty_db::common::items::DummyGroup () {
+| /* Undefined attributes from here */
+| unknown_complex ("1, 2, 3, 4, 5");
+| unknown_complex ("1, 2, 3, 4, 5");
+| unknown_complex ("1, 2, 3, 4, 5");
+| unknown_complex ("1, 2, 3, 4, 5");
 | /* Undefined attributes end here */
 }"#,
     );

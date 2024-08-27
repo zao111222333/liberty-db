@@ -245,6 +245,42 @@ impl<const N: usize> ComplexAttri for [ArcStr; N] {
     crate::ast::join_fmt(self.iter(), f, |s, ff| write!(ff, "{s}"), ", ")
   }
 }
+impl<const N: usize> ComplexAttri for [NotNan<f64>; N] {
+  #[inline]
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+    let l = v.len();
+    if l != N {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    v.iter()
+      .map(|&s| s.parse::<NotNan<f64>>())
+      .collect::<Result<Vec<NotNan<f64>>, _>>()
+      .map_or_else(
+        |e| Err(ComplexParseError::Float(e)),
+        |_v| {
+          TryInto::<[NotNan<f64>; N]>::try_into(_v)
+            .map_or(Err(ComplexParseError::Other), Ok)
+        },
+      )
+  }
+  #[inline]
+  fn is_set(&self) -> bool {
+    N == 0
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let mut buffer = ryu::Buffer::new();
+    crate::ast::join_fmt(
+      self.iter(),
+      f,
+      |float, ff| write!(ff, "{}", buffer.format(Into::<f64>::into(*float))),
+      ", ",
+    )
+  }
+}
 
 impl ComplexAttri for Vec<f64> {
   #[inline]
@@ -398,7 +434,12 @@ impl ComplexAttri for Vec<ArcStr> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    crate::ast::join_fmt(self.iter(), f, |s, ff| write!(ff, "{s}"), ", ")
+    crate::ast::join_fmt_no_quote(
+      self.iter(),
+      f,
+      |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
+      ", ",
+    )
   }
 }
 impl ComplexAttri for Vec<usize> {
@@ -419,7 +460,7 @@ impl ComplexAttri for Vec<usize> {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let mut buffer = itoa::Buffer::new();
-    crate::ast::join_fmt(
+    crate::ast::join_fmt_no_quote(
       self.iter(),
       f,
       |i, ff| write!(ff, "{}", buffer.format(*i)),
@@ -473,29 +514,21 @@ impl ComplexAttri for (f64, f64, ArcStr) {
     write!(f, "{}, {}", buffer.format(self.1), self.2)
   }
 }
-impl ComplexAttri for (f64, f64) {
+impl ComplexAttri for (NotNan<f64>, NotNan<f64>) {
   #[inline]
   fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
-    let v1: f64 = match i.next() {
+    let v1: NotNan<f64> = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => {
-          return Err(ComplexParseError::Float(
-            ordered_float::ParseNotNanError::ParseFloatError(e),
-          ))
-        }
+        Err(e) => return Err(ComplexParseError::Float(e)),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v2: f64 = match i.next() {
+    let v2: NotNan<f64> = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => {
-          return Err(ComplexParseError::Float(
-            ordered_float::ParseNotNanError::ParseFloatError(e),
-          ))
-        }
+        Err(e) => return Err(ComplexParseError::Float(e)),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
@@ -510,8 +543,8 @@ impl ComplexAttri for (f64, f64) {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
-    write!(f, "{}, ", buffer.format(self.0))?;
-    write!(f, "{}", buffer.format(self.1))
+    write!(f, "{}, ", buffer.format(Into::<f64>::into(self.0)))?;
+    write!(f, "{}", buffer.format(Into::<f64>::into(self.1)))
   }
 }
 

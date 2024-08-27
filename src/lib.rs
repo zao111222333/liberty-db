@@ -127,8 +127,6 @@ pub use arcstr;
 pub use arcstr::ArcStr;
 pub use mut_set::MutSet as GroupSet;
 pub use ordered_float::NotNan;
-/// `bundle` group structure.
-pub mod bundle;
 /// `bus` group structure.
 pub mod bus;
 /// `cell` group structure.

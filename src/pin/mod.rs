@@ -10,7 +10,9 @@ use crate::{
   timing::Timing,
   ArcStr, GroupSet, NotNan,
 };
+mod bundle;
 mod items;
+pub use bundle::*;
 // use crate::units;
 pub use items::*;
 /// You can define a `pin` group within a [`cell`](crate::cell::Cell),
@@ -886,6 +888,26 @@ pub struct Pin {
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
   pub x_function: Option<BooleanExpression>,
+  /// The `switch_pin`  attribute is a pin-level Boolean attribute.
+  /// When it is set to true, it is used to identify the pin as
+  /// the switch pin of a coarse-grain switch cell
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=279.19&end=279.20
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub switch_pin: Option<bool>,
+  /// The `level_shifter_data_pin`  attribute specifies the input data pin on a level shifter cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=260.19&end=260.20
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub level_shifter_data_pin: Option<bool>,
+  /// The `level_shifter_enable_pin`  attribute specifies the enable input pin on a level shifter cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=260.30&end=260.31
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub level_shifter_enable_pin: Option<bool>,
   // /* Complex Attributes in a pin Group */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -897,7 +919,7 @@ pub struct Pin {
   /// ">Reference-Instance</a>
   // NOTICE: Complex Attributes in a pin Group
   #[liberty(complex(type = Option))]
-  pub fall_capacitance_range: Option<(f64, f64)>,
+  pub fall_capacitance_range: Option<(NotNan<f64>, NotNan<f64>)>,
   // pub fall_capacitance_range: Option<(units::Capacitance, units::Capacitance)>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -908,7 +930,7 @@ pub struct Pin {
   /// =229.29
   /// ">Reference-Instance</a>
   #[liberty(complex(type = Option))]
-  pub rise_capacitance_range: Option<(f64, f64)>,
+  pub rise_capacitance_range: Option<(NotNan<f64>, NotNan<f64>)>,
   // NOTICE: Group Attributes in a pin Group
   // electromigration () { }
   #[liberty(group(type=Set))]

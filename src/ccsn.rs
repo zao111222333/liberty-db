@@ -206,7 +206,7 @@ pub struct CCSNStage {
 
 impl GroupFn for CCSNStage {
   #[inline]
-  fn post_process(&mut self) {
+  fn post_parse_process(&mut self) {
     if self.miller_cap_fall.is_sign_negative() {
       self.miller_cap_fall.set_zero();
       log::warn!("miller_cap_fall is negative!");

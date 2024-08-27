@@ -528,7 +528,7 @@ pub struct Library {
 impl GroupFn for Library {}
 
 impl fmt::Display for Library {
-  /// Demo
+  /// Format [Library] struct as `.lib` file, see more at [examples](https://github.com/zao111222333/liberty-db/tree/master/examples)
   /// ```
   /// use liberty_db::library::Library;
   /// use std::{
@@ -539,7 +539,6 @@ impl fmt::Display for Library {
   /// let mut writer = BufWriter::new(File::create(Path::new("out.lib")).unwrap());
   /// write!(&mut writer, "{}", library).unwrap();
   /// ```
-  /// Format [Library] struct as `.lib` file
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
     self.fmt_lib::<DefaultIndentation>(f)
