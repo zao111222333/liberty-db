@@ -6,7 +6,7 @@ mod items;
 use crate::{
   ast::{AttributeList, DefaultIndentation, GroupComments, GroupFn},
   cell::Cell,
-  common::table::{DriverWaveform, TableTemple},
+  common::table::{CompactLutTemplate, DriverWaveform, TableTemple},
   units, ArcStr, GroupSet,
 };
 use core::fmt;
@@ -478,6 +478,12 @@ pub struct Library {
   /// ">Reference</a>
   #[liberty(group(type = Set))]
   pub base_curves: GroupSet<BaseCurves>,
+  /// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=41.20&end=41.21
+  /// ">Reference</a>
+  #[liberty(group(type = Set))]
+  pub compact_lut_template: GroupSet<CompactLutTemplate>,
   /// The library-level `normalized_driver_waveform`  group represents a collection
   /// of driver waveforms under various input slew values.
   /// The `index_1`  specifies the input slew and `index_2`  specifies the normalized voltage.

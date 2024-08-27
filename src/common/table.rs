@@ -106,6 +106,131 @@ pub struct TableLookUp2D {
   pub values: Values,
 }
 
+/// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=41.20&end=41.21
+/// ">Reference</a>
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set::derive::item(
+  sort,
+  macro(derive(Debug, Clone,Default);)
+)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct CompactLutTemplate {
+  #[id]
+  #[liberty(name)]
+  name: Option<ArcStr>,
+  /// group comments
+  #[liberty(comments)]
+  pub comments: GroupComments<Self>,
+  /// group undefined attributes
+  #[liberty(undefined)]
+  pub undefined: AttributeList,
+  #[liberty(simple(type=Option))]
+  pub base_curves_group: Option<ArcStr>,
+  /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub variable_1: Option<VariableTypeCompactLutTemplateIndex12>,
+  /// The `index_1`  and `index_2`  attributes are required.
+  /// The `index_1`  and `index_2`  attributes define the
+  /// `input_net_transition`  and `total_output_net_capacitance`  values.
+  /// The index value for `input_net_transition`  or `total_output_net_capacitance`  
+  /// is a floating-point number.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.7&end=43.10
+  /// ">Reference</a>
+  #[liberty(complex)]
+  pub index_1: Vec<NotNan<f64>>,
+  /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub variable_2: Option<VariableTypeCompactLutTemplateIndex12>,
+  /// The `index_1`  and `index_2`  attributes are required.
+  /// The `index_1`  and `index_2`  attributes define the
+  /// `input_net_transition`  and `total_output_net_capacitance`  values.
+  /// The index value for `input_net_transition`  or `total_output_net_capacitance`  
+  /// is a floating-point number.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.7&end=43.10
+  /// ">Reference</a>
+  #[liberty(complex)]
+  pub index_2: Vec<NotNan<f64>>,
+  /// The string values in `index_3`  are determined by the `base_curve_type` value
+  /// in the `base_curve`  group. When `ccs_timing_half_curve` is the
+  /// `base_curve_type`  value, the following six string values (parameters)
+  /// should be defined: `init_current`, `peak_current`, `peak_voltage`, `peak_time`, `left_id`, `right_id`;
+  /// their order is not fixed.
+  #[liberty(simple(type = Option))]
+  pub variable_3: Option<VariableTypeCompactLutTemplateIndex3>,
+  /// The string values in `index_3`  are determined by the `base_curve_type` value
+  /// in the `base_curve`  group. When `ccs_timing_half_curve` is the
+  /// `base_curve_type`  value, the following six string values (parameters)
+  /// should be defined: `init_current`, `peak_current`, `peak_voltage`, `peak_time`, `left_id`, `right_id`;
+  /// their order is not fixed.
+  ///
+  /// More than six parameters are allowed if a more robust syntax is required
+  /// or for circumstances where more parameters are needed to describe the original data.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.18+43.22&end=43.21+43.23
+  /// ">Reference</a>
+  #[liberty(complex)]
+  pub index_3: Vec<ArcStr>,
+}
+
+impl GroupFn for CompactLutTemplate {}
+
+/// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(strum_macros::Display, strum_macros::EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum VariableTypeCompactLutTemplateIndex12 {
+  #[strum(serialize = "input_net_transition")]
+  InputNetTransition,
+  #[strum(serialize = "total_output_net_capacitance")]
+  TotalOutputNetCapacitance,
+}
+
+impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+
+/// The only legal string value for the `variable_3`  attribute is `curve_parameters`.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.30&end=42.31
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(strum_macros::Display, strum_macros::EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum VariableTypeCompactLutTemplateIndex3 {
+  #[strum(serialize = "curve_parameters")]
+  CurveParameters,
+}
+
+impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(

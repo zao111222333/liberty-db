@@ -10828,6 +10828,87 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | curve_y (5377, \
 | | | "0.9828261, 0.9591251, 0.9178336, 0.8307046, 0.7409797, 0.6495229, 0.5223359, 0.3659552, 0.1904654");
 | }
+| compact_lut_template (c_ccs_drv_template_1) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | variable_2 : total_output_net_capacitance;
+| | index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
+| | variable_3 : curve_parameters;
+| | index_3 (init_current, peak_current, peak_voltage, peak_time, left_id, right_id);
+| }
+| compact_lut_template (c_ccs_drv_template_2) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | variable_2 : total_output_net_capacitance;
+| | index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
+| | variable_3 : curve_parameters;
+| | index_3 (init_current, peak_current, peak_voltage, peak_time, left_id, right_id);
+| }
+| compact_lut_template (c_ccs_drv_template_3) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | variable_2 : total_output_net_capacitance;
+| | index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
+| | variable_3 : curve_parameters;
+| | index_3 (init_current, peak_current, peak_voltage, peak_time, left_id, right_id);
+| }
+| compact_lut_template (c_ccs_drv_template_4) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | variable_2 : total_output_net_capacitance;
+| | index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
+| | variable_3 : curve_parameters;
+| | index_3 (init_current, peak_current, peak_voltage, peak_time, left_id, right_id);
+| }
+| compact_lut_template (c_ccs_pwr_template_1) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | /* Undefined attributes from here */
+| | variable_2 : curve_parameters;
+| | index_2 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
+| | /* Undefined attributes end here */
+| }
+| compact_lut_template (c_ccs_pwr_template_2) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | variable_2 : total_output_net_capacitance;
+| | index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
+| | variable_3 : curve_parameters;
+| | index_3 (init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, "[point_time2", point_current2, bc_id3, "...]", end_time, end_current);
+| }
+| compact_lut_template (c_ccs_pwr_template_3) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | variable_2 : total_output_net_capacitance;
+| | index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
+| | variable_3 : curve_parameters;
+| | index_3 (init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, "[point_time2", point_current2, bc_id3, "...]", end_time, end_current);
+| }
+| compact_lut_template (c_ccs_pwr_template_4) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | variable_2 : total_output_net_capacitance;
+| | index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
+| | variable_3 : curve_parameters;
+| | index_3 (init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, "[point_time2", point_current2, bc_id3, "...]", end_time, end_current);
+| }
+| compact_lut_template (c_ccs_pwr_template_5) {
+| | base_curves_group : nc_compact_ccs_curve_1;
+| | variable_1 : input_net_transition;
+| | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+| | variable_2 : total_output_net_capacitance;
+| | index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
+| | variable_3 : curve_parameters;
+| | index_3 (init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, "[point_time2", point_current2, bc_id3, "...]", end_time, end_current);
+| }
 | normalized_driver_waveform (driver_waveform_template) {
 | | driver_waveform_name : preDrv;
 | | index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
@@ -20516,84 +20597,5 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | driver_model : snps_predriver;
 | def_sim_opt : "POST=1 PROBE POST_VERSION=2001 INGOLD=2 NOMOD NOPAGE NUMDGT=10 MEASDGT=10 LIMPTS=500000 ICSWEEP=0 AUTOSTOP ALTCC=1 RUNLVL=5 ACCURATE=1 ABSVAR=1.000000e-03 RELVAR=1.000000e-02";
 | simulator : "HSPICE -- C-2009.03-SP1 32-BIT (May 25 2009)";
-| compact_lut_template (c_ccs_pwr_template_1) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : curve_parameters;
-| | index_2 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
-| }
-| compact_lut_template (c_ccs_drv_template_1) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : total_output_net_capacitance;
-| | index_2 ("0.1000000, 0.2500000, 0.5000000, 1.0000000, 2.0000000, 4.0000000, 8.0000000");
-| | variable_3 : curve_parameters;
-| | index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
-| }
-| compact_lut_template (c_ccs_pwr_template_2) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : total_output_net_capacitance;
-| | index_2 ("0.1000000, 0.2500000, 0.5000000, 1.0000000, 2.0000000, 4.0000000, 8.0000000");
-| | variable_3 : curve_parameters;
-| | index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
-| }
-| compact_lut_template (c_ccs_drv_template_2) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : total_output_net_capacitance;
-| | index_2 ("0.1000000, 0.5000000, 1.0000000, 2.0000000, 4.0000000, 8.0000000, 16.0000001");
-| | variable_3 : curve_parameters;
-| | index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
-| }
-| compact_lut_template (c_ccs_pwr_template_3) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : total_output_net_capacitance;
-| | index_2 ("0.1000000, 0.5000000, 1.0000000, 2.0000000, 4.0000000, 8.0000000, 16.0000001");
-| | variable_3 : curve_parameters;
-| | index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
-| }
-| compact_lut_template (c_ccs_drv_template_3) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : total_output_net_capacitance;
-| | index_2 ("0.1000000, 1.0000000, 2.0000000, 4.0000000, 8.0000000, 16.0000001, 32.0000001");
-| | variable_3 : curve_parameters;
-| | index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
-| }
-| compact_lut_template (c_ccs_pwr_template_4) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : total_output_net_capacitance;
-| | index_2 ("0.1000000, 1.0000000, 2.0000000, 4.0000000, 8.0000000, 16.0000001, 32.0000001");
-| | variable_3 : curve_parameters;
-| | index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
-| }
-| compact_lut_template (c_ccs_drv_template_4) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : total_output_net_capacitance;
-| | index_2 ("0.1000000, 2.0000000, 4.0000000, 8.0000000, 16.0000001, 32.0000001, 64.0000002");
-| | variable_3 : curve_parameters;
-| | index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
-| }
-| compact_lut_template (c_ccs_pwr_template_5) {
-| | base_curves_group : nc_compact_ccs_curve_1;
-| | variable_1 : input_net_transition;
-| | index_1 ("0.0160000, 0.0320000, 0.0640000, 0.1280000, 0.2560000, 0.5120000, 1.0240000");
-| | variable_2 : total_output_net_capacitance;
-| | index_2 ("0.1000000, 2.0000000, 4.0000000, 8.0000000, 16.0000001, 32.0000001, 64.0000002");
-| | variable_3 : curve_parameters;
-| | index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
-| }
 | /* Undefined attributes end here */
 }

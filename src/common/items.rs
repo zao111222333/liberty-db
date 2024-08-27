@@ -97,6 +97,16 @@ pub enum VariableType {
   InputTransitionTime,
 }
 
+impl SimpleAttri for VariableType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
 /// ?field=test
@@ -124,6 +134,7 @@ pub struct Domain {
   pub undefined: crate::ast::AttributeList,
   pub group_name: ArcStr,
   pub calc_mode: Option<ArcStr>,
+  #[liberty(simple(type = Option))]
   pub variable_1: Option<VariableType>,
   pub variable_2: Option<VariableType>,
   pub variable_3: Option<VariableType>,
