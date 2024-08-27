@@ -216,6 +216,17 @@ pub struct Cell {
   /// ">Reference</a>
   #[liberty(simple(type=Option))]
   pub level_shifter_type: Option<LevelShifterType>,
+  /// The `retention_cell`  attribute identifies a retention cell. The `retention_cell_style` value is a random string
+  ///
+  /// Syntax
+  /// ```
+  /// retention_cell : retention_cell_style ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=118.21+118.24&end=118.22+118.25
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub retention_cell: Option<ArcStr>,
   /// The `switch_cell_type`  cell-level attribute specifies
   /// the type of the switch cell for direct inference.
   ///

@@ -70,6 +70,32 @@ pub struct Pin {
   /// ">Reference-Definition</a>
   #[liberty(simple)]
   pub related_ground_pin: ArcStr,
+  #[liberty(complex(type = Option))]
+  /// The `retention_pin` complex attribute identifies the retention pins of a retention cell. The
+  /// attribute defines the following information:
+  /// + pin class
+  ///
+  ///   Valid values:
+  ///   + `restore`: Restores the state of the cell.
+  ///   + `save`: Saves the state of the cell.
+  ///   + `save_restore`: Saves and restores the state of the cell.
+  /// + disable value
+  ///
+  /// Defines the value of the retention pin when the cell works in normal mode. The valid
+  /// values are 0 and 1.
+  ///
+  /// Syntax
+  /// ```
+  /// retention_pin (pin_class, disable_value) ;
+  /// ```
+  /// Example
+  /// ```
+  /// retention_pin (save | restore | save_restore, enumerated_type) ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=282.3&end=282.23
+  /// ">Reference-Definition</a>
+  pub retention_pin: Option<RetentionPin>,
   /// The `related_power_pin`  and `related_ground_pin`  attributes
   /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
   /// The `related_power_pin`  and `related_ground_pin` attributes are used

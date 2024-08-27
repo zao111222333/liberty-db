@@ -700,14 +700,14 @@ impl ComplexAttri for PinOpposite {
     let name_list1: WordSet = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => return Err(ComplexParseError::Other),
+        Err(_) => return Err(ComplexParseError::Other),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let name_list2: WordSet = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
-        Err(e) => return Err(ComplexParseError::Other),
+        Err(_) => return Err(ComplexParseError::Other),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };

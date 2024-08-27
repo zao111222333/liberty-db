@@ -1,5 +1,10 @@
-use crate::ast::SimpleAttri;
-use core::{fmt, str::FromStr};
+use crate::ast::{
+  CodeFormatter, ComplexAttri, ComplexParseError, Indentation, SimpleAttri,
+};
+use core::{
+  fmt::{self, Write},
+  str::FromStr,
+};
 use strum_macros::{Display, EnumString};
 
 /// <a name ="reference_link" href="
@@ -329,6 +334,91 @@ impl FromStr for TwoValue {
   }
 }
 
+/// Example
+/// ``` text
+/// retention_pin (save | restore | save_restore, enumerated_type) ;
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=282.3&end=282.23
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum PinClass {
+  /// `save`
+  #[strum(serialize = "save")]
+  Save,
+  /// `restore`
+  #[strum(serialize = "restore")]
+  Restore,
+  /// `save_restore`
+  #[strum(serialize = "save_restore")]
+  SaveRestore,
+}
+/// The `retention_pin` complex attribute identifies the retention pins of a retention cell. The
+/// attribute defines the following information:
+/// + pin class
+///
+///   Valid values:
+///   + `restore`: Restores the state of the cell.
+///   + `save`: Saves the state of the cell.
+///   + `save_restore`: Saves and restores the state of the cell.
+/// + disable value
+///
+/// Defines the value of the retention pin when the cell works in normal mode. The valid
+/// values are 0 and 1.
+///
+/// Syntax
+/// ``` text
+/// retention_pin (pin_class, disable_value) ;
+/// ```
+/// Example
+/// ``` text
+/// retention_pin (save | restore | save_restore, enumerated_type) ;
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=282.3&end=282.23
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Copy)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct RetentionPin {
+  /// `pin_class`
+  pub pin_class: PinClass,
+  /// `disable_value`
+  pub disable_value: PreferTied,
+}
+impl ComplexAttri for RetentionPin {
+  #[inline]
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
+    let pin_class: PinClass = match i.next() {
+      Some(&s) => match s.parse() {
+        Ok(f) => f,
+        Err(_) => return Err(ComplexParseError::Other),
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let disable_value: PreferTied = match i.next() {
+      Some(&s) => match s.parse() {
+        Ok(f) => f,
+        Err(_) => return Err(ComplexParseError::Other),
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if i.next().is_some() {
+      Err(ComplexParseError::LengthDismatch)
+    } else {
+      Ok(Self { pin_class, disable_value })
+    }
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{}, {}", self.pin_class, self.disable_value)
+  }
+}
+
 #[cfg(test)]
 mod test {
   use super::*;
@@ -339,5 +429,33 @@ mod test {
     assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1"));
     assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("111"));
     assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1-"));
+  }
+  #[test]
+  fn retention_pin() {
+    let pin = crate::ast::test_parse_fmt::<crate::Cell>(
+      r#"(cell1){
+        pin(A){
+          retention_pin (save_restore, 1);
+        }
+        pin(B){
+          retention_pin (restore, 0);
+        }
+        pin(C){
+          retention_pin ("save", 0);
+        }
+      }"#,
+      r#"
+liberty_db::cell::Cell (cell1) {
+| pin (A) {
+| | retention_pin (save_restore, 1);
+| }
+| pin (B) {
+| | retention_pin (restore, 0);
+| }
+| pin (C) {
+| | retention_pin (save, 0);
+| }
+}"#,
+    );
   }
 }
