@@ -36,6 +36,7 @@ fn make_golden() {
 
 #[test]
 fn regression() {
+  simple_logger::SimpleLogger::new().init().unwrap();
   for test_lib_path in crate::all_lib_files() {
     println!("================\n{}", test_lib_path.display());
     let golden_lib_path = golden_path(&test_lib_path);
