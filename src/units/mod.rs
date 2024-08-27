@@ -438,9 +438,9 @@ impl ComplexAttri for CapacitiveLoadUnit {
   ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
     if self.ff_pf {
-      write!(f, "{}ff", buffer.format(self._v.get::<capacitance::femtofarad>()))
+      write!(f, "{}, ff", buffer.format(self._v.get::<capacitance::femtofarad>()))
     } else {
-      write!(f, "{}pf", buffer.format(self._v.get::<capacitance::picofarad>()))
+      write!(f, "{}, pf", buffer.format(self._v.get::<capacitance::picofarad>()))
     }
   }
 }

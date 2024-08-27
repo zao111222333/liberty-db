@@ -30,7 +30,7 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | default_wire_load_resistance : 0.00186;
 | default_wire_load_selection : predcaps;
 | time_unit : 1ns;
-| capacitive_load_unit (1.0ff);
+| capacitive_load_unit (1.0, ff);
 | voltage_unit : 1V;
 | current_unit : 1uA;
 | pulling_resistance_unit : 1kohm;

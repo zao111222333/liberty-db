@@ -12,7 +12,7 @@ liberty_db::library::Library (gscl45nm) {
 | }
 | default_operating_conditions : typical;
 | time_unit : 1ns;
-| capacitive_load_unit (1.0pf);
+| capacitive_load_unit (1.0, pf);
 | voltage_unit : 1V;
 | current_unit : 1uA;
 | pulling_resistance_unit : 1kohm;

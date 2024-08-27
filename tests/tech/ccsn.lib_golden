@@ -22,7 +22,7 @@ liberty_db::library::Library (ccsn) {
 | default_max_transition : 1.28;
 | default_output_pin_cap : 0.0;
 | time_unit : 1ns;
-| capacitive_load_unit (1.0pf);
+| capacitive_load_unit (1.0, pf);
 | voltage_unit : 1V;
 | current_unit : 1mA;
 | pulling_resistance_unit : 1kohm;
