@@ -330,7 +330,7 @@ pub struct Cell {
   pub statetable: Option<Statetable>,
   #[liberty(group(type=Set))]
   pub pin: GroupSet<Pin>,
-  #[liberty(group(type=Option))]
+  #[liberty(group(type=Vec))]
   /// The `test_cell`  group is in a `cell` group or `model` group.
   /// It models only the nontest behavior of a scan cell, which
   /// is described by an `ff`, `ff_bank`, `latch`, `latch_bank`  or `statetable`  statement
@@ -338,7 +338,7 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
   /// ">Reference</a>
-  pub test_cell: Option<TestCell>,
+  pub test_cell: Vec<TestCell>,
   #[liberty(group(type=Set))]
   // TODO:
   pub bundle: GroupSet<Bundle>,
