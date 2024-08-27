@@ -57,10 +57,10 @@ cargo test --package liberty-tests --lib -- parser_bench::test_all_lib_files --e
 
 ## TODO List
 
-+ merge fields of `timing` at parse phase
-```
-impl __timing::ImmutIdTiming { xxx }
-```
++ `intrinsic_parasitic` group
++ `leakage_current` group
++ `dynamic_current` group
++ user `define`
 + use PDFJS
 + stream input
 + Linked Group
