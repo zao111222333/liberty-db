@@ -15,7 +15,8 @@ pub use fmt::{
   TestCodeFormatter, TestIndentation,
 };
 use nom::{error::Error, IResult};
-use ordered_float::ParseNotNanError;
+use ordered_float::{NotNan, ParseNotNanError};
+use std::collections::HashMap;
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
@@ -108,6 +109,59 @@ impl PartialEq for LinkError {
 //     }
 //   }
 // }
+
+#[derive(Debug, Clone)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum DefinedAttribute {
+  /// Boolean
+  Boolean(Vec<bool>),
+  /// string
+  String(Vec<ArcStr>),
+  /// integer
+  Integer(Vec<isize>),
+  /// float
+  Float(Vec<NotNan<f64>>),
+}
+
+#[derive(Debug, Clone, Default)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct Defined {
+  pub simple: HashMap<ArcStr, DefinedAttribute>,
+  pub group: HashMap<ArcStr, Vec<GroupWrapper>>,
+}
+
+impl Defined {
+  #[inline]
+  pub(crate) fn parse_set_simple<'a>(
+    attribute: &mut DefinedAttribute,
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> IResult<&'a str, Result<(), AttriValue>, Error<&'a str>> {
+    #[inline]
+    fn nom_parse_push<'a, T: SimpleAttri>(
+      i: &'a str,
+      line_num: &mut usize,
+      v: &mut Vec<T>,
+    ) -> IResult<&'a str, Result<(), AttriValue>, Error<&'a str>> {
+      match <T as SimpleAttri>::nom_parse(i, line_num) {
+        Ok((input, Ok(res))) => {
+          v.push(res);
+          Ok((input, Ok(())))
+        }
+        Ok((input, Err(wrapper))) => Ok((input, Err(wrapper))),
+        Err(e) => Err(e),
+      }
+    }
+    match attribute {
+      DefinedAttribute::Boolean(v) => nom_parse_push(i, line_num, v),
+      DefinedAttribute::String(v) => nom_parse_push(i, line_num, v),
+      DefinedAttribute::Integer(v) => nom_parse_push(i, line_num, v),
+      DefinedAttribute::Float(v) => nom_parse_push(i, line_num, v),
+    }
+  }
+}
 
 pub(crate) type SimpleParseErr<'a, T> =
   IResult<&'a str, Result<T, AttriValue>, Error<&'a str>>;
