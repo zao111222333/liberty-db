@@ -492,6 +492,39 @@ impl SimpleAttri for PgType {
   }
 }
 
+/// The `switch_cell_type`  cell-level attribute specifies
+/// the type of the switch cell for direct inference.
+///
+/// Syntax:
+/// ``` text
+/// switch_cell_type : coarse_grain | fine_grain;
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=210.8&end=210.13
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum SwitchCellType {
+  /// `coarse_grain`
+  #[strum(serialize = "coarse_grain")]
+  CoarseGrain,
+  /// `fine_grain`
+  #[strum(serialize = "fine_grain")]
+  FineGrain,
+}
+impl SimpleAttri for SwitchCellType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    line_num: &mut usize,
+  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+
 /// You can use the `clock_gating_integrated_cell` attribute to enter specific
 /// values that determine which integrated cell functionality the clock-gating tool uses.
 ///

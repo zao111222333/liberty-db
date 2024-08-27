@@ -4,8 +4,9 @@
 
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
+  common::table::TableLookUp2D,
   expression::{FFBank, Latch, LatchBank, FF},
-  pin::{Bundle, Pin},
+  pin::{AntennaDiodeType, Bundle, Pin},
   ArcStr, GroupSet, NotNan,
 };
 mod items;
@@ -31,11 +32,39 @@ pub struct Cell {
   pub undefined: AttributeList,
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
+  /// The `dont_use`  attribute with a true value indicates
+  /// that a cell should not be added to a design
+  /// during optimization
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=107.3&end=107.4
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub dont_use: Option<bool>,
+  /// The `dont_touch`  attribute with a true
+  /// value indicates that all instances of the cell must
+  /// remain in the network.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=106.21&end=106.22
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub dont_touch: Option<bool>,
   /// CellId
   #[liberty(simple(type=Option))]
   pub single_bit_degenerate: Option<ArcStr>,
   #[liberty(simple(type = Option))]
   pub driver_waveform_rise: Option<ArcStr>,
+  #[liberty(simple(type = Option))]
+  pub driver_waveform_fall: Option<ArcStr>,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
+  /// ?field=test
+  /// &bgn
+  /// =228.4
+  /// &end
+  /// =228.4
+  /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
+  pub antenna_diode_type: Option<AntennaDiodeType>,
   /// You can use the `clock_gating_integrated_cell` attribute to enter specific
   /// values that determine which integrated cell functionality the clock-gating tool uses.
   ///
@@ -49,11 +78,34 @@ pub struct Cell {
   #[liberty(simple(type = Option))]
   pub clock_gating_integrated_cell: Option<ClockGatingIntegratedCell>,
   #[liberty(simple(type = Option))]
-  pub driver_waveform_fall: Option<ArcStr>,
-  #[liberty(simple(type = Option))]
   pub cell_footprint: Option<ArcStr>,
   #[liberty(simple(type=Option))]
   pub cell_leakage_power: Option<f64>,
+  /// The `switch_cell_type`  cell-level attribute specifies
+  /// the type of the switch cell for direct inference.
+  ///
+  /// Syntax:
+  /// ``` text
+  /// switch_cell_type : coarse_grain | fine_grain;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=210.8&end=210.13
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type=Option))]
+  pub switch_cell_type: Option<SwitchCellType>,
+  /// Use the `dc_current`  group to specify the input and output voltage values
+  /// of a two-dimensional current table for a channel-connecting block.
+  ///
+  /// Use `index_1`  to represent the input voltage
+  /// and `index_2`  to represent the output voltage.
+  /// The `values`  attribute of the group lists the relative
+  /// channel-connecting block DC current values in library units measured
+  /// at the channel-connecting block output node.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
+  /// ">Reference-Definition</a>
+  #[liberty(group(type = Option))]
+  pub dc_current: Option<TableLookUp2D>,
   /// The `input_voltage_range`  attribute specifies the allowed
   /// voltage range of the level-shifter input pin and the voltage
   /// range for all input pins of the cell under all possible operating conditions
@@ -99,12 +151,53 @@ pub struct Cell {
   pub statetable: Option<Statetable>,
   #[liberty(group(type=Set))]
   pub pin: GroupSet<Pin>,
+  #[liberty(group(type=Option))]
+  /// The `test_cell`  group is in a `cell` group or `model` group.
+  /// It models only the nontest behavior of a scan cell, which
+  /// is described by an `ff`, `ff_bank`, `latch`, `latch_bank`  or `statetable`  statement
+  /// and `pin` function attributes
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
+  /// ">Reference</a>
+  pub test_cell: Option<TestCell>,
   #[liberty(group(type=Set))]
   // TODO:
   pub bundle: GroupSet<Bundle>,
 }
 impl GroupFn for Cell {}
 
+/// The `test_cell`  group is in a `cell` group or `model` group.
+/// It models only the nontest behavior of a scan cell, which
+/// is described by an `ff`, `ff_bank`, `latch`, `latch_bank`  or `statetable`  statement
+/// and `pin` function attributes
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
+/// ">Reference</a>
+#[derive(Debug, Default, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct TestCell {
+  /// group comments
+  #[liberty(comments)]
+  pub comments: GroupComments<Self>,
+  /// group undefined attributes
+  #[liberty(undefined)]
+  pub undefined: AttributeList,
+  #[liberty(group(type=Set))]
+  pub ff: GroupSet<FF>,
+  #[liberty(group(type=Set))]
+  pub ff_bank: GroupSet<FFBank>,
+  #[liberty(group(type=Set))]
+  pub latch: GroupSet<Latch>,
+  #[liberty(group(type=Set))]
+  pub latch_bank: GroupSet<LatchBank>,
+  #[liberty(group(type=Set))]
+  pub pin: GroupSet<Pin>,
+  #[liberty(group(type=Set))]
+  pub statetable: GroupSet<Statetable>,
+}
+
+impl GroupFn for TestCell {}
 #[cfg(test)]
 mod test {
   use super::Cell;
