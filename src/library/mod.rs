@@ -550,22 +550,22 @@ impl Library {
   /// Parse `.lib` file as a [Library] struct.
   #[allow(clippy::arithmetic_side_effects)]
   #[inline]
-  pub fn parse_lib(i: &str) -> Result<Self, ParserError<'_>> {
+  pub fn parse_lib(i: &str) -> Result<Self, ParserError> {
     let mut line_num = 0;
     let input1 = match parser::comment_space_newline(i) {
       Ok((input1, n)) => {
         line_num += n;
         input1
       }
-      Err(e) => return Err(ParserError::NomError(line_num, e)),
+      Err(e) => return Err(ParserError::nom(line_num, e)),
     };
     let (input2, key) = match parser::key::<nom::error::Error<&str>>(input1) {
       Ok(res) => res,
-      Err(e) => return Err(ParserError::NomError(line_num, e)),
+      Err(e) => return Err(ParserError::nom(line_num, e)),
     };
     if key == "library" {
       match <Self as GroupAttri>::nom_parse(input2, &mut line_num) {
-        Err(e) => Err(ParserError::NomError(line_num, e)),
+        Err(e) => Err(ParserError::nom(line_num, e)),
         Ok((_, Err(e))) => Err(ParserError::IdError(line_num, e)),
         Ok((_, Ok(l))) => Ok(l),
       }
@@ -585,7 +585,7 @@ impl Library {
   }
   /// TODO: Parse `.json` file as a [Library] struct.
   #[inline]
-  pub fn parse_json(_i: &str) -> Result<Self, ParserError<'_>> {
+  pub fn parse_json(_i: &str) -> Result<Self, ParserError> {
     todo!()
   }
   /// TODO: Format [Library] to .json
@@ -598,7 +598,7 @@ impl Library {
   }
   /// TODO: Parse `.db` file as a [Library] struct.
   #[inline]
-  pub fn parse_db(_i: &str) -> Result<Self, ParserError<'_>> {
+  pub fn parse_db(_i: &str) -> Result<Self, ParserError> {
     todo!()
   }
   /// TODO: Format [Library] to .db

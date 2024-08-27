@@ -360,29 +360,35 @@ pub trait NameAttri: Sized {
   ) -> core::fmt::Result;
 }
 
-fn display_nom_error(e: &nom::Err<Error<&str>>) -> ArcStr {
-  match e {
-    nom::Err::Incomplete(_) => e.to_string(),
-    nom::Err::Failure(_e) | nom::Err::Error(_e) => format!(
-      "type[{}] at[{}]",
-      _e.code.description(),
-      _e.input.lines().next().unwrap_or("")
-    ),
-  }
-  .into()
-}
 /// Error for parser
 #[derive(Debug, thiserror::Error)]
-pub enum ParserError<'a> {
+pub enum ParserError {
   /// TitleLenMismatch(want,got,title)
   #[error("Line#{0}, {1}")]
   IdError(usize, IdError),
   /// replace same id
-  #[error("Line#{0}, {}", display_nom_error(.1))]
-  NomError(usize, nom::Err<Error<&'a str>>),
+  #[error("Line#{0}, {1}")]
+  NomError(usize, String),
   /// something else
   #[error("Line#{0}, {1}")]
   Other(usize, String),
+}
+
+impl ParserError {
+  #[inline]
+  pub(crate) fn nom(line: usize, e: nom::Err<Error<&str>>) -> Self {
+    Self::NomError(
+      line,
+      match e {
+        nom::Err::Incomplete(_) => e.to_string(),
+        nom::Err::Failure(_e) | nom::Err::Error(_e) => format!(
+          "type [{}] at [{}]",
+          _e.code.description(),
+          _e.input.lines().next().unwrap_or("")
+        ),
+      },
+    )
+  }
 }
 
 /// `TestWrapper`

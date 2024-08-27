@@ -21,7 +21,7 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
 }
 
 // open `#[test]` only when we need to re-golden
-// #[test]
+#[test]
 fn make_golden() {
   for test_lib_path in crate::all_lib_files() {
     let golden_lib_path = golden_path(&test_lib_path);

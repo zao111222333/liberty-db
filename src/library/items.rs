@@ -420,25 +420,25 @@ pub struct OutputVoltage {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.45&end=75.46
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vol: ArcStr,
+  pub vol: Formula,
   /// The minimum output voltage generated to represent a logic 1.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.3&end=76.4
   /// ">Reference</a>
   #[liberty(simple)]
-  pub voh: ArcStr,
+  pub voh: Formula,
   /// The minimum output voltage the pad can generate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.5&end=76.6
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vomin: ArcStr,
+  pub vomin: Formula,
   /// The maximum output voltage the pad can generate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.7&end=76.8
   /// ">Reference</a>
   #[liberty(simple)]
-  pub vomax: ArcStr,
+  pub vomax: Formula,
 }
 impl GroupFn for OutputVoltage {}
 

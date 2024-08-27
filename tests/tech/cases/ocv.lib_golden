@@ -76,40 +76,40 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 | | vimax : 1.3 ;
 | }
 | output_voltage (cmos) {
-| | vol : 0.24;
-| | voh : 0.56;
-| | vomin : -0.5;
-| | vomax : 1.3;
+| | vol : 0.24 ;
+| | voh : 0.56 ;
+| | vomin : -0.5 ;
+| | vomax : 1.3 ;
 | }
 | output_voltage (cmos_schmitt) {
-| | vol : 0.24;
-| | voh : 0.56;
-| | vomin : -0.5;
-| | vomax : 1.3;
+| | vol : 0.24 ;
+| | voh : 0.56 ;
+| | vomin : -0.5 ;
+| | vomax : 1.3 ;
 | }
 | output_voltage (pci) {
-| | vol : 0.8;
-| | voh : 2;
-| | vomin : -0.5;
-| | vomax : 1.3;
+| | vol : 0.8 ;
+| | voh : 2 ;
+| | vomin : -0.5 ;
+| | vomax : 1.3 ;
 | }
 | output_voltage (schmitt) {
-| | vol : 0.24;
-| | voh : 0.56;
-| | vomin : -0.5;
-| | vomax : 1.3;
+| | vol : 0.24 ;
+| | voh : 0.56 ;
+| | vomin : -0.5 ;
+| | vomax : 1.3 ;
 | }
 | output_voltage (ttl) {
-| | vol : 0.8;
-| | voh : 2;
-| | vomin : -0.5;
-| | vomax : 1.3;
+| | vol : 0.8 ;
+| | voh : 2 ;
+| | vomin : -0.5 ;
+| | vomax : 1.3 ;
 | }
 | output_voltage (ttl_schmitt) {
-| | vol : 0.8;
-| | voh : 2;
-| | vomin : -0.5;
-| | vomax : 1.3;
+| | vol : 0.8 ;
+| | voh : 2 ;
+| | vomin : -0.5 ;
+| | vomax : 1.3 ;
 | }
 | slew_upper_threshold_pct_rise : 70.0;
 | slew_lower_threshold_pct_rise : 30.0;
