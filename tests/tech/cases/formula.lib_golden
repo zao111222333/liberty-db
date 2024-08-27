@@ -16,7 +16,7 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 | default_operating_conditions : tt0p8v25c;
 | define_cell_area (bond_pads, pad_slots);
 | define_cell_area (pad_drivers, pad_driver_sites);
-| library_features ("report_delay_calculation, report_power_calculation");
+| library_features (report_delay_calculation, report_power_calculation);
 | default_leakage_power_density : 0.0;
 | default_cell_leakage_power : 0.0;
 | default_fanout_load : 1.0;

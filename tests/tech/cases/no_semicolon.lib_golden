@@ -14,16 +14,16 @@ liberty_db::library::Library (some) {
 | input_threshold_pct_rise : 50.0;
 | output_threshold_pct_rise : 50.0;
 | output_threshold_pct_fall : 50.0;
-| /* Undefined attributes from here */
-| resistance : 0.00001;
-| capacitance : 1;
-| area : 0;
-| slope : 0;
-| fanout_length (1, 0.0000);
-| fanout_length (2, 0.0000);
-| fanout_length (3, 0.0000);
-| fanout_length (4, 0.0000);
-| fanout_length (5, 0.0000);
-| fanout_length (6, 0.0000);
-| /* Undefined attributes end here */
+| wire_load (1000000) {
+| | area : 0.0;
+| | capacitance : 1.0;
+| | resistance : 0.00001;
+| | slope : 0.0;
+| | fanout_length (1, 0.0);
+| | fanout_length (2, 0.0);
+| | fanout_length (3, 0.0);
+| | fanout_length (4, 0.0);
+| | fanout_length (5, 0.0);
+| | fanout_length (6, 0.0);
+| }
 }
