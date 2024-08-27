@@ -14,6 +14,7 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | voltage : 0.85;
 | }
 | default_operating_conditions : dlvl_ff0p85v25c_i0p85v;
+| default_threshold_voltage_group : saed32cell_hvt;
 | define (def_sim_opt, library, string);
 | define (driver_model, library, string);
 | define (simulator, library, string);
@@ -6069,7 +6070,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | }
 | /* Undefined attributes from here */
 | driver_model : snps_predriver;
-| default_threshold_voltage_group : saed32cell_hvt;
 | def_sim_opt : "POST=1 PROBE POST_VERSION=2001 INGOLD=2 NOMOD NOPAGE NUMDGT=10 MEASDGT=10 LIMPTS=500000 ICSWEEP=0 AUTOSTOP ALTCC=1 RUNLVL=5 ACCURATE=1 ABSVAR=1.000000e-03 RELVAR=1.000000e-02";
 | simulator : "HSPICE -- C-2009.03-SP1 32-BIT (May 25 2009)";
 | /* Undefined attributes end here */

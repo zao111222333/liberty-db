@@ -122,6 +122,12 @@ pub struct Library {
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
   pub default_operating_conditions: Option<ArcStr>,
+  /// The optional `default_threshold_voltage_group`  attribute specifies a cell’s category based on its threshold voltage characteristics
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=23.20&end=23.21
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub default_threshold_voltage_group: Option<ArcStr>,
   /// Use this attribute to define new, temporary, or user-defined attributes
   /// for use in symbol and technology libraries.
   /// You can use either a space or a comma to separate the arguments.
@@ -141,13 +147,6 @@ pub struct Library {
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
   pub define: GroupSet<Define>,
-  /// The `define_cell_area`  attribute defines the area resources a `cell` uses,
-  /// such as the number of pad slots.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.23&end=36.24
-  /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub define_cell_area: GroupSet<DefineCellArea>,
   /// Use this special attribute to define new, temporary, or user-defined groups
   /// for use in technology libraries.
   /// <a name ="reference_link" href="
@@ -155,6 +154,13 @@ pub struct Library {
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
   pub define_group: GroupSet<DefineGroup>,
+  /// The `define_cell_area`  attribute defines the area resources a `cell` uses,
+  /// such as the number of pad slots.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.23&end=36.24
+  /// ">Reference</a>
+  #[liberty(complex(type = Set))]
+  pub define_cell_area: GroupSet<DefineCellArea>,
   /// ``` liberty
   /// library_features (value_1, value_2, ..., value_n) ;
   /// ```
