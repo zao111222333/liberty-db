@@ -4,7 +4,7 @@
 use crate::{
   ast::{AttributeList, GroupComments, GroupFn},
   ccsn::{CCSNStage, ReceiverCapacitance},
-  common::items::WordSet,
+  common::items::{NameList, WordSet},
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
@@ -42,9 +42,13 @@ pub use items::*;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Pin {
   /// Name of the pin
+  /// `pin (name | name_list)`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=227.10&end=227.25
+  /// ">Reference-Definition</a>
   #[id]
   #[liberty(name)]
-  pub name: ArcStr,
+  pub name: NameList,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
@@ -85,11 +89,11 @@ pub struct Pin {
   /// values are 0 and 1.
   ///
   /// Syntax
-  /// ```
+  /// ``` text
   /// retention_pin (pin_class, disable_value) ;
   /// ```
   /// Example
-  /// ```
+  /// ``` text
   /// retention_pin (save | restore | save_restore, enumerated_type) ;
   /// ```
   /// <a name ="reference_link" href="
@@ -621,7 +625,7 @@ pub struct Pin {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=261.11+261.17&end=261.12+261.18
   /// ">Reference</a>
   #[liberty(simple(type=Option))]
-  pub map_to_logic: Option<PreferTied>,
+  pub map_to_logic: Option<OneZero>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -816,7 +820,7 @@ pub struct Pin {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=267.24&end=267.26
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub prefer_tied: Option<PreferTied>,
+  pub prefer_tied: Option<OneZero>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -1096,6 +1100,27 @@ pub struct Pin {
 }
 
 impl GroupFn for Pin {}
+
+#[cfg(test)]
+mod test {
+
+  #[test]
+  fn pin_name_list() {
+    let cell = crate::ast::test_parse_fmt::<crate::Cell>(
+      r#"(test_cell){
+        pin (A) {}
+        pin (B,C,D,E) {}
+      }"#,
+      r#"
+liberty_db::cell::Cell (test_cell) {
+| pin (A) {
+| }
+| pin (B, C, D, E) {
+| }
+}"#,
+    );
+  }
+}
 
 // #[test]
 // fn test_link() {

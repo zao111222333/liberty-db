@@ -3,15 +3,17 @@
 //!
 use core::fmt::{self, Write};
 
+use itertools::Itertools;
+
 use crate::{
   ast::{
-    is_word, parser::simple_custom, CodeFormatter, ComplexAttri, ComplexParseError,
-    IdError, Indentation, NameAttri, SimpleAttri,
+    is_word, join_fmt_no_quote, parser::simple_custom, CodeFormatter, ComplexAttri,
+    ComplexParseError, IdError, Indentation, NameAttri, SimpleAttri,
   },
   ArcStr, NotNan,
 };
 
-use super::items::Formula;
+use super::items::{Formula, NameList, WordSet};
 impl SimpleAttri for f64 {
   #[inline]
   fn nom_parse<'a>(
@@ -149,6 +151,47 @@ impl NameAttri for ArcStr {
   }
 }
 
+impl NameAttri for NameList {
+  #[inline]
+  fn parse(v: Vec<&str>) -> Result<Self, IdError> {
+    let l = v.len();
+    match l {
+      0 => Err(IdError::length_dismatch(1, 0, v)),
+      #[allow(clippy::indexing_slicing)]
+      1 => Ok(Self::Name(v[0].into())),
+      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(ArcStr::from).collect() })),
+    }
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{self}")
+  }
+}
+
+impl fmt::Display for NameList {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::Name(s) => {
+        if is_word(s) {
+          write!(f, "{s}")
+        } else {
+          write!(f, "\"{s}\"")
+        }
+      }
+      Self::List(set) => join_fmt_no_quote(
+        set.inner.iter().sorted(),
+        f,
+        |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
+        ", ",
+      ),
+    }
+  }
+}
+
 impl NameAttri for Vec<ArcStr> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, IdError> {
@@ -159,7 +202,7 @@ impl NameAttri for Vec<ArcStr> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    crate::ast::join_fmt_no_quote(
+    join_fmt_no_quote(
       self.iter(),
       f,
       |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
@@ -187,7 +230,7 @@ impl<const N: usize> NameAttri for [ArcStr; N] {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    crate::ast::join_fmt_no_quote(
+    join_fmt_no_quote(
       self.iter(),
       f,
       |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
@@ -434,7 +477,7 @@ impl ComplexAttri for Vec<ArcStr> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    crate::ast::join_fmt_no_quote(
+    join_fmt_no_quote(
       self.iter(),
       f,
       |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
@@ -460,12 +503,7 @@ impl ComplexAttri for Vec<usize> {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let mut buffer = itoa::Buffer::new();
-    crate::ast::join_fmt_no_quote(
-      self.iter(),
-      f,
-      |i, ff| write!(ff, "{}", buffer.format(*i)),
-      ", ",
-    )
+    join_fmt_no_quote(self.iter(), f, |i, ff| write!(ff, "{}", buffer.format(*i)), ", ")
   }
 }
 

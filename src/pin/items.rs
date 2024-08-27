@@ -257,7 +257,7 @@ impl SimpleAttri for SlewControl {
 /// ">Reference-Instance</a>
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub enum PreferTied {
+pub enum OneZero {
   /// 1
   #[strum(serialize = "1")]
   One,
@@ -265,7 +265,7 @@ pub enum PreferTied {
   #[strum(serialize = "0")]
   Zero,
 }
-impl SimpleAttri for PreferTied {
+impl SimpleAttri for OneZero {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -384,7 +384,7 @@ pub struct RetentionPin {
   /// `pin_class`
   pub pin_class: PinClass,
   /// `disable_value`
-  pub disable_value: PreferTied,
+  pub disable_value: OneZero,
 }
 impl ComplexAttri for RetentionPin {
   #[inline]
@@ -397,7 +397,7 @@ impl ComplexAttri for RetentionPin {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let disable_value: PreferTied = match i.next() {
+    let disable_value: OneZero = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::Other),

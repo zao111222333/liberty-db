@@ -270,3 +270,17 @@ pub struct Formula(pub ArcStr);
 //   Mul(Box<_Formula>, Box<_Formula>),
 //   Div(Box<_Formula>, Box<_Formula>),
 // }
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum NameList {
+  Name(ArcStr),
+  List(WordSet),
+}
+
+impl Default for NameList {
+  #[inline]
+  fn default() -> Self {
+    Self::Name(ArcStr::new())
+  }
+}

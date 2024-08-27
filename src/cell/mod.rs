@@ -219,7 +219,7 @@ pub struct Cell {
   /// The `retention_cell`  attribute identifies a retention cell. The `retention_cell_style` value is a random string
   ///
   /// Syntax
-  /// ```
+  /// ``` text
   /// retention_cell : retention_cell_style ;
   /// ```
   /// <a name ="reference_link" href="
