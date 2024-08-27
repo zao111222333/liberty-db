@@ -1,5 +1,8 @@
 use crate::{
-  ast::{join_fmt, AttriValue, GroupComments, GroupFn, NamedGroup, SimpleAttri},
+  ast::{
+    join_fmt, AttriValue, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
+    GroupFn, Indentation, NamedGroup, SimpleAttri,
+  },
   common::items::WordSet,
   expression::IdBooleanExpression,
   pin::Direction,
@@ -176,9 +179,9 @@ impl NamedGroup for Statetable {
   }
   #[inline]
   #[allow(clippy::indexing_slicing)]
-  fn fmt_name<T: Write, I: crate::ast::Indentation>(
+  fn fmt_name<T: Write, I: Indentation>(
     &self,
-    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     if self.input_nodes.len() == 1 {
       write!(f, "{}", self.input_nodes[0])?;
@@ -253,9 +256,9 @@ impl SimpleAttri for Table {
       })
   }
   #[inline]
-  fn fmt_self<T: Write, I: crate::ast::Indentation>(
+  fn fmt_self<T: Write, I: Indentation>(
     &self,
-    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+    f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let indent = f.indentation();
     join_fmt(
@@ -651,5 +654,74 @@ impl SimpleAttri for ClockGatingIntegratedCell {
     line_num: &mut usize,
   ) -> crate::ast::SimpleParseErr<'a, Self> {
     crate::ast::nom_parse_from_str(i, line_num)
+  }
+}
+
+/// Use the pin_opposite attribute to describe functionally opposite (logically inverse) groups
+/// of input or output pins.
+/// Syntax
+///
+/// ``` text
+/// pin_opposite ("name_list1", "name_list2") ;
+/// ```
+///
+/// + `name_list1`: A `name_list` of output pins requires the supplied output values to be opposite.
+/// + `name_list2`: A `name_list` of input pins requires the supplied input values to be opposite.
+///
+/// In the following example, pins IP and OP are logically inverse.
+/// ``` text
+/// pin_opposite ("IP", "OP") ;
+/// ```
+/// The `pin_opposite` attribute also incorporates the functionality of the `pin_equal` complex
+/// attribute.
+///
+/// In the following example, Q1, Q2, and Q3 are equal; QB1 and QB2 are equal; and the pins
+/// in the first group are opposite of the pins in the second group.
+/// ``` text
+/// pin_opposite ("Q1 Q2 Q3", "QB1 QB2") ;
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=124.9&end=124.22
+/// ">Reference</a>
+#[derive(Debug, Clone)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(serde::Serialize, serde::Deserialize)]
+
+pub struct PinOpposite {
+  pub name_list1: WordSet,
+  pub name_list2: WordSet,
+}
+
+impl ComplexAttri for PinOpposite {
+  #[inline]
+  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+    let mut i = v.iter();
+    let name_list1: WordSet = match i.next() {
+      Some(&s) => match s.parse() {
+        Ok(f) => f,
+        Err(e) => return Err(ComplexParseError::Other),
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let name_list2: WordSet = match i.next() {
+      Some(&s) => match s.parse() {
+        Ok(f) => f,
+        Err(e) => return Err(ComplexParseError::Other),
+      },
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if i.next().is_some() {
+      Err(ComplexParseError::LengthDismatch)
+    } else {
+      Ok(Self { name_list1, name_list2 })
+    }
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{}, {}", self.name_list1, self.name_list2)
   }
 }

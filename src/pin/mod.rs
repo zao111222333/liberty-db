@@ -510,6 +510,38 @@ pub struct Pin {
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
   pub is_pad: Option<bool>,
+  /// The `is_pll_reference_pin` Boolean attribute tags a pin as a reference pin on the phaselocked loop.
+  /// In a phase-locked loop cell group, the is_pll_reference_pin attribute
+  /// should be set to true in only one input pin group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=256.17&end=256.19
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_pll_reference_pin: Option<bool>,
+  /// The `is_pll_feedback_pin`  Boolean attribute tags a pin as a feedback pin on a phase-locked loop.
+  /// In a phase-locked loop cell group, the `is_pll_feedback_pin`  attribute should
+  /// be set to true in only one input pin group
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=257.3&end=257.5
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_pll_feedback_pin: Option<bool>,
+  /// The `is_pll_output_pin`  Boolean attribute tags a pin as an output pin on a phase-locked loop.
+  /// In a phase-locked loop cell group, the `is_pll_output_pin`  attribute
+  /// should be set to true in one or more output pin groups.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=257.35&end=257.37
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_pll_output_pin: Option<bool>,
+  /// The `is_unbuffered`  attribute specifies the pin as unbuffered.
+  /// You can specify this optional attribute on the pins of any library cell.
+  /// The default is false.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=258.39&end=258.40
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub is_unbuffered: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -520,6 +552,50 @@ pub struct Pin {
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
   pub is_unconnected: Option<bool>,
+  /// The `isolation_cell_data_pin`  attribute identifies the data pin of any isolation cell.The valid values of this attribute are true  or false. If this attribute is not specified, all the input pins of the isolation cell are considered to be data pins.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=259.12&end=259.14
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub isolation_cell_data_pin: Option<bool>,
+  /// The `isolation_cell_enable_pin`  attribute specifies the enable input pin of an isolation cell including a clock isolation cell. For more information about isolation cells,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=258.39&end=258.40
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub isolation_cell_enable_pin: Option<bool>,
+  /// The `isolation_enable_condition`  attribute specifies the isolation condition for internally-isolated pins, buses, and bundles of a cell. When this attribute is defined in a pin group, the corresponding Boolean expression can include only input and inout pins. Do not include the output pins of an internally isolated cell in the Boolean expression
+  ///
+  /// The attribute is applicable to pins of macro cells
+  ///
+  /// When the isolation_enable_condition  attribute is defined in a bus  or  bundle  group, the corresponding Boolean expression can include pins, and buses and bundles of the same bit-width. For example, when the Boolean expression includes a bus and a bundle, both of them must have the same bit-width.
+  ///
+  /// Pins, buses, and bundles that have the isolation_enable_condition  attribute must also have the always_on  attribute.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=260.3&end=260.13
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub isolation_enable_condition: Option<BooleanExpression>,
+  /// The `level_shifter_data_pin`  attribute specifies the input data pin on a level shifter cell
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=260.19&end=260.20
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub level_shifter_data_pin: Option<bool>,
+  /// The `level_shifter_enable_pin`  attribute specifies the enable input pin on a level shifter cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=260.30&end=260.31
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub level_shifter_enable_pin: Option<bool>,
+  /// The `map_to_logic`  attribute specifies which logic level to tie a pin when a power-switch cell functions as a normal cell. For more information about power-switch cells
+  ///
+  /// Valid values are 1 and 0.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=261.11+261.17&end=261.12+261.18
+  /// ">Reference</a>
+  #[liberty(simple(type=Option))]
+  pub map_to_logic: Option<PreferTied>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -896,18 +972,6 @@ pub struct Pin {
   /// ">Reference-Definition</a>
   #[liberty(simple(type = Option))]
   pub switch_pin: Option<bool>,
-  /// The `level_shifter_data_pin`  attribute specifies the input data pin on a level shifter cell.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=260.19&end=260.20
-  /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
-  pub level_shifter_data_pin: Option<bool>,
-  /// The `level_shifter_enable_pin`  attribute specifies the enable input pin on a level shifter cell.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=260.30&end=260.31
-  /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
-  pub level_shifter_enable_pin: Option<bool>,
   // /* Complex Attributes in a pin Group */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

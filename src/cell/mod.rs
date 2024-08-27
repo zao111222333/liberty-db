@@ -55,6 +55,12 @@ pub struct Cell {
   pub driver_waveform_rise: Option<ArcStr>,
   #[liberty(simple(type = Option))]
   pub driver_waveform_fall: Option<ArcStr>,
+  /// The `always_on`  simple attribute models always-on cells or signal pins. Specify the attribute at the cell level to determine whether a cell is an always-on cell. Specify the attribute at the pin level to determine whether a pin is an always-on signal pin.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=100.73&end=100.75
+  /// ">Reference-Instance</a>
+  #[liberty(simple(type = Option))]
+  pub always_on: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -262,8 +268,41 @@ pub struct Cell {
   /// ">Reference</a>
   #[liberty(complex(type=Option))]
   pub input_voltage_range: Option<(NotNan<f64>, NotNan<f64>)>,
+  /// The `input_voltage_range`  and `output_voltage_range`  attributes
+  /// should always be defined together.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=122.7&end=122.23
+  /// ">Reference</a>
   #[liberty(complex(type=Option))]
   pub output_voltage_range: Option<(NotNan<f64>, NotNan<f64>)>,
+  /// Use the pin_opposite attribute to describe functionally opposite (logically inverse) groups
+  /// of input or output pins.
+  /// Syntax
+  ///
+  /// ``` text
+  /// pin_opposite ("name_list1", "name_list2") ;
+  /// ```
+  ///
+  /// + `name_list1`: A name_list of output pins requires the supplied output values to be opposite.
+  /// + `name_list2`: A name_list of input pins requires the supplied input values to be opposite.
+  ///
+  /// In the following example, pins IP and OP are logically inverse.
+  /// ``` text
+  /// pin_opposite ("IP", "OP") ;
+  /// ```
+  /// The pin_opposite attribute also incorporates the functionality of the `pin_equal` complex
+  /// attribute.
+  ///
+  /// In the following example, Q1, Q2, and Q3 are equal; QB1 and QB2 are equal; and the pins
+  /// in the first group are opposite of the pins in the second group.
+  /// ``` text
+  /// pin_opposite ("Q1 Q2 Q3", "QB1 QB2") ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=124.9&end=124.22
+  /// ">Reference</a>
+  #[liberty(complex(type=Option))]
+  pub pin_opposite: Option<PinOpposite>,
   #[liberty(group(type=Set))]
   pub pg_pin: GroupSet<PgPin>,
   #[liberty(group(type=Set))]
@@ -330,6 +369,33 @@ impl GroupFn for TestCell {}
 #[cfg(test)]
 mod test {
   use super::Cell;
+  /// In the following example, pins IP and OP are logically inverse.
+  /// ``` text
+  /// pin_opposite ("IP", "OP") ;
+  /// ```
+  /// The `pin_opposite` attribute also incorporates the functionality of the `pin_equal` complex
+  /// attribute.
+  ///
+  /// In the following example, Q1, Q2, and Q3 are equal; QB1 and QB2 are equal; and the pins
+  /// in the first group are opposite of the pins in the second group.
+  /// ``` text
+  /// pin_opposite ("Q1 Q2 Q3", "QB1 QB2") ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=124.9&end=124.22
+  /// ">Reference</a>
+  #[test]
+  fn example_pin_opposite() {
+    let cell = crate::ast::test_parse_fmt::<Cell>(
+      r#"(test) {
+        pin_opposite ("Q1 Q2 Q3", "QB1 QB2") ;
+      }"#,
+      r#"
+liberty_db::cell::Cell (test) {
+| pin_opposite ("Q1 Q2 Q3", "QB1 QB2");
+}"#,
+    );
+  }
   /// Example 23 A multibit register containing four rising-edge-triggered D flip-flops
   /// with clear  and preset is shown in Figure 1 and Example 23
   /// <a name ="reference_link" href="
@@ -674,8 +740,7 @@ liberty_db::cell::Cell (latch4) {
   #[test]
   fn example_pll() {
     let cell = crate::ast::test_parse_fmt::<Cell>(
-      r#"
-    (my_pll) {
+      r#"(my_pll) {
         is_pll_cell : true;
         pin( REFCLK ) {
             direction : input;
@@ -726,7 +791,58 @@ liberty_db::cell::Cell (latch4) {
             }
         }
     }"#,
-      r#""#,
+      r#"
+liberty_db::cell::Cell (my_pll) {
+| is_pll_cell : true;
+| pin (FBKCLK) {
+| | direction : input;
+| | is_pll_feedback_pin : true;
+| }
+| pin (OUTCLK1) {
+| | direction : output;
+| | is_pll_output_pin : true;
+| | timing () {
+| | | related_pin : REFCLK;
+| | | timing_sense : positive_unate;
+| | | timing_type : combinational_fall;
+| | | cell_fall (scalar) {
+| | | | values ("0.0");
+| | | }
+| | }
+| | timing () {
+| | | related_pin : REFCLK;
+| | | timing_sense : positive_unate;
+| | | timing_type : combinational_rise;
+| | | cell_rise (scalar) {
+| | | | values ("0.0");
+| | | }
+| | }
+| }
+| pin (OUTCLK2) {
+| | direction : output;
+| | is_pll_output_pin : true;
+| | timing () {
+| | | related_pin : REFCLK;
+| | | timing_sense : positive_unate;
+| | | timing_type : combinational_fall;
+| | | cell_fall (scalar) {
+| | | | values ("0.0");
+| | | }
+| | }
+| | timing () {
+| | | related_pin : REFCLK;
+| | | timing_sense : positive_unate;
+| | | timing_type : combinational_rise;
+| | | cell_rise (scalar) {
+| | | | values ("0.0");
+| | | }
+| | }
+| }
+| pin (REFCLK) {
+| | direction : input;
+| | is_pll_reference_pin : true;
+| }
+}"#,
     );
   }
   /// Example 28 a multibit register containing four high-enable D latches with the clear  attribute.
@@ -977,7 +1093,6 @@ liberty_db::cell::Cell (DLT2) {
 | | }
 | | timing () {
 | | | related_pin : D;
-| | | timing_type : combinational;
 | | | cell_fall (scalar) {
 | | | | values ("2.0");
 | | | }
@@ -1018,7 +1133,6 @@ liberty_db::cell::Cell (DLT2) {
 | | }
 | | timing () {
 | | | related_pin : D;
-| | | timing_type : combinational;
 | | | cell_fall (scalar) {
 | | | | values ("2.0");
 | | | }

@@ -759,9 +759,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.727976;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.729727;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.604137, 0.776885);
 | | | rise_capacitance_range (0.600471, 0.777821);
 | | | internal_power () {
@@ -794,9 +794,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.574034;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.560655;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.503784, 0.704269);
 | | | rise_capacitance_range (0.483603, 0.691463);
 | | | internal_power () {
@@ -1024,9 +1024,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.713257;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.716068;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.583556, 0.774249);
 | | | rise_capacitance_range (0.578286, 0.77671);
 | | | internal_power () {
@@ -1059,9 +1059,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.569794;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.555158;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.50274, 0.70739);
 | | | rise_capacitance_range (0.487643, 0.694665);
 | | | internal_power () {
@@ -1289,9 +1289,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.693655;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.697998;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.557877, 0.774639);
 | | | rise_capacitance_range (0.554017, 0.77802);
 | | | internal_power () {
@@ -1324,9 +1324,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.562641;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.547707;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.501978, 0.715791);
 | | | rise_capacitance_range (0.484545, 0.696733);
 | | | internal_power () {
@@ -1554,9 +1554,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.667649;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.673798;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.534464, 0.778202);
 | | | rise_capacitance_range (0.534011, 0.776352);
 | | | internal_power () {
@@ -1589,9 +1589,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.550848;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.538177;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.499323, 0.714271);
 | | | rise_capacitance_range (0.483479, 0.696639);
 | | | internal_power () {
@@ -1823,9 +1823,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.691588;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.663499;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.542961, 0.760956);
 | | | rise_capacitance_range (0.509129, 0.760495);
 | | | internal_power () {
@@ -1858,9 +1858,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.986497;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.903589;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.861077, 1.15111);
 | | | rise_capacitance_range (0.830405, 1.132838);
 | | | internal_power () {
@@ -2092,9 +2092,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.856078;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.83386;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.757923, 0.909499);
 | | | rise_capacitance_range (0.732346, 0.911126);
 | | | internal_power () {
@@ -2127,9 +2127,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 1.194413;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 1.167272;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (1.023819, 1.4403);
 | | | rise_capacitance_range (0.995309, 1.421643);
 | | | internal_power () {
@@ -2361,9 +2361,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.872945;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.852951;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.763769, 0.943449);
 | | | rise_capacitance_range (0.738792, 0.944378);
 | | | internal_power () {
@@ -2396,9 +2396,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 1.187218;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 1.159877;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (1.021055, 1.427223);
 | | | rise_capacitance_range (0.992204, 1.41324);
 | | | internal_power () {
@@ -2630,9 +2630,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.837739;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.806776;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.765837, 0.89041);
 | | | rise_capacitance_range (0.741048, 0.839947);
 | | | internal_power () {
@@ -2665,9 +2665,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 1.202089;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 1.174793;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (1.035001, 1.454011);
 | | | rise_capacitance_range (1.002952, 1.431777);
 | | | internal_power () {
@@ -2895,9 +2895,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.540393;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.531291;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.46098, 0.573139);
 | | | rise_capacitance_range (0.449617, 0.570854);
 | | | internal_power () {
@@ -2930,9 +2930,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.511922;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.515777;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.417114, 0.572644);
 | | | rise_capacitance_range (0.415226, 0.574609);
 | | | internal_power () {
@@ -3160,9 +3160,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.540988;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.534587;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.461379, 0.572814);
 | | | rise_capacitance_range (0.453194, 0.572264);
 | | | internal_power () {
@@ -3195,9 +3195,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.50881;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.512764;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.412171, 0.583315);
 | | | rise_capacitance_range (0.411673, 0.584899);
 | | | internal_power () {
@@ -3425,9 +3425,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.541641;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.534358;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.461646, 0.573055);
 | | | rise_capacitance_range (0.453695, 0.572693);
 | | | internal_power () {
@@ -3460,9 +3460,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.498055;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.501395;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.405714, 0.576176);
 | | | rise_capacitance_range (0.406311, 0.577922);
 | | | internal_power () {
@@ -3690,9 +3690,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.541444;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.534039;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.460602, 0.573814);
 | | | rise_capacitance_range (0.455116, 0.571505);
 | | | internal_power () {
@@ -3725,9 +3725,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.488474;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.491798;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.399878, 0.577026);
 | | | rise_capacitance_range (0.40137, 0.578646);
 | | | internal_power () {
@@ -3959,9 +3959,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.893132;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.86951;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.763959, 0.957101);
 | | | rise_capacitance_range (0.735538, 0.956769);
 | | | internal_power () {
@@ -3994,9 +3994,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.477762;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.473156;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.39625, 0.519845);
 | | | rise_capacitance_range (0.388483, 0.518401);
 | | | internal_power () {
@@ -4228,9 +4228,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.855911;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.837276;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.746397, 0.920625);
 | | | rise_capacitance_range (0.721716, 0.923455);
 | | | internal_power () {
@@ -4263,9 +4263,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.481982;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.472892;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.409466, 0.512849);
 | | | rise_capacitance_range (0.401024, 0.512755);
 | | | internal_power () {
@@ -4497,9 +4497,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.873931;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.854009;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.751236, 0.95223);
 | | | rise_capacitance_range (0.726877, 0.953814);
 | | | internal_power () {
@@ -4532,9 +4532,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.481666;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.472427;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.409271, 0.513489);
 | | | rise_capacitance_range (0.400788, 0.512853);
 | | | internal_power () {
@@ -4766,9 +4766,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.832749;
 | | | fanout_load : 0.095;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.812826;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.755758, 0.870016);
 | | | rise_capacitance_range (0.731235, 0.855748);
 | | | internal_power () {
@@ -4801,9 +4801,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.475218;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDL;
+| | | level_shifter_enable_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.46565;
-| | | level_shifter_enable_pin : true;
 | | | fall_capacitance_range (0.401614, 0.504782);
 | | | rise_capacitance_range (0.392971, 0.502627);
 | | | internal_power () {
@@ -5023,9 +5023,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.397007;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.389834;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.340123, 0.426901);
 | | | rise_capacitance_range (0.331071, 0.428591);
 | | }
@@ -5149,9 +5149,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.562858;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.547917;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.472535, 0.605743);
 | | | rise_capacitance_range (0.452325, 0.60639);
 | | }
@@ -5275,9 +5275,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.622347;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.60529;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.512105, 0.685609);
 | | | rise_capacitance_range (0.491509, 0.683629);
 | | }
@@ -5401,9 +5401,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 2.345652;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 2.269405;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (1.961081, 2.504993);
 | | | rise_capacitance_range (1.814225, 2.501787);
 | | }
@@ -5531,9 +5531,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.648725;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.659638;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.547752, 0.737868);
 | | | rise_capacitance_range (0.556774, 0.738314);
 | | }
@@ -5661,9 +5661,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.656525;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.672033;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.550184, 0.761304);
 | | | rise_capacitance_range (0.558521, 0.762545);
 | | }
@@ -5791,9 +5791,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.678759;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.690721;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.588291, 0.786204);
 | | | rise_capacitance_range (0.596353, 0.75461);
 | | }
@@ -5921,9 +5921,9 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | fall_capacitance : 0.372779;
 | | | fanout_load : 0.077;
 | | | input_signal_level : VDDH;
+| | | level_shifter_data_pin : true;
 | | | max_transition : 1.024;
 | | | rise_capacitance : 0.379434;
-| | | level_shifter_data_pin : true;
 | | | fall_capacitance_range (0.307409, 0.411562);
 | | | rise_capacitance_range (0.314738, 0.412166);
 | | }

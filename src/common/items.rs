@@ -156,8 +156,8 @@ impl fmt::Display for WordSet {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self.inner.len() {
       0 => Ok(()),
-      1 => f.write_str(self.inner.iter().next().unwrap().as_str()),
-      _ => join_fmt(self.inner.iter(), f, |s, ff| ff.write_str(s.as_str()), " "),
+      1 => write!(f, "{}", self.inner.iter().next().unwrap()),
+      _ => join_fmt(self.inner.iter().sorted(), f, |s, ff| ff.write_str(s.as_str()), " "),
     }
   }
 }
