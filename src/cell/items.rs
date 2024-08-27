@@ -282,7 +282,7 @@ mod test_statetable {
   use super::*;
   #[test]
   fn statetable_test() {
-    _ = crate::ast::test_parse::<Statetable>(
+    _ = crate::ast::test_parse_fmt::<Statetable>(
       r#"(" CLK EN SE",ENL) {
         table : "	H   L  L : - : L ,\
         H   L  H : - : H ,\
@@ -291,6 +291,14 @@ mod test_statetable {
         L   -  - : - : N ";
     }
   "#,
+      r#"
+liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
+| table : "H   L  L : - : L ,\
+|          H   L  H : - : H ,\
+|          H   H  L : - : H ,\
+|          H   H  H : - : H ,\
+|          L   -  - : - : N";
+}"#,
     );
   }
 }

@@ -354,24 +354,3 @@ impl ComplexAttri for PropagatingCcb {
       })
   }
 }
-
-#[cfg(test)]
-mod test {
-  use super::*;
-  #[test]
-  fn parse_file() -> anyhow::Result<()> {
-    use std::fs::File;
-    use std::io::{BufWriter, Write};
-    let filepath = "tests/tech/ccsn.lib";
-    let data = std::fs::read_to_string(filepath).expect("Failed to open file.");
-    match crate::library::Library::parse_lib(&data) {
-      Ok(library) => {
-        let file = File::create("output.lib")?;
-        let mut writer = BufWriter::new(file);
-        write!(&mut writer, "{library}")?;
-      }
-      Err(e) => panic!("[ERROR] {e:?}"),
-    }
-    Ok(())
-  }
-}

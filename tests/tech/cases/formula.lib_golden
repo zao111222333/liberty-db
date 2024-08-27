@@ -1,0 +1,23 @@
+
+liberty_db::library::Library (some) {
+| technology (cmos);
+| delay_model : table_lookup;
+| time_unit : 1ns;
+| voltage_unit : 1V;
+| leakage_power_unit : ;
+| input_voltage (cmos_schmitt) {
+| | vil : 0.3 * VDD ;
+| | vih : 0.7 * VDD ;
+| | vimin : -0.5 ;
+| | vimax : VDD + 0.5 ;
+| }
+| slew_upper_threshold_pct_rise : 80.0;
+| slew_lower_threshold_pct_rise : 20.0;
+| slew_derate_from_library : 1.0;
+| slew_lower_threshold_pct_fall : 20.0;
+| slew_upper_threshold_pct_fall : 80.0;
+| input_threshold_pct_fall : 50.0;
+| input_threshold_pct_rise : 50.0;
+| output_threshold_pct_rise : 50.0;
+| output_threshold_pct_fall : 50.0;
+}

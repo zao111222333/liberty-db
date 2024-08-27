@@ -16,3 +16,5 @@ criterion = "0.3"
 liberty-io = "0.0.2"
 libertyparse = "0.3"
 anyhow = "1.0.80"
+similar = { version = "2.6.0", features = ["inline"]}
+console = "0.15.8"

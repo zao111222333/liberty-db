@@ -119,6 +119,7 @@
     clippy::cast_possible_truncation,
     clippy::as_conversions,
     clippy::needless_raw_string_hashes,
+    clippy::arithmetic_side_effects,
   )
 )]
 
@@ -156,4 +157,4 @@ pub mod ast;
 /// CCSN relative attributes
 pub mod ccsn;
 mod types;
-mod util;
+pub mod util;

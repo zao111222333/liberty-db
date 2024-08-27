@@ -71,7 +71,10 @@ num-traits = "0.2.19"
 # mexprp = "0.3.1"
 
 [dev-dependencies]
-anyhow = "1.0.80"
+similar = { version = "2.6.0", features = ["inline"]}
+console = "0.15.8"
+
+# anyhow = "1.0.80"
 
 # [profile.dev.build-override]
 # opt-level = 3

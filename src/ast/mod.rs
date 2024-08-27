@@ -421,6 +421,7 @@ pub fn test_parse<G: GroupAttri + core::fmt::Debug>(input: &str) -> G {
   println!("{wrapper}");
   wrapper.inner
 }
+
 #[cfg(test)]
 #[inline]
 pub fn test_parse_fmt<G: GroupAttri + core::fmt::Debug>(
@@ -428,10 +429,9 @@ pub fn test_parse_fmt<G: GroupAttri + core::fmt::Debug>(
   fmt_want: &str,
 ) -> G {
   let wrapper = input.parse::<TestWrapper<G>>().expect("Group parse failed");
-  println!("{:?}", wrapper.inner);
   let fmt_str = wrapper.to_string();
   println!("{fmt_str}");
-  assert_eq!(fmt_want, fmt_str, "Group fmt assert");
+  crate::util::text_diff(fmt_want, fmt_str.as_str());
   wrapper.inner
 }
 
