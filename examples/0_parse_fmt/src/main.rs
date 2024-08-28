@@ -58,8 +58,8 @@ fn main() {
       library.comments.this.push("line3".into());
       library.comments.time_unit.push("line4\nline5".into());
       library.comments.time_unit.push("line6".into());
-      println!("{}", library);
+      println!("{library}");
     }
-    Err(e) => panic!("{:#?}", e),
+    Err(e) => panic!("{e:#?}"),
   }
 }

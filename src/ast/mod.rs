@@ -17,7 +17,10 @@ pub use fmt::{
 use itertools::Itertools;
 use nom::{error::Error, IResult};
 use ordered_float::{NotNan, ParseNotNanError};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
+
+const DEFINED_COMMENT: &str = " /* user defined attribute */";
+
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
@@ -106,9 +109,12 @@ pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
     key: &ArcStr,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    v.iter().try_for_each(|res_u| match res_u {
-      Ok(u) => SimpleAttri::fmt_liberty(u, key, f),
-      Err(u) => Format::liberty(u, key, f),
+    v.iter().try_for_each(|res_u| {
+      match res_u {
+        Ok(u) => SimpleAttri::fmt_liberty(u, key, f),
+        Err(u) => SimpleAttri::fmt_liberty(u, key, f),
+      }
+      .and(write!(f, "{DEFINED_COMMENT}"))
     })
   }
   attributes.iter().sorted().try_for_each(|(key, attri)| match attri {
@@ -147,40 +153,145 @@ pub(crate) fn attributs_set_undefined_complex(
     _ = attri_map.insert(ArcStr::from(key), AttriValues::Complex(vec![undefined]));
   }
 }
+#[allow(clippy::too_many_lines)]
 #[inline]
 pub(crate) fn attributs_set_undefined_attri(
   attri_map: &mut Attributes,
   key: &str,
+  group_name: &str,
+  scope: &ParseScope,
   undefined: UndefinedAttriValue,
 ) {
-  if let Some(value) = attri_map.get_mut(key) {
-    match (value, undefined) {
-      (AttriValues::Simple(SimpleDefined::String(v)), UndefinedAttriValue::Simple(u)) => {
-        v.push(u);
-      }
-      (AttriValues::Complex(v), UndefinedAttriValue::Complex(u)) => {
-        v.push(u);
-      }
-      (AttriValues::Group(v), UndefinedAttriValue::Group(u)) => {
-        v.push(u);
-      }
-      (got, want) => {
-        log::error!("Key={key}, the old undefined attribute do NOT meet new one");
+  match scope.define_map.get(group_name).and_then(|m| m.get(key)) {
+    None => {
+      log::warn!("Line={}; undefined {}", scope.line_num, key);
+      if let Some(value) = attri_map.get_mut(key) {
+        match (value, undefined) {
+          (
+            AttriValues::Simple(SimpleDefined::String(v)),
+            UndefinedAttriValue::Simple(u),
+          ) => {
+            v.push(u);
+          }
+          (AttriValues::Complex(v), UndefinedAttriValue::Complex(u)) => {
+            v.push(u);
+          }
+          (AttriValues::Group(v), UndefinedAttriValue::Group(u)) => {
+            v.push(u);
+          }
+          (got, want) => {
+            log::error!(
+              "Line={}; Key={key}, the old undefined attribute do NOT meet new one",
+              scope.line_num
+            );
+          }
+        }
+      } else {
+        _ = attri_map.insert(
+          ArcStr::from(key),
+          match undefined {
+            UndefinedAttriValue::Simple(u) => {
+              AttriValues::Simple(SimpleDefined::String(vec![u]))
+            }
+            UndefinedAttriValue::Complex(u) => AttriValues::Complex(vec![u]),
+            UndefinedAttriValue::Group(u) => AttriValues::Group(vec![u]),
+          },
+        );
       }
     }
-  } else {
-    _ = attri_map.insert(
-      ArcStr::from(key),
-      match undefined {
-        UndefinedAttriValue::Simple(u) => {
-          AttriValues::Simple(SimpleDefined::String(vec![u]))
+    Some(DefinedType::Simple(simple_type)) => {
+      if let UndefinedAttriValue::Simple(u) = undefined {
+        if let Some(value) = attri_map.get_mut(key) {
+          match simple_type {
+            AttributeType::Boolean => {
+              if let AttriValues::Simple(SimpleDefined::Boolean(v)) = value {
+                v.push(u.parse().map_or(Err(u), Ok));
+              } else {
+                log::error!(
+                  "Line={}; Key={key}, the old attribute do NOT meet new one",
+                  scope.line_num
+                );
+              }
+            }
+            AttributeType::String => {
+              if let AttriValues::Simple(SimpleDefined::String(v)) = value {
+                v.push(u);
+              } else {
+                log::error!(
+                  "Line={}; Key={key}, the old attribute do NOT meet new one",
+                  scope.line_num
+                );
+              }
+            }
+            AttributeType::Integer => {
+              if let AttriValues::Simple(SimpleDefined::Integer(v)) = value {
+                v.push(u.parse().map_or(Err(u), Ok));
+              } else {
+                log::error!(
+                  "Line={}; Key={key}, the old attribute do NOT meet new one",
+                  scope.line_num
+                );
+              }
+            }
+            AttributeType::Float => {
+              if let AttriValues::Simple(SimpleDefined::Float(v)) = value {
+                v.push(u.parse().map_or(Err(u), Ok));
+              } else {
+                log::error!(
+                  "Line={}; Key={key}, the old attribute do NOT meet new one",
+                  scope.line_num
+                );
+              }
+            }
+          }
+        } else {
+          _ = attri_map.insert(
+            ArcStr::from(key),
+            match simple_type {
+              AttributeType::Boolean => {
+                AttriValues::Simple(SimpleDefined::Boolean(vec![u
+                  .parse()
+                  .map_or(Err(u), Ok)]))
+              }
+              AttributeType::String => {
+                AttriValues::Simple(SimpleDefined::String(vec![u]))
+              }
+              AttributeType::Integer => {
+                AttriValues::Simple(SimpleDefined::Integer(vec![u
+                  .parse()
+                  .map_or(Err(u), Ok)]))
+              }
+              AttributeType::Float => AttriValues::Simple(SimpleDefined::Float(vec![u
+                .parse()
+                .map_or(Err(u), Ok)])),
+            },
+          );
         }
-        UndefinedAttriValue::Complex(u) => AttriValues::Complex(vec![u]),
-        UndefinedAttriValue::Group(u) => AttriValues::Group(vec![u]),
-      },
-    );
+      } else {
+        log::error!("Line={}; Key={key}, `defined` got wrong type", scope.line_num);
+      }
+    }
+    Some(DefinedType::Group) => {
+      if let UndefinedAttriValue::Group(u) = undefined {
+        if let Some(value) = attri_map.get_mut(key) {
+          if let AttriValues::Group(v) = value {
+            v.push(u);
+          } else {
+            log::error!(
+              "Line={}; Key={key}, the old attribute do NOT meet new one",
+              scope.line_num
+            );
+          }
+        } else {
+          _ = attri_map.insert(ArcStr::from(key), AttriValues::Group(vec![u]));
+        }
+      } else {
+        log::error!("Line={}; Key={key}, `defined_group` got wrong type", scope.line_num);
+      }
+    }
   }
 }
+
 /// Error for `LinkedGroup`
 #[derive(Debug)]
 #[derive(thiserror::Error)]
@@ -206,11 +317,16 @@ impl PartialEq for LinkError {
   }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DefinedType {
+  Simple(AttributeType),
+  Group,
+}
+
 #[derive(Debug, Default)]
 pub struct ParseScope {
   pub line_num: usize,
-  pub define_simple: HashMap<ArcStr, HashMap<ArcStr, AttributeType>>,
-  pub define_group: HashMap<ArcStr, HashSet<ArcStr>>,
+  pub define_map: HashMap<ArcStr, HashMap<ArcStr, DefinedType>>,
   pub compact_lut_template_index3_len: usize,
 }
 
@@ -261,45 +377,45 @@ pub enum DefinedAttribute {
   Float(Vec<NotNan<f64>>),
 }
 
-impl SimpleDefined {
-  #[inline]
-  pub(crate) fn parse_set<'a>(
-    &mut self,
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> IResult<&'a str, (), Error<&'a str>> {
-    #[inline]
-    fn nom_parse_simple<'a, T: SimpleAttri>(
-      i: &'a str,
-      scope: &mut ParseScope,
-      v: &mut Vec<Result<T, ArcStr>>,
-    ) -> IResult<&'a str, (), Error<&'a str>> {
-      match <T as SimpleAttri>::nom_parse(i, scope) {
-        Ok((input, Ok(res))) => {
-          v.push(Ok(res));
-          Ok((input, ()))
-        }
-        Ok((input, Err(s))) => {
-          v.push(Err(s));
-          Ok((input, ()))
-        }
-        Err(e) => Err(e),
-      }
-    }
-    match self {
-      Self::Boolean(v) => nom_parse_simple(i, scope, v),
-      Self::Integer(v) => nom_parse_simple(i, scope, v),
-      Self::Float(v) => nom_parse_simple(i, scope, v),
-      Self::String(v) => match <ArcStr as SimpleAttri>::nom_parse(i, scope) {
-        Ok((input, Ok(res) | Err(res))) => {
-          v.push(res);
-          Ok((input, ()))
-        }
-        Err(e) => Err(e),
-      },
-    }
-  }
-}
+// impl SimpleDefined {
+//   #[inline]
+//   pub(crate) fn parse_set<'a>(
+//     &mut self,
+//     i: &'a str,
+//     scope: &mut ParseScope,
+//   ) -> IResult<&'a str, (), Error<&'a str>> {
+//     #[inline]
+//     fn nom_parse_simple<'a, T: SimpleAttri>(
+//       i: &'a str,
+//       scope: &mut ParseScope,
+//       v: &mut Vec<Result<T, ArcStr>>,
+//     ) -> IResult<&'a str, (), Error<&'a str>> {
+//       match <T as SimpleAttri>::nom_parse(i, scope) {
+//         Ok((input, Ok(res))) => {
+//           v.push(Ok(res));
+//           Ok((input, ()))
+//         }
+//         Ok((input, Err(s))) => {
+//           v.push(Err(s));
+//           Ok((input, ()))
+//         }
+//         Err(e) => Err(e),
+//       }
+//     }
+//     match self {
+//       Self::Boolean(v) => nom_parse_simple(i, scope, v),
+//       Self::Integer(v) => nom_parse_simple(i, scope, v),
+//       Self::Float(v) => nom_parse_simple(i, scope, v),
+//       Self::String(v) => match <ArcStr as SimpleAttri>::nom_parse(i, scope) {
+//         Ok((input, Ok(res) | Err(res))) => {
+//           v.push(res);
+//           Ok((input, ()))
+//         }
+//         Err(e) => Err(e),
+//       },
+//     }
+//   }
+// }
 
 pub(crate) type SimpleParseRes<'a, T> =
   IResult<&'a str, Result<T, ArcStr>, Error<&'a str>>;
@@ -476,6 +592,7 @@ pub trait GroupAttri: Sized {
   /// `nom_parse`, will be implemented by macros
   fn nom_parse<'a>(
     i: &'a str,
+    group_name: &str,
     scope: &mut ParseScope,
   ) -> IResult<&'a str, Result<Self, IdError>, Error<&'a str>>;
   /// `fmt_liberty`
@@ -584,7 +701,7 @@ impl<G: GroupAttri> FromStr for TestWrapper<G> {
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     let mut scope = ParseScope::default();
-    match G::nom_parse(s, &mut scope) {
+    match G::nom_parse(s, "", &mut scope) {
       Ok((_, Ok(inner))) => Ok(Self { inner, scope }),
       Ok((_, Err(e))) => Err(format!("{e:#?}")),
       Err(e) => Err(format!("{e:#?}")),
@@ -742,7 +859,7 @@ impl Format for SimpleWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    SimpleAttri::fmt_liberty(self, key, f)
+    SimpleAttri::fmt_liberty(self, key, f).and(write!(f, "{DEFINED_COMMENT}"))
   }
 }
 
@@ -753,7 +870,7 @@ impl Format for ComplexWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    ComplexAttri::fmt_liberty(&self.0, key, f)
+    ComplexAttri::fmt_liberty(&self.0, key, f).and(write!(f, "{DEFINED_COMMENT}"))
   }
 }
 
@@ -772,7 +889,7 @@ impl Format for GroupWrapper {
       |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
       ", ",
     )?;
-    write!(f, ") {{")?;
+    write!(f, ") {{ {DEFINED_COMMENT}")?;
     f.indent(1);
     attributs_fmt_liberty(&self.attri_map, f)?;
     f.dedent(1);

@@ -5,11 +5,6 @@ liberty_db::library::Library (gscl45nm) {
 | nom_process : 1.0;
 | nom_temperature : 27.0;
 | nom_voltage : 1.1;
-| operating_conditions (typical) {
-| | process : 1.0;
-| | temperature : 27.0;
-| | voltage : 1.1;
-| }
 | default_operating_conditions : typical;
 | time_unit : 1ns;
 | capacitive_load_unit (1.0, pf);
@@ -26,6 +21,12 @@ liberty_db::library::Library (gscl45nm) {
 | input_threshold_pct_rise : 50.0;
 | output_threshold_pct_rise : 50.0;
 | output_threshold_pct_fall : 50.0;
+| in_place_swap_mode : match_footprint;
+| operating_conditions (typical) {
+| | process : 1.0;
+| | temperature : 27.0;
+| | voltage : 1.1;
+| }
 | power_lut_template (energy_template_4x5) {
 | | variable_1 : total_output_net_capacitance;
 | | variable_2 : input_transition_time;
@@ -96,7 +97,6 @@ liberty_db::library::Library (gscl45nm) {
 | | index_1 ("1000.0, 1001.0, 1002.0");
 | | index_2 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0, 1005.0");
 | }
-| in_place_swap_mode : match_footprint;
 | cell (DFFNEGX1) {
 | | area : 7.9781;
 | | cell_leakage_power : 50.8627;

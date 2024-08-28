@@ -29,7 +29,7 @@ pub(super) fn as_sdf_str(expr: &Expr) -> String {
     }),
     Expr::Not(e) => match e.as_ref() {
       Expr::Variable(s) => {
-        format!("{} == 1'b0", s.clone())
+        format!("{s} == 1'b0")
       }
       _ => unreachable!(),
     },

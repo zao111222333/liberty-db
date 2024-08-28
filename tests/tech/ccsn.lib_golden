@@ -7,11 +7,6 @@ liberty_db::library::Library (ccsn) {
 | nom_process : 1.0;
 | nom_temperature : 0.0;
 | nom_voltage : 0.88;
-| operating_conditions (PVT_0P88V_0C) {
-| | process : 1.0;
-| | temperature : 0.0;
-| | voltage : 0.88;
-| }
 | default_operating_conditions : PVT_0P88V_0C;
 | define (char_when, receiver_capacitance, string);
 | define (is_propagating, receiver_capacitance, string);
@@ -39,6 +34,12 @@ liberty_db::library::Library (ccsn) {
 | input_threshold_pct_rise : 50.0;
 | output_threshold_pct_rise : 50.0;
 | output_threshold_pct_fall : 50.0;
+| in_place_swap_mode : match_footprint;
+| operating_conditions (PVT_0P88V_0C) {
+| | process : 1.0;
+| | temperature : 0.0;
+| | voltage : 0.88;
+| }
 | output_current_template (ccs_template) {
 | | variable_1 : input_net_transition;
 | | variable_2 : total_output_net_capacitance;
@@ -89,7 +90,6 @@ liberty_db::library::Library (ccsn) {
 | | variable_1 : input_net_transition;
 | | index_1 ("0.0018, 0.0086, 0.0223, 0.0497, 0.1045, 0.2141, 0.4332, 0.8715");
 | }
-| in_place_swap_mode : match_footprint;
 | cell (AO21D1BWP30P140) {
 | | area : 0.0;
 | | cell_leakage_power : 0.0107199;

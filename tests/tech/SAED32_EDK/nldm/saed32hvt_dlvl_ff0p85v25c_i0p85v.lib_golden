@@ -7,12 +7,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | nom_process : 1.01;
 | nom_temperature : 25.0;
 | nom_voltage : 0.85;
-| operating_conditions (dlvl_ff0p85v25c_i0p85v) {
-| | process : 1.01;
-| | temperature : 25.0;
-| | tree_type : worst_case_tree;
-| | voltage : 0.85;
-| }
 | default_operating_conditions : dlvl_ff0p85v25c_i0p85v;
 | default_threshold_voltage_group : saed32cell_hvt;
 | define (def_sim_opt, library, string);
@@ -39,12 +33,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | voltage_map (VDDH, 0.85);
 | voltage_map (VDDL, 0.85);
 | voltage_map (VSS, 0.0);
-| output_voltage (DC_0) {
-| | vol : 0.0425;
-| | voh : 0.8075;
-| | vomin : 0;
-| | vomax : VDDL;
-| }
 | slew_upper_threshold_pct_rise : 80.0;
 | slew_lower_threshold_pct_rise : 20.0;
 | slew_derate_from_library : 1.0;
@@ -54,6 +42,22 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | input_threshold_pct_rise : 50.0;
 | output_threshold_pct_rise : 50.0;
 | output_threshold_pct_fall : 50.0;
+| default_wire_load : ForQA;
+| def_sim_opt : "POST=1 PROBE POST_VERSION=2001 INGOLD=2 NOMOD NOPAGE NUMDGT=10 MEASDGT=10 LIMPTS=500000 ICSWEEP=0 AUTOSTOP ALTCC=1 RUNLVL=5 ACCURATE=1 ABSVAR=1.000000e-03 RELVAR=1.000000e-02"; /* user defined attribute */
+| driver_model : snps_predriver; /* user defined attribute */
+| simulator : "HSPICE -- C-2009.03-SP1 32-BIT (May 25 2009)"; /* user defined attribute */
+| operating_conditions (dlvl_ff0p85v25c_i0p85v) {
+| | process : 1.01;
+| | temperature : 25.0;
+| | tree_type : worst_case_tree;
+| | voltage : 0.85;
+| }
+| output_voltage (DC_0) {
+| | vol : 0.0425;
+| | voh : 0.8075;
+| | vomin : 0;
+| | vomax : VDDL;
+| }
 | power_lut_template (power_inputs_1) {
 | | variable_1 : input_transition_time;
 | | index_1 ("1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0");
@@ -715,7 +719,6 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | wire_load_selection (predcaps) {
 | | wire_load_from_area (4000000.0, 8000000.0, 8000000);
 | }
-| default_wire_load : ForQA;
 | cell (LSDNENCLSSX1_HVT) {
 | | area : 2.287296;
 | | driver_waveform_rise : preDrv;
@@ -6012,9 +6015,4 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 | | | }
 | | }
 | }
-| /* Undefined attributes from here */
-| def_sim_opt : "POST=1 PROBE POST_VERSION=2001 INGOLD=2 NOMOD NOPAGE NUMDGT=10 MEASDGT=10 LIMPTS=500000 ICSWEEP=0 AUTOSTOP ALTCC=1 RUNLVL=5 ACCURATE=1 ABSVAR=1.000000e-03 RELVAR=1.000000e-02";
-| driver_model : snps_predriver;
-| simulator : "HSPICE -- C-2009.03-SP1 32-BIT (May 25 2009)";
-| /* Undefined attributes end here */
 }

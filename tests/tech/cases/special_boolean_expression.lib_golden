@@ -4,7 +4,6 @@ liberty_db::library::Library (some) {
 | delay_model : table_lookup;
 | time_unit : 1ns;
 | voltage_unit : 1V;
-| leakage_power_unit : ;
 | slew_upper_threshold_pct_rise : 80.0;
 | slew_lower_threshold_pct_rise : 20.0;
 | slew_derate_from_library : 1.0;

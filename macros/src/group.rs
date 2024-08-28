@@ -53,7 +53,7 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let simple_res: _;
-        (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input,scope)?;
+        (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input, scope)?;
         match simple_res {
           Ok(simple) => {
             res.#field_name=simple;
@@ -75,7 +75,7 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,scope)?;
+        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, scope)?;
         match complex_res {
           Ok(complex) => res.#field_name=complex,
           Err((e,undefined)) => {
@@ -97,7 +97,7 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,scope)?;
+        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, scope)?;
         match complex_res {
           Ok(complex) => res.#field_name=Some(complex),
           Err((e,undefined)) => {
@@ -170,7 +170,7 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, scope)?;
+        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, key, scope)?;
         match group_res{
           Ok(group) => {
             res.#field_name.push(group);
@@ -194,7 +194,7 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, scope)?;
+        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, key, scope)?;
         match group_res{
           Ok(group) => {
             if let Some(old) = res.#field_name.replace(
@@ -223,7 +223,7 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, scope)?;
+        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, key, scope)?;
         match group_res{
           Ok(group) => {
             if let Some(old) = res.#field_name{
@@ -268,7 +268,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       parse_fields_type(fields)?;
     let mut attri_comments = quote! {};
     let mut parser_arms = quote! {};
-    let mut write_fields = quote! {};
+    let mut write_simple_complex = quote! {};
+    let mut write_group = quote! {};
     let comments_self = Ident::new("this", Span::call_site());
     for field in fields.into_iter() {
       if let Some(field_name) = &field.ident {
@@ -290,10 +291,20 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
               #parser_arms
               #parser_arm
             };
-            write_fields = quote! {
-              #write_fields
-              #write_field
-            };
+            match arrti_type {
+              AttriType::Simple(_) | AttriType::Complex(_) => {
+                write_simple_complex = quote! {
+                  #write_simple_complex
+                  #write_field
+                }
+              }
+              AttriType::Group(_) => {
+                write_group = quote! {
+                  #write_group
+                  #write_field
+                }
+              }
+            }
           }
         }
       } else {
@@ -375,18 +386,18 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           let indent = f.indentation();
           #write_title
           f.indent(1);
-          #write_fields
+          #write_simple_complex
           if !self.#attributes_name.is_empty(){
-            let indent1 = f.indentation();
-            write!(f,"\n{indent1}/* Undefined attributes from here */")?;
             crate::ast::attributs_fmt_liberty(&self.#attributes_name,f)?;
-            write!(f,"\n{indent1}/* Undefined attributes end here */")?;
           }
+          #write_group
           f.dedent(1);
           write!(f, "\n{indent}}}")
         }
         fn nom_parse<'a>(
-          i: &'a str, scope: &mut crate::ast::ParseScope
+          i: &'a str,
+          group_name: &str,
+          scope: &mut crate::ast::ParseScope,
         ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
           let (mut input,title) = crate::ast::parser::title(i, &mut scope.line_num)?;
           let mut res = Self::default();
@@ -403,10 +414,15 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
                 match key {
                   #parser_arms
                   _ => {
-                    let (new_input,undefined) = crate::ast::parser::undefine(input, &mut scope.line_num)?;
+                    let (new_input,undefined) = crate::ast::parser::undefine(input, key, scope)?;
                     input = new_input;
-                    log::warn!("Line={}; undefined {}", scope.line_num, key);
-                    crate::ast::attributs_set_undefined_attri(&mut res.#attributes_name, key, undefined);
+                    crate::ast::attributs_set_undefined_attri(
+                      &mut res.#attributes_name,
+                      key,
+                      group_name,
+                      scope,
+                      undefined,
+                    );
                   },
                 }
               }

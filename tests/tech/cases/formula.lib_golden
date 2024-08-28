@@ -7,12 +7,6 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 | nom_process : 1.0;
 | nom_temperature : 25.0;
 | nom_voltage : 0.8;
-| operating_conditions (tt0p8v25c) {
-| | process : 1.0;
-| | temperature : 25.0;
-| | tree_type : balanced_tree;
-| | voltage : 0.8;
-| }
 | default_operating_conditions : tt0p8v25c;
 | define_cell_area (bond_pads, pad_slots);
 | define_cell_area (pad_drivers, pad_driver_sites);
@@ -38,6 +32,23 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 | voltage_map (VDDGR, 0.8);
 | voltage_map (VDDSRC, 0.8);
 | voltage_map (VSS, 0.0);
+| slew_upper_threshold_pct_rise : 70.0;
+| slew_lower_threshold_pct_rise : 30.0;
+| slew_derate_from_library : 0.5;
+| slew_lower_threshold_pct_fall : 30.0;
+| slew_upper_threshold_pct_fall : 70.0;
+| input_threshold_pct_fall : 50.0;
+| input_threshold_pct_rise : 50.0;
+| output_threshold_pct_rise : 50.0;
+| output_threshold_pct_fall : 50.0;
+| default_wire_load : ZeroWireload;
+| in_place_swap_mode : match_footprint;
+| operating_conditions (tt0p8v25c) {
+| | process : 1.0;
+| | temperature : 25.0;
+| | tree_type : balanced_tree;
+| | voltage : 0.8;
+| }
 | input_voltage (cmos) {
 | | vil : 0.3 * VDD ;
 | | vih : 0.7 * VDD ;
@@ -110,15 +121,6 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 | | vomin : -0.5 ;
 | | vomax : VDD + 0.5 ;
 | }
-| slew_upper_threshold_pct_rise : 70.0;
-| slew_lower_threshold_pct_rise : 30.0;
-| slew_derate_from_library : 0.5;
-| slew_lower_threshold_pct_fall : 30.0;
-| slew_upper_threshold_pct_fall : 70.0;
-| input_threshold_pct_fall : 50.0;
-| input_threshold_pct_rise : 50.0;
-| output_threshold_pct_rise : 50.0;
-| output_threshold_pct_fall : 50.0;
 | power_lut_template (passive_power_template_7x1) {
 | | variable_1 : input_transition_time;
 | | index_1 ("0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007");
@@ -273,6 +275,4 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 | wire_load_selection (WireAreaForZero) {
 | | wire_load_from_area (0.0, 113034.0, ZeroWireload);
 | }
-| default_wire_load : ZeroWireload;
-| in_place_swap_mode : match_footprint;
 }

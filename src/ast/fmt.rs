@@ -149,20 +149,19 @@ mod test {
       }"#,
       r#"
 liberty_db::common::items::DummyGroup (0) {
-| /* Undefined attributes from here */
-| level (1) {
-| | level (2) {
-| | | level (3) {
-| | | | level (4) {
-| | | | | level (5) {
-| | | | | | level (6) {
-| | | | | | | level (7) {
-| | | | | | | | level (8) {
-| | | | | | | | | level (9) {
-| | | | | | | | | level (10) {
-| | | | | | | | | level (11) {
-| | | | | | | | | level (12) {
-| | | | | | | | | level (13) {
+| level (1) {  /* user defined attribute */
+| | level (2) {  /* user defined attribute */
+| | | level (3) {  /* user defined attribute */
+| | | | level (4) {  /* user defined attribute */
+| | | | | level (5) {  /* user defined attribute */
+| | | | | | level (6) {  /* user defined attribute */
+| | | | | | | level (7) {  /* user defined attribute */
+| | | | | | | | level (8) {  /* user defined attribute */
+| | | | | | | | | level (9) {  /* user defined attribute */
+| | | | | | | | | level (10) {  /* user defined attribute */
+| | | | | | | | | level (11) {  /* user defined attribute */
+| | | | | | | | | level (12) {  /* user defined attribute */
+| | | | | | | | | level (13) {  /* user defined attribute */
 | | | | | | | | | }
 | | | | | | | | | }
 | | | | | | | | | }
@@ -176,7 +175,6 @@ liberty_db::common::items::DummyGroup (0) {
 | | | }
 | | }
 | }
-| /* Undefined attributes end here */
 }"#,
     );
   }
@@ -193,12 +191,10 @@ liberty_db::common::items::DummyGroup (0) {
       }"#,
       r#"
 liberty_db::common::items::DummyGroup () {
-| /* Undefined attributes from here */
-| unknown_complex (1, 2, 3, 4, 5);
-| unknown_complex (1, 2, 3, 4, 5);
-| unknown_complex (1, 2, 3, 4, 5);
-| unknown_complex (1, 2, 3, 4, 5);
-| /* Undefined attributes end here */
+| unknown_complex (1, 2, 3, 4, 5); /* user defined attribute */
+| unknown_complex (1, 2, 3, 4, 5); /* user defined attribute */
+| unknown_complex (1, 2, 3, 4, 5); /* user defined attribute */
+| unknown_complex (1, 2, 3, 4, 5); /* user defined attribute */
 }"#,
     );
   }

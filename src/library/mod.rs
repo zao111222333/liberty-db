@@ -3,6 +3,7 @@
 //! </script>
 
 mod items;
+mod test;
 use crate::{
   ast::{Attributes, DefaultIndentation, GroupComments, GroupFn, ParseScope},
   cell::Cell,
@@ -613,6 +614,7 @@ impl fmt::Display for Library {
 }
 use crate::ast::{parser, GroupAttri, ParserError};
 impl Library {
+  const KEY: &'static str = "library";
   /// Parse `.lib` file as a [Library] struct.
   #[allow(clippy::arithmetic_side_effects)]
   #[inline]
@@ -629,14 +631,17 @@ impl Library {
       Ok(res) => res,
       Err(e) => return Err(ParserError::nom(scope.line_num, e)),
     };
-    if key == "library" {
-      match <Self as GroupAttri>::nom_parse(input2, &mut scope) {
+    if key == Self::KEY {
+      match <Self as GroupAttri>::nom_parse(input2, Self::KEY, &mut scope) {
         Err(e) => Err(ParserError::nom(scope.line_num, e)),
         Ok((_, Err(e))) => Err(ParserError::IdError(scope.line_num, e)),
         Ok((_, Ok(l))) => Ok(l),
       }
     } else {
-      Err(ParserError::Other(scope.line_num, format!("Need key=library, find={key}")))
+      Err(ParserError::Other(
+        scope.line_num,
+        format!("Need key={}, find={key}", Self::KEY),
+      ))
     }
   }
   #[inline]
@@ -646,7 +651,7 @@ impl Library {
   ) -> Result<(), fmt::Error> {
     let ff = &mut crate::ast::CodeFormatter::<'_, fmt::Formatter<'_>, I>::new(f);
     crate::ast::fmt_first_line_comment(&self.comments.this, ff)?;
-    self.fmt_liberty("library", ff)?;
+    self.fmt_liberty(Self::KEY, ff)?;
     writeln!(f)
   }
   /// TODO: Parse `.json` file as a [Library] struct.

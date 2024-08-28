@@ -119,6 +119,7 @@
     clippy::cast_possible_truncation,
     clippy::as_conversions,
     clippy::needless_raw_string_hashes,
+    clippy::indexing_slicing,
     clippy::arithmetic_side_effects,
   )
 )]

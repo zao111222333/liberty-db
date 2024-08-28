@@ -5,8 +5,8 @@
 
 use crate::{
   ast::{
-    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    Indentation, ParseScope, SimpleAttri,
+    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
+    GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
   },
   common::items::Formula,
   expression::logic,
@@ -281,9 +281,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
 | vector (1, "0 0 1");
 | vector (3, "Z 0 1");
 | vector (4, "1 1 0");
-| /* Undefined attributes from here */
-| vector (2, "0 X 9");
-| /* Undefined attributes end here */
+| vector (2, "0 X 9"); /* user defined attribute */
 }"#,
     );
     assert!(sense1.attributes.len() == 1);
@@ -750,15 +748,16 @@ impl ComplexAttri for Define {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
+    // FIXME: avoid clone
     _ = scope
-      .define_simple
+      .define_map
       .entry(group_name.clone())
       .and_modify(|m| {
-        _ = m.insert(attribute_name.clone(), attribute_type);
+        _ = m.insert(attribute_name.clone(), DefinedType::Simple(attribute_type));
       })
       .or_insert({
         let mut m = HashMap::new();
-        _ = m.insert(attribute_name.clone(), attribute_type);
+        _ = m.insert(attribute_name.clone(), DefinedType::Simple(attribute_type));
         m
       });
     Ok(Self { attribute_name, group_name, attribute_type })
@@ -799,7 +798,7 @@ pub struct DefineGroup {
 }
 impl ComplexAttri for DefineGroup {
   #[inline]
-  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let group = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -812,6 +811,18 @@ impl ComplexAttri for DefineGroup {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
+    // FIXME: avoid clone
+    _ = scope
+      .define_map
+      .entry(parent_name.clone())
+      .and_modify(|m| {
+        _ = m.insert(group.clone(), DefinedType::Group);
+      })
+      .or_insert({
+        let mut m = HashMap::new();
+        _ = m.insert(group.clone(), DefinedType::Group);
+        m
+      });
     Ok(Self { group, parent_name })
   }
   #[inline]

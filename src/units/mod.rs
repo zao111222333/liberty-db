@@ -604,6 +604,10 @@ impl Deref for LeakagePowerUnit {
 
 impl SimpleAttri for LeakagePowerUnit {
   #[inline]
+  fn is_set(&self) -> bool {
+    self.ne(&Self::None)
+  }
+  #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,

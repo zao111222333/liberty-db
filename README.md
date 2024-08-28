@@ -7,18 +7,28 @@
 [![liberty-macros](https://shields.io/crates/v/liberty-macros.svg?style=flat-square&label=liberty-macros)](https://crates.io/crates/liberty-macros)
 [![Docs](https://docs.rs/liberty-db/badge.svg)](https://docs.rs/liberty-db)
 
-**Work in progress, unstable**
+## Highlight Features
+
++ All `liberty` datastructure supported, reference to Liberty Version R-2020.09, September 2020
++ Parser & formatter are implemented by static macros, providing a decent preformance
++ Well defined [document](https://docs.rs/liberty-db/latest/liberty_db/library/struct.Library.html)
++ Support `define` `define_group` user-defined attributes
++ Verified with library-complier
 
 ## Usage
 
+This library is implemented in Rust, [get start here](https://doc.rust-lang.org/book/ch01-00-getting-started.html).
+
 ```toml
 [dependencies]
-liberty_db = "0.5"
+liberty_db = "0.6"
 ```
 
-See more in [doc](https://docs.rs/liberty-db)
+See more in [document](https://docs.rs/liberty-db)
 
-## Demo
+## Examples
+
+The examples are in [./examples](https://github.com/zao111222333/liberty-db/tree/master/examples), you can run them with commands:
 
 ``` shell
 # example0
@@ -29,10 +39,10 @@ cargo run --package example1_parse_fmt_file -- tests/tech/cases/ocv.lib
 cargo run --package example2_prune_lib -- tests/tech/cases/ocv.lib
 ```
 
-
 ## Test
 
 ```shell
+cargo test
 cargo test --package liberty-tests --test tests
 ```
 
@@ -60,10 +70,10 @@ cargo test --package liberty-tests --lib -- parser_bench::test_all_lib_files --e
 + `intrinsic_parasitic` group
 + `leakage_current` group
 + `dynamic_current` group
-+ user `define`
 + use PDFJS
 + stream input
 + Linked Group
++ ~~user `define`~~
 + ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~
 + ~~fix missing newline at endding~~
 + ~~recursive parse boolean expression~~

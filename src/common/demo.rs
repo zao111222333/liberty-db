@@ -161,9 +161,7 @@ liberty_db::common::demo::Timing () {
 liberty_db::common::demo::Timing () {
 | values ("-100.0, 2.0, 3.0, 1.0, 2.0, 3.0");
 | t2 : combinational;
-| /* Undefined attributes from here */
-| t1 : ombinational;
-| /* Undefined attributes end here */
+| t1 : ombinational; /* user defined attribute */
 }"#,
     );
   }
@@ -250,10 +248,8 @@ liberty_db::common::demo::Cell (INV) {
 | }
 | pin (Y) {
 | | timing () {
-| | | /* Undefined attributes from here */
-| | | t1 : foo_error;
-| | | test_table (1, 2, 4, 5, 6, 4, 5, 6);
-| | | /* Undefined attributes end here */
+| | | t1 : foo_error; /* user defined attribute */
+| | | test_table (1, 2, 4, 5, 6, 4, 5, 6); /* user defined attribute */
 | | }
 | }
 | statetable ("CLK EN SE", ENL) {
@@ -298,19 +294,17 @@ liberty_db::common::demo::Cell (INV) {
       r#"
 liberty_db::common::demo::Cell (INV) {
 | area : 5.4;
+| undefine_area : 5.4; /* user defined attribute */
+| undefine_pin (C) {  /* user defined attribute */
+| | timing (w) {  /* user defined attribute */
+| | | t1 : combinational; /* user defined attribute */
+| | }
+| }
 | pin (A) {
 | | timing () {
 | | | t2 : combinational;
 | | }
 | }
-| /* Undefined attributes from here */
-| undefine_area : 5.4;
-| undefine_pin (C) {
-| | timing (w) {
-| | | t1 : combinational;
-| | }
-| }
-| /* Undefined attributes end here */
 }"#,
     );
     cell.comments.area.push("xc".into());

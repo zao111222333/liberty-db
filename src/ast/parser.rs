@@ -169,14 +169,15 @@ mod test_space {
 #[inline]
 pub(crate) fn undefine<'a>(
   i: &'a str,
-  line_num: &mut usize,
+  group_name: &str,
+  scope: &mut super::ParseScope,
 ) -> IResult<&'a str, super::UndefinedAttriValue, Error<&'a str>> {
-  let line_num_back = *line_num;
-  if let Ok((input, res)) = simple(i, line_num) {
+  let line_num_back: usize = scope.line_num;
+  if let Ok((input, res)) = simple(i, &mut scope.line_num) {
     return Ok((input, super::UndefinedAttriValue::Simple(ArcStr::from(res))));
   }
-  *line_num = line_num_back;
-  if let Ok((input, res)) = complex(i, line_num) {
+  scope.line_num = line_num_back;
+  if let Ok((input, res)) = complex(i, &mut scope.line_num) {
     return Ok((
       input,
       super::UndefinedAttriValue::Complex(super::ComplexWrapper(
@@ -184,8 +185,8 @@ pub(crate) fn undefine<'a>(
       )),
     ));
   }
-  *line_num = line_num_back;
-  match title(i, line_num) {
+  scope.line_num = line_num_back;
+  match title(i, &mut scope.line_num) {
     Ok((mut input, title)) => {
       let mut res = GroupWrapper {
         title: title.into_iter().map(ArcStr::from).collect(),
@@ -197,20 +198,20 @@ pub(crate) fn undefine<'a>(
             (input, _) = end_group(input)?;
             let (new_input, n) = comment_space_newline(input)?;
             input = new_input;
-            *line_num += n;
+            scope.line_num += n;
             return Ok((input, super::UndefinedAttriValue::Group(res)));
           }
           Err(e) => return Err(e),
           Ok((input1, key)) => {
-            let (new_input, undefined) = undefine(input1, line_num)?;
+            let (new_input, undefined) = undefine(input1, group_name, scope)?;
             input = new_input;
-            // TODO: check
-            // if let super::UndefinedAttriValue::Group(_) = undefined {
-            //   let n: usize;
-            //   (input, n) = comment_space_newline(input)?;
-            //   *line_num += n;
-            // }
-            super::attributs_set_undefined_attri(&mut res.attri_map, key, undefined);
+            super::attributs_set_undefined_attri(
+              &mut res.attri_map,
+              key,
+              group_name,
+              scope,
+              undefined,
+            );
           }
         }
       }
