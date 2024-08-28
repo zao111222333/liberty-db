@@ -7,8 +7,8 @@ use proc_macro2::Ident;
 enum InternalType {
   /// `name`
   Name,
-  /// `undefined`
-  UndefinedAttributeList,
+  /// `attributes`
+  AttributeList,
   /// `comment`
   Comment,
 }
@@ -62,13 +62,13 @@ pub(crate) fn parse_fields_type(
   HashMap<&Ident, AttriType>,
   // Name
   Vec<&syn::Field>,
-  // undefined name
+  // attributes name
   &Ident,
   // comment name
   &Ident,
 )> {
   let mut _name_vec = Vec::new();
-  let mut _undefined_name = None;
+  let mut _attributes_name = None;
   let mut _comments_name = None;
   let mut err_buf = None;
   let attri_type_map: HashMap<&Ident, AttriType> = fields
@@ -81,14 +81,14 @@ pub(crate) fn parse_fields_type(
               _name_vec.push(field);
               None
             }
-            FieldType::Internal(InternalType::UndefinedAttributeList) => {
-              if let Some(name) = &_undefined_name {
+            FieldType::Internal(InternalType::AttributeList) => {
+              if let Some(name) = &_attributes_name {
                 err_buf = Some(syn::Error::new(
                   proc_macro2::Span::call_site(),
-                  format!("duplicated undefined {}.", name),
+                  format!("duplicated attributes {}.", name),
                 ));
               } else {
-                _undefined_name = Some(field_name);
+                _attributes_name = Some(field_name);
               }
               None
             }
@@ -123,29 +123,29 @@ pub(crate) fn parse_fields_type(
   if let Some(e) = err_buf {
     Err(e)
   } else {
-    match (_undefined_name, _comments_name) {
+    match (_attributes_name, _comments_name) {
       (None, None) => Err(syn::Error::new(
         proc_macro2::Span::call_site(),
-        "Can not find undefined & comment".to_string(),
+        "Can not find attributes & comment".to_string(),
       )),
       (None, Some(_)) => Err(syn::Error::new(
         proc_macro2::Span::call_site(),
-        "Can not find undefined".to_string(),
+        "Can not find attributes".to_string(),
       )),
       (Some(_), None) => Err(syn::Error::new(
         proc_macro2::Span::call_site(),
         "Can not find comment".to_string(),
       )),
-      (Some(undefined_name), Some(comments_name)) => {
-        Ok((attri_type_map, _name_vec, undefined_name, comments_name))
+      (Some(attributes_name), Some(comments_name)) => {
+        Ok((attri_type_map, _name_vec, attributes_name, comments_name))
       }
     }
   }
 }
 
 /// ```
-/// // UndefinedAttribute
-/// #[liberty(undefined)]
+/// // Attributes
+/// #[liberty(attributes)]
 /// // GroupComments
 /// #[liberty(comments)]
 /// // Auto vector Id: Vec<ArcStr>
@@ -191,10 +191,8 @@ fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Field
               "name" => {
                 return Ok(Some(FieldType::Internal(InternalType::Name)));
               }
-              "undefined" => {
-                return Ok(Some(FieldType::Internal(
-                  InternalType::UndefinedAttributeList,
-                )))
+              "attributes" => {
+                return Ok(Some(FieldType::Internal(InternalType::AttributeList)))
               }
               "comments" => return Ok(Some(FieldType::Internal(InternalType::Comment))),
               "simple" => {
@@ -400,8 +398,8 @@ fn main() {
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Foo {
-  #[liberty(undefined)]
-    undefined: bool,
+  #[liberty(attributes)]
+  attributes: bool,
     #[liberty(id(title=2))]
     id_2: bool,
     #[liberty(id(title=0))]

@@ -39,7 +39,7 @@ mod group;
 #[proc_macro_derive(Group, attributes(liberty))]
 pub fn macro_group(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
-  let toks = group::inner(&ast, true).unwrap_or_else(|err| err.to_compile_error());
+  let toks = group::inner(&ast).unwrap_or_else(|err| err.to_compile_error());
   toks.into()
 }
 

@@ -57,8 +57,8 @@ pub struct CCSNStage {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(simple(type = Option))]
   pub load_cap_fall: Option<f64>,
   #[liberty(simple(type = Option))]
@@ -289,8 +289,8 @@ pub struct ReceiverCapacitance {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[id]
   #[liberty(simple(type=Option))]
   pub when: Option<IdBooleanExpression>,

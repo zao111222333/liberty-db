@@ -132,8 +132,8 @@ pub struct Domain {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: crate::ast::Attributes,
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
   pub group_name: ArcStr,
   pub calc_mode: Option<ArcStr>,
   #[liberty(simple(type = Option))]
@@ -250,8 +250,8 @@ pub struct DummyGroup {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: crate::ast::Attributes,
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
 }
 impl GroupFn for DummyGroup {}
 

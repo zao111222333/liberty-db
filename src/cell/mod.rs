@@ -28,8 +28,8 @@ pub struct Cell {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
   /// The `dont_use`  attribute with a true value indicates
@@ -360,8 +360,8 @@ pub struct TestCell {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(group(type=Set))]
   pub ff: GroupSet<FF>,
   #[liberty(group(type=Set))]

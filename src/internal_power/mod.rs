@@ -20,8 +20,8 @@ pub struct InternalPower {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   // NOTICE: Simple Attributes
   // equal_or_opposite_output
   // falling_together_group

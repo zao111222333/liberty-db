@@ -197,8 +197,8 @@ pub struct CellDegradation {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: ast::Attributes,
+  #[liberty(attributes)]
+  pub attributes: ast::Attributes,
   /// /* lookup table */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7

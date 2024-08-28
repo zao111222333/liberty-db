@@ -24,8 +24,8 @@ pub struct Bundle {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(complex)]
   pub members: Vec<ArcStr>,
   #[liberty(simple(type = Option))]

@@ -13,8 +13,8 @@ use core::fmt::Write;
 // #[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing {
   /// group undefined attributes
-  #[liberty(undefined)]
-  undefined: Attributes,
+  #[liberty(attributes)]
+  attributes: Attributes,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments<Self>,
@@ -40,8 +40,8 @@ pub(crate) struct Pin {
   #[liberty(comments)]
   comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  undefined: Attributes,
+  #[liberty(attributes)]
+  attributes: Attributes,
   #[liberty(group(type=Vec))]
   timing: Vec<Timing>,
 }
@@ -63,8 +63,8 @@ pub(crate) struct FF {
   #[liberty(comments)]
   comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  undefined: Attributes,
+  #[liberty(attributes)]
+  attributes: Attributes,
   #[liberty(simple(type = Option))]
   next_state: Option<ArcStr>,
 }
@@ -108,8 +108,8 @@ pub(crate) struct Cell {
   #[liberty(comments)]
   comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  undefined: Attributes,
+  #[liberty(attributes)]
+  attributes: Attributes,
   #[liberty(simple(type = Option))]
   area: Option<f64>,
   #[liberty(group(type=Set))]

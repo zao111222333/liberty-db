@@ -44,8 +44,8 @@ pub struct Sensitization {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// The `pin_names` attribute specified at the library level defines
   /// a default list of pin names. All vectors in this `sensitization` group
   /// are the exhaustive list of all possible transitions of the input pins
@@ -286,7 +286,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
 | /* Undefined attributes end here */
 }"#,
     );
-    assert!(sense1.undefined.len() == 1);
+    assert!(sense1.attributes.len() == 1);
   }
 }
 impl GroupFn for Sensitization {}
@@ -364,8 +364,8 @@ pub struct InputVoltage {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// The maximum input voltage for which the input to the core is guaranteed to be a logic 0
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.7&end=62.8
@@ -414,8 +414,8 @@ pub struct OutputVoltage {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// The maximum output voltage generated to represent a logic 0.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.45&end=75.46
@@ -498,8 +498,8 @@ pub struct OperatingConditions {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// An optional attribute, you can use calc_mode  to specify an associated process mode.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.28&end=72.28
@@ -581,8 +581,8 @@ pub struct FpgaIsd {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// The `drive`  attribute is optional and specifies the output current of the FPGA part or the FPGA cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.7&end=64.8
@@ -934,8 +934,8 @@ pub struct WireLoad {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
@@ -1120,8 +1120,8 @@ pub struct WireLoadSection {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
@@ -1213,8 +1213,8 @@ pub struct BaseCurves {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// The `base_curve_type` attribute specifies the type of base curve.
   /// The valid values for `base_curve_type`  are `ccs_timing_half_curve`  and `ccs_half_curve`.
   /// The `ccs_half_curve`  value allows you to model compact CCS power

@@ -6,7 +6,7 @@ use syn::{Data, DeriveInput, Fields};
 fn group_field_fn(
   field_name: &Ident,
   arrti_type: &AttriType,
-  undefined_name: &Ident,
+  attributes_name: &Ident,
   comments_name: &Ident,
   comments_self: &Ident,
 ) -> syn::Result<(
@@ -38,7 +38,7 @@ fn group_field_fn(
           },
           Err(undefined) => {
             log::error!("Line={}; Key={}; Value={:?}",scope.line_num,key,undefined);
-            crate::ast::attributs_set_undefined_simple(&mut res.#undefined_name, key, undefined);
+            crate::ast::attributs_set_undefined_simple(&mut res.#attributes_name, key, undefined);
           },
         }
       };
@@ -60,7 +60,7 @@ fn group_field_fn(
           },
           Err(undefined) => {
             log::error!("Line={}; Key={}; Value={:?}",scope.line_num,key,undefined);
-            crate::ast::attributs_set_undefined_simple(&mut res.#undefined_name, key, undefined);
+            crate::ast::attributs_set_undefined_simple(&mut res.#attributes_name, key, undefined);
           },
         }
       };
@@ -80,7 +80,7 @@ fn group_field_fn(
           Ok(complex) => res.#field_name=complex,
           Err((e,undefined)) => {
             log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
-            crate::ast::attributs_set_undefined_complex(&mut res.#undefined_name, key, undefined);
+            crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
           },
         }
       };
@@ -102,7 +102,7 @@ fn group_field_fn(
           Ok(complex) => res.#field_name=Some(complex),
           Err((e,undefined)) => {
             log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
-            crate::ast::attributs_set_undefined_complex(&mut res.#undefined_name, key, undefined);
+            crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
           },
         }
       };
@@ -123,7 +123,7 @@ fn group_field_fn(
           },
           Err((e,undefined)) => {
             log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
-            crate::ast::attributs_set_undefined_complex(&mut res.#undefined_name, key, undefined);
+            crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
           },
         }
         let n: usize;
@@ -152,7 +152,7 @@ fn group_field_fn(
           },
           Err((e,undefined)) => {
             log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
-            crate::ast::attributs_set_undefined_complex(&mut res.#undefined_name, key, undefined);
+            crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
           },
         }
         let n: usize;
@@ -253,10 +253,7 @@ fn group_field_fn(
   ))
 }
 
-pub(crate) fn inner(
-  ast: &DeriveInput,
-  link: bool,
-) -> syn::Result<proc_macro2::TokenStream> {
+pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
   let ident = &ast.ident;
   let st = match &ast.data {
     Data::Struct(s) => s,
@@ -267,7 +264,7 @@ pub(crate) fn inner(
 
   if let Fields::Named(named) = &st.fields {
     let fields = &named.named;
-    let (attri_type_map, name_vec, undefined_name, comments_name) =
+    let (attri_type_map, name_vec, attributes_name, comments_name) =
       parse_fields_type(fields)?;
     let mut attri_comments = quote! {};
     let mut parser_arms = quote! {};
@@ -281,7 +278,7 @@ pub(crate) fn inner(
             let (attri_comment, write_field, parser_arm) = group_field_fn(
               field_name,
               arrti_type,
-              undefined_name,
+              attributes_name,
               comments_name,
               &comments_self,
             )?;
@@ -306,11 +303,6 @@ pub(crate) fn inner(
         ));
       }
     }
-    let link_self = if link {
-      quote! {<Self as crate::ast::GroupFn>::post_parse_process(&mut res);}
-    } else {
-      quote! {}
-    };
     let (change_id_return, write_title) = if name_vec.is_empty() {
       (
         quote! {return Ok((input, Ok(res)));},
@@ -384,10 +376,10 @@ pub(crate) fn inner(
           #write_title
           f.indent(1);
           #write_fields
-          if !self.#undefined_name.is_empty(){
+          if !self.#attributes_name.is_empty(){
             let indent1 = f.indentation();
             write!(f,"\n{indent1}/* Undefined attributes from here */")?;
-            crate::ast::attributs_fmt_liberty(&self.#undefined_name,f)?;
+            crate::ast::attributs_fmt_liberty(&self.#attributes_name,f)?;
             write!(f,"\n{indent1}/* Undefined attributes end here */")?;
           }
           f.dedent(1);
@@ -402,7 +394,7 @@ pub(crate) fn inner(
             match crate::ast::parser::key(input){
               Err(nom::Err::Error(_)) => {
                 (input,_) = crate::ast::parser::end_group(input)?;
-                #link_self
+                <Self as crate::ast::GroupFn>::post_parse_process(&mut res);
                 #change_id_return
               },
               Err(e) => return Err(e),
@@ -414,7 +406,7 @@ pub(crate) fn inner(
                     let (new_input,undefined) = crate::ast::parser::undefine(input, &mut scope.line_num)?;
                     input = new_input;
                     log::warn!("Line={}; undefined {}", scope.line_num, key);
-                    crate::ast::attributs_set_undefined_attri(&mut res.#undefined_name, key, undefined);
+                    crate::ast::attributs_set_undefined_attri(&mut res.#attributes_name, key, undefined);
                   },
                 }
               }
@@ -430,17 +422,6 @@ pub(crate) fn inner(
     Err(syn::Error::new(Span::call_site(), "Can not find NamedField".to_string()))
   }
 }
-// type Punctuated = syn::punctuated::Punctuated<Field, Token![,]>;
-// fn fields_of_input(input: &mut DeriveInput) -> &mut Punctuated {
-//   match &mut input.data {
-//     Data::Struct(data) => match &mut data.fields {
-//       Fields::Named(fields) => &mut fields.named,
-//       Fields::Unnamed(fields) => &mut fields.unnamed,
-//       Fields::Unit => unreachable!(),
-//     },
-//     Data::Enum(_) | Data::Union(_) => unreachable!(),
-//   }
-// }
 
 #[test]
 fn main() {
@@ -448,9 +429,9 @@ fn main() {
   let input = r#"
   #[derive(liberty_macros::Group)]
   struct Timing {
-    /// group undefined attributes
-  #[liberty(undefined)]
-    pub undefined: Attributes,
+    /// group attributes attributes
+  #[liberty(attributes)]
+    pub attributes: Attributes,
     /// group comments
   #[liberty(comments)]
     pub comments: GroupComments<Self>,
@@ -462,6 +443,6 @@ fn main() {
     t2: Option<TimingType>,
   }"#;
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();
-  let out = inner(ast, false).unwrap_or_else(|err| err.to_compile_error());
+  let out = inner(ast).unwrap_or_else(|err| err.to_compile_error());
   println!("{}", out)
 }

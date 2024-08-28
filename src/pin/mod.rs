@@ -53,8 +53,8 @@ pub struct Pin {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(simple(type = Option))]
   pub driver_waveform_rise: Option<ArcStr>,
   #[liberty(simple(type = Option))]

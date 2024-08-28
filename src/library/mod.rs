@@ -40,8 +40,8 @@ pub struct Library {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   /// The `technology`  attribute statement specifies the technology
   /// family being used in the library.
   /// When you define the technology  attribute,

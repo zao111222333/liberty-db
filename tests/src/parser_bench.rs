@@ -132,7 +132,7 @@ const PARSER_LIBERTYPARSE: ParserCtx = ParserCtx {
 
 #[test]
 pub fn test_all_lib_files() {
-  simple_logger::SimpleLogger::new().init().unwrap();
+  simple_logger::SimpleLogger::new().init();
   use prettytable::{Cell, Row, Table};
   let all_parser: Vec<ParserCtx> =
     vec![PARSER_LIBERTY_DB, PARSER_LIBERTY_IO, PARSER_LIBERTYPARSE];

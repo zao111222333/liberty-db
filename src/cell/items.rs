@@ -36,8 +36,8 @@ pub struct LeakagePower {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: crate::ast::Attributes,
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
   #[id]
   #[liberty(simple(type = Option))]
   power_level: Option<ArcStr>,
@@ -148,8 +148,8 @@ pub struct Statetable {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: crate::ast::Attributes,
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
   #[liberty(simple)]
   pub table: Table,
 }
@@ -328,8 +328,8 @@ pub struct PgPin {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: crate::ast::Attributes,
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

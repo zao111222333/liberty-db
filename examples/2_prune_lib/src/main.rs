@@ -21,7 +21,7 @@ fn main() {
   for operating_condition in library.operating_conditions.iter_mut() {
     operating_condition.voltage = 0.8;
   }
-  log::warn!("Undefined Items: {:?}", library.undefined);
+  log::warn!("Attributes Items: {:?}", library.attributes);
   for cell in library.cell.iter_mut() {
     log::info!("Loop to [cell] {}", cell.name);
     for pin in cell.pin.iter_mut() {

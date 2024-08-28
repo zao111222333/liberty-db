@@ -21,8 +21,8 @@ pub struct TableLookUpMultiSegment {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(simple)]
   #[id]
   segment: usize,
@@ -69,8 +69,8 @@ pub struct DriverWaveform {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -99,8 +99,8 @@ pub struct TableLookUp2D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -128,8 +128,8 @@ pub struct CompactLutTemplate {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(simple(type=Option))]
   pub base_curves_group: Option<ArcStr>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
@@ -250,8 +250,8 @@ pub struct Vector3D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[id]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
@@ -280,8 +280,8 @@ pub struct ReferenceTimeVector3D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[id]
   #[liberty(simple)]
   pub reference_time: NotNan<f64>,
@@ -313,8 +313,8 @@ pub struct Vector4D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[id]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
@@ -345,8 +345,8 @@ pub struct Vector3DGrpup {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<Vector3D>,
 }
@@ -366,8 +366,8 @@ pub struct ReferenceTimeVector3DGrpup {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<ReferenceTimeVector3D>,
 }
@@ -387,8 +387,8 @@ pub struct Vector4DGrpup {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<Vector4D>,
 }
@@ -413,8 +413,8 @@ pub struct TableLookUp3D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -442,8 +442,8 @@ pub struct TableLookUp1D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -472,8 +472,8 @@ pub struct CompactCcsTable {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(simple)]
   pub base_curves_group: ArcStr,
   #[liberty(complex)]
@@ -505,8 +505,8 @@ pub struct TableLookUp {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -618,8 +618,8 @@ pub struct TableTemple {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
   #[liberty(simple(type=Option))]
   pub variable_1: Option<Variable>,
   #[liberty(simple(type=Option))]

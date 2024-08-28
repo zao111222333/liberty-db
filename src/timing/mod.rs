@@ -62,8 +62,8 @@ pub struct Timing {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[liberty(undefined)]
-  pub undefined: Attributes,
+  #[liberty(attributes)]
+  pub attributes: Attributes,
 
   /// Use this attribute to indicate that a constraint arc is for
   /// a clock gating relation between the data and clock pin,
