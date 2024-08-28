@@ -712,7 +712,6 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 | | }
 | }
 | /* Undefined attributes from here */
-| em_temp_degradation_factor : 0;
 | default_fall_delay_intercept : 0;
 | default_fall_pin_resistance : 0;
 | default_inout_pin_fall_res : 0;
@@ -727,5 +726,6 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 | default_rise_pin_resistance : 0;
 | default_slope_fall : 0;
 | default_slope_rise : 0;
+| em_temp_degradation_factor : 0;
 | /* Undefined attributes end here */
 }

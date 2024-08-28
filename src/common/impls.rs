@@ -8,7 +8,7 @@ use itertools::Itertools;
 use crate::{
   ast::{
     is_word, join_fmt_no_quote, parser::simple_custom, CodeFormatter, ComplexAttri,
-    ComplexParseError, IdError, Indentation, NameAttri, SimpleAttri,
+    ComplexParseError, IdError, Indentation, NameAttri, ParseScope, SimpleAttri,
   },
   ArcStr, NotNan,
 };
@@ -18,9 +18,9 @@ impl SimpleAttri for f64 {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    simple_custom(i, line_num, nom::number::complete::double)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    simple_custom(i, &mut scope.line_num, nom::number::complete::double)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -37,15 +37,15 @@ impl SimpleAttri for NotNan<f64> {
   #[allow(clippy::undocumented_unsafe_blocks)]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
     #[inline]
     fn f(i: &str) -> nom::IResult<&str, NotNan<f64>, nom::error::Error<&str>> {
       nom::combinator::map(nom::number::complete::double, |f| unsafe {
         NotNan::<f64>::new_unchecked(f)
       })(i)
     }
-    simple_custom(i, line_num, f)
+    simple_custom(i, &mut scope.line_num, f)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -62,18 +62,18 @@ impl SimpleAttri for bool {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 impl SimpleAttri for usize {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -89,9 +89,9 @@ impl SimpleAttri for isize {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -243,9 +243,9 @@ impl SimpleAttri for ArcStr {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -266,7 +266,7 @@ impl SimpleAttri for ArcStr {
 
 impl<const N: usize> ComplexAttri for [ArcStr; N] {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let l = v.len();
     if l != N {
       return Err(ComplexParseError::LengthDismatch);
@@ -290,7 +290,7 @@ impl<const N: usize> ComplexAttri for [ArcStr; N] {
 }
 impl<const N: usize> ComplexAttri for [NotNan<f64>; N] {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let l = v.len();
     if l != N {
       return Err(ComplexParseError::LengthDismatch);
@@ -327,7 +327,7 @@ impl<const N: usize> ComplexAttri for [NotNan<f64>; N] {
 
 impl ComplexAttri for Vec<f64> {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => {
@@ -356,7 +356,7 @@ impl ComplexAttri for Vec<f64> {
 
 impl ComplexAttri for super::items::IdVector {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut iter = v.iter();
     let id = if let Some(&id_str) = iter.next() {
       id_str.parse()?
@@ -387,7 +387,7 @@ impl ComplexAttri for super::items::IdVector {
 
 impl ComplexAttri for Vec<NotNan<f64>> {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => Err(ComplexParseError::Float(e)),
@@ -414,7 +414,7 @@ impl ComplexAttri for Vec<NotNan<f64>> {
 
 impl ComplexAttri for ArcStr {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let v1 = match i.next() {
       Some(&s) => Self::from(s),
@@ -439,7 +439,7 @@ impl ComplexAttri for ArcStr {
 }
 impl ComplexAttri for NotNan<f64> {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let v1: Self = match i.next() {
       Some(&s) => match s.parse() {
@@ -465,7 +465,7 @@ impl ComplexAttri for NotNan<f64> {
 }
 impl ComplexAttri for Vec<ArcStr> {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     Ok(v.iter().map(|&s| ArcStr::from(s)).collect())
   }
   #[inline]
@@ -487,7 +487,7 @@ impl ComplexAttri for Vec<ArcStr> {
 }
 impl ComplexAttri for Vec<usize> {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     match v.iter().map(|&s| s.parse()).collect() {
       Ok(r) => Ok(r),
       Err(e) => Err(ComplexParseError::Int(e)),
@@ -509,7 +509,7 @@ impl ComplexAttri for Vec<usize> {
 
 impl ComplexAttri for (f64, f64, ArcStr) {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let v1: f64 = match i.next() {
       Some(&s) => match s.parse() {
@@ -554,7 +554,7 @@ impl ComplexAttri for (f64, f64, ArcStr) {
 }
 impl ComplexAttri for (NotNan<f64>, NotNan<f64>) {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let v1: NotNan<f64> = match i.next() {
       Some(&s) => match s.parse() {
@@ -596,12 +596,12 @@ impl SimpleAttri for Formula {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
     #[inline]
     fn f(i: &str) -> nom::IResult<&str, Formula, nom::error::Error<&str>> {
       nom::combinator::map(crate::ast::parser::formula, |s| Formula(ArcStr::from(s)))(i)
     }
-    simple_custom(i, line_num, f)
+    simple_custom(i, &mut scope.line_num, f)
   }
 }

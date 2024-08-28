@@ -2,7 +2,7 @@
 //! `Timing`.
 
 use crate::{
-  ast::{self, GroupComments, GroupFn, SimpleAttri},
+  ast::{self, GroupComments, GroupFn, ParseScope, SimpleAttri},
   expression::logic::{self, LogicLike},
   ArcStr, NotNan,
 };
@@ -142,8 +142,8 @@ impl TimingSenseType {
 }
 impl SimpleAttri for TimingSenseType {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> ast::SimpleParseErr<'a, Self> {
-    ast::nom_parse_from_str(i, line_num)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::nom_parse_from_str(i, scope)
   }
 }
 /// You define the mode attribute within a timing group.
@@ -198,7 +198,7 @@ pub struct CellDegradation {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: ast::AttributeList,
+  pub undefined: ast::Attributes,
   /// /* lookup table */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7

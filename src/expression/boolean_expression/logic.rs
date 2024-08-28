@@ -1,4 +1,4 @@
-use crate::ast::SimpleAttri;
+use crate::ast::{ParseScope, SimpleAttri};
 use core::{
   cmp::Ordering,
   fmt,
@@ -218,9 +218,9 @@ impl SimpleAttri for Normal {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 impl fmt::Display for Normal {

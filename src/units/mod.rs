@@ -3,7 +3,7 @@
 //! </script>
 
 use crate::{
-  ast::{CodeFormatter, Indentation},
+  ast::{CodeFormatter, Indentation, ParseScope},
   NotNan,
 };
 use core::{
@@ -126,9 +126,9 @@ impl SimpleAttri for TimeUnit {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -200,9 +200,9 @@ impl SimpleAttri for VoltageUnit {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -301,9 +301,9 @@ impl SimpleAttri for CurrentUnit {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -375,9 +375,9 @@ impl SimpleAttri for PullingResistanceUnit {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -409,7 +409,7 @@ impl Deref for CapacitiveLoadUnit {
 
 impl ComplexAttri for CapacitiveLoadUnit {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let value: NotNan<f64> = match i.next() {
       Some(&s) => match s.parse() {
@@ -606,8 +606,8 @@ impl SimpleAttri for LeakagePowerUnit {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }

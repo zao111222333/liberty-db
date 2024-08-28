@@ -27,7 +27,7 @@ fn make_golden() {
     let golden_lib_path = golden_path(&test_lib_path);
     let library =
       Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
-    let wrapper = TestWrapper { inner: library, line_count: 0 };
+    let wrapper = TestWrapper { inner: library, scope: Default::default() };
     let golden_lib = File::create(golden_lib_path).unwrap();
     let mut writer = BufWriter::new(golden_lib);
     write!(writer, "{wrapper}");
@@ -42,7 +42,7 @@ fn regression() {
     let golden_lib_path = golden_path(&test_lib_path);
     let library =
       Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
-    let wrapper = TestWrapper { inner: library, line_count: 0 };
+    let wrapper = TestWrapper { inner: library, scope: Default::default() };
     let golden = read_to_string(golden_lib_path).unwrap();
     let new = wrapper.to_string();
     crate::text_diff(golden.as_str(), new.as_str());

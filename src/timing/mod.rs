@@ -12,7 +12,7 @@ pub mod builder;
 pub mod impls;
 pub mod items;
 use crate::{
-  ast::{AttributeList, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn},
   ccsn::PropagatingCcb,
   common::{
     items::{SdfEdgeType, WordSet},
@@ -63,7 +63,7 @@ pub struct Timing {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
 
   /// Use this attribute to indicate that a constraint arc is for
   /// a clock gating relation between the data and clock pin,

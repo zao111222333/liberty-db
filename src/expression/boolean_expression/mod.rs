@@ -6,7 +6,7 @@ mod latch_ff;
 pub mod logic;
 mod parser;
 use crate::{
-  ast::{CodeFormatter, Indentation},
+  ast::{CodeFormatter, Indentation, ParseScope},
   ArcStr,
 };
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
@@ -131,9 +131,9 @@ impl crate::ast::SimpleAttri for BooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -147,9 +147,9 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(

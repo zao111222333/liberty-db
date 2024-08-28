@@ -3,7 +3,11 @@
 //! </script>
 use core::{fmt, str::FromStr};
 
-use crate::{ast::SimpleAttri, expression::logic, types::MaxMin};
+use crate::{
+  ast::{ParseScope, SimpleAttri},
+  expression::logic,
+  types::MaxMin,
+};
 
 /// # Combinational Timing Arcs
 ///
@@ -717,9 +721,9 @@ impl SimpleAttri for TimingType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 

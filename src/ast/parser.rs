@@ -2,6 +2,8 @@
 //!
 //! All parser utilis.
 //!
+use std::collections::HashMap;
+
 use nom::{
   branch::alt,
   bytes::streaming::{escaped, is_not, tag, take, take_until, take_while},
@@ -168,16 +170,16 @@ mod test_space {
 pub(crate) fn undefine<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, super::AttriValue, Error<&'a str>> {
+) -> IResult<&'a str, super::UndefinedAttriValue, Error<&'a str>> {
   let line_num_back = *line_num;
   if let Ok((input, res)) = simple(i, line_num) {
-    return Ok((input, super::AttriValue::Simple(ArcStr::from(res))));
+    return Ok((input, super::UndefinedAttriValue::Simple(ArcStr::from(res))));
   }
   *line_num = line_num_back;
   if let Ok((input, res)) = complex(i, line_num) {
     return Ok((
       input,
-      super::AttriValue::Complex(super::ComplexWrapper(
+      super::UndefinedAttriValue::Complex(super::ComplexWrapper(
         res.into_iter().map(ArcStr::from).collect(),
       )),
     ));
@@ -187,26 +189,28 @@ pub(crate) fn undefine<'a>(
     Ok((mut input, title)) => {
       let mut res = GroupWrapper {
         title: title.into_iter().map(ArcStr::from).collect(),
-        attr_list: vec![],
+        attri_map: HashMap::new(),
       };
       loop {
         match key(input) {
           Err(nom::Err::Error(_)) => {
             (input, _) = end_group(input)?;
-            return Ok((input, super::AttriValue::Group(res)));
+            let (new_input, n) = comment_space_newline(input)?;
+            input = new_input;
+            *line_num += n;
+            return Ok((input, super::UndefinedAttriValue::Group(res)));
           }
           Err(e) => return Err(e),
-          Ok((input1, _key)) => {
-            input = input1;
-            if let Ok((input2, attri)) = undefine(input, line_num) {
-              input = input2;
-              if let super::AttriValue::Group(_) = attri {
-                let (input3, n) = comment_space_newline(input)?;
-                input = input3;
-                *line_num += n;
-              }
-              res.attr_list.push((ArcStr::from(_key), attri));
-            }
+          Ok((input1, key)) => {
+            let (new_input, undefined) = undefine(input1, line_num)?;
+            input = new_input;
+            // TODO: check
+            // if let super::UndefinedAttriValue::Group(_) = undefined {
+            //   let n: usize;
+            //   (input, n) = comment_space_newline(input)?;
+            //   *line_num += n;
+            // }
+            super::attributs_set_undefined_attri(&mut res.attri_map, key, undefined);
           }
         }
       }
@@ -303,7 +307,7 @@ pub(crate) fn simple_custom<'a, T>(
   i: &'a str,
   line_num: &mut usize,
   func: fn(&'a str) -> IResult<&'a str, T, Error<&'a str>>,
-) -> super::SimpleParseErr<'a, T> {
+) -> super::SimpleParseRes<'a, T> {
   map(
     tuple((
       space,
@@ -311,7 +315,7 @@ pub(crate) fn simple_custom<'a, T>(
       space,
       alt((
         map(alt((func, delimited(char('"'), func, char('"')))), Ok),
-        map(alt((word, unquote)), |s| Err(super::AttriValue::Simple(ArcStr::from(s)))),
+        map(alt((word, unquote)), |s| Err(ArcStr::from(s))),
       )),
       alt((
         preceded(terminated(space, char(';')), comment_space_newline),

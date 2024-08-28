@@ -1,5 +1,5 @@
 use crate::ast::{
-  CodeFormatter, ComplexAttri, ComplexParseError, Indentation, SimpleAttri,
+  CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope, SimpleAttri,
 };
 use core::{
   fmt::{self, Write},
@@ -32,9 +32,9 @@ impl SimpleAttri for AntennaDiodeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -62,9 +62,9 @@ impl SimpleAttri for Direction {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -82,9 +82,9 @@ impl SimpleAttri for DontFault {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
@@ -111,9 +111,9 @@ impl SimpleAttri for DriverType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
@@ -136,9 +136,9 @@ impl SimpleAttri for NextstateType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -160,9 +160,9 @@ impl SimpleAttri for PinFuncType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
@@ -179,9 +179,9 @@ impl SimpleAttri for RestoreEdgeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -213,9 +213,9 @@ impl SimpleAttri for SignalType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 #[derive(Default)]
@@ -236,9 +236,9 @@ impl SimpleAttri for SlewControl {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -269,9 +269,9 @@ impl SimpleAttri for OneZero {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
@@ -302,9 +302,9 @@ impl SimpleAttri for TwoValue {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 impl fmt::Display for TwoValue {
@@ -388,7 +388,7 @@ pub struct RetentionPin {
 }
 impl ComplexAttri for RetentionPin {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let pin_class: PinClass = match i.next() {
       Some(&s) => match s.parse() {

@@ -1,7 +1,7 @@
 use crate::{
   ast::{
-    join_fmt, AttriValue, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
-    GroupFn, Indentation, NamedGroup, SimpleAttri,
+    join_fmt, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
+    Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
   },
   common::items::WordSet,
   expression::IdBooleanExpression,
@@ -37,7 +37,7 @@ pub struct LeakagePower {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::Attributes,
   #[id]
   #[liberty(simple(type = Option))]
   power_level: Option<ArcStr>,
@@ -149,7 +149,7 @@ pub struct Statetable {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::Attributes,
   #[liberty(simple)]
   pub table: Table,
 }
@@ -244,16 +244,11 @@ impl SimpleAttri for Table {
     !self.v.is_empty()
   }
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    line_num: &mut usize,
-  ) -> nom::IResult<&'a str, Result<Self, AttriValue>, nom::error::Error<&'a str>> {
-    let (input, simple_multi) = crate::ast::parser::simple_multi(i, line_num)?;
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+    let (input, simple_multi) = crate::ast::parser::simple_multi(i, &mut scope.line_num)?;
     simple_multi
       .parse()
-      .map_or(Ok((input, Err(AttriValue::Simple(ArcStr::from(simple_multi))))), |s| {
-        Ok((input, Ok(s)))
-      })
+      .map_or(Ok((input, Err(ArcStr::from(simple_multi)))), |s| Ok((input, Ok(s))))
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -334,7 +329,7 @@ pub struct PgPin {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::Attributes,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -487,11 +482,8 @@ pub enum PgType {
 }
 impl SimpleAttri for PgType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -520,11 +512,8 @@ pub enum SwitchCellType {
 }
 impl SimpleAttri for SwitchCellType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -550,11 +539,8 @@ pub enum FpgaCellType {
 }
 impl SimpleAttri for FpgaCellType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 /// The `level_shifter_type`  attribute specifies the
@@ -588,11 +574,8 @@ pub enum LevelShifterType {
 }
 impl SimpleAttri for LevelShifterType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -649,15 +632,12 @@ impl fmt::Display for ClockGatingIntegratedCell {
 
 impl SimpleAttri for ClockGatingIntegratedCell {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
-/// Use the pin_opposite attribute to describe functionally opposite (logically inverse) groups
+/// Use the `pin_opposite` attribute to describe functionally opposite (logically inverse) groups
 /// of input or output pins.
 /// Syntax
 ///
@@ -695,7 +675,7 @@ pub struct PinOpposite {
 
 impl ComplexAttri for PinOpposite {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let name_list1: WordSet = match i.next() {
       Some(&s) => match s.parse() {

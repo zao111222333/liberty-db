@@ -1,5 +1,8 @@
 use crate::{
-  ast::{AttributeList, ComplexAttri, GroupComments, GroupFn, SimpleAttri},
+  ast::{
+    Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, ParseScope,
+    SimpleAttri,
+  },
   ArcStr, GroupSet, NotNan,
 };
 use core::fmt::{self, Write};
@@ -19,7 +22,7 @@ pub struct TableLookUpMultiSegment {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(simple)]
   #[id]
   segment: usize,
@@ -67,7 +70,7 @@ pub struct DriverWaveform {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -97,7 +100,7 @@ pub struct TableLookUp2D {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -126,7 +129,7 @@ pub struct CompactLutTemplate {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(simple(type=Option))]
   pub base_curves_group: Option<ArcStr>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
@@ -203,9 +206,9 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -225,9 +228,9 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -248,7 +251,7 @@ pub struct Vector3D {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[id]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
@@ -278,7 +281,7 @@ pub struct ReferenceTimeVector3D {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[id]
   #[liberty(simple)]
   pub reference_time: NotNan<f64>,
@@ -311,7 +314,7 @@ pub struct Vector4D {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[id]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
@@ -343,7 +346,7 @@ pub struct Vector3DGrpup {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<Vector3D>,
 }
@@ -364,7 +367,7 @@ pub struct ReferenceTimeVector3DGrpup {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<ReferenceTimeVector3D>,
 }
@@ -385,7 +388,7 @@ pub struct Vector4DGrpup {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(group(type = Set))]
   pub vector: GroupSet<Vector4D>,
 }
@@ -411,7 +414,7 @@ pub struct TableLookUp3D {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -440,7 +443,7 @@ pub struct TableLookUp1D {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -470,7 +473,7 @@ pub struct CompactCcsTable {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(simple)]
   pub base_curves_group: ArcStr,
   #[liberty(complex)]
@@ -503,7 +506,7 @@ pub struct TableLookUp {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -560,11 +563,11 @@ pub struct Values {
 
 impl ComplexAttri for Values {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, crate::ast::ComplexParseError> {
+  fn parse(v: &Vec<&str>, scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     Ok(Self {
       size1: 0,
       size2: 0,
-      inner: <Vec<NotNan<f64>> as ComplexAttri>::parse(v)?,
+      inner: <Vec<NotNan<f64>> as ComplexAttri>::parse(v, scope)?,
     })
   }
   #[inline]
@@ -616,7 +619,7 @@ pub struct TableTemple {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(simple(type=Option))]
   pub variable_1: Option<Variable>,
   #[liberty(simple(type=Option))]
@@ -741,9 +744,9 @@ impl SimpleAttri for Variable {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 

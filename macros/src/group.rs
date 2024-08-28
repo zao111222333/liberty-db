@@ -31,14 +31,14 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let simple_res: _;
-        (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input,line_num)?;
+        (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input, scope)?;
         match simple_res {
           Ok(simple) => {
             res.#field_name=Some(simple);
           },
           Err(undefined) => {
-            log::error!("line={}; Key={}; Value={:?}",line_num,key,undefined);
-            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
+            log::error!("Line={}; Key={}; Value={:?}",scope.line_num,key,undefined);
+            crate::ast::attributs_set_undefined_simple(&mut res.#undefined_name, key, undefined);
           },
         }
       };
@@ -53,14 +53,14 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let simple_res: _;
-        (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input,line_num)?;
+        (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input,scope)?;
         match simple_res {
           Ok(simple) => {
             res.#field_name=simple;
           },
           Err(undefined) => {
-            log::error!("Line={}; Key={}; Value={:?}",line_num,key,undefined);
-            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
+            log::error!("Line={}; Key={}; Value={:?}",scope.line_num,key,undefined);
+            crate::ast::attributs_set_undefined_simple(&mut res.#undefined_name, key, undefined);
           },
         }
       };
@@ -75,12 +75,12 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,line_num)?;
+        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,scope)?;
         match complex_res {
           Ok(complex) => res.#field_name=complex,
           Err((e,undefined)) => {
-            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
-            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
+            crate::ast::attributs_set_undefined_complex(&mut res.#undefined_name, key, undefined);
           },
         }
       };
@@ -97,12 +97,12 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,line_num)?;
+        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input,scope)?;
         match complex_res {
           Ok(complex) => res.#field_name=Some(complex),
           Err((e,undefined)) => {
-            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
-            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
+            crate::ast::attributs_set_undefined_complex(&mut res.#undefined_name, key, undefined);
           },
         }
       };
@@ -116,19 +116,19 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, line_num)?;
+        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, scope)?;
         match complex_res{
           Ok(complex) => {
             res.#field_name.push(complex);
           },
           Err((e,undefined)) => {
-            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
-            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
+            crate::ast::attributs_set_undefined_complex(&mut res.#undefined_name, key, undefined);
           },
         }
         let n: usize;
         (input,n) = crate::ast::parser::comment_space_newline(input)?;
-        *line_num+=n;
+        scope.line_num += n;
       };
     }
     AttriType::Complex(ComplexType::Set) => {
@@ -140,24 +140,24 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, line_num)?;
+        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, scope)?;
         match complex_res{
           Ok(complex) => {
             if let Some(_) = res.#field_name.replace(
               complex,
             ){
               let e = crate::ast::IdError::RepeatAttri;
-              log::error!("Line={}, error={}",line_num,e);
+              log::error!("Line={}, error={}",scope.line_num,e);
             }
           },
           Err((e,undefined)) => {
-            log::error!("Line={}; Key={}; Value={:?}; Err={}",line_num,key,undefined,e);
-            res.#undefined_name.push((crate::ArcStr::from(key), undefined));
+            log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
+            crate::ast::attributs_set_undefined_complex(&mut res.#undefined_name, key, undefined);
           },
         }
         let n: usize;
         (input,n) = crate::ast::parser::comment_space_newline(input)?;
-        *line_num+=n;
+        scope.line_num += n;
       };
     }
     AttriType::Group(GroupType::Vec) => {
@@ -170,18 +170,18 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
+        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, scope)?;
         match group_res{
           Ok(group) => {
             res.#field_name.push(group);
           },
           Err(e) => {
-            log::error!("Line={}, error={}",line_num,e);
+            log::error!("Line={}, error={}",scope.line_num,e);
           },
         }
         let n: usize;
         (input,n) = crate::ast::parser::comment_space_newline(input)?;
-        *line_num+=n;
+        scope.line_num += n;
       };
     }
     AttriType::Group(GroupType::Set) => {
@@ -194,23 +194,23 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
+        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, scope)?;
         match group_res{
           Ok(group) => {
             if let Some(old) = res.#field_name.replace(
               group,
             ){
               let e = crate::ast::IdError::RepeatIdx;
-              log::error!("Line={}, error={}",line_num,e);
+              log::error!("Line={}, error={}",scope.line_num,e);
             }
           },
           Err(e) => {
-            log::error!("Line={}, error={}",line_num,e);
+            log::error!("Line={}, error={}",scope.line_num,e);
           },
         }
         let n: usize;
         (input,n) = crate::ast::parser::comment_space_newline(input)?;
-        *line_num+=n;
+        scope.line_num += n;
       };
     }
     AttriType::Group(GroupType::Option) => {
@@ -223,22 +223,22 @@ fn group_field_fn(
       };
       parser_arm = quote! {
         let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, line_num)?;
+        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, scope)?;
         match group_res{
           Ok(group) => {
             if let Some(old) = res.#field_name{
               let e = crate::ast::IdError::RepeatAttri;
-              log::error!("Line={}, error={}",line_num,e);
+              log::error!("Line={}, error={}",scope.line_num,e);
             }
             res.#field_name = Some(group);
           },
           Err(e) => {
-            log::error!("Line={}, error={}",line_num,e);
+            log::error!("Line={}, error={}",scope.line_num,e);
           },
         }
         let n: usize;
         (input,n) = crate::ast::parser::comment_space_newline(input)?;
-        *line_num+=n;
+        scope.line_num += n;
       };
     }
   }
@@ -387,16 +387,16 @@ pub(crate) fn inner(
           if !self.#undefined_name.is_empty(){
             let indent1 = f.indentation();
             write!(f,"\n{indent1}/* Undefined attributes from here */")?;
-            crate::ast::liberty_attr_list(&self.#undefined_name,f)?;
+            crate::ast::attributs_fmt_liberty(&self.#undefined_name,f)?;
             write!(f,"\n{indent1}/* Undefined attributes end here */")?;
           }
           f.dedent(1);
           write!(f, "\n{indent}}}")
         }
         fn nom_parse<'a>(
-          i: &'a str, line_num: &mut usize
+          i: &'a str, scope: &mut crate::ast::ParseScope
         ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
-          let (mut input,title) = crate::ast::parser::title(i,line_num)?;
+          let (mut input,title) = crate::ast::parser::title(i, &mut scope.line_num)?;
           let mut res = Self::default();
           loop {
             match crate::ast::parser::key(input){
@@ -411,13 +411,10 @@ pub(crate) fn inner(
                 match key {
                   #parser_arms
                   _ => {
-                    let undefined: crate::ast::AttriValue;
-                    (input,undefined) = crate::ast::parser::undefine(input,line_num)?;
-                    log::warn!("Line={}; undefined {}",line_num,key);
-                    res.#undefined_name.push((crate::ArcStr::from(key), undefined));
-                    let n: usize;
-                    (input,n) = crate::ast::parser::comment_space_newline(input)?;
-                    *line_num+=n;
+                    let (new_input,undefined) = crate::ast::parser::undefine(input, &mut scope.line_num)?;
+                    input = new_input;
+                    log::warn!("Line={}; undefined {}", scope.line_num, key);
+                    crate::ast::attributs_set_undefined_attri(&mut res.#undefined_name, key, undefined);
                   },
                 }
               }
@@ -453,7 +450,7 @@ fn main() {
   struct Timing {
     /// group undefined attributes
   #[liberty(undefined)]
-    pub undefined: AttributeList,
+    pub undefined: Attributes,
     /// group comments
   #[liberty(comments)]
     pub comments: GroupComments<Self>,

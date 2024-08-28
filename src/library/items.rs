@@ -5,14 +5,15 @@
 
 use crate::{
   ast::{
-    AttributeList, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
-    GroupFn, Indentation, SimpleAttri,
+    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
+    Indentation, ParseScope, SimpleAttri,
   },
   common::items::Formula,
   expression::logic,
   ArcStr, GroupSet, NotNan,
 };
 use core::fmt::{self, Write};
+use std::collections::HashMap;
 
 /// The `sensitization` group defined at the library level describes
 /// the complete state patterns for a specific list of pins (defined by the `pin_names` attribute)
@@ -44,7 +45,7 @@ pub struct Sensitization {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The `pin_names` attribute specified at the library level defines
   /// a default list of pin names. All vectors in this `sensitization` group
   /// are the exhaustive list of all possible transitions of the input pins
@@ -156,7 +157,7 @@ pub struct SensitizationVector {
 
 impl ComplexAttri for SensitizationVector {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let id: usize = match i.next() {
       Some(&s) => match s.parse() {
@@ -281,7 +282,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
 | vector (3, "Z 0 1");
 | vector (4, "1 1 0");
 | /* Undefined attributes from here */
-| vector ("2, 0 X 9");
+| vector (2, "0 X 9");
 | /* Undefined attributes end here */
 }"#,
     );
@@ -310,7 +311,7 @@ pub struct VoltageMap {
 }
 impl ComplexAttri for VoltageMap {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let name = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -364,7 +365,7 @@ pub struct InputVoltage {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The maximum input voltage for which the input to the core is guaranteed to be a logic 0
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.7&end=62.8
@@ -414,7 +415,7 @@ pub struct OutputVoltage {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The maximum output voltage generated to represent a logic 0.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.45&end=75.46
@@ -465,9 +466,9 @@ impl SimpleAttri for DelayModel {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -498,7 +499,7 @@ pub struct OperatingConditions {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// An optional attribute, you can use calc_mode  to specify an associated process mode.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.28&end=72.28
@@ -581,7 +582,7 @@ pub struct FpgaIsd {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The `drive`  attribute is optional and specifies the output current of the FPGA part or the FPGA cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.7&end=64.8
@@ -624,9 +625,9 @@ impl SimpleAttri for FPGASlew {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -656,9 +657,9 @@ impl SimpleAttri for TreeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -729,7 +730,7 @@ pub enum AttributeType {
 }
 impl ComplexAttri for Define {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let attribute_name = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -749,6 +750,17 @@ impl ComplexAttri for Define {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
+    _ = scope
+      .define_simple
+      .entry(group_name.clone())
+      .and_modify(|m| {
+        _ = m.insert(attribute_name.clone(), attribute_type);
+      })
+      .or_insert({
+        let mut m = HashMap::new();
+        _ = m.insert(attribute_name.clone(), attribute_type);
+        m
+      });
     Ok(Self { attribute_name, group_name, attribute_type })
   }
   #[inline]
@@ -787,7 +799,7 @@ pub struct DefineGroup {
 }
 impl ComplexAttri for DefineGroup {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let group = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -875,7 +887,7 @@ pub enum ResourceType {
 }
 impl ComplexAttri for DefineCellArea {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let area_name = match i.next() {
       Some(&s) => ArcStr::from(s),
@@ -923,7 +935,7 @@ pub struct WireLoad {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
@@ -1023,7 +1035,7 @@ pub struct FanoutLength {
 }
 impl ComplexAttri for FanoutLength {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let fanout = match i.next() {
       Some(&s) => match s.parse() {
@@ -1109,7 +1121,7 @@ pub struct WireLoadSection {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
@@ -1155,9 +1167,9 @@ impl SimpleAttri for BaseCurveType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -1202,7 +1214,7 @@ pub struct BaseCurves {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The `base_curve_type` attribute specifies the type of base curve.
   /// The valid values for `base_curve_type`  are `ccs_timing_half_curve`  and `ccs_half_curve`.
   /// The `ccs_half_curve`  value allows you to model compact CCS power

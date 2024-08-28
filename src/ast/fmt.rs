@@ -194,10 +194,10 @@ liberty_db::common::items::DummyGroup (0) {
       r#"
 liberty_db::common::items::DummyGroup () {
 | /* Undefined attributes from here */
-| unknown_complex ("1, 2, 3, 4, 5");
-| unknown_complex ("1, 2, 3, 4, 5");
-| unknown_complex ("1, 2, 3, 4, 5");
-| unknown_complex ("1, 2, 3, 4, 5");
+| unknown_complex (1, 2, 3, 4, 5);
+| unknown_complex (1, 2, 3, 4, 5);
+| unknown_complex (1, 2, 3, 4, 5);
+| unknown_complex (1, 2, 3, 4, 5);
 | /* Undefined attributes end here */
 }"#,
     );

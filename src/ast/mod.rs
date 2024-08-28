@@ -4,7 +4,7 @@
 
 mod fmt;
 pub mod parser;
-use crate::ArcStr;
+use crate::{library::AttributeType, ArcStr};
 use core::{
   fmt::Write,
   num::{ParseFloatError, ParseIntError},
@@ -14,13 +14,14 @@ pub use fmt::{
   CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation,
   TestCodeFormatter, TestIndentation,
 };
+use itertools::Itertools;
 use nom::{error::Error, IResult};
 use ordered_float::{NotNan, ParseNotNanError};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ComplexWrapper(Vec<ArcStr>);
 /// Wrapper for group attribute
@@ -31,28 +32,155 @@ pub struct ComplexWrapper(Vec<ArcStr>);
 ///   attri_key2 xxx
 /// }
 /// ```
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct GroupWrapper {
   /// title
   pub title: Vec<ArcStr>,
-  /// `attr_list`
-  pub attr_list: AttributeList,
+  /// `attri_map`
+  pub attri_map: Attributes,
 }
-/// type for Undefined `AttributeList`
-pub type AttributeList = Vec<(ArcStr, AttriValue)>;
-/// `AttriValue` for `undefined_attribute/serialization`
-#[derive(Debug, Clone)]
+impl Ord for GroupWrapper {
+  #[inline]
+  fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+    self.title.cmp(&other.title)
+  }
+}
+impl PartialOrd for GroupWrapper {
+  #[inline]
+  fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+    Some(self.cmp(other))
+  }
+}
+/// type for Undefined `Attributes`
+pub type Attributes = HashMap<ArcStr, AttriValues>;
+/// `AttriValues` for `undefined_attribute/serialization`
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub enum AttriValue {
-  /// `Simple`
-  Simple(SimpleWrapper),
-  /// `Complex`
+pub enum AttriValues {
+  /// Defined `Simple`
+  Simple(SimpleDefined),
+  /// Undefined `Complex`
+  Complex(Vec<ComplexWrapper>),
+  /// Defined `Group`
+  Group(Vec<GroupWrapper>),
+}
+
+pub(crate) enum UndefinedAttriValue {
+  Simple(ArcStr),
   Complex(ComplexWrapper),
-  /// `Group`
   Group(GroupWrapper),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum SimpleDefined {
+  /// Boolean `Simple`
+  Boolean(Vec<Result<bool, ArcStr>>),
+  /// string `Simple`
+  String(Vec<ArcStr>),
+  /// integer `Simple`
+  Integer(Vec<Result<isize, ArcStr>>),
+  /// float `Simple`
+  Float(Vec<Result<NotNan<f64>, ArcStr>>),
+}
+
+#[inline]
+pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
+  attributes: &Attributes,
+  f: &mut CodeFormatter<'_, T, I>,
+) -> core::fmt::Result {
+  #[allow(clippy::all)]
+  #[inline]
+  fn fmt1<T: Write, I: Indentation, U: Format>(
+    v: &Vec<U>,
+    key: &ArcStr,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    v.iter().try_for_each(|u| Format::liberty(u, key, f))
+  }
+  #[allow(clippy::all)]
+  #[inline]
+  fn fmt2<T: Write, I: Indentation, U: SimpleAttri>(
+    v: &Vec<Result<U, ArcStr>>,
+    key: &ArcStr,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    v.iter().try_for_each(|res_u| match res_u {
+      Ok(u) => SimpleAttri::fmt_liberty(u, key, f),
+      Err(u) => Format::liberty(u, key, f),
+    })
+  }
+  attributes.iter().sorted().try_for_each(|(key, attri)| match attri {
+    AttriValues::Simple(SimpleDefined::String(v)) => fmt1(v, key, f),
+    AttriValues::Simple(SimpleDefined::Boolean(v)) => fmt2(v, key, f),
+    AttriValues::Simple(SimpleDefined::Float(v)) => fmt2(v, key, f),
+    AttriValues::Simple(SimpleDefined::Integer(v)) => fmt2(v, key, f),
+    AttriValues::Complex(v) => fmt1(v, key, f),
+    AttriValues::Group(v) => fmt1(v, key, f),
+  })
+}
+#[inline]
+pub(crate) fn attributs_set_undefined_simple(
+  attri_map: &mut Attributes,
+  key: &str,
+  undefined: ArcStr,
+) {
+  if let Some(AttriValues::Simple(SimpleDefined::String(v))) = attri_map.get_mut(key) {
+    v.push(undefined);
+  } else {
+    _ = attri_map.insert(
+      ArcStr::from(key),
+      AttriValues::Simple(SimpleDefined::String(vec![undefined])),
+    );
+  }
+}
+#[inline]
+pub(crate) fn attributs_set_undefined_complex(
+  attri_map: &mut Attributes,
+  key: &str,
+  undefined: ComplexWrapper,
+) {
+  if let Some(AttriValues::Complex(v)) = attri_map.get_mut(key) {
+    v.push(undefined);
+  } else {
+    _ = attri_map.insert(ArcStr::from(key), AttriValues::Complex(vec![undefined]));
+  }
+}
+#[inline]
+pub(crate) fn attributs_set_undefined_attri(
+  attri_map: &mut Attributes,
+  key: &str,
+  undefined: UndefinedAttriValue,
+) {
+  if let Some(value) = attri_map.get_mut(key) {
+    match (value, undefined) {
+      (AttriValues::Simple(SimpleDefined::String(v)), UndefinedAttriValue::Simple(u)) => {
+        v.push(u);
+      }
+      (AttriValues::Complex(v), UndefinedAttriValue::Complex(u)) => {
+        v.push(u);
+      }
+      (AttriValues::Group(v), UndefinedAttriValue::Group(u)) => {
+        v.push(u);
+      }
+      (got, want) => {
+        log::error!("Key={key}, the old undefined attribute do NOT meet new one");
+      }
+    }
+  } else {
+    _ = attri_map.insert(
+      ArcStr::from(key),
+      match undefined {
+        UndefinedAttriValue::Simple(u) => {
+          AttriValues::Simple(SimpleDefined::String(vec![u]))
+        }
+        UndefinedAttriValue::Complex(u) => AttriValues::Complex(vec![u]),
+        UndefinedAttriValue::Group(u) => AttriValues::Group(vec![u]),
+      },
+    );
+  }
+}
 /// Error for `LinkedGroup`
 #[derive(Debug)]
 #[derive(thiserror::Error)]
@@ -76,6 +204,14 @@ impl PartialEq for LinkError {
       _ => false,
     }
   }
+}
+
+#[derive(Debug, Default)]
+pub struct ParseScope {
+  pub line_num: usize,
+  pub define_simple: HashMap<ArcStr, HashMap<ArcStr, AttributeType>>,
+  pub define_group: HashMap<ArcStr, HashSet<ArcStr>>,
+  pub compact_lut_template_index3_len: usize,
 }
 
 // /// Reference: https://rustcc.cn/article?id=ac75148b-6eb0-4249-b36d-0a14875b736e
@@ -125,63 +261,64 @@ pub enum DefinedAttribute {
   Float(Vec<NotNan<f64>>),
 }
 
-#[derive(Debug, Clone, Default)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct Defined {
-  pub simple: HashMap<ArcStr, DefinedAttribute>,
-  pub group: HashMap<ArcStr, Vec<GroupWrapper>>,
-}
-
-impl Defined {
+impl SimpleDefined {
   #[inline]
-  pub(crate) fn parse_set_simple<'a>(
-    attribute: &mut DefinedAttribute,
+  pub(crate) fn parse_set<'a>(
+    &mut self,
     i: &'a str,
-    line_num: &mut usize,
-  ) -> IResult<&'a str, Result<(), AttriValue>, Error<&'a str>> {
+    scope: &mut ParseScope,
+  ) -> IResult<&'a str, (), Error<&'a str>> {
     #[inline]
-    fn nom_parse_push<'a, T: SimpleAttri>(
+    fn nom_parse_simple<'a, T: SimpleAttri>(
       i: &'a str,
-      line_num: &mut usize,
-      v: &mut Vec<T>,
-    ) -> IResult<&'a str, Result<(), AttriValue>, Error<&'a str>> {
-      match <T as SimpleAttri>::nom_parse(i, line_num) {
+      scope: &mut ParseScope,
+      v: &mut Vec<Result<T, ArcStr>>,
+    ) -> IResult<&'a str, (), Error<&'a str>> {
+      match <T as SimpleAttri>::nom_parse(i, scope) {
         Ok((input, Ok(res))) => {
-          v.push(res);
-          Ok((input, Ok(())))
+          v.push(Ok(res));
+          Ok((input, ()))
         }
-        Ok((input, Err(wrapper))) => Ok((input, Err(wrapper))),
+        Ok((input, Err(s))) => {
+          v.push(Err(s));
+          Ok((input, ()))
+        }
         Err(e) => Err(e),
       }
     }
-    match attribute {
-      DefinedAttribute::Boolean(v) => nom_parse_push(i, line_num, v),
-      DefinedAttribute::String(v) => nom_parse_push(i, line_num, v),
-      DefinedAttribute::Integer(v) => nom_parse_push(i, line_num, v),
-      DefinedAttribute::Float(v) => nom_parse_push(i, line_num, v),
+    match self {
+      Self::Boolean(v) => nom_parse_simple(i, scope, v),
+      Self::Integer(v) => nom_parse_simple(i, scope, v),
+      Self::Float(v) => nom_parse_simple(i, scope, v),
+      Self::String(v) => match <ArcStr as SimpleAttri>::nom_parse(i, scope) {
+        Ok((input, Ok(res) | Err(res))) => {
+          v.push(res);
+          Ok((input, ()))
+        }
+        Err(e) => Err(e),
+      },
     }
   }
 }
 
-pub(crate) type SimpleParseErr<'a, T> =
-  IResult<&'a str, Result<T, AttriValue>, Error<&'a str>>;
-
+pub(crate) type SimpleParseRes<'a, T> =
+  IResult<&'a str, Result<T, ArcStr>, Error<&'a str>>;
+pub(crate) type ComplexParseRes<'a, T> =
+  IResult<&'a str, Result<T, (ComplexParseError, ComplexWrapper)>, Error<&'a str>>;
 #[inline]
 pub fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
   i: &'a str,
-  line_num: &mut usize,
-) -> SimpleParseErr<'a, T> {
-  let (input, s) = parser::simple(i, line_num)?;
+  scope: &mut ParseScope,
+) -> SimpleParseRes<'a, T> {
+  let (input, s) = parser::simple(i, &mut scope.line_num)?;
   s.parse()
-    .map_or(Ok((input, Err(AttriValue::Simple(ArcStr::from(s))))), |simple| {
-      Ok((input, Ok(simple)))
-    })
+    .map_or(Ok((input, Err(ArcStr::from(s)))), |simple| Ok((input, Ok(simple))))
 }
 
 /// Simple Attribute in Liberty
 pub trait SimpleAttri: Sized + core::fmt::Display {
   /// `nom_parse`, auto implement
-  fn nom_parse<'a>(i: &'a str, line_num: &mut usize) -> SimpleParseErr<'a, Self>;
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self>;
   #[inline]
   fn is_set(&self) -> bool {
     true
@@ -274,24 +411,17 @@ pub fn join_fmt_no_quote<
 /// Complex Attribute in Liberty
 pub trait ComplexAttri: Sized {
   /// basic `parser`
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError>;
+  #[allow(clippy::ptr_arg)]
+  fn parse(v: &Vec<&str>, scope: &mut ParseScope) -> Result<Self, ComplexParseError>;
   /// `nom_parse`, auto implement
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    line_num: &mut usize,
-  ) -> IResult<&'a str, Result<Self, (ComplexParseError, AttriValue)>, Error<&'a str>> {
-    let (input, complex) = parser::complex(i, line_num)?;
-    match Self::parse(&complex) {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
+    let (input, complex) = parser::complex(i, &mut scope.line_num)?;
+    match Self::parse(&complex, scope) {
       Ok(s) => Ok((input, Ok(s))),
       Err(e) => Ok((
         input,
-        Err((
-          e,
-          AttriValue::Complex(ComplexWrapper(
-            complex.into_iter().map(ArcStr::from).collect(),
-          )),
-        )),
+        Err((e, ComplexWrapper(complex.into_iter().map(ArcStr::from).collect()))),
       )),
     }
   }
@@ -341,12 +471,12 @@ pub trait GroupAttri: Sized {
   /// `test_wrapper`
   #[inline]
   fn test_wrapper(self) -> TestWrapper<Self> {
-    TestWrapper { inner: self, line_count: 0 }
+    TestWrapper { inner: self, scope: ParseScope::default() }
   }
   /// `nom_parse`, will be implemented by macros
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
+    scope: &mut ParseScope,
   ) -> IResult<&'a str, Result<Self, IdError>, Error<&'a str>>;
   /// `fmt_liberty`
   fn fmt_liberty<T: Write, I: Indentation>(
@@ -446,16 +576,16 @@ impl ParserError {
 #[derive(Debug)]
 pub struct TestWrapper<G> {
   pub inner: G,
-  pub line_count: usize,
+  pub scope: ParseScope,
 }
 
 impl<G: GroupAttri> FromStr for TestWrapper<G> {
   type Err = String;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    let mut line_count = 1;
-    match G::nom_parse(s, &mut line_count) {
-      Ok((_, Ok(inner))) => Ok(Self { inner, line_count }),
+    let mut scope = ParseScope::default();
+    match G::nom_parse(s, &mut scope) {
+      Ok((_, Ok(inner))) => Ok(Self { inner, scope }),
       Ok((_, Err(e))) => Err(format!("{e:#?}")),
       Err(e) => Err(format!("{e:#?}")),
     }
@@ -612,13 +742,7 @@ impl Format for SimpleWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    if self.is_empty() {
-      Ok(())
-    } else if is_word(self) {
-      write!(f, "\n{}{key} : {self};", f.indentation())
-    } else {
-      write!(f, "\n{}{key} : \"{self}\";", f.indentation())
-    }
+    SimpleAttri::fmt_liberty(self, key, f)
   }
 }
 
@@ -629,40 +753,8 @@ impl Format for ComplexWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    if self.0.is_empty() {
-      Ok(())
-    } else {
-      let indent1 = f.indentation();
-      write!(f, "\n{indent1}{key} (")?;
-      if self.0.len() == 1 {
-        #[allow(clippy::indexing_slicing)]
-        let s = &self.0[0];
-        if is_word(s) {
-          write!(f, "{s}")?;
-        } else {
-          write!(f, "\"{s}\"")?;
-        }
-      } else {
-        join_fmt(self.0.iter(), f, |s, ff| write!(ff, "{s}"), ", ")?;
-      }
-      write!(f, ");")
-    }
+    ComplexAttri::fmt_liberty(&self.0, key, f)
   }
-}
-
-#[inline]
-pub(crate) fn liberty_attr_list<T: Write, I: Indentation>(
-  attr_list: &AttributeList,
-  f: &mut CodeFormatter<'_, T, I>,
-) -> core::fmt::Result {
-  for (key, attr) in attr_list {
-    match attr {
-      AttriValue::Simple(a) => Format::liberty(a, key, f)?,
-      AttriValue::Complex(a) => Format::liberty(a, key, f)?,
-      AttriValue::Group(a) => Format::liberty(a, key, f)?,
-    }
-  }
-  Ok(())
 }
 
 impl Format for GroupWrapper {
@@ -682,7 +774,7 @@ impl Format for GroupWrapper {
     )?;
     write!(f, ") {{")?;
     f.indent(1);
-    liberty_attr_list(&self.attr_list, f)?;
+    attributs_fmt_liberty(&self.attri_map, f)?;
     f.dedent(1);
     write!(f, "\n{indent}}}")
   }

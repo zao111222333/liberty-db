@@ -2,7 +2,7 @@
 //! cargo expand `common::demo`
 
 use crate::{
-  ast::{AttributeList, GroupComments, GroupFn, NamedGroup},
+  ast::{Attributes, GroupComments, GroupFn, NamedGroup},
   cell::Statetable,
   timing::TimingType,
   ArcStr, GroupSet,
@@ -14,7 +14,7 @@ use core::fmt::Write;
 pub(crate) struct Timing {
   /// group undefined attributes
   #[liberty(undefined)]
-  undefined: AttributeList,
+  undefined: Attributes,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments<Self>,
@@ -41,7 +41,7 @@ pub(crate) struct Pin {
   comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  undefined: AttributeList,
+  undefined: Attributes,
   #[liberty(group(type=Vec))]
   timing: Vec<Timing>,
 }
@@ -64,7 +64,7 @@ pub(crate) struct FF {
   comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  undefined: AttributeList,
+  undefined: Attributes,
   #[liberty(simple(type = Option))]
   next_state: Option<ArcStr>,
 }
@@ -109,7 +109,7 @@ pub(crate) struct Cell {
   comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  undefined: AttributeList,
+  undefined: Attributes,
   #[liberty(simple(type = Option))]
   area: Option<f64>,
   #[liberty(group(type=Set))]
@@ -252,7 +252,7 @@ liberty_db::common::demo::Cell (INV) {
 | | timing () {
 | | | /* Undefined attributes from here */
 | | | t1 : foo_error;
-| | | test_table ("1, 2, 4, 5, 6, 4, 5, 6");
+| | | test_table (1, 2, 4, 5, 6, 4, 5, 6);
 | | | /* Undefined attributes end here */
 | | }
 | }

@@ -1,5 +1,5 @@
 use crate::{
-  ast::{AttributeList, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn},
   expression::IdBooleanExpression,
   pin::{Direction, NextstateType},
   timing::Timing,
@@ -25,7 +25,7 @@ pub struct Bundle {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(complex)]
   pub members: Vec<ArcStr>,
   #[liberty(simple(type = Option))]

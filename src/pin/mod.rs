@@ -2,7 +2,7 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 use crate::{
-  ast::{AttributeList, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn},
   ccsn::{CCSNStage, ReceiverCapacitance},
   common::items::{NameList, WordSet},
   expression::{logic, BooleanExpression},
@@ -54,7 +54,7 @@ pub struct Pin {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(simple(type = Option))]
   pub driver_waveform_rise: Option<ArcStr>,
   #[liberty(simple(type = Option))]

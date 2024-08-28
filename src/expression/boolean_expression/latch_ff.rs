@@ -4,7 +4,7 @@
 
 use super::{BooleanExpression, BooleanExpressionLike, UNKNOWN};
 use crate::{
-  ast::{AttributeList, GroupComments, GroupFn, IdError, NamedGroup},
+  ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
   ArcStr,
 };
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
@@ -56,7 +56,7 @@ pub struct FF {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
@@ -143,7 +143,7 @@ pub struct FFBank {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
@@ -226,7 +226,7 @@ pub struct Latch {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
@@ -312,7 +312,7 @@ pub struct LatchBank {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
@@ -862,9 +862,9 @@ impl crate::ast::SimpleAttri for ClearPresetState {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 

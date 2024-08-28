@@ -1,5 +1,7 @@
 use crate::{
-  ast::{join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, SimpleAttri},
+  ast::{
+    join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
+  },
   ArcStr,
 };
 use core::{
@@ -101,9 +103,9 @@ impl SimpleAttri for VariableType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -131,7 +133,7 @@ pub struct Domain {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::Attributes,
   pub group_name: ArcStr,
   pub calc_mode: Option<ArcStr>,
   #[liberty(simple(type = Option))]
@@ -195,9 +197,9 @@ impl SimpleAttri for WordSet {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -249,7 +251,7 @@ pub struct DummyGroup {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: crate::ast::AttributeList,
+  pub undefined: crate::ast::Attributes,
 }
 impl GroupFn for DummyGroup {}
 

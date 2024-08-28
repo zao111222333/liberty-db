@@ -3,7 +3,7 @@
 //! </script>
 
 use crate::{
-  ast::{AttributeList, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn},
   common::table::TableLookUp2D,
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
@@ -29,7 +29,7 @@ pub struct Cell {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(simple(type=Option))]
   pub area: Option<f64>,
   /// The `dont_use`  attribute with a true value indicates
@@ -361,7 +361,7 @@ pub struct TestCell {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(group(type=Set))]
   pub ff: GroupSet<FF>,
   #[liberty(group(type=Set))]

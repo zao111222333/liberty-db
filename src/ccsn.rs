@@ -4,8 +4,8 @@
 
 use crate::{
   ast::{
-    AttributeList, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
-    GroupFn, Indentation, SimpleAttri,
+    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
+    Indentation, ParseScope, SimpleAttri,
   },
   common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
@@ -58,7 +58,7 @@ pub struct CCSNStage {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[liberty(simple(type = Option))]
   pub load_cap_fall: Option<f64>,
   #[liberty(simple(type = Option))]
@@ -247,9 +247,9 @@ impl SimpleAttri for StageType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    line_num: &mut usize,
-  ) -> crate::ast::SimpleParseErr<'a, Self> {
-    crate::ast::nom_parse_from_str(i, line_num)
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -290,7 +290,7 @@ pub struct ReceiverCapacitance {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   #[id]
   #[liberty(simple(type=Option))]
   pub when: Option<IdBooleanExpression>,
@@ -328,7 +328,7 @@ pub struct PropagatingCcb {
 
 impl ComplexAttri for PropagatingCcb {
   #[inline]
-  fn parse(v: &[&str]) -> Result<Self, ComplexParseError> {
+  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
     let mut i = v.iter();
     let input_ccb_name = match i.next() {
       Some(&s) => ArcStr::from(s),

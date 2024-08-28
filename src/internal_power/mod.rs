@@ -1,5 +1,5 @@
 use crate::{
-  ast::{AttributeList, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn},
   common::{
     items::{Domain, WordSet},
     table::TableLookUp,
@@ -21,7 +21,7 @@ pub struct InternalPower {
   pub comments: GroupComments<Self>,
   /// group undefined attributes
   #[liberty(undefined)]
-  pub undefined: AttributeList,
+  pub undefined: Attributes,
   // NOTICE: Simple Attributes
   // equal_or_opposite_output
   // falling_together_group
