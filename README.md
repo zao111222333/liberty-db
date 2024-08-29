@@ -10,7 +10,7 @@
 ## Highlight Features
 
 + All `liberty` datastructure supported, reference to Liberty Version R-2020.09, September 2020
-+ Parser & formatter are implemented by static macros, providing a decent preformance
++ Parser & formatter are implemented by static macros, providing a decent preformance and tiny ~2MB `parser & formatter` binary
 + Well defined [document](https://docs.rs/liberty-db/latest/liberty_db/library/struct.Library.html)
 + Support `define` `define_group` user-defined attributes
 + Verified with library-complier
