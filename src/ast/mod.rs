@@ -179,7 +179,7 @@ pub(crate) fn attributs_set_undefined_attri(
           (AttriValues::Group(v), UndefinedAttriValue::Group(u)) => {
             v.push(u);
           }
-          (got, want) => {
+          (_, _) => {
             log::error!(
               "Line={}; Key={key}, the old undefined attribute do NOT meet new one",
               scope.line_num
