@@ -572,7 +572,7 @@ pub struct Library {
 
 impl GroupFn for Library {
   #[inline]
-  fn post_parse_process(&mut self) {
+  fn post_parse_process(&mut self, _scope: &mut ParseScope) {
     // if let Some(first) = self.compact_lut_template.iter().next() {
     //   let l = first.index_3.len();
     //   if l != 0 {
@@ -650,8 +650,8 @@ impl Library {
     f: &mut fmt::Formatter<'_>,
   ) -> Result<(), fmt::Error> {
     let ff = &mut crate::ast::CodeFormatter::<'_, fmt::Formatter<'_>, I>::new(f);
-    crate::ast::fmt_first_line_comment(&self.comments.this, ff)?;
-    self.fmt_liberty(Self::KEY, ff)?;
+    crate::ast::fmt_library_beginning(&self.comments.this, ff)?;
+    GroupAttri::fmt_liberty(self, Self::KEY, ff)?;
     writeln!(f)
   }
   /// TODO: Parse `.json` file as a [Library] struct.

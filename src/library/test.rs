@@ -20,6 +20,12 @@ fn parse_cmp(text: &str, want: &str) -> Library {
   }
 }
 
+fn fmt_cmp(library: &Library, want: &str) {
+  let s = library.to_string();
+  println!("{s}");
+  text_diff(&s, want);
+}
+
 #[test]
 fn define() {
   let library = parse_cmp(
@@ -110,5 +116,51 @@ library (define) {
   assert_eq!(
     &cell_test1.attributes["my_define_integer"],
     &AttriValues::Simple(SimpleDefined::Integer(vec![Ok(1), Ok(2), Ok(3), Ok(4),]))
+  );
+}
+
+#[test]
+fn comment() {
+  let mut library = Library::default();
+  library.comments.this.push("comment1".into());
+  library.comments.this.push("comment2\ncomment3".into());
+  library.comments.technology.push("comment1".into());
+  library.comments.technology.push("comment2\ncomment3".into());
+  library.comments.time_unit.push("one line comment".into());
+  let mut cell_test1 = Cell::default();
+  cell_test1.name = "test1".into();
+  cell_test1.comments.this.push("comment1\ncomment2".into());
+  cell_test1.comments.this.push("comment3".into());
+  library.cell.insert(cell_test1);
+  fmt_cmp(
+    &library,
+    r#"/* comment1
+** comment2
+** comment3 */
+library ("") {
+  /* comment1
+  ** comment2
+  ** comment3 */
+  technology (cmos);
+  delay_model : table_lookup;
+  /* one line comment */
+  time_unit : 1ns;
+  voltage_unit : 1V;
+  slew_upper_threshold_pct_rise : 80.0;
+  slew_lower_threshold_pct_rise : 20.0;
+  slew_derate_from_library : 1.0;
+  slew_lower_threshold_pct_fall : 20.0;
+  slew_upper_threshold_pct_fall : 80.0;
+  input_threshold_pct_fall : 50.0;
+  input_threshold_pct_rise : 50.0;
+  output_threshold_pct_rise : 50.0;
+  output_threshold_pct_fall : 50.0;
+  /* comment1
+  ** comment2
+  ** comment3 */
+  cell (test1) {
+  }
+}
+"#,
   );
 }

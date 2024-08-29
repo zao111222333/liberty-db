@@ -578,7 +578,7 @@ pub type AttriComment = Vec<ArcStr>;
 pub trait GroupFn {
   /// `post_parse_process` call back
   #[inline]
-  fn post_parse_process(&mut self) {}
+  fn post_parse_process(&mut self, _scope: &mut ParseScope) {}
 }
 /// `GroupAttri`
 pub trait GroupAttri: Sized {
@@ -740,7 +740,7 @@ pub fn test_parse_fmt<G: GroupAttri + core::fmt::Debug>(
 }
 
 /// For basic formatter
-pub trait Format {
+pub(crate) trait Format {
   /// `.lib` format
   fn liberty<T: Write, I: Indentation>(
     &self,
@@ -774,9 +774,8 @@ pub trait Format {
 pub(crate) fn is_word(s: &ArcStr) -> bool {
   !s.is_empty() && s.chars().all(parser::char_in_word)
 }
+/// For basic formatter
 impl Format for AttriComment {
-  /// See [`core::str::replace`](core::str::replace)
-  #[allow(clippy::arithmetic_side_effects, clippy::undocumented_unsafe_blocks)]
   #[inline]
   fn liberty<T: Write, I: Indentation>(
     &self,
@@ -786,36 +785,21 @@ impl Format for AttriComment {
     if self.is_empty() {
       Ok(())
     } else {
-      let mut first_line = true;
-      let mut first_char = || {
-        if first_line {
-          first_line = false;
-          '/'
-        } else {
-          '*'
-        }
-      };
       let indent = f.indentation();
-      self.iter().try_for_each(|line| {
-        let mut last_end = 0;
-        line.match_indices('\n').try_for_each(|(start, _)| {
-          // see [alloc::str::replace]
-          let s = unsafe { line.get_unchecked(last_end..start) };
-          last_end = start + 1;
-          f.write_fmt(format_args!("\n{indent}{}* {s}", first_char()))
-        })?;
-        // see [alloc::str::replace]
-        let s = unsafe { line.get_unchecked(last_end..line.len()) };
-        f.write_fmt(format_args!("\n{indent}{}* {s}", first_char()))
-      })?;
-      f.write_str(" */")
+      write!(f, "\n{indent}/* ")?;
+      join_fmt_no_quote(
+        self.iter().flat_map(|lines| lines.split('\n')),
+        f,
+        |line, ff| write!(ff, "{line}"),
+        format!("\n{indent}** ").as_str(),
+      )?;
+      write!(f, " */")
     }
   }
 }
 
-#[allow(clippy::arithmetic_side_effects, clippy::undocumented_unsafe_blocks)]
 #[inline]
-pub(crate) fn fmt_first_line_comment<T: Write, I: Indentation>(
+pub(crate) fn fmt_library_beginning<T: Write, I: Indentation>(
   comment: &AttriComment,
   f: &mut CodeFormatter<'_, T, I>,
 ) -> core::fmt::Result {
@@ -827,31 +811,16 @@ pub(crate) fn fmt_first_line_comment<T: Write, I: Indentation>(
       env!("CARGO_PKG_VERSION"),
     )
   } else {
-    let mut first_line = true;
-    let mut first_chars = || {
-      if first_line {
-        first_line = false;
-        "/"
-      } else {
-        "\n*"
-      }
-    };
-    comment.iter().try_for_each(|line| {
-      let mut last_end = 0;
-      line.match_indices('\n').try_for_each(|(start, _)| {
-        // see [alloc::str::replace]
-        let s = unsafe { line.get_unchecked(last_end..start) };
-        last_end = start + 1;
-        f.write_fmt(format_args!("{}* {s}", first_chars()))
-      })?;
-      // see [alloc::str::replace]
-      let s = unsafe { line.get_unchecked(last_end..line.len()) };
-      f.write_fmt(format_args!("{}* {s}", first_chars()))
-    })?;
-    f.write_str(" */")
+    write!(f, "/* ")?;
+    join_fmt_no_quote(
+      comment.iter().flat_map(|lines| lines.split('\n')),
+      f,
+      |line, ff| write!(ff, "{line}"),
+      "\n** ",
+    )?;
+    write!(f, " */")
   }
 }
-
 impl Format for SimpleWrapper {
   #[inline]
   fn liberty<T: Write, I: Indentation>(

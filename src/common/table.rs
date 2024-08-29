@@ -186,7 +186,15 @@ pub struct CompactLutTemplate {
   pub index_3: Vec<ArcStr>,
 }
 
-impl GroupFn for CompactLutTemplate {}
+impl GroupFn for CompactLutTemplate {
+  #[inline]
+  fn post_parse_process(&mut self, scope: &mut ParseScope) {
+    let l = self.index_3.len();
+    if l != 0 {
+      scope.compact_lut_template_index3_len = l;
+    }
+  }
+}
 
 /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
 /// <a name ="reference_link" href="
@@ -481,10 +489,20 @@ pub struct CompactCcsTable {
 }
 impl GroupFn for CompactCcsTable {
   #[inline]
-  fn post_parse_process(&mut self) {
-    // TODO
-    self.values.size1 = self.values.inner.len();
-    self.values.size2 = 1;
+  #[allow(clippy::integer_division)]
+  #[allow(clippy::arithmetic_side_effects)]
+  #[allow(clippy::integer_division_remainder_used)]
+  fn post_parse_process(&mut self, scope: &mut ParseScope) {
+    if scope.compact_lut_template_index3_len == 0 {
+      scope.compact_lut_template_index3_len = 1;
+    }
+    // if scope.compact_lut_template_index3_len == 0 {
+    //   self.values.size2 = 1;
+    //   self.values.size1 = self.values.inner.len();
+    // } else {
+    self.values.size1 = scope.compact_lut_template_index3_len;
+    self.values.size2 = self.values.inner.len() / scope.compact_lut_template_index3_len;
+    // }
   }
 }
 
@@ -528,7 +546,7 @@ pub struct TableLookUp {
 )]
 impl GroupFn for AllTypes {
   #[inline]
-  fn post_parse_process(&mut self) {
+  fn post_parse_process(&mut self, _scope: &mut ParseScope) {
     match (self.index_1.len(), self.index_2.len()) {
       (0, 0) => {
         self.values.size1 = self.values.inner.len();

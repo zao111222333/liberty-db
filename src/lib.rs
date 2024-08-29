@@ -121,6 +121,7 @@
     clippy::needless_raw_string_hashes,
     clippy::indexing_slicing,
     clippy::arithmetic_side_effects,
+    clippy::field_reassign_with_default,
   )
 )]
 

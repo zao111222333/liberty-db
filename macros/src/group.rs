@@ -30,8 +30,8 @@ fn group_field_fn(
         }
       };
       parser_arm = quote! {
-        let simple_res: _;
-        (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input, scope)?;
+        let (new_input,simple_res) = crate::ast::SimpleAttri::nom_parse(input, scope)?;
+        input = new_input;
         match simple_res {
           Ok(simple) => {
             res.#field_name=Some(simple);
@@ -52,8 +52,8 @@ fn group_field_fn(
         crate::ast::SimpleAttri::fmt_liberty(&self.#field_name, #s_field_name, f)?;
       };
       parser_arm = quote! {
-        let simple_res: _;
-        (input,simple_res) = <_ as crate::ast::SimpleAttri>::nom_parse(input, scope)?;
+        let (new_input,simple_res) = crate::ast::SimpleAttri::nom_parse(input, scope)?;
+        input = new_input;
         match simple_res {
           Ok(simple) => {
             res.#field_name=simple;
@@ -74,8 +74,8 @@ fn group_field_fn(
         crate::ast::ComplexAttri::fmt_liberty(&self.#field_name, #s_field_name, f)?;
       };
       parser_arm = quote! {
-        let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, scope)?;
+        let (new_input,complex_res) = crate::ast::ComplexAttri::nom_parse(input, scope)?;
+        input = new_input;
         match complex_res {
           Ok(complex) => res.#field_name=complex,
           Err((e,undefined)) => {
@@ -96,8 +96,8 @@ fn group_field_fn(
         }
       };
       parser_arm = quote! {
-        let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, scope)?;
+        let (new_input,complex_res) = crate::ast::ComplexAttri::nom_parse(input, scope)?;
+        input = new_input;
         match complex_res {
           Ok(complex) => res.#field_name=Some(complex),
           Err((e,undefined)) => {
@@ -115,8 +115,8 @@ fn group_field_fn(
         }
       };
       parser_arm = quote! {
-        let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, scope)?;
+        let (new_input,complex_res) = crate::ast::ComplexAttri::nom_parse(input, scope)?;
+        input = new_input;
         match complex_res{
           Ok(complex) => {
             res.#field_name.push(complex);
@@ -139,8 +139,8 @@ fn group_field_fn(
         }
       };
       parser_arm = quote! {
-        let complex_res: _;
-        (input,complex_res) = <_ as crate::ast::ComplexAttri>::nom_parse(input, scope)?;
+        let (new_input,complex_res) = crate::ast::ComplexAttri::nom_parse(input, scope)?;
+        input = new_input;
         match complex_res{
           Ok(complex) => {
             if let Some(_) = res.#field_name.replace(
@@ -169,8 +169,8 @@ fn group_field_fn(
         }
       };
       parser_arm = quote! {
-        let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, key, scope)?;
+        let (new_input,group_res) = crate::ast::GroupAttri::nom_parse(input, key, scope)?;
+        input = new_input;
         match group_res{
           Ok(group) => {
             res.#field_name.push(group);
@@ -193,8 +193,8 @@ fn group_field_fn(
         }
       };
       parser_arm = quote! {
-        let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, key, scope)?;
+        let (new_input,group_res) = crate::ast::GroupAttri::nom_parse(input, key, scope)?;
+        input = new_input;
         match group_res{
           Ok(group) => {
             if let Some(old) = res.#field_name.replace(
@@ -222,8 +222,8 @@ fn group_field_fn(
         }
       };
       parser_arm = quote! {
-        let group_res: _;
-        (input,group_res) = <_ as crate::ast::GroupAttri>::nom_parse(input, key, scope)?;
+        let (new_input,group_res) = crate::ast::GroupAttri::nom_parse(input, key, scope)?;
+        input = new_input;
         match group_res{
           Ok(group) => {
             if let Some(old) = res.#field_name{
@@ -405,7 +405,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
             match crate::ast::parser::key(input){
               Err(nom::Err::Error(_)) => {
                 (input,_) = crate::ast::parser::end_group(input)?;
-                <Self as crate::ast::GroupFn>::post_parse_process(&mut res);
+                <Self as crate::ast::GroupFn>::post_parse_process(&mut res, scope);
                 #change_id_return
               },
               Err(e) => return Err(e),
