@@ -6,6 +6,7 @@ use crate::{
   ArcStr, GroupSet, NotNan,
 };
 use core::fmt::{self, Write};
+
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
@@ -186,15 +187,7 @@ pub struct CompactLutTemplate {
   pub index_3: Vec<ArcStr>,
 }
 
-impl GroupFn for CompactLutTemplate {
-  #[inline]
-  fn post_parse_process(&mut self, scope: &mut ParseScope) {
-    let l = self.index_3.len();
-    if l != 0 {
-      scope.compact_lut_template_index3_len = l;
-    }
-  }
-}
+impl GroupFn for CompactLutTemplate {}
 
 /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
 /// <a name ="reference_link" href="
@@ -487,24 +480,7 @@ pub struct CompactCcsTable {
   #[liberty(complex)]
   pub values: Values,
 }
-impl GroupFn for CompactCcsTable {
-  #[inline]
-  #[allow(clippy::integer_division)]
-  #[allow(clippy::arithmetic_side_effects)]
-  #[allow(clippy::integer_division_remainder_used)]
-  fn post_parse_process(&mut self, scope: &mut ParseScope) {
-    if scope.compact_lut_template_index3_len == 0 {
-      scope.compact_lut_template_index3_len = 1;
-    }
-    // if scope.compact_lut_template_index3_len == 0 {
-    //   self.values.size2 = 1;
-    //   self.values.size1 = self.values.inner.len();
-    // } else {
-    self.values.size1 = scope.compact_lut_template_index3_len;
-    self.values.size2 = self.values.inner.len() / scope.compact_lut_template_index3_len;
-    // }
-  }
-}
+impl GroupFn for CompactCcsTable {}
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
@@ -536,38 +512,12 @@ pub struct TableLookUp {
   #[liberty(complex)]
   pub values: Values,
 }
-#[duplicate::duplicate_item(
-  AllTypes;
-  [TableLookUp];
-  [TableLookUpMultiSegment];
-  [TableLookUp2D];
-  [TableLookUp3D];
-  [DriverWaveform];
-)]
-impl GroupFn for AllTypes {
-  #[inline]
-  fn post_parse_process(&mut self, _scope: &mut ParseScope) {
-    match (self.index_1.len(), self.index_2.len()) {
-      (0, 0) => {
-        self.values.size1 = self.values.inner.len();
-      }
-      (l1, 0) => {
-        // 1-d table
-        // fall_power (passive_power_template_8x1) {
-        //   index_1 (0.0023, 0.0091, 0.0228, 0.0502, 0.105, 0.2145, 0.4335, 0.8715);
-        //   values ("0.000137298, 0.00013122, 0.000128847, 0.000127135, 0.000126483, 0.000125385, 0.000125261, 0.000125493");
-        // }
-        self.values.size1 = l1;
-        self.values.size2 = 1;
-      }
-      (l1, l2) => {
-        self.values.size1 = l2;
-        self.values.size2 = l1;
-      }
-    }
-  }
-}
 
+impl GroupFn for TableLookUp {}
+impl GroupFn for TableLookUpMultiSegment {}
+impl GroupFn for TableLookUp2D {}
+impl GroupFn for TableLookUp3D {}
+impl GroupFn for DriverWaveform {}
 impl GroupFn for Vector3D {}
 impl GroupFn for Vector4D {}
 
@@ -581,12 +531,36 @@ pub struct Values {
 
 impl ComplexAttri for Values {
   #[inline]
-  fn parse(v: &Vec<&str>, scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
-    Ok(Self {
-      size1: 0,
-      size2: 0,
-      inner: <Vec<NotNan<f64>> as ComplexAttri>::parse(v, scope)?,
-    })
+  #[allow(clippy::arithmetic_side_effects)]
+  fn parse(
+    vec: &Vec<Vec<&str>>,
+    _scope: &mut ParseScope,
+  ) -> Result<Self, ComplexParseError> {
+    let mut size1 = 0;
+    let mut size2 = 0;
+    // FIXME: optimize it
+    let mut table_len_mismatch = false;
+    let inner = vec
+      .iter()
+      .flat_map(|v| {
+        size2 += 1;
+        let l = v.len();
+        #[allow(clippy::else_if_without_else)]
+        if l != 0 {
+          if size1 == 0 {
+            size1 = l;
+          } else if size1 != l {
+            table_len_mismatch = true;
+          }
+        }
+        v.iter().map(|s| s.parse())
+      })
+      .collect::<Result<Vec<NotNan<f64>>, _>>()?;
+    if table_len_mismatch {
+      Err(ComplexParseError::LengthDismatch)
+    } else {
+      Ok(Self { size1, size2, inner })
+    }
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -949,4 +923,58 @@ pub enum ScalarVariable {
   /// ">Reference-Definition</a>
   #[strum(serialize = "normalized_voltage")]
   NormalizedVoltage,
+}
+
+#[cfg(test)]
+mod test {
+  use crate::ast::test_parse_fmt;
+
+  #[test]
+  fn table() {
+    let table = test_parse_fmt::<super::TableLookUp>(
+      r#" ("CCS_RCV_TEMPLATE_0") {
+      index_1("0.0186051, 0.0372112, 0.0744591");
+      index_2("0.1000000, 0.2500000, 0.5000000");
+      values("5.4283814e-01, 5.4289214e-01, 5.4298464e-01", \
+        "6.0907950e-01, 6.0906120e-01, 6.0903281e-01,", \
+        "6.2226570e-01, 6.2225652e-01, 6.2212002e-01,");
+    }
+    "#,
+      r#"
+liberty_db::common::table::TableLookUp (CCS_RCV_TEMPLATE_0) {
+| index_1 ("0.0186051, 0.0372112, 0.0744591");
+| index_2 ("0.1, 0.25, 0.5");
+| values ("0.54283814, 0.54289214, 0.54298464", \
+| | "0.6090795, 0.6090612, 0.60903281", \
+| | "0.6222657, 0.62225652, 0.62212002");
+}"#,
+    );
+  }
+  #[test]
+  fn compact_ccs_table() {
+    let table = test_parse_fmt::<super::CompactCcsTable>(
+      r#" ("c_ccs_pwr_template_6") {
+        values("-0.0119931,-101.1912245,", \
+          "-0.0119953,-101.1912245,", \
+          "-0.0119957,-101.1912245,", \
+          "-0.0119957,-101.1912245,", \
+          "-0.0119957,-101.1912245,", \
+          "-0.0119953,-101.1912245,", \
+          "-0.0119953,-101.1912245,", \
+          "-0.7696603,-101.1912245,");
+      }
+    "#,
+      r#"
+liberty_db::common::table::CompactCcsTable (c_ccs_pwr_template_6) {
+| values ("-0.0119931, -101.1912245", \
+| | "-0.0119953, -101.1912245", \
+| | "-0.0119957, -101.1912245", \
+| | "-0.0119957, -101.1912245", \
+| | "-0.0119957, -101.1912245", \
+| | "-0.0119953, -101.1912245", \
+| | "-0.0119953, -101.1912245", \
+| | "-0.7696603, -101.1912245");
+}"#,
+    );
+  }
 }

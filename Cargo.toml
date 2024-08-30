@@ -4,7 +4,7 @@
 members = ["macros", "tests", "examples/*"]
 
 [workspace.package]
-version = "0.6.0"
+version = "0.6.1"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -44,7 +44,7 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html" ]
 default = []
 
 [dependencies]
-# liberty-macros = "0.6.0"
+# liberty-macros = "0.6.1"
 liberty-macros = { path = "macros" }
 log = { version = "0.4", features = ["std", "serde"] }
 serde = { version = "1.0", features = ["derive"] }

@@ -388,8 +388,11 @@ pub struct RetentionPin {
 }
 impl ComplexAttri for RetentionPin {
   #[inline]
-  fn parse(v: &Vec<&str>, _scope: &mut ParseScope) -> Result<Self, ComplexParseError> {
-    let mut i = v.iter();
+  fn parse(
+    vec: &Vec<Vec<&str>>,
+    _scope: &mut ParseScope,
+  ) -> Result<Self, ComplexParseError> {
+    let mut i = vec.iter().flat_map(IntoIterator::into_iter);
     let pin_class: PinClass = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,

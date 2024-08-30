@@ -187,14 +187,16 @@ liberty_db::common::items::DummyGroup (0) {
           4,5);
         unknown_complex ("1,2",3,4,5);
         unknown_complex (1,2,\
-          3,"4,5");
+          3, "4,5");
       }"#,
       r#"
 liberty_db::common::items::DummyGroup () {
 | unknown_complex (1, 2, 3, 4, 5); /* user defined attribute */
+| unknown_complex ("1, 2, 3", \
+| "4, 5");  /* user defined attribute */
 | unknown_complex (1, 2, 3, 4, 5); /* user defined attribute */
-| unknown_complex (1, 2, 3, 4, 5); /* user defined attribute */
-| unknown_complex (1, 2, 3, 4, 5); /* user defined attribute */
+| unknown_complex ("1, 2", \
+| "3, 4, 5");  /* user defined attribute */
 }"#,
     );
   }

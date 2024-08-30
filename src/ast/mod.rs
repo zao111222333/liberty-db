@@ -26,7 +26,26 @@ pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct ComplexWrapper(Vec<ArcStr>);
+pub enum ComplexWrapper {
+  Single(Vec<ArcStr>),
+  Multi(Vec<Vec<ArcStr>>),
+}
+impl ComplexWrapper {
+  fn collect(mut vec: Vec<Vec<&str>>) -> Self {
+    if vec.len() <= 1 {
+      vec.pop().map_or(Self::Single(Vec::new()), |first| {
+        Self::Single(first.into_iter().map_into::<ArcStr>().collect())
+      })
+    } else {
+      Self::Multi(
+        vec
+          .into_iter()
+          .map(|v| v.into_iter().map_into::<ArcStr>().collect())
+          .collect(),
+      )
+    }
+  }
+}
 /// Wrapper for group attribute
 ///
 /// ``` text
@@ -528,17 +547,17 @@ pub fn join_fmt_no_quote<
 pub trait ComplexAttri: Sized {
   /// basic `parser`
   #[allow(clippy::ptr_arg)]
-  fn parse(v: &Vec<&str>, scope: &mut ParseScope) -> Result<Self, ComplexParseError>;
+  fn parse(
+    vec: &Vec<Vec<&str>>,
+    scope: &mut ParseScope,
+  ) -> Result<Self, ComplexParseError>;
   /// `nom_parse`, auto implement
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
-    let (input, complex) = parser::complex(i, &mut scope.line_num)?;
-    match Self::parse(&complex, scope) {
+    let (input, vec) = parser::complex(i, &mut scope.line_num)?;
+    match Self::parse(&vec, scope) {
       Ok(s) => Ok((input, Ok(s))),
-      Err(e) => Ok((
-        input,
-        Err((e, ComplexWrapper(complex.into_iter().map(ArcStr::from).collect()))),
-      )),
+      Err(e) => Ok((input, Err((e, ComplexWrapper::collect(vec))))),
     }
   }
   #[inline]
@@ -839,7 +858,24 @@ impl Format for ComplexWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    ComplexAttri::fmt_liberty(&self.0, key, f).and(write!(f, "{DEFINED_COMMENT}"))
+    match self {
+      Self::Single(signle) => {
+        ComplexAttri::fmt_liberty(signle, key, f).and(write!(f, "{DEFINED_COMMENT}"))
+      }
+      Self::Multi(multi) => {
+        let indent = f.indentation();
+        write!(f, "\n{indent}{key} (")?;
+        let mut iter = multi.iter();
+        if let Some(v) = iter.next() {
+          join_fmt(v.iter(), f, |s, ff| write!(ff, "{s}"), ", ")?;
+        }
+        while let Some(v) = iter.next() {
+          write!(f, ", \\\n{indent}")?;
+          join_fmt(v.iter(), f, |s, ff| write!(ff, "{s}"), ", ")?;
+        }
+        write!(f, "); {DEFINED_COMMENT}")
+      }
+    }
   }
 }
 

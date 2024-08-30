@@ -399,7 +399,7 @@ mod test {
   fn example_pin_opposite() {
     let cell = crate::ast::test_parse_fmt::<Cell>(
       r#"(test) {
-        pin_opposite ("Q1 Q2 Q3", "QB1 QB2") ;
+        pin_opposite ("Q1 Q2 Q3 ", "QB1 QB2 ") ;
       }"#,
       r#"
 liberty_db::cell::Cell (test) {

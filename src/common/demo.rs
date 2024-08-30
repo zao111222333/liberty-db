@@ -249,7 +249,9 @@ liberty_db::common::demo::Cell (INV) {
 | pin (Y) {
 | | timing () {
 | | | t1 : foo_error; /* user defined attribute */
-| | | test_table (1, 2, 4, 5, 6, 4, 5, 6); /* user defined attribute */
+| | | test_table ("1, 2", \
+| | | "4, 5, 6", \
+| | | "4, 5, 6");  /* user defined attribute */
 | | }
 | }
 | statetable ("CLK EN SE", ENL) {

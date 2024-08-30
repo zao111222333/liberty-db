@@ -2,20 +2,18 @@
 //!
 //! All parser utilis.
 //!
-use std::collections::HashMap;
-
+use crate::{ast::GroupWrapper, ArcStr};
 use nom::{
   branch::alt,
   bytes::streaming::{escaped, is_not, tag, take, take_until, take_while},
   character::streaming::{char, one_of},
   combinator::{map, map_opt, opt},
   error::{ContextError, Error, ErrorKind, FromExternalError, ParseError},
-  multi::{many0, separated_list0},
+  multi::{many0, many_till, separated_list0},
   sequence::{delimited, pair, preceded, terminated, tuple},
   IResult, InputTakeAtPosition,
 };
-
-use crate::{ast::GroupWrapper, ArcStr};
+use std::collections::HashMap;
 
 #[inline]
 fn comment_single(i: &str) -> IResult<&str, usize, Error<&str>> {
@@ -177,12 +175,10 @@ pub(crate) fn undefine<'a>(
     return Ok((input, super::UndefinedAttriValue::Simple(ArcStr::from(res))));
   }
   scope.line_num = line_num_back;
-  if let Ok((input, res)) = complex(i, &mut scope.line_num) {
+  if let Ok((input, vec)) = complex(i, &mut scope.line_num) {
     return Ok((
       input,
-      super::UndefinedAttriValue::Complex(super::ComplexWrapper(
-        res.into_iter().map(ArcStr::from).collect(),
-      )),
+      super::UndefinedAttriValue::Complex(super::ComplexWrapper::collect(vec)),
     ));
   }
   scope.line_num = line_num_back;
@@ -264,6 +260,17 @@ where
   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
 {
   i.split_at_position1(|item| !char_in_word(item), ErrorKind::Alpha)
+}
+
+#[inline]
+pub(crate) fn word_all<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+where
+  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
+{
+  i.split_at_position1(
+    |item| !(item.is_alphanumeric() || "/_.+-: \t[]".contains(item)),
+    ErrorKind::Alpha,
+  )
 }
 
 #[inline]
@@ -354,60 +361,55 @@ pub(crate) fn simple<'a>(
 }
 
 #[inline]
-fn complex_complex(i: &str) -> IResult<&str, Vec<&str>, Error<&str>> {
-  let (input, words) = unquote(i)?;
-  Ok((
-    input,
-    words
-      .split(',')
-      .filter_map(|s| {
-        let _s = s.trim();
-        if _s.is_empty() {
-          None
-        } else {
-          Some(_s)
-        }
-      })
-      .collect(),
-  ))
+fn single_line_complex(i: &str) -> IResult<&str, Vec<&str>, Error<&str>> {
+  map(
+    separated_list0(
+      pair(char(','), space),
+      alt((
+        delimited(
+          char('"'),
+          terminated(
+            separated_list0(pair(char(','), space), preceded(space, word_all)),
+            opt(pair(char(','), space)),
+          ),
+          char('"'),
+        ),
+        separated_list0(pair(char(','), space), delimited(space, word, space)),
+      )),
+    ),
+    |v| {
+      v.into_iter()
+        .flat_map(IntoIterator::into_iter)
+        .map(str::trim_end)
+        .collect()
+    },
+  )(i)
 }
 
-#[inline]
 pub(crate) fn complex<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<Vec<&'a str>>, Error<&'a str>> {
   map(
     tuple((
       space,
       char('('),
       comment_space_newline_slash,
-      many0(pair(
-        alt((map(word, |s| vec![s]), complex_complex)),
-        tuple((space, char(','), comment_space_newline_slash)),
+      many_till(pair(single_line_complex, comment_space_newline_slash), char(')')),
+      alt((
+        preceded(pair(space, char(';')), comment_space_newline),
+        comment_space_newline_many1,
       )),
-      opt(pair(
-        alt((complex_complex, map(word, |s| vec![s]))),
-        comment_space_newline_slash,
-      )),
-      char(')'),
-      space,
-      alt((preceded(char(';'), comment_space_newline), comment_space_newline_many1)),
     )),
-    |(_, _, n0, res, last, _, _, n1)| {
+    |(_, _, n0, (res, _), n1)| {
       *line_num += n0 + n1;
-      let mut vec: Vec<&'a str> = res
+      res
         .into_iter()
-        .flat_map(|(v, (_, _, n))| {
+        .map(|(v, n)| {
           *line_num += n;
           v
         })
-        .collect();
-      if let Some((last_vec, n)) = last {
-        *line_num += n;
-        vec.extend(last_vec);
-      }
-      vec
+        .collect()
     },
   )(i)
 }
@@ -415,6 +417,99 @@ pub(crate) fn complex<'a>(
 #[cfg(test)]
 mod test_key {
   use super::*;
+  #[test]
+  fn test_complex() {
+    assert_eq!(
+      Ok(("}", vec![vec!["3", "4", "5"]])),
+      complex(r#" (3, "4,5"); }"#, &mut 1)
+    );
+    assert_eq!(Ok(("}", vec![vec!["1", "2", "3"]])), complex(r#" (1,2,3); }"#, &mut 1));
+    assert_eq!(Ok(("}", vec![vec!["1"]])), complex(r#" (1); }"#, &mut 1));
+    assert_eq!(
+      Ok(("}", vec![vec!["1", "2", "3"]])),
+      complex(
+        r#" (1,2,3)
+     }"#,
+        &mut 1
+      )
+    );
+    assert_eq!(
+      Ok(("}", vec![vec!["1", "2", "3"]])),
+      complex(
+        r#" ("1,2,", 3 );
+          }"#,
+        &mut 1
+      )
+    );
+    assert_eq!(
+      Ok(("}", vec![vec!["1", "2", "3"]])),
+      complex(
+        r#" ( \
+            1,2,3 \
+          )
+     }"#,
+        &mut 1
+      )
+    );
+    assert_eq!(
+      Ok(("}", vec![vec!["1", "2"], vec!["3", "4"]])),
+      complex(
+        r#" ("1,2",\
+              3,4);
+        }"#,
+        &mut 1
+      )
+    );
+    assert_eq!(
+      Ok(("}", vec![vec!["1", "2"], vec!["3"]])),
+      complex(
+        r#" ("1,2,",\
+              3,);
+        }"#,
+        &mut 1
+      )
+    );
+    assert_eq!(
+      Ok(("}", vec![vec!["Q1 Q2 Q3", "QB1 QB2"]])),
+      complex(
+        r#" ("Q1 Q2 Q3 ", " QB1 QB2") ;
+        }"#,
+        &mut 1
+      )
+    );
+    assert_eq!(
+      Ok(("}", vec![vec!["Q1 Q2 Q3", "QB1 QB2"]])),
+      complex(
+        r#" (" Q1 Q2 Q3 ", "QB1 QB2") ;
+        }"#,
+        &mut 1
+      )
+    );
+    assert_eq!(
+      Ok((
+        "}",
+        vec![vec![
+          "init_time",
+          "init_current",
+          "bc_id1",
+          "point_time1",
+          "point_current1",
+          "bc_id2",
+          "[point_time2",
+          "point_current2",
+          "bc_id3",
+          "...]",
+          "end_time",
+          "end_current"
+        ]]
+      )),
+      complex(
+        r#" ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
+        }"#,
+        &mut 1
+      )
+    );
+  }
   #[test]
   fn test1() {
     use nom::error::VerboseError;
