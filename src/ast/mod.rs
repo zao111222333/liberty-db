@@ -767,6 +767,7 @@ pub(crate) trait Format {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result;
   /// `.db` format
+  #[allow(dead_code)]
   #[inline]
   fn db<T: Write, I: Indentation>(
     &self,
@@ -778,6 +779,7 @@ pub(crate) trait Format {
     todo!()
   }
   /// `.json` format
+  #[allow(dead_code)]
   #[inline]
   fn json<T: Write, I: Indentation>(
     &self,

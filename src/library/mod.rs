@@ -570,30 +570,7 @@ pub struct Library {
   pub cell: GroupSet<Cell>,
 }
 
-impl GroupFn for Library {
-  #[inline]
-  fn post_parse_process(&mut self, _scope: &mut ParseScope) {
-    // if let Some(first) = self.compact_lut_template.iter().next() {
-    //   let l = first.index_3.len();
-    //   if l != 0 {
-    //     for cell in self.cell.iter_mut() {
-    //       for pin in cell.pin.iter_mut() {
-    //         for timing in pin.timing.iter_mut() {
-    //           if let Some(ccs_rise) = timing.compact_ccs_rise.as_mut() {
-    //             ccs_rise.values.size2 = ccs_rise.values.inner.len() / l;
-    //             ccs_rise.values.size1 = l;
-    //           }
-    //           if let Some(ccs_fall) = timing.compact_ccs_fall.as_mut() {
-    //             ccs_fall.values.size2 = ccs_fall.values.inner.len() / l;
-    //             ccs_fall.values.size1 = l;
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-  }
-}
+impl GroupFn for Library {}
 
 impl fmt::Display for Library {
   /// Format [Library] struct as `.lib` file, see more at [examples](https://github.com/zao111222333/liberty-db/tree/master/examples)
