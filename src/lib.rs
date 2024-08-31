@@ -148,11 +148,13 @@ pub mod pin;
 pub use pin::Pin;
 /// `timing` group structure.
 pub mod timing;
+pub use timing::Timing;
 /// Partially re-exported [uom](https://crates.io/crates/uom) quantities and measurement units
 /// used in the library public interface.
 pub mod units;
 
 pub mod ast;
+pub use ast::Group;
 
 /// CCSN relative attributes
 pub mod ccsn;

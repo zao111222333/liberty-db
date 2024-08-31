@@ -378,8 +378,12 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
       #[doc(hidden)]
       #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
-      impl crate::ast::GroupAttri for #ident {
+      impl crate::ast::Group for #ident {
         type Comments=#comments_ident;
+      }
+      #[doc(hidden)]
+      #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
+      impl crate::ast::GroupAttri for #ident {
         fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
           use core::fmt::Write;
           use itertools::Itertools;

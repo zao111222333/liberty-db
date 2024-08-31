@@ -89,7 +89,7 @@ pub enum AttriValues {
 }
 
 pub(crate) enum UndefinedAttriValue {
-  Simple(ArcStr),
+  Simple(SimpleWrapper),
   Complex(ComplexWrapper),
   Group(GroupWrapper),
 }
@@ -343,10 +343,9 @@ pub enum DefinedType {
 }
 
 #[derive(Debug, Default)]
-pub struct ParseScope {
+pub(crate) struct ParseScope {
   pub line_num: usize,
   pub define_map: HashMap<ArcStr, HashMap<ArcStr, DefinedType>>,
-  pub compact_lut_template_index3_len: usize,
 }
 
 // /// Reference: https://rustcc.cn/article?id=ac75148b-6eb0-4249-b36d-0a14875b736e
@@ -396,52 +395,12 @@ pub enum DefinedAttribute {
   Float(Vec<NotNan<f64>>),
 }
 
-// impl SimpleDefined {
-//   #[inline]
-//   pub(crate) fn parse_set<'a>(
-//     &mut self,
-//     i: &'a str,
-//     scope: &mut ParseScope,
-//   ) -> IResult<&'a str, (), Error<&'a str>> {
-//     #[inline]
-//     fn nom_parse_simple<'a, T: SimpleAttri>(
-//       i: &'a str,
-//       scope: &mut ParseScope,
-//       v: &mut Vec<Result<T, ArcStr>>,
-//     ) -> IResult<&'a str, (), Error<&'a str>> {
-//       match <T as SimpleAttri>::nom_parse(i, scope) {
-//         Ok((input, Ok(res))) => {
-//           v.push(Ok(res));
-//           Ok((input, ()))
-//         }
-//         Ok((input, Err(s))) => {
-//           v.push(Err(s));
-//           Ok((input, ()))
-//         }
-//         Err(e) => Err(e),
-//       }
-//     }
-//     match self {
-//       Self::Boolean(v) => nom_parse_simple(i, scope, v),
-//       Self::Integer(v) => nom_parse_simple(i, scope, v),
-//       Self::Float(v) => nom_parse_simple(i, scope, v),
-//       Self::String(v) => match <ArcStr as SimpleAttri>::nom_parse(i, scope) {
-//         Ok((input, Ok(res) | Err(res))) => {
-//           v.push(res);
-//           Ok((input, ()))
-//         }
-//         Err(e) => Err(e),
-//       },
-//     }
-//   }
-// }
-
 pub(crate) type SimpleParseRes<'a, T> =
   IResult<&'a str, Result<T, ArcStr>, Error<&'a str>>;
 pub(crate) type ComplexParseRes<'a, T> =
   IResult<&'a str, Result<T, (ComplexParseError, ComplexWrapper)>, Error<&'a str>>;
 #[inline]
-pub fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
+pub(crate) fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
   i: &'a str,
   scope: &mut ParseScope,
 ) -> SimpleParseRes<'a, T> {
@@ -451,7 +410,7 @@ pub fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
 }
 
 /// Simple Attribute in Liberty
-pub trait SimpleAttri: Sized + core::fmt::Display {
+pub(crate) trait SimpleAttri: Sized + core::fmt::Display {
   /// `nom_parse`, auto implement
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self>;
   #[inline]
@@ -544,7 +503,7 @@ pub fn join_fmt_no_quote<
 }
 
 /// Complex Attribute in Liberty
-pub trait ComplexAttri: Sized {
+pub(crate) trait ComplexAttri: Sized {
   /// basic `parser`
   #[allow(clippy::ptr_arg)]
   fn parse(
@@ -589,25 +548,29 @@ pub trait ComplexAttri: Sized {
 }
 
 /// `GroupComments`
-pub type GroupComments<T> = <T as GroupAttri>::Comments;
+pub type GroupComments<T> = <T as Group>::Comments;
 
 /// `AttriComment`
 pub type AttriComment = Vec<ArcStr>;
 /// Group Functions
-pub trait GroupFn {
+pub(crate) trait GroupFn {
   /// `post_parse_process` call back
   #[inline]
   fn post_parse_process(&mut self, _scope: &mut ParseScope) {}
 }
-/// `GroupAttri`
-pub trait GroupAttri: Sized {
+/// Export Group APIs
+#[allow(private_bounds)]
+pub trait Group: Sized + GroupAttri {
   /// group Comments
   type Comments;
   /// `test_wrapper`
   #[inline]
-  fn test_wrapper(self) -> TestWrapper<Self> {
-    TestWrapper { inner: self, scope: ParseScope::default() }
+  fn display(&self) -> GroupDisplay<'_, Self> {
+    GroupDisplay { inner: self }
   }
+}
+/// `GroupAttri`, internal Group APIs
+pub(crate) trait GroupAttri: Sized {
   /// `nom_parse`, will be implemented by macros
   fn nom_parse<'a>(
     i: &'a str,
@@ -656,7 +619,7 @@ impl IdError {
 
 /// If more than one `#[liberty(name)]`,
 /// need to impl `NamedGroup` manually
-pub trait NamedGroup: GroupAttri {
+pub(crate) trait NamedGroup: GroupAttri {
   /// parse name from `v: &[&str]` and then set self
   fn parse_set_name(&mut self, v: Vec<&str>) -> Result<(), IdError>;
   /// `fmt_liberty`
@@ -710,25 +673,11 @@ impl ParserError {
 
 /// `TestWrapper`
 #[derive(Debug)]
-pub struct TestWrapper<G> {
-  pub inner: G,
-  pub scope: ParseScope,
+pub struct GroupDisplay<'a, G> {
+  pub inner: &'a G,
 }
 
-impl<G: GroupAttri> FromStr for TestWrapper<G> {
-  type Err = String;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    let mut scope = ParseScope::default();
-    match G::nom_parse(s, "", &mut scope) {
-      Ok((_, Ok(inner))) => Ok(Self { inner, scope }),
-      Ok((_, Err(e))) => Err(format!("{e:#?}")),
-      Err(e) => Err(format!("{e:#?}")),
-    }
-  }
-}
-
-impl<G: GroupAttri> core::fmt::Display for TestWrapper<G> {
+impl<'a, G: GroupAttri> core::fmt::Display for GroupDisplay<'a, G> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ff = TestCodeFormatter::new(f);
@@ -738,24 +687,30 @@ impl<G: GroupAttri> core::fmt::Display for TestWrapper<G> {
 
 #[cfg(test)]
 #[inline]
-pub fn test_parse<G: GroupAttri + core::fmt::Debug>(input: &str) -> G {
-  let wrapper = input.parse::<TestWrapper<G>>().expect("Group parse failed");
-  println!("{:?}", wrapper.inner);
-  println!("{wrapper}");
-  wrapper.inner
+pub(crate) fn test_parse<G: GroupAttri + Group>(input: &str) -> G {
+  let mut scope = ParseScope::default();
+  let g = match G::nom_parse(input, "", &mut scope) {
+    Ok((_, Ok(g))) => g,
+    Ok((_, Err(e))) => panic!("{e:#?}"),
+    Err(e) => panic!("{e:#?}"),
+  };
+  println!("{}", g.display());
+  g
 }
 
 #[cfg(test)]
 #[inline]
-pub fn test_parse_fmt<G: GroupAttri + core::fmt::Debug>(
-  input: &str,
-  fmt_want: &str,
-) -> G {
-  let wrapper = input.parse::<TestWrapper<G>>().expect("Group parse failed");
-  let fmt_str = wrapper.to_string();
+pub(crate) fn test_parse_fmt<G: GroupAttri + Group>(input: &str, fmt_want: &str) -> G {
+  let mut scope = ParseScope::default();
+  let g = match G::nom_parse(input, "", &mut scope) {
+    Ok((_, Ok(g))) => g,
+    Ok((_, Err(e))) => panic!("{e:#?}"),
+    Err(e) => panic!("{e:#?}"),
+  };
+  let fmt_str = g.display().to_string();
   println!("{fmt_str}");
   crate::util::text_diff(fmt_want, fmt_str.as_str());
-  wrapper.inner
+  g
 }
 
 /// For basic formatter

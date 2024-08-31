@@ -1,8 +1,5 @@
 #![cfg(test)]
-use console::{style, Style};
-use core::fmt;
-use liberty_db::{ast::TestWrapper, Library};
-use similar::{ChangeTag, TextDiff};
+use liberty_db::{ast::Group, Library};
 use std::{
   fs::{read_to_string, File},
   io::{BufWriter, Write},
@@ -27,10 +24,9 @@ fn make_golden() {
     let golden_lib_path = golden_path(&test_lib_path);
     let library =
       Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
-    let wrapper = TestWrapper { inner: library, scope: Default::default() };
     let golden_lib = File::create(golden_lib_path).unwrap();
     let mut writer = BufWriter::new(golden_lib);
-    write!(writer, "{wrapper}");
+    write!(writer, "{}", library.display());
   }
 }
 
@@ -42,9 +38,8 @@ fn regression() {
     let golden_lib_path = golden_path(&test_lib_path);
     let library =
       Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
-    let wrapper = TestWrapper { inner: library, scope: Default::default() };
     let golden = read_to_string(golden_lib_path).unwrap();
-    let new = wrapper.to_string();
+    let new = library.display().to_string();
     crate::text_diff(golden.as_str(), new.as_str());
   }
 }

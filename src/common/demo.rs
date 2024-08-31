@@ -123,7 +123,7 @@ impl GroupFn for Cell {}
 
 #[cfg(test)]
 mod test {
-  use crate::ast::DefaultIndentation;
+  use crate::ast::{DefaultIndentation, Group};
 
   use super::*;
   #[test]
@@ -311,6 +311,6 @@ liberty_db::common::demo::Cell (INV) {
     );
     cell.comments.area.push("xc".into());
     cell.comments.area.push("xc".into());
-    println!("{}", cell.test_wrapper());
+    println!("{}", cell.display());
   }
 }
