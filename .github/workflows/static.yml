@@ -20,6 +20,10 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 
+env:
+  CARGO_TERM_COLOR: always
+  RUST_VERSION: "1.80.0"
+
 jobs:
   # Single deploy job since we're just deploying
   deploy:
@@ -28,8 +32,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+      - run: cargo bench --bench benchmark
+      - run: mv target/criterion docs/static/bench
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact

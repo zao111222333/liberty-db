@@ -13,10 +13,10 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_VERSION: "1.80.0"
   # A fixed version used for testing, so that the builds don't
   # spontaneously break after a few years.
   # Make sure to update this from time to time.
-  RUST_VERSION: "1.80.0"
 jobs:
   # Checks syntax formatting.
   fmt:
@@ -61,10 +61,8 @@ jobs:
           components: rustfmt
       - name: Build
         run: cargo build --verbose
-      - name: Run tests1
+      - name: Run tests
         run: cargo test --verbose --all-features
-      - name: Run tests2
-        run: cargo test --verbose --all-features --package liberty-tests
   # Checks code style.
   clippy:
     needs: check

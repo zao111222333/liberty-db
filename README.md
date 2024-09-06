@@ -49,7 +49,7 @@ cargo test --package liberty-tests --test tests
 ## Testbench
 
 ```shell
-cargo test --package liberty-tests --lib -- parser_bench::test_all_lib_files --exact --nocapture 
+cargo bench --bench benchmark
 ```
 
 | [liberty-db](https://crates.io/crates/liberty-db) | [liberty-io](https://crates.io/crates/liberty-io) | [libertyparse](https://crates.io/crates/libertyparse) | Test Liberty File |

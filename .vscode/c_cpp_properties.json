@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/benches/projs",
+                "${workspaceFolder}/benches/projs/si2libertyParser/include"
+            ],
+            "defines": []
+        }
+    ],
+    "version": 4
+}

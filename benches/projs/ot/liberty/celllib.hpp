@@ -58,6 +58,7 @@ struct Celllib {
   std::unordered_map<std::string, Cell> cells;
 
   void read(const std::filesystem::path&);
+  void read_buffer(std::vector<char>&);
   void scale_time(float);
   void scale_resistance(float);
   void scale_power(float);

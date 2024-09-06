@@ -716,7 +716,6 @@ Cell Celllib::_extract_cell(token_iterator& itr, const token_iterator end) {
 
 // Procedure: read
 void Celllib::read(const std::filesystem::path& path) {
-  
   std::ifstream ifs(path, std::ios::ate);
   
   // return on failure
@@ -727,7 +726,10 @@ void Celllib::read(const std::filesystem::path& path) {
   std::vector<char> buffer(fsize + 1);
   ifs.read(buffer.data(), fsize);
   buffer[fsize] = 0;
+  read_buffer(buffer);
+}
 
+void Celllib::read_buffer(std::vector<char>& buffer) {
   // get tokens
   std::vector<std::string_view> tokens;
   tokens.reserve(buffer.size() / sizeof(std::string));

@@ -1,7 +1,7 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # cargo publish --allow-dirty --registry crates-io -p liberty-db
 [workspace]
-members = ["macros", "tests", "examples/*"]
+members = ["macros", "examples/*"]
 
 [workspace.package]
 version = "0.6.2"
@@ -22,7 +22,7 @@ categories = ["development-tools"]
 [package]
 name = "liberty-db"
 description = "`liberty` data structre"
-include = ["/src", "/tests", "/examples", "/docs/header.html", "README.md"]
+include = ["/src", "/examples", "/docs/header.html", "README.md"]
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -77,6 +77,7 @@ walkdir = "2"
 criterion = { version = "0.5", features = ["html_reports"] }
 similar = { version = "2.6.0", features = ["inline"]}
 console = "0.15.8"
+simple_logger = "5.0"
 libertyparse = "0.3.0"
 liberty-io = "0.0.4"
 

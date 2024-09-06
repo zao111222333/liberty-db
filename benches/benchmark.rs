@@ -1,6 +1,6 @@
 use criterion::{black_box, Criterion};
 use std::{
-  ffi::{c_char, CString, OsStr},
+  ffi::{c_char, c_void, CString, OsStr},
   fmt::Write,
   fs::{metadata, read_to_string},
   io::Cursor,
@@ -9,9 +9,10 @@ use std::{
   time::Duration,
 };
 
-// 声明外部 C 函数
 extern "C" {
-  fn ot_parse_lib(path: *const c_char);
+  fn ot_parse_lib(s: *const c_char) -> *mut c_void;
+  fn ot_write_lib(ptr: *mut c_void);
+  fn ot_drop_lib(ptr: *mut c_void);
 }
 
 fn all_files() -> impl Iterator<Item = PathBuf> {
@@ -34,11 +35,15 @@ fn all_files() -> impl Iterator<Item = PathBuf> {
 
 type ParseFn<L> = fn(&str) -> Result<L, ()>;
 type WriteFn<L> = fn(&L) -> Result<(), ()>;
+type DropFn<L> = fn(L);
+
+#[allow(dead_code)]
 struct ProjCtx<L> {
   name: &'static str,
   info: &'static str,
   parse_fn: ParseFn<L>,
   write_fn: WriteFn<L>,
+  drop_fn: DropFn<L>,
 }
 impl<L> ProjCtx<L> {
   fn fail(&self, file_path: &str, parse_or_write: bool) {
@@ -60,9 +65,10 @@ impl<L> ProjCtx<L> {
   ) {
     let library_string = read_to_string(file_path).unwrap();
     let s = library_string.as_str();
-    if let Ok(Ok(_)) = panic::catch_unwind(|| (self.parse_fn)(black_box(s))) {
+    if let Ok(Ok(try_l)) = panic::catch_unwind(|| (self.parse_fn)(black_box(s))) {
+      (self.drop_fn)(try_l);
       group.bench_function(format!(" {}", self.name).as_str(), |b| {
-        b.iter(|| (self.parse_fn)(black_box(s)))
+        b.iter(|| (self.parse_fn)(black_box(s)).map(|l| (self.drop_fn)(l)))
       });
     } else {
       self.fail(file_path, true);
@@ -76,12 +82,16 @@ impl<L> ProjCtx<L> {
     let library_string = read_to_string(file_path).unwrap();
     let s = library_string.as_str();
     if let Ok(Ok(l)) = panic::catch_unwind(|| (self.parse_fn)(black_box(s))) {
-      group.bench_function(format!(" {}", self.name).as_str(), |b| {
-        b.iter(|| (self.write_fn)(black_box(&l)))
-      });
-    } else {
-      self.fail(file_path, false);
+      if (self.write_fn)(black_box(&l)).is_ok() {
+        group.bench_function(format!(" {}", self.name).as_str(), |b| {
+          b.iter(|| (self.write_fn)(black_box(&l)))
+        });
+        (self.drop_fn)(l);
+        return;
+      }
+      (self.drop_fn)(l);
     }
+    self.fail(file_path, false);
   }
 }
 
@@ -89,13 +99,14 @@ const LIBERTY_DB: ProjCtx<liberty_db::Library> = ProjCtx {
   name: "liberty-db",
   info: "https://crates.io/crates/liberty-db",
   parse_fn: |s| liberty_db::Library::parse_lib(s).map_err(|_| ()),
-  write_fn: |l: &liberty_db::Library| {
+  write_fn: |l| {
     let mut buf = String::new();
     match write!(buf, "{l}") {
       Ok(_) => Ok(()),
       Err(_) => Err(()),
     }
   },
+  drop_fn: drop,
 };
 
 const LIBERTY_IO: ProjCtx<liberty_io::Group> = ProjCtx {
@@ -106,6 +117,7 @@ const LIBERTY_IO: ProjCtx<liberty_io::Group> = ProjCtx {
     liberty_io::read_liberty_bytes(&mut cursor).map_err(|_| ())
   },
   write_fn: |_| Err(()),
+  drop_fn: drop,
 };
 
 const LIBERTYPARSE: ProjCtx<libertyparse::Liberty> = ProjCtx {
@@ -113,29 +125,32 @@ const LIBERTYPARSE: ProjCtx<libertyparse::Liberty> = ProjCtx {
   info: "https://crates.io/crates/libertyparse",
   parse_fn: |s| libertyparse::Liberty::parse_str(s).map_err(|_| ()),
   write_fn: |_| Err(()),
+  drop_fn: drop,
+};
+
+const OPEN_TIMER: ProjCtx<*mut c_void> = ProjCtx {
+  name: "OpenTimer",
+  info: "https://github.com/OpenTimer/OpenTimer",
+  parse_fn: |s| {
+    let cstr = CString::new(s).unwrap();
+    Ok(unsafe { ot_parse_lib(cstr.as_ptr()) })
+  },
+  write_fn: |l| {
+    unsafe { ot_write_lib(*l) };
+    Ok(())
+  },
+  drop_fn: |l| unsafe { ot_drop_lib(l) },
 };
 
 fn bench_all(c: &mut Criterion) {
   for path in all_files() {
     let file_path = path.display().to_string();
-    let file_path_c_str = CString::new(file_path.as_str()).unwrap();
     {
       let mut parse_group = c.benchmark_group(&format!("[parse] {file_path} "));
       LIBERTY_DB.parse_bench(&mut parse_group, &file_path);
       LIBERTY_IO.parse_bench(&mut parse_group, &file_path);
       LIBERTYPARSE.parse_bench(&mut parse_group, &file_path);
-      // 调用 C++ 函数
-      if let Ok(_) = panic::catch_unwind(|| unsafe {
-        ot_parse_lib(file_path_c_str.as_ptr());
-      }) {
-        parse_group.bench_function(format!(" {}", "OpenTimer").as_str(), |b| {
-          b.iter(|| unsafe {
-            ot_parse_lib(file_path_c_str.as_ptr());
-          })
-        });
-      } else {
-        // self.fail(file_path, true);
-      }
+      OPEN_TIMER.parse_bench(&mut parse_group, &file_path);
       parse_group.finish();
     }
     {
@@ -143,6 +158,7 @@ fn bench_all(c: &mut Criterion) {
       LIBERTY_DB.write_bench(&mut write_group, &file_path);
       LIBERTY_IO.write_bench(&mut write_group, &file_path);
       LIBERTYPARSE.write_bench(&mut write_group, &file_path);
+      OPEN_TIMER.write_bench(&mut write_group, &file_path);
       write_group.finish();
     }
   }

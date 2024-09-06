@@ -1,13 +1,14 @@
-#![allow(unused)]
-mod parser_bench;
-mod regression;
+#![cfg(test)]
+use liberty_db::{ast::Group, Library};
+use std::{
+  ffi::OsStr,
+  fs::{metadata, read_to_string, File},
+  io::{BufWriter, Write},
+  path::{Path, PathBuf},
+};
 
-use std::{ffi::OsStr, fs::metadata, path::PathBuf};
-
-use walkdir::WalkDir;
-
-fn all_lib_files() -> Vec<PathBuf> {
-  WalkDir::new("tech")
+fn all_files() -> impl Iterator<Item = PathBuf> {
+  walkdir::WalkDir::new("tests/tech")
     .into_iter()
     .filter_map(|e| match e {
       Ok(entry) => {
@@ -22,10 +23,9 @@ fn all_lib_files() -> Vec<PathBuf> {
       }
       Err(_) => None,
     })
-    .collect::<Vec<PathBuf>>()
 }
 
-pub fn text_diff(old: &str, new: &str) {
+fn text_diff(old: &str, new: &str) {
   use console::{style, Style};
   use core::fmt;
   use similar::{ChangeTag, TextDiff};
@@ -73,4 +73,43 @@ pub fn text_diff(old: &str, new: &str) {
     }
   }
   assert!(!has_diff, "has different!");
+}
+
+fn golden_path(test_lib_path: &Path) -> PathBuf {
+  test_lib_path.with_file_name(
+    test_lib_path
+      .file_name()
+      .unwrap()
+      .to_str()
+      .unwrap()
+      .replace(".lib", ".lib_golden"),
+  )
+}
+
+#[allow(dead_code)]
+// open `#[test]` only when we need to re-golden
+// #[test]
+fn make_golden() {
+  for test_lib_path in all_files() {
+    let golden_lib_path = golden_path(&test_lib_path);
+    let library =
+      Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
+    let golden_lib = File::create(golden_lib_path).unwrap();
+    let mut writer = BufWriter::new(golden_lib);
+    _ = write!(writer, "{}", library.display());
+  }
+}
+
+#[test]
+fn regression() {
+  _ = simple_logger::SimpleLogger::new().init();
+  for test_lib_path in all_files() {
+    println!("================\n{}", test_lib_path.display());
+    let golden_lib_path = golden_path(&test_lib_path);
+    let library =
+      Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
+    let golden = read_to_string(golden_lib_path).unwrap();
+    let new = library.display().to_string();
+    crate::text_diff(golden.as_str(), new.as_str());
+  }
 }
