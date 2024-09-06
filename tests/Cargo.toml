@@ -13,7 +13,7 @@ walkdir = "2"
 prettytable-rs = "^0.10"
 colored = "2.0.0"
 criterion = "0.3"
-liberty-io = "0.0.2"
+# liberty-io = "0.0.2"
 libertyparse = "0.3"
 anyhow = "1.0.80"
 similar = { version = "2.6.0", features = ["inline"]}

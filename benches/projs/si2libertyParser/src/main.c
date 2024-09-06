@@ -25,6 +25,7 @@
 
 static void print_version(void)
 {
+	int VERSION = 0;
 	printf("liberty_parse version %s\n\n", VERSION);
 }
 

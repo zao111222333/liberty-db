@@ -102,19 +102,19 @@ const PARSER_LIBERTY_DB: ParserCtx = ParserCtx {
   },
 };
 
-const PARSER_LIBERTY_IO: ParserCtx = ParserCtx {
-  name: "liberty-io",
-  info: "https://crates.io/crates/liberty-io",
-  parser: |filepath| {
-    let f = File::open(filepath).expect("Failed to open file.");
-    let mut buf = BufReader::new(f);
-    let result = liberty_io::read_liberty_bytes(&mut buf);
-    match result {
-      Ok(_) => Ok(()),
-      Err(_) => Err(fmt::Error),
-    }
-  },
-};
+// const PARSER_LIBERTY_IO: ParserCtx = ParserCtx {
+//   name: "liberty-io",
+//   info: "https://crates.io/crates/liberty-io",
+//   parser: |filepath| {
+//     let f = File::open(filepath).expect("Failed to open file.");
+//     let mut buf = BufReader::new(f);
+//     let result = liberty_io::read_liberty_bytes(&mut buf);
+//     match result {
+//       Ok(_) => Ok(()),
+//       Err(_) => Err(fmt::Error),
+//     }
+//   },
+// };
 
 const PARSER_LIBERTYPARSE: ParserCtx = ParserCtx {
   name: "libertyparse",
@@ -134,8 +134,7 @@ const PARSER_LIBERTYPARSE: ParserCtx = ParserCtx {
 pub fn test_all_lib_files() {
   simple_logger::SimpleLogger::new().init();
   use prettytable::{Cell, Row, Table};
-  let all_parser: Vec<ParserCtx> =
-    vec![PARSER_LIBERTY_DB, PARSER_LIBERTY_IO, PARSER_LIBERTYPARSE];
+  let all_parser: Vec<ParserCtx> = vec![PARSER_LIBERTY_DB, PARSER_LIBERTYPARSE];
   let results: Vec<Vec<TestResult>> = all_parser
     .iter()
     .map(|ctx| {
