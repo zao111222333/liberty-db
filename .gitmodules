@@ -1,3 +1,0 @@
-[submodule "si2libertyParser"]
-	path = tests/other_parser/si2libertyParser
-	url = https://github.com/zao111222333/si2libertyParser.git
