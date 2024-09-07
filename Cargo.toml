@@ -80,6 +80,8 @@ console = "0.15.8"
 simple_logger = "5.0"
 libertyparse = "0.3.0"
 liberty-io = "0.0.4"
+serde_json = "1.0"
+sysinfo = "0.31"
 
 [[bench]]
 name = "benchmark"
