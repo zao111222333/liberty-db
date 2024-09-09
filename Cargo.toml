@@ -22,7 +22,7 @@ categories = ["development-tools"]
 [package]
 name = "liberty-db"
 description = "`liberty` data structre"
-include = ["/src", "/tests", "/benches", "/examples", "/docs/header.html", "README.md"]
+include = ["/src", "/examples", "/docs/header.html", "README.md"]
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -58,7 +58,6 @@ simple_logger = "5.0"
 serde_json = "1.0"
 
 [dependencies]
-# liberty-macros = "0.6.4"
 liberty-macros = { path = "macros" }
 log = { workspace = true }
 serde = { workspace = true }
@@ -89,8 +88,6 @@ walkdir = { workspace = true }
 similar = { workspace = true }
 console = { workspace = true }
 simple_logger = { workspace = true }
-
-# anyhow = "1.0.80"
 
 # [profile.dev.build-override]
 # opt-level = 3

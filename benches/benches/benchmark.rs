@@ -14,21 +14,27 @@ enum Projs {
 }
 #[derive(Debug, strum_macros::EnumIter)]
 enum Versions {
-  LibertyDb,
-  LibertyDb0p6p2,
-  LibertyDb0p5p9,
-  LibertyDb0p4p13,
-  LibertyDb0p3p1,
+  LibertyDbLatest,
+  LibertyDb0p6p3,
+  // LibertyDb0p6p2,
+  // LibertyDb0p6p1,
+  // LibertyDb0p6p0,
+  LibertyDb0p5,
+  LibertyDb0p4,
+  LibertyDb0p3,
 }
 #[rustfmt::skip]
 impl Proj for Versions {
   fn info(&self) -> ProjInfo {
     match self {
-      Self::LibertyDb => liberty_db::Library::INFO,
-      Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::INFO,
-      Self::LibertyDb0p5p9 => liberty_db_0p5p9::Library::INFO,
-      Self::LibertyDb0p4p13 => liberty_db_0p4p13::Library::INFO,
-      Self::LibertyDb0p3p1 => liberty_db_0p3p1::library::Library::INFO,
+      Self::LibertyDbLatest => liberty_db_latest::Library::INFO,
+      Self::LibertyDb0p6p3 => liberty_db_0p6p3::Library::INFO,
+      // Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::INFO,
+      // Self::LibertyDb0p6p1 => liberty_db_0p6p1::Library::INFO,
+      // Self::LibertyDb0p6p0 => liberty_db_0p6p0::Library::INFO,
+      Self::LibertyDb0p5 => liberty_db_0p5p9::Library::INFO,
+      Self::LibertyDb0p4 => liberty_db_0p4p13::Library::INFO,
+      Self::LibertyDb0p3 => liberty_db_0p3p1::library::Library::INFO,
     }
   }
   fn parse_bench(
@@ -38,11 +44,14 @@ impl Proj for Versions {
     group_path: &str,
   ) -> BenchResult {
     match self {
-      Self::LibertyDb => liberty_db::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyDb0p5p9 => liberty_db_0p5p9::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyDb0p4p13 => liberty_db_0p4p13::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyDb0p3p1 => liberty_db_0p3p1::library::Library::parse_bench(group, file_path, group_path),
+      Self::LibertyDbLatest => liberty_db_latest::Library::parse_bench(group, file_path, group_path),
+      Self::LibertyDb0p6p3 => liberty_db_0p6p3::Library::parse_bench(group, file_path, group_path),
+      // Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::parse_bench(group, file_path, group_path),
+      // Self::LibertyDb0p6p1 => liberty_db_0p6p1::Library::parse_bench(group, file_path, group_path),
+      // Self::LibertyDb0p6p0 => liberty_db_0p6p0::Library::parse_bench(group, file_path, group_path),
+      Self::LibertyDb0p5 => liberty_db_0p5p9::Library::parse_bench(group, file_path, group_path),
+      Self::LibertyDb0p4 => liberty_db_0p4p13::Library::parse_bench(group, file_path, group_path),
+      Self::LibertyDb0p3 => liberty_db_0p3p1::library::Library::parse_bench(group, file_path, group_path),
     }
   }
   fn write_bench(
@@ -52,11 +61,14 @@ impl Proj for Versions {
     group_path: &str,
   ) -> BenchResult {
     match self {
-      Self::LibertyDb => liberty_db::Library::write_bench(group, file_path, group_path),
-      Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::write_bench(group, file_path, group_path),
-      Self::LibertyDb0p5p9 => liberty_db_0p5p9::Library::write_bench(group, file_path, group_path),
-      Self::LibertyDb0p4p13 => liberty_db_0p4p13::Library::write_bench(group, file_path, group_path),
-      Self::LibertyDb0p3p1 => liberty_db_0p3p1::library::Library::write_bench(group, file_path, group_path),
+      Self::LibertyDbLatest => liberty_db_latest::Library::write_bench(group, file_path, group_path),
+      Self::LibertyDb0p6p3 => liberty_db_0p6p3::Library::write_bench(group, file_path, group_path),
+      // Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::write_bench(group, file_path, group_path),
+      // Self::LibertyDb0p6p1 => liberty_db_0p6p1::Library::write_bench(group, file_path, group_path),
+      // Self::LibertyDb0p6p0 => liberty_db_0p6p0::Library::write_bench(group, file_path, group_path),
+      Self::LibertyDb0p5 => liberty_db_0p5p9::Library::write_bench(group, file_path, group_path),
+      Self::LibertyDb0p4 => liberty_db_0p4p13::Library::write_bench(group, file_path, group_path),
+      Self::LibertyDb0p3 => liberty_db_0p3p1::library::Library::write_bench(group, file_path, group_path),
     }
   }
 }
@@ -64,7 +76,7 @@ impl Proj for Versions {
 impl Proj for Projs {
   fn info(&self) -> ProjInfo {
     match self {
-      Self::LibertyDb => liberty_db::Library::INFO,
+      Self::LibertyDb => liberty_db_latest::Library::INFO,
       Self::LibertyIo => liberty_io::Group::INFO,
       Self::LibertyParse => libertyparse::Liberty::INFO,
       Self::OPenTimer => OPenTimerLibraryPtr::INFO,
@@ -78,7 +90,7 @@ impl Proj for Projs {
     group_path: &str,
   ) -> BenchResult {
     match self {
-      Self::LibertyDb => liberty_db::Library::parse_bench(group, file_path, group_path),
+      Self::LibertyDb => liberty_db_latest::Library::parse_bench(group, file_path, group_path),
       Self::LibertyIo => liberty_io::Group::parse_bench(group, file_path, group_path),
       Self::LibertyParse => libertyparse::Liberty::parse_bench(group, file_path, group_path),
       Self::OPenTimer => OPenTimerLibraryPtr::parse_bench(group, file_path, group_path),
@@ -92,7 +104,7 @@ impl Proj for Projs {
     group_path: &str,
   ) -> BenchResult {
     match self {
-      Self::LibertyDb => liberty_db::Library::write_bench(group, file_path, group_path),
+      Self::LibertyDb => liberty_db_latest::Library::write_bench(group, file_path, group_path),
       Self::LibertyIo => liberty_io::Group::write_bench(group, file_path, group_path),
       Self::LibertyParse => libertyparse::Liberty::write_bench(group, file_path, group_path),
       Self::OPenTimer => OPenTimerLibraryPtr::write_bench(group, file_path, group_path),

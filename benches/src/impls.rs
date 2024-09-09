@@ -6,12 +6,12 @@ use std::{
   str::FromStr,
 };
 
-impl ProjLibrary for liberty_db::Library {
+impl ProjLibrary for liberty_db_latest::Library {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",
     url: "https://crates.io/crates/liberty-db",
     lang: "rust",
-    version: "lastest",
+    version: "latest",
     typed_support: TypedSupport::AllTyped,
     parsed_boolexpr: true,
     other: "current version",
@@ -25,15 +25,15 @@ impl ProjLibrary for liberty_db::Library {
   }
 }
 
-impl ProjLibrary for liberty_db_0p6p2::Library {
+impl ProjLibrary for liberty_db_0p6p3::Library {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",
-    url: "https://crates.io/crates/liberty-db/0.6.2",
+    url: "https://crates.io/crates/liberty-db/0.6.3",
     lang: "rust",
-    version: "0.6.2",
+    version: "0.6.3",
     typed_support: TypedSupport::AllTyped,
     parsed_boolexpr: true,
-    other: "published at 2024-08-31",
+    other: "published at 2024-09-07",
   };
   fn parse(s: &str) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
@@ -43,6 +43,63 @@ impl ProjLibrary for liberty_db_0p6p2::Library {
     Ok(())
   }
 }
+
+// impl ProjLibrary for liberty_db_0p6p2::Library {
+//   const INFO: ProjInfo = ProjInfo {
+//     name: "liberty-db",
+//     url: "https://crates.io/crates/liberty-db/0.6.2",
+//     lang: "rust",
+//     version: "0.6.2",
+//     typed_support: TypedSupport::AllTyped,
+//     parsed_boolexpr: true,
+//     other: "published at 2024-08-31",
+//   };
+//   fn parse(s: &str) -> Result<Self, ()> {
+//     Self::parse_lib(s).map_err(|_| ())
+//   }
+//   fn write(&self) -> Result<(), ()> {
+//     _ = black_box(self.to_string());
+//     Ok(())
+//   }
+// }
+
+// impl ProjLibrary for liberty_db_0p6p1::Library {
+//   const INFO: ProjInfo = ProjInfo {
+//     name: "liberty-db",
+//     url: "https://crates.io/crates/liberty-db/0.6.1",
+//     lang: "rust",
+//     version: "0.6.2",
+//     typed_support: TypedSupport::AllTyped,
+//     parsed_boolexpr: true,
+//     other: "published at 2024-08-30",
+//   };
+//   fn parse(s: &str) -> Result<Self, ()> {
+//     Self::parse_lib(s).map_err(|_| ())
+//   }
+//   fn write(&self) -> Result<(), ()> {
+//     _ = black_box(self.to_string());
+//     Ok(())
+//   }
+// }
+
+// impl ProjLibrary for liberty_db_0p6p0::Library {
+//   const INFO: ProjInfo = ProjInfo {
+//     name: "liberty-db",
+//     url: "https://crates.io/crates/liberty-db/0.6.0",
+//     lang: "rust",
+//     version: "0.6.0",
+//     typed_support: TypedSupport::AllTyped,
+//     parsed_boolexpr: true,
+//     other: "published at 2024-08-28",
+//   };
+//   fn parse(s: &str) -> Result<Self, ()> {
+//     Self::parse_lib(s).map_err(|_| ())
+//   }
+//   fn write(&self) -> Result<(), ()> {
+//     _ = black_box(self.to_string());
+//     Ok(())
+//   }
+// }
 
 impl ProjLibrary for liberty_db_0p5p9::Library {
   const INFO: ProjInfo = ProjInfo {
