@@ -1,7 +1,7 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # cargo publish --allow-dirty --registry crates-io -p liberty-db
 [workspace]
-members = ["macros", "examples/*"]
+members = ["macros", "examples/*", "benches/projs/liberty2json"]
 
 [workspace.package]
 version = "0.6.3"
@@ -22,7 +22,7 @@ categories = ["development-tools"]
 [package]
 name = "liberty-db"
 description = "`liberty` data structre"
-include = ["/src", "/examples", "/docs/header.html", "README.md"]
+include = ["/src", "/tests", "/benches", "/examples", "/docs/header.html", "README.md"]
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -82,6 +82,7 @@ libertyparse = "0.3.0"
 liberty-io = "0.0.4"
 serde_json = "1.0"
 sysinfo = "0.31"
+liberty2json = { path = "benches/projs/liberty2json" }
 
 [[bench]]
 name = "benchmark"

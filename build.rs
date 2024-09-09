@@ -44,7 +44,7 @@ fn main() {
     panic!("g++ compilation failed");
   }
 
-  println!("cargo::rerun-if-changed={}", projs_dir.join("projs.cpp").display());
+  println!("cargo:rerun-if-changed={}", projs_dir.join("projs.cpp").display());
   println!("cargo:rustc-link-search=native={out_dir}");
   println!("cargo:rustc-link-lib=dylib=projs");
 }
