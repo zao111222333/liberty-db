@@ -425,7 +425,7 @@ fn main() {
   );
   println!(
     "{}",
-    res_table
+    (info_table + &res_table)
       .replace("href=\"./", "href=\"https://zao111222333.github.io/liberty-db/bench/"),
   );
 }
