@@ -42,13 +42,13 @@ jobs:
           NAME="${REPO##*/}"
           { 
             wget https://${{ github.repository_owner }}.github.io/$NAME/criterion.tar.gz
-            tar -xf criterion.tar.gz 
+            tar -xf criterion.tar.gz
           } || {
             echo "fail to get old data"
           }
-      - run: ls target/criterion
       - run: cargo bench --bench benchmark
-      - run: |
+      - name: Collect benchmark static files
+        run: |
           mv target/criterion docs/static/bench
           tar -zcvf docs/static/criterion.tar.gz target/criterion
       - name: Setup Pages
