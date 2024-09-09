@@ -36,16 +36,13 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
-      - name: Use old data as baseline
+      - name: Try to use old data as baseline
         run: |
-          mkdir -p target/criterion
           REPO="${{ github.repository }}"
           NAME="${REPO##*/}"
           { 
             wget https://${{ github.repository_owner }}.github.io/$NAME/criterion.tar.gz && tar -xf criterion.tar.gz 
           } || {
-            wget -r -np -nH --cut-dirs=1 -P target/ https://${{ github.repository_owner }}.github.io/$NAME/bench/
-            mv bench criterion
           }
       - run: ls target/criterion
       - run: cargo bench --bench benchmark
