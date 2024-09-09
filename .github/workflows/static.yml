@@ -39,7 +39,9 @@ jobs:
       - name: Use old data as baseline
         run: |
           mkdir -p target/criterion
-          wget -r -np -nH --cut-dirs=1 -P target/criterion https://${{ github.repository_owner }}.github.io/${{ github.repository }}/bench/
+          REPO="${{ github.repository }}"
+          NAME="${REPO##*/}"
+          wget -r -np -nH --cut-dirs=1 -P target/criterion https://${{ github.repository_owner }}.github.io/$NAME/bench/
       - run: cargo bench --bench benchmark
       - run: |
           mv target/criterion docs/static/bench
