@@ -409,11 +409,11 @@ impl Deref for CapacitiveLoadUnit {
 
 impl ComplexAttri for CapacitiveLoadUnit {
   #[inline]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = vec.iter().flat_map(IntoIterator::into_iter);
+    let mut i = iter.flat_map(IntoIterator::into_iter);
     let value: NotNan<f64> = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,

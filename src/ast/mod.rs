@@ -31,16 +31,16 @@ pub enum ComplexWrapper {
   Multi(Vec<Vec<ArcStr>>),
 }
 impl ComplexWrapper {
-  fn collect(mut vec: Vec<Vec<&str>>) -> Self {
+  fn collect(mut vec: Vec<(Vec<&str>, usize)>) -> Self {
     if vec.len() <= 1 {
       vec.pop().map_or(Self::Single(Vec::new()), |first| {
-        Self::Single(first.into_iter().map_into::<ArcStr>().collect())
+        Self::Single(first.0.into_iter().map_into::<ArcStr>().collect())
       })
     } else {
       Self::Multi(
         vec
           .into_iter()
-          .map(|v| v.into_iter().map_into::<ArcStr>().collect())
+          .map(|(v, _)| v.into_iter().map_into::<ArcStr>().collect())
           .collect(),
       )
     }
@@ -505,16 +505,23 @@ pub fn join_fmt_no_quote<
 /// Complex Attribute in Liberty
 pub(crate) trait ComplexAttri: Sized {
   /// basic `parser`
-  #[allow(clippy::ptr_arg)]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError>;
   /// `nom_parse`, auto implement
+  #[allow(clippy::arithmetic_side_effects)]
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
     let (input, vec) = parser::complex(i, &mut scope.line_num)?;
-    match Self::parse(&vec, scope) {
+    let mut line_num = 0;
+    let iter = vec.iter().map(|(v, n)| {
+      line_num += n;
+      v
+    });
+    let res = Self::parse(iter, scope);
+    scope.line_num += line_num;
+    match res {
       Ok(s) => Ok((input, Ok(s))),
       Err(e) => Ok((input, Err((e, ComplexWrapper::collect(vec))))),
     }

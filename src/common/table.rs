@@ -532,16 +532,15 @@ pub struct Values {
 impl ComplexAttri for Values {
   #[inline]
   #[allow(clippy::arithmetic_side_effects)]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut size1 = 0;
     let mut size2 = 0;
     // FIXME: optimize it
     let mut table_len_mismatch = false;
-    let inner = vec
-      .iter()
+    let inner = iter
       .flat_map(|v| {
         size2 += 1;
         let l = v.len();

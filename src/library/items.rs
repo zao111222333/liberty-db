@@ -157,11 +157,11 @@ pub struct SensitizationVector {
 
 impl ComplexAttri for SensitizationVector {
   #[inline]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = vec.iter().flat_map(IntoIterator::into_iter);
+    let mut i = iter.flat_map(IntoIterator::into_iter);
     let id: usize = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
@@ -312,11 +312,11 @@ pub struct VoltageMap {
 }
 impl ComplexAttri for VoltageMap {
   #[inline]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = vec.iter().flat_map(IntoIterator::into_iter);
+    let mut i = iter.flat_map(IntoIterator::into_iter);
     let name = match i.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
@@ -734,11 +734,11 @@ pub enum AttributeType {
 }
 impl ComplexAttri for Define {
   #[inline]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = vec.iter().flat_map(IntoIterator::into_iter);
+    let mut i = iter.flat_map(IntoIterator::into_iter);
     let attribute_name = match i.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
@@ -807,11 +807,11 @@ pub struct DefineGroup {
 }
 impl ComplexAttri for DefineGroup {
   #[inline]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = vec.iter().flat_map(IntoIterator::into_iter);
+    let mut i = iter.flat_map(IntoIterator::into_iter);
     let group = match i.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
@@ -910,11 +910,11 @@ pub enum ResourceType {
 }
 impl ComplexAttri for DefineCellArea {
   #[inline]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = vec.iter().flat_map(IntoIterator::into_iter);
+    let mut i = iter.flat_map(IntoIterator::into_iter);
     let area_name = match i.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
@@ -1061,11 +1061,11 @@ pub struct FanoutLength {
 }
 impl ComplexAttri for FanoutLength {
   #[inline]
-  fn parse(
-    vec: &Vec<Vec<&str>>,
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = vec.iter().flat_map(IntoIterator::into_iter);
+    let mut i = iter.flat_map(IntoIterator::into_iter);
     let fanout = match i.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,

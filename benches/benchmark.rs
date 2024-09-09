@@ -46,7 +46,6 @@ struct ProjInfo {
   url: &'static str,
   lang: &'static str,
   typed_support: TypedSupport,
-  json_support: bool,
   parsed_boolexpr: bool,
   other: &'static str,
 }
@@ -157,7 +156,7 @@ impl ProjUnderTest {
   fn info_html(&self) -> String {
     let info = self.info();
     format!(
-      "<tr><th style=\"text-align:left;padding-left:5px\"><a href=\"{}\">{}</a></th><th>{}</th>{}<th>{}</th><th>{}</th><th>{}</th></tr>", 
+      "<tr><th style=\"text-align:left;padding-left:5px\"><a href=\"{}\">{}</a></th><th>{}</th>{}<th>{}</th><th>{}</th></tr>", 
       info.url,
       info.name,
       info.lang,
@@ -167,7 +166,6 @@ impl ProjUnderTest {
         TypedSupport::AstOnly => "<th></th><th></th><th>&#10003</th>",
       },
       if info.parsed_boolexpr{"&#10003"}else{""},
-      if info.json_support{"&#10003"}else{""},
       info.other
     )
   }
@@ -210,7 +208,6 @@ impl ProjLibrary for liberty_db::Library {
     url: "https://crates.io/crates/liberty-db",
     lang: "rust",
     typed_support: TypedSupport::AllTyped,
-    json_support: true,
     parsed_boolexpr: true,
     other: "this project",
   };
@@ -228,7 +225,6 @@ impl ProjLibrary for liberty_io::Group {
     url: "https://crates.io/crates/liberty-io",
     lang: "rust",
     typed_support: TypedSupport::AstOnly,
-    json_support: false,
     parsed_boolexpr: false,
     other: "",
   };
@@ -243,7 +239,6 @@ impl ProjLibrary for libertyparse::Liberty {
     url: "https://crates.io/crates/libertyparse",
     lang: "rust",
     typed_support: TypedSupport::PartialTyped,
-    json_support: false,
     parsed_boolexpr: true,
     other: "",
   };
@@ -257,7 +252,6 @@ impl ProjLibrary for OPenTimerLibraryPtr {
     url: "https://github.com/OpenTimer/OpenTimer",
     lang: "c++17",
     typed_support: TypedSupport::PartialTyped,
-    json_support: false,
     parsed_boolexpr: true,
     other: "",
   };
@@ -279,7 +273,6 @@ impl ProjLibrary for liberty2json::Liberty {
     url: "https://github.com/erihsu/liberty2json",
     lang: "rust",
     typed_support: TypedSupport::AstOnly,
-    json_support: true,
     parsed_boolexpr: false,
     other: "",
   };

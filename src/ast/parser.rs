@@ -386,10 +386,11 @@ fn single_line_complex(i: &str) -> IResult<&str, Vec<&str>, Error<&str>> {
   )(i)
 }
 
+#[allow(clippy::type_complexity)]
 pub(crate) fn complex<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<Vec<&'a str>>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<(Vec<&'a str>, usize)>, Error<&'a str>> {
   map(
     tuple((
       space,
@@ -404,12 +405,6 @@ pub(crate) fn complex<'a>(
     |(_, _, n0, (res, _), n1)| {
       *line_num += n0 + n1;
       res
-        .into_iter()
-        .map(|(v, n)| {
-          *line_num += n;
-          v
-        })
-        .collect()
     },
   )(i)
 }
@@ -420,13 +415,16 @@ mod test_key {
   #[test]
   fn test_complex() {
     assert_eq!(
-      Ok(("}", vec![vec!["3", "4", "5"]])),
+      Ok(("}", vec![(vec!["3", "4", "5"], 0)])),
       complex(r#" (3, "4,5"); }"#, &mut 1)
     );
-    assert_eq!(Ok(("}", vec![vec!["1", "2", "3"]])), complex(r#" (1,2,3); }"#, &mut 1));
-    assert_eq!(Ok(("}", vec![vec!["1"]])), complex(r#" (1); }"#, &mut 1));
     assert_eq!(
-      Ok(("}", vec![vec!["1", "2", "3"]])),
+      Ok(("}", vec![(vec!["1", "2", "3"], 0)])),
+      complex(r#" (1,2,3); }"#, &mut 1)
+    );
+    assert_eq!(Ok(("}", vec![(vec!["1"], 0)])), complex(r#" (1); }"#, &mut 1));
+    assert_eq!(
+      Ok(("}", vec![(vec!["1", "2", "3"], 0)])),
       complex(
         r#" (1,2,3)
      }"#,
@@ -434,7 +432,7 @@ mod test_key {
       )
     );
     assert_eq!(
-      Ok(("}", vec![vec!["1", "2", "3"]])),
+      Ok(("}", vec![(vec!["1", "2", "3"], 0)])),
       complex(
         r#" ("1,2,", 3 );
           }"#,
@@ -442,7 +440,7 @@ mod test_key {
       )
     );
     assert_eq!(
-      Ok(("}", vec![vec!["1", "2", "3"]])),
+      Ok(("}", vec![(vec!["1", "2", "3"], 1)])),
       complex(
         r#" ( \
             1,2,3 \
@@ -452,7 +450,7 @@ mod test_key {
       )
     );
     assert_eq!(
-      Ok(("}", vec![vec!["1", "2"], vec!["3", "4"]])),
+      Ok(("}", vec![(vec!["1", "2"], 1), (vec!["3", "4"], 0)])),
       complex(
         r#" ("1,2",\
               3,4);
@@ -461,7 +459,7 @@ mod test_key {
       )
     );
     assert_eq!(
-      Ok(("}", vec![vec!["1", "2"], vec!["3"]])),
+      Ok(("}", vec![(vec!["1", "2"], 1), (vec!["3"], 0)])),
       complex(
         r#" ("1,2,",\
               3,);
@@ -470,7 +468,7 @@ mod test_key {
       )
     );
     assert_eq!(
-      Ok(("}", vec![vec!["Q1 Q2 Q3", "QB1 QB2"]])),
+      Ok(("}", vec![(vec!["Q1 Q2 Q3", "QB1 QB2"], 0)])),
       complex(
         r#" ("Q1 Q2 Q3 ", " QB1 QB2") ;
         }"#,
@@ -478,7 +476,7 @@ mod test_key {
       )
     );
     assert_eq!(
-      Ok(("}", vec![vec!["Q1 Q2 Q3", "QB1 QB2"]])),
+      Ok(("}", vec![(vec!["Q1 Q2 Q3", "QB1 QB2"], 0)])),
       complex(
         r#" (" Q1 Q2 Q3 ", "QB1 QB2") ;
         }"#,
@@ -488,20 +486,23 @@ mod test_key {
     assert_eq!(
       Ok((
         "}",
-        vec![vec![
-          "init_time",
-          "init_current",
-          "bc_id1",
-          "point_time1",
-          "point_current1",
-          "bc_id2",
-          "[point_time2",
-          "point_current2",
-          "bc_id3",
-          "...]",
-          "end_time",
-          "end_current"
-        ]]
+        vec![(
+          vec![
+            "init_time",
+            "init_current",
+            "bc_id1",
+            "point_time1",
+            "point_current1",
+            "bc_id2",
+            "[point_time2",
+            "point_current2",
+            "bc_id3",
+            "...]",
+            "end_time",
+            "end_current"
+          ],
+          0
+        )]
       )),
       complex(
         r#" ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");

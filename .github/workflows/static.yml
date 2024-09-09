@@ -36,6 +36,10 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
+      - name: Use old data as baseline
+        run: |
+          mkdir -p target/criterion
+          wget -r -np -nH --cut-dirs=1 -P target/criterion https://zao111222333.github.io/liberty-db/bench/
       - run: cargo bench --bench benchmark
       - run: mv target/criterion docs/static/bench
       - name: Setup Pages
