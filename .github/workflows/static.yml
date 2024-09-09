@@ -39,16 +39,17 @@ jobs:
       - name: Use old data as baseline
         run: |
           mkdir -p target/criterion
-          wget -r -np -nH --cut-dirs=1 -P target/criterion https://zao111222333.github.io/liberty-db/bench/
+          wget -r -np -nH --cut-dirs=1 -P target/criterion https://http://${{ github.repository_owner }}.github.io/${{ github.repository }}/bench/
       - run: cargo bench --bench benchmark
-      - run: mv target/criterion docs/static/bench
+      - run: |
+          mv target/criterion docs/static/bench
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: './docs/static'
+          path: 'docs/static'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1

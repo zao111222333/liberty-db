@@ -1,148 +1,143 @@
 use super::{
-    attribute_parser::group_attribute_parser,
-    base::{qstring, tstring, ws},
+  attribute_parser::group_attribute_parser,
+  base::{qstring, tstring, ws},
 };
 
 use crate::{LibRes, LibertyJson};
 
 use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    error::context,
-    multi::many0,
-    sequence::{delimited, terminated, tuple},
+  branch::alt,
+  bytes::complete::tag,
+  error::context,
+  multi::many0,
+  sequence::{delimited, terminated, tuple},
 };
 use serde_json::map::Map;
 
 // header group is named group, and only contain attributes
 pub fn header_group_parser(input: &str) -> LibRes<&str, (&str, LibertyJson)> {
-    context(
-        "Named Group Parser",
-        tuple((
-            tuple((
-                tstring,
-                delimited(tag("("), alt((qstring, tstring)), tag(")")),
-            )),
-            delimited(ws(tag("{")), many0(group_attribute_parser), ws(tag("}"))),
-        )),
-    )(input)
-    .map(|(res, data)| {
-        let mut json_data = Map::new();
-        let mut result = Map::new();
-        for attr in data.1 {
-            json_data.insert(attr.0.to_string(), attr.1);
-        }
-        result.insert(((data.0).1).into(), LibertyJson::from(json_data));
-        // group attribute is unique, so insert directly
+  context(
+    "Named Group Parser",
+    tuple((
+      tuple((tstring, delimited(tag("("), alt((qstring, tstring)), tag(")")))),
+      delimited(ws(tag("{")), many0(group_attribute_parser), ws(tag("}"))),
+    )),
+  )(input)
+  .map(|(res, data)| {
+    let mut json_data = Map::new();
+    let mut result = Map::new();
+    for attr in data.1 {
+      json_data.insert(attr.0.to_string(), attr.1);
+    }
+    result.insert(((data.0).1).into(), LibertyJson::from(json_data));
+    // group attribute is unique, so insert directly
 
-        (res, ((data.0).0, LibertyJson::from(result)))
-    })
+    (res, ((data.0).0, LibertyJson::from(result)))
+  })
 }
 
 // assume named group only contain unnamed group
 pub fn named_group_parser(input: &str) -> LibRes<&str, (&str, LibertyJson)> {
-    context(
-        "Named Group Parser",
-        tuple((
-            tuple((tstring, delimited(tag("("), tstring, tag(")")))),
-            delimited(
-                ws(tag("{")),
-                tuple((many0(group_attribute_parser), many0(unnamed_group_parser))),
-                ws(tag("}")),
-            ),
-        )),
-    )(input)
-    .map(|(res, data)| {
-        let mut json_data = Map::new();
-        let mut result = Map::new();
-        // json_data.insert("name".into(), LibertyJson::from((data.0).1.to_string()));
-        // group attribute is unique, so insert directly
-        if !(data.1).0.is_empty() {
-            for attr in (data.1).0 {
-                json_data.insert(attr.0.to_string(), attr.1);
-            }
-        }
-        // group duplicated group, like timing(),power()
-        if !(data.1).1.is_empty() {
-            // first check similarity
-            let unique_groups = merge_same_group((data.1).1);
-            for grp in unique_groups {
-                json_data.insert(grp.0, grp.1);
-            }
-        }
-        result.insert((data.0).1.into(), LibertyJson::from(json_data));
-        (res, ((data.0).0, LibertyJson::from(result)))
-    })
+  context(
+    "Named Group Parser",
+    tuple((
+      tuple((tstring, delimited(tag("("), tstring, tag(")")))),
+      delimited(
+        ws(tag("{")),
+        tuple((many0(group_attribute_parser), many0(unnamed_group_parser))),
+        ws(tag("}")),
+      ),
+    )),
+  )(input)
+  .map(|(res, data)| {
+    let mut json_data = Map::new();
+    let mut result = Map::new();
+    // json_data.insert("name".into(), LibertyJson::from((data.0).1.to_string()));
+    // group attribute is unique, so insert directly
+    if !(data.1).0.is_empty() {
+      for attr in (data.1).0 {
+        json_data.insert(attr.0.to_string(), attr.1);
+      }
+    }
+    // group duplicated group, like timing(),power()
+    if !(data.1).1.is_empty() {
+      // first check similarity
+      let unique_groups = merge_same_group((data.1).1);
+      for grp in unique_groups {
+        json_data.insert(grp.0, grp.1);
+      }
+    }
+    result.insert((data.0).1.into(), LibertyJson::from(json_data));
+    (res, ((data.0).0, LibertyJson::from(result)))
+  })
 }
 
 pub fn unnamed_group_parser(input: &str) -> LibRes<&str, (&str, LibertyJson)> {
-    context(
-        "UnNamed Group Parser",
+  context(
+    "UnNamed Group Parser",
+    tuple((
+      terminated(tstring, tag("()")),
+      delimited(
+        ws(tag("{")),
         tuple((
-            terminated(tstring, tag("()")),
-            delimited(
-                ws(tag("{")),
-                tuple((
-                    many0(group_attribute_parser),
-                    many0(alt((unnamed_group_parser, named_group_parser))),
-                )),
-                ws(tag("}")),
-            ),
+          many0(group_attribute_parser),
+          many0(alt((unnamed_group_parser, named_group_parser))),
         )),
-    )(input)
-    .map(|(res, data)| {
-        let mut json_data = Map::new();
-        if !(data.1).0.is_empty() {
-            for attr in (data.1).0 {
-                json_data.insert(attr.0.to_string(), attr.1);
-            }
-        }
-        if !(data.1).1.is_empty() {
-            let unique_groups = merge_same_group((data.1).1);
-            for grp in unique_groups {
-                json_data.insert(grp.0, grp.1);
-            }
-        }
-        (res, (data.0, LibertyJson::from(json_data)))
-    })
+        ws(tag("}")),
+      ),
+    )),
+  )(input)
+  .map(|(res, data)| {
+    let mut json_data = Map::new();
+    if !(data.1).0.is_empty() {
+      for attr in (data.1).0 {
+        json_data.insert(attr.0.to_string(), attr.1);
+      }
+    }
+    if !(data.1).1.is_empty() {
+      let unique_groups = merge_same_group((data.1).1);
+      for grp in unique_groups {
+        json_data.insert(grp.0, grp.1);
+      }
+    }
+    (res, (data.0, LibertyJson::from(json_data)))
+  })
 }
 
 use std::collections::HashSet;
 // check duplicated key situation in all (key,value), return ifself if no duplicated key,
 // else merge all values with duplicated key into new value and return non-duplicated key (key,value)s
 pub fn merge_same_group(groups: Vec<(&str, LibertyJson)>) -> Vec<(String, LibertyJson)> {
-    let mut key_set = HashSet::new();
-    let mut last_insert_fail = false;
-    let mut need_merge_group_name = String::new();
-    let mut result = Vec::new();
-    let mut need_merge = Vec::new();
-    for (k, v) in groups {
-        if key_set.insert(k) {
-            result.push((k.to_string(), v));
-            if last_insert_fail == true {
-                result.push((
-                    need_merge_group_name.clone(),
-                    LibertyJson::from(need_merge.clone()),
-                ));
-                need_merge = Vec::new();
-            }
-        } else {
-            last_insert_fail = true;
-            need_merge.push(v);
-            if last_insert_fail == false {
-                need_merge_group_name = k.to_string();
-            }
-        }
+  let mut key_set = HashSet::new();
+  let mut last_insert_fail = false;
+  let mut need_merge_group_name = String::new();
+  let mut result = Vec::new();
+  let mut need_merge = Vec::new();
+  for (k, v) in groups {
+    if key_set.insert(k) {
+      result.push((k.to_string(), v));
+      if last_insert_fail == true {
+        result
+          .push((need_merge_group_name.clone(), LibertyJson::from(need_merge.clone())));
+        need_merge = Vec::new();
+      }
+    } else {
+      last_insert_fail = true;
+      need_merge.push(v);
+      if last_insert_fail == false {
+        need_merge_group_name = k.to_string();
+      }
     }
-    result
+  }
+  result
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    #[test]
-    fn test_group_1() {
-        let input = "    pin(A) { 
+  use super::*;
+  #[test]
+  fn test_group_1() {
+    let input = "    pin(A) { 
       capacitance : 0.0004127 ; 
       direction : input ; 
       fall_capacitance : 0.0004127 ; 
@@ -171,12 +166,12 @@ mod tests {
         }
       }
   }";
-        let (_, _) = named_group_parser(input).unwrap();
-    }
+    let (_, _) = named_group_parser(input).unwrap();
+  }
 
-    #[test]
-    fn test_group_2() {
-        let input = "      internal_power() { 
+  #[test]
+  fn test_group_2() {
+    let input = "      internal_power() { 
         related_pg_pin : \"VDD\" ; 
         when : \"!B&!CK&!SE&!SI\" ; 
 
@@ -194,12 +189,12 @@ mod tests {
                  -0.00017043, -0.00017127, -0.00017152\");
         }
       }";
-        let (_, _) = unnamed_group_parser(input).unwrap();
-    }
+    let (_, _) = unnamed_group_parser(input).unwrap();
+  }
 
-    #[test]
-    fn test_group_3() {
-        let input = "      timing() { 
+  #[test]
+  fn test_group_3() {
+    let input = "      timing() { 
         related_pin : \"CK\" ; 
         sdf_cond : \"ENABLE_B_AND_NOT_SE === 1'b1\" ; 
         timing_type : hold_rising ; 
@@ -225,12 +220,12 @@ mod tests {
                  \"-0.42141, -0.40086, -0.36784, -0.32407, -0.27785\");
         }
       }";
-        let (_, _) = unnamed_group_parser(input).unwrap();
-    }
+    let (_, _) = unnamed_group_parser(input).unwrap();
+  }
 
-    #[test]
-    fn test_group_4() {
-        let input = "        fall_constraint(cnst_ctin_rtin_5x5) { 
+  #[test]
+  fn test_group_4() {
+    let input = "        fall_constraint(cnst_ctin_rtin_5x5) { 
           index_1(\"0.01, 0.096347, 0.39944, 0.97825, 1.88\");
           index_2(\"0.01, 0.096347, 0.39944, 0.97825, 1.88\");
           values(\"-0.057255, -0.024717, 0.060606, 0.17141, 0.28867\",\\
@@ -239,12 +234,12 @@ mod tests {
                  \"-0.31589, -0.2968, -0.23804, -0.1371, -0.025855\",\\
                  \"-0.44037, -0.43037, -0.40215, -0.3206, -0.21397\");
         }";
-        let (_, _) = named_group_parser(input).unwrap();
-    }
+    let (_, _) = named_group_parser(input).unwrap();
+  }
 
-    #[test]
-    fn test_group_5() {
-        let input = "    pin(E) { 
+  #[test]
+  fn test_group_5() {
+    let input = "    pin(E) { 
       clock_gate_enable_pin : true ;
       capacitance : 0.00043968 ; 
       direction : input ; 
@@ -348,12 +343,12 @@ mod tests {
         }
       }
     }";
-        let (_, _) = named_group_parser(input).unwrap();
-    }
+    let (_, _) = named_group_parser(input).unwrap();
+  }
 
-    #[test]
-    fn test_group_6() {
-        let input = "      timing() { 
+  #[test]
+  fn test_group_6() {
+    let input = "      timing() { 
         related_pin : \"CK\" ; 
         sdf_cond : \"ENABLE_NOT_TE === 1'b1\" ; 
         timing_type : hold_falling ; 
@@ -379,24 +374,24 @@ mod tests {
                  \"-0.38821, -0.35143, -0.23499, -0.092728, 0.059553\");
         }
       }";
-        let (_, _) = unnamed_group_parser(input).unwrap();
-    }
+    let (_, _) = unnamed_group_parser(input).unwrap();
+  }
 
-    #[test]
-    fn test_group_7() {
-        let input = "  wire_load(\"Zero\") {
+  #[test]
+  fn test_group_7() {
+    let input = "  wire_load(\"Zero\") {
     resistance : 0.00397143;
     capacitance : 0.000206;
     area : 0;
     slope : 0.0;
     fanout_length (1, 0.0);
   }";
-        let (_, _) = header_group_parser(input).unwrap();
-    }
+    let (_, _) = header_group_parser(input).unwrap();
+  }
 
-    #[test]
-    fn test_group_8() {
-        let input = "      internal_power() { 
+  #[test]
+  fn test_group_8() {
+    let input = "      internal_power() { 
         when : \"!B&!CK&!SE&!SI\" ; 
 
         fall_power(pwr_tin_7) { 
@@ -413,6 +408,6 @@ mod tests {
                  -0.000112191, -0.000112566, -0.000112543, -0.000112614\");
         }
       }";
-        let (_, _) = unnamed_group_parser(input).unwrap();
-    }
+    let (_, _) = unnamed_group_parser(input).unwrap();
+  }
 }
