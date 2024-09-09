@@ -41,7 +41,11 @@ jobs:
           mkdir -p target/criterion
           REPO="${{ github.repository }}"
           NAME="${REPO##*/}"
-          { wget https://${{ github.repository_owner }}.github.io/$NAME/criterion.tar.gz && tar -xf criterion.tar.gz } || wget -r -np -nH --cut-dirs=1 -P target/criterion https://${{ github.repository_owner }}.github.io/$NAME/bench/
+          { 
+            wget https://${{ github.repository_owner }}.github.io/$NAME/criterion.tar.gz && tar -xf criterion.tar.gz 
+          } || {
+            wget -r -np -nH --cut-dirs=1 -P target/criterion https://${{ github.repository_owner }}.github.io/$NAME/bench/
+          }
       - run: ls target/criterion
       - run: cargo bench --bench benchmark
       - run: |
