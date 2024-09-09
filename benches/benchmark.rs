@@ -363,7 +363,7 @@ fn bench_all(c: &mut Criterion) -> ResList {
 
 fn info_table() -> String {
   format!(
-    "<h3>Projects Under Test</h3><div class=\"info-table\"><table><thead><tr><th style=\"font-weight:bold;\">Name</th><th style=\"font-weight:bold;\">Language</th><th colspan=\"3\" style=\"text-align:center;font-weight:bold;\">Type Support</th><th style=\"font-weight:bold;\">Boolean Expression</th><th style=\"font-weight:bold;\">Json Convert</th><th style=\"font-weight:bold;\">Comment</th></tr><tr><th></th><th></th><th>All</th><th>Partly</th><th>AST only</th><th></th><th></th><th></th></tr></thead><tbody>{}</tbody></table></div>", 
+    "<h3>Projects Under Test</h3><div class=\"info-table\"><table><thead><tr><th style=\"font-weight:bold;\">Proj</th><th style=\"font-weight:bold;\">Language</th><th colspan=\"3\" style=\"text-align:center;font-weight:bold;\">Type Support</th><th style=\"font-weight:bold;\">Boolean Expression</th><th style=\"font-weight:bold;\">Comment</th></tr><tr><th></th><th></th><th>All</th><th>Partly</th><th>AST only</th><th></th><th></th></tr></thead><tbody>{}</tbody></table></div>", 
     ProjUnderTest::iter().map(|proj| proj.info_html()).join(""),
   )
 }
