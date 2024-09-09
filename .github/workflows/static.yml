@@ -45,7 +45,7 @@ jobs:
           } || {
             echo "fail to get baseline data"
           }
-      - run: cargo bench --bench benchmark
+      - run: cargo bench --package benches
       - name: Collect benchmark static files
         run: |
           tar -zcvf docs/static/criterion.tar.gz target/criterion

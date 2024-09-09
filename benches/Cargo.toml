@@ -1,0 +1,32 @@
+[package]
+name = "benches"
+edition = "2021"
+publish = false
+
+[dependencies]
+log = { workspace = true }
+simple_logger = { workspace = true }
+itertools = { workspace = true }
+walkdir = { workspace = true }
+console = { workspace = true }
+similar = { workspace = true }
+serde_json = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }
+criterion = { version = "0.5", features = ["html_reports"] }
+sysinfo = "0.31"
+chrono = "0.4.38"
+
+liberty-io = "0.0.4"
+libertyparse = "0.3.0"
+liberty2json = { path = "projs/liberty2json" }
+# liberty-db-0p6p3 = { package="liberty-db", version = "0.6.3" }
+liberty-db = { path = ".." }
+liberty-db-0p6p2  = { package="liberty-db", version = "0.6.2" }
+liberty-db-0p5p9  = { package="liberty-db", version = "0.5.9" }
+liberty-db-0p4p13 = { package="liberty-db", version = "0.4.13" }
+liberty-db-0p3p1  = { package="liberty-db", version = "0.3.1" }
+
+[[bench]]
+name = "benchmark"
+harness = false

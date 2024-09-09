@@ -22,7 +22,7 @@ fn cpp_files(search_paths: &[PathBuf]) -> Vec<String> {
 
 fn main() {
   let out_dir = env::var("OUT_DIR").unwrap();
-  let projs_dir = Path::new("benches/projs");
+  let projs_dir = Path::new("projs");
   // g++ -std=c++17 -fPIC -shared -I. -o libprojs.so projs.cpp ot/liberty/*.cpp ot/unit/*.cpp -lstdc++fs
   let status = Command::new("g++")
     .args([
