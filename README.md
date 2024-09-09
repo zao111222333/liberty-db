@@ -1,10 +1,11 @@
 # liberty-db
 
-[![pipeline](https://github.com/zao111222333/liberty-db/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/zao111222333/liberty-db/actions/workflows/rust.yml)
-[![pipeline](https://github.com/zao111222333/liberty-db/actions/workflows/static.yml/badge.svg?branch=master)](https://github.com/zao111222333/liberty-db/actions/workflows/static.yml)
+[![pipeline](https://github.com/zao111222333/liberty-db/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/zao111222333/liberty-db/actions/workflows/build.yml)
+[![pipeline](https://github.com/zao111222333/liberty-db/actions/workflows/bench_deploy.yml/badge.svg?branch=master)](https://github.com/zao111222333/liberty-db/actions/workflows/bench_deploy.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![liberty-db](https://shields.io/crates/v/liberty-db.svg?style=flat-square&label=liberty-db)](https://crates.io/crates/liberty-db)
 [![Docs](https://docs.rs/liberty-db/badge.svg)](https://docs.rs/liberty-db)
+[![Benchmark](https://img.shields.io/badge/Benchmark%20Report-8A2BE2)](https://zao111222333.github.io/liberty-db/bench)
 
 ## Highlight Features
 
