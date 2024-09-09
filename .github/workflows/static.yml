@@ -41,8 +41,10 @@ jobs:
           REPO="${{ github.repository }}"
           NAME="${REPO##*/}"
           { 
-            wget https://${{ github.repository_owner }}.github.io/$NAME/criterion.tar.gz && tar -xf criterion.tar.gz 
+            wget https://${{ github.repository_owner }}.github.io/$NAME/criterion.tar.gz
+            tar -xf criterion.tar.gz 
           } || {
+            echo "fail to get old data"
           }
       - run: ls target/criterion
       - run: cargo bench --bench benchmark
