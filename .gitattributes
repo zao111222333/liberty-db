@@ -1,2 +1,2 @@
-benches/projs/** linguist-vendored
+dev/include/** linguist-vendored
 *.lib_golden linguist-generated

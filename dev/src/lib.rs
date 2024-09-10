@@ -202,8 +202,8 @@ impl BenchResult {
 }
 
 pub type ResList = Vec<(String, [(String, Vec<BenchResult>); 2])>;
-fn all_files() -> impl Iterator<Item = PathBuf> {
-  walkdir::WalkDir::new("../tests/tech").into_iter().filter_map(|res| {
+pub fn all_files() -> impl Iterator<Item = PathBuf> {
+  walkdir::WalkDir::new("tech").into_iter().filter_map(|res| {
     res.ok().and_then(|entry| {
       let path = entry.path();
       let extension = path.extension().and_then(OsStr::to_str);
@@ -293,7 +293,10 @@ pub fn res_table(
   format!("<h3>Parse Performance Comparison</h3>{parse_table}<h3>Write Performance Comparison</h3>{write_table}")
 }
 
-pub fn run(projs: impl Clone + Iterator<Item = impl Proj>, regression: bool) -> String {
+pub fn run_bench(
+  projs: impl Clone + Iterator<Item = impl Proj>,
+  regression: bool,
+) -> String {
   let mut criterion = Criterion::default()
     .sample_size(100)
     .with_output_color(true)

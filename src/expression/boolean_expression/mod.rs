@@ -45,42 +45,13 @@ pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
     expr
   }
 }
-// /// `(A)? B : C` <-> `(A & B) | (!A & C)`
-// #[inline]
-// fn condition(cond: Expr, then_value: Expr, else_value: Expr) -> Expr {
-//   let box_cond = Box::new(cond);
-//   let box_then = Box::new(then_value);
-//   let box_else = Box::new(else_value);
-//   let expr = Expr::Or(
-//     Box::new(Expr::And(box_cond.clone(), box_then)),
-//     Box::new(Expr::And(Box::new(Expr::Not(box_cond)), box_else)),
-//   );
-//   expr
-// }
-
-// #[inline]
-// fn condition_box(cond: Box<Expr>, then_value: Box<Expr>, else_value: Box<Expr>) -> Expr {
-//   // let box_cond = Box::new(cond);
-//   // let box_then = Box::new(then_value);
-//   // let box_else = Box::new(else_value);
-//   let expr = Expr::Or(
-//     Box::new(Expr::And(cond.clone(), then_value)),
-//     Box::new(Expr::And(Box::new(Expr::Not(cond)), else_value)),
-//   );
-//   expr
-// }
 
 impl BooleanExpressionLike for Expr {}
 impl BooleanExpressionLike for BooleanExpression {}
 impl BooleanExpressionLike for IdBooleanExpression {}
 
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-/// ?field=test
-/// &bgn
-/// =132.36
-/// &end
-/// =132.38
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=132.36+132.41&end=132.38+133.13
 /// ">Reference</a>
 ///
 /// | Operator | Description                           |
@@ -101,7 +72,9 @@ impl BooleanExpressionLike for IdBooleanExpression {}
 /// ``` liberty
 /// function : " \"1A\" + \"1B\" " ;
 /// ```
-///
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct BooleanExpression {
@@ -161,12 +134,7 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {
 }
 
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-/// ?field=test
-/// &bgn
-/// =132.36
-/// &end
-/// =132.38
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=132.36+132.41&end=132.38+133.13
 /// ">Reference</a>
 ///
 /// | Operator | Description                           |
@@ -187,7 +155,9 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {
 /// ``` liberty
 /// function : " \"1A\" + \"1B\" " ;
 /// ```
-///
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdBooleanExpression {

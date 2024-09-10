@@ -5,12 +5,12 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![liberty-db](https://shields.io/crates/v/liberty-db.svg?style=flat-square&label=liberty-db)](https://crates.io/crates/liberty-db)
 [![Docs](https://docs.rs/liberty-db/badge.svg)](https://docs.rs/liberty-db)
-[![Benchmark](https://img.shields.io/badge/Benchmark%20Report-8A2BE2)](https://zao111222333.github.io/liberty-db/bench)
+[![Benchmark](https://img.shields.io/badge/Benchmark%20Summary-8A2BE2)](https://zao111222333.github.io/liberty-db/bench)
 
 ## Highlight Features
 
 + Support all `liberty` attributes via datastructure, not abstract syntax tree (AST) only, according to [Liberty Version R-2020.09, September 2020](https://zao111222333.github.io/liberty-db/2020.09/reference_manual.pdf)
-+ Support `liberty` boolean expression syntax, employ [binary decesion diagram (BDD)](https://github.com/sybila/biodivine-lib-bdd) to hash
++ Support [`liberty` boolean expression syntax](https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=132.36+132.41&end=132.38+133.13), employ [binary decesion diagram (BDD)](https://github.com/sybila/biodivine-lib-bdd) to [identify (hashing)](https://docs.rs/liberty-db/latest/liberty_db/expression/struct.IdBooleanExpression.html)
 + Parser & formatter are implemented by static macros, providing a decent preformance and tiny ~2MB `parser & formatter` binary. See [benchmark summary](https://zao111222333.github.io/liberty-db/bench)
 + Support `define` & `define_group` user-defined attributes
 + Well defined [document](https://docs.rs/liberty-db/latest/liberty_db/library/struct.Library.html) & verified with library-complier

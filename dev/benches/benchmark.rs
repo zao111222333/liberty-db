@@ -1,4 +1,4 @@
-use benches::{run, BenchResult, OPenTimerLibraryPtr, Proj, ProjInfo, ProjLibrary};
+use dev::{run_bench, BenchResult, OPenTimerLibraryPtr, Proj, ProjInfo, ProjLibrary};
 use std::{
   fs::File,
   io::{BufWriter, Write},
@@ -113,8 +113,8 @@ impl Proj for Projs {
   }
 }
 fn main() {
-  let projs_table = run(Projs::iter(), false);
-  let regress_table = run(Versions::iter(), true);
+  let projs_table = run_bench(Projs::iter(), false);
+  let regress_table = run_bench(Versions::iter(), true);
 
   let out_file = File::create("../target/criterion/index.html").unwrap();
   let mut writer = BufWriter::new(out_file);
@@ -131,12 +131,12 @@ fn main() {
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Benchmark Result</title>
+<title>Benchmark Summary</title>
 <style type="text/css">
 {ccs_text}
 </style>
 </head>
-<body><div class="body"><h2>Benchmark Result</h2>
+<body><div class="body"><h2>Benchmark Summary</h2>
 <p>Platform: {cpu_info}</p>
 <p>{date_info}</p>
 <div class="absolute">

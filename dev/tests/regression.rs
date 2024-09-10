@@ -1,26 +1,10 @@
 #![cfg(test)]
-use liberty_db::{ast::Group, Library};
+use liberty_db_latest::{ast::Group, Library};
 use std::{
-  ffi::OsStr,
-  fs::{metadata, read_to_string, File},
+  fs::{read_to_string, File},
   io::{BufWriter, Write},
   path::{Path, PathBuf},
 };
-
-fn all_files() -> impl Iterator<Item = PathBuf> {
-  walkdir::WalkDir::new("tests/tech").into_iter().filter_map(|res| {
-    res.ok().and_then(|entry| {
-      let path = entry.path();
-      let extension = path.extension().and_then(OsStr::to_str);
-      let md = metadata(path).unwrap();
-      if md.is_file() && extension == Some("lib") {
-        Some(entry.into_path())
-      } else {
-        None
-      }
-    })
-  })
-}
 
 fn text_diff(old: &str, new: &str) {
   use console::{style, Style};
@@ -87,7 +71,7 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
 // open `#[test]` only when we need to re-golden
 // #[test]
 fn make_golden() {
-  for test_lib_path in all_files() {
+  for test_lib_path in dev::all_files() {
     let golden_lib_path = golden_path(&test_lib_path);
     let library =
       Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
@@ -100,13 +84,13 @@ fn make_golden() {
 #[test]
 fn regression() {
   _ = simple_logger::SimpleLogger::new().init();
-  for test_lib_path in all_files() {
+  for test_lib_path in dev::all_files() {
     println!("================\n{}", test_lib_path.display());
     let golden_lib_path = golden_path(&test_lib_path);
     let library =
       Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
     let golden = read_to_string(golden_lib_path).unwrap();
     let new = library.display().to_string();
-    crate::text_diff(golden.as_str(), new.as_str());
+    text_diff(golden.as_str(), new.as_str());
   }
 }

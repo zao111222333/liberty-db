@@ -1,7 +1,7 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # cargo publish --allow-dirty --registry crates-io -p liberty-db
 [workspace]
-members = ["macros", "examples/*", "benches", "benches/projs/liberty2json"]
+members = ["macros", "examples/*", "dev", "dev/include/liberty2json"]
 
 [workspace.package]
 version = "0.6.4"
@@ -51,6 +51,7 @@ strum = "0.26"
 strum_macros = "0.26"
 itertools = "0.13"
 arcstr = { version = "1.2", features = ["serde"] }
+ordered-float = { version = "4.0", features = ["serde"] }
 walkdir = "2"
 similar = { version = "2.6.0", features = ["inline"]}
 console = "0.15.8"
@@ -66,7 +67,7 @@ strum = { workspace = true }
 strum_macros = { workspace = true }
 itertools = { workspace = true }
 arcstr = { workspace = true }
-ordered-float = { version = "4.0", features = ["serde"] }
+ordered-float = { workspace = true }
 nom = "7.1"
 lazy_static = "1.4.0"
 enum_dispatch = "0.3.11"
@@ -78,13 +79,12 @@ uom = { version = "0.36.0", default-features = false, features = ["f64", "si", "
 # biodivine-lib-bdd = { path = "../../biodivine-lib-bdd", features = ["serde"] }
 biodivine-lib-bdd = { version = "0.5.19", features = ["serde"] }
 mut_set = "0.4.0"
-# mut_set = {path = "../mut_set"}
+# mut_set = { path = "../mut_set" }
 duplicate = "1.0.0"
 num-traits = "0.2"
 # mexprp = "0.3.1"
 
 [dev-dependencies]
-walkdir = { workspace = true }
 similar = { workspace = true }
 console = { workspace = true }
 simple_logger = { workspace = true }
