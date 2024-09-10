@@ -191,7 +191,7 @@ impl BenchResult {
         "<td style=\"color:Red;text-align:right;padding-right:10px;\">FAIL</td>"
           .to_string()
       }
-      Self::Ok { path, run_time, change } => {
+      Self::Ok { path, run_time, change: _ } => {
         format!(
           "<td style=\"text-align:right;padding-right:10px;\"><a href=\"./{path}\" style=\"color:MediumSeaGreen;\">{}</a></td>",
           format_duration(run_time)
