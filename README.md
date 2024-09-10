@@ -28,28 +28,28 @@ See more in [document](https://docs.rs/liberty-db)
 
 ## Examples
 
-The examples are in [./examples](https://github.com/zao111222333/liberty-db/tree/master/examples), you can run them with commands:
+You can run [examples](https://github.com/zao111222333/liberty-db/tree/master/examples) with commands:
 
 ``` shell
 # example0
 cargo run --package example0_parse_fmt
 # example1
-cargo run --package example1_parse_fmt_file -- tests/tech/cases/ocv.lib
+cargo run --package example1_parse_fmt_file -- dev/tech/cases/ocv.lib
 # example2
-cargo run --package example2_prune_lib -- tests/tech/cases/ocv.lib
+cargo run --package example2_prune_lib -- dev/tech/cases/ocv.lib
 ```
 
 ## Test
 
 ```shell
 cargo test
-cargo test --package liberty-tests --test tests
+cargo test --package dev
 ```
 
 ## Testbench
 
 ```shell
-cargo bench --bench benchmark
+cargo bench --bench dev
 ```
 
 See latest [benchmark summary](https://zao111222333.github.io/liberty-db/bench).
