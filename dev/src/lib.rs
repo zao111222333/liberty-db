@@ -219,6 +219,7 @@ pub fn all_files() -> impl Iterator<Item = PathBuf> {
 pub fn bench_all(
   c: &mut Criterion,
   projs: impl Clone + Iterator<Item = impl Proj>,
+  regression: bool,
 ) -> ResList {
   let group_path_max_len = 64;
   let group_name2path = |group_name: &String| {
@@ -229,10 +230,11 @@ pub fn bench_all(
     group_path
   };
   let mut res_list = Vec::new();
+  let tag = if regression { "regression" } else { "comparsion" };
   for path in all_files() {
     let file_path = path.display().to_string();
     let parse_res = {
-      let group_name = format!("[parse] {file_path} ");
+      let group_name = format!("[{tag}-parse] {file_path}");
       let group_path = group_name2path(&group_name);
       let mut parse_group = c.benchmark_group(&group_name);
       let res = projs
@@ -243,7 +245,7 @@ pub fn bench_all(
       (group_path, res)
     };
     let write_res = {
-      let group_name = format!("[write] {file_path} ");
+      let group_name = format!("[{tag}-write] {file_path} ");
       let group_path = group_name2path(&group_name);
       let mut write_group = c.benchmark_group(&group_name);
       let res = projs
@@ -302,7 +304,7 @@ pub fn run_bench(
     .with_output_color(true)
     .warm_up_time(Duration::from_millis(1000))
     .configure_from_args();
-  let res_list = bench_all(&mut criterion, projs.clone());
+  let res_list = bench_all(&mut criterion, projs.clone(), regression);
   criterion.final_summary();
 
   let mut info_table = info_table(projs.clone());
