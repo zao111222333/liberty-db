@@ -10,7 +10,7 @@ OBJS = $(patsubst $(SRCDIR)/%.c, %.o, $(SRCS))
 LIBRARY = libsi2dr_liberty.a
 
 %.o: $(SRCDIR)/%.c
-	$(CC) $(INCLUDES) -c -fPIC $< -o $@
+	$(CC) $(INCLUDES) -c -O3 -fPIC $< -o $@
 
 %.c: %.y
 	@echo "Skipping Yacc"
