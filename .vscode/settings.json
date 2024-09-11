@@ -83,5 +83,13 @@
         },
     },
     "rust-analyzer.showUnlinkedFileNotification": false,
+    "files.associations": {
+        "*.wasm": "wasm",
+        "*.cdl": "spice",
+        "si2dr_liberty.h": "c",
+        "iostream": "cpp",
+        "new": "cpp",
+        "iosfwd": "cpp"
+    },
 
 }

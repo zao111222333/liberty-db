@@ -1,120 +1,37 @@
-use dev::{run_bench, BenchResult, OPenTimerLibraryPtr, Proj, ProjInfo, ProjLibrary};
+use dev::{
+  gen_projs,
+  projs::{OpenTimerLibrary, Si2drLibertyLibrary},
+  run_bench,
+};
 use std::{
   fs::File,
   io::{BufWriter, Write},
 };
-use strum::IntoEnumIterator;
-#[derive(Debug, strum_macros::EnumIter)]
-enum Projs {
-  LibertyDb,
-  LibertyIo,
-  LibertyParse,
-  OPenTimer,
-  Liberty2json,
-}
-#[derive(Debug, strum_macros::EnumIter)]
-enum Versions {
-  LibertyDbLatest,
-  LibertyDb0p6p3,
-  // LibertyDb0p6p2,
-  // LibertyDb0p6p1,
-  // LibertyDb0p6p0,
-  LibertyDb0p5,
-  LibertyDb0p4,
-  LibertyDb0p3,
-}
-#[rustfmt::skip]
-impl Proj for Versions {
-  fn info(&self) -> ProjInfo {
-    match self {
-      Self::LibertyDbLatest => liberty_db_latest::Library::INFO,
-      Self::LibertyDb0p6p3 => liberty_db_0p6p3::Library::INFO,
-      // Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::INFO,
-      // Self::LibertyDb0p6p1 => liberty_db_0p6p1::Library::INFO,
-      // Self::LibertyDb0p6p0 => liberty_db_0p6p0::Library::INFO,
-      Self::LibertyDb0p5 => liberty_db_0p5p9::Library::INFO,
-      Self::LibertyDb0p4 => liberty_db_0p4p13::Library::INFO,
-      Self::LibertyDb0p3 => liberty_db_0p3p1::library::Library::INFO,
-    }
-  }
-  fn parse_bench(
-    &self,
-    group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::WallTime>,
-    file_path: &str,
-    group_path: &str,
-  ) -> BenchResult {
-    match self {
-      Self::LibertyDbLatest => liberty_db_latest::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyDb0p6p3 => liberty_db_0p6p3::Library::parse_bench(group, file_path, group_path),
-      // Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::parse_bench(group, file_path, group_path),
-      // Self::LibertyDb0p6p1 => liberty_db_0p6p1::Library::parse_bench(group, file_path, group_path),
-      // Self::LibertyDb0p6p0 => liberty_db_0p6p0::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyDb0p5 => liberty_db_0p5p9::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyDb0p4 => liberty_db_0p4p13::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyDb0p3 => liberty_db_0p3p1::library::Library::parse_bench(group, file_path, group_path),
-    }
-  }
-  fn write_bench(
-    &self,
-    group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::WallTime>,
-    file_path: &str,
-    group_path: &str,
-  ) -> BenchResult {
-    match self {
-      Self::LibertyDbLatest => liberty_db_latest::Library::write_bench(group, file_path, group_path),
-      Self::LibertyDb0p6p3 => liberty_db_0p6p3::Library::write_bench(group, file_path, group_path),
-      // Self::LibertyDb0p6p2 => liberty_db_0p6p2::Library::write_bench(group, file_path, group_path),
-      // Self::LibertyDb0p6p1 => liberty_db_0p6p1::Library::write_bench(group, file_path, group_path),
-      // Self::LibertyDb0p6p0 => liberty_db_0p6p0::Library::write_bench(group, file_path, group_path),
-      Self::LibertyDb0p5 => liberty_db_0p5p9::Library::write_bench(group, file_path, group_path),
-      Self::LibertyDb0p4 => liberty_db_0p4p13::Library::write_bench(group, file_path, group_path),
-      Self::LibertyDb0p3 => liberty_db_0p3p1::library::Library::write_bench(group, file_path, group_path),
-    }
-  }
-}
-#[rustfmt::skip]
-impl Proj for Projs {
-  fn info(&self) -> ProjInfo {
-    match self {
-      Self::LibertyDb => liberty_db_latest::Library::INFO,
-      Self::LibertyIo => liberty_io::Group::INFO,
-      Self::LibertyParse => libertyparse::Liberty::INFO,
-      Self::OPenTimer => OPenTimerLibraryPtr::INFO,
-      Self::Liberty2json => liberty2json::Liberty::INFO,
-    }
-  }
-  fn parse_bench(
-    &self,
-    group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::WallTime>,
-    file_path: &str,
-    group_path: &str,
-  ) -> BenchResult {
-    match self {
-      Self::LibertyDb => liberty_db_latest::Library::parse_bench(group, file_path, group_path),
-      Self::LibertyIo => liberty_io::Group::parse_bench(group, file_path, group_path),
-      Self::LibertyParse => libertyparse::Liberty::parse_bench(group, file_path, group_path),
-      Self::OPenTimer => OPenTimerLibraryPtr::parse_bench(group, file_path, group_path),
-      Self::Liberty2json => liberty2json::Liberty::parse_bench(group, file_path, group_path),
-    }
-  }
-  fn write_bench(
-    &self,
-    group: &mut criterion::BenchmarkGroup<'_, criterion::measurement::WallTime>,
-    file_path: &str,
-    group_path: &str,
-  ) -> BenchResult {
-    match self {
-      Self::LibertyDb => liberty_db_latest::Library::write_bench(group, file_path, group_path),
-      Self::LibertyIo => liberty_io::Group::write_bench(group, file_path, group_path),
-      Self::LibertyParse => libertyparse::Liberty::write_bench(group, file_path, group_path),
-      Self::OPenTimer => OPenTimerLibraryPtr::write_bench(group, file_path, group_path),
-      Self::Liberty2json => liberty2json::Liberty::write_bench(group, file_path, group_path),
-    }
-  }
-}
 fn main() {
-  let projs_table = run_bench(Projs::iter(), false);
-  let regress_table = run_bench(Versions::iter(), true);
+  let projs_table = run_bench(
+    gen_projs![
+      (LibertyDb, liberty_db_latest::Library),
+      (Si2drLiberty, Si2drLibertyLibrary),
+      (OPenTimer, OpenTimerLibrary),
+      (LibertyIo, liberty_io::Group),
+      (LibertyParse, libertyparse::Liberty),
+      (Liberty2json, liberty2json::Liberty),
+    ],
+    false,
+  );
+  let regress_table = run_bench(
+    gen_projs![
+      (LibertyDbLatest, liberty_db_latest::Library),
+      (LibertyDb0p6p3, liberty_db_0p6p3::Library),
+      // (LibertyDb0p6p2, liberty_db_0p6p2::Library),
+      // (LibertyDb0p6p1, liberty_db_0p6p1::Library),
+      // (LibertyDb0p6p0, liberty_db_0p6p0::Library),
+      (LibertyDb0p5, liberty_db_0p5p9::Library),
+      (LibertyDb0p4, liberty_db_0p4p13::Library),
+      (LibertyDb0p3, liberty_db_0p3p1::library::Library),
+    ],
+    true,
+  );
 
   let out_file = File::create("../target/criterion/index.html").unwrap();
   let mut writer = BufWriter::new(out_file);

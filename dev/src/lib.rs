@@ -1,16 +1,14 @@
-mod impls;
+pub mod projs;
 use criterion::{black_box, Criterion};
 use itertools::Itertools;
 use serde_json::Value;
 use std::{
-  ffi::{c_void, OsStr},
+  ffi::OsStr,
   fs::{metadata, read_to_string},
   panic,
   path::{Path, PathBuf},
   time::Duration,
 };
-
-pub type OPenTimerLibraryPtr = *mut c_void;
 
 enum TypedSupport {
   AllTyped,

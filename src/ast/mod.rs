@@ -678,7 +678,7 @@ impl ParserError {
   }
 }
 
-/// `TestWrapper`
+/// `GroupDisplay`
 #[derive(Debug)]
 pub struct GroupDisplay<'a, G> {
   pub inner: &'a G,

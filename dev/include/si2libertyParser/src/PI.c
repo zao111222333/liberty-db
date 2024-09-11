@@ -81,8 +81,6 @@ int lib__name_needs_to_be_quoted(char *name);
 
 char *expr_string( si2drExprT *e);
 
-void lib__write_group(FILE *of, si2drGroupIdT group, char *indent, char *cellname);
-
 void create_floating_define_for_cell_area(si2drStringT string);
 
 static int l__iter_group_count = 0;

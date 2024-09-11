@@ -3,8 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/benches/projs",
-                "${workspaceFolder}/benches/projs/si2libertyParser/include"
+                "${workspaceFolder}/dev/include",
+                "${workspaceFolder}/dev/include/si2libertyParser/include"
             ],
             "defines": []
         }

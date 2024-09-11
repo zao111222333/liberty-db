@@ -4,7 +4,7 @@
 members = ["macros", "examples/*", "dev", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.6.4"
+version = "0.6.5"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -69,10 +69,7 @@ itertools = { workspace = true }
 arcstr = { workspace = true }
 ordered-float = { workspace = true }
 nom = "7.1"
-lazy_static = "1.4.0"
-enum_dispatch = "0.3.11"
 derivative = "2.2.0"
-prettytable-rs = "^0.10"
 ryu = "1.0"
 itoa = "1.0"
 uom = { version = "0.36.0", default-features = false, features = ["f64", "si", "std", "serde"] }
@@ -83,6 +80,10 @@ mut_set = "0.4.0"
 duplicate = "1.0.0"
 num-traits = "0.2"
 # mexprp = "0.3.1"
+
+lazy_static = "1.4.0"
+enum_dispatch = "0.3.11"
+prettytable-rs = "^0.10"
 
 [dev-dependencies]
 similar = { workspace = true }

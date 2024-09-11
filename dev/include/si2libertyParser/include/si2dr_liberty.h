@@ -599,7 +599,7 @@ si2drExprT   *si2drOpExprGetRightExpr SI2_ARGS(( si2drExprT  *expr,
 												  si2drGroupIdT targetGroup, 
 												  si2drErrorT *err));
 
-
+	void lib__write_group(FILE *of, si2drGroupIdT group, char *indent, char *cellname);
 /* HELPER FUNCTIONS/STRUCTURES */
 
 #ifdef NO_LONG_DOUBLE
