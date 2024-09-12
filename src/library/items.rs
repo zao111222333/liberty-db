@@ -37,7 +37,7 @@ use std::collections::HashMap;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Sensitization {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
@@ -305,7 +305,7 @@ impl GroupFn for Sensitization {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct VoltageMap {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   pub name: ArcStr,
   /// voltage
   pub voltage: f64,
@@ -361,7 +361,7 @@ impl ComplexAttri for VoltageMap {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct InputVoltage {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
@@ -411,7 +411,7 @@ impl GroupFn for InputVoltage {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct OutputVoltage {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
@@ -495,7 +495,7 @@ impl SimpleAttri for DelayModel {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct OperatingConditions {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
@@ -578,7 +578,7 @@ impl GroupFn for OperatingConditions {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FpgaIsd {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
@@ -695,13 +695,13 @@ pub struct Define {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.10&end=36.11
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "&str")]
   pub attribute_name: ArcStr,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.12&end=36.13
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "&str")]
   pub group_name: ArcStr,
   /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
   /// <a name ="reference_link" href="
@@ -796,13 +796,13 @@ pub struct DefineGroup {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.33&end=37.34
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "&str")]
   pub group: ArcStr,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.35&end=37.36
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "&str")]
   pub parent_name: ArcStr,
 }
 impl ComplexAttri for DefineGroup {
@@ -863,7 +863,7 @@ pub struct DefineCellArea {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.28&end=36.29
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "&str")]
   pub area_name: ArcStr,
   /// The resource type can be
   /// + `pad_slots`
@@ -953,7 +953,7 @@ impl ComplexAttri for DefineCellArea {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WireLoad {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
@@ -1142,7 +1142,7 @@ impl ComplexAttri for FanoutLength {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WireLoadSection {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
@@ -1235,7 +1235,7 @@ impl SimpleAttri for BaseCurveType {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct BaseCurves {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments

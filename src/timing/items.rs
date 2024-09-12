@@ -190,7 +190,7 @@ pub type Mode = [ArcStr; 2];
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CellDegradation {
   /// name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments

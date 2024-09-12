@@ -1,4 +1,4 @@
-use liberty_db::{library::Library, Group};
+use liberty_db::{library::Library, ArcStr, Cell, Group};
 
 static TEMPLATE: &str = r#"
 library(gscl45nm) {
@@ -56,8 +56,20 @@ fn main() {
       library.comments.time_unit.push("line4\nline5".into());
       library.comments.time_unit.push("line6".into());
       println!("{library}");
+      println!("\niteration cell");
       for cell in &library.cell {
         println!("{}", cell.display());
+      }
+      println!("\nindex cell");
+      if let Some(sdffrs_x2) = library.cell.get(&Cell::new_id(ArcStr::from("SDFFRS_X2")))
+      {
+        println!("{}", sdffrs_x2.display());
+      }
+      println!("borrow index cell");
+      if let Some(sdffrs_x2) =
+        library.cell.get_borrow(Cell::borrow_id(&library.cell, "SDFFRS_X2"))
+      {
+        println!("{}", sdffrs_x2.display());
       }
     }
     Err(e) => panic!("{e:#?}"),

@@ -36,7 +36,7 @@ pub struct InternalPower {
   // switching_interval
   // switching_together_group
   #[liberty(simple(type = Option))]
-  #[id]
+  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   pub when: Option<IdBooleanExpression>,
   // NOTICE: Complex Attribute
   #[liberty(complex(type = Option))]

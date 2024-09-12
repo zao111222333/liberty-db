@@ -45,13 +45,13 @@ use num_traits::Zero;
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
   sort,
-  macro(derive(Debug, Clone,Default);)
+  macro(derive(Debug, Clone, Default);)
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CCSNStage {
   /// group name
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "&[ArcStr]")]
   pub name: Vec<ArcStr>,
   /// group comments
   #[liberty(comments)]
@@ -110,7 +110,7 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.15&end=287.17
   /// ">Reference-Definition</a>
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type = Option))]
   pub related_ccb_node: Option<ArcStr>,
   /// Use the `stage_type`  attribute to specify the stage type of the channel-connecting block output voltage.
@@ -123,7 +123,7 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[liberty(simple)]
   pub stage_type: StageType,
-  #[id]
+  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type = Option))]
   pub when: Option<IdBooleanExpression>,
   /// The pin-based mode  attribute is provided in the `ccsn_first_stage`  
@@ -282,7 +282,7 @@ impl SimpleAttri for StageType {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReceiverCapacitance {
   /// group name
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   pub name: Option<ArcStr>,
   /// group comments
@@ -291,7 +291,7 @@ pub struct ReceiverCapacitance {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id]
+  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type=Option))]
   pub when: Option<IdBooleanExpression>,
   #[liberty(group(type=Set))]

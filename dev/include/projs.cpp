@@ -73,7 +73,6 @@ extern "C" void* si2dr_liberty_parse_lib(const char* s) {
     groups = si2drPIGetGroups(&*err);
     while( !si2drObjectIsNull((group=si2drIterNextGroup(groups,&*err)),&*err) )
 	{
-		
 		std::cout << "\n\nChecking the database...\n\n";
 		si2drCheckLibertyLibrary(group, &*err);
 
@@ -81,7 +80,6 @@ extern "C" void* si2dr_liberty_parse_lib(const char* s) {
 			std::cout << "Passed\n\n";
 		else
 			std::cout << "Errors detected\n\n";
-
 	}
 	si2drIterQuit(groups,&*err);
     return static_cast<void*>(err);

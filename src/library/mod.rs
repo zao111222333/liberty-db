@@ -34,7 +34,7 @@ pub use items::*;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Library {
   /// library name
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments

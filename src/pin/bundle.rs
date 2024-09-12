@@ -1,5 +1,6 @@
 use crate::{
   ast::{Attributes, GroupComments, GroupFn},
+  common::items::NameList,
   expression::IdBooleanExpression,
   pin::{Direction, NextstateType},
   timing::Timing,
@@ -19,7 +20,7 @@ pub struct Bundle {
   /// Name of the pin
   #[id]
   #[liberty(name)]
-  pub name: ArcStr,
+  pub name: NameList,
   /// group comments
   #[liberty(comments)]
   pub comments: GroupComments<Self>,

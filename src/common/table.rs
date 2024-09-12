@@ -16,7 +16,7 @@ use core::fmt::{self, Write};
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUpMultiSegment {
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
   #[liberty(comments)]
@@ -47,7 +47,7 @@ pub struct TableLookUpMultiSegment {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DriverWaveform {
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   pub name: Option<ArcStr>,
   /// The `driver_waveform_name`  string attribute differentiates the driver waveform table
@@ -63,7 +63,7 @@ pub struct DriverWaveform {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=71.24&end=71.31
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type=Option))]
   pub driver_waveform_name: Option<ArcStr>,
   /// group comments
@@ -93,7 +93,7 @@ pub struct DriverWaveform {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp2D {
   // TODO: unit
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -122,7 +122,7 @@ pub struct TableLookUp2D {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CompactLutTemplate {
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -244,7 +244,7 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector3D {
   // TODO: unit
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -274,7 +274,7 @@ pub struct Vector3D {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReferenceTimeVector3D {
   // TODO: unit
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -307,7 +307,7 @@ pub struct ReferenceTimeVector3D {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector4D {
   // TODO: unit
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -339,7 +339,7 @@ pub struct Vector4D {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector3DGrpup {
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -360,7 +360,7 @@ pub struct Vector3DGrpup {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReferenceTimeVector3DGrpup {
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -381,7 +381,7 @@ pub struct ReferenceTimeVector3DGrpup {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector4DGrpup {
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -407,7 +407,7 @@ impl GroupFn for ReferenceTimeVector3DGrpup {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp3D {
   // TODO: unit
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -436,7 +436,7 @@ pub struct TableLookUp3D {
 pub struct TableLookUp1D {
   // TODO: unit
   unit: (),
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -466,7 +466,7 @@ impl GroupFn for TableLookUp1D {}
 pub struct CompactCcsTable {
   // TODO: unit
   unit: (),
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -492,7 +492,7 @@ impl GroupFn for CompactCcsTable {}
 pub struct TableLookUp {
   // TODO: unit
   unit: (),
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
@@ -602,7 +602,7 @@ impl ComplexAttri for Values {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableTemple {
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments

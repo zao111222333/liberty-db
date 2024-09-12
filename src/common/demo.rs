@@ -33,7 +33,7 @@ impl GroupFn for Timing {}
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct Pin {
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   name: ArcStr,
   /// group comments
@@ -53,10 +53,10 @@ impl GroupFn for Pin {}
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct FF {
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   variable1: ArcStr,
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   variable2: ArcStr,
   /// group comments

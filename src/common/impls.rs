@@ -1,10 +1,6 @@
 //!
 //! implement basic types
 //!
-use core::fmt::{self, Write};
-
-use itertools::Itertools;
-
 use crate::{
   ast::{
     is_word, join_fmt_no_quote, parser::simple_custom, CodeFormatter, ComplexAttri,
@@ -12,6 +8,8 @@ use crate::{
   },
   ArcStr, NotNan,
 };
+use core::fmt::{self, Write};
+use itertools::Itertools;
 
 use super::items::{Formula, NameList, WordSet};
 impl SimpleAttri for f64 {

@@ -35,7 +35,7 @@ pub struct FF {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "&str")]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -49,7 +49,7 @@ pub struct FF {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "&str")]
   pub variable2: ArcStr,
   /// group comments
   #[liberty(comments)]
@@ -119,7 +119,7 @@ pub struct FFBank {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "&str")]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -133,7 +133,7 @@ pub struct FFBank {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "&str")]
   pub variable2: ArcStr,
   /// bits
   #[liberty(name)]
@@ -204,7 +204,7 @@ pub struct Latch {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
@@ -218,7 +218,7 @@ pub struct Latch {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub variable2: ArcStr,
   /// group comments
@@ -287,7 +287,7 @@ pub struct LatchBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
@@ -301,7 +301,7 @@ pub struct LatchBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id]
+  #[id(borrow = "&str")]
   #[liberty(name)]
   pub variable2: ArcStr,
   /// bits

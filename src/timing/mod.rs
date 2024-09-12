@@ -1026,7 +1026,7 @@ pub struct Timing {
   ///
   /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
   /// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
-  #[id]
+  #[id(borrow = "Option<&TimingSenseType>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type = Option))]
   pub timing_sense: Option<TimingSenseType>,
   /// The `timing_type` attribute distinguishes between combinational
@@ -1259,7 +1259,7 @@ pub struct Timing {
   /// the constrained pin and a positive pulse on the related pin.
   /// + `nochange_low_low` (negative/negative): Indicates a negative pulse on
   /// the constrained pin and a negative pulse on the related pin.
-  #[id]
+  #[id(borrow = "Option<&TimingType>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type = Option))]
   pub timing_type: Option<TimingType>,
   /// <a name ="reference_link" href="
@@ -1278,7 +1278,7 @@ pub struct Timing {
   /// &end
   /// =203.71
   /// ">Reference-Instance</a>
-  #[id]
+  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type = Option))]
   pub when: Option<IdBooleanExpression>,
   /// <a name ="reference_link" href="

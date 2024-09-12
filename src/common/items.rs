@@ -126,7 +126,7 @@ impl SimpleAttri for VariableType {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Domain {
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
   #[liberty(comments)]
@@ -244,7 +244,7 @@ impl FromStr for WordSet {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DummyGroup {
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
   #[liberty(comments)]

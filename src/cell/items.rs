@@ -29,7 +29,7 @@ use core::{
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct LeakagePower {
-  #[id]
+  #[id(borrow = "&[ArcStr]")]
   #[liberty(name)]
   pub name: Vec<ArcStr>,
   /// group comments
@@ -38,13 +38,13 @@ pub struct LeakagePower {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type = Option))]
   power_level: Option<ArcStr>,
   #[id]
   #[liberty(simple)]
   related_pg_pin: WordSet,
-  #[id]
+  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   #[liberty(simple(type = Option))]
   when: Option<IdBooleanExpression>,
   #[liberty(simple)]
@@ -138,10 +138,10 @@ mod test_sort {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Statetable {
-  #[id]
+  #[id(borrow = "&[ArcStr]")]
   #[liberty(name)]
   pub input_nodes: Vec<ArcStr>,
-  #[id]
+  #[id(borrow = "&[ArcStr]")]
   #[liberty(name)]
   pub internal_nodes: Vec<ArcStr>,
   /// group comments
@@ -322,7 +322,7 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PgPin {
   #[liberty(name)]
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
   #[liberty(comments)]
