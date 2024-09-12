@@ -54,7 +54,7 @@ simple_logger = "5.0"
 serde_json = "1.0"
 
 [dependencies]
-liberty-macros = "0.6.6"
+liberty-macros = { path = "macros" }
 log = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
