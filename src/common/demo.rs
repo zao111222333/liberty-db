@@ -1,6 +1,8 @@
 #![allow(clippy::redundant_pub_crate)]
 //! cargo expand `common::demo`
 
+use ordered_float::NotNan;
+
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, NamedGroup},
   cell::Statetable,
@@ -19,7 +21,7 @@ pub(crate) struct Timing {
   #[liberty(comments)]
   comments: GroupComments<Self>,
   #[liberty(complex)]
-  values: Vec<f64>,
+  values: Vec<NotNan<f64>>,
   #[liberty(simple(type = Option))]
   t1: Option<TimingType>,
   #[liberty(simple(type = Option))]

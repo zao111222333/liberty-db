@@ -178,7 +178,7 @@ impl NamedGroup for Statetable {
     }
   }
   #[inline]
-  #[allow(clippy::indexing_slicing)]
+  #[expect(clippy::indexing_slicing)]
   fn fmt_name<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
@@ -302,6 +302,7 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 }
 
 /// Use the `pg_pin` group to specify power and ground pins.
+///
 /// The library cells can have multiple `pg_pin` groups.
 /// A `pg_pin` group is mandatory for each cell.
 /// A cell must have at least one `primary_power` pin
@@ -523,7 +524,7 @@ impl SimpleAttri for SwitchCellType {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=109.29+109.36&end=109.30+109.37
 /// ">Reference</a>
-#[allow(non_camel_case_types)]
+#[expect(non_camel_case_types)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
@@ -555,7 +556,7 @@ impl SimpleAttri for FpgaCellType {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=115.9&end=115.17
 /// ">Reference</a>
-#[allow(non_camel_case_types)]
+#[expect(non_camel_case_types)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]

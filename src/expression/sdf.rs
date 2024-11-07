@@ -64,7 +64,7 @@ impl SimpleAttri for SdfExpression {
 impl SdfExpression {
   #[must_use]
   #[inline]
-  pub fn new(s: ArcStr) -> Self {
+  pub const fn new(s: ArcStr) -> Self {
     Self { inner: s }
   }
 }

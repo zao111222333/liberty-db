@@ -48,7 +48,7 @@ impl LogicLike for Level {
       Self::High => Self::Low,
     }
   }
-  #[allow(clippy::match_like_matches_macro)]
+  #[expect(clippy::match_like_matches_macro)]
   #[inline]
   fn variant_eq(&self, other: &Self) -> bool {
     match (self, other) {
@@ -88,7 +88,7 @@ impl LogicLike for Edge {
       Self::Rise => Self::Fall,
     }
   }
-  #[allow(clippy::match_like_matches_macro)]
+  #[expect(clippy::match_like_matches_macro)]
   #[inline]
   fn variant_eq(&self, other: &Self) -> bool {
     match (self, other) {
@@ -195,7 +195,7 @@ impl LogicLike for UnInit {
   fn inverse(&self) -> Self {
     *self
   }
-  #[allow(clippy::match_like_matches_macro)]
+  #[expect(clippy::match_like_matches_macro)]
   #[inline]
   fn variant_eq(&self, other: &Self) -> bool {
     match (self, other) {
@@ -412,7 +412,7 @@ impl State {
   //   }
   // }
   /// `get_illegal_type`
-  #[allow(clippy::wildcard_enum_match_arm)]
+  #[expect(clippy::wildcard_enum_match_arm)]
   #[must_use]
   #[inline]
   pub const fn get_illegal_type(&self) -> Option<IllegalType> {
@@ -545,7 +545,7 @@ impl LogicLike for Vector {
     self.iter().map(State::inverse).collect::<Vec<State>>().into()
   }
   #[inline]
-  #[allow(clippy::indexing_slicing)]
+  #[expect(clippy::indexing_slicing)]
   fn variant_eq(&self, other: &Self) -> bool {
     if self.len() != other.len() {
       return false;

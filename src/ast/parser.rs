@@ -386,7 +386,7 @@ fn single_line_complex(i: &str) -> IResult<&str, Vec<&str>, Error<&str>> {
   )(i)
 }
 
-#[allow(clippy::type_complexity)]
+#[expect(clippy::type_complexity)]
 pub(crate) fn complex<'a>(
   i: &'a str,
   line_num: &mut usize,

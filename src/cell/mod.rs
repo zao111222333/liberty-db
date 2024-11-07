@@ -346,6 +346,7 @@ pub struct Cell {
 impl GroupFn for Cell {}
 
 /// The `test_cell`  group is in a `cell` group or `model` group.
+///
 /// It models only the nontest behavior of a scan cell, which
 /// is described by an `ff`, `ff_bank`, `latch`, `latch_bank`  or `statetable`  statement
 /// and `pin` function attributes

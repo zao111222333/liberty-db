@@ -14,6 +14,7 @@ use core::fmt;
 pub use items::*;
 
 /// The first line of the library group statement names the library.
+///
 /// It is the first executable line in your library.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=20.24&end=20.26
@@ -593,7 +594,7 @@ use crate::ast::{parser, GroupAttri, ParserError};
 impl Library {
   const KEY: &'static str = "library";
   /// Parse `.lib` file as a [Library] struct.
-  #[allow(clippy::arithmetic_side_effects)]
+  #[expect(clippy::arithmetic_side_effects)]
   #[inline]
   pub fn parse_lib(i: &str) -> Result<Self, ParserError> {
     let mut scope = ParseScope::default();

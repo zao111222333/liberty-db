@@ -9,6 +9,7 @@ use crate::{
 
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
 /// ?field=test
@@ -147,6 +148,7 @@ impl SimpleAttri for TimingSenseType {
   }
 }
 /// You define the mode attribute within a timing group.
+///
 /// A mode attribute pertains to an individual timing arc.
 /// The timing arc is active when mode is instantiated with a name and a value.
 /// You can specify multiple instances of the mode attribute,
@@ -175,6 +177,7 @@ pub type Mode = [ArcStr; 2];
 
 /// The `cell_degradation`  group describes a cell performance degradation
 /// design rule for compiling a design.
+///
 /// A cell degradation design rule specifies the maximum capacitive load
 /// a cell can drive without causing cell performance degradation during the fall transition.
 /// <a name ="reference_link" href="

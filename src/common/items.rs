@@ -152,8 +152,8 @@ pub struct WordSet {
   pub inner: HashSet<ArcStr>,
 }
 impl fmt::Display for WordSet {
-  #[allow(clippy::unwrap_in_result)]
-  #[allow(clippy::unwrap_used)]
+  #[expect(clippy::unwrap_in_result)]
+  #[expect(clippy::unwrap_used)]
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self.inner.len() {
@@ -177,7 +177,7 @@ impl Ord for WordSet {
   }
 }
 
-#[allow(clippy::non_canonical_partial_ord_impl)]
+#[expect(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for WordSet {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {

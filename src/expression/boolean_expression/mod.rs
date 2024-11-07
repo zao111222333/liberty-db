@@ -220,7 +220,7 @@ impl IdBooleanExpression {
 }
 
 impl Eq for IdBooleanExpression {}
-#[allow(clippy::non_canonical_partial_ord_impl)]
+#[expect(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for IdBooleanExpression {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -253,9 +253,8 @@ impl From<BooleanExpression> for IdBooleanExpression {
     let sorted_nodes = node_set
       .into_iter()
       .sorted()
-      .map(|s| {
+      .inspect(|s| {
         _ = builder.make_variable(s.as_str());
-        s
       })
       .collect();
     let variables = builder.build();

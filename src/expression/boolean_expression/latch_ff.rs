@@ -11,6 +11,7 @@ use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt::Write;
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
+///
 /// TODO: For information about the `test_cell` group, see [test_cell](crate::test_cell) Group
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=157.22&end=157.40
@@ -95,6 +96,7 @@ pub struct FF {
 }
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
+///
 /// TODO: For information about the `test_cell` group, see [test_cell](crate::test_cell) Group
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=157.22&end=157.40
@@ -182,6 +184,7 @@ pub struct FFBank {
 }
 
 /// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=183.3&end=183.5
 /// ">Reference-Definition</a>
@@ -265,6 +268,7 @@ pub struct Latch {
 }
 
 /// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=183.3&end=183.5
 /// ">Reference-Definition</a>
@@ -552,7 +556,7 @@ impl LatchFF for AllTypes {}
 )]
 impl GroupFn for AllTypes {}
 /// trait for `FF` and `FFBank`
-#[allow(private_bounds)]
+#[expect(private_bounds)]
 pub trait LatchFF: __LatchFF {
   /// Get the `BooleanExpression` of variable1
   #[inline]
@@ -693,7 +697,7 @@ pub trait LatchFF: __LatchFF {
     BooleanExpression { expr }
   }
   /// Get the `BooleanExpression` of (variable1,variable2)
-  #[allow(clippy::too_many_lines)]
+  #[expect(clippy::too_many_lines)]
   #[inline]
   fn variable_expr(&self) -> (BooleanExpression, BooleanExpression) {
     let present_state1 = Box::new(Expr::Variable(self.variable1().to_string()));
@@ -870,7 +874,7 @@ impl crate::ast::SimpleAttri for ClearPresetState {
 
 #[cfg(test)]
 mod test {
-  #[allow(unused_imports)]
+  #[expect(unused_imports)]
   use crate::expression::{FFBank, IdBooleanExpression, Latch, LatchBank, LatchFF, FF};
   #[test]
   fn special_boolean_expression() {

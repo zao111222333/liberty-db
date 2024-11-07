@@ -18,6 +18,7 @@ pub use items::*;
 /// You can define a `pin` group within a [`cell`](crate::cell::Cell),
 /// [`test_cell`](crate::test_cell), [`model`](crate::model),
 /// or [`bus`](crate::bus::Bus) group.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
 /// ?field=test

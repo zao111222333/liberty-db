@@ -4,7 +4,7 @@
 
 use crate::{
   ast::{CodeFormatter, Indentation, ParseScope},
-  NotNan,
+  common::parse_f64,
 };
 use core::{
   fmt::{self, Write},
@@ -59,6 +59,7 @@ use crate::ast::{ComplexAttri, ComplexParseError, SimpleAttri};
 use core::ops::Deref;
 
 /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=42.25&end=42.30
 /// ">Reference</a>
@@ -115,7 +116,7 @@ impl TimeUnit {
 
 impl Deref for TimeUnit {
   type Target = Time;
-  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
+  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -133,6 +134,7 @@ impl SimpleAttri for TimeUnit {
 }
 
 /// Valid values are 1mV, 10mV, 100mV, and 1V. The default is 1V.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.2&end=43.9
 /// ">Reference</a>
@@ -189,7 +191,7 @@ impl VoltageUnit {
 
 impl Deref for VoltageUnit {
   type Target = ElectricPotential;
-  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
+  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -207,6 +209,7 @@ impl SimpleAttri for VoltageUnit {
 }
 
 /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
+///
 /// **No default exists for the `current_unit` attribute if the attribute is omitted.**
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.12&end=43.24
@@ -290,7 +293,7 @@ impl CurrentUnit {
 
 impl Deref for CurrentUnit {
   type Target = ElectricCurrent;
-  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
+  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -308,6 +311,7 @@ impl SimpleAttri for CurrentUnit {
 }
 
 /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm.
+///
 /// **No default exists for `pulling_resistance_unit` if the attribute is omitted.**
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=43.25&end=44.4
@@ -364,7 +368,7 @@ impl PullingResistanceUnit {
 
 impl Deref for PullingResistanceUnit {
   type Target = ElectricalResistance;
-  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
+  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]
@@ -385,6 +389,7 @@ impl SimpleAttri for PullingResistanceUnit {
 /// values within the logic library, including
 /// default capacitances, `max_fanout` capacitances,
 /// pin capacitances, and wire capacitances.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.7&end=44.19
 /// ">Reference</a>
@@ -400,7 +405,7 @@ pub struct CapacitiveLoadUnit {
 
 impl Deref for CapacitiveLoadUnit {
   type Target = Capacitance;
-  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
+  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &self._v
@@ -414,11 +419,8 @@ impl ComplexAttri for CapacitiveLoadUnit {
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter.flat_map(IntoIterator::into_iter);
-    let value: NotNan<f64> = match i.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(e) => return Err(ComplexParseError::Float(e)),
-      },
+    let value = match i.next() {
+      Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let (ff_pf, _v): (bool, Capacitance) = match i.next() {
@@ -598,7 +600,7 @@ impl LeakagePowerUnit {
 
 impl Deref for LeakagePowerUnit {
   type Target = Power;
-  #[allow(clippy::indexing_slicing, clippy::as_conversions)]
+  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &Self::LUT[*self as usize]

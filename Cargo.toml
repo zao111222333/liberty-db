@@ -64,6 +64,7 @@ itertools = { workspace = true }
 arcstr = { workspace = true }
 ordered-float = { workspace = true }
 nom = "7.1"
+fast-float2 = "0.2.3"
 derivative = "2.2.0"
 ryu = "1.0"
 itoa = "1.0"

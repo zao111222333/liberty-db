@@ -243,6 +243,7 @@ impl SimpleAttri for SlewControl {
 }
 
 /// The `prefer_tied` attribute describes an input pin of a flip-flop or latch.
+///
 /// It indicates what the library developer wants this pin connected to.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -284,7 +285,8 @@ enum OneValue {
   #[strum(serialize = "x")]
   Unkown,
 }
-/// Two values that define the value of the differential signals
+/// Two values that define the value of the differential signals.
+///
 /// when both inputs are driven to the same value. The first value
 /// represents the value when both input pins are at logic 0;
 /// the second value represents the value when both input pins are at logic 1.

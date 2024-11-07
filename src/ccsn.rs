@@ -19,6 +19,7 @@ use num_traits::Zero;
 
 /// Use the `ccsn_first_stage` group to specify CCS noise for the first stage of the channel-
 /// connected block (CCB).
+///
 /// A `ccsn_first_stage` or `ccsn_last_stage` group contains the following information:
 /// • A set of channel-connected block parameters: the `is_needed`, `is_inverting`,
 /// stage_type, `miller_cap_rise`, `miller_cap_fall`, and optional `related_ccb_node`
@@ -343,7 +344,7 @@ impl ComplexAttri for PropagatingCcb {
     }
     Ok(Self { input_ccb_name, output_ccb_name })
   }
-  #[allow(clippy::or_fun_call)]
+  #[expect(clippy::or_fun_call)]
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,

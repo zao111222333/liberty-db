@@ -654,6 +654,7 @@ impl fmt::Display for ArcNoChange {
 
 /// The `timing_type` attribute distinguishes between combinational
 /// and sequential cells by defining the type of timing arc.
+///
 /// If this attribute is not assigned, the cell is considered combinational (Default).
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

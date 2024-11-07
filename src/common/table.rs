@@ -7,6 +7,8 @@ use crate::{
 };
 use core::fmt::{self, Write};
 
+use super::parse_f64;
+
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
@@ -110,7 +112,8 @@ pub struct TableLookUp2D {
   pub values: Values,
 }
 
-/// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling
+/// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=41.20&end=41.21
 /// ">Reference</a>
@@ -190,6 +193,7 @@ pub struct CompactLutTemplate {
 impl GroupFn for CompactLutTemplate {}
 
 /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
 /// ">Reference</a>
@@ -214,6 +218,7 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
 }
 
 /// The only legal string value for the `variable_3`  attribute is `curve_parameters`.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.30&end=42.31
 /// ">Reference</a>
@@ -453,6 +458,7 @@ pub struct TableLookUp1D {
 impl GroupFn for TableLookUp1D {}
 
 /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
 /// ">Reference-Definition</a>
@@ -531,7 +537,7 @@ pub struct Values {
 
 impl ComplexAttri for Values {
   #[inline]
-  #[allow(clippy::arithmetic_side_effects)]
+  #[expect(clippy::arithmetic_side_effects)]
   fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
     iter: I,
     _scope: &mut ParseScope,
@@ -544,7 +550,7 @@ impl ComplexAttri for Values {
       .flat_map(|v| {
         size2 += 1;
         let l = v.len();
-        #[allow(clippy::else_if_without_else)]
+        #[expect(clippy::else_if_without_else)]
         if l != 0 {
           if size1 == 0 {
             size1 = l;
@@ -552,7 +558,7 @@ impl ComplexAttri for Values {
             table_len_mismatch = true;
           }
         }
-        v.iter().map(|s| s.parse())
+        v.iter().map(parse_f64)
       })
       .collect::<Result<Vec<NotNan<f64>>, _>>()?;
     if table_len_mismatch {
@@ -577,7 +583,7 @@ impl ComplexAttri for Values {
       crate::ast::join_fmt(
         v.iter(),
         f,
-        |float, ff| write!(ff, "{}", buffer.format(Into::<f64>::into(*float))),
+        |float, ff| write!(ff, "{}", buffer.format(float.into_inner())),
         ", ",
       )?;
     }
@@ -586,7 +592,7 @@ impl ComplexAttri for Values {
       crate::ast::join_fmt(
         v.iter(),
         f,
-        |float, ff| write!(ff, "{}", buffer.format(Into::<f64>::into(*float))),
+        |float, ff| write!(ff, "{}", buffer.format(float.into_inner())),
         ", ",
       )?;
     }

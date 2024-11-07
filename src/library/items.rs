@@ -8,14 +8,15 @@ use crate::{
     Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
     GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
   },
-  common::items::Formula,
+  common::{items::Formula, parse_f64},
   expression::logic,
   ArcStr, GroupSet, NotNan,
 };
 use core::fmt::{self, Write};
 use std::collections::HashMap;
 
-/// The `sensitization` group defined at the library level describes
+/// The `sensitization` group defined at the library level describes.
+///
 /// the complete state patterns for a specific list of pins (defined by the `pin_names` attribute)
 /// that are referenced and instantiated as stimuli in the timing arc.
 ///
@@ -293,7 +294,8 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
 impl GroupFn for Sensitization {}
 
 /// Use the `voltage_map`  attribute to associate a voltage name
-/// with relative voltage values referenced by the cell-level `pg_pin`  groups
+/// with relative voltage values referenced by the cell-level `pg_pin`  groups.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.15&end=39.16
 /// ">Reference</a>
@@ -308,7 +310,7 @@ pub struct VoltageMap {
   #[id(borrow = "&str")]
   pub name: ArcStr,
   /// voltage
-  pub voltage: f64,
+  pub voltage: NotNan<f64>,
 }
 impl ComplexAttri for VoltageMap {
   #[inline]
@@ -322,14 +324,7 @@ impl ComplexAttri for VoltageMap {
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let voltage = match i.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(e) => {
-          return Err(ComplexParseError::Float(
-            ordered_float::ParseNotNanError::ParseFloatError(e),
-          ))
-        }
-      },
+      Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if i.next().is_some() {
@@ -343,12 +338,13 @@ impl ComplexAttri for VoltageMap {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
-    write!(f, "{}, {}", self.name, buffer.format(self.voltage))
+    write!(f, "{}, {}", self.name, buffer.format(self.voltage.into_inner()))
   }
 }
 
 /// An `input_voltage`  group is defined in the library  group to designate
 /// a set of input voltage ranges for your cells.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=61.32&end=61.33
 /// ">Reference</a>
@@ -399,6 +395,7 @@ impl GroupFn for InputVoltage {}
 
 /// You define an `output_voltage` group in the `library` group to designate a set of output
 /// voltage level ranges to drive output cells.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.22&end=75.23
 /// ">Reference</a>
@@ -449,6 +446,7 @@ impl GroupFn for OutputVoltage {}
 
 /// Use the `delay_model`  attribute to specify which delay model
 /// to use in the delay calculations.
+///
 /// The `delay_model`  attribute must be the first attribute in the library
 /// if a technology attribute is not present.
 /// Otherwise, it should follow the technology attribute.
@@ -477,6 +475,7 @@ impl SimpleAttri for DelayModel {
 }
 
 /// Use this group to define operating conditions;
+///
 /// that is, `process`, `voltage`, and `temperature`.
 /// You define an `operating_conditions`  group at the library-level, as shown here:
 /// <a name ="reference_link" href="
@@ -609,6 +608,7 @@ pub struct FpgaIsd {
 impl GroupFn for FpgaIsd {}
 
 /// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.27&end=64.28
 /// ">Reference</a>
@@ -669,6 +669,7 @@ impl SimpleAttri for TreeType {
 
 /// Use this attribute to define new, temporary, or user-defined attributes
 /// for use in symbol and technology libraries.
+///
 /// You can use either a space or a comma to separate the arguments.
 /// The following example shows how to define a new string attribute called `bork`,
 /// which is valid in a `pin`  group:
@@ -710,6 +711,7 @@ pub struct Define {
   pub attribute_type: AttributeType,
 }
 /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.14&end=36.15
 /// ">Reference</a>
@@ -764,7 +766,7 @@ impl ComplexAttri for Define {
       .and_modify(|m| {
         _ = m.insert(attribute_name.clone(), DefinedType::Simple(attribute_type));
       })
-      .or_insert({
+      .or_insert_with(|| {
         let mut m = HashMap::new();
         _ = m.insert(attribute_name.clone(), DefinedType::Simple(attribute_type));
         m
@@ -782,6 +784,7 @@ impl ComplexAttri for Define {
 
 /// Use this special attribute to define new, temporary, or user-defined groups
 /// for use in technology libraries.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.24&end=37.25
 /// ">Reference</a>
@@ -830,7 +833,7 @@ impl ComplexAttri for DefineGroup {
       .and_modify(|m| {
         _ = m.insert(group.clone(), DefinedType::Group);
       })
-      .or_insert({
+      .or_insert_with(|| {
         let mut m = HashMap::new();
         _ = m.insert(group.clone(), DefinedType::Group);
         m
@@ -848,6 +851,7 @@ impl ComplexAttri for DefineGroup {
 
 /// The `define_cell_area`  attribute defines the area resources a `cell` uses,
 /// such as the number of pad slots.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.23&end=36.24
 /// ">Reference</a>
@@ -941,6 +945,7 @@ impl ComplexAttri for DefineCellArea {
 }
 
 /// A `wire_load`  group is defined in a `library`  group, as follows.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.16&end=94.17
 /// ">Reference</a>
@@ -1015,7 +1020,8 @@ impl GroupFn for WireLoad {}
 
 /// Use this attribute to define values for fanout and length
 /// when you create the wire load manually.
-/// fanoutAn integer representing the total number of pins, minus one, on the net driven by the given output.lengthA floating-point number representing the estimated amount of metal that is statistically found on a network with the given number of pins.
+///
+/// fanout: An integer representing the total number of pins, minus one, on the net driven by the given output.lengthA floating-point number representing the estimated amount of metal that is statistically found on a network with the given number of pins.
 ///
 /// Examples
 /// ``` liberty
@@ -1051,11 +1057,11 @@ pub struct FanoutLength {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.22&end=96.23
   /// ">Reference</a>
-  pub length: f64,
+  pub length: NotNan<f64>,
   /// average_capacitance
-  pub average_capacitance: Option<f64>,
+  pub average_capacitance: Option<NotNan<f64>>,
   /// standard_deviation
-  pub standard_deviation: Option<f64>,
+  pub standard_deviation: Option<NotNan<f64>>,
   /// number_of_nets
   pub number_of_nets: Option<u32>,
 }
@@ -1074,14 +1080,7 @@ impl ComplexAttri for FanoutLength {
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let length = match i.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(e) => {
-          return Err(ComplexParseError::Float(
-            ordered_float::ParseNotNanError::ParseFloatError(e),
-          ))
-        }
-      },
+      Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let average_capacitance = i.next().and_then(|s| s.parse().ok());
@@ -1112,24 +1111,30 @@ impl ComplexAttri for FanoutLength {
           f,
           "{}, {}, ",
           buffer_i.format(self.fanout),
-          buffer_f.format(self.length),
+          buffer_f.format(self.length.into_inner()),
         )?;
-        write!(f, "{}, ", buffer_f.format(average_capacitance),)?;
+        write!(f, "{}, ", buffer_f.format(average_capacitance.into_inner()))?;
         write!(
           f,
           "{}, {}",
-          buffer_f.format(standard_deviation),
+          buffer_f.format(standard_deviation.into_inner()),
           buffer_i.format(number_of_nets),
         )
       }
       _ => {
-        write!(f, "{}, {}", buffer_i.format(self.fanout), buffer_f.format(self.length))
+        write!(
+          f,
+          "{}, {}",
+          buffer_i.format(self.fanout),
+          buffer_f.format(self.length.into_inner())
+        )
       }
     }
   }
 }
 
 /// A `wire_load_selection`  group is defined in a `library`  group, as follows.
+///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.16&end=94.17
 /// ">Reference</a>
@@ -1156,11 +1161,12 @@ pub struct WireLoadSection {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
   /// ">Reference</a>
   #[liberty(complex)]
-  pub wire_load_from_area: (f64, f64, ArcStr),
+  pub wire_load_from_area: (NotNan<f64>, NotNan<f64>, ArcStr),
 }
 impl GroupFn for WireLoadSection {}
 
 /// The `base_curve_type` attribute specifies the type of base curve.
+///
 /// The valid values for `base_curve_type`  are `ccs_timing_half_curve`  and `ccs_half_curve`.
 /// The `ccs_half_curve`  value allows you to model compact CCS power
 /// and compact CCS timing data within the same `base_curves`  group.

@@ -28,6 +28,7 @@ use crate::{
 use items::TimingSenseType;
 
 /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
+///
 /// The timing group can be used to identify the name or names of multiple timing arcs.
 /// A timing group identifies multiple timing arcs, by identifying a timing arc in a [pin](crate::pin::Pin) group
 /// that has more than one related pin or when the timing arc is part of a [bundle](crate::bundle::Bundle) or a [bus](crate::bus::Bus).

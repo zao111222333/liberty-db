@@ -112,7 +112,7 @@ pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
   attributes: &Attributes,
   f: &mut CodeFormatter<'_, T, I>,
 ) -> core::fmt::Result {
-  #[allow(clippy::all)]
+  #[expect(clippy::all)]
   #[inline]
   fn fmt1<T: Write, I: Indentation, U: Format>(
     v: &Vec<U>,
@@ -121,7 +121,7 @@ pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
   ) -> core::fmt::Result {
     v.iter().try_for_each(|u| Format::liberty(u, key, f))
   }
-  #[allow(clippy::all)]
+  #[expect(clippy::all)]
   #[inline]
   fn fmt2<T: Write, I: Indentation, U: SimpleAttri>(
     v: &Vec<Result<U, ArcStr>>,
@@ -172,7 +172,7 @@ pub(crate) fn attributs_set_undefined_complex(
     _ = attri_map.insert(ArcStr::from(key), AttriValues::Complex(vec![undefined]));
   }
 }
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 #[inline]
 pub(crate) fn attributs_set_undefined_attri(
   attri_map: &mut Attributes,
@@ -324,7 +324,7 @@ pub enum LinkError {
 }
 
 impl PartialEq for LinkError {
-  #[allow(clippy::match_like_matches_macro)]
+  #[expect(clippy::match_like_matches_macro)]
   #[inline]
   fn eq(&self, other: &Self) -> bool {
     match (self, other) {
@@ -446,7 +446,8 @@ pub(crate) trait SimpleAttri: Sized + core::fmt::Display {
 pub enum ComplexParseError {
   /// `ParseFloatError`
   #[error("{0}")]
-  Float(#[from] ParseNotNanError<ParseFloatError>),
+  Float(#[from] fast_float2::Error),
+  // Float(#[from] ParseNotNanError<ParseFloatError>),
   /// `ParseIntError`
   #[error("{0}")]
   Int(#[from] ParseIntError),
@@ -510,7 +511,7 @@ pub(crate) trait ComplexAttri: Sized {
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError>;
   /// `nom_parse`, auto implement
-  #[allow(clippy::arithmetic_side_effects)]
+  #[expect(clippy::arithmetic_side_effects)]
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
     let (input, vec) = parser::complex(i, &mut scope.line_num)?;
@@ -566,7 +567,7 @@ pub(crate) trait GroupFn {
   fn post_parse_process(&mut self, _scope: &mut ParseScope) {}
 }
 /// Export Group APIs
-#[allow(private_bounds)]
+#[expect(private_bounds)]
 pub trait Group: Sized + GroupAttri {
   /// group Comments
   type Comments;
@@ -729,7 +730,7 @@ pub(crate) trait Format {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result;
   /// `.db` format
-  #[allow(dead_code)]
+  #[expect(dead_code)]
   #[inline]
   fn db<T: Write, I: Indentation>(
     &self,
@@ -741,7 +742,7 @@ pub(crate) trait Format {
     todo!()
   }
   /// `.json` format
-  #[allow(dead_code)]
+  #[expect(dead_code)]
   #[inline]
   fn json<T: Write, I: Indentation>(
     &self,

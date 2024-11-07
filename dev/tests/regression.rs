@@ -6,6 +6,7 @@ use std::{
   path::{Path, PathBuf},
 };
 
+#[cfg(test)]
 fn text_diff(old: &str, new: &str) {
   use console::{style, Style};
   use core::fmt;
@@ -81,6 +82,7 @@ fn make_golden() {
   }
 }
 
+#[cfg(test)]
 #[test]
 fn regression() {
   _ = simple_logger::SimpleLogger::new().init();
