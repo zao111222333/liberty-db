@@ -5,18 +5,14 @@
 mod fmt;
 pub mod parser;
 use crate::{library::AttributeType, ArcStr};
-use core::{
-  fmt::Write,
-  num::{ParseFloatError, ParseIntError},
-  str::FromStr,
-};
+use core::{fmt::Write, num::ParseIntError, str::FromStr};
 pub use fmt::{
   CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation,
   TestCodeFormatter, TestIndentation,
 };
 use itertools::Itertools;
 use nom::{error::Error, IResult};
-use ordered_float::{NotNan, ParseNotNanError};
+use ordered_float::NotNan;
 use std::collections::HashMap;
 
 const DEFINED_COMMENT: &str = " /* user defined attribute */";

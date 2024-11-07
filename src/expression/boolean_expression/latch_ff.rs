@@ -874,7 +874,6 @@ impl crate::ast::SimpleAttri for ClearPresetState {
 
 #[cfg(test)]
 mod test {
-  #[expect(unused_imports)]
   use crate::expression::{FFBank, IdBooleanExpression, Latch, LatchBank, LatchFF, FF};
   #[test]
   fn special_boolean_expression() {

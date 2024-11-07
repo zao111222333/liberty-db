@@ -405,7 +405,6 @@ pub struct CapacitiveLoadUnit {
 
 impl Deref for CapacitiveLoadUnit {
   type Target = Capacitance;
-  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
   fn deref(&self) -> &Self::Target {
     &self._v
