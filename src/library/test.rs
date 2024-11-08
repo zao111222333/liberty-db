@@ -88,7 +88,7 @@ library (define) {
 }
 "#,
   );
-  let cell_test1 = library.cell.get(&ArcStr::from("test1")).unwrap();
+  let cell_test1 = library.cell.get(&Cell::new_id(&library.cell, "test1")).unwrap();
   println!("{:?}", library.attributes);
   println!("{:?}", cell_test1.attributes);
   assert_eq!(

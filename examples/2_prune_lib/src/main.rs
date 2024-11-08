@@ -28,29 +28,27 @@ fn main() {
       log::info!("Loop to [pin] {}", pin.name);
 
       for timing in pin.timing.iter_mut() {
-        // Log timing_id
-        let timing_id = timing.id();
         log::info!(
           "Loop to [timing] related_pin={} {} {} {}",
-          timing_id.related_pin,
-          if let Some(timing_sense) = timing_id.timing_sense {
+          timing.related_pin,
+          if let Some(timing_sense) = timing.timing_sense {
             format!("timing_sense={timing_sense}")
           } else {
             String::new()
           },
-          if let Some(when) = &timing_id.when {
+          if let Some(when) = &timing.when {
             format!("when={when}")
           } else {
             String::new()
           },
-          if let Some(timing_type) = &timing_id.timing_type {
+          if let Some(timing_type) = &timing.timing_type {
             format!("timing_type={timing_type}")
           } else {
             String::new()
           },
         );
         // Add `sdf_cond` from `when`
-        if let Some(when) = &timing.id().when {
+        if let Some(when) = &timing.when {
           timing.sdf_cond = Some(when.sdf());
         }
         // remove LVF's LUT

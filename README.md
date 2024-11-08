@@ -46,17 +46,17 @@ Basic information as follow, see latest [benchmark summary](https://zao111222333
 
 ## Dev
 
-Run benchmark yourself, it will takes 30mins.
-
-```shell
-cargo bench --bench dev
-```
-
-Run unit-test and regression yourself.
+Run unit-test and regression.
 
 ```shell
 cargo test
 cargo test --package dev
+```
+
+Run benchmark, it will takes 5h.
+
+```shell
+cargo bench --bench dev
 ```
 
 ## TODO

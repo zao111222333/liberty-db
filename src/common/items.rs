@@ -73,8 +73,6 @@ pub struct IdVector {
   pub vec: Vec<NotNan<f64>>,
 }
 
-impl Copy for __id_vector::IdVectorId {}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[derive(Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
