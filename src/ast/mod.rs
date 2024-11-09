@@ -713,7 +713,7 @@ pub(crate) fn test_parse_fmt<G: GroupAttri + Group>(input: &str, fmt_want: &str)
   };
   let fmt_str = g.display().to_string();
   println!("{fmt_str}");
-  crate::util::text_diff(fmt_want, fmt_str.as_str());
+  dev::text_diff(fmt_want, fmt_str.as_str());
   g
 }
 
