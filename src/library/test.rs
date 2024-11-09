@@ -52,38 +52,38 @@ fn define() {
   }"#,
     r#"/* test */
 library (define) {
-  technology (cmos);
-  delay_model : table_lookup;
-  define (my_define_bool, library, boolean);
-  define (my_define_float, library, float);
-  define (my_define_integer, cell, integer);
-  define (my_define_str, library, string);
-  time_unit : 1ns;
-  voltage_unit : 1V;
-  slew_upper_threshold_pct_rise : 80.0;
-  slew_lower_threshold_pct_rise : 20.0;
-  slew_derate_from_library : 1.0;
-  slew_lower_threshold_pct_fall : 20.0;
-  slew_upper_threshold_pct_fall : 80.0;
-  input_threshold_pct_fall : 50.0;
-  input_threshold_pct_rise : 50.0;
-  output_threshold_pct_rise : 50.0;
-  output_threshold_pct_fall : 50.0;
-  my_define_bool : true; /* user defined attribute */
-  my_define_bool : abc; /* user defined attribute */
-  my_define_bool : false; /* user defined attribute */
-  my_define_float : 1.0; /* user defined attribute */
-  my_define_float : 2.0; /* user defined attribute */
-  my_define_float : 3.0; /* user defined attribute */
-  my_define_float : 4.0; /* user defined attribute */
-  my_define_float : abc; /* user defined attribute */
-  my_define_str : abc; /* user defined attribute */
-  cell (test1) {
-    my_define_integer : 1; /* user defined attribute */
-    my_define_integer : 2; /* user defined attribute */
-    my_define_integer : 3; /* user defined attribute */
-    my_define_integer : 4; /* user defined attribute */
-  }
+| technology (cmos);
+| delay_model : table_lookup;
+| define (my_define_bool, library, boolean);
+| define (my_define_float, library, float);
+| define (my_define_integer, cell, integer);
+| define (my_define_str, library, string);
+| time_unit : 1ns;
+| voltage_unit : 1V;
+| slew_upper_threshold_pct_rise : 80.0;
+| slew_lower_threshold_pct_rise : 20.0;
+| slew_derate_from_library : 1.0;
+| slew_lower_threshold_pct_fall : 20.0;
+| slew_upper_threshold_pct_fall : 80.0;
+| input_threshold_pct_fall : 50.0;
+| input_threshold_pct_rise : 50.0;
+| output_threshold_pct_rise : 50.0;
+| output_threshold_pct_fall : 50.0;
+| my_define_bool : true; /* user defined attribute */
+| my_define_bool : abc; /* user defined attribute */
+| my_define_bool : false; /* user defined attribute */
+| my_define_float : 1.0; /* user defined attribute */
+| my_define_float : 2.0; /* user defined attribute */
+| my_define_float : 3.0; /* user defined attribute */
+| my_define_float : 4.0; /* user defined attribute */
+| my_define_float : abc; /* user defined attribute */
+| my_define_str : abc; /* user defined attribute */
+| cell (test1) {
+| | my_define_integer : 1; /* user defined attribute */
+| | my_define_integer : 2; /* user defined attribute */
+| | my_define_integer : 3; /* user defined attribute */
+| | my_define_integer : 4; /* user defined attribute */
+| }
 }
 "#,
   );
@@ -137,28 +137,28 @@ fn comment() {
 ** comment2
 ** comment3 */
 library ("") {
-  /* comment1
-  ** comment2
-  ** comment3 */
-  technology (cmos);
-  delay_model : table_lookup;
-  /* one line comment */
-  time_unit : 1ns;
-  voltage_unit : 1V;
-  slew_upper_threshold_pct_rise : 80.0;
-  slew_lower_threshold_pct_rise : 20.0;
-  slew_derate_from_library : 1.0;
-  slew_lower_threshold_pct_fall : 20.0;
-  slew_upper_threshold_pct_fall : 80.0;
-  input_threshold_pct_fall : 50.0;
-  input_threshold_pct_rise : 50.0;
-  output_threshold_pct_rise : 50.0;
-  output_threshold_pct_fall : 50.0;
-  /* comment1
-  ** comment2
-  ** comment3 */
-  cell (test1) {
-  }
+| /* comment1
+| ** comment2
+| ** comment3 */
+| technology (cmos);
+| delay_model : table_lookup;
+| /* one line comment */
+| time_unit : 1ns;
+| voltage_unit : 1V;
+| slew_upper_threshold_pct_rise : 80.0;
+| slew_lower_threshold_pct_rise : 20.0;
+| slew_derate_from_library : 1.0;
+| slew_lower_threshold_pct_fall : 20.0;
+| slew_upper_threshold_pct_fall : 80.0;
+| input_threshold_pct_fall : 50.0;
+| input_threshold_pct_rise : 50.0;
+| output_threshold_pct_rise : 50.0;
+| output_threshold_pct_fall : 50.0;
+| /* comment1
+| ** comment2
+| ** comment3 */
+| cell (test1) {
+| }
 }
 "#,
   );

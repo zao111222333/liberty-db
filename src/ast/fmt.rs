@@ -3,14 +3,15 @@ use core::{fmt, marker::PhantomData, ops::Deref};
 /// See more at [`DefaultIndentation`]
 pub trait Indentation {
   const LUT: &'static [&'static str];
-
+  const LAST_LINE: &'static str = match Self::LUT.last() {
+    Some(s) => s,
+    None => "",
+  };
   /// Get indentation
   #[must_use]
   #[inline]
   fn indentation(level: usize) -> &'static str {
-    Self::LUT
-      .get(level)
-      .map_or(Self::LUT.last().map_or("", Deref::deref), Deref::deref)
+    Self::LUT.get(level).map_or(Self::LAST_LINE, Deref::deref)
   }
 }
 
@@ -18,34 +19,35 @@ pub trait Indentation {
 #[derive(Debug, Clone, Copy)]
 pub struct DefaultIndentation;
 impl Indentation for DefaultIndentation {
-  const LUT: &'static [&'static str] = &[
-    "",
-    "  ",
-    "    ",
-    "      ",
-    "        ",
-    "          ",
-    "            ",
-    "              ",
-    "                ",
-    "                  ",
-  ];
-}
-#[derive(Debug, Clone, Copy)]
-pub struct TestIndentation;
-impl Indentation for TestIndentation {
-  const LUT: &'static [&'static str] = &[
-    "",
-    "| ",
-    "| | ",
-    "| | | ",
-    "| | | | ",
-    "| | | | | ",
-    "| | | | | | ",
-    "| | | | | | | ",
-    "| | | | | | | | ",
-    "| | | | | | | | | ",
-  ];
+  cfg_if::cfg_if! {
+    if #[cfg(test)]{
+      const LUT: &'static [&'static str] =  &[
+        "",
+        "| ",
+        "| | ",
+        "| | | ",
+        "| | | | ",
+        "| | | | | ",
+        "| | | | | | ",
+        "| | | | | | | ",
+        "| | | | | | | | ",
+        "| | | | | | | | | ",
+      ];
+    }else{
+      const LUT: &'static [&'static str] = &[
+        "",
+        "  ",
+        "    ",
+        "      ",
+        "        ",
+        "          ",
+        "            ",
+        "              ",
+        "                ",
+        "                  ",
+      ];
+    }
+  }
 }
 /// `CodeFormatter` with indent
 #[derive(Debug)]
@@ -56,8 +58,6 @@ pub struct CodeFormatter<'a, F, I> {
 }
 
 pub type DefaultCodeFormatter<'a, F> = CodeFormatter<'a, F, DefaultIndentation>;
-pub type TestCodeFormatter<'a, F> = CodeFormatter<'a, F, TestIndentation>;
-
 impl<F: fmt::Write, I> fmt::Write for CodeFormatter<'_, F, I> {
   #[inline]
   fn write_str(&mut self, s: &str) -> fmt::Result {

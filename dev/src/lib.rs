@@ -3,7 +3,6 @@ use criterion::{black_box, Criterion};
 use itertools::Itertools;
 use serde_json::Value;
 use std::{
-  ffi::OsStr,
   fs::{metadata, read_to_string},
   panic,
   path::{Path, PathBuf},
@@ -204,9 +203,8 @@ pub fn all_files() -> impl Iterator<Item = PathBuf> {
   walkdir::WalkDir::new("tech").into_iter().filter_map(|res| {
     res.ok().and_then(|entry| {
       let path = entry.path();
-      let extension = path.extension().and_then(OsStr::to_str);
       let md = metadata(path).unwrap();
-      if md.is_file() && extension == Some("lib") {
+      if md.is_file() && path.ends_with("lib") && !path.ends_with("golden.lib") {
         Some(entry.into_path())
       } else {
         None

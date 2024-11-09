@@ -6,10 +6,7 @@ mod fmt;
 pub mod parser;
 use crate::{library::AttributeType, ArcStr};
 use core::{fmt::Write, num::ParseIntError, str::FromStr};
-pub use fmt::{
-  CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation,
-  TestCodeFormatter, TestIndentation,
-};
+pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
 use itertools::Itertools;
 use nom::{error::Error, IResult};
 use ordered_float::NotNan;
@@ -684,7 +681,7 @@ pub struct GroupDisplay<'a, G> {
 impl<'a, G: GroupAttri> core::fmt::Display for GroupDisplay<'a, G> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ff = TestCodeFormatter::new(f);
+    let mut ff = DefaultCodeFormatter::new(f);
     self.inner.fmt_liberty(core::any::type_name::<G>(), &mut ff)
   }
 }
