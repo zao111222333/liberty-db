@@ -203,8 +203,10 @@ pub fn all_files() -> impl Iterator<Item = PathBuf> {
   walkdir::WalkDir::new("tech").into_iter().filter_map(|res| {
     res.ok().and_then(|entry| {
       let path = entry.path();
+      let file_name = path.file_name().unwrap().to_str().unwrap();
       let md = metadata(path).unwrap();
-      if md.is_file() && path.ends_with("lib") && !path.ends_with("golden.lib") {
+      if md.is_file() && file_name.ends_with("lib") && !file_name.ends_with("golden.lib")
+      {
         Some(entry.into_path())
       } else {
         None
@@ -258,7 +260,7 @@ pub fn bench_all(
 
 pub fn info_table(projs: impl Clone + Iterator<Item = impl Proj>) -> String {
   format!(
-    "<div class=\"info-table\"><table><thead><tr><th rowspan=\"2\" style=\"font-weight:bold;\">Proj</th><th rowspan=\"2\" style=\"font-weight:bold;\">Language</th><th rowspan=\"2\" style=\"font-weight:bold;\">Version</th><th colspan=\"3\" style=\"text-align:center;font-weight:bold;\">Type Support</th><th rowspan=\"2\" style=\"font-weight:bold;\">Boolean Expression</th><th rowspan=\"2\" style=\"font-weight:bold;\">Comment</th></tr><tr><th>All</th><th>Partly</th><th>AST only</th></tr></thead><tbody>{}</tbody></table></div>", 
+    "<div class=\"info-table\"><table><thead><tr><th rowspan=\"2\" style=\"font-weight:bold;\">Project</th><th rowspan=\"2\" style=\"font-weight:bold;\">Lang</th><th rowspan=\"2\" style=\"font-weight:bold;\">Version</th><th colspan=\"3\" style=\"text-align:center;font-weight:bold;\">Type Support</th><th rowspan=\"2\" style=\"font-weight:bold;\">Boolean<br>Expression</th><th rowspan=\"2\" style=\"font-weight:bold;\">Comment</th></tr><tr><th>All</th><th>Partly</th><th>AST only</th></tr></thead><tbody>{}</tbody></table></div>", 
     projs.map(|proj| proj.info_html()).join(""),
   )
 }

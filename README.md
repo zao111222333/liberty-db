@@ -64,7 +64,6 @@ cargo bench --bench dev
 + `intrinsic_parasitic` group
 + `leakage_current` group
 + `dynamic_current` group
-+ use PDFJS
 + stream input
 + Linked Group
 + ~~user `define`~~
