@@ -5,6 +5,7 @@ name: build
 # from dev branches).
 on:
   push:
+    branches: ["master"]
     branches-ignore:
       - 'dev-*'
   pull_request:
