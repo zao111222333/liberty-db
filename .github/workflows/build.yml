@@ -61,9 +61,9 @@ jobs:
           components: rustfmt
       - name: Build
         run: cargo build --verbose
-      - name: Run tests1
+      - name: Run Tests
         run: cargo test --verbose --all-features
-      - name: Run tests1
+      - name: Run Regression
         run: cargo test --verbose --all-features --package dev
   # Checks code style.
   clippy:
@@ -83,7 +83,7 @@ jobs:
   # Compute code coverage
   codecov:
     needs: test
-    name: Code coverage
+    name: Code Coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -94,14 +94,15 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-tarpaulin
-      - run: cargo tarpaulin --verbose --lib --examples --workspace --exclude dev --all-features --out xml
+      - run: cargo tarpaulin --verbose --lib --examples --workspace --exclude dev liberty-macros --all-features --out xml html --output-dir target/codecov
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v4
         with:
+          files: target/codecov/cobertura.xml
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-coverage-report
-          path: cobertura.xml
+      # - name: Archive code coverage results
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: code-coverage-report
+      #     path: target/codecov/cobertura.xml
