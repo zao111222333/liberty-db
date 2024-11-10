@@ -33,7 +33,7 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
       # upload empty artifact
-      - run: mkdir -p target/criterion
+      - run: mkdir -p target/criterion/1
       - name: Archive bench results
         uses: actions/upload-artifact@v4
         with:
