@@ -1,2 +1,2 @@
 dev/include/** linguist-vendored
-*.lib_golden linguist-generated
+*.golden.lib linguist-generated

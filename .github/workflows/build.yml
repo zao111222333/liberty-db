@@ -80,27 +80,28 @@ jobs:
           components: clippy
       - run: cargo clippy --all-features
 
-  # # Compute code coverage
-  # codecov:
-  #   needs: test
-  #   name: Code coverage
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: dtolnay/rust-toolchain@stable
-  #       with:
-  #         toolchain: ${{ env.RUST_VERSION }}
-  #     # Install action using cargo-binstall, which is faster because we don't have to compile tarpaulin every time.
-  #     - uses: taiki-e/install-action@v2
-  #       with:
-  #         tool: cargo-tarpaulin
-  #     - run: cargo tarpaulin --verbose --lib --examples --all-features --out xml
-  #     - name: Upload to codecov.io
-  #       uses: codecov/codecov-action@v4
-  #       with:
-  #         token: ${{ secrets.CODECOV_TOKEN }}
-  #     - name: Archive code coverage results
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: code-coverage-report
-  #         path: cobertura.xml
+  # Compute code coverage
+  codecov:
+    needs: test
+    name: Code coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+      # Install action using cargo-binstall, which is faster because we don't have to compile tarpaulin every time.
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-tarpaulin
+      - run: cargo tarpaulin --verbose --lib --examples --all-features --out xml
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: cobertura.xml

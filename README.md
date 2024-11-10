@@ -6,6 +6,7 @@
 [![liberty-db](https://shields.io/crates/v/liberty-db.svg?style=flat-square&label=liberty-db)](https://crates.io/crates/liberty-db)
 [![Docs](https://docs.rs/liberty-db/badge.svg)](https://docs.rs/liberty-db)
 [![Benchmark](https://img.shields.io/badge/Benchmark-8A2BE2)](https://zao111222333.github.io/liberty-db/bench)
+[![codecov](https://codecov.io/github/zao111222333/liberty-db/graph/badge.svg?token=AI2BVDIFOI)](https://codecov.io/github/zao111222333/liberty-db)
 
 ## Highlight Features
 

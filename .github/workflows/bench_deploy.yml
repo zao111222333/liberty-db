@@ -25,11 +25,7 @@ env:
   RUST_VERSION: "1.82.0"
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  bench:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,26 +33,31 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
       - name: Obtain baseline data (result of last time)
-        run: |
-          REPO="${{ github.repository }}"
-          NAME="${REPO##*/}"
-          { 
-            wget https://${{ github.repository_owner }}.github.io/$NAME/criterion.tar.gz && tar -xf criterion.tar.gz
-          } || {
-            echo "fail to get baseline data"
-          }
-      - run: cargo bench --package dev
-      - name: Collect benchmark static files
-        run: |
-          tar -zcvf docs/static/criterion.tar.gz target/criterion
-          mv target/criterion docs/static/bench
-      - name: Setup Pages
-        uses: actions/configure-pages@v2
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/download-artifact@v4
         with:
-          # Upload entire repository
-          path: 'docs/static'
+          name: bench-report
+          path: target/criterion
+      - run: cargo bench --package dev
+      - name: Archive bench results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-report
+          path: target/criterion
+      - name: Collect benchmark static files
+        run: mv target/criterion docs/static/bench
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/static
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: bench
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
