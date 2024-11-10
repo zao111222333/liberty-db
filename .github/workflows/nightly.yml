@@ -2,8 +2,9 @@ name: Nightly
 
 on:
   schedule:
-    - cron: '10 11 * * *'  # 9:10@UTC, 1:10@LA
-
+    - cron: '10 11 * * *'  # 11:10@UTC, 3:10@LA
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 permissions:
   contents: write
 
@@ -25,7 +26,7 @@ jobs:
       - name: Package
         run: .github/workflows/package.sh ${{ needs.prepare.outputs.DATE }}
       - name: Archive package
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         with:
           key: package-${{ needs.prepare.outputs.DATE }}
           path: target/package

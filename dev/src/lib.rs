@@ -232,7 +232,7 @@ pub fn bench_all(
   for path in all_files() {
     let file_path = path.display().to_string();
     let parse_res = {
-      let group_name = format!("[{tag}-parse] {file_path}");
+      let group_name = format!("[{tag}-parse] {file_path} ");
       let group_path = group_name2path(&group_name);
       let mut parse_group = c.benchmark_group(&group_name);
       let res = projs
@@ -300,7 +300,7 @@ pub fn run_bench(
   let mut criterion = Criterion::default()
     .sample_size(100)
     .with_output_color(true)
-    .warm_up_time(Duration::from_millis(1000))
+    .warm_up_time(Duration::from_millis(100))
     .configure_from_args();
   let res_list = bench_all(&mut criterion, projs.clone(), regression);
   criterion.final_summary();
