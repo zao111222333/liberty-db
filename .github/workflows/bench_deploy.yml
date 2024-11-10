@@ -32,14 +32,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
-      # upload empty artifact
-      # - run: mkdir -p target/criterion
-      # - run: touch target/criterion/1
-      # - name: Archive bench results
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: bench-report
-      #     path: target/criterion
       - name: Obtain baseline data (result of last time)
         id: restore-cache
         uses: actions/cache@v4
@@ -66,13 +58,6 @@ jobs:
         with:
           path: docs/static/bench
           key: bench-report
-      # - name: Collect benchmark static files
-      #   run: mv target/criterion docs/static/bench
-      # - name: Upload static files as artifact
-      #   id: deployment
-      #   uses: actions/upload-pages-artifact@v3
-      #   with:
-      #     path: docs/static
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
