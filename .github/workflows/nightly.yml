@@ -1,0 +1,27 @@
+name: Nightly Tag
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # 9:00@UTC, 1:00@LA
+
+permissions:
+  contents: write
+
+jobs:
+  create-nightly-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: config Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create Tag & push
+        run: |
+          TAG_NAME=$(date '+%Y%m%d' -d '-1 day')
+          if git rev-parse "refs/tags/$TAG_NAME" >/dev/null 2>&1; then
+            git tag -d "$TAG_NAME"
+          fi
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME" --force
