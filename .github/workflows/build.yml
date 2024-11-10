@@ -6,9 +6,8 @@ name: build
 on:
   push:
     branches: ["master"]
-    branches-ignore:
-      - 'dev-*'
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - '*'
 
