@@ -2,7 +2,7 @@ name: Nightly Tag
 
 on:
   schedule:
-    - cron: '0 9 * * *'  # 9:00@UTC, 1:00@LA
+    - cron: '10 9 * * *'  # 9:10@UTC, 1:10@LA
 
 permissions:
   contents: write
