@@ -41,23 +41,17 @@ jobs:
       #     name: bench-report
       #     path: target/criterion
       - name: Obtain baseline data (result of last time)
-        uses: actions/download-artifact@v4
+        id: restore-cache
+        uses: actions/cache@v4
         with:
-          name: bench-report
           path: target/criterion
+          key: bench-report
       - run: cargo bench --package dev
       - name: Archive bench results
-        uses: actions/upload-artifact@v4
+        uses: actions/cache@v4
         with:
-          name: bench-report
+          key: bench-report
           path: target/criterion
-      - name: Collect benchmark static files
-        run: mv target/criterion docs/static/bench
-      - name: Upload static files as artifact
-        id: deployment
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/static
 
   deploy:
     environment:
@@ -66,6 +60,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: bench
     steps:
+      - name: Load bench results
+        id: restore-cache
+        uses: actions/cache@v4
+        with:
+          path: docs/static/bench
+          key: bench-report
+      # - name: Collect benchmark static files
+      #   run: mv target/criterion docs/static/bench
+      # - name: Upload static files as artifact
+      #   id: deployment
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     path: docs/static
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
