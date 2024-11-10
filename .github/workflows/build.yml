@@ -18,16 +18,6 @@ env:
   # spontaneously break after a few years.
   # Make sure to update this from time to time.
 jobs:
-  matrix_test:
-    strategy:
-      max-parallel: 2
-      matrix:
-        version: [10, 12, 14]
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to ${{ matrix.os }} ${{ matrix.version }}
-        run: echo "Deploying to ${{ matrix.os }} ${{ matrix.version }}"
   # Checks syntax formatting.
   fmt:
     name: Rustfmt

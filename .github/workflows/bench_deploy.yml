@@ -25,16 +25,15 @@ env:
   RUST_VERSION: "1.82.0"
 
 jobs:
-  matrix_test:
+  regression:
     strategy:
-      max-parallel: 2
+      max-parallel: 4
       matrix:
-        version: [10, 12, 14]
-        os: [ubuntu-latest, windows-latest]
+        build: [liberty-io, libertyparse, liberty2json, liberty-db-latest, liberty-db-nightly, liberty-db-0p6p3, liberty-db-0p5p9, liberty-db-0p4p13, liberty-db-0p3p1]
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to ${{ matrix.os }} ${{ matrix.version }}
-        run: echo "Deploying to ${{ matrix.os }} ${{ matrix.version }}"
+      - name: Deploy to ${{ matrix.build }}
+        run: echo "Deploying to ${{ matrix.build }}"
   bench:
     runs-on: ubuntu-latest
     steps:
