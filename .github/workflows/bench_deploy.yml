@@ -32,6 +32,13 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
+      # upload empty artifact
+      - run: mkdir -f target/criterion
+      - name: Archive bench results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-report
+          path: target/criterion
       - name: Obtain baseline data (result of last time)
         uses: actions/download-artifact@v4
         with:
