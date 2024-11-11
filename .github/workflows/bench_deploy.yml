@@ -12,6 +12,7 @@ on:
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
+  actions: write # require to delete cache
 
 # Allow one concurrent deployment
 concurrency:
