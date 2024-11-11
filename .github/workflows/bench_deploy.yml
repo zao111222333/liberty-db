@@ -70,11 +70,15 @@ jobs:
     needs: bench
     steps:
       - uses: actions/checkout@v4
+      # https://github.com/actions/cache/issues/1444
+      # If the target path doesn't match the source path, 
+      # restore reports "Cache not found for input keys"
       - name: Load bench results
         uses: actions/cache/restore@v4
         with:
-          path: docs/static/bench
+          path: target/criterion
           key: ${{ env.CACHE_KEY_BENCH }}
+      - run: mv target/criterion docs/static/bench
       - name: Upload Static Files as Artifact
         uses: actions/upload-pages-artifact@v3
         with:
