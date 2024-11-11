@@ -94,7 +94,7 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-tarpaulin
-      - run: cargo tarpaulin --verbose --lib --examples --workspace --exclude dev liberty-macros --all-features --out xml html --output-dir target/codecov
+      - run: cargo tarpaulin --verbose --lib --examples --workspace --exclude liberty-macros --exclude-files dev/* --all-features --out xml html --output-dir target/codecov
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v4
         with:

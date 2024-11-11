@@ -45,7 +45,7 @@ jobs:
         with:
           path: target/criterion
           key: ${{ env.CACHE_KEY_BENCH }}
-      # - run: cargo bench --package dev
+      - run: cargo bench --package dev
       - name: Clear last bench results
         continue-on-error: true # Don't fail if the cache doesn't exist
         env:
