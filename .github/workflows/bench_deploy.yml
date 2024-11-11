@@ -21,7 +21,7 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
   RUST_VERSION: "1.82.0"
-
+  CACHE_KEY_BENCH: bench-report
 jobs:
   regression:
     strategy:
@@ -43,12 +43,19 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: target/criterion
-          key: bench-report
-      - run: cargo bench --package dev
+          key: ${{ env.CACHE_KEY_BENCH }}
+      # - run: cargo bench --package dev
+      - name: Clear last bench results
+        continue-on-error: true # Don't fail if the cache doesn't exist
+        env:
+          GH_TOKEN: ${{ github.token }} # required by gh
+        run: |
+          gh extension install actions/gh-actions-cache
+          gh actions-cache delete ${{ env.CACHE_KEY_BENCH }} --confirm -R ${{ github.repository }}
       - name: Archive bench results
         uses: actions/cache/save@v4
         with:
-          key: bench-report
+          key: ${{ env.CACHE_KEY_BENCH }}
           path: target/criterion
   
   deploy:
@@ -61,11 +68,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: bench
     steps:
+      - uses: actions/checkout@v4
       - name: Load bench results
         uses: actions/cache/restore@v4
         with:
           path: docs/static/bench
-          key: bench-report
+          key: ${{ env.CACHE_KEY_BENCH }}
       - name: Upload Static Files as Artifact
         uses: actions/upload-pages-artifact@v3
         with:
