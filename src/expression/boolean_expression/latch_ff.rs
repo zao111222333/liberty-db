@@ -18,10 +18,7 @@ use core::fmt::Write;
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FF {
   /// The `variable1` (`variable[0]`) value is the state of the
@@ -114,10 +111,7 @@ pub struct FF {
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FFBank {
   /// The `variable1` (`variable[0]`) value is the state of the
@@ -213,10 +207,7 @@ pub struct FFBank {
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Latch {
   /// The `variable1` (`variable[0]`) value is the state of the
@@ -308,10 +299,7 @@ pub struct Latch {
 /// ">Reference-Definition</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct LatchBank {
   /// The `variable1` (`variable[0]`) value is the state of the

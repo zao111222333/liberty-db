@@ -26,7 +26,6 @@ fn main() {
     log::info!("Loop to [cell] {}", cell.name);
     for pin in cell.pin.iter_mut() {
       log::info!("Loop to [pin] {}", pin.name);
-
       for timing in pin.timing.iter_mut() {
         log::info!(
           "Loop to [timing] related_pin={} {} {} {}",

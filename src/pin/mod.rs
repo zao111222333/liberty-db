@@ -34,12 +34,9 @@ pub use items::*;
 /// + An example of the `pin` group syntax showing the attribute
 /// and group statements that you can use within the `pin` group
 /// + Descriptions of the attributes and groups you can use in a `pin` group
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Pin {
   /// Name of the pin
@@ -1127,6 +1124,8 @@ pub struct Pin {
   // electromigration () { }
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<InternalPower>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<InternalPower>::deserialize_with")]
   pub internal_power: GroupSet<InternalPower>,
   // TODO
   // max_trans () { }
@@ -1159,6 +1158,8 @@ pub struct Pin {
   ///
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<Timing>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Timing>::deserialize_with")]
   pub timing: GroupSet<Timing>,
   /// Use the `receiver_capacitance`  group to specify capacitance values
   /// for composite current source (CCS) receiver modeling at the pin level.
@@ -1179,6 +1180,8 @@ pub struct Pin {
   /// ">Reference-Definition</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<ReceiverCapacitance>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<ReceiverCapacitance>::deserialize_with")]
   pub receiver_capacitance: GroupSet<ReceiverCapacitance>,
   /// In referenced CCS noise modeling,
   /// use the `input_ccb`  group to specify the CCS noise for
@@ -1192,15 +1195,23 @@ pub struct Pin {
   /// ">Reference-Instance</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
   pub input_ccb: GroupSet<CCSNStage>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
   pub output_ccb: GroupSet<CCSNStage>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
   pub ccsn_first_stage: GroupSet<CCSNStage>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
   pub ccsn_last_stage: GroupSet<CCSNStage>,
 }
 

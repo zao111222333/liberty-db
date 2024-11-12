@@ -11,6 +11,7 @@ use crate::{
 };
 use core::fmt::Write;
 #[derive(Default, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing {
@@ -28,12 +29,11 @@ pub(crate) struct Timing {
   t2: Option<TimingType>,
 }
 impl GroupFn for Timing {}
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
+
+#[mut_set::derive::item(sort)]
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub(crate) struct Pin {
   #[size = 8]
   #[liberty(name)]
@@ -52,10 +52,9 @@ pub(crate) struct Pin {
   timing: Vec<Timing>,
 }
 impl GroupFn for Pin {}
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
+
+#[mut_set::derive::item(sort)]
+#[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct FF {

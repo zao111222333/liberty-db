@@ -94,7 +94,7 @@ jobs:
 
   # Compute code coverage
   codecov:
-    needs: [clippy, regression]
+    needs: [test, clippy, regression]
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:

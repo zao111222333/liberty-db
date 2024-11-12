@@ -42,12 +42,9 @@ use num_traits::Zero;
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CCSNStage {
   /// group name
@@ -297,12 +294,9 @@ impl SimpleAttri for StageType {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReceiverCapacitance {
   /// group name
@@ -324,9 +318,13 @@ pub struct ReceiverCapacitance {
   pub when: Option<IdBooleanExpression>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
   pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment>,
   #[size = 336]
   #[liberty(group)]

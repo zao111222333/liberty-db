@@ -25,13 +25,7 @@ pub use items::*;
 #[derive(Debug, Clone, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone);
-        derive(derivative::Derivative);
-        derivative(Default);),
-  attr_filter(derivative;)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Library {
   /// library name
@@ -130,6 +124,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OperatingConditions>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OperatingConditions>::deserialize_with")]
   pub operating_conditions: GroupSet<OperatingConditions>,
   /// Default operating conditions for the library
   /// <a name ="reference_link" href="
@@ -164,6 +160,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(complex(type = Set))]
+  #[serde(serialize_with = "GroupSet::<Define>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Define>::deserialize_with")]
   pub define: GroupSet<Define>,
   /// Use this special attribute to define new, temporary, or user-defined groups
   /// for use in technology libraries.
@@ -172,6 +170,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(complex(type = Set))]
+  #[serde(serialize_with = "GroupSet::<DefineGroup>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<DefineGroup>::deserialize_with")]
   pub define_group: GroupSet<DefineGroup>,
   /// The `define_cell_area`  attribute defines the area resources a `cell` uses,
   /// such as the number of pad slots.
@@ -180,6 +180,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(complex(type = Set))]
+  #[serde(serialize_with = "GroupSet::<DefineCellArea>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<DefineCellArea>::deserialize_with")]
   pub define_cell_area: GroupSet<DefineCellArea>,
   /// ``` liberty
   /// library_features (value_1, value_2, ..., value_n) ;
@@ -350,6 +352,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(complex(type = Set))]
+  #[serde(serialize_with = "GroupSet::<VoltageMap>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<VoltageMap>::deserialize_with")]
   pub voltage_map: GroupSet<VoltageMap>,
   /// An `input_voltage`  group is defined in the library  group to designate
   /// a set of input voltage ranges for your cells.
@@ -358,6 +362,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<InputVoltage>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<InputVoltage>::deserialize_with")]
   pub input_voltage: GroupSet<InputVoltage>,
   /// You define an `output_voltage` group in the `library` group to designate a set of output
   /// voltage level ranges to drive output cells.
@@ -366,6 +372,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OutputVoltage>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OutputVoltage>::deserialize_with")]
   pub output_voltage: GroupSet<OutputVoltage>,
   /// Use the `slew_upper_threshold_pct_rise`  attribute to set the value of the upper threshold point
   /// that is used to model the delay of a pin rising from 0 to 1.
@@ -508,6 +516,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<TableTemple>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableTemple>::deserialize_with")]
   pub output_current_template: GroupSet<TableTemple>,
   /// The `power_lut_template` group is defined within the `library` group, as shown here:
   /// <a name ="reference_link" href="
@@ -515,6 +525,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<TableTemple>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableTemple>::deserialize_with")]
   pub power_lut_template: GroupSet<TableTemple>,
   /// Use the `lu_table_template`  group to define templates of common information
   /// to use in lookup tables. Define the `lu_table_template`  group at the library level
@@ -523,6 +535,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<TableTemple>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableTemple>::deserialize_with")]
   pub lu_table_template: GroupSet<TableTemple>,
   /// The `base_curves`  group is a library-level group that contains
   /// the detailed description of normalized base curves.
@@ -550,6 +564,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<BaseCurves>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<BaseCurves>::deserialize_with")]
   pub base_curves: GroupSet<BaseCurves>,
   /// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling
   /// <a name ="reference_link" href="
@@ -557,6 +573,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<CompactLutTemplate>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CompactLutTemplate>::deserialize_with")]
   pub compact_lut_template: GroupSet<CompactLutTemplate>,
   /// The library-level `normalized_driver_waveform`  group represents a collection
   /// of driver waveforms under various input slew values.
@@ -570,6 +588,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<DriverWaveform>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<DriverWaveform>::deserialize_with")]
   pub normalized_driver_waveform: GroupSet<DriverWaveform>,
   /// A `wire_load`  group is defined in a `library`  group, as follows.
   /// <a name ="reference_link" href="
@@ -577,6 +597,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<WireLoad>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<WireLoad>::deserialize_with")]
   pub wire_load: GroupSet<WireLoad>,
   /// A `wire_load_selection`  group is defined in a `library`  group, as follows.
   /// <a name ="reference_link" href="
@@ -584,6 +606,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<WireLoadSection>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<WireLoadSection>::deserialize_with")]
   pub wire_load_selection: GroupSet<WireLoadSection>,
   /// Wire load
   /// <a name ="reference_link" href="
@@ -608,6 +632,8 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<FpgaIsd>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<FpgaIsd>::deserialize_with")]
   pub fpga_isd: GroupSet<FpgaIsd>,
   /// When you specify more than one `fpga_isd`  group, you **must** also define
   /// the library-level `default_fpga_isd`  attribute to specify which `fpga_isd`
@@ -633,9 +659,13 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<Sensitization>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Sensitization>::deserialize_with")]
   pub sensitization: GroupSet<Sensitization>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<Cell>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Cell>::deserialize_with")]
   pub cell: GroupSet<Cell>,
 }
 

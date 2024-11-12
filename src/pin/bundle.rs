@@ -9,13 +9,10 @@ use crate::{
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[derive(serde::Serialize, serde::Deserialize)]
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Default, Clone)]
-#[mut_set::derive::item(
-    sort,
-  macro(derive(Debug, Clone,Default);)
-)]
 #[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Bundle {
   /// Name of the pin
   #[id]
@@ -47,6 +44,8 @@ pub struct Bundle {
   pub nextstate_type: Option<NextstateType>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<Timing>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Timing>::deserialize_with")]
   pub timing: GroupSet<Timing>,
 }
 

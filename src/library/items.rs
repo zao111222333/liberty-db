@@ -8,7 +8,10 @@ use crate::{
     Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
     GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
   },
-  common::{items::Formula, parse_f64},
+  common::{
+    items::{Formula, IdVector},
+    parse_f64,
+  },
   expression::logic,
   ArcStr, GroupSet, NotNan,
 };
@@ -31,10 +34,7 @@ use std::collections::HashMap;
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Sensitization {
   /// name
@@ -305,10 +305,7 @@ impl GroupFn for Sensitization {}
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.15&end=39.16
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct VoltageMap {
   /// name
@@ -356,10 +353,7 @@ impl ComplexAttri for VoltageMap {
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct InputVoltage {
   /// name
@@ -414,10 +408,7 @@ impl GroupFn for InputVoltage {}
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct OutputVoltage {
   /// name
@@ -504,13 +495,7 @@ impl SimpleAttri for DelayModel {
 #[derive(Debug, Clone, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone);
-        derive(derivative::Derivative);
-        derivative(Default);),
-  attr_filter(derivative;)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct OperatingConditions {
   /// name
@@ -597,13 +582,7 @@ impl GroupFn for OperatingConditions {}
 #[derive(Debug, Clone, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone);
-        derive(derivative::Derivative);
-        derivative(Default);),
-  attr_filter(derivative;)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FpgaIsd {
   /// name
@@ -722,10 +701,7 @@ impl SimpleAttri for TreeType {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.5&end=36.21
 /// ">Reference</a>
 #[derive(Debug, Clone)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Define {
   /// The name of the attribute you are creating.
@@ -828,10 +804,7 @@ impl ComplexAttri for Define {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.24&end=37.25
 /// ">Reference</a>
 #[derive(Debug, Clone)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefineGroup {
   /// The name of the user-defined group.
@@ -897,10 +870,7 @@ impl ComplexAttri for DefineGroup {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.23&end=36.24
 /// ">Reference</a>
 #[derive(Debug, Clone)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefineCellArea {
   /// A name of a resource type.
@@ -993,10 +963,7 @@ impl ComplexAttri for DefineCellArea {
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WireLoad {
   /// name
@@ -1064,6 +1031,8 @@ pub struct WireLoad {
   /// ">Reference</a>
   #[size = 48]
   #[liberty(complex(type = Set))]
+  #[serde(serialize_with = "GroupSet::<FanoutLength>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<FanoutLength>::deserialize_with")]
   pub fanout_length: GroupSet<FanoutLength>,
 }
 impl GroupFn for WireLoad {}
@@ -1090,10 +1059,7 @@ impl GroupFn for WireLoad {}
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
 /// ">Reference</a>
 #[derive(Debug, Clone, Default, Copy)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default, Copy);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FanoutLength {
   /// An integer representing the total number of pins, minus one, on the net driven by the given output
@@ -1190,10 +1156,7 @@ impl ComplexAttri for FanoutLength {
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WireLoadSection {
   /// name
@@ -1288,10 +1251,7 @@ impl SimpleAttri for BaseCurveType {
 /// ">Reference</a>
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct BaseCurves {
   /// name
@@ -1332,7 +1292,9 @@ pub struct BaseCurves {
   pub curve_x: Vec<NotNan<f64>>,
   #[size = 48]
   #[liberty(complex(type = Set))]
-  pub curve_y: GroupSet<crate::common::items::IdVector>,
+  #[serde(serialize_with = "GroupSet::<IdVector>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<IdVector>::deserialize_with")]
+  pub curve_y: GroupSet<IdVector>,
 }
 
 impl GroupFn for BaseCurves {}

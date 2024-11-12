@@ -72,10 +72,7 @@ impl SimpleAttri for SdfEdgeType {
 }
 
 #[derive(Debug, Clone, Default)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone, Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdVector {
   #[id]
@@ -127,10 +124,7 @@ impl SimpleAttri for VariableType {
 /// ">Reference-Definition</a>
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Domain {
   #[size = 8]
@@ -260,10 +254,7 @@ impl FromStr for WordSet {
 
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
+#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DummyGroup {
   #[size = 8]

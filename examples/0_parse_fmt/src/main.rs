@@ -1,4 +1,4 @@
-use liberty_db::{library::Library, Cell, Group};
+use liberty_db::{library::Library, Group};
 
 static TEMPLATE: &str = r#"
 library(gscl45nm) {
@@ -61,12 +61,11 @@ fn main() {
         println!("{}", cell.display());
       }
       println!("\nindex cell");
-      let borrow_id = Cell::new_id(&library.cell, "SDFFRS_X2");
-      if let Some(sdffrs_x2) = library.cell.get(&borrow_id) {
+      if let Some(sdffrs_x2) = library.cell.get("SDFFRS_X2") {
         println!("{}", sdffrs_x2.display());
       }
       println!("borrow index cell");
-      if let Some(sdffrs_x2) = library.cell.get(&borrow_id) {
+      if let Some(sdffrs_x2) = library.cell.get("SDFFRS_X2") {
         println!("{}", sdffrs_x2.display());
       }
     }

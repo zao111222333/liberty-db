@@ -21,12 +21,9 @@ use core::{
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
+#[mut_set::derive::item(sort)]
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct LeakagePower {
   #[id(borrow = "&[ArcStr]")]
@@ -125,7 +122,7 @@ mod test_sort {
       vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       cell
         .leakage_power
-        .into_iter_sort()
+        .iter_sort()
         .map(|leakage| leakage.value.into_inner() as i8)
         .collect::<Vec<_>>()
     );
@@ -138,12 +135,9 @@ mod test_sort {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
+#[mut_set::derive::item(sort)]
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Statetable {
   #[id(borrow = "&[ArcStr]")]
@@ -327,12 +321,9 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-    sort,
-    macro(derive(Debug, Clone,Default);)
-  )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PgPin {
   #[size = 8]

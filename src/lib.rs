@@ -128,7 +128,7 @@
 
 pub use arcstr;
 pub use arcstr::ArcStr;
-pub use mut_set::MutSet as GroupSet;
+type GroupSet<T> = <T as mut_set::Item>::MutSet<std::hash::RandomState>;
 pub use ordered_float::NotNan;
 /// `bus` group structure.
 pub mod bus;

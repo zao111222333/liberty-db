@@ -184,12 +184,9 @@ pub type Mode = [ArcStr; 2];
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33&end=347.35
 /// ">Reference</a>
 ///
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone, Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CellDegradation {
   /// name

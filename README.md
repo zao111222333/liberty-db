@@ -67,6 +67,7 @@ cargo bench --bench dev
 + `dynamic_current` group
 + stream input
 + Linked Group
++ like IndexMap, only sort once and store
 + ~~user `define`~~
 + ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~
 + ~~fix missing newline at endding~~

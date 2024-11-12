@@ -23,7 +23,7 @@ use crate::{
   ArcStr, GroupSet, NotNan,
 };
 
-use items::TimingSenseType;
+use items::{CellDegradation, TimingSenseType};
 
 /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
 ///
@@ -47,12 +47,9 @@ use items::TimingSenseType;
 /// =203.29
 /// ">Reference-Instatnce-In-Pin</a>
 ///
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(
-  sort,
-  macro(derive(Debug, Clone,Default);)
-)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Timing {
   #[size = 24]
@@ -1490,7 +1487,9 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   #[size = 48]
   #[liberty(group(type = Set))]
-  pub cell_degradation: GroupSet<items::CellDegradation>,
+  #[serde(serialize_with = "GroupSet::<CellDegradation>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CellDegradation>::deserialize_with")]
+  pub cell_degradation: GroupSet<CellDegradation>,
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
   ///
   /// **Note:**
@@ -1586,9 +1585,13 @@ pub struct Timing {
   pub propogated_noise_width_low: Option<TableLookUp>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
   #[size = 48]
   #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
   pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment>,
   #[size = 336]
   #[liberty(group)]
