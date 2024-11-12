@@ -79,7 +79,7 @@ jobs:
         run: cargo test --verbose --all-features --package dev
   # Checks code style.
   clippy:
-    needs: [check, regression]
+    needs: check
     name: Clippy
     runs-on: ubuntu-latest
     # env:
@@ -94,7 +94,7 @@ jobs:
 
   # Compute code coverage
   codecov:
-    needs: test
+    needs: [clippy, regression]
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:
