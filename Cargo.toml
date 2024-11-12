@@ -72,7 +72,7 @@ sysinfo = "0.32"
 chrono = "0.4.38"
 
 [dependencies]
-liberty-macros = "0.6.12"
+liberty-macros = { path = "macros" }
 log.workspace = true
 serde.workspace = true
 thiserror.workspace = true
