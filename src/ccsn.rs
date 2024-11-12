@@ -301,7 +301,7 @@ impl SimpleAttri for StageType {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(
   sort,
-  macro(derive(Debug, Clone,Default);)
+  macro(derive(Debug, Clone, Default);)
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReceiverCapacitance {
