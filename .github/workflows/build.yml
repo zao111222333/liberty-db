@@ -49,7 +49,7 @@ jobs:
   # Run tests.
   test:
     needs: check
-    name: Test Suite (linux)
+    name: Test (linux)
     runs-on: ubuntu-latest
     env:
       RUSTFLAGS: "-D warnings"
@@ -63,11 +63,23 @@ jobs:
         run: cargo build --verbose
       - name: Run Tests
         run: cargo test --verbose --all-features
+  regression:
+    needs: check
+    name: Regression (linux)
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-D warnings"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          components: rustfmt
       - name: Run Regression
         run: cargo test --verbose --all-features --package dev
   # Checks code style.
   clippy:
-    needs: check
+    needs: [check, regression]
     name: Clippy
     runs-on: ubuntu-latest
     # env:

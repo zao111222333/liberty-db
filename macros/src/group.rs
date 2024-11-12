@@ -271,47 +271,54 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     let mut write_simple_complex = quote! {};
     let mut write_group = quote! {};
     let comments_self = Ident::new("this", Span::call_site());
+    let mut field_name_arrti_type_old_pos = Vec::new();
     for field in fields.into_iter() {
       if let Some(field_name) = &field.ident {
-        match attri_type_map.get(field_name) {
-          None => {}
-          Some(arrti_type) => {
-            let (attri_comment, write_field, parser_arm) = group_field_fn(
-              field_name,
-              arrti_type,
-              attributes_name,
-              comments_name,
-              &comments_self,
-            )?;
-            attri_comments = quote! {
-              #attri_comments
-              #attri_comment
-            };
-            parser_arms = quote! {
-              #parser_arms
-              #parser_arm
-            };
-            match arrti_type {
-              AttriType::Simple(_) | AttriType::Complex(_) => {
-                write_simple_complex = quote! {
-                  #write_simple_complex
-                  #write_field
-                }
-              }
-              AttriType::Group(_) => {
-                write_group = quote! {
-                  #write_group
-                  #write_field
-                }
-              }
-            }
-          }
+        if let Some((arrti_type, old_pos)) = attri_type_map.get(field_name) {
+          field_name_arrti_type_old_pos.push((field_name, arrti_type, old_pos));
         }
       } else {
         return Err(syn::Error::new(
           proc_macro2::Span::call_site(),
           "Can not find field ident!".to_string(),
         ));
+      }
+    }
+    field_name_arrti_type_old_pos.sort_by(|(_, _, a), (_, _, b)| match (a, b) {
+      (None, None) => std::cmp::Ordering::Equal,
+      (None, Some(_)) => std::cmp::Ordering::Greater,
+      (Some(_), None) => std::cmp::Ordering::Less,
+      (Some(a), Some(b)) => a.cmp(b),
+    });
+    for (field_name, arrti_type, _) in field_name_arrti_type_old_pos {
+      let (attri_comment, write_field, parser_arm) = group_field_fn(
+        field_name,
+        arrti_type,
+        attributes_name,
+        comments_name,
+        &comments_self,
+      )?;
+      attri_comments = quote! {
+        #attri_comments
+        #attri_comment
+      };
+      parser_arms = quote! {
+        #parser_arms
+        #parser_arm
+      };
+      match arrti_type {
+        AttriType::Simple(_) | AttriType::Complex(_) => {
+          write_simple_complex = quote! {
+            #write_simple_complex
+            #write_field
+          }
+        }
+        AttriType::Group(_) => {
+          write_group = quote! {
+            #write_group
+            #write_field
+          }
+        }
       }
     }
     let (change_id_return, write_title) = if name_vec.is_empty() {

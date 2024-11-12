@@ -1,5 +1,6 @@
 #![cfg(test)]
-use dev::{all_files, text_diff};
+use dev::all_files;
+use dev_utils::text_diff;
 use liberty_db_latest::{ast::Group, Library};
 use std::{
   fs::{read_to_string, File},

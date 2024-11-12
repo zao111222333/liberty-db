@@ -12,7 +12,7 @@ fn parse_cmp(text: &str, want: &str) -> Library {
       library.comments.this.push("test".into());
       let s = library.to_string();
       println!("{s}");
-      dev::text_diff(&s, want);
+      dev_utils::text_diff(&s, want);
       library
     }
     Err(e) => panic!("{e:#?}"),
@@ -22,7 +22,7 @@ fn parse_cmp(text: &str, want: &str) -> Library {
 fn fmt_cmp(library: &Library, want: &str) {
   let s = library.to_string();
   println!("{s}");
-  dev::text_diff(&s, want);
+  dev_utils::text_diff(&s, want);
 }
 
 #[test]

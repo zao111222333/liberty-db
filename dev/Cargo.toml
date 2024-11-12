@@ -27,6 +27,9 @@ liberty-db-0p5p9  = { package = "liberty-db", version = "=0.5.9" }
 liberty-db-0p4p13 = { package = "liberty-db", version = "=0.4.13" }
 liberty-db-0p3p1  = { package = "liberty-db", version = "=0.3.1" }
 
+[dev-dependencies]
+dev_utils = { path = "utils" }
+
 [[bench]]
 name = "benchmark"
 harness = false

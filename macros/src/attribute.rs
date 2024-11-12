@@ -2,6 +2,7 @@ use core::fmt::Debug;
 use std::collections::HashMap;
 
 use proc_macro2::Ident;
+use syn::spanned::Spanned;
 
 #[derive(Debug, Clone, Copy)]
 enum InternalType {
@@ -59,7 +60,7 @@ enum FieldType {
 pub(crate) fn parse_fields_type(
   fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
 ) -> syn::Result<(
-  HashMap<&Ident, AttriType>,
+  HashMap<&Ident, (AttriType, Option<usize>)>,
   // Name
   Vec<&syn::Field>,
   // attributes name
@@ -71,41 +72,47 @@ pub(crate) fn parse_fields_type(
   let mut _attributes_name = None;
   let mut _comments_name = None;
   let mut err_buf = None;
-  let attri_type_map: HashMap<&Ident, AttriType> = fields
+  let attri_type_map: HashMap<&Ident, (AttriType, Option<usize>)> = fields
     .iter()
     .filter_map(|field| {
       if let (Some(field_name), field_attrs) = (&field.ident, &field.attrs) {
-        match parse_field_attrs(field_attrs) {
-          Ok(Some(t)) => match t {
-            FieldType::Internal(InternalType::Name) => {
-              _name_vec.push(field);
-              None
-            }
-            FieldType::Internal(InternalType::AttributeList) => {
-              if let Some(name) = &_attributes_name {
-                err_buf = Some(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  format!("duplicated attributes {}.", name),
-                ));
-              } else {
-                _attributes_name = Some(field_name);
+        match parse_field_pos(field_attrs) {
+          Ok(pos) => match parse_field_attrs(field_attrs) {
+            Ok(Some(t)) => match t {
+              FieldType::Internal(InternalType::Name) => {
+                _name_vec.push(field);
+                None
               }
-              None
-            }
-            FieldType::Internal(InternalType::Comment) => {
-              if let Some(name) = &_comments_name {
-                err_buf = Some(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  format!("duplicated comment {}.", name),
-                ));
-              } else {
-                _comments_name = Some(field_name);
+              FieldType::Internal(InternalType::AttributeList) => {
+                if let Some(name) = &_attributes_name {
+                  err_buf = Some(syn::Error::new(
+                    proc_macro2::Span::call_site(),
+                    format!("duplicated attributes {}.", name),
+                  ));
+                } else {
+                  _attributes_name = Some(field_name);
+                }
+                None
               }
+              FieldType::Internal(InternalType::Comment) => {
+                if let Some(name) = &_comments_name {
+                  err_buf = Some(syn::Error::new(
+                    proc_macro2::Span::call_site(),
+                    format!("duplicated comment {}.", name),
+                  ));
+                } else {
+                  _comments_name = Some(field_name);
+                }
+                None
+              }
+              FieldType::Attri(attri_type) => Some((field_name, (attri_type, pos))),
+            },
+            Ok(None) => None,
+            Err(e) => {
+              err_buf = Some(e);
               None
             }
-            FieldType::Attri(attri_type) => Some((field_name, attri_type)),
           },
-          Ok(None) => None,
           Err(e) => {
             err_buf = Some(e);
             None
@@ -227,6 +234,26 @@ fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Field
           ));
         }
       }
+    }
+  }
+  Ok(None)
+}
+fn parse_field_pos(field_attrs: &[syn::Attribute]) -> syn::Result<Option<usize>> {
+  for attr in field_attrs {
+    if attr.path().is_ident("old_pos") {
+      match &attr.meta {
+        syn::Meta::List(_) | syn::Meta::Path(_) => {
+          return Err(syn::Error::new(attr.meta.span(), "expected #[old_pos = 123 ]"))
+        }
+        syn::Meta::NameValue(s) => {
+          if let syn::Expr::Lit(expr_lit) = &s.value {
+            if let syn::Lit::Int(lit_int) = &expr_lit.lit {
+              return Ok(Some(lit_int.base10_parse::<usize>()?));
+            }
+          }
+          return Err(syn::Error::new(attr.meta.span(), "Expected integer literal"));
+        }
+      };
     }
   }
   Ok(None)
