@@ -12,7 +12,7 @@ use crate::{
   },
   expression::IdBooleanExpression,
   timing::items::Mode,
-  ArcStr, GroupSet,
+  ArcStr, GroupSet, NotNan,
 };
 use core::fmt::{self, Write};
 use num_traits::Zero;
@@ -52,18 +52,23 @@ use num_traits::Zero;
 pub struct CCSNStage {
   /// group name
   #[liberty(name)]
+  #[size = 24]
   #[id(borrow = "&[ArcStr]")]
   pub name: Vec<ArcStr>,
   /// group comments
+  #[size = 288]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 16]
   #[liberty(simple(type = Option))]
-  pub load_cap_fall: Option<f64>,
+  pub load_cap_fall: Option<NotNan<f64>>,
+  #[size = 16]
   #[liberty(simple(type = Option))]
-  pub load_cap_rise: Option<f64>,
+  pub load_cap_rise: Option<NotNan<f64>>,
   /// Use the `is_inverting`  attribute to specify whether the channel-connecting block is inverting.
   /// This attribute is mandatory if the `is_needed` attribute value is true.
   /// If the channel-connecting block is inverting, set the attribute to true.
@@ -73,15 +78,17 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=285.31&end=285.36
   /// ">Reference-Definition</a>
-  #[liberty(simple)]
-  pub is_inverting: bool,
+  #[size = 1]
+  #[liberty(simple(type = Option))]
+  pub is_inverting: Option<bool>,
   /// Use the `is_needed`  attribute to specify
   /// whether composite current source (CCS) noise modeling data is required.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=286.5&end=286.6
   /// ">Reference-Definition</a>
-  #[liberty(simple)]
-  pub is_needed: bool,
+  #[size = 1]
+  #[liberty(simple(type = Option))]
+  pub is_needed: Option<bool>,
   /// The `is_pass_gate`  attribute is defined in a ccsn_*_stage  group,
   /// such as the `ccsn_first_stage`  group,
   /// to indicate that the ccsn_*_stage  information is modeled as a pass gate.
@@ -89,30 +96,34 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=286.17&end=286.19
   /// ">Reference-Definition</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub is_pass_gate: Option<bool>,
   /// Use the `miller_cap_fall`  attribute to specify the Miller capacitance value for the channel-connecting block.
-  /// /// A floating-point number representing the Miller capacitance value. The value must be greater or equal to zero.
+  /// A floating-point number representing the Miller capacitance value. The value must be greater or equal to zero.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=286.25&end=286.26
   /// ">Reference-Definition</a>
-  #[liberty(simple)]
-  pub miller_cap_fall: f64,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub miller_cap_fall: Option<NotNan<f64>>,
   /// Use the `miller_cap_rise`  attribute to specify the Miller capacitance value for the channel-connecting block.
   /// A floating-point number representing the Miller capacitance value. The value must be greater or equal to zero.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.3&end=287.11
   /// ">Reference-Definition</a>
-  #[liberty(simple)]
-  pub miller_cap_rise: f64,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub miller_cap_rise: Option<NotNan<f64>>,
   /// The optional `related_ccb_node`  attribute specifies the SPICE node
   /// in the subcircuit netlist that is used for the `dc_current`  
   /// table characterization and waveform measurements.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.15&end=287.17
   /// ">Reference-Definition</a>
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(simple(type = Option))]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   pub related_ccb_node: Option<ArcStr>,
   /// Use the `stage_type`  attribute to specify the stage type of the channel-connecting block output voltage.
   ///
@@ -122,10 +133,12 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.27+288.2&end=287.36+288.5
   /// ">Reference-Definition</a>
-  #[liberty(simple)]
-  pub stage_type: StageType,
-  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  #[size = 1]
   #[liberty(simple(type = Option))]
+  pub stage_type: Option<StageType>,
+  #[size = 80]
+  #[liberty(simple(type = Option))]
+  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   pub when: Option<IdBooleanExpression>,
   /// The pin-based mode  attribute is provided in the `ccsn_first_stage`  
   /// and `ccsn_last_stage` groups for conditional data modeling.
@@ -134,6 +147,7 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.23&end=287.25
   /// ">Reference-Definition</a>
+  #[size = 16]
   #[liberty(complex(type = Option))]
   pub mode: Option<Mode>,
   /// Use the `dc_current`  group to specify the input and output voltage values
@@ -147,6 +161,7 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
   /// ">Reference-Definition</a>
+  #[size = 240]
   #[liberty(group(type = Option))]
   pub dc_current: Option<TableLookUp2D>,
   /// Use the `output_voltage_fall`  group to specify vector groups that describe
@@ -161,6 +176,7 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.6&end=289.26
   /// ">Reference-Definition</a>
+  #[size = 128]
   #[liberty(group(type = Option))]
   pub output_voltage_fall: Option<Vector3DGrpup>,
   /// Use the `output_voltage_rise`  group to specify `vector` groups that describe
@@ -171,6 +187,7 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.28&end=289.30
   /// ">Reference-Definition</a>
+  #[size = 128]
   #[liberty(group(type = Option))]
   pub output_voltage_rise: Option<Vector3DGrpup>,
   /// The `propagated_noise_low`  group uses `vector` groups to specify the
@@ -186,6 +203,7 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=290.19&end=290.20
   /// ">Reference-Definition</a>
+  #[size = 128]
   #[liberty(group(type = Option))]
   pub propagated_noise_low: Option<Vector4DGrpup>,
   /// The `propagated_noise_high`  group uses `vector` groups to specify the
@@ -201,6 +219,7 @@ pub struct CCSNStage {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.33&end=289.35
   /// ">Reference-Definition</a>
+  #[size = 128]
   #[liberty(group(type = Option))]
   pub propagated_noise_high: Option<Vector4DGrpup>,
 }
@@ -208,13 +227,17 @@ pub struct CCSNStage {
 impl GroupFn for CCSNStage {
   #[inline]
   fn post_parse_process(&mut self, _scope: &mut ParseScope) {
-    if self.miller_cap_fall.is_sign_negative() {
-      self.miller_cap_fall.set_zero();
-      log::warn!("miller_cap_fall is negative!");
+    if let Some(miller_cap_fall) = self.miller_cap_fall.as_mut() {
+      if miller_cap_fall.is_sign_negative() {
+        miller_cap_fall.set_zero();
+        log::warn!("miller_cap_fall is negative!");
+      }
     }
-    if self.miller_cap_rise.is_sign_negative() {
-      self.miller_cap_rise.set_zero();
-      log::warn!("miller_cap_rise is negative!");
+    if let Some(miller_cap_rise) = self.miller_cap_rise.as_mut() {
+      if miller_cap_rise.is_sign_negative() {
+        miller_cap_rise.set_zero();
+        log::warn!("miller_cap_rise is negative!");
+      }
     }
   }
 }
@@ -283,28 +306,38 @@ impl SimpleAttri for StageType {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReceiverCapacitance {
   /// group name
+  #[size = 8]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
   pub name: Option<ArcStr>,
   /// group comments
+  #[size = 48]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  #[size = 80]
   #[liberty(simple(type=Option))]
   pub when: Option<IdBooleanExpression>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment>,
+  #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance1_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance1_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance2_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance2_rise: Option<TableLookUp>,
 }

@@ -22,23 +22,28 @@ pub use items::*;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Cell {
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
+  #[size = 744]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type=Option))]
-  pub area: Option<f64>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub area: Option<NotNan<f64>>,
   /// The `dont_use`  attribute with a true value indicates
   /// that a cell should not be added to a design
   /// during optimization
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=107.3&end=107.4
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub dont_use: Option<bool>,
   /// The `dont_touch`  attribute with a true
   /// value indicates that all instances of the cell must
@@ -46,19 +51,24 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=106.21&end=106.22
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub dont_touch: Option<bool>,
   /// CellId
-  #[liberty(simple(type=Option))]
+  #[size = 8]
+  #[liberty(simple(type = Option))]
   pub single_bit_degenerate: Option<ArcStr>,
+  #[size = 8]
   #[liberty(simple(type = Option))]
   pub driver_waveform_rise: Option<ArcStr>,
+  #[size = 8]
   #[liberty(simple(type = Option))]
   pub driver_waveform_fall: Option<ArcStr>,
   /// The `always_on`  simple attribute models always-on cells or signal pins. Specify the attribute at the cell level to determine whether a cell is an always-on cell. Specify the attribute at the pin level to determine whether a pin is an always-on signal pin.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=100.73&end=100.75
   /// ">Reference-Instance</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub always_on: Option<bool>,
   /// <a name ="reference_link" href="
@@ -69,6 +79,7 @@ pub struct Cell {
   /// &end
   /// =228.4
   /// ">Reference-Instance</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub antenna_diode_type: Option<AntennaDiodeType>,
   /// You can use the `clock_gating_integrated_cell` attribute to enter specific
@@ -81,33 +92,39 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=103.19&end=103.24
   /// ">Reference</a>
+  #[size = 16]
   #[liberty(simple(type = Option))]
   pub clock_gating_integrated_cell: Option<ClockGatingIntegratedCell>,
+  #[size = 8]
   #[liberty(simple(type = Option))]
   pub cell_footprint: Option<ArcStr>,
-  #[liberty(simple(type=Option))]
-  pub cell_leakage_power: Option<f64>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub cell_leakage_power: Option<NotNan<f64>>,
   /// The `em_temp_degradation_factor` attribute specifies the electromigration
   /// exponential degradation factor
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=109.17&end=109.18
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
-  pub em_temp_degradation_factor: Option<f64>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub em_temp_degradation_factor: Option<NotNan<f64>>,
   /// interprets a combination timing arc between the clock pin and the output pin as a rising edge arc or as a falling edge arc
   ///
   /// Valid values are `rising_edge_clock_cell`  and `falling_edge_clock_cell`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=109.29+109.36&end=109.30+109.37
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub fpga_cell_type: Option<FpgaCellType>,
   /// Use the `fpga_isd`  attribute to reference the drive,
   /// `io_type`, and `slew`  information contained in a library-level `fpga_isd`  group.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=110.3&end=110.4
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 8]
+  #[liberty(simple(type = Option))]
   pub fpga_isd: Option<ArcStr>,
   /// Indicates that the `timing` arcs are interpreted according
   ///  to interface `timing` specifications semantics.
@@ -118,13 +135,15 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=110.14&end=110.17
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub interface_timing: Option<bool>,
   /// Use the io_type  attribute to define the I/O standard used by this I/O cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=110.25&end=110.26
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 8]
+  #[liberty(simple(type = Option))]
   pub io_type: Option<ArcStr>,
   /// The `is_pad`  attribute identifies a pad pin on
   /// any I/O cell. You can also specify the `is_pad` attribute
@@ -136,7 +155,8 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=111.5&end=111.8
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub is_pad: Option<bool>,
   /// The `is_pll_cell`  Boolean attribute identifies a phase-locked loop
   /// cell. A phase-locked loop (PLL) is a feedback control system
@@ -145,13 +165,15 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=111.5&end=111.8
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub is_pll_cell: Option<bool>,
   /// The cell-level `is_clock_gating_cell` attribute specifies that a cell is for clock gating.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=113.8&end=113.9
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub is_clock_gating_cell: Option<bool>,
   /// The `is_clock_isolation_cell`  attribute identifies a cell as a clock-isolation cell.
   /// The default is false, meaning that the cell is a standard cell.
@@ -159,6 +181,7 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=113.18&end=113.20
   /// ">Reference</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub is_clock_isolation_cell: Option<bool>,
   /// The cell-level `is_isolation_cell`  attribute specifies that a
@@ -168,7 +191,8 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=113.27&end=113.29
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub is_isolation_cell: Option<bool>,
   /// The cell-level `is_level_shifter`  attribute specifies
   /// that a cell is a level shifter cell.
@@ -178,7 +202,8 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=114.5&end=114.7
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub is_level_shifter: Option<bool>,
   /// The `is_macro_cell`  simple Boolean attribute identifies
   /// whether a cell is a macro cell.
@@ -187,7 +212,8 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=114.15&end=114.17
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub is_macro_cell: Option<bool>,
   /// The `is_soi`  attribute specifies that the cell is a
   /// silicon-on-insulator (SOI) cell.
@@ -200,6 +226,7 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=114.25&end=114.28
   /// ">Reference</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub is_soi: Option<bool>,
   /// The `level_shifter_type`  attribute specifies the
@@ -214,7 +241,8 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=115.9&end=115.17
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub level_shifter_type: Option<LevelShifterType>,
   /// The `retention_cell`  attribute identifies a retention cell. The `retention_cell_style` value is a random string
   ///
@@ -225,7 +253,8 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=118.21+118.24&end=118.22+118.25
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 8]
+  #[liberty(simple(type = Option))]
   pub retention_cell: Option<ArcStr>,
   /// The `switch_cell_type`  cell-level attribute specifies
   /// the type of the switch cell for direct inference.
@@ -237,7 +266,8 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=210.8&end=210.13
   /// ">Reference-Definition</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub switch_cell_type: Option<SwitchCellType>,
   /// Use the `dc_current`  group to specify the input and output voltage values
   /// of a two-dimensional current table for a channel-connecting block.
@@ -250,6 +280,7 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
   /// ">Reference-Definition</a>
+  #[size = 240]
   #[liberty(group(type = Option))]
   pub dc_current: Option<TableLookUp2D>,
   /// The `input_voltage_range`  attribute specifies the allowed
@@ -277,14 +308,16 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=122.7&end=122.23
   /// ">Reference</a>
-  #[liberty(complex(type=Option))]
+  #[size = 24]
+  #[liberty(complex(type = Option))]
   pub input_voltage_range: Option<(NotNan<f64>, NotNan<f64>)>,
   /// The `input_voltage_range`  and `output_voltage_range`  attributes
   /// should always be defined together.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=122.7&end=122.23
   /// ">Reference</a>
-  #[liberty(complex(type=Option))]
+  #[size = 24]
+  #[liberty(complex(type = Option))]
   pub output_voltage_range: Option<(NotNan<f64>, NotNan<f64>)>,
   /// Use the pin_opposite attribute to describe functionally opposite (logically inverse) groups
   /// of input or output pins.
@@ -312,25 +345,35 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=124.9&end=124.22
   /// ">Reference</a>
-  #[liberty(complex(type=Option))]
+  #[size = 96]
+  #[liberty(complex(type = Option))]
   pub pin_opposite: Option<PinOpposite>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub pg_pin: GroupSet<PgPin>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub ff: GroupSet<FF>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub ff_bank: GroupSet<FFBank>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub latch: GroupSet<Latch>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub latch_bank: GroupSet<LatchBank>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub leakage_power: GroupSet<LeakagePower>,
-  #[liberty(group(type=Option))]
+  #[size = 168]
+  #[liberty(group(type = Option))]
   pub statetable: Option<Statetable>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub pin: GroupSet<Pin>,
-  #[liberty(group(type=Vec))]
+  #[size = 24]
+  #[liberty(group(type = Vec))]
   /// The `test_cell`  group is in a `cell` group or `model` group.
   /// It models only the nontest behavior of a scan cell, which
   /// is described by an `ff`, `ff_bank`, `latch`, `latch_bank`  or `statetable`  statement
@@ -339,7 +382,8 @@ pub struct Cell {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
   /// ">Reference</a>
   pub test_cell: Vec<TestCell>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   // TODO:
   pub bundle: GroupSet<Bundle>,
 }
@@ -355,25 +399,34 @@ impl GroupFn for Cell {}
 /// ">Reference</a>
 #[derive(Debug, Default, Clone)]
 #[derive(liberty_macros::Group)]
+#[derive(mut_set::derive::Dummy)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TestCell {
   /// group comments
+  #[size = 24]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub ff: GroupSet<FF>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub ff_bank: GroupSet<FFBank>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub latch: GroupSet<Latch>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub latch_bank: GroupSet<LatchBank>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub pin: GroupSet<Pin>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub statetable: GroupSet<Statetable>,
 }
 

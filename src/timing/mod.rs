@@ -5,7 +5,6 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use std::collections::HashMap;
 mod timing_type;
 pub use timing_type::*;
 pub mod builder;
@@ -21,8 +20,7 @@ use crate::{
     },
   },
   expression::{BooleanExpression, IdBooleanExpression, SdfExpression},
-  library::Sensitization,
-  units, ArcStr, GroupSet,
+  ArcStr, GroupSet, NotNan,
 };
 
 use items::TimingSenseType;
@@ -57,12 +55,15 @@ use items::TimingSenseType;
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Timing {
+  #[size = 24]
   #[liberty(name)]
   pub name: Vec<ArcStr>,
   /// group comments
+  #[size = 864]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
 
@@ -99,6 +100,7 @@ pub struct Timing {
   /// &end
   /// =320.6
   /// ">Reference-Instance</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clock_gating_flag: Option<bool>,
   /// The `default_timing` attribute allows you to specify one timing arc as the default
@@ -127,42 +129,45 @@ pub struct Timing {
   /// &end
   /// =320.7
   /// ">Reference-Instance</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub default_timing: Option<bool>,
-  // /// The `fall_resistance` attribute represents the load-dependent output resistance,
-  // /// or drive capability, for a logic 1-to-0 transition.
-  // ///
-  // /// #### Note
-  // /// You cannot specify a resistance unit in the library.
-  // /// Instead, the resistance unit is derived from the ratio of the time_unit
-  // /// value to the capacitive_load_unit value.
-  // ///
-  // /// #### Syntax
-  // /// `fall_resistance : valuefloat ; `
-  // ///
-  // /// `value` is a positive floating-point number in terms of delay time per load unit.
-  // ///
-  // /// #### Example
-  // /// ``` liberty
-  // /// fall_resistance : 0.18 ;
-  // /// ```
-  // /// <a name ="reference_link" href="
-  // /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  // /// ?field=test
-  // /// &bgn
-  // /// =205.7
-  // /// &end
-  // /// =205.20
-  // /// ">Reference-Definition</a>
-  // /// <a name ="reference_link" href="
-  // /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  // /// ?field=test
-  // /// &bgn
-  // /// =203.33
-  // /// &end
-  // /// =203.33
-  // /// ">Reference-Instance</a>
-  // pub fall_resistance: Option<units::ElectricalResistance>,
+  /// The `fall_resistance` attribute represents the load-dependent output resistance,
+  /// or drive capability, for a logic 1-to-0 transition.
+  ///
+  /// #### Note
+  /// You cannot specify a resistance unit in the library.
+  /// Instead, the resistance unit is derived from the ratio of the time_unit
+  /// value to the capacitive_load_unit value.
+  ///
+  /// #### Syntax
+  /// `fall_resistance : valuefloat ; `
+  ///
+  /// `value` is a positive floating-point number in terms of delay time per load unit.
+  ///
+  /// #### Example
+  /// ``` liberty
+  /// fall_resistance : 0.18 ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+  /// ?field=test
+  /// &bgn
+  /// =205.7
+  /// &end
+  /// =205.20
+  /// ">Reference-Definition</a>
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+  /// ?field=test
+  /// &bgn
+  /// =203.33
+  /// &end
+  /// =203.33
+  /// ">Reference-Instance</a>
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub fall_resistance: Option<NotNan<f64>>,
   /// The `fpga_arc_condition` attribute specifies a Boolean condition that enables
   /// a timing arc.
   ///
@@ -191,6 +196,8 @@ pub struct Timing {
   /// &end
   /// =203.34
   /// ">Reference-Instance</a>
+  #[size = 24]
+  #[liberty(simple(type = Option))]
   pub fpga_arc_condition: Option<BooleanExpression>,
   /// Use this attribute to reference a `calc_mode` value in a
   /// [domain](crate::common::items::Domain) group in a polynomial table.
@@ -221,6 +228,8 @@ pub struct Timing {
   /// &end
   /// =203.35
   /// ">Reference-Instance</a>
+  #[size = 8]
+  #[liberty(simple(type = Option))]
   pub fpga_domain_style: Option<ArcStr>,
   /// Use pairs of `interdependence_id` attributes to identify interdependent pairs
   /// of `setup` and `hold` constraint tables. Interdependence data is supported
@@ -301,6 +310,8 @@ pub struct Timing {
   /// &end
   /// =203.36
   /// ">Reference-Instance</a>
+  #[size = 16]
+  #[liberty(simple(type = Option))]
   pub interdependence_id: Option<usize>,
   /// On an output pin, `intrinsic_fall` defines the 1-to-Z propagation time
   /// for a three-state-disable timing type and the Z-to-0 propagation time
@@ -335,7 +346,9 @@ pub struct Timing {
   /// &end
   /// =203.37
   /// ">Reference-Instance</a>
-  pub intrinsic_fall: Option<units::Time>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub intrinsic_fall: Option<NotNan<f64>>,
   /// On an output pin, `intrinsic_rise` defines the 0-to-Z propagation time
   /// for a three-state-disable timing type and a Z-to-1 propagation time
   /// for a three-state-enable timing type.
@@ -369,7 +382,9 @@ pub struct Timing {
   /// &end
   /// =203.38
   /// ">Reference-Instance</a>
-  pub intrinsic_rise: Option<units::Time>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub intrinsic_rise: Option<NotNan<f64>>,
   /// The `related_bus_equivalent` attribute generates a single timing arc
   /// for all paths from points in a group through an internal pin (I) to given endpoints.
   ///
@@ -415,6 +430,7 @@ pub struct Timing {
   /// &end
   /// =203.39
   /// ">Reference-Instance</a>
+  #[size = 48]
   #[liberty(simple)]
   pub related_bus_equivalent: WordSet,
   /// The `related_bus_pins` attribute defines the pin or pins that
@@ -451,6 +467,7 @@ pub struct Timing {
   /// &end
   /// =203.40
   /// ">Reference-Instance</a>
+  #[size = 48]
   #[liberty(simple)]
   pub related_bus_pins: WordSet,
   /// The `related_output_pin` attribute specifies the output or inout pin used
@@ -483,6 +500,7 @@ pub struct Timing {
   /// &end
   /// =203.41
   /// ">Reference-Instance</a>
+  #[size = 48]
   #[liberty(simple)]
   pub related_output_pin: WordSet,
   /// The `related_pin` attribute defines the pin or pins representing
@@ -552,6 +570,7 @@ pub struct Timing {
   /// =203.42
   /// ">Reference-Instance</a>
   #[id]
+  #[size = 48]
   #[liberty(simple)]
   pub related_pin: WordSet,
   /// The `rise_resistance` attribute represents the load-dependent output resistance,
@@ -587,7 +606,9 @@ pub struct Timing {
   /// &end
   /// =203.43
   /// ">Reference-Instance</a>
-  pub rise_resistance: Option<units::ElectricalResistance>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub rise_resistance: Option<NotNan<f64>>,
   /// The `sdf_cond` attribute is defined in the state-dependent timing group
   /// to support SDF file generation and condition matching during back-annotation.
   /// #### Syntax
@@ -620,6 +641,7 @@ pub struct Timing {
   /// &end
   /// =203.44
   /// ">Reference-Instance</a>
+  #[size = 8]
   #[liberty(simple(type = Option))]
   pub sdf_cond: Option<SdfExpression>,
   /// The `sdf_cond_end` attribute defines a timing-check condition specific
@@ -651,6 +673,7 @@ pub struct Timing {
   /// &end
   /// =203.45
   /// ">Reference-Instance</a>
+  #[size = 8]
   #[liberty(simple(type = Option))]
   pub sdf_cond_end: Option<SdfExpression>,
   /// The `sdf_cond_start` attribute defines a timing-check condition specific
@@ -683,6 +706,7 @@ pub struct Timing {
   /// &end
   /// =203.46
   /// ">Reference-Instance</a>
+  #[size = 8]
   #[liberty(simple(type = Option))]
   pub sdf_cond_start: Option<SdfExpression>,
   /// The `sdf_edges` attribute defines the edge specification on both
@@ -716,35 +740,39 @@ pub struct Timing {
   /// &end
   /// =203.47
   /// ">Reference-Instance</a>
-  pub sdf_edges: SdfEdgeType,
-  /// FIXME: Can Not find instance in `timing`, only find definition
-  ///
-  /// The `sensitization_master` attribute defines the `sensitization` group
-  /// specific to the current timing group to generate stimulus for characterization.
-  /// The attribute is optional when the sensitization master used for
-  /// the timing arc is the same as that defined in the current cell.
-  /// It is required when they are different. Any sensitization group name
-  /// predefined in the current library is a valid attribute value.
-  ///
-  /// #### Syntax
-  /// `sensitization_master : sensitization_group_name;`
-  ///
-  /// `sensitization_group_name`: A string identifying the sensitization
-  /// group name predefined in the current library.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// sensitization_master : sensi_2in_1out;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =211.3
-  /// &end
-  /// =211.15
-  /// ">Reference-Definition</a>
-  pub sensitization_master: Option<Sensitization>,
+  #[size = 1]
+  #[liberty(simple(type = Option))]
+  pub sdf_edges: Option<SdfEdgeType>,
+  // /// FIXME: Can Not find instance in `timing`, only find definition
+  // ///
+  // /// The `sensitization_master` attribute defines the `sensitization` group
+  // /// specific to the current timing group to generate stimulus for characterization.
+  // /// The attribute is optional when the sensitization master used for
+  // /// the timing arc is the same as that defined in the current cell.
+  // /// It is required when they are different. Any sensitization group name
+  // /// predefined in the current library is a valid attribute value.
+  // ///
+  // /// #### Syntax
+  // /// `sensitization_master : sensitization_group_name;`
+  // ///
+  // /// `sensitization_group_name`: A string identifying the sensitization
+  // /// group name predefined in the current library.
+  // ///
+  // /// #### Example
+  // /// ``` liberty
+  // /// sensitization_master : sensi_2in_1out;
+  // /// ```
+  // /// <a name ="reference_link" href="
+  // /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+  // /// ?field=test
+  // /// &bgn
+  // /// =211.3
+  // /// &end
+  // /// =211.15
+  // /// ">Reference-Definition</a>
+  // #[size = 1]
+  // #[liberty(simple(type = Option))]
+  // pub sensitization_master: Option<Sensitization>,
   /// The `slope_fall` attribute represents the incremental delay
   /// to add to the slope of the input waveform for a logic 1-to-0 transition.
   ///
@@ -774,7 +802,9 @@ pub struct Timing {
   /// &end
   /// =203.48
   /// ">Reference-Instance</a>
-  pub slope_fall: Option<units::Time>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub slope_fall: Option<NotNan<f64>>,
   /// The `slope_rise` attribute represents the incremental delay
   /// to add to the slope of the input waveform for a logic 0-to-1 transition.
   ///
@@ -804,7 +834,9 @@ pub struct Timing {
   /// &end
   /// =203.49
   /// ">Reference-Instance</a>
-  pub slope_rise: Option<units::Time>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub slope_rise: Option<NotNan<f64>>,
   /// The `steady_state_resistance_above_high` attribute specifies a
   /// steady-state resistance value for a region of a current-voltage (I-V) curve
   /// when the output is high and the noise is over the high voltage rail.
@@ -836,7 +868,9 @@ pub struct Timing {
   /// &end
   /// =203.50
   /// ">Reference-Instance</a>
-  pub steady_state_resistance_above_high: Option<units::ElectricalResistance>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub steady_state_resistance_above_high: Option<NotNan<f64>>,
   /// The `steady_state_resistance_below_low` attribute specifies a steady-state
   /// resistance value for a region of a current-voltage (I-V) curve
   /// when the output is low and the noise is below the low voltage rail.
@@ -868,7 +902,9 @@ pub struct Timing {
   /// &end
   /// =203.51
   /// ">Reference-Instance</a>
-  pub steady_state_resistance_below_low: Option<units::ElectricalResistance>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub steady_state_resistance_below_low: Option<NotNan<f64>>,
   /// The `steady_state_resistance_high` attribute specifies a steady-state
   /// resistance value for a region of a current-voltage (I-V) curve when
   /// the output is high and the noise is below the high voltage rail.
@@ -900,7 +936,9 @@ pub struct Timing {
   /// &end
   /// =203.52
   /// ">Reference-Instance</a>
-  pub steady_state_resistance_high: Option<units::ElectricalResistance>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub steady_state_resistance_high: Option<NotNan<f64>>,
   /// The `steady_state_resistance_low` attribute specifies a steady-state
   /// resistance value for a region of a current-voltage (I-V) curve
   /// when the output is low and the noise is over the low voltage rail.
@@ -933,7 +971,9 @@ pub struct Timing {
   /// &end
   /// =203.53
   /// ">Reference-Instance</a>
-  pub steady_state_resistance_low: Option<units::ElectricalResistance>,
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub steady_state_resistance_low: Option<NotNan<f64>>,
   /// Used for noise modeling, the `tied_off` attribute allows you
   /// to specify the I-V characteristics and steady-state resistance values
   /// on tied-off cells.
@@ -964,6 +1004,8 @@ pub struct Timing {
   /// &end
   /// =203.54
   /// ">Reference-Instance</a>
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub tied_off: Option<bool>,
   /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
   /// <a name ="reference_link" href="
@@ -1027,8 +1069,9 @@ pub struct Timing {
   ///
   /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
   /// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
-  #[id(borrow = "Option<&TimingSenseType>", check_fn = "mut_set::borrow_option!")]
+  #[size = 11]
   #[liberty(simple(type = Option))]
+  #[id(borrow = "Option<&TimingSenseType>", check_fn = "mut_set::borrow_option!")]
   pub timing_sense: Option<TimingSenseType>,
   /// The `timing_type` attribute distinguishes between combinational
   /// and sequential cells by defining the type of timing arc.
@@ -1260,8 +1303,9 @@ pub struct Timing {
   /// the constrained pin and a positive pulse on the related pin.
   /// + `nochange_low_low` (negative/negative): Indicates a negative pulse on
   /// the constrained pin and a negative pulse on the related pin.
-  #[id(borrow = "Option<&TimingType>", check_fn = "mut_set::borrow_option!")]
+  #[size = 3]
   #[liberty(simple(type = Option))]
+  #[id(borrow = "Option<&TimingType>", check_fn = "mut_set::borrow_option!")]
   pub timing_type: Option<TimingType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -1279,8 +1323,9 @@ pub struct Timing {
   /// &end
   /// =203.71
   /// ">Reference-Instance</a>
-  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  #[size = 80]
   #[liberty(simple(type = Option))]
+  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   pub when: Option<IdBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -1298,6 +1343,8 @@ pub struct Timing {
   /// &end
   /// =204.0
   /// ">Reference-Instance</a>
+  #[size = 32]
+  #[liberty(simple(type = Option))]
   pub when_end: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -1315,16 +1362,10 @@ pub struct Timing {
   /// &end
   /// =204.1
   /// ">Reference-Instance</a>
+  #[size = 32]
+  #[liberty(simple(type = Option))]
   pub when_start: Option<BooleanExpression>,
   // piecewise model only
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =
-  /// &end
-  /// =
-  /// ">Reference-Definition</a>
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
   /// ?field=test
@@ -1333,7 +1374,10 @@ pub struct Timing {
   /// &end
   /// =204.3
   /// ">Reference-Instance</a>
-  pub fall_delay_intercept: Option<(i64, f64)>,
+  #[size = 24]
+  #[liberty(complex(type = Option))]
+  pub fall_delay_intercept: Option<(i64, NotNan<f64>)>,
+  #[size = 16]
   #[liberty(complex(type=Option))]
   pub propagating_ccb: Option<PropagatingCcb>,
   // piecewise model only
@@ -1353,7 +1397,9 @@ pub struct Timing {
   /// &end
   /// =204.4
   /// ">Reference-Instance</a>
-  pub fall_pin_resistance: Option<(i64, f64)>,
+  #[size = 24]
+  #[liberty(complex(type = Option))]
+  pub fall_pin_resistance: Option<(i64, NotNan<f64>)>,
   /// You define the mode attribute within a timing group.
   /// A mode attribute pertains to an individual timing arc.
   /// The timing arc is active when mode is instantiated with a name and a value.
@@ -1377,6 +1423,7 @@ pub struct Timing {
   /// &end
   /// =204.5
   /// ">Reference-Instance</a>
+  #[size = 16]
   #[liberty(complex(type = Option))]
   pub mode: Option<items::Mode>,
   // piecewise model only
@@ -1396,7 +1443,9 @@ pub struct Timing {
   /// &end
   /// =204.6
   /// ">Reference-Instance</a>
-  pub rise_delay_intercept: Option<(i64, f64)>,
+  #[size = 24]
+  #[liberty(complex(type = Option))]
+  pub rise_delay_intercept: Option<(i64, NotNan<f64>)>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1414,7 +1463,9 @@ pub struct Timing {
   /// &end
   /// =204.7
   /// ">Reference-Instance</a>
-  pub rise_pin_resistance: Option<(i64, f64)>,
+  #[size = 24]
+  #[liberty(complex(type = Option))]
+  pub rise_pin_resistance: Option<(i64, NotNan<f64>)>,
   /// The `cell_degradation` group describes a cell performance degradation
   /// design rule for compiling a design. A cell degradation design rule
   /// specifies the maximum capacitive load a cell can drive without causing
@@ -1437,8 +1488,9 @@ pub struct Timing {
   /// &end
   /// =204.9
   /// ">Reference-Instance</a>
-  // TODO:
-  pub cell_degradation: HashMap<ArcStr, items::CellDegradation>,
+  #[size = 48]
+  #[liberty(group(type = Set))]
+  pub cell_degradation: GroupSet<items::CellDegradation>,
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
   ///
   /// **Note:**
@@ -1463,154 +1515,225 @@ pub struct Timing {
   /// &end
   /// =204.10
   /// ">Reference-Instance</a>
+  #[size = 336]
   #[liberty(group)]
   pub cell_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub cell_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub fall_constraint: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub fall_propagation: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub fall_transition: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub noise_immunity_above_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub noise_immunity_below_low: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub noise_immunity_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub noise_immunity_low: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub output_current_fall: Option<ReferenceTimeVector3DGrpup>,
+  #[size = 336]
   #[liberty(group)]
   pub output_current_rise: Option<ReferenceTimeVector3DGrpup>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_height_above_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_height_below_low: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_height_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_height_low: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_peak_time_ratio_above_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_peak_time_ratio_below_low: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_peak_time_ratio_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_peak_time_ratio_low: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_width_above_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_width_below_low: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_width_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub propogated_noise_width_low: Option<TableLookUp>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
-  #[liberty(group(type=Set))]
+  #[size = 48]
+  #[liberty(group(type = Set))]
   pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment>,
+  #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance1_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance1_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance2_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance2_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub retaining_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub retaining_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub retain_fall_slew: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub retain_rise_slew: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub rise_constraint: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub rise_propagation: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub rise_transition: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub steady_state_current_high: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub steady_state_current_low: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub steady_state_current_tristate: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_cell_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_cell_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_rise_transition: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_fall_transition: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_retaining_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_retaining_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_rise_slew: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_fall_slew: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_rise_constraint: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_mean_shift_fall_constraint: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_cell_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_cell_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_rise_transition: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_fall_transition: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_retaining_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_retaining_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_rise_slew: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_fall_slew: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_rise_constraint: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_std_dev_fall_constraint: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_cell_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_cell_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_rise_transition: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_fall_transition: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_retaining_rise: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_retaining_fall: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_rise_slew: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_fall_slew: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_rise_constraint: Option<TableLookUp>,
+  #[size = 336]
   #[liberty(group)]
   pub ocv_skewness_fall_constraint: Option<TableLookUp>,
   /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
   /// ">Reference-Definition</a>
+  #[size = 176]
   #[liberty(group)]
   pub compact_ccs_rise: Option<CompactCcsTable>,
   /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
   /// ">Reference-Definition</a>
+  #[size = 176]
   #[liberty(group)]
   pub compact_ccs_fall: Option<CompactCcsTable>,
 }

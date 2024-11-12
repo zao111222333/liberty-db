@@ -35,16 +35,20 @@ impl GroupFn for Timing {}
 #[derive(Default, Debug, Clone)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct Pin {
-  #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "&str")]
   name: ArcStr,
   /// group comments
+  #[size = 24]
   #[liberty(comments)]
   comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   attributes: Attributes,
-  #[liberty(group(type=Vec))]
+  #[size = 24]
+  #[liberty(group(type = Vec))]
   timing: Vec<Timing>,
 }
 impl GroupFn for Pin {}
@@ -56,15 +60,19 @@ impl GroupFn for Pin {}
 #[derive(liberty_macros::Group)]
 pub(crate) struct FF {
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   variable1: ArcStr,
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   variable2: ArcStr,
   /// group comments
+  #[size = 48]
   #[liberty(comments)]
   comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   attributes: Attributes,
   #[liberty(simple(type = Option))]
@@ -113,10 +121,10 @@ pub(crate) struct Cell {
   #[liberty(attributes)]
   attributes: Attributes,
   #[liberty(simple(type = Option))]
-  area: Option<f64>,
-  #[liberty(group(type=Set))]
+  area: Option<NotNan<f64>>,
+  #[liberty(group(type = Set))]
   ff: GroupSet<FF>,
-  #[liberty(group(type=Set))]
+  #[liberty(group(type = Set))]
   pin: GroupSet<Pin>,
   #[liberty(group(type = Option))]
   statetable: Option<Statetable>,

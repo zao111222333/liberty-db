@@ -18,25 +18,34 @@ use super::parse_f64;
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUpMultiSegment {
   #[liberty(name)]
+  #[size = 8]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 168]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple)]
   #[id]
+  #[size = 8]
+  #[liberty(simple)]
   segment: usize,
+  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<NotNan<f64>>,
+  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
@@ -49,8 +58,9 @@ pub struct TableLookUpMultiSegment {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DriverWaveform {
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   pub name: Option<ArcStr>,
   /// The `driver_waveform_name`  string attribute differentiates the driver waveform table
   /// from other driver waveform tables when multiple tables are defined.
@@ -65,23 +75,31 @@ pub struct DriverWaveform {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=71.24&end=71.31
   /// ">Reference</a>
+  #[size = 8]
+  #[liberty(simple(type = Option))]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
-  #[liberty(simple(type=Option))]
   pub driver_waveform_name: Option<ArcStr>,
   /// group comments
+  #[size = 168]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<NotNan<f64>>,
+  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
@@ -95,19 +113,25 @@ pub struct DriverWaveform {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp2D {
   // TODO: unit
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 96]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<NotNan<f64>>,
+  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
@@ -125,21 +149,26 @@ pub struct TableLookUp2D {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CompactLutTemplate {
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 192]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type=Option))]
+  #[size = 8]
+  #[liberty(simple(type = Option))]
   pub base_curves_group: Option<ArcStr>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
   /// ">Reference</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub variable_1: Option<VariableTypeCompactLutTemplateIndex12>,
   /// The `index_1`  and `index_2`  attributes are required.
@@ -150,12 +179,14 @@ pub struct CompactLutTemplate {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.7&end=43.10
   /// ">Reference</a>
+  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
   /// ">Reference</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub variable_2: Option<VariableTypeCompactLutTemplateIndex12>,
   /// The `index_1`  and `index_2`  attributes are required.
@@ -166,6 +197,7 @@ pub struct CompactLutTemplate {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.7&end=43.10
   /// ">Reference</a>
+  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<NotNan<f64>>,
   /// The string values in `index_3`  are determined by the `base_curve_type` value
@@ -173,6 +205,7 @@ pub struct CompactLutTemplate {
   /// `base_curve_type`  value, the following six string values (parameters)
   /// should be defined: `init_current`, `peak_current`, `peak_voltage`, `peak_time`, `left_id`, `right_id`;
   /// their order is not fixed.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub variable_3: Option<VariableTypeCompactLutTemplateIndex3>,
   /// The string values in `index_3`  are determined by the `base_curve_type` value
@@ -186,6 +219,7 @@ pub struct CompactLutTemplate {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.18+43.22&end=43.21+43.23
   /// ">Reference</a>
+  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<ArcStr>,
 }
@@ -249,23 +283,30 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector3D {
   // TODO: unit
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 120]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id]
+  #[size = 8]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
   #[id]
+  #[size = 8]
   #[liberty(complex)]
   pub index_2: NotNan<f64>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<NotNan<f64>>,
 }
@@ -279,26 +320,34 @@ pub struct Vector3D {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReferenceTimeVector3D {
   // TODO: unit
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 144]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id]
+  #[size = 8]
   #[liberty(simple)]
   pub reference_time: NotNan<f64>,
   #[id]
+  #[size = 8]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
   #[id]
+  #[size = 8]
   #[liberty(complex)]
   pub index_2: NotNan<f64>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<NotNan<f64>>,
 }
@@ -312,26 +361,34 @@ pub struct ReferenceTimeVector3D {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector4D {
   // TODO: unit
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 144]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id]
+  #[size = 8]
   #[liberty(complex)]
   pub index_1: NotNan<f64>,
   #[id]
+  #[size = 8]
   #[liberty(complex)]
   pub index_2: NotNan<f64>,
   #[id]
+  #[size = 8]
   #[liberty(complex)]
   pub index_3: NotNan<f64>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<NotNan<f64>>,
 }
@@ -344,15 +401,19 @@ pub struct Vector4D {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector3DGrpup {
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 24]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 48]
   #[liberty(group(type = Set))]
   pub vector: GroupSet<Vector3D>,
 }
@@ -365,15 +426,19 @@ pub struct Vector3DGrpup {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReferenceTimeVector3DGrpup {
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 24]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 48]
   #[liberty(group(type = Set))]
   pub vector: GroupSet<ReferenceTimeVector3D>,
 }
@@ -386,15 +451,19 @@ pub struct ReferenceTimeVector3DGrpup {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector4DGrpup {
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 24]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 48]
   #[liberty(group(type = Set))]
   pub vector: GroupSet<Vector4D>,
 }
@@ -412,21 +481,28 @@ impl GroupFn for ReferenceTimeVector3DGrpup {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp3D {
   // TODO: unit
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 120]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<NotNan<f64>>,
+  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
@@ -441,17 +517,22 @@ pub struct TableLookUp3D {
 pub struct TableLookUp1D {
   // TODO: unit
   unit: (),
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 72]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<NotNan<f64>>,
 }
@@ -472,17 +553,22 @@ impl GroupFn for TableLookUp1D {}
 pub struct CompactCcsTable {
   // TODO: unit
   unit: (),
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 72]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 8]
   #[liberty(simple)]
   pub base_curves_group: ArcStr,
+  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
@@ -498,23 +584,31 @@ impl GroupFn for CompactCcsTable {}
 pub struct TableLookUp {
   // TODO: unit
   unit: (),
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 144]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<NotNan<f64>>,
+  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<NotNan<f64>>,
+  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
@@ -608,30 +702,41 @@ impl ComplexAttri for Values {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableTemple {
-  #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
+  #[size = 216]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type=Option))]
+  #[size = 2]
+  #[liberty(simple(type = Option))]
   pub variable_1: Option<Variable>,
-  #[liberty(simple(type=Option))]
+  #[size = 2]
+  #[liberty(simple(type = Option))]
   pub variable_2: Option<Variable>,
-  #[liberty(simple(type=Option))]
+  #[size = 2]
+  #[liberty(simple(type = Option))]
   pub variable_3: Option<Variable>,
-  #[liberty(simple(type=Option))]
+  #[size = 2]
+  #[liberty(simple(type = Option))]
   pub variable_4: Option<Variable>,
-  #[liberty(complex(type=Option))]
+  #[size = 24]
+  #[liberty(complex(type = Option))]
   pub index_1: Option<Vec<NotNan<f64>>>,
-  #[liberty(complex(type=Option))]
+  #[size = 24]
+  #[liberty(complex(type = Option))]
   pub index_2: Option<Vec<NotNan<f64>>>,
-  #[liberty(complex(type=Option))]
+  #[size = 24]
+  #[liberty(complex(type = Option))]
   pub index_3: Option<Vec<NotNan<f64>>>,
-  #[liberty(complex(type=Option))]
+  #[size = 24]
+  #[liberty(complex(type = Option))]
   pub index_4: Option<Vec<NotNan<f64>>>,
 }
 impl GroupFn for TableTemple {}

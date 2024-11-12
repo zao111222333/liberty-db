@@ -15,23 +15,6 @@ use super::{
   items::{Formula, NameList, WordSet},
   parse_f64,
 };
-impl SimpleAttri for f64 {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    simple_custom(i, &mut scope.line_num, nom::number::complete::double)
-  }
-  #[inline]
-  fn fmt_self<T: Write, I: Indentation>(
-    &self,
-    f: &mut CodeFormatter<'_, T, I>,
-  ) -> fmt::Result {
-    let mut buffer = ryu::Buffer::new();
-    f.write_str(buffer.format(*self))
-  }
-}
 
 impl SimpleAttri for NotNan<f64> {
   #[inline]
@@ -536,6 +519,38 @@ impl ComplexAttri for (NotNan<f64>, NotNan<f64>, ArcStr) {
     write!(f, "{}, {}", buffer.format(self.1.into_inner()), self.2)
   }
 }
+impl ComplexAttri for (i64, NotNan<f64>) {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+    iter: I,
+    _scope: &mut ParseScope,
+  ) -> Result<Self, ComplexParseError> {
+    let mut i = iter.flat_map(IntoIterator::into_iter);
+    let v1 = match i.next() {
+      Some(s) => s.parse::<i64>()?,
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let v2 = match i.next() {
+      Some(s) => parse_f64(s)?,
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if i.next().is_some() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok((v1, v2))
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let mut buffer_i = itoa::Buffer::new();
+    let mut buffer = ryu::Buffer::new();
+    write!(f, "{}, ", buffer_i.format(self.0))?;
+    write!(f, "{}", buffer.format(self.1.into_inner()))
+  }
+}
+
 impl ComplexAttri for (NotNan<f64>, NotNan<f64>) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(

@@ -39,12 +39,15 @@ use std::collections::HashMap;
 pub struct Sensitization {
   /// name
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
+  #[size = 48]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `pin_names` attribute specified at the library level defines
@@ -57,6 +60,7 @@ pub struct Sensitization {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.28&end=88.32
   /// ">Reference</a>
+  #[size = 24]
   #[liberty(complex)]
   pub pin_names: Vec<ArcStr>,
   /// # vector Complex Attribute
@@ -102,6 +106,7 @@ pub struct Sensitization {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=89.5&end=89.29
   /// ">Reference</a>
+  #[size = 24]
   #[liberty(complex(type = Vec))]
   pub vector: Vec<SensitizationVector>,
 }
@@ -308,6 +313,7 @@ impl GroupFn for Sensitization {}
 pub struct VoltageMap {
   /// name
   #[id(borrow = "&str")]
+  #[size = 8]
   pub name: ArcStr,
   /// voltage
   pub voltage: NotNan<f64>,
@@ -358,36 +364,43 @@ impl ComplexAttri for VoltageMap {
 pub struct InputVoltage {
   /// name
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
+  #[size = 120]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The maximum input voltage for which the input to the core is guaranteed to be a logic 0
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.7&end=62.8
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub vil: Formula,
   /// The minimum input voltage for which the input to the core is guaranteed to be a logic 1
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.10&end=62.11
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub vih: Formula,
   /// The minimum acceptable input voltage.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.13&end=62.13
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub vimin: Formula,
   /// The maximum acceptable input voltage.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.15&end=62.16
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub vimax: Formula,
 }
@@ -409,36 +422,43 @@ impl GroupFn for InputVoltage {}
 pub struct OutputVoltage {
   /// name
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
+  #[size = 120]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The maximum output voltage generated to represent a logic 0.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.45&end=75.46
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub vol: Formula,
   /// The minimum output voltage generated to represent a logic 1.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.3&end=76.4
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub voh: Formula,
   /// The minimum output voltage the pad can generate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.5&end=76.6
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub vomin: Formula,
   /// The maximum output voltage the pad can generate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.7&end=76.8
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub vomax: Formula,
 }
@@ -495,52 +515,61 @@ impl SimpleAttri for DelayModel {
 pub struct OperatingConditions {
   /// name
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
+  #[size = 192]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// An optional attribute, you can use calc_mode  to specify an associated process mode.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.28&end=72.28
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple(type = Option))]
   pub calc_mode: Option<ArcStr>,
   /// Use this optional attribute to specify values for up to five user-defined variables.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.36&end=72.37
   /// ">Reference</a>
+  #[size = 16]
   #[liberty(simple(type = Option))]
-  pub parameteri: Option<f64>,
+  pub parameteri: Option<NotNan<f64>>,
   /// Use the `process`  attribute to specify a scaling factor to account for variations in the outcome of the actual semiconductor manufacturing steps.
   ///
   /// A floating-point number from 0 through 100.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.44+73.7&end=72.45+73.8
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
-  pub process: f64,
+  pub process: NotNan<f64>,
   /// Use the process_label  attribute to specify the name of the current process.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.9&end=73.10
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple(type = Option))]
   pub process_label: Option<ArcStr>,
   /// Use the `temperature`  attribute to specify the ambient temperature in which the design is to operate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.15&end=73.16
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
-  pub temperature: f64,
+  pub temperature: NotNan<f64>,
   /// Use the `tree_type`  attribute to specify the environment interconnect model.
   ///
   /// Valid values are `best_case_tree`, `balanced_tree`, and `worst_case_tree`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.24+73.30&end=73.25+73.31
   /// ">Reference</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub tree_type: Option<TreeType>,
   /// Use the `voltage`  attribute to specify the operating voltage of the design; typically 5 volts for a CMOS library.
@@ -549,9 +578,10 @@ pub struct OperatingConditions {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.32+74.3&end=73.33+74.4
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "5.0"))]
-  pub voltage: f64,
+  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(5.0) }"))]
+  pub voltage: NotNan<f64>,
 }
 impl GroupFn for OperatingConditions {}
 
@@ -577,32 +607,38 @@ impl GroupFn for OperatingConditions {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FpgaIsd {
   /// name
-  #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
+  #[size = 96]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `drive`  attribute is optional and specifies the output current of the FPGA part or the FPGA cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.7&end=64.8
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub drive: ArcStr,
   /// The `io_type`  attribute is required and specifies the input or output voltage of the FPGA part or the FPGA cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.17&end=64.18
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
   pub io_type: ArcStr,
   /// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.27&end=64.28
   /// ">Reference</a>
-  #[liberty(simple(type=Option))]
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub slew: Option<FPGASlew>,
 }
 impl GroupFn for FpgaIsd {}
@@ -697,17 +733,20 @@ pub struct Define {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.10&end=36.11
   /// ">Reference</a>
   #[id(borrow = "&str")]
+  #[size = 8]
   pub attribute_name: ArcStr,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.12&end=36.13
   /// ">Reference</a>
   #[id(borrow = "&str")]
+  #[size = 8]
   pub group_name: ArcStr,
   /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.14&end=36.15
   /// ">Reference</a>
+  #[size = 1]
   pub attribute_type: AttributeType,
 }
 /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
@@ -800,12 +839,14 @@ pub struct DefineGroup {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.33&end=37.34
   /// ">Reference</a>
   #[id(borrow = "&str")]
+  #[size = 8]
   pub group: ArcStr,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.35&end=37.36
   /// ">Reference</a>
   #[id(borrow = "&str")]
+  #[size = 8]
   pub parent_name: ArcStr,
 }
 impl ComplexAttri for DefineGroup {
@@ -868,6 +909,7 @@ pub struct DefineCellArea {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.28&end=36.29
   /// ">Reference</a>
   #[id(borrow = "&str")]
+  #[size = 8]
   pub area_name: ArcStr,
   /// The resource type can be
   /// + `pad_slots`
@@ -959,40 +1001,47 @@ impl ComplexAttri for DefineCellArea {
 pub struct WireLoad {
   /// name
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
+  #[size = 120]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
-  pub area: f64,
+  pub area: NotNan<f64>,
   /// Use this attribute to specify capacitance per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=95.5&end=95.6
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
-  pub capacitance: f64,
+  pub capacitance: NotNan<f64>,
   /// Use this attribute to specify wire resistance per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=95.15&end=95.16
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
-  pub resistance: f64,
+  pub resistance: NotNan<f64>,
   /// Use this attribute to characterize linear fanout length behavior
   /// beyond the scope of the longest length specified
   /// in the `fanout_length`  attribute.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=95.25&end=95.26
   /// ">Reference</a>
+  #[size = 8]
   #[liberty(simple)]
-  pub slope: f64,
+  pub slope: NotNan<f64>,
   /// Use this attribute to define values for fanout and length
   /// when you create the wire load manually.
   /// fanoutAn integer representing the total number of pins, minus one, on the net driven by the given output.lengthA floating-point number representing the estimated amount of metal that is statistically found on a network with the given number of pins.
@@ -1013,6 +1062,7 @@ pub struct WireLoad {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
   /// ">Reference</a>
+  #[size = 48]
   #[liberty(complex(type = Set))]
   pub fanout_length: GroupSet<FanoutLength>,
 }
@@ -1148,18 +1198,22 @@ impl ComplexAttri for FanoutLength {
 pub struct WireLoadSection {
   /// name
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
+  #[size = 48]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
   /// ">Reference</a>
+  #[size = 24]
   #[liberty(complex)]
   pub wire_load_from_area: (NotNan<f64>, NotNan<f64>, ArcStr),
 }
@@ -1241,13 +1295,16 @@ impl SimpleAttri for BaseCurveType {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct BaseCurves {
   /// name
-  #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
+  #[size = 72]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `base_curve_type` attribute specifies the type of base curve.
@@ -1267,10 +1324,13 @@ pub struct BaseCurves {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=40.21+40.26&end=40.25+40.29
   /// ">Reference</a>
+  #[size = 1]
   #[liberty(simple)]
   pub base_curve_type: BaseCurveType,
+  #[size = 24]
   #[liberty(complex)]
   pub curve_x: Vec<NotNan<f64>>,
+  #[size = 48]
   #[liberty(complex(type = Set))]
   pub curve_y: GroupSet<crate::common::items::IdVector>,
 }

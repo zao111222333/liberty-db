@@ -193,25 +193,30 @@ pub type Mode = [ArcStr; 2];
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CellDegradation {
   /// name
-  #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
+  #[size = 72]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: ast::Attributes,
   /// /* lookup table */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7
   /// ">Reference</a>
+  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   /// /* lookup table */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7
   /// ">Reference</a>
+  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<NotNan<f64>>,
 }

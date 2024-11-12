@@ -7,7 +7,7 @@ use crate::{
   expression::IdBooleanExpression,
   pin::Direction,
   timing::items::Mode,
-  ArcStr,
+  ArcStr, NotNan,
 };
 use core::{
   fmt::{self, Write},
@@ -30,25 +30,33 @@ use core::{
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct LeakagePower {
   #[id(borrow = "&[ArcStr]")]
+  #[size = 24]
   #[liberty(name)]
   pub name: Vec<ArcStr>,
   /// group comments
+  #[size = 144]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[size = 8]
   #[liberty(simple(type = Option))]
   power_level: Option<ArcStr>,
   #[id]
+  #[size = 48]
   #[liberty(simple)]
   related_pg_pin: WordSet,
   #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  #[size = 80]
   #[liberty(simple(type = Option))]
   when: Option<IdBooleanExpression>,
+  #[size = 8]
   #[liberty(simple)]
-  value: f64,
+  value: NotNan<f64>,
+  #[size = 16]
   #[liberty(complex(type = Option))]
   mode: Option<Mode>,
 }
@@ -118,7 +126,7 @@ mod test_sort {
       cell
         .leakage_power
         .into_iter_sort()
-        .map(|leakage| leakage.value as i8)
+        .map(|leakage| leakage.value.into_inner() as i8)
         .collect::<Vec<_>>()
     );
   }
@@ -139,17 +147,22 @@ mod test_sort {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Statetable {
   #[id(borrow = "&[ArcStr]")]
+  #[size = 24]
   #[liberty(name)]
   pub input_nodes: Vec<ArcStr>,
   #[id(borrow = "&[ArcStr]")]
+  #[size = 24]
   #[liberty(name)]
   pub internal_nodes: Vec<ArcStr>,
   /// group comments
+  #[size = 48]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
+  #[size = 24]
   #[liberty(simple)]
   pub table: Table,
 }
@@ -322,13 +335,16 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
   )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PgPin {
+  #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 240]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   /// <a name ="reference_link" href="
@@ -339,6 +355,7 @@ pub struct PgPin {
   /// &end
   /// =228.22
   /// ">Reference-Instance</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub direction: Option<Direction>,
   /// Use the `voltage_name`  attribute to specify an associated voltage.
@@ -348,6 +365,7 @@ pub struct PgPin {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
+  #[size = 8]
   #[liberty(simple)]
   pub voltage_name: ArcStr,
   /// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
@@ -369,21 +387,25 @@ pub struct PgPin {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=210.8&end=210.13
   /// ">Reference-Definition</a>
+  #[size = 1]
   #[liberty(simple)]
   pub pg_type: PgType,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
+  #[size = 8]
   #[liberty(simple)]
   pub user_pg_type: ArcStr,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
+  #[size = 8]
   #[liberty(simple)]
   pub physical_connection: ArcStr,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
+  #[size = 8]
   #[liberty(simple)]
   pub related_bias_pin: ArcStr,
   /// The `std_cell_main_rail`  Boolean attribute is defined in a `primary_power`
@@ -393,6 +415,7 @@ pub struct PgPin {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=278.29&end=278.31
   /// ">Reference-Definition</a>
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub std_cell_main_rail: Option<bool>,
   /// The `pg_function`  attribute models the logical function
@@ -405,6 +428,7 @@ pub struct PgPin {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=266.21&end=266.26
   /// ">Reference-Definition</a>
+  #[size = 80]
   #[liberty(simple(type = Option))]
   pub pg_function: Option<IdBooleanExpression>,
   /// The `switch_function`  string attribute identifies the condition
@@ -419,6 +443,7 @@ pub struct PgPin {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=279.5&end=279.13
   /// ">Reference-Definition</a>
+  #[size = 80]
   #[liberty(simple(type = Option))]
   pub switch_function: Option<IdBooleanExpression>,
 }
@@ -667,7 +692,6 @@ impl SimpleAttri for ClockGatingIntegratedCell {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(serde::Serialize, serde::Deserialize)]
-
 pub struct PinOpposite {
   pub name_list1: WordSet,
   pub name_list2: WordSet,

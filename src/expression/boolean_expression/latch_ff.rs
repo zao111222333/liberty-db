@@ -35,6 +35,7 @@ pub struct FF {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
+  #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str")]
   pub variable1: ArcStr,
@@ -49,24 +50,30 @@ pub struct FF {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
+  #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str")]
   pub variable2: ArcStr,
   /// group comments
+  #[size = 192]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clear_preset_var1: Option<ClearPresetState>,
   /// The `clear_preset_var2` attribute gives the value that `variable2`
   ///  has when `clear` and `preset` are both active at the same time.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clear_preset_var2: Option<ClearPresetState>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
@@ -76,6 +83,7 @@ pub struct FF {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=159.24&end=159.27
   /// ">Reference-Definition</a>
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub clocked_on: Option<BooleanExpression>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
@@ -85,12 +93,15 @@ pub struct FF {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=159.24&end=159.27
   /// ">Reference-Definition</a>
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub clocked_on_also: Option<BooleanExpression>,
   /// The value of `variable1` after the active edge.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub next_state: Option<BooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub preset: Option<BooleanExpression>,
 }
@@ -120,6 +131,7 @@ pub struct FFBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
+  #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str")]
   pub variable1: ArcStr,
@@ -134,27 +146,34 @@ pub struct FFBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
+  #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str")]
   pub variable2: ArcStr,
   /// bits
+  #[size = 8]
   #[liberty(name)]
   pub bits: usize,
   /// group comments
+  #[size = 192]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clear_preset_var1: Option<ClearPresetState>,
   /// The `clear_preset_var2` attribute gives the value that `variable2`
   ///  has when `clear` and `preset` are both active at the same time.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clear_preset_var2: Option<ClearPresetState>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
@@ -164,6 +183,7 @@ pub struct FFBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=159.24&end=159.27
   /// ">Reference-Definition</a>
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub clocked_on: Option<BooleanExpression>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
@@ -173,12 +193,15 @@ pub struct FFBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=159.24&end=159.27
   /// ">Reference-Definition</a>
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub clocked_on_also: Option<BooleanExpression>,
   /// The value of `variable1` after the active edge.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub next_state: Option<BooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub preset: Option<BooleanExpression>,
 }
@@ -207,8 +230,9 @@ pub struct Latch {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "&str")]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -221,24 +245,30 @@ pub struct Latch {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "&str")]
   pub variable2: ArcStr,
   /// group comments
+  #[size = 192]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clear_preset_var1: Option<ClearPresetState>,
   /// The `clear_preset_var2` attribute gives the value that `variable2`
   ///  has when `clear` and `preset` are both active at the same time.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clear_preset_var2: Option<ClearPresetState>,
   /// The `enable`  attribute gives the state of the enable input,
@@ -248,6 +278,7 @@ pub struct Latch {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.11&end=185.13
   /// ">Reference-Definition</a>
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub enable: Option<BooleanExpression>,
   /// The `enable_also`  attribute gives the state of the `enable`
@@ -257,12 +288,15 @@ pub struct Latch {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.23&end=185.25
   /// ">Reference-Definition</a>
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub enable_also: Option<BooleanExpression>,
   /// The value of `variable1` after the active edge.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub data_in: Option<BooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub preset: Option<BooleanExpression>,
 }
@@ -291,8 +325,9 @@ pub struct LatchBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
+  #[id(borrow = "&str")]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -306,26 +341,33 @@ pub struct LatchBank {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
   #[id(borrow = "&str")]
+  #[size = 8]
   #[liberty(name)]
   pub variable2: ArcStr,
   /// bits
+  #[size = 8]
   #[liberty(name)]
   pub bits: usize,
   /// group comments
+  #[size = 192]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub clear: Option<BooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clear_preset_var1: Option<ClearPresetState>,
   /// The `clear_preset_var2` attribute gives the value that `variable2`
   ///  has when `clear` and `preset` are both active at the same time.
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clear_preset_var2: Option<ClearPresetState>,
   /// The `enable`  attribute gives the state of the enable input,
@@ -335,6 +377,7 @@ pub struct LatchBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.11&end=185.13
   /// ">Reference-Definition</a>
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub enable: Option<BooleanExpression>,
   /// The `enable_also`  attribute gives the state of the `enable`
@@ -344,12 +387,15 @@ pub struct LatchBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.23&end=185.25
   /// ">Reference-Definition</a>
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub enable_also: Option<BooleanExpression>,
   /// The value of `variable1` after the active edge.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub data_in: Option<BooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
+  #[size = 32]
   #[liberty(simple(type = Option))]
   pub preset: Option<BooleanExpression>,
 }

@@ -61,6 +61,16 @@ pub enum SdfEdgeType {
   BothEdges,
 }
 
+impl SimpleAttri for SdfEdgeType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
+  }
+}
+
 #[derive(Debug, Clone, Default)]
 #[mut_set::derive::item(
   sort,
@@ -123,24 +133,39 @@ impl SimpleAttri for VariableType {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Domain {
+  #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
+  #[size = 192]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  pub group_name: ArcStr,
+  #[size = 8]
+  #[liberty(simple(type = Option))]
   pub calc_mode: Option<ArcStr>,
+  #[size = 1]
   #[liberty(simple(type = Option))]
   pub variable_1: Option<VariableType>,
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub variable_2: Option<VariableType>,
+  #[size = 1]
+  #[liberty(simple(type = Option))]
   pub variable_3: Option<VariableType>,
-  pub index_1: Vec<f64>,
-  pub index_2: Vec<f64>,
-  pub index_3: Vec<f64>,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_1: Vec<NotNan<f64>>,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_2: Vec<NotNan<f64>>,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_3: Vec<NotNan<f64>>,
 }
 impl GroupFn for Domain {}
 /// sth. like "A B C" will save as set{A B C}
@@ -241,13 +266,16 @@ impl FromStr for WordSet {
 )]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DummyGroup {
+  #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
+  #[size = 24]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
+  #[size = 48]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
 }
