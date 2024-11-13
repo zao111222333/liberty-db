@@ -32,6 +32,7 @@ pub struct Library {
   #[id(borrow = "&str")]
   #[size = 8]
   #[liberty(name)]
+  #[derivative(Default(value = "arcstr::literal!(\"undefined\")"))]
   pub name: ArcStr,
   /// group comments
   #[size = 1152]

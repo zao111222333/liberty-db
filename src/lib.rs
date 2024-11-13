@@ -2,7 +2,7 @@
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
-
+#![cfg(not(doctest))]
 #![doc(
     // The following are document setting according to
     // https://doc.rust-lang.org/rustdoc/write-documentation/the-doc-attribute.html

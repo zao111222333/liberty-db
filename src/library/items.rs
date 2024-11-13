@@ -700,8 +700,8 @@ impl SimpleAttri for TreeType {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.5&end=36.21
 /// ">Reference</a>
-#[derive(Debug, Clone)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Define {
   /// The name of the attribute you are creating.
@@ -730,13 +730,14 @@ pub struct Define {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.14&end=36.15
 /// ">Reference</a>
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum AttributeType {
   /// Boolean
+  #[default]
   #[strum(serialize = "Boolean", serialize = "boolean")]
   Boolean,
   /// string
@@ -803,8 +804,8 @@ impl ComplexAttri for Define {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.24&end=37.25
 /// ">Reference</a>
-#[derive(Debug, Clone)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefineGroup {
   /// The name of the user-defined group.
@@ -869,8 +870,8 @@ impl ComplexAttri for DefineGroup {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.23&end=36.24
 /// ">Reference</a>
-#[derive(Debug, Clone)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefineCellArea {
   /// A name of a resource type.
@@ -905,13 +906,14 @@ pub struct DefineCellArea {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.3&end=37.11
 /// ">Reference</a>
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ResourceType {
   /// `pad_slots`
+  #[default]
   #[strum(serialize = "pad_slots")]
   PadSlots,
   /// `pad_input_driver_sites`

@@ -1,4 +1,6 @@
 #![cfg(test)]
+use num_traits::One;
+
 use crate::{
   ast::{AttriValues, SimpleDefined},
   NotNan,
@@ -136,7 +138,7 @@ fn comment() {
     r#"/* comment1
 ** comment2
 ** comment3 */
-library ("") {
+library (undefined) {
 | /* comment1
 | ** comment2
 | ** comment3 */
@@ -158,6 +160,54 @@ library ("") {
 | ** comment2
 | ** comment3 */
 | cell (test1) {
+| }
+}
+"#,
+  );
+}
+
+#[test]
+fn entry() {
+  use num_traits::Zero;
+  let mut library = Library::default();
+  library.comments.this.push("comment1".into());
+  library
+    .cell
+    .entry("CELL1".into())
+    .and_modify(|cell| cell.area = Some(NotNan::one()))
+    .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+  library
+    .cell
+    .entry("CELL2".into())
+    .and_modify(|cell| cell.area = Some(NotNan::one()))
+    .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+  library
+    .cell
+    .entry("CELL2".into())
+    .and_modify(|cell| cell.area = Some(NotNan::one()))
+    .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+  fmt_cmp(
+    &library,
+    r#"/* comment1 */
+library (undefined) {
+| technology (cmos);
+| delay_model : table_lookup;
+| time_unit : 1ns;
+| voltage_unit : 1V;
+| slew_upper_threshold_pct_rise : 80.0;
+| slew_lower_threshold_pct_rise : 20.0;
+| slew_derate_from_library : 1.0;
+| slew_lower_threshold_pct_fall : 20.0;
+| slew_upper_threshold_pct_fall : 80.0;
+| input_threshold_pct_fall : 50.0;
+| input_threshold_pct_rise : 50.0;
+| output_threshold_pct_rise : 50.0;
+| output_threshold_pct_fall : 50.0;
+| cell (CELL1) {
+| | area : 0.0;
+| }
+| cell (CELL2) {
+| | area : 1.0;
 | }
 }
 "#,

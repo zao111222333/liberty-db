@@ -47,9 +47,9 @@ jobs:
       - run: cargo check --all-features
 
   # Run tests.
-  test:
+  unit_test:
     needs: check
-    name: Test (linux)
+    name: Unit Test
     runs-on: ubuntu-latest
     env:
       RUSTFLAGS: "-D warnings"
@@ -63,9 +63,9 @@ jobs:
         run: cargo build --verbose
       - name: Run Tests
         run: cargo test --verbose --all-features --lib
-  regression:
+  case_test:
     needs: check
-    name: Regression (linux)
+    name: Case Test
     runs-on: ubuntu-latest
     env:
       RUSTFLAGS: "-D warnings"
@@ -75,7 +75,7 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
           components: rustfmt
-      - name: Run Regression
+      - name: Run Test Case
         run: cargo test --verbose --all-features --package dev
   # Checks code style.
   clippy:
@@ -91,10 +91,23 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           components: clippy
       - run: cargo clippy --all-features
-
+  regression:
+    needs: [unit_test, clippy, case_test]
+    name: Regression
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-D warnings"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          components: rustfmt
+      - name: Run Regression
+        run: echo "TODO ${{ github.event.pull_request.head.sha }}"
   # Compute code coverage
   codecov:
-    needs: [test, clippy, regression]
+    needs: [unit_test, clippy, case_test]
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:
