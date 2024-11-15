@@ -16,7 +16,6 @@ use crate::{
   ArcStr, GroupSet, NotNan,
 };
 use core::fmt::{self, Write};
-use std::collections::HashMap;
 
 /// The `sensitization` group defined at the library level describes.
 ///
@@ -775,18 +774,10 @@ impl ComplexAttri for Define {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    // FIXME: avoid clone
-    _ = scope
-      .define_map
-      .entry(group_name.clone())
-      .and_modify(|m| {
-        _ = m.insert(attribute_name.clone(), DefinedType::Simple(attribute_type));
-      })
-      .or_insert_with(|| {
-        let mut m = HashMap::new();
-        _ = m.insert(attribute_name.clone(), DefinedType::Simple(attribute_type));
-        m
-      });
+    _ = scope.define_map.insert(
+      crate::ast::define_id(&group_name, &attribute_name),
+      DefinedType::Simple(attribute_type),
+    );
     Ok(Self { attribute_name, group_name, attribute_type })
   }
   #[inline]
@@ -841,18 +832,9 @@ impl ComplexAttri for DefineGroup {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    // FIXME: avoid clone
     _ = scope
       .define_map
-      .entry(parent_name.clone())
-      .and_modify(|m| {
-        _ = m.insert(group.clone(), DefinedType::Group);
-      })
-      .or_insert_with(|| {
-        let mut m = HashMap::new();
-        _ = m.insert(group.clone(), DefinedType::Group);
-        m
-      });
+      .insert(crate::ast::define_id(&parent_name, &group), DefinedType::Group);
     Ok(Self { group, parent_name })
   }
   #[inline]

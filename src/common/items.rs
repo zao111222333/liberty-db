@@ -2,7 +2,7 @@ use crate::{
   ast::{
     join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
   },
-  ArcStr,
+  ArcStr, NotNan,
 };
 use core::{
   cmp::Ordering,
@@ -11,7 +11,6 @@ use core::{
   str::FromStr,
 };
 use itertools::Itertools;
-use ordered_float::NotNan;
 use std::collections::HashSet;
 use strum_macros::{Display, EnumString};
 

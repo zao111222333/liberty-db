@@ -4,13 +4,12 @@
 
 mod fmt;
 pub mod parser;
-use crate::{library::AttributeType, ArcStr};
+use crate::{library::AttributeType, ArcStr, NotNan};
 use core::{fmt::Write, num::ParseIntError, str::FromStr};
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
 use itertools::Itertools;
 use nom::{error::Error, IResult};
-use ordered_float::NotNan;
-use std::collections::HashMap;
+use std::{collections::HashMap, hash::Hasher};
 
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 pub(crate) const HASHER: ahash::RandomState =
@@ -176,7 +175,7 @@ pub(crate) fn attributs_set_undefined_attri(
   scope: &ParseScope,
   undefined: UndefinedAttriValue,
 ) {
-  match scope.define_map.get(group_name).and_then(|m| m.get(key)) {
+  match scope.define_map.get(&define_id(group_name, key)) {
     None => {
       log::warn!("Line={}; undefined {}", scope.line_num, key);
       if let Some(value) = attri_map.get_mut(key) {
@@ -340,7 +339,17 @@ pub enum DefinedType {
 #[derive(Debug, Default)]
 pub(crate) struct ParseScope {
   pub line_num: usize,
-  pub define_map: HashMap<ArcStr, HashMap<ArcStr, DefinedType>>,
+  pub define_map: HashMap<u64, DefinedType>,
+}
+
+#[inline]
+#[must_use]
+pub(crate) fn define_id(group_name: &str, key: &str) -> u64 {
+  use std::hash::{BuildHasher, Hash};
+  let mut hasher = HASHER.build_hasher();
+  group_name.hash(&mut hasher);
+  key.hash(&mut hasher);
+  hasher.finish()
 }
 
 // /// Reference: https://rustcc.cn/article?id=ac75148b-6eb0-4249-b36d-0a14875b736e
