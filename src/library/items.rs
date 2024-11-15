@@ -6,14 +6,14 @@
 use crate::{
   ast::{
     Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
-    GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
+    GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
   },
   common::{
     items::{Formula, IdVector},
     parse_f64,
   },
   expression::logic,
-  ArcStr, GroupSet, NotNan,
+  ArcStr, NotNan,
 };
 use core::fmt::{self, Write};
 
@@ -774,10 +774,11 @@ impl ComplexAttri for Define {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    _ = scope.define_map.insert(
-      crate::ast::define_id(&group_name, &attribute_name),
-      DefinedType::Simple(attribute_type),
-    );
+    let define_id =
+      crate::ast::define_id(scope.define_map.hasher(), &group_name, &attribute_name);
+    _ = scope
+      .define_map
+      .insert(define_id, DefinedType::Simple(attribute_type));
     Ok(Self { attribute_name, group_name, attribute_type })
   }
   #[inline]
@@ -832,9 +833,9 @@ impl ComplexAttri for DefineGroup {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    _ = scope
-      .define_map
-      .insert(crate::ast::define_id(&parent_name, &group), DefinedType::Group);
+    let define_id =
+      crate::ast::define_id(scope.define_map.hasher(), &parent_name, &group);
+    _ = scope.define_map.insert(define_id, DefinedType::Group);
     Ok(Self { group, parent_name })
   }
   #[inline]

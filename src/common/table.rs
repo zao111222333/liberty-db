@@ -1,9 +1,9 @@
 use crate::{
   ast::{
-    Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, ParseScope,
-    SimpleAttri,
+    Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
+    ParseScope, SimpleAttri,
   },
-  ArcStr, GroupSet, NotNan,
+  ArcStr, NotNan,
 };
 use core::fmt::{self, Write};
 

@@ -1,10 +1,10 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # cargo publish --allow-dirty --registry crates-io -p liberty-db
 [workspace]
-members = ["macros", "examples/*", "dev", "dev/utils", "dev/include/liberty2json"]
+members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.6.14"
+version = "0.7.0"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -36,7 +36,10 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html"]
 
 [features]
-default = []
+default = ["ahash"]
+ahash = ["dep:ahash"]
+__dbg = ["__dbg_no_hash_match"]
+__dbg_no_hash_match = ["liberty-macros/__dbg_no_hash_match"]
 
 [workspace.dependencies]
 log = { version = "0.4", features = ["std", "serde"] }
@@ -70,12 +73,18 @@ cfg-if = "1.0.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 sysinfo = "0.32"
 chrono = "0.4.38"
-ahash = { version="0.8", features = ["no-rng"]}
+# faster hash
+ahash = { version = "0.8", features = ["no-rng"]}
+# group name matching use faster but less DOS resistance foldhash
+# but that's okay since the matching is static and any error will
+# be find during compiling with `#[deny(unreachable_patterns)]`
+foldhash = "0.1.3"
 
 [dependencies]
 liberty-macros = { path = "macros" }
+ahash = { workspace = true, optional = true }
+foldhash.workspace = true
 log.workspace = true
-ahash.workspace = true
 serde.workspace = true
 thiserror.workspace = true
 strum.workspace = true
@@ -99,3 +108,4 @@ cfg-if.workspace = true
 
 [dev-dependencies]
 dev_utils = { path = "dev/utils" }
+simple_logger.workspace = true

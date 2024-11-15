@@ -2,13 +2,13 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 use crate::{
-  ast::{Attributes, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn, GroupSet},
   ccsn::{CCSNStage, ReceiverCapacitance},
   common::items::{NameList, WordSet},
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
-  ArcStr, GroupSet, NotNan,
+  ArcStr, NotNan,
 };
 mod bundle;
 mod items;

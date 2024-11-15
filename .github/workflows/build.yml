@@ -76,7 +76,7 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           components: rustfmt
       - name: Run Test Case
-        run: cargo test --verbose --all-features --package dev
+        run: cargo test --verbose --package dev
   # Checks code style.
   clippy:
     needs: check
@@ -91,8 +91,23 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           components: clippy
       - run: cargo clippy --all-features
+  examples:
+    needs: check
+    name: Run Examples
+    runs-on: ubuntu-latest
+    # env:
+      # RUSTFLAGS: "-D warnings -A clippy::todo"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          components: clippy
+      - run: cargo run --example 0_parse_fmt
+      - run: cargo run --example 1_parse_fmt_file -- dev/tech/cases/ocv.lib
+      - run: cargo run --example 2_prune_lib -- dev/tech/cases/ocv.lib
   regression:
-    needs: [unit_test, clippy, case_test]
+    needs: [unit_test, clippy, case_test, examples]
     name: Regression
     runs-on: ubuntu-latest
     env:

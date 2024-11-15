@@ -165,7 +165,7 @@ impl GroupFn for Domain {}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WordSet {
-  pub inner: HashSet<ArcStr>,
+  pub inner: HashSet<ArcStr, crate::RandomState>,
 }
 impl fmt::Display for WordSet {
   #[expect(clippy::unwrap_in_result)]

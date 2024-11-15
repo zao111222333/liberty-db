@@ -1,10 +1,10 @@
 use crate::{
-  ast::{Attributes, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn, GroupSet},
   common::items::NameList,
   expression::IdBooleanExpression,
   pin::{Direction, NextstateType},
   timing::Timing,
-  ArcStr, GroupSet, NotNan,
+  ArcStr, NotNan,
 };
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');

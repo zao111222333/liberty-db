@@ -3,8 +3,7 @@ use dev::all_files;
 use dev_utils::text_diff;
 use liberty_db_latest::{ast::Group, Library};
 use std::{
-  fs::{read_to_string, File},
-  io::{BufWriter, Write},
+  fs::read_to_string,
   path::{Path, PathBuf},
 };
 
@@ -19,10 +18,16 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
   )
 }
 
+/// when we need to re-golden
+/// cargo test --package dev --features __dbg -- regression make_golden
+#[cfg(feature = "__dbg")]
 #[allow(dead_code)]
-// open `#[test]` only when we need to re-golden
-// #[test]
+#[test]
 fn make_golden() {
+  use std::{
+    fs::File,
+    io::{BufWriter, Write},
+  };
   for test_lib_path in all_files() {
     let golden_lib_path = golden_path(&test_lib_path);
     let library =

@@ -5,10 +5,10 @@
 mod items;
 mod test;
 use crate::{
-  ast::{Attributes, DefaultIndentation, GroupComments, GroupFn, ParseScope},
+  ast::{Attributes, DefaultIndentation, GroupComments, GroupFn, GroupSet, ParseScope},
   cell::Cell,
   common::table::{CompactLutTemplate, DriverWaveform, TableTemple},
-  units, ArcStr, GroupSet, NotNan,
+  units, ArcStr, NotNan,
 };
 use core::fmt;
 pub use items::*;
@@ -22,10 +22,10 @@ pub use items::*;
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone, derivative::Derivative)]
 #[derivative(Default)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Library {
   /// library name

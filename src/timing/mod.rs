@@ -11,7 +11,7 @@ pub mod builder;
 pub mod impls;
 pub mod items;
 use crate::{
-  ast::{Attributes, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn, GroupSet},
   ccsn::PropagatingCcb,
   common::{
     items::{SdfEdgeType, WordSet},
@@ -20,7 +20,7 @@ use crate::{
     },
   },
   expression::{BooleanExpression, IdBooleanExpression, SdfExpression},
-  ArcStr, GroupSet, NotNan,
+  ArcStr, NotNan,
 };
 
 use items::{CellDegradation, TimingSenseType};

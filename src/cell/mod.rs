@@ -7,11 +7,11 @@ mod test;
 pub use items::*;
 
 use crate::{
-  ast::{Attributes, GroupComments, GroupFn},
+  ast::{Attributes, GroupComments, GroupFn, GroupSet},
   common::table::TableLookUp2D,
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
-  ArcStr, GroupSet, NotNan,
+  ArcStr, NotNan,
 };
 
 /// cell

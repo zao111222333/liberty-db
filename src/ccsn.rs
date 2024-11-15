@@ -5,14 +5,14 @@
 use crate::{
   ast::{
     Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    Indentation, ParseScope, SimpleAttri,
+    GroupSet, Indentation, ParseScope, SimpleAttri,
   },
   common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
   },
   expression::IdBooleanExpression,
   timing::items::Mode,
-  ArcStr, GroupSet, NotNan,
+  ArcStr, NotNan,
 };
 use core::fmt::{self, Write};
 use num_traits::Zero;

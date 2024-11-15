@@ -1,8 +1,19 @@
-use crate::{attribute::*, HASHER};
+use crate::attribute::*;
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn::{Data, DeriveInput, Fields};
-
+cfg_if::cfg_if! {
+  if #[cfg(not(feature = "__dbg_no_hash_match"))]
+  {
+    use core::hash::{BuildHasher, Hash, Hasher};
+    const HASHER: foldhash::fast::FixedState = foldhash::fast::FixedState::with_seed(41);
+    fn hash_one<T: Hash>(t: &T) -> u64 {
+      let mut hasher = HASHER.build_hasher();
+      t.hash(&mut hasher);
+      hasher.finish()
+    }
+  }
+}
 fn group_field_fn(
   field_name: &Ident,
   arrti_type: &AttriType,
@@ -242,16 +253,30 @@ fn group_field_fn(
       };
     }
   }
-  let s_field_hash = HASHER.hash_one(&s_field_name);
-  Ok((
-    attri_comment,
-    write_field,
-    quote!(
-      #s_field_hash => {
-        #parser_arm
-      },
-    ),
-  ))
+  cfg_if::cfg_if! {
+    if #[cfg(feature = "__dbg_no_hash_match")] {
+      Ok((
+        attri_comment,
+        write_field,
+        quote!(
+          #s_field_name => {
+            #parser_arm
+          },
+        ),
+      ))
+    }else{
+      let s_field_hash = hash_one(&s_field_name);
+      Ok((
+        attri_comment,
+        write_field,
+        quote!(
+          #s_field_hash => {
+            #parser_arm
+          },
+        ),
+      ))
+    }
+  }
 }
 
 pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -375,6 +400,11 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
       _ => quote!(),
     };
+    #[cfg(feature = "__dbg_no_hash_match")]
+    let key_id = quote!(key);
+    #[cfg(not(feature = "__dbg_no_hash_match"))]
+    let key_id = quote!(crate::ast::hash_one(key));
+
     let impl_group = quote! {
       #named_group_impl
       #[doc(hidden)]
@@ -414,7 +444,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           let (mut input,title) = crate::ast::parser::title(i, &mut scope.line_num)?;
           let mut res = Self::default();
           loop {
-            match crate::ast::parser::key(input){
+            match crate::ast::parser::key(input) {
               Err(nom::Err::Error(_)) => {
                 (input,_) = crate::ast::parser::end_group(input)?;
                 <Self as crate::ast::GroupFn>::post_parse_process(&mut res, scope);
@@ -423,7 +453,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
               Err(e) => return Err(e),
               Ok((_input,key)) => {
                 input = _input;
-                match crate::ast::HASHER.hash_one(key) {
+                #[deny(unreachable_patterns)]
+                match #key_id {
                   #parser_arms
                   _ => {
                     let (new_input,undefined) = crate::ast::parser::undefine(input, key, scope)?;

@@ -1,7 +1,0 @@
-[package]
-name = "example0_parse_fmt"
-edition = "2021"
-publish = false
-
-[dependencies]
-liberty-db = { path = "../.." }

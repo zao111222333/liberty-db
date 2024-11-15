@@ -1,10 +1,11 @@
 #![allow(clippy::redundant_pub_crate)]
-//! cargo expand `common::demo`
+//! cargo expand common::demo
+//! cargo expand common::demo --features __dbg_no_hash_match
 use crate::{
-  ast::{Attributes, GroupComments, GroupFn, NamedGroup},
+  ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
   timing::TimingType,
-  ArcStr, GroupSet, NotNan,
+  ArcStr, NotNan,
 };
 use core::fmt::Write;
 #[derive(Default, Debug, Clone)]

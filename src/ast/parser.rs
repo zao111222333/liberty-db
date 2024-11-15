@@ -186,7 +186,7 @@ pub(crate) fn undefine<'a>(
     Ok((mut input, title)) => {
       let mut res = GroupWrapper {
         title: title.into_iter().map(ArcStr::from).collect(),
-        attri_map: HashMap::new(),
+        attri_map: HashMap::with_hasher(crate::RandomState::new()),
       };
       loop {
         match key(input) {

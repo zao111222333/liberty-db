@@ -125,10 +125,8 @@
   )
 )]
 
-pub use arcstr;
-pub use arcstr::ArcStr;
-type GroupSet<T> = <T as mut_set::Item>::MutSet<std::hash::RandomState>;
-pub use ordered_float::NotNan;
+pub use arcstr::{self, ArcStr};
+pub use ordered_float::{self, NotNan};
 /// `bus` group structure.
 pub mod bus;
 /// `cell` group structure.
@@ -160,3 +158,9 @@ pub use ast::Group;
 pub mod ccsn;
 mod types;
 pub mod util;
+
+// foldhash::fast::RandomState;
+#[cfg(not(feature = "ahash"))]
+type RandomState = std::hash::RandomState;
+#[cfg(feature = "ahash")]
+type RandomState = ahash::RandomState;

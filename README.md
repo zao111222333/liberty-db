@@ -22,18 +22,18 @@ This library is implemented in [Rust](https://doc.rust-lang.org/book/ch01-00-get
 
 ```toml
 [dependencies]
-liberty_db = "0.6"
+liberty_db = "0.7"
 ```
 
 You can run [examples](examples) with commands:
 
 ``` shell
 # example0
-cargo run --package example0_parse_fmt
+cargo run --example 0_parse_fmt
 # example1
-cargo run --package example1_parse_fmt_file -- dev/tech/cases/ocv.lib
+cargo run --example 1_parse_fmt_file -- dev/tech/cases/ocv.lib
 # example2
-cargo run --package example2_prune_lib -- dev/tech/cases/ocv.lib
+cargo run --example 2_prune_lib -- dev/tech/cases/ocv.lib
 ```
 
 ## Benchmark
@@ -68,6 +68,9 @@ cargo bench --bench dev
 + stream input
 + Linked Group
 + like IndexMap, only sort once and store
++ CI: only do comparsion after tag new version
++ CI: auto release after tag
++ CI: fast regression self in build.yml
 + ~~user `define`~~
 + ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~
 + ~~fix missing newline at endding~~
