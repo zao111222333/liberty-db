@@ -1,4 +1,4 @@
-use crate::attribute::*;
+use crate::{attribute::*, HASHER};
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn::{Data, DeriveInput, Fields};
@@ -242,11 +242,12 @@ fn group_field_fn(
       };
     }
   }
+  let s_field_hash = HASHER.hash_one(&s_field_name);
   Ok((
     attri_comment,
     write_field,
     quote!(
-      #s_field_name => {
+      #s_field_hash => {
         #parser_arm
       },
     ),
@@ -422,7 +423,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
               Err(e) => return Err(e),
               Ok((_input,key)) => {
                 input = _input;
-                match key {
+                match crate::ast::HASHER.hash_one(key) {
                   #parser_arms
                   _ => {
                     let (new_input,undefined) = crate::ast::parser::undefine(input, key, scope)?;

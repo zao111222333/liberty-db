@@ -70,10 +70,12 @@ cfg-if = "1.0.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 sysinfo = "0.32"
 chrono = "0.4.38"
+ahash = { version="0.8", features = ["no-rng"]}
 
 [dependencies]
 liberty-macros = { path = "macros" }
 log.workspace = true
+ahash.workspace = true
 serde.workspace = true
 thiserror.workspace = true
 strum.workspace = true

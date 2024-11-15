@@ -104,6 +104,7 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           components: rustfmt
       - name: Run Regression
+        # https://www.reddit.com/r/git/comments/1ecplap/how_to_get_the_head_commit_hash_of_a_pr_in_github/#:~:text=If%20you%20want%20to%20get,head.
         run: echo "TODO ${{ github.event.pull_request.head.sha }}"
   # Compute code coverage
   codecov:

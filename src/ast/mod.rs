@@ -13,6 +13,8 @@ use ordered_float::NotNan;
 use std::collections::HashMap;
 
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
+pub(crate) const HASHER: ahash::RandomState =
+  ahash::RandomState::with_seeds(1234567, 0, 0, core::u64::MAX);
 
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;

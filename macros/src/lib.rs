@@ -47,3 +47,5 @@ pub fn macro_group(input: TokenStream) -> TokenStream {
 pub fn macro_nothing(_: TokenStream) -> TokenStream {
   quote::quote!().into()
 }
+const HASHER: ahash::RandomState =
+  ahash::RandomState::with_seeds(1234567, 0, 0, u64::MAX);
