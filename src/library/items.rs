@@ -177,7 +177,13 @@ impl ComplexAttri for SensitizationVector {
     let states = match i.next() {
       Some(&s) => match s
         .split_ascii_whitespace()
-        .map(str::parse)
+        .map(|t| match t {
+          "1" => Ok(logic::Static::H),
+          "0" => Ok(logic::Static::L),
+          "X" => Ok(logic::Static::X),
+          "Z" => Ok(logic::Static::Z),
+          _ => Err(ComplexParseError::UnsupportedWord),
+        })
         .collect::<Result<Vec<logic::Static>, _>>()
       {
         Ok(states) => states,
@@ -195,8 +201,8 @@ impl ComplexAttri for SensitizationVector {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = itoa::Buffer::new();
-    write!(f, "{}, ", buffer.format(self.id))?;
+    f.write_int(self.id)?;
+    f.write_str(", ")?;
     crate::ast::join_fmt(
       self.states.iter(),
       f,
@@ -323,8 +329,8 @@ impl ComplexAttri for VoltageMap {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = ryu::Buffer::new();
-    write!(f, "{}, {}", self.name, buffer.format(self.voltage.into_inner()))
+    write!(f, "{}, ", self.name)?;
+    f.write_float(self.voltage.into_inner())
   }
 }
 
@@ -1088,31 +1094,21 @@ impl ComplexAttri for FanoutLength {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer_f = ryu::Buffer::new();
-    let mut buffer_i = itoa::Buffer::new();
     match (self.average_capacitance, self.standard_deviation, self.number_of_nets) {
       (Some(average_capacitance), Some(standard_deviation), Some(number_of_nets)) => {
-        write!(
-          f,
-          "{}, {}, ",
-          buffer_i.format(self.fanout),
-          buffer_f.format(self.length.into_inner()),
-        )?;
-        write!(f, "{}, ", buffer_f.format(average_capacitance.into_inner()))?;
-        write!(
-          f,
-          "{}, {}",
-          buffer_f.format(standard_deviation.into_inner()),
-          buffer_i.format(number_of_nets),
-        )
+        f.write_int(self.fanout)?;
+        f.write_str(", ")?;
+        f.write_float(self.length.into_inner())?;
+        f.write_float(average_capacitance.into_inner())?;
+        f.write_str(", ")?;
+        f.write_float(standard_deviation.into_inner())?;
+        f.write_str(", ")?;
+        f.write_int(number_of_nets)
       }
       _ => {
-        write!(
-          f,
-          "{}, {}",
-          buffer_i.format(self.fanout),
-          buffer_f.format(self.length.into_inner())
-        )
+        f.write_int(self.fanout)?;
+        f.write_str(", ")?;
+        f.write_float(self.length.into_inner())
       }
     }
   }

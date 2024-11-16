@@ -50,10 +50,12 @@ impl Indentation for DefaultIndentation {
   }
 }
 /// `CodeFormatter` with indent
-#[derive(Debug)]
+#[allow(missing_debug_implementations)]
 pub struct CodeFormatter<'a, F, I> {
   f: &'a mut F,
   level: usize,
+  buff_f: ryu::Buffer,
+  buff_i: itoa::Buffer,
   __i: PhantomData<I>,
 }
 
@@ -70,9 +72,24 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
   /// formatter that implements `fmt::Write` that can be used with the macro `write!()`
   #[inline]
   pub fn new(f: &'a mut T) -> Self {
-    Self { f, level: 0, __i: PhantomData }
+    Self {
+      f,
+      level: 0,
+      buff_f: ryu::Buffer::new(),
+      buff_i: itoa::Buffer::new(),
+      __i: PhantomData,
+    }
   }
-
+  #[inline]
+  pub(crate) fn write_float<F: ryu::Float>(&mut self, float: F) -> fmt::Result {
+    let s = self.buff_f.format(float);
+    self.f.write_str(s)
+  }
+  #[inline]
+  pub(crate) fn write_int<Int: itoa::Integer>(&mut self, int: Int) -> fmt::Result {
+    let s = self.buff_i.format(int);
+    self.f.write_str(s)
+  }
   /// Set the indentation level to a specific value
   #[inline]
   pub fn set_level(&mut self, level: usize) {

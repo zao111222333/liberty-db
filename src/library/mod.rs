@@ -12,6 +12,7 @@ use crate::{
 };
 use core::fmt;
 pub use items::*;
+use std::fmt::Write;
 
 /// The first line of the library group statement names the library.
 ///
@@ -729,7 +730,7 @@ impl Library {
     let ff = &mut crate::ast::CodeFormatter::<'_, fmt::Formatter<'_>, I>::new(f);
     crate::ast::fmt_library_beginning(&self.comments.this, ff)?;
     GroupAttri::fmt_liberty(self, Self::KEY, ff)?;
-    writeln!(f)
+    f.write_char('\n')
   }
   /// TODO: Parse `.json` file as a [Library] struct.
   #[inline]

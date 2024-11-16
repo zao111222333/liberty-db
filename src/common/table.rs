@@ -635,13 +635,12 @@ impl ComplexAttri for Values {
     f: &mut crate::ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let indent = f.indentation();
-    let mut buffer = ryu::Buffer::new();
     let mut iter = self.inner.chunks(self.size1);
     if let Some(v) = iter.next() {
       crate::ast::join_fmt(
         v.iter(),
         f,
-        |float, ff| write!(ff, "{}", buffer.format(float.into_inner())),
+        |float, ff| ff.write_float(float.into_inner()),
         ", ",
       )?;
     }
@@ -650,7 +649,7 @@ impl ComplexAttri for Values {
       crate::ast::join_fmt(
         v.iter(),
         f,
-        |float, ff| write!(ff, "{}", buffer.format(float.into_inner())),
+        |float, ff| ff.write_float(float.into_inner()),
         ", ",
       )?;
     }

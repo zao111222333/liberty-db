@@ -36,9 +36,7 @@ impl SimpleAttri for NotNan<f64> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let float: f64 = (*self).into();
-    let mut buffer = ryu::Buffer::new();
-    f.write_str(buffer.format(float))
+    f.write_float(self.into_inner())
   }
 }
 
@@ -64,8 +62,7 @@ impl SimpleAttri for usize {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = itoa::Buffer::new();
-    f.write_str(buffer.format(*self))
+    f.write_int(*self)
   }
 }
 
@@ -82,8 +79,7 @@ impl SimpleAttri for isize {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = itoa::Buffer::new();
-    f.write_str(buffer.format(*self))
+    f.write_int(*self)
   }
 }
 
@@ -301,11 +297,10 @@ impl<const N: usize> ComplexAttri for [NotNan<f64>; N] {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = ryu::Buffer::new();
     crate::ast::join_fmt(
       self.iter(),
       f,
-      |float, ff| write!(ff, "{}", buffer.format(float.into_inner())),
+      |float, ff| ff.write_float(float.into_inner()),
       ", ",
     )
   }
@@ -333,12 +328,12 @@ impl ComplexAttri for super::items::IdVector {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    write!(f, "{}, \\\n{}", itoa::Buffer::new().format(self.id), f.indentation())?;
-    let mut buffer = ryu::Buffer::new();
+    f.write_int(self.id)?;
+    write!(f, ", \\\n{}", f.indentation())?;
     crate::ast::join_fmt(
       self.vec.iter(),
       f,
-      |float, ff| write!(ff, "{}", buffer.format(float.into_inner())),
+      |float, ff| ff.write_float(float.into_inner()),
       ", ",
     )
   }
@@ -365,11 +360,10 @@ impl ComplexAttri for Vec<NotNan<f64>> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = ryu::Buffer::new();
     crate::ast::join_fmt(
       self.iter(),
       f,
-      |float, ff| write!(ff, "{}", buffer.format(float.into_inner())),
+      |float, ff| ff.write_float(float.into_inner()),
       ", ",
     )
   }
@@ -424,9 +418,7 @@ impl ComplexAttri for NotNan<f64> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = ryu::Buffer::new();
-    let float: f64 = (*self).into();
-    write!(f, "{}", buffer.format(float))
+    f.write_float(self.into_inner())
   }
 }
 impl ComplexAttri for Vec<ArcStr> {
@@ -480,8 +472,7 @@ impl ComplexAttri for Vec<usize> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = itoa::Buffer::new();
-    join_fmt_no_quote(self.iter(), f, |i, ff| write!(ff, "{}", buffer.format(*i)), ", ")
+    join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_int(*i), ", ")
   }
 }
 
@@ -514,9 +505,11 @@ impl ComplexAttri for (NotNan<f64>, NotNan<f64>, ArcStr) {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = ryu::Buffer::new();
-    write!(f, "{}, ", buffer.format(self.0.into_inner()))?;
-    write!(f, "{}, {}", buffer.format(self.1.into_inner()), self.2)
+    f.write_float(self.0.into_inner())?;
+    f.write_str(", ")?;
+    f.write_float(self.1.into_inner())?;
+    f.write_str(", ")?;
+    f.write_str(&self.2)
   }
 }
 impl ComplexAttri for (i64, NotNan<f64>) {
@@ -544,10 +537,9 @@ impl ComplexAttri for (i64, NotNan<f64>) {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer_i = itoa::Buffer::new();
-    let mut buffer = ryu::Buffer::new();
-    write!(f, "{}, ", buffer_i.format(self.0))?;
-    write!(f, "{}", buffer.format(self.1.into_inner()))
+    f.write_int(self.0)?;
+    f.write_str(", ")?;
+    f.write_float(self.1.into_inner())
   }
 }
 
@@ -576,9 +568,9 @@ impl ComplexAttri for (NotNan<f64>, NotNan<f64>) {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = ryu::Buffer::new();
-    write!(f, "{}, ", buffer.format(self.0.into_inner()))?;
-    write!(f, "{}", buffer.format(self.1.into_inner()))
+    f.write_float(self.0.into_inner())?;
+    f.write_str(", ")?;
+    f.write_float(self.1.into_inner())
   }
 }
 
