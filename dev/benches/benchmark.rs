@@ -22,7 +22,7 @@ fn main() {
   let regress_table = run_bench(
     gen_projs![
       (LibertyDbLatest, liberty_db_latest::Library),
-      (LibertyDb0p6p3, liberty_db_0p6p3::Library),
+      (LibertyDb0p6p3, liberty_db_0p6p14::Library),
       // (LibertyDb0p6p2, liberty_db_0p6p2::Library),
       // (LibertyDb0p6p1, liberty_db_0p6p1::Library),
       // (LibertyDb0p6p0, liberty_db_0p6p0::Library),
