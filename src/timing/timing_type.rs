@@ -165,22 +165,22 @@ impl fmt::Display for ArcCombinational {
     match self {
       Self::Combinational(edge) => match edge {
         Some(_edge) => match _edge {
-          logic::Edge::Fall => write!(f, "{}", Self::COMBINATIONAL_FALL),
-          logic::Edge::Rise => write!(f, "{}", Self::COMBINATIONAL_RISE),
+          logic::Edge::F => write!(f, "{}", Self::COMBINATIONAL_FALL),
+          logic::Edge::R => write!(f, "{}", Self::COMBINATIONAL_RISE),
         },
         None => write!(f, "{}", Self::COMBINATIONAL),
       },
       Self::ThreeStateDisable(edge) => match edge {
         Some(_edge) => match _edge {
-          logic::Edge::Fall => write!(f, "{}", Self::THREE_STATE_DISABLE_FALL),
-          logic::Edge::Rise => write!(f, "{}", Self::THREE_STATE_DISABLE_RISE),
+          logic::Edge::F => write!(f, "{}", Self::THREE_STATE_DISABLE_FALL),
+          logic::Edge::R => write!(f, "{}", Self::THREE_STATE_DISABLE_RISE),
         },
         None => write!(f, "{}", Self::THREE_STATE_DISABLE),
       },
       Self::ThreeStateEnable(edge) => match edge {
         Some(_edge) => match _edge {
-          logic::Edge::Fall => write!(f, "{}", Self::THREE_STATE_ENABLE_FALL),
-          logic::Edge::Rise => write!(f, "{}", Self::THREE_STATE_ENABLE_RISE),
+          logic::Edge::F => write!(f, "{}", Self::THREE_STATE_ENABLE_FALL),
+          logic::Edge::R => write!(f, "{}", Self::THREE_STATE_ENABLE_RISE),
         },
         None => write!(f, "{}", Self::THREE_STATE_ENABLE),
       },
@@ -465,30 +465,30 @@ impl fmt::Display for ArcSequential {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::Edge(edge) => match edge {
-        logic::Edge::Fall => write!(f, "{}", Self::FALLING_EDGE),
-        logic::Edge::Rise => write!(f, "{}", Self::RISING_EDGE),
+        logic::Edge::F => write!(f, "{}", Self::FALLING_EDGE),
+        logic::Edge::R => write!(f, "{}", Self::RISING_EDGE),
       },
       Self::Preset => write!(f, "{}", Self::PRESET),
       Self::Clear => write!(f, "{}", Self::CLEAR),
       Self::Hold(edge) => match edge {
-        logic::Edge::Fall => write!(f, "{}", Self::HOLD_FALLING),
-        logic::Edge::Rise => write!(f, "{}", Self::HOLD_RISING),
+        logic::Edge::F => write!(f, "{}", Self::HOLD_FALLING),
+        logic::Edge::R => write!(f, "{}", Self::HOLD_RISING),
       },
       Self::Setup(edge) => match edge {
-        logic::Edge::Fall => write!(f, "{}", Self::SETUP_FALLING),
-        logic::Edge::Rise => write!(f, "{}", Self::SETUP_RISING),
+        logic::Edge::F => write!(f, "{}", Self::SETUP_FALLING),
+        logic::Edge::R => write!(f, "{}", Self::SETUP_RISING),
       },
       Self::Recovery(edge) => match edge {
-        logic::Edge::Fall => write!(f, "{}", Self::RECOVERY_FALLING),
-        logic::Edge::Rise => write!(f, "{}", Self::RECOVERY_RISING),
+        logic::Edge::F => write!(f, "{}", Self::RECOVERY_FALLING),
+        logic::Edge::R => write!(f, "{}", Self::RECOVERY_RISING),
       },
       Self::Skew(edge) => match edge {
-        logic::Edge::Fall => write!(f, "{}", Self::SKEW_FALLING),
-        logic::Edge::Rise => write!(f, "{}", Self::SKEW_RISING),
+        logic::Edge::F => write!(f, "{}", Self::SKEW_FALLING),
+        logic::Edge::R => write!(f, "{}", Self::SKEW_RISING),
       },
       Self::Removal(edge) => match edge {
-        logic::Edge::Fall => write!(f, "{}", Self::REMOVAL_FALLING),
-        logic::Edge::Rise => write!(f, "{}", Self::REMOVAL_RISING),
+        logic::Edge::F => write!(f, "{}", Self::REMOVAL_FALLING),
+        logic::Edge::R => write!(f, "{}", Self::REMOVAL_RISING),
       },
       Self::MinPulseWidth => write!(f, "{}", Self::MIN_PULSE_WIDTH),
       Self::MinimumPeriod => write!(f, "{}", Self::MINIMUM_PERIOD),
@@ -568,12 +568,12 @@ impl fmt::Display for ArcNonSequential {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::NonSeqSetup(edge) => match edge {
-        logic::Edge::Fall => write!(f, "{}", Self::NON_SEQ_SETUP_FALLING),
-        logic::Edge::Rise => write!(f, "{}", Self::NON_SEQ_SETUP_RISING),
+        logic::Edge::F => write!(f, "{}", Self::NON_SEQ_SETUP_FALLING),
+        logic::Edge::R => write!(f, "{}", Self::NON_SEQ_SETUP_RISING),
       },
       Self::NonSeqHold(edge) => match edge {
-        logic::Edge::Fall => write!(f, "{}", Self::NON_SEQ_HOLD_FALLING),
-        logic::Edge::Rise => write!(f, "{}", Self::NON_SEQ_HOLD_RISING),
+        logic::Edge::F => write!(f, "{}", Self::NON_SEQ_HOLD_FALLING),
+        logic::Edge::R => write!(f, "{}", Self::NON_SEQ_HOLD_RISING),
       },
     }
   }
@@ -635,16 +635,16 @@ impl fmt::Display for ArcNoChange {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::NoChange(s1, s2) => match (s1, s2) {
-        (logic::Level::High, logic::Level::High) => {
+        (logic::Level::H, logic::Level::H) => {
           write!(f, "{}", Self::NOCHANGE_HIGH_HIGH)
         }
-        (logic::Level::High, logic::Level::Low) => {
+        (logic::Level::H, logic::Level::L) => {
           write!(f, "{}", Self::NOCHANGE_HIGH_LOW)
         }
-        (logic::Level::Low, logic::Level::High) => {
+        (logic::Level::L, logic::Level::H) => {
           write!(f, "{}", Self::NOCHANGE_LOW_HIGH)
         }
-        (logic::Level::Low, logic::Level::Low) => {
+        (logic::Level::L, logic::Level::L) => {
           write!(f, "{}", Self::NOCHANGE_LOW_LOW)
         }
       },
@@ -791,62 +791,60 @@ impl TimingType {
     Self::Combinational(ArcCombinational::Combinational(None));
   /// `COMBINATIONAL_RISE`
   pub const COMBINATIONAL_RISE: Self =
-    Self::Combinational(ArcCombinational::Combinational(Some(logic::Edge::Rise)));
+    Self::Combinational(ArcCombinational::Combinational(Some(logic::Edge::R)));
   /// `COMBINATIONAL_FALL`
   pub const COMBINATIONAL_FALL: Self =
-    Self::Combinational(ArcCombinational::Combinational(Some(logic::Edge::Fall)));
+    Self::Combinational(ArcCombinational::Combinational(Some(logic::Edge::F)));
   /// `THREE_STATE_DISABLE`
   pub const THREE_STATE_DISABLE: Self =
     Self::Combinational(ArcCombinational::ThreeStateDisable(None));
   /// `THREE_STATE_DISABLE_RISE`
   pub const THREE_STATE_DISABLE_RISE: Self =
-    Self::Combinational(ArcCombinational::ThreeStateDisable(Some(logic::Edge::Rise)));
+    Self::Combinational(ArcCombinational::ThreeStateDisable(Some(logic::Edge::R)));
   /// `THREE_STATE_DISABLE_FALL`
   pub const THREE_STATE_DISABLE_FALL: Self =
-    Self::Combinational(ArcCombinational::ThreeStateDisable(Some(logic::Edge::Fall)));
+    Self::Combinational(ArcCombinational::ThreeStateDisable(Some(logic::Edge::F)));
   /// `THREE_STATE_ENABLE`
   pub const THREE_STATE_ENABLE: Self =
     Self::Combinational(ArcCombinational::ThreeStateEnable(None));
   /// `THREE_STATE_ENABLE_RISE`
   pub const THREE_STATE_ENABLE_RISE: Self =
-    Self::Combinational(ArcCombinational::ThreeStateEnable(Some(logic::Edge::Rise)));
+    Self::Combinational(ArcCombinational::ThreeStateEnable(Some(logic::Edge::R)));
   /// `THREE_STATE_ENABLE_FALL`
   pub const THREE_STATE_ENABLE_FALL: Self =
-    Self::Combinational(ArcCombinational::ThreeStateEnable(Some(logic::Edge::Fall)));
+    Self::Combinational(ArcCombinational::ThreeStateEnable(Some(logic::Edge::F)));
   /// `RISING_EDGE`
-  pub const RISING_EDGE: Self = Self::Sequential(ArcSequential::Edge(logic::Edge::Rise));
+  pub const RISING_EDGE: Self = Self::Sequential(ArcSequential::Edge(logic::Edge::R));
   /// `FALLING_EDGE`
-  pub const FALLING_EDGE: Self = Self::Sequential(ArcSequential::Edge(logic::Edge::Fall));
+  pub const FALLING_EDGE: Self = Self::Sequential(ArcSequential::Edge(logic::Edge::F));
   /// `PRESET`
   pub const PRESET: Self = Self::Sequential(ArcSequential::Preset);
   /// `CLEAR`
   pub const CLEAR: Self = Self::Sequential(ArcSequential::Clear);
   /// `HOLD_RISING`
-  pub const HOLD_RISING: Self = Self::Sequential(ArcSequential::Hold(logic::Edge::Rise));
+  pub const HOLD_RISING: Self = Self::Sequential(ArcSequential::Hold(logic::Edge::R));
   /// `HOLD_FALLING`
-  pub const HOLD_FALLING: Self = Self::Sequential(ArcSequential::Hold(logic::Edge::Fall));
+  pub const HOLD_FALLING: Self = Self::Sequential(ArcSequential::Hold(logic::Edge::F));
   /// `SETUP_RISING`
-  pub const SETUP_RISING: Self =
-    Self::Sequential(ArcSequential::Setup(logic::Edge::Rise));
+  pub const SETUP_RISING: Self = Self::Sequential(ArcSequential::Setup(logic::Edge::R));
   /// `SETUP_FALLING`
-  pub const SETUP_FALLING: Self =
-    Self::Sequential(ArcSequential::Setup(logic::Edge::Fall));
+  pub const SETUP_FALLING: Self = Self::Sequential(ArcSequential::Setup(logic::Edge::F));
   /// `RECOVERY_RISING`
   pub const RECOVERY_RISING: Self =
-    Self::Sequential(ArcSequential::Recovery(logic::Edge::Rise));
+    Self::Sequential(ArcSequential::Recovery(logic::Edge::R));
   /// `RECOVERY_FALLING`
   pub const RECOVERY_FALLING: Self =
-    Self::Sequential(ArcSequential::Recovery(logic::Edge::Fall));
+    Self::Sequential(ArcSequential::Recovery(logic::Edge::F));
   /// `SKEW_RISING`
-  pub const SKEW_RISING: Self = Self::Sequential(ArcSequential::Skew(logic::Edge::Rise));
+  pub const SKEW_RISING: Self = Self::Sequential(ArcSequential::Skew(logic::Edge::R));
   /// `SKEW_FALLING`
-  pub const SKEW_FALLING: Self = Self::Sequential(ArcSequential::Skew(logic::Edge::Fall));
+  pub const SKEW_FALLING: Self = Self::Sequential(ArcSequential::Skew(logic::Edge::F));
   /// `REMOVAL_RISING`
   pub const REMOVAL_RISING: Self =
-    Self::Sequential(ArcSequential::Removal(logic::Edge::Rise));
+    Self::Sequential(ArcSequential::Removal(logic::Edge::R));
   /// `REMOVAL_FALLING`
   pub const REMOVAL_FALLING: Self =
-    Self::Sequential(ArcSequential::Removal(logic::Edge::Fall));
+    Self::Sequential(ArcSequential::Removal(logic::Edge::F));
   /// `MIN_PULSE_WIDTH`
   pub const MIN_PULSE_WIDTH: Self = Self::Sequential(ArcSequential::MinPulseWidth);
   /// `MINIMUM_PERIOD`
@@ -859,28 +857,28 @@ impl TimingType {
     Self::Sequential(ArcSequential::ClockTreePath(MaxMin::Min));
   /// `NON_SEQ_SETUP_RISING`
   pub const NON_SEQ_SETUP_RISING: Self =
-    Self::NonSequential(ArcNonSequential::NonSeqSetup(logic::Edge::Rise));
+    Self::NonSequential(ArcNonSequential::NonSeqSetup(logic::Edge::R));
   /// `NON_SEQ_SETUP_FALLING`
   pub const NON_SEQ_SETUP_FALLING: Self =
-    Self::NonSequential(ArcNonSequential::NonSeqSetup(logic::Edge::Fall));
+    Self::NonSequential(ArcNonSequential::NonSeqSetup(logic::Edge::F));
   /// `NON_SEQ_HOLD_RISING`
   pub const NON_SEQ_HOLD_RISING: Self =
-    Self::NonSequential(ArcNonSequential::NonSeqHold(logic::Edge::Rise));
+    Self::NonSequential(ArcNonSequential::NonSeqHold(logic::Edge::R));
   /// `NON_SEQ_HOLD_FALLING`
   pub const NON_SEQ_HOLD_FALLING: Self =
-    Self::NonSequential(ArcNonSequential::NonSeqHold(logic::Edge::Fall));
+    Self::NonSequential(ArcNonSequential::NonSeqHold(logic::Edge::F));
   /// `NOCHANGE_HIGH_HIGH`
   pub const NOCHANGE_HIGH_HIGH: Self =
-    Self::NoChange(ArcNoChange::NoChange(logic::Level::High, logic::Level::High));
+    Self::NoChange(ArcNoChange::NoChange(logic::Level::H, logic::Level::H));
   /// `NOCHANGE_HIGH_LOW`
   pub const NOCHANGE_HIGH_LOW: Self =
-    Self::NoChange(ArcNoChange::NoChange(logic::Level::High, logic::Level::Low));
+    Self::NoChange(ArcNoChange::NoChange(logic::Level::H, logic::Level::L));
   /// `NOCHANGE_LOW_HIGH`
   pub const NOCHANGE_LOW_HIGH: Self =
-    Self::NoChange(ArcNoChange::NoChange(logic::Level::Low, logic::Level::High));
+    Self::NoChange(ArcNoChange::NoChange(logic::Level::L, logic::Level::H));
   /// `NOCHANGE_LOW_LOW`
   pub const NOCHANGE_LOW_LOW: Self =
-    Self::NoChange(ArcNoChange::NoChange(logic::Level::Low, logic::Level::Low));
+    Self::NoChange(ArcNoChange::NoChange(logic::Level::L, logic::Level::L));
   const LIST: [Self; 35] = [
     Self::COMBINATIONAL,
     Self::COMBINATIONAL_RISE,

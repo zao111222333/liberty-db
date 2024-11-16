@@ -344,8 +344,8 @@ pub struct Library {
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.22&end=44.31
   /// ">Reference</a>
   #[size = 1]
-  #[liberty(simple)]
-  pub leakage_power_unit: units::LeakagePowerUnit,
+  #[liberty(simple(type = Option))]
+  pub leakage_power_unit: Option<units::LeakagePowerUnit>,
   /// Use the `voltage_map`  attribute to associate a voltage name
   /// with relative voltage values referenced by the cell-level `pg_pin`  groups
   /// <a name ="reference_link" href="

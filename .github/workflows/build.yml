@@ -62,7 +62,7 @@ jobs:
       - name: Build
         run: cargo build --verbose
       - name: Run Tests
-        run: cargo test --verbose --all-features --lib
+        run: cargo test --verbose --all-features --lib --release
   case_test:
     needs: check
     name: Case Test
@@ -76,7 +76,7 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           components: rustfmt
       - name: Run Test Case
-        run: cargo test --verbose --package dev
+        run: cargo test --verbose --package dev --release
   # Checks code style.
   clippy:
     needs: check

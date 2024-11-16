@@ -127,6 +127,7 @@
 
 pub use arcstr::{self, ArcStr};
 pub use ordered_float::{self, NotNan};
+pub use strum::IntoEnumIterator;
 /// `bus` group structure.
 pub mod bus;
 /// `cell` group structure.

@@ -4,6 +4,7 @@
 //! </script>
 mod latch_ff;
 pub mod logic;
+mod logic_impl;
 mod parser;
 use crate::{
   ast::{CodeFormatter, Indentation, ParseScope},

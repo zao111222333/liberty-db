@@ -205,10 +205,10 @@ impl ComplexAttri for SensitizationVector {
           ff,
           "{}",
           match state {
-            logic::Static::UnInit(logic::UnInit::HighImpedance) => "Z",
-            logic::Static::UnInit(logic::UnInit::Unknown(_)) => "X",
-            logic::Static::Level(logic::Level::High) => "1",
-            logic::Static::Level(logic::Level::Low) => "0",
+            logic::Static::Z => "Z",
+            logic::Static::X => "X",
+            logic::Static::H => "1",
+            logic::Static::L => "0",
           }
         )
       },
@@ -245,35 +245,19 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
       vec![
         SensitizationVector {
           id: 1,
-          states: vec![
-            logic::Static::Level(logic::Level::Low),
-            logic::Static::Level(logic::Level::Low),
-            logic::Static::Level(logic::Level::High),
-          ]
+          states: vec![logic::Static::L, logic::Static::L, logic::Static::H,]
         },
         SensitizationVector {
           id: 2,
-          states: vec![
-            logic::Static::Level(logic::Level::Low),
-            logic::Static::UnInit(logic::UnInit::Unknown(None)),
-            logic::Static::Level(logic::Level::High),
-          ]
+          states: vec![logic::Static::L, logic::Static::X, logic::Static::H,]
         },
         SensitizationVector {
           id: 3,
-          states: vec![
-            logic::Static::UnInit(logic::UnInit::HighImpedance),
-            logic::Static::Level(logic::Level::Low),
-            logic::Static::Level(logic::Level::High),
-          ]
+          states: vec![logic::Static::Z, logic::Static::L, logic::Static::H,]
         },
         SensitizationVector {
           id: 4,
-          states: vec![
-            logic::Static::Level(logic::Level::High),
-            logic::Static::Level(logic::Level::High),
-            logic::Static::Level(logic::Level::Low),
-          ]
+          states: vec![logic::Static::H, logic::Static::H, logic::Static::L,]
         }
       ]
     );

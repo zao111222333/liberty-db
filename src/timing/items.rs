@@ -1,9 +1,11 @@
 //! All item structure inside
 //! `Timing`.
 
+use core::ops::Not;
+
 use crate::{
   ast::{self, GroupComments, GroupFn, ParseScope, SimpleAttri},
-  expression::logic::{self, LogicLike},
+  expression::logic,
   ArcStr, NotNan,
 };
 
@@ -136,7 +138,7 @@ impl TimingSenseType {
   pub fn compute_edge(&self, pin_edge: &logic::Edge) -> Option<logic::Edge> {
     match self {
       Self::PositiveUnate => Some(*pin_edge),
-      Self::NegativeUnate => Some(pin_edge.inverse()),
+      Self::NegativeUnate => Some(pin_edge.not()),
       Self::NonUnate => None,
     }
   }

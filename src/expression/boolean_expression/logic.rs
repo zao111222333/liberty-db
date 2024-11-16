@@ -1,22 +1,5 @@
 use crate::ast::{ParseScope, SimpleAttri};
-use core::{
-  cmp::Ordering,
-  fmt,
-  hash::Hash,
-  ops::{Deref, DerefMut},
-  str::FromStr,
-};
-
-/// `LogicLike`
-pub trait LogicLike: fmt::Display + fmt::Debug {
-  /// inverse
-  ///
-  /// 0->1, 1->0
-  #[must_use]
-  fn inverse(&self) -> Self;
-  /// Fall(_) == Fall(_)
-  fn variant_eq(&self, other: &Self) -> bool;
-}
+use core::{cmp::Ordering, hash::Hash};
 
 /// Level
 #[derive(Ord, PartialOrd)]
@@ -27,35 +10,10 @@ pub trait LogicLike: fmt::Display + fmt::Debug {
 pub enum Level {
   /// High
   #[strum(serialize = "h", serialize = "1", serialize = "H")]
-  High,
+  H,
   /// Low
   #[strum(serialize = "l", serialize = "0", serialize = "L")]
-  Low,
-}
-
-impl Level {
-  /// High
-  pub const H: Self = Self::High;
-  /// Low
-  pub const L: Self = Self::Low;
-}
-
-impl LogicLike for Level {
-  #[inline]
-  fn inverse(&self) -> Self {
-    match self {
-      Self::Low => Self::High,
-      Self::High => Self::Low,
-    }
-  }
-  #[expect(clippy::match_like_matches_macro)]
-  #[inline]
-  fn variant_eq(&self, other: &Self) -> bool {
-    match (self, other) {
-      (Self::High, Self::High) | (Self::Low, Self::Low) => true,
-      _ => false,
-    }
-  }
+  L,
 }
 
 /// Edge
@@ -67,90 +25,36 @@ impl LogicLike for Level {
 pub enum Edge {
   /// Fall
   #[strum(serialize = "f", serialize = "F")]
-  Fall,
+  F,
   /// Rise
   #[strum(serialize = "r", serialize = "R")]
-  Rise,
+  R,
 }
 
-impl Edge {
-  /// Fall
-  pub const F: Self = Self::Fall;
-  /// Rise
-  pub const R: Self = Self::Rise;
-}
-
-impl LogicLike for Edge {
+impl<'a> core::ops::Not for &'a Edge {
+  type Output = Edge;
   #[inline]
-  fn inverse(&self) -> Self {
+  fn not(self) -> Self::Output {
     match self {
-      Self::Fall => Self::Rise,
-      Self::Rise => Self::Fall,
-    }
-  }
-  #[expect(clippy::match_like_matches_macro)]
-  #[inline]
-  fn variant_eq(&self, other: &Self) -> bool {
-    match (self, other) {
-      (Self::Fall, Self::Fall) => true,
-      (Self::Rise, Self::Rise) => true,
-      _ => false,
-    }
-  }
-}
-
-/// State
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(strum_macros::Display)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub enum IllegalType {
-  HighImpedanceInput,
-  NoIdea,
-  RiseFallAtLevel,
-}
-impl IllegalType {
-  #[must_use]
-  #[inline]
-  pub const fn combine(a: &Option<Self>, b: &Option<Self>) -> Option<Self> {
-    match (a, b) {
-      (None, None) => None,
-      (None, Some(b_t)) => Some(*b_t),
-      (Some(a_t), None) => Some(*a_t),
-      (Some(a_t), Some(_)) => {
-        Some(*a_t)
-        // match (a_t, b_t) {
-        //   // FIXME:
-        //   (a_vaild, _b_vaild) => Some(*a_vaild),
-        // }
-      }
+      Edge::F => Edge::R,
+      Edge::R => Edge::F,
     }
   }
 }
 
 /// `UnInit`
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
 #[derive(derivative::Derivative)]
 #[derivative(PartialEq, Hash, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum UnInit {
   /// `Unknown`
   #[strum(serialize = "x", serialize = "X")]
-  Unknown(
-    #[derivative(Hash = "ignore")]
-    #[derivative(PartialEq = "ignore")]
-    Option<IllegalType>,
-  ),
+  X,
   /// `HighImpedance`
   #[strum(serialize = "z", serialize = "Z")]
-  HighImpedance,
-}
-
-impl UnInit {
-  /// `Unknown`
-  pub const X: Self = Self::Unknown(None);
-  /// `HighImpedance`
-  pub const Z: Self = Self::HighImpedance;
+  Z,
 }
 
 impl PartialOrd for UnInit {
@@ -163,57 +67,31 @@ impl Ord for UnInit {
   #[inline]
   fn cmp(&self, other: &Self) -> Ordering {
     match (self, other) {
-      (Self::Unknown(_), Self::HighImpedance) => Ordering::Greater,
-      (Self::HighImpedance, Self::Unknown(_)) => Ordering::Less,
-      (Self::Unknown(_), Self::Unknown(_))
-      | (Self::HighImpedance, Self::HighImpedance) => Ordering::Equal,
-    }
-  }
-}
-
-impl fmt::Display for UnInit {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::Unknown(c) => match c {
-        Some(_c) => write!(f, "X({_c})"),
-        None => write!(f, "X"),
-      },
-      Self::HighImpedance => write!(f, "Z"),
-    }
-  }
-}
-
-impl Default for UnInit {
-  #[inline]
-  fn default() -> Self {
-    Self::X
-  }
-}
-impl LogicLike for UnInit {
-  #[inline]
-  fn inverse(&self) -> Self {
-    *self
-  }
-  #[expect(clippy::match_like_matches_macro)]
-  #[inline]
-  fn variant_eq(&self, other: &Self) -> bool {
-    match (self, other) {
-      (Self::Unknown(_), Self::Unknown(_)) => true,
-      (Self::HighImpedance, Self::HighImpedance) => true,
-      _ => false,
+      (Self::X, Self::Z) => Ordering::Greater,
+      (Self::Z, Self::X) => Ordering::Less,
+      (Self::X, Self::X) | (Self::Z, Self::Z) => Ordering::Equal,
     }
   }
 }
 /// H L R F
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
 pub enum Normal {
-  /// R F
-  Edge(Edge),
-  /// H L
-  Level(Level),
+  /// R
+  #[strum(serialize = "R")]
+  R,
+  /// F
+  #[strum(serialize = "F")]
+  F,
+  /// H
+  #[strum(serialize = "H")]
+  H,
+  /// L
+  #[strum(serialize = "L")]
+  L,
 }
+
 impl SimpleAttri for Normal {
   #[inline]
   fn nom_parse<'a>(
@@ -223,242 +101,123 @@ impl SimpleAttri for Normal {
     crate::ast::nom_parse_from_str(i, scope)
   }
 }
-impl fmt::Display for Normal {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::Edge(Edge::Rise) => write!(f, "R"),
-      Self::Edge(Edge::Fall) => write!(f, "F"),
-      Self::Level(Level::High) => write!(f, "H"),
-      Self::Level(Level::Low) => write!(f, "L"),
-    }
-  }
-}
-impl FromStr for Normal {
-  type Err = strum::ParseError;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    s.parse::<Edge>().map_or(
-      s.parse::<Level>()
-        .map_or(Err(strum::ParseError::VariantNotFound), |level| Ok(Self::Level(level))),
-      |edge| Ok(Self::Edge(edge)),
-    )
-  }
-}
-impl Normal {
-  /// Rise
-  pub const R: Self = Self::Edge(Edge::R);
-  /// Fall
-  pub const F: Self = Self::Edge(Edge::F);
-  /// High
-  pub const H: Self = Self::Level(Level::H);
-  /// Low
-  pub const L: Self = Self::Level(Level::L);
-}
-impl From<Normal> for State {
-  #[inline]
-  fn from(value: Normal) -> Self {
-    match value {
-      Normal::Edge(s) => Self::Edge(s),
-      Normal::Level(s) => Self::Level(s),
-    }
-  }
-}
-
 /// H L R F
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
 pub enum Static {
-  /// X Z
-  UnInit(UnInit),
-  /// H L
-  Level(Level),
+  /// X
+  #[strum(serialize = "X")]
+  X,
+  /// Z
+  #[strum(serialize = "Z")]
+  Z,
+  /// H
+  #[strum(serialize = "H")]
+  H,
+  /// L
+  #[strum(serialize = "L")]
+  L,
 }
 
-impl Static {
-  /// Rise
-  pub const X: Self = Self::UnInit(UnInit::Unknown(None));
-  /// Fall
-  pub const Z: Self = Self::UnInit(UnInit::HighImpedance);
-  /// High
-  pub const H: Self = Self::Level(Level::H);
-  /// Low
-  pub const L: Self = Self::Level(Level::L);
-}
-impl From<Static> for State {
-  #[inline]
-  fn from(value: Static) -> Self {
-    match value {
-      Static::UnInit(s) => Self::UnInit(s),
-      Static::Level(s) => Self::Level(s),
-    }
-  }
-}
-
-impl FromStr for Static {
-  type Err = strum::ParseError;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    s.parse::<UnInit>().map_or(
-      s.parse::<Level>()
-        .map_or(Err(strum::ParseError::VariantNotFound), |level| Ok(Self::Level(level))),
-      |uninit| Ok(Self::UnInit(uninit)),
-    )
-  }
-}
-impl fmt::Display for Static {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::UnInit(UnInit::HighImpedance) => write!(f, "Z"),
-      Self::UnInit(UnInit::Unknown(_)) => write!(f, "X"),
-      Self::Level(Level::High) => write!(f, "H"),
-      Self::Level(Level::Low) => write!(f, "L"),
-    }
-  }
-}
 /// State
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
 pub enum State {
-  /// X Z
-  UnInit(UnInit),
-  /// R F
-  Edge(Edge),
-  /// H L
-  Level(Level),
-}
-impl fmt::Display for State {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::UnInit(s) => s.fmt(f),
-      Self::Edge(s) => s.fmt(f),
-      Self::Level(s) => s.fmt(f),
-    }
-  }
-}
-
-impl Default for State {
-  #[inline]
-  fn default() -> Self {
-    Self::X
-  }
-}
-
-impl LogicLike for State {
-  #[must_use]
-  #[inline]
-  fn inverse(&self) -> Self {
-    match self {
-      Self::UnInit(s) => Self::UnInit(s.inverse()),
-      Self::Edge(s) => Self::Edge(s.inverse()),
-      Self::Level(s) => Self::Level(s.inverse()),
-    }
-  }
-  #[must_use]
-  #[inline]
-  fn variant_eq(&self, other: &Self) -> bool {
-    match (self, other) {
-      (Self::UnInit(a), Self::UnInit(b)) => a.variant_eq(b),
-      (Self::Edge(a), Self::Edge(b)) => a.variant_eq(b),
-      (Self::Level(a), Self::Level(b)) => a.variant_eq(b),
-      _ => false,
-    }
-  }
+  /// L
+  #[strum(serialize = "L")]
+  L,
+  /// H
+  #[strum(serialize = "H")]
+  H,
+  /// X
+  #[strum(serialize = "X")]
+  X,
+  /// Z
+  #[strum(serialize = "Z")]
+  Z,
+  /// LH
+  #[strum(serialize = "LH")]
+  LH,
+  /// HL
+  #[strum(serialize = "HL")]
+  HL,
+  /// LX
+  #[strum(serialize = "LX")]
+  LX,
+  /// LZ
+  #[strum(serialize = "LZ")]
+  LZ,
+  /// HX
+  #[strum(serialize = "HX")]
+  HX,
+  /// HZ
+  #[strum(serialize = "HZ")]
+  HZ,
+  /// XL
+  #[strum(serialize = "XL")]
+  XL,
+  /// ZL
+  #[strum(serialize = "ZL")]
+  ZL,
+  /// XH
+  #[strum(serialize = "XH")]
+  XH,
+  /// ZH
+  #[strum(serialize = "ZH")]
+  ZH,
 }
 
 impl State {
-  /// `Unknown`
-  pub const X: Self = Self::UnInit(UnInit::X);
-  /// `HighImpedance`
-  pub const Z: Self = Self::UnInit(UnInit::Z);
-  /// `Fall`
-  pub const F: Self = Self::Edge(Edge::F);
-  /// `Rise`
-  pub const R: Self = Self::Edge(Edge::R);
-  /// `High`
-  pub const H: Self = Self::Level(Level::H);
-  /// `Low`
-  pub const L: Self = Self::Level(Level::L);
-  const LIST: [Self; 6] = [Self::X, Self::Z, Self::F, Self::R, Self::H, Self::L];
-  /// `iter`
-  #[inline]
-  pub fn iter() -> impl Iterator<Item = Self> {
-    Self::LIST.iter().copied()
-  }
-  // /// get_change_pattern
-  // #[inline]
-  // pub fn get_change_pattern(&self) -> Option<ChangePattern> {
-  //   match self {
-  //     State::Edge(s) => match s {
-  //       Edge::Fall(c) => *c,
-  //       Edge::Rise(c) => *c,
-  //     },
-  //     _ => None,
-  //   }
-  // }
-  // /// set_change_pattern
-  // #[inline]
-  // pub fn set_change_pattern(&self, c: &Option<ChangePattern>) -> Self {
-  //   match self {
-  //     State::Edge(s) => match s {
-  //       Edge::Fall(_) => Self::Edge(Edge::Fall(*c)),
-  //       Edge::Rise(_) => Self::Edge(Edge::Rise(*c)),
-  //     },
-  //     _ => *self,
-  //   }
-  // }
-  /// `get_illegal_type`
-  #[expect(clippy::wildcard_enum_match_arm)]
-  #[must_use]
-  #[inline]
-  pub const fn get_illegal_type(&self) -> Option<IllegalType> {
-    match self {
-      Self::UnInit(UnInit::Unknown(t)) => *t,
-      _ => None,
-    }
-  }
-  /// `set_illegal_type`
-  #[must_use]
-  #[inline]
-  pub const fn set_illegal_type(&self, t: &Option<IllegalType>) -> Self {
-    match (self, t) {
-      (Self::UnInit(UnInit::Unknown(_)), _) => Self::UnInit(UnInit::Unknown(*t)),
-      _ => *self,
-    }
-  }
-  /// `get_bgn` state
+  /// `bgn` state
   ///
   /// R -> 0, F -> 1, otherwise not change
   #[must_use]
   #[inline]
-  pub const fn get_bgn(&self) -> Self {
+  pub const fn bgn(&self) -> Static {
     match self {
-      Self::Edge(s) => match s {
-        Edge::Fall => Self::Level(Level::High),
-        Edge::Rise => Self::Level(Level::Low),
-      },
-      Self::UnInit(_) | Self::Level(_) => *self,
+      Self::L => Static::L,
+      Self::H => Static::H,
+      Self::X => Static::X,
+      Self::Z => Static::Z,
+      Self::LH => Static::L,
+      Self::HL => Static::H,
+      Self::LX => Static::L,
+      Self::LZ => Static::L,
+      Self::HX => Static::H,
+      Self::HZ => Static::H,
+      Self::XL => Static::X,
+      Self::ZL => Static::Z,
+      Self::XH => Static::X,
+      Self::ZH => Static::Z,
     }
   }
-  /// `get_end` state
+  /// `end` state
   ///
   /// R -> 1, F -> 1, otherwise not change
   #[must_use]
   #[inline]
-  pub const fn get_end(&self) -> Self {
+  pub const fn end(&self) -> Static {
     match self {
-      Self::Edge(s) => match s {
-        Edge::Fall => Self::Level(Level::Low),
-        Edge::Rise => Self::Level(Level::High),
-      },
-      Self::UnInit(_) | Self::Level(_) => *self,
+      Self::L => Static::L,
+      Self::H => Static::H,
+      Self::X => Static::X,
+      Self::Z => Static::Z,
+      Self::LH => Static::H,
+      Self::HL => Static::L,
+      Self::LX => Static::X,
+      Self::LZ => Static::Z,
+      Self::HX => Static::X,
+      Self::HZ => Static::Z,
+      Self::XL => Static::L,
+      Self::ZL => Static::L,
+      Self::XH => Static::H,
+      Self::ZH => Static::H,
     }
   }
-
   /// | BGN(self) | END  | Combined|
   /// | :-------: | :--: | :-----: |
   /// | 1         | 0    | F       |
@@ -471,93 +230,98 @@ impl State {
   /// | F/R       | Any  | Illegal |
   #[must_use]
   #[inline]
-  pub const fn combine_bgn_end(bgn: &Self, end: &Self) -> Self {
+  pub const fn combine_bgn_end(bgn: &Static, end: &Static) -> State {
     match (bgn, end) {
-      (_, Self::Edge(_)) | (Self::Edge(_), _) => {
-        Self::UnInit(UnInit::Unknown(Some(IllegalType::RiseFallAtLevel)))
-      }
-      (Self::UnInit(_) | Self::Level(_), Self::UnInit(_))
-      | (Self::UnInit(_), Self::Level(_)) => *end,
-      (Self::Level(_bgn), Self::Level(_end)) => match (_bgn, _end) {
-        (Level::High, Level::High) => Self::Level(Level::High),
-        (Level::High, Level::Low) => Self::Edge(Edge::Fall),
-        (Level::Low, Level::High) => Self::Edge(Edge::Rise),
-        (Level::Low, Level::Low) => Self::Level(Level::Low),
-      },
+      (Static::X, Static::X) => Self::X,
+      (Static::X, Static::Z) => Self::X,
+      (Static::X, Static::H) => Self::XH,
+      (Static::X, Static::L) => Self::XL,
+      (Static::Z, Static::X) => Self::X,
+      (Static::Z, Static::Z) => Self::X,
+      (Static::Z, Static::H) => Self::ZH,
+      (Static::Z, Static::L) => Self::ZL,
+      (Static::H, Static::X) => Self::HX,
+      (Static::H, Static::Z) => Self::HZ,
+      (Static::H, Static::H) => Self::H,
+      (Static::H, Static::L) => Self::HL,
+      (Static::L, Static::X) => Self::LX,
+      (Static::L, Static::Z) => Self::LZ,
+      (Static::L, Static::H) => Self::LH,
+      (Static::L, Static::L) => Self::L,
     }
   }
 }
 
-/// Vector
-#[derive(Default)]
-#[derive(Debug, Clone)]
-#[derive(Hash, PartialEq, Eq)]
-#[derive(Ord, PartialOrd)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct Vector {
-  value: Vec<State>,
-}
+// /// Vector
+// #[derive(Default)]
+// #[derive(Debug, Clone)]
+// #[derive(Hash, PartialEq, Eq)]
+// #[derive(Ord, PartialOrd)]
+// #[derive(serde::Serialize, serde::Deserialize)]
+// pub struct Vector {
+//   value: Vec<State>,
+// }
 
-impl DerefMut for Vector {
-  #[inline]
-  fn deref_mut(&mut self) -> &mut Self::Target {
-    &mut self.value
-  }
-}
-impl Deref for Vector {
-  type Target = Vec<State>;
-  #[inline]
-  fn deref(&self) -> &Self::Target {
-    &self.value
-  }
-}
+// impl DerefMut for Vector {
+//   #[inline]
+//   fn deref_mut(&mut self) -> &mut Self::Target {
+//     &mut self.value
+//   }
+// }
+// impl Deref for Vector {
+//   type Target = Vec<State>;
+//   #[inline]
+//   fn deref(&self) -> &Self::Target {
+//     &self.value
+//   }
+// }
 
-impl From<Vec<State>> for Vector {
-  #[inline]
-  fn from(value: Vec<State>) -> Self {
-    Self { value }
-  }
-}
+// impl From<Vec<State>> for Vector {
+//   #[inline]
+//   fn from(value: Vec<State>) -> Self {
+//     Self { value }
+//   }
+// }
 
-impl From<Vector> for Vec<State> {
-  #[inline]
-  fn from(value: Vector) -> Self {
-    value.value
-  }
-}
+// impl From<Vector> for Vec<State> {
+//   #[inline]
+//   fn from(value: Vector) -> Self {
+//     value.value
+//   }
+// }
 
-impl fmt::Display for Vector {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    self.iter().fold(
-      Ok(()),
-      |result, state| result.and_then(|_| state.fmt(f)), // match state.get_change_pattern() {
-                                                         // Some(c) => result.and_then(|_| write!(f, "{}{}", state, c)),
-                                                         // None => result.and_then(|_| write!(f, "{}", state)),
-                                                         // }
-    )
-  }
-}
+// impl fmt::Display for Vector {
+//   #[inline]
+//   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//     self.iter().fold(
+//       Ok(()),
+//       |result, state| result.and_then(|_| state.fmt(f)), // match state.get_change_pattern() {
+//                                                          // Some(c) => result.and_then(|_| write!(f, "{}{}", state, c)),
+//                                                          // None => result.and_then(|_| write!(f, "{}", state)),
+//                                                          // }
+//     )
+//   }
+// }
 
-impl LogicLike for Vector {
-  #[inline]
-  fn inverse(&self) -> Self {
-    self.iter().map(State::inverse).collect::<Vec<State>>().into()
-  }
-  #[inline]
-  #[expect(clippy::indexing_slicing)]
-  fn variant_eq(&self, other: &Self) -> bool {
-    if self.len() != other.len() {
-      return false;
-    }
-    for (idx, a) in self.iter().enumerate() {
-      if !a.variant_eq(&other[idx]) {
-        return false;
-      }
-    }
-    true
-  }
-}
+// impl LogicLike for Vector {
+//   #[inline]
+//   fn inverse(&self) -> Self {
+//     self.iter().map(State::inverse).collect::<Vec<State>>().into()
+//   }
+//   #[inline]
+//   #[expect(clippy::indexing_slicing)]
+//   fn variant_eq(&self, other: &Self) -> bool {
+//     if self.len() != other.len() {
+//       return false;
+//     }
+//     for (idx, a) in self.iter().enumerate() {
+//       if !a.variant_eq(&other[idx]) {
+//         return false;
+//       }
+//     }
+//     true
+//   }
+// }
 
 // /// Operator1
 // #[derive(Debug, Clone, Copy, PartialEq)]
@@ -653,8 +417,8 @@ impl LogicLike for Vector {
 //   /// e.g. `High` `or` `Low` = `High`
 //   pub fn compute(&self, a: &State, b: &State) -> State {
 //     let compute_edge_logic = || -> State {
-//       let bgn_state = self.compute(&a.get_bgn(), &b.get_bgn());
-//       let end_state = self.compute(&a.get_end(), &b.get_end());
+//       let bgn_state = self.compute(&a.bgn(), &b.bgn());
+//       let end_state = self.compute(&a.end(), &b.end());
 //       let a_pattern = a.get_change_pattern();
 //       let b_pattern = b.get_change_pattern();
 //       State::combine_bgn_end(&bgn_state, &end_state)
@@ -663,27 +427,27 @@ impl LogicLike for Vector {
 //     let combine_illegal = || -> State {
 //       let a_illegal = a.get_illegal_type();
 //       let b_illegal = b.get_illegal_type();
-//       State::UnInit(UnInit::Unknown(IllegalType::combine(&a_illegal, &b_illegal)))
+//       State::UnInit(UnInit::X(IllegalType::combine(&a_illegal, &b_illegal)))
 //     };
 //     match (self, a, b) {
 //       (_, _, State::Edge(_)) => compute_edge_logic(),
 //       (_, State::Edge(_), _) => compute_edge_logic(),
 //       (_, State::UnInit(_a), State::UnInit(_b)) => combine_illegal(),
 //       (Operator2::And, State::UnInit(_a), State::Level(_b)) => match (_a, _b) {
-//         (UnInit::Unknown(_), Level::High) => *a,
-//         (UnInit::Unknown(_), Level::Low) => State::Level(Level::Low),
-//         (UnInit::HighImpedance, Level::High) => {
-//           State::UnInit(UnInit::Unknown(Some(IllegalType::HighImpedanceInput)))
+//         (UnInit::X, Level::High) => *a,
+//         (UnInit::X, Level::Low) => State::Level(Level::Low),
+//         (UnInit::Z, Level::High) => {
+//           State::UnInit(UnInit::X(Some(IllegalType::HighImpedanceInput)))
 //         }
-//         (UnInit::HighImpedance, Level::Low) => State::Level(Level::Low),
+//         (UnInit::Z, Level::Low) => State::Level(Level::Low),
 //       },
 //       (Operator2::And, State::Level(_a), State::UnInit(_b)) => match (_a, _b) {
-//         (Level::High, UnInit::Unknown(_)) => *b,
-//         (Level::High, UnInit::HighImpedance) => {
-//           State::UnInit(UnInit::Unknown(Some(IllegalType::HighImpedanceInput)))
+//         (Level::High, UnInit::X) => *b,
+//         (Level::High, UnInit::Z) => {
+//           State::UnInit(UnInit::X(Some(IllegalType::HighImpedanceInput)))
 //         }
-//         (Level::Low, UnInit::Unknown(_)) => State::Level(Level::Low),
-//         (Level::Low, UnInit::HighImpedance) => State::Level(Level::Low),
+//         (Level::Low, UnInit::X) => State::Level(Level::Low),
+//         (Level::Low, UnInit::Z) => State::Level(Level::Low),
 //       },
 //       (Operator2::And, State::Level(_a), State::Level(_b)) => match (_a, _b) {
 //         (Level::High, Level::High) => State::Level(Level::High),
@@ -692,19 +456,19 @@ impl LogicLike for Vector {
 //         (Level::Low, Level::Low) => State::Level(Level::Low),
 //       },
 //       (Operator2::Or, State::UnInit(_a), State::Level(_b)) => match (_a, _b) {
-//         (UnInit::Unknown(_), Level::High) => State::Level(Level::High),
-//         (UnInit::Unknown(_), Level::Low) => *a,
-//         (UnInit::HighImpedance, Level::High) => State::Level(Level::High),
-//         (UnInit::HighImpedance, Level::Low) => {
-//           State::UnInit(UnInit::Unknown(Some(IllegalType::HighImpedanceInput)))
+//         (UnInit::X, Level::High) => State::Level(Level::High),
+//         (UnInit::X, Level::Low) => *a,
+//         (UnInit::Z, Level::High) => State::Level(Level::High),
+//         (UnInit::Z, Level::Low) => {
+//           State::UnInit(UnInit::X(Some(IllegalType::HighImpedanceInput)))
 //         }
 //       },
 //       (Operator2::Or, State::Level(_a), State::UnInit(_b)) => match (_a, _b) {
-//         (Level::High, UnInit::Unknown(_)) => State::Level(Level::High),
-//         (Level::High, UnInit::HighImpedance) => State::Level(Level::High),
-//         (Level::Low, UnInit::Unknown(_)) => *b,
-//         (Level::Low, UnInit::HighImpedance) => {
-//           State::UnInit(UnInit::Unknown(Some(IllegalType::HighImpedanceInput)))
+//         (Level::High, UnInit::X) => State::Level(Level::High),
+//         (Level::High, UnInit::Z) => State::Level(Level::High),
+//         (Level::Low, UnInit::X) => *b,
+//         (Level::Low, UnInit::Z) => {
+//           State::UnInit(UnInit::X(Some(IllegalType::HighImpedanceInput)))
 //         }
 //       },
 //       (Operator2::Or, State::Level(_a), State::Level(_b)) => match (_a, _b) {
@@ -714,23 +478,23 @@ impl LogicLike for Vector {
 //         (Level::Low, Level::Low) => State::Level(Level::Low),
 //       },
 //       (Operator2::Xor, State::UnInit(_a), State::Level(_b)) => match (_a, _b) {
-//         (UnInit::Unknown(_), Level::High) => *a,
-//         (UnInit::Unknown(_), Level::Low) => *a,
-//         (UnInit::HighImpedance, Level::High) => {
-//           State::UnInit(UnInit::Unknown(Some(IllegalType::HighImpedanceInput)))
+//         (UnInit::X, Level::High) => *a,
+//         (UnInit::X, Level::Low) => *a,
+//         (UnInit::Z, Level::High) => {
+//           State::UnInit(UnInit::X(Some(IllegalType::HighImpedanceInput)))
 //         }
-//         (UnInit::HighImpedance, Level::Low) => {
-//           State::UnInit(UnInit::Unknown(Some(IllegalType::HighImpedanceInput)))
+//         (UnInit::Z, Level::Low) => {
+//           State::UnInit(UnInit::X(Some(IllegalType::HighImpedanceInput)))
 //         }
 //       },
 //       (Operator2::Xor, State::Level(_a), State::UnInit(_b)) => match (_a, _b) {
-//         (Level::High, UnInit::Unknown(_)) => *b,
-//         (Level::High, UnInit::HighImpedance) => {
-//           State::UnInit(UnInit::Unknown(Some(IllegalType::HighImpedanceInput)))
+//         (Level::High, UnInit::X) => *b,
+//         (Level::High, UnInit::Z) => {
+//           State::UnInit(UnInit::X(Some(IllegalType::HighImpedanceInput)))
 //         }
-//         (Level::Low, UnInit::Unknown(_)) => *b,
-//         (Level::Low, UnInit::HighImpedance) => {
-//           State::UnInit(UnInit::Unknown(Some(IllegalType::HighImpedanceInput)))
+//         (Level::Low, UnInit::X) => *b,
+//         (Level::Low, UnInit::Z) => {
+//           State::UnInit(UnInit::X(Some(IllegalType::HighImpedanceInput)))
 //         }
 //       },
 //       (Operator2::Xor, State::Level(_a), State::Level(_b)) => match (_a, _b) {

@@ -247,12 +247,15 @@ pub enum BoolExprErr {
   /// `Bracket`
   #[error("left-right Bracket mismatch")]
   Bracket,
-  /// `NoIdea`
-  #[error("something go wrong, {0}")]
-  NoIdea(u8),
   /// `BackNot`
   #[error("Can not move back-not")]
   BackNot,
+  /// `NoIdea`
+  #[error("something go wrong, code=1")]
+  NoIdea1,
+  /// `NoIdea`
+  #[error("something go wrong, code=2")]
+  NoIdea2,
 }
 
 /// **(internal)** Utility method to find first occurrence of a specific token in the token tree.
@@ -324,17 +327,17 @@ fn terminal(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
       if data.len() == 1 {
         Ok(Box::new(n.clone()))
       } else {
-        Err(BoolExprErr::NoIdea(3))
+        Err(BoolExprErr::NoIdea2)
       }
     }
     (Some(Token::Tokens(v)), _) => {
       if data.len() == 1 {
         Ok(parse_formula(v)?)
       } else {
-        Err(BoolExprErr::NoIdea(3))
+        Err(BoolExprErr::NoIdea2)
       }
     }
-    _ => Err(BoolExprErr::NoIdea(2)),
+    _ => Err(BoolExprErr::NoIdea1),
   }
 }
 
