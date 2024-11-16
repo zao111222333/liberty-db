@@ -280,11 +280,11 @@ impl ComplexAttri for CapacitiveLoadUnit {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let mut buffer = ryu::Buffer::new();
+    f.write_float(self.val.into_inner())?;
     if self.ff_pf {
-      write!(f, "{}, ff", buffer.format(self.val.into_inner()))
+      f.write_str(", ff")
     } else {
-      write!(f, "{}, pf", buffer.format(self.val.into_inner()))
+      f.write_str(", pf")
     }
   }
 }
