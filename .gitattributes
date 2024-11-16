@@ -1,5 +1,5 @@
 dev/include/** linguist-vendored
 *.golden.lib linguist-generated
 # ignore on release
-doc export-ignore
+docs export-ignore
 dev/tech export-ignore
