@@ -178,6 +178,7 @@ impl State {
   #[must_use]
   #[inline]
   pub const fn bgn(&self) -> Static {
+    #[expect(clippy::match_same_arms)]
     match self {
       Self::L => Static::L,
       Self::H => Static::H,
@@ -201,6 +202,7 @@ impl State {
   #[must_use]
   #[inline]
   pub const fn end(&self) -> Static {
+    #[expect(clippy::match_same_arms)]
     match self {
       Self::L => Static::L,
       Self::H => Static::H,
@@ -230,7 +232,8 @@ impl State {
   /// | F/R       | Any  | Illegal |
   #[must_use]
   #[inline]
-  pub const fn combine_bgn_end(bgn: &Static, end: &Static) -> State {
+  pub const fn combine_bgn_end(bgn: Static, end: Static) -> Self {
+    #[expect(clippy::match_same_arms)]
     match (bgn, end) {
       (Static::X, Static::X) => Self::X,
       (Static::X, Static::Z) => Self::X,

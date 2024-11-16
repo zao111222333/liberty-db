@@ -7,6 +7,7 @@ cfg_if::cfg_if! {
   {
     use core::hash::{BuildHasher, Hash, Hasher};
     const HASHER: foldhash::fast::FixedState = foldhash::fast::FixedState::with_seed(41);
+    #[allow(clippy::manual_hash_one)]
     fn hash_one<T: Hash>(t: &T) -> u64 {
       let mut hasher = HASHER.build_hasher();
       t.hash(&mut hasher);

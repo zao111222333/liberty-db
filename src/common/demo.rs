@@ -1,4 +1,4 @@
-#![allow(clippy::redundant_pub_crate)]
+#![allow(clippy::redundant_pub_crate, clippy::doc_markdown)]
 //! cargo expand common::demo
 //! cargo expand common::demo --features __dbg_no_hash_match
 use crate::{

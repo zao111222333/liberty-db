@@ -19,6 +19,7 @@ const DEFINED_COMMENT: &str = " /* user defined attribute */";
 const HASHER: foldhash::fast::FixedState = foldhash::fast::FixedState::with_seed(41);
 #[inline]
 #[cfg(not(feature = "__dbg_no_hash_match"))]
+#[expect(clippy::manual_hash_one)]
 pub(crate) fn hash_one<T: Hash + ?Sized>(t: &T) -> u64 {
   let mut hasher = HASHER.build_hasher();
   t.hash(&mut hasher);
@@ -465,7 +466,7 @@ pub(crate) trait SimpleAttri: Sized + core::fmt::Display {
 
 /// `ComplexParseError`
 #[derive(thiserror::Error, Debug)]
-pub enum ComplexParseError {
+pub(crate) enum ComplexParseError {
   /// `ParseFloatError`
   #[error("{0}")]
   Float(#[from] fast_float2::Error),

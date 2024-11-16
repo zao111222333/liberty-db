@@ -10,9 +10,8 @@ use crate::{
   common::table::{CompactLutTemplate, DriverWaveform, TableTemple},
   units, ArcStr, NotNan,
 };
-use core::fmt;
+use core::fmt::{self, Write};
 pub use items::*;
-use std::fmt::Write;
 
 /// The first line of the library group statement names the library.
 ///

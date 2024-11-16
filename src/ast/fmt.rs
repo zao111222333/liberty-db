@@ -50,7 +50,7 @@ impl Indentation for DefaultIndentation {
   }
 }
 /// `CodeFormatter` with indent
-#[allow(missing_debug_implementations)]
+#[expect(missing_debug_implementations)]
 pub struct CodeFormatter<'a, F, I> {
   f: &'a mut F,
   level: usize,

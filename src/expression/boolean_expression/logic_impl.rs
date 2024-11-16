@@ -1,58 +1,59 @@
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::multiple_inherent_impl)]
 use super::logic::{State, Static};
 use core::ops::{BitAnd, BitOr, BitXor, Not};
 
-impl<'a> BitAnd for &'a Static {
-  type Output = Static;
+impl BitAnd for Static {
+  type Output = Self;
   #[must_use]
   #[inline]
   fn bitand(self, rhs: Self) -> Self::Output {
     match (self, rhs) {
-      (_, Static::L) | (Static::L, _) => Static::L,
-      (Static::Z, _) => Static::X,
-      (_, Static::Z) => Static::X,
-      (l, Static::H) => *l,
-      (Static::H, r) => *r,
-      _ => Static::Z,
+      (_, Self::L) | (Self::L, _) => Self::L,
+      (Self::Z, _) | (_, Self::Z) => Self::X,
+      (l, Self::H) => l,
+      (Self::H, r) => r,
+      _ => Self::Z,
     }
   }
 }
 
-impl<'a> BitOr for &'a Static {
-  type Output = Static;
+impl BitOr for Static {
+  type Output = Self;
   #[must_use]
   #[inline]
   fn bitor(self, rhs: Self) -> Self::Output {
     match (self, rhs) {
-      (Static::H, _) | (_, Static::H) => Static::H,
-      (Static::L, Static::L) => Static::L,
-      _ => Static::Z,
+      (Self::H, _) | (_, Self::H) => Self::H,
+      (Self::L, Self::L) => Self::L,
+      _ => Self::Z,
     }
   }
 }
 
-impl<'a> BitXor for &'a Static {
-  type Output = Static;
+impl BitXor for Static {
+  type Output = Self;
   #[must_use]
   #[inline]
   fn bitxor(self, rhs: Self) -> Self::Output {
     match (self, rhs) {
-      (Static::H, Static::L) | (Static::L, Static::H) => Static::H,
-      (Static::H, Static::H) | (Static::L, Static::L) => Static::L,
-      _ => Static::Z,
+      (Self::H, Self::L) | (Self::L, Self::H) => Self::H,
+      (Self::H, Self::H) | (Self::L, Self::L) => Self::L,
+      _ => Self::Z,
     }
   }
 }
 
-impl<'a> Not for &'a Static {
-  type Output = Static;
+impl Not for Static {
+  type Output = Self;
   #[must_use]
   #[inline]
   fn not(self) -> Self::Output {
     match self {
-      Static::X => Static::X,
-      Static::Z => Static::Z,
-      Static::H => Static::L,
-      Static::L => Static::H,
+      Self::X => Self::X,
+      Self::Z => Self::Z,
+      Self::H => Self::L,
+      Self::L => Self::H,
     }
   }
 }
@@ -62,25 +63,25 @@ mod test {
   use crate::IntoEnumIterator;
 
   impl State {
-    fn combine_op2(&self, rhs: &Self, f: fn(&Static, &Static) -> Static) -> Self {
-      State::combine_bgn_end(&f(&self.bgn(), &rhs.bgn()), &f(&self.end(), &rhs.end()))
+    fn combine_op2(self, rhs: Self, f: fn(Static, Static) -> Static) -> Self {
+      Self::combine_bgn_end(f(self.bgn(), rhs.bgn()), f(self.end(), rhs.end()))
     }
   }
 
   #[inline]
-  fn static_bitand(l: &Static, r: &Static) -> Static {
+  fn static_bitand(l: Static, r: Static) -> Static {
     l.bitand(r)
   }
   #[inline]
-  fn static_bitor(l: &Static, r: &Static) -> Static {
+  fn static_bitor(l: Static, r: Static) -> Static {
     l.bitor(r)
   }
   #[inline]
-  fn static_bitxor(l: &Static, r: &Static) -> Static {
+  fn static_bitxor(l: Static, r: Static) -> Static {
     l.bitxor(r)
   }
   #[inline]
-  fn static_not(l: &Static) -> Static {
+  fn static_not(l: Static) -> Static {
     l.not()
   }
 
@@ -90,7 +91,7 @@ mod test {
       for r in State::iter() {
         println!(
           "(Self::{l},Self::{r})=>Self::{},",
-          State::combine_op2(&l, &r, static_bitor)
+          State::combine_op2(l, r, static_bitor)
         );
       }
     }
@@ -100,21 +101,21 @@ mod test {
     for l in State::iter() {
       println!(
         "Self::{l}=>Self::{},",
-        State::combine_bgn_end(&l.bgn().not(), &l.end().not())
+        State::combine_bgn_end(l.bgn().not(), l.end().not())
       );
     }
   }
   #[test]
   fn gen_lut_op1() {
     for l in State::iter() {
-      println!("Self::{},", State::combine_bgn_end(&l.bgn().not(), &l.end().not()));
+      println!("Self::{},", State::combine_bgn_end(l.bgn().not(), l.end().not()));
     }
   }
   #[test]
   fn gen_lut_op2() {
     for l in State::iter() {
       for r in State::iter() {
-        println!("Self::{},", State::combine_op2(&l, &r, static_bitor));
+        println!("Self::{},", State::combine_op2(l, r, static_bitor));
       }
     }
   }
@@ -124,9 +125,9 @@ mod test {
     use std::time::SystemTime;
     let fns: [(
       &str,
-      fn(&Static, &Static) -> Static,
-      fn(&State, &State) -> State,
-      fn(&State, &State) -> State,
+      fn(Static, Static) -> Static,
+      fn(State, State) -> State,
+      fn(State, State) -> State,
     ); 3] = [
       ("and", static_bitand, State::lut_bitand, State::match_bitand),
       ("or", static_bitor, State::lut_bitor, State::match_bitor),
@@ -137,39 +138,39 @@ mod test {
       println!("=============== {name}");
       for l in State::iter() {
         for r in State::iter() {
-          assert_eq!(State::combine_op2(&l, &r, static_op2), lut_op2(&l, &r));
-          assert_eq!(State::combine_op2(&l, &r, static_op2), match_op2(&l, &r));
+          assert_eq!(State::combine_op2(l, r, static_op2), lut_op2(l, r));
+          assert_eq!(State::combine_op2(l, r, static_op2), match_op2(l, r));
         }
       }
-      let start = SystemTime::now();
+      let start_combine = SystemTime::now();
       for _ in 0..n {
         for l in State::iter() {
           for r in State::iter() {
-            _ = criterion::black_box(State::combine_op2(&l, &r, static_op2));
+            _ = criterion::black_box(State::combine_op2(l, r, static_op2));
           }
         }
       }
-      let runtime_combine = SystemTime::now().duration_since(start).unwrap();
+      let runtime_combine = SystemTime::now().duration_since(start_combine).unwrap();
       println!("runtime combine {runtime_combine:?}");
-      let start = SystemTime::now();
+      let start_match = SystemTime::now();
       for _ in 0..n {
         for l in State::iter() {
           for r in State::iter() {
-            _ = criterion::black_box(match_op2(&l, &r));
+            _ = criterion::black_box(match_op2(l, r));
           }
         }
       }
-      let runtime_match = SystemTime::now().duration_since(start).unwrap();
+      let runtime_match = SystemTime::now().duration_since(start_match).unwrap();
       println!("runtime match   {runtime_match:?}");
-      let start = SystemTime::now();
+      let start_lut = SystemTime::now();
       for _ in 0..n {
         for l in State::iter() {
           for r in State::iter() {
-            _ = criterion::black_box(lut_op2(&l, &r));
+            _ = criterion::black_box(lut_op2(l, r));
           }
         }
       }
-      let runtime_lut = SystemTime::now().duration_since(start).unwrap();
+      let runtime_lut = SystemTime::now().duration_since(start_lut).unwrap();
       println!("runtime lut     {runtime_lut:?}");
       #[cfg(not(debug_assertions))]
       {
@@ -186,78 +187,78 @@ mod test {
     let n = 20000000;
     println!("=============== not");
     for l in State::iter() {
-      let combine = State::combine_bgn_end(&l.bgn().not(), &l.end().not());
-      assert_eq!(combine, State::match_not(&l));
-      assert_eq!(combine, State::lut_not(&l));
+      let combine = State::combine_bgn_end(l.bgn().not(), l.end().not());
+      assert_eq!(combine, State::match_not(l));
+      assert_eq!(combine, State::lut_not(l));
     }
-    let start = SystemTime::now();
+    let start_combine = SystemTime::now();
     for _ in 0..n {
       for l in State::iter() {
-        let combine = State::combine_bgn_end(&l.bgn().not(), &l.end().not());
+        let combine = State::combine_bgn_end(l.bgn().not(), l.end().not());
         _ = criterion::black_box(combine);
       }
     }
-    let runtime_combine = SystemTime::now().duration_since(start).unwrap();
+    let runtime_combine = SystemTime::now().duration_since(start_combine).unwrap();
     println!("runtime combine {runtime_combine:?}");
-    let start = SystemTime::now();
+    let start_match = SystemTime::now();
     for _ in 0..n {
       for l in State::iter() {
-        _ = criterion::black_box(State::match_not(&l));
+        _ = criterion::black_box(State::match_not(l));
       }
     }
-    let runtime_match = SystemTime::now().duration_since(start).unwrap();
+    let runtime_match = SystemTime::now().duration_since(start_match).unwrap();
     println!("runtime match   {runtime_match:?}");
-    let start = SystemTime::now();
+    let start_lut = SystemTime::now();
     for _ in 0..n {
       for l in State::iter() {
         for r in State::iter() {
-          _ = criterion::black_box(State::lut_not(&l));
+          _ = criterion::black_box(State::lut_not(l));
         }
       }
     }
-    let runtime_lut = SystemTime::now().duration_since(start).unwrap();
+    let runtime_lut = SystemTime::now().duration_since(start_lut).unwrap();
     println!("runtime lut     {runtime_lut:?}");
     #[cfg(not(debug_assertions))]
     {
       assert!(runtime_lut > runtime_combine);
-      assert!(runtime_match.as_secs_f32() / runtime_combine.as_secs_f32() > 0.8);
+      assert!(runtime_combine.as_secs_f32() / runtime_match.as_secs_f32() > 0.8);
     }
   }
 }
 
-impl<'a> BitAnd for &'a State {
-  type Output = State;
+impl BitAnd for State {
+  type Output = Self;
   #[must_use]
   #[inline]
   fn bitand(self, rhs: Self) -> Self::Output {
-    State::lut_bitand(self, rhs)
+    Self::lut_bitand(self, rhs)
   }
 }
 
-impl<'a> BitOr for &'a State {
-  type Output = State;
+impl BitOr for State {
+  type Output = Self;
   #[must_use]
   #[inline]
   fn bitor(self, rhs: Self) -> Self::Output {
-    State::lut_bitor(self, rhs)
+    Self::lut_bitor(self, rhs)
   }
 }
 
-impl<'a> BitXor for &'a State {
-  type Output = State;
+impl BitXor for State {
+  type Output = Self;
   #[must_use]
   #[inline]
   fn bitxor(self, rhs: Self) -> Self::Output {
-    State::lut_bitxor(self, rhs)
+    Self::lut_bitxor(self, rhs)
   }
 }
 
-impl<'a> Not for &'a State {
-  type Output = State;
+impl Not for State {
+  type Output = Self;
   #[must_use]
   #[inline]
   fn not(self) -> Self::Output {
-    State::combine_not(self)
+    Self::match_not(self)
   }
 }
 
@@ -462,13 +463,19 @@ impl State {
   ];
   #[must_use]
   #[inline]
-  fn lut_bitand(&self, rhs: &Self) -> Self {
-    Self::LUT_AND[(*self as usize) * 14 + (*rhs as usize)]
+  #[expect(
+    clippy::indexing_slicing,
+    clippy::arithmetic_side_effects,
+    clippy::as_conversions
+  )]
+  const fn lut_bitand(self, rhs: Self) -> Self {
+    Self::LUT_AND[(self as usize) * 14 + (rhs as usize)]
   }
   #[must_use]
   #[inline]
   #[cfg(test)]
-  fn match_bitand(&self, rhs: &Self) -> Self {
+  const fn match_bitand(self, rhs: Self) -> Self {
+    #[expect(clippy::match_same_arms)]
     match (self, rhs) {
       (Self::L, Self::L) => Self::L,
       (Self::L, Self::H) => Self::L,
@@ -871,13 +878,19 @@ impl State {
   ];
   #[must_use]
   #[inline]
-  fn lut_bitor(&self, rhs: &Self) -> Self {
-    Self::LUT_OR[(*self as usize) * 14 + (*rhs as usize)]
+  #[expect(
+    clippy::indexing_slicing,
+    clippy::arithmetic_side_effects,
+    clippy::as_conversions
+  )]
+  const fn lut_bitor(self, rhs: Self) -> Self {
+    Self::LUT_OR[(self as usize) * 14 + (rhs as usize)]
   }
   #[must_use]
   #[inline]
   #[cfg(test)]
-  fn match_bitor(&self, rhs: &Self) -> Self {
+  const fn match_bitor(self, rhs: Self) -> Self {
+    #[expect(clippy::match_same_arms)]
     match (self, rhs) {
       (Self::L, Self::L) => Self::L,
       (Self::L, Self::H) => Self::H,
@@ -1280,13 +1293,19 @@ impl State {
   ];
   #[must_use]
   #[inline]
-  fn lut_bitxor(&self, rhs: &Self) -> Self {
-    Self::LUT_XOR[(*self as usize) * 14 + (*rhs as usize)]
+  #[expect(
+    clippy::indexing_slicing,
+    clippy::arithmetic_side_effects,
+    clippy::as_conversions
+  )]
+  const fn lut_bitxor(self, rhs: Self) -> Self {
+    Self::LUT_XOR[(self as usize) * 14 + (rhs as usize)]
   }
   #[must_use]
   #[inline]
   #[cfg(test)]
-  fn match_bitxor(&self, rhs: &Self) -> Self {
+  const fn match_bitxor(self, rhs: Self) -> Self {
+    #[expect(clippy::match_same_arms)]
     match (self, rhs) {
       (Self::L, Self::L) => Self::L,
       (Self::L, Self::H) => Self::H,
@@ -1508,19 +1527,21 @@ impl State {
   ];
   #[must_use]
   #[inline]
-  fn combine_not(&self) -> Self {
-    State::combine_bgn_end(&self.bgn().not(), &self.end().not())
+  #[cfg(test)]
+  fn combine_not(self) -> Self {
+    Self::combine_bgn_end(self.bgn().not(), self.end().not())
   }
   #[must_use]
   #[inline]
   #[cfg(test)]
-  fn lut_not(&self) -> Self {
-    Self::LUT_NOT[*self as usize]
+  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
+  const fn lut_not(self) -> Self {
+    Self::LUT_NOT[self as usize]
   }
   #[must_use]
   #[inline]
-  #[cfg(test)]
-  fn match_not(&self) -> Self {
+  const fn match_not(self) -> Self {
+    #[expect(clippy::match_same_arms)]
     match self {
       Self::L => Self::H,
       Self::H => Self::L,

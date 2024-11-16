@@ -1,3 +1,4 @@
+#![allow(clippy::unsafe_derive_deserialize, clippy::undocumented_unsafe_blocks)]
 //! <script>
 //! IFRAME('https://en.wikipedia.org/wiki/International_System_of_Units');
 //! </script>
@@ -40,7 +41,8 @@ pub enum TimeUnit {
 
 impl TimeUnit {
   #[inline]
-  pub fn value(&self) -> NotNan<f64> {
+  #[must_use]
+  pub const fn value(&self) -> NotNan<f64> {
     match self {
       Self::_1ps => unsafe { NotNan::new_unchecked(1E-12_f64) },
       Self::_10ps => unsafe { NotNan::new_unchecked(1E-11_f64) },
@@ -89,12 +91,13 @@ pub enum VoltageUnit {
 
 impl VoltageUnit {
   #[inline]
-  pub fn value(&self) -> NotNan<f64> {
+  #[must_use]
+  pub const fn value(&self) -> NotNan<f64> {
     match self {
-      VoltageUnit::_1mV => unsafe { NotNan::new_unchecked(1E-3_f64) },
-      VoltageUnit::_10mV => unsafe { NotNan::new_unchecked(1E-2_f64) },
-      VoltageUnit::_100mV => unsafe { NotNan::new_unchecked(1E-1_f64) },
-      VoltageUnit::_1V => unsafe { NotNan::new_unchecked(1E0_f64) },
+      Self::_1mV => unsafe { NotNan::new_unchecked(1E-3_f64) },
+      Self::_10mV => unsafe { NotNan::new_unchecked(1E-2_f64) },
+      Self::_100mV => unsafe { NotNan::new_unchecked(1E-1_f64) },
+      Self::_1V => unsafe { NotNan::new_unchecked(1E0_f64) },
     }
   }
 }
@@ -147,7 +150,8 @@ pub enum CurrentUnit {
 
 impl CurrentUnit {
   #[inline]
-  pub fn value(&self) -> NotNan<f64> {
+  #[must_use]
+  pub const fn value(&self) -> NotNan<f64> {
     match self {
       Self::_1uA => unsafe { NotNan::new_unchecked(1E-6_f64) },
       Self::_10uA => unsafe { NotNan::new_unchecked(1E-5_f64) },
@@ -199,7 +203,8 @@ pub enum PullingResistanceUnit {
 
 impl PullingResistanceUnit {
   #[inline]
-  pub fn value(&self) -> NotNan<f64> {
+  #[must_use]
+  pub const fn value(&self) -> NotNan<f64> {
     match self {
       Self::_1ohm => unsafe { NotNan::new_unchecked(1E0_f64) },
       Self::_10ohm => unsafe { NotNan::new_unchecked(1E1_f64) },
@@ -242,6 +247,8 @@ pub struct CapacitiveLoadUnit {
 
 impl CapacitiveLoadUnit {
   #[inline]
+  #[must_use]
+  #[expect(clippy::arithmetic_side_effects, clippy::float_arithmetic)]
   pub fn value(&self) -> NotNan<f64> {
     if self.ff_pf {
       self.val * 1e-15
@@ -347,7 +354,8 @@ pub enum LeakagePowerUnit {
 
 impl LeakagePowerUnit {
   #[inline]
-  pub fn value(&self) -> NotNan<f64> {
+  #[must_use]
+  pub const fn value(&self) -> NotNan<f64> {
     match self {
       Self::_1pW => unsafe { NotNan::new_unchecked(1E-12_f64) },
       Self::_10pW => unsafe { NotNan::new_unchecked(1E-11_f64) },

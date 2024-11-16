@@ -1094,23 +1094,20 @@ impl ComplexAttri for FanoutLength {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    match (self.average_capacitance, self.standard_deviation, self.number_of_nets) {
-      (Some(average_capacitance), Some(standard_deviation), Some(number_of_nets)) => {
-        f.write_int(self.fanout)?;
-        f.write_str(", ")?;
-        f.write_float(self.length.into_inner())?;
-        f.write_float(average_capacitance.into_inner())?;
-        f.write_str(", ")?;
-        f.write_float(standard_deviation.into_inner())?;
-        f.write_str(", ")?;
-        f.write_int(number_of_nets)
-      }
-      _ => {
-        f.write_int(self.fanout)?;
-        f.write_str(", ")?;
-        f.write_float(self.length.into_inner())
-      }
+    f.write_int(self.fanout)?;
+    f.write_str(", ")?;
+    f.write_float(self.length.into_inner())?;
+    if let (Some(average_capacitance), Some(standard_deviation), Some(number_of_nets)) =
+      (self.average_capacitance, self.standard_deviation, self.number_of_nets)
+    {
+      f.write_str(", ")?;
+      f.write_float(average_capacitance.into_inner())?;
+      f.write_str(", ")?;
+      f.write_float(standard_deviation.into_inner())?;
+      f.write_str(", ")?;
+      f.write_int(number_of_nets)?;
     }
+    Ok(())
   }
 }
 
