@@ -1,7 +1,6 @@
 #! /bin/bash
-# .github/workflows/publish.sh 0.6.4
+# .github/workflows/publish.sh 0.7.0
 VERSION=$1
-
 sed -i "/\[workspace.package\]/,/version/ s/version = \"[^\"]*\"/version = \"$VERSION\"/" Cargo.toml
 cd macros
 cargo publish --allow-dirty --registry crates-io

@@ -123,7 +123,7 @@ jobs:
         run: echo "TODO ${{ github.event.pull_request.head.sha }}"
   # Compute code coverage
   codecov:
-    needs: [unit_test, clippy, case_test]
+    needs: [unit_test, clippy, case_test, examples]
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:

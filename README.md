@@ -69,7 +69,6 @@ cargo bench --bench dev
 + Linked Group
 + like IndexMap, only sort once and store
 + CI: only do comparsion after tag new version
-+ CI: auto release after tag
 + CI: fast regression self in build.yml
 + ~~user `define`~~
 + ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~
