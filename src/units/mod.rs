@@ -3,60 +3,13 @@
 //! </script>
 
 use crate::{
-  ast::{CodeFormatter, Indentation, ParseScope},
-  common::parse_f64,
-};
-use core::{
-  fmt::{self, Write},
-  marker::PhantomData,
-};
-pub use uom::{
-  fmt::DisplayStyle,
-  si::{
-    capacitance, electric_current, electric_potential, electrical_resistance,
-    f64::{
-      Capacitance, ElectricCharge, ElectricCurrent, ElectricPotential,
-      ElectricalResistance, Energy, Length, Power, Ratio, ThermodynamicTemperature, Time,
-    },
-    ratio, thermodynamic_temperature, Unit,
+  ast::{
+    CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope, SimpleAttri,
   },
+  common::parse_f64,
+  NotNan,
 };
-pub mod electric_charge;
-pub mod energy;
-pub mod length;
-pub mod power;
-pub mod time;
-
-/// Create `Length` quantity with `meter` unit
-#[must_use]
-#[inline]
-pub fn meter(v: f64) -> Length {
-  Length::new::<length::meter>(v)
-}
-
-/// Create `Time` quantity with `second` unit
-#[must_use]
-#[inline]
-pub fn second(v: f64) -> Time {
-  Time::new::<time::second>(v)
-}
-
-/// Create `Time` quantity with `microsecond` unit
-#[must_use]
-#[inline]
-pub fn microsecond(v: f64) -> Time {
-  Time::new::<time::microsecond>(v)
-}
-
-/// Create `Time` quantity with `nanosecond` unit
-#[must_use]
-#[inline]
-pub fn nanosecond(v: f64) -> Time {
-  Time::new::<time::nanosecond>(v)
-}
-
-use crate::ast::{ComplexAttri, ComplexParseError, SimpleAttri};
-use core::ops::Deref;
+use core::fmt::{self, Write};
 
 /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
 ///
@@ -86,40 +39,14 @@ pub enum TimeUnit {
 }
 
 impl TimeUnit {
-  const LUT: [<Self as Deref>::Target; 4] = [
-    // 1ps
-    Time {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-12_f64,
-    },
-    // 10ps
-    Time {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-11_f64,
-    },
-    // 100ps
-    Time {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-10_f64,
-    },
-    // 1ns
-    Time {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-9_f64,
-    },
-  ];
-}
-
-impl Deref for TimeUnit {
-  type Target = Time;
-  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
-  fn deref(&self) -> &Self::Target {
-    &Self::LUT[*self as usize]
+  pub fn value(&self) -> NotNan<f64> {
+    match self {
+      Self::_1ps => unsafe { NotNan::new_unchecked(1E-12_f64) },
+      Self::_10ps => unsafe { NotNan::new_unchecked(1E-11_f64) },
+      Self::_100ps => unsafe { NotNan::new_unchecked(1E-10_f64) },
+      Self::_1ns => unsafe { NotNan::new_unchecked(1E-9_f64) },
+    }
   }
 }
 
@@ -161,40 +88,14 @@ pub enum VoltageUnit {
 }
 
 impl VoltageUnit {
-  const LUT: [<Self as Deref>::Target; 4] = [
-    // 1mV
-    ElectricPotential {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-3_f64,
-    },
-    // 10mV
-    ElectricPotential {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-2_f64,
-    },
-    // 100mV
-    ElectricPotential {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-1_f64,
-    },
-    // 1V
-    ElectricPotential {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E0___f64,
-    },
-  ];
-}
-
-impl Deref for VoltageUnit {
-  type Target = ElectricPotential;
-  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
-  fn deref(&self) -> &Self::Target {
-    &Self::LUT[*self as usize]
+  pub fn value(&self) -> NotNan<f64> {
+    match self {
+      VoltageUnit::_1mV => unsafe { NotNan::new_unchecked(1E-3_f64) },
+      VoltageUnit::_10mV => unsafe { NotNan::new_unchecked(1E-2_f64) },
+      VoltageUnit::_100mV => unsafe { NotNan::new_unchecked(1E-1_f64) },
+      VoltageUnit::_1V => unsafe { NotNan::new_unchecked(1E0_f64) },
+    }
   }
 }
 
@@ -245,58 +146,17 @@ pub enum CurrentUnit {
 }
 
 impl CurrentUnit {
-  const LUT: [<Self as Deref>::Target; 7] = [
-    // 1uA
-    ElectricCurrent {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-6_f64,
-    },
-    // 10uA
-    ElectricCurrent {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-5_f64,
-    },
-    // 100uA
-    ElectricCurrent {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-4_f64,
-    },
-    // 1mA
-    ElectricCurrent {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-3_f64,
-    },
-    // 10mA
-    ElectricCurrent {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-2_f64,
-    },
-    // 100mA
-    ElectricCurrent {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-1_f64,
-    },
-    // 1A
-    ElectricCurrent {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E0_f64,
-    },
-  ];
-}
-
-impl Deref for CurrentUnit {
-  type Target = ElectricCurrent;
-  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
-  fn deref(&self) -> &Self::Target {
-    &Self::LUT[*self as usize]
+  pub fn value(&self) -> NotNan<f64> {
+    match self {
+      Self::_1uA => unsafe { NotNan::new_unchecked(1E-6_f64) },
+      Self::_10uA => unsafe { NotNan::new_unchecked(1E-5_f64) },
+      Self::_100uA => unsafe { NotNan::new_unchecked(1E-4_f64) },
+      Self::_1mA => unsafe { NotNan::new_unchecked(1E-3_f64) },
+      Self::_10mA => unsafe { NotNan::new_unchecked(1E-2_f64) },
+      Self::_100mA => unsafe { NotNan::new_unchecked(1E-1_f64) },
+      Self::_1A => unsafe { NotNan::new_unchecked(1E0_f64) },
+    }
   }
 }
 
@@ -338,40 +198,14 @@ pub enum PullingResistanceUnit {
 }
 
 impl PullingResistanceUnit {
-  const LUT: [<Self as Deref>::Target; 4] = [
-    // 1ohm
-    ElectricalResistance {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E0_f64,
-    },
-    // 10ohm
-    ElectricalResistance {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E1_f64,
-    },
-    // 100ohm
-    ElectricalResistance {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E2_f64,
-    },
-    // 1kohm
-    ElectricalResistance {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E3_f64,
-    },
-  ];
-}
-
-impl Deref for PullingResistanceUnit {
-  type Target = ElectricalResistance;
-  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
-  fn deref(&self) -> &Self::Target {
-    &Self::LUT[*self as usize]
+  pub fn value(&self) -> NotNan<f64> {
+    match self {
+      Self::_1ohm => unsafe { NotNan::new_unchecked(1E0_f64) },
+      Self::_10ohm => unsafe { NotNan::new_unchecked(1E1_f64) },
+      Self::_100ohm => unsafe { NotNan::new_unchecked(1E2_f64) },
+      Self::_1kohm => unsafe { NotNan::new_unchecked(1E3_f64) },
+    }
   }
 }
 
@@ -399,15 +233,21 @@ impl SimpleAttri for PullingResistanceUnit {
 #[derive(Debug, Default, Clone, Copy)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CapacitiveLoadUnit {
-  ff_pf: bool,
-  _v: Capacitance,
+  /// `ff`: `true`
+  ///
+  /// `pf`: `false`
+  pub ff_pf: bool,
+  pub val: NotNan<f64>,
 }
 
-impl Deref for CapacitiveLoadUnit {
-  type Target = Capacitance;
+impl CapacitiveLoadUnit {
   #[inline]
-  fn deref(&self) -> &Self::Target {
-    &self._v
+  pub fn value(&self) -> NotNan<f64> {
+    if self.ff_pf {
+      self.val * 1e-15
+    } else {
+      self.val * 1e-12
+    }
   }
 }
 
@@ -418,14 +258,14 @@ impl ComplexAttri for CapacitiveLoadUnit {
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter.flat_map(IntoIterator::into_iter);
-    let value = match i.next() {
+    let val = match i.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let (ff_pf, _v): (bool, Capacitance) = match i.next() {
+    let ff_pf = match i.next() {
       Some(&s) => match s {
-        "ff" => (true, Capacitance::new::<capacitance::femtofarad>(*value)),
-        "pf" => (false, Capacitance::new::<capacitance::picofarad>(*value)),
+        "ff" => true,
+        "pf" => false,
         _ => return Err(ComplexParseError::UnsupportedWord),
       },
       None => return Err(ComplexParseError::LengthDismatch),
@@ -433,7 +273,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    Ok(Self { ff_pf, _v })
+    Ok(Self { ff_pf, val })
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -442,9 +282,9 @@ impl ComplexAttri for CapacitiveLoadUnit {
   ) -> fmt::Result {
     let mut buffer = ryu::Buffer::new();
     if self.ff_pf {
-      write!(f, "{}, ff", buffer.format(self._v.get::<capacitance::femtofarad>()))
+      write!(f, "{}, ff", buffer.format(self.val.into_inner()))
     } else {
-      write!(f, "{}, pf", buffer.format(self._v.get::<capacitance::picofarad>()))
+      write!(f, "{}, pf", buffer.format(self.val.into_inner()))
     }
   }
 }
@@ -460,14 +300,10 @@ impl ComplexAttri for CapacitiveLoadUnit {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 #[derive(strum_macros::EnumString, strum_macros::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LeakagePowerUnit {
-  /// No units
-  #[strum(serialize = "")]
-  #[default]
-  None,
   /// 1pW, 1e-12
   #[strum(serialize = "1pW")]
   _1pW,
@@ -508,109 +344,28 @@ pub enum LeakagePowerUnit {
   #[strum(serialize = "1W")]
   _1W,
 }
+
 impl LeakagePowerUnit {
-  const LUT: [<Self as Deref>::Target; 14] = [
-    // No Unit
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1.0_f64,
-    },
-    // 1pW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-12_f64,
-    },
-    // 10pW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-11_f64,
-    },
-    // 100pW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-10_f64,
-    },
-    // 1nW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-9_f64,
-    },
-    // 10nW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-8_f64,
-    },
-    // 100nW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-7_f64,
-    },
-    // 1uW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-6_f64,
-    },
-    // 10uW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-5_f64,
-    },
-    // 100uW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-4_f64,
-    },
-    // 1mW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-3_f64,
-    },
-    // 10mW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-2_f64,
-    },
-    // 100mW
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E-1_f64,
-    },
-    // 1W
-    Power {
-      dimension: PhantomData,
-      units: PhantomData,
-      value: 1E0_f64,
-    },
-  ];
-}
-
-impl Deref for LeakagePowerUnit {
-  type Target = Power;
-  #[expect(clippy::indexing_slicing, clippy::as_conversions)]
   #[inline]
-  fn deref(&self) -> &Self::Target {
-    &Self::LUT[*self as usize]
+  pub fn value(&self) -> NotNan<f64> {
+    match self {
+      Self::_1pW => unsafe { NotNan::new_unchecked(1E-12_f64) },
+      Self::_10pW => unsafe { NotNan::new_unchecked(1E-11_f64) },
+      Self::_100pW => unsafe { NotNan::new_unchecked(1E-10_f64) },
+      Self::_1nW => unsafe { NotNan::new_unchecked(1E-9_f64) },
+      Self::_10nW => unsafe { NotNan::new_unchecked(1E-8_f64) },
+      Self::_100nW => unsafe { NotNan::new_unchecked(1E-7_f64) },
+      Self::_1uW => unsafe { NotNan::new_unchecked(1E-6_f64) },
+      Self::_10uW => unsafe { NotNan::new_unchecked(1E-5_f64) },
+      Self::_100uW => unsafe { NotNan::new_unchecked(1E-4_f64) },
+      Self::_1mW => unsafe { NotNan::new_unchecked(1E-3_f64) },
+      Self::_10mW => unsafe { NotNan::new_unchecked(1E-2_f64) },
+      Self::_100mW => unsafe { NotNan::new_unchecked(1E-1_f64) },
+      Self::_1W => unsafe { NotNan::new_unchecked(1E-0_f64) },
+    }
   }
 }
-
 impl SimpleAttri for LeakagePowerUnit {
-  #[inline]
-  fn is_set(&self) -> bool {
-    self.ne(&Self::None)
-  }
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
