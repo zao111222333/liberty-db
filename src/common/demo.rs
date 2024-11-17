@@ -1,6 +1,6 @@
 #![allow(clippy::redundant_pub_crate, clippy::doc_markdown)]
 //! cargo expand common::demo
-//! cargo expand common::demo --features __dbg_no_hash_match
+//! cargo expand common::demo --no-default-features
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
@@ -42,7 +42,7 @@ pub(crate) struct Pin {
   #[liberty(comments)]
   comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   attributes: Attributes,
   #[size = 24]
@@ -69,7 +69,7 @@ pub(crate) struct FF {
   #[liberty(comments)]
   comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   attributes: Attributes,
   #[liberty(simple(type = Option))]

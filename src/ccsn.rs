@@ -57,7 +57,7 @@ pub struct CCSNStage {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 16]
@@ -301,27 +301,27 @@ impl SimpleAttri for StageType {
 pub struct ReceiverCapacitance {
   /// group name
   #[size = 8]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   pub name: Option<ArcStr>,
   /// group comments
   #[size = 48]
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   #[size = 80]
   #[liberty(simple(type=Option))]
+  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   pub when: Option<IdBooleanExpression>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]

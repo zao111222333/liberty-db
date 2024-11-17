@@ -35,7 +35,7 @@ pub struct LeakagePower {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
@@ -43,7 +43,7 @@ pub struct LeakagePower {
   #[liberty(simple(type = Option))]
   power_level: Option<ArcStr>,
   #[id]
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   related_pg_pin: WordSet,
   #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
@@ -153,7 +153,7 @@ pub struct Statetable {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   #[size = 24]
@@ -335,7 +335,7 @@ pub struct PgPin {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   /// <a name ="reference_link" href="

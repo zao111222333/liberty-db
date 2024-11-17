@@ -33,8 +33,8 @@ lazy_static::lazy_static! {
 
 pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
   #[inline]
-  fn get_nodes(&self) -> HashSet<ArcStr, crate::RandomState> {
-    let mut node_set = HashSet::with_hasher(crate::RandomState::new());
+  fn get_nodes(&self) -> HashSet<ArcStr, crate::ast::RandomState> {
+    let mut node_set = HashSet::with_hasher(crate::ast::RandomState::new());
     _get_nodes(self.borrow(), &mut node_set);
     node_set
   }
@@ -288,7 +288,7 @@ impl fmt::Display for IdBooleanExpression {
 }
 
 #[inline]
-fn _get_nodes(expr: &Expr, node_set: &mut HashSet<ArcStr, crate::RandomState>) {
+fn _get_nodes(expr: &Expr, node_set: &mut HashSet<ArcStr, crate::ast::RandomState>) {
   match expr {
     Expr::Const(_) => (),
     Expr::Variable(node) => {

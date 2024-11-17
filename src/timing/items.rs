@@ -201,7 +201,7 @@ pub struct CellDegradation {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: ast::Attributes,
   /// /* lookup table */

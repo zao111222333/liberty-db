@@ -46,7 +46,7 @@ pub struct Sensitization {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `pin_names` attribute specified at the library level defines
@@ -355,7 +355,7 @@ pub struct InputVoltage {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The maximum input voltage for which the input to the core is guaranteed to be a logic 0
@@ -410,7 +410,7 @@ pub struct OutputVoltage {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The maximum output voltage generated to represent a logic 0.
@@ -497,7 +497,7 @@ pub struct OperatingConditions {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// An optional attribute, you can use calc_mode  to specify an associated process mode.
@@ -584,7 +584,7 @@ pub struct FpgaIsd {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `drive`  attribute is optional and specifies the output current of the FPGA part or the FPGA cell.
@@ -764,8 +764,7 @@ impl ComplexAttri for Define {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    let define_id =
-      crate::ast::define_id(scope.define_map.hasher(), &group_name, &attribute_name);
+    let define_id = crate::ast::define_id(&scope.hasher, &group_name, &attribute_name);
     _ = scope
       .define_map
       .insert(define_id, DefinedType::Simple(attribute_type));
@@ -823,8 +822,7 @@ impl ComplexAttri for DefineGroup {
     if i.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    let define_id =
-      crate::ast::define_id(scope.define_map.hasher(), &parent_name, &group);
+    let define_id = crate::ast::define_id(&scope.hasher, &parent_name, &group);
     _ = scope.define_map.insert(define_id, DefinedType::Group);
     Ok(Self { group, parent_name })
   }
@@ -951,7 +949,7 @@ pub struct WireLoad {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
@@ -1004,7 +1002,7 @@ pub struct WireLoad {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
   /// ">Reference</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<FanoutLength>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FanoutLength>::deserialize_with")]
@@ -1131,7 +1129,7 @@ pub struct WireLoadSection {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
@@ -1226,7 +1224,7 @@ pub struct BaseCurves {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `base_curve_type` attribute specifies the type of base curve.
@@ -1252,7 +1250,7 @@ pub struct BaseCurves {
   #[size = 24]
   #[liberty(complex)]
   pub curve_x: Vec<NotNan<f64>>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<IdVector>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<IdVector>::deserialize_with")]

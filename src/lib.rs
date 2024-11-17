@@ -163,9 +163,3 @@ pub use ast::Group;
 pub mod ccsn;
 mod types;
 pub mod util;
-
-// foldhash::fast::RandomState;
-#[cfg(not(feature = "ahash"))]
-type RandomState = std::hash::RandomState;
-#[cfg(feature = "ahash")]
-type RandomState = ahash::RandomState;

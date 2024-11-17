@@ -48,3 +48,19 @@ pub fn text_diff(old: &str, new: &str) {
   }
   assert!(!has_diff, "has different!");
 }
+
+pub fn all_files(root: &str) -> impl Iterator<Item = std::path::PathBuf> {
+  walkdir::WalkDir::new(root).into_iter().filter_map(|res| {
+    res.ok().and_then(|entry| {
+      let path = entry.path();
+      let file_name = path.file_name().unwrap().to_str().unwrap();
+      let md = std::fs::metadata(path).unwrap();
+      if md.is_file() && file_name.ends_with("lib") && !file_name.ends_with("golden.lib")
+      {
+        Some(entry.into_path())
+      } else {
+        None
+      }
+    })
+  })
+}

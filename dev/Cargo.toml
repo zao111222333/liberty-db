@@ -4,10 +4,6 @@ edition = "2021"
 publish = false
 resolver = "2"
 
-[features]
-default = []
-__dbg = ["liberty-db-latest/__dbg"]
-
 [dependencies]
 itertools.workspace = true
 walkdir.workspace = true
@@ -20,6 +16,7 @@ strum_macros.workspace = true
 criterion.workspace = true
 sysinfo.workspace = true
 chrono.workspace = true
+dev_utils.workspace = true
 
 liberty-io = "0.0.4"
 libertyparse = "0.3.0"
@@ -30,9 +27,6 @@ liberty-db-0p6p14  = { package = "liberty-db", version = "=0.6.14" }
 liberty-db-0p5p9  = { package = "liberty-db", version = "=0.5.9" }
 liberty-db-0p4p13 = { package = "liberty-db", version = "=0.4.13" }
 liberty-db-0p3p1  = { package = "liberty-db", version = "=0.3.1" }
-
-[dev-dependencies]
-dev_utils = { path = "utils" }
 
 [[bench]]
 name = "benchmark"

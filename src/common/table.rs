@@ -23,7 +23,7 @@ pub struct TableLookUpMultiSegment {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id]
@@ -78,7 +78,7 @@ pub struct DriverWaveform {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 24]
@@ -113,7 +113,7 @@ pub struct TableLookUp2D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 24]
@@ -146,7 +146,7 @@ pub struct CompactLutTemplate {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 8]
@@ -277,7 +277,7 @@ pub struct Vector3D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id]
@@ -311,7 +311,7 @@ pub struct ReferenceTimeVector3D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id]
@@ -349,7 +349,7 @@ pub struct Vector4D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id]
@@ -386,10 +386,10 @@ pub struct Vector3DGrpup {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Vector3D>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Vector3D>::deserialize_with")]
@@ -410,10 +410,10 @@ pub struct ReferenceTimeVector3DGrpup {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<ReferenceTimeVector3D>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<ReferenceTimeVector3D>::deserialize_with")]
@@ -434,10 +434,10 @@ pub struct Vector4DGrpup {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Vector4D>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Vector4D>::deserialize_with")]
@@ -463,7 +463,7 @@ pub struct TableLookUp3D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 24]
@@ -496,7 +496,7 @@ pub struct TableLookUp1D {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 24]
@@ -529,7 +529,7 @@ pub struct CompactCcsTable {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 8]
@@ -557,7 +557,7 @@ pub struct TableLookUp {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 24]
@@ -671,7 +671,7 @@ pub struct TableTemple {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 2]

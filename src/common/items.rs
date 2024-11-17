@@ -135,7 +135,7 @@ pub struct Domain {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   #[size = 8]
@@ -165,7 +165,7 @@ impl GroupFn for Domain {}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WordSet {
-  pub inner: HashSet<ArcStr, crate::RandomState>,
+  pub inner: HashSet<ArcStr, crate::ast::RandomState>,
 }
 impl fmt::Display for WordSet {
   #[expect(clippy::unwrap_in_result)]
@@ -265,7 +265,7 @@ pub struct DummyGroup {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
 }

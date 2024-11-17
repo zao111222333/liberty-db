@@ -49,6 +49,7 @@ library(gscl45nm) {
   }
 }"#;
 fn main() {
+  simple_logger::SimpleLogger::new().init().unwrap();
   match Library::parse_lib(TEMPLATE) {
     Ok(ref mut library) => {
       library.comments.this.push("line1\nline2".into());

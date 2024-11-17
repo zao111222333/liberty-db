@@ -62,21 +62,7 @@ jobs:
       - name: Build
         run: cargo build --verbose
       - name: Run Tests
-        run: cargo test --verbose --all-features --lib --release
-  case_test:
-    needs: check
-    name: Case Test
-    runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: "-D warnings"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ env.RUST_VERSION }}
-          components: rustfmt
-      - name: Run Test Case
-        run: cargo test --verbose --package dev --release
+        run: cargo test --verbose --features __test_runtime_assert --lib --release
   # Checks code style.
   clippy:
     needs: check
@@ -107,7 +93,7 @@ jobs:
       - run: cargo run --example 1_parse_fmt_file -- dev/tech/cases/ocv.lib
       - run: cargo run --example 2_prune_lib -- dev/tech/cases/ocv.lib
   regression:
-    needs: [unit_test, clippy, case_test, examples]
+    needs: [unit_test, clippy, examples]
     name: Regression
     runs-on: ubuntu-latest
     env:
@@ -123,7 +109,7 @@ jobs:
         run: echo "TODO ${{ github.event.pull_request.head.sha }}"
   # Compute code coverage
   codecov:
-    needs: [unit_test, clippy, case_test, examples]
+    needs: [unit_test, clippy, examples]
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:
@@ -135,7 +121,7 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-tarpaulin
-      - run: cargo tarpaulin --verbose --release --lib --examples --workspace --exclude liberty-macros --exclude-files dev/* --all-features --out xml html --output-dir target/codecov
+      - run: cargo tarpaulin --verbose --release --lib --examples --workspace --exclude liberty-macros --exclude-files dev/* --out xml html --output-dir target/codecov
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v4
         with:

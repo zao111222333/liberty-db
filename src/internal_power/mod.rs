@@ -18,7 +18,7 @@ pub struct InternalPower {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   // NOTICE: Simple Attributes
@@ -26,11 +26,11 @@ pub struct InternalPower {
   // falling_together_group
   // power_level
   #[id]
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub related_pin: WordSet,
   #[id]
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub related_pg_pin: WordSet,
   // rising_together_group

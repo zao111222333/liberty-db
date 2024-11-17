@@ -60,7 +60,7 @@ pub struct Timing {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
 
@@ -427,7 +427,7 @@ pub struct Timing {
   /// &end
   /// =203.39
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub related_bus_equivalent: WordSet,
   /// The `related_bus_pins` attribute defines the pin or pins that
@@ -464,7 +464,7 @@ pub struct Timing {
   /// &end
   /// =203.40
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub related_bus_pins: WordSet,
   /// The `related_output_pin` attribute specifies the output or inout pin used
@@ -497,7 +497,7 @@ pub struct Timing {
   /// &end
   /// =203.41
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub related_output_pin: WordSet,
   /// The `related_pin` attribute defines the pin or pins representing
@@ -567,7 +567,7 @@ pub struct Timing {
   /// =203.42
   /// ">Reference-Instance</a>
   #[id]
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub related_pin: WordSet,
   /// The `rise_resistance` attribute represents the load-dependent output resistance,
@@ -1485,7 +1485,7 @@ pub struct Timing {
   /// &end
   /// =204.9
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CellDegradation>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CellDegradation>::deserialize_with")]
@@ -1583,12 +1583,12 @@ pub struct Timing {
   #[size = 336]
   #[liberty(group)]
   pub propogated_noise_width_low: Option<TableLookUp>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]

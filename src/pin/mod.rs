@@ -53,7 +53,7 @@ pub struct Pin {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 8]
@@ -178,7 +178,7 @@ pub struct Pin {
   /// &end
   /// =228.5
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub antenna_diode_related_ground_pins: WordSet,
   /// <a name ="reference_link" href="
@@ -189,7 +189,7 @@ pub struct Pin {
   /// &end
   /// =228.6
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub antenna_diode_related_power_pins: WordSet,
   /// <a name ="reference_link" href="
@@ -355,7 +355,7 @@ pub struct Pin {
   /// &end
   /// =228.21
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub connection_class: WordSet,
   /// <a name ="reference_link" href="
@@ -531,7 +531,7 @@ pub struct Pin {
   /// &end
   /// =228.41
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(simple)]
   pub input_map: WordSet,
   /// <a name ="reference_link" href="
@@ -1122,7 +1122,7 @@ pub struct Pin {
   pub rise_capacitance_range: Option<(NotNan<f64>, NotNan<f64>)>,
   // NOTICE: Group Attributes in a pin Group
   // electromigration () { }
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<InternalPower>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<InternalPower>::deserialize_with")]
@@ -1156,7 +1156,7 @@ pub struct Pin {
   /// =203.29
   /// ">Reference-Instatnce-In-Pin</a>
   ///
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Timing>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Timing>::deserialize_with")]
@@ -1178,7 +1178,7 @@ pub struct Pin {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=316.5&end=316.31
   /// ">Reference-Definition</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<ReceiverCapacitance>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<ReceiverCapacitance>::deserialize_with")]
@@ -1193,22 +1193,22 @@ pub struct Pin {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=296.7&end=296.12
   /// ">Reference-Instance</a>
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
   pub input_ccb: GroupSet<CCSNStage>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
   pub output_ccb: GroupSet<CCSNStage>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
   pub ccsn_first_stage: GroupSet<CCSNStage>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]

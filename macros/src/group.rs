@@ -1,19 +1,16 @@
 use crate::attribute::*;
+use core::hash::{BuildHasher, Hash, Hasher};
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn::{Data, DeriveInput, Fields};
-cfg_if::cfg_if! {
-  if #[cfg(not(feature = "__dbg_no_hash_match"))]
-  {
-    use core::hash::{BuildHasher, Hash, Hasher};
-    const HASHER: foldhash::fast::FixedState = foldhash::fast::FixedState::with_seed(41);
-    #[allow(clippy::manual_hash_one)]
-    fn hash_one<T: Hash>(t: &T) -> u64 {
-      let mut hasher = HASHER.build_hasher();
-      t.hash(&mut hasher);
-      hasher.finish()
-    }
-  }
+
+#[cfg(feature = "hash_match")]
+#[allow(clippy::manual_hash_one)]
+fn hash_one<T: Hash>(t: &T) -> u64 {
+  const HASHER: foldhash::fast::FixedState = foldhash::fast::FixedState::with_seed(41);
+  let mut hasher = HASHER.build_hasher();
+  t.hash(&mut hasher);
+  hasher.finish()
 }
 fn group_field_fn(
   field_name: &Ident,
@@ -255,23 +252,23 @@ fn group_field_fn(
     }
   }
   cfg_if::cfg_if! {
-    if #[cfg(feature = "__dbg_no_hash_match")] {
-      Ok((
-        attri_comment,
-        write_field,
-        quote!(
-          #s_field_name => {
-            #parser_arm
-          },
-        ),
-      ))
-    }else{
+    if #[cfg(feature = "hash_match")] {
       let s_field_hash = hash_one(&s_field_name);
       Ok((
         attri_comment,
         write_field,
         quote!(
           #s_field_hash => {
+            #parser_arm
+          },
+        ),
+      ))
+    } else {
+      Ok((
+        attri_comment,
+        write_field,
+        quote!(
+          #s_field_name => {
             #parser_arm
           },
         ),
@@ -401,9 +398,9 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
       _ => quote!(),
     };
-    #[cfg(feature = "__dbg_no_hash_match")]
+    #[cfg(not(feature = "hash_match"))]
     let key_id = quote!(key);
-    #[cfg(not(feature = "__dbg_no_hash_match"))]
+    #[cfg(feature = "hash_match")]
     let key_id = quote!(crate::ast::hash_one(key));
 
     let impl_group = quote! {

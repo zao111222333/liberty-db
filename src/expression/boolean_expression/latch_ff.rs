@@ -56,7 +56,7 @@ pub struct FF {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
@@ -153,7 +153,7 @@ pub struct FFBank {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
@@ -245,7 +245,7 @@ pub struct Latch {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
@@ -341,7 +341,7 @@ pub struct LatchBank {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.

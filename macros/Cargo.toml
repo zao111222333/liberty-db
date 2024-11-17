@@ -17,7 +17,7 @@ proc-macro = true
 
 [features]
 default = []
-__dbg_no_hash_match = []
+hash_match = []
 
 [dependencies]
 foldhash.workspace = true

@@ -29,7 +29,7 @@ pub struct Cell {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 16]
@@ -347,32 +347,32 @@ pub struct Cell {
   #[size = 96]
   #[liberty(complex(type = Option))]
   pub pin_opposite: Option<PinOpposite>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<PgPin>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<PgPin>::deserialize_with")]
   pub pg_pin: GroupSet<PgPin>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FF>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FF>::deserialize_with")]
   pub ff: GroupSet<FF>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FFBank>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FFBank>::deserialize_with")]
   pub ff_bank: GroupSet<FFBank>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Latch>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Latch>::deserialize_with")]
   pub latch: GroupSet<Latch>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LatchBank>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LatchBank>::deserialize_with")]
   pub latch_bank: GroupSet<LatchBank>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LeakagePower>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LeakagePower>::deserialize_with")]
@@ -380,7 +380,7 @@ pub struct Cell {
   #[size = 168]
   #[liberty(group(type = Option))]
   pub statetable: Option<Statetable>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Pin>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Pin>::deserialize_with")]
@@ -395,7 +395,7 @@ pub struct Cell {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
   /// ">Reference</a>
   pub test_cell: Vec<TestCell>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Bundle>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Bundle>::deserialize_with")]
@@ -421,35 +421,35 @@ pub struct TestCell {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FF>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FF>::deserialize_with")]
   pub ff: GroupSet<FF>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FFBank>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FFBank>::deserialize_with")]
   pub ff_bank: GroupSet<FFBank>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Latch>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Latch>::deserialize_with")]
   pub latch: GroupSet<Latch>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LatchBank>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LatchBank>::deserialize_with")]
   pub latch_bank: GroupSet<LatchBank>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Pin>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Pin>::deserialize_with")]
   pub pin: GroupSet<Pin>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Statetable>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Statetable>::deserialize_with")]

@@ -1,7 +1,6 @@
 #![cfg(test)]
-use dev::all_files;
-use dev_utils::text_diff;
-use liberty_db_latest::{ast::Group, Library};
+use dev_utils::{all_files, text_diff};
+use liberty_db::{ast::Group, Library};
 use std::{
   fs::read_to_string,
   path::{Path, PathBuf},
@@ -19,8 +18,8 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
 }
 
 /// when we need to re-golden
-/// cargo test --package dev --features __dbg -- regression make_golden
-#[cfg(feature = "__dbg")]
+/// cargo test --no-default-features --test regression -- make_golden --exact --show-output
+#[cfg(all(not(feature = "fast_hash"), not(feature = "hash_match")))]
 #[allow(dead_code)]
 #[test]
 fn make_golden() {
@@ -28,7 +27,7 @@ fn make_golden() {
     fs::File,
     io::{BufWriter, Write},
   };
-  for test_lib_path in all_files() {
+  for test_lib_path in all_files("dev/tech") {
     let golden_lib_path = golden_path(&test_lib_path);
     let library =
       Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
@@ -42,7 +41,7 @@ fn make_golden() {
 #[test]
 fn regression() {
   _ = simple_logger::SimpleLogger::new().init();
-  for test_lib_path in all_files() {
+  for test_lib_path in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());
     let golden_lib_path = golden_path(&test_lib_path);
     let library =

@@ -24,7 +24,7 @@ pub struct Bundle {
   #[liberty(comments)]
   pub comments: GroupComments<Self>,
   /// group undefined attributes
-  #[size = 48]
+  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 24]
@@ -42,7 +42,7 @@ pub struct Bundle {
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub nextstate_type: Option<NextstateType>,
-  #[size = 48]
+  #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Timing>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Timing>::deserialize_with")]

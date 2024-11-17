@@ -12,13 +12,16 @@ use itertools::Itertools;
 use nom::{error::Error, IResult};
 use std::collections::HashMap;
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
-// pub(crate) const HASHER: ahash::RandomState =
-//   ahash::RandomState::with_seeds(1_234_567_890, 123_456_789, 1_234_567, u64::MAX);
 
-#[cfg(not(feature = "__dbg_no_hash_match"))]
+#[cfg(not(feature = "fast_hash"))]
+pub(crate) type RandomState = std::hash::RandomState;
+#[cfg(feature = "fast_hash")]
+pub(crate) type RandomState = ahash::RandomState;
+
+#[cfg(feature = "hash_match")]
 const HASHER: foldhash::fast::FixedState = foldhash::fast::FixedState::with_seed(41);
 #[inline]
-#[cfg(not(feature = "__dbg_no_hash_match"))]
+#[cfg(feature = "hash_match")]
 #[expect(clippy::manual_hash_one)]
 pub(crate) fn hash_one<T: Hash + ?Sized>(t: &T) -> u64 {
   let mut hasher = HASHER.build_hasher();
@@ -26,7 +29,7 @@ pub(crate) fn hash_one<T: Hash + ?Sized>(t: &T) -> u64 {
   hasher.finish()
 }
 
-pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<crate::RandomState>;
+pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;
@@ -82,7 +85,7 @@ impl PartialOrd for GroupWrapper {
   }
 }
 /// type for Undefined `Attributes`
-pub type Attributes = HashMap<ArcStr, AttriValues, crate::RandomState>;
+pub type Attributes = HashMap<ArcStr, AttriValues, foldhash::fast::FixedState>;
 /// `AttriValues` for `undefined_attribute/serialization`
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -188,10 +191,7 @@ pub(crate) fn attributs_set_undefined_attri(
   scope: &ParseScope,
   undefined: UndefinedAttriValue,
 ) {
-  match scope
-    .define_map
-    .get(&define_id(scope.define_map.hasher(), group_name, key))
-  {
+  match scope.define_map.get(&define_id(&scope.hasher, group_name, key)) {
     None => {
       log::warn!("Line={}; undefined {}", scope.line_num, key);
       if let Some(value) = attri_map.get_mut(key) {
@@ -354,17 +354,14 @@ pub enum DefinedType {
 
 #[derive(Debug, Default)]
 pub(crate) struct ParseScope {
-  pub line_num: usize,
-  pub define_map: HashMap<u64, DefinedType, crate::RandomState>,
+  pub(crate) line_num: usize,
+  pub(crate) define_map: HashMap<u64, DefinedType, mut_set::NoHashBuildHasher>,
+  pub(crate)hasher: RandomState,
 }
 
 #[inline]
 #[must_use]
-pub(crate) fn define_id(
-  hash_builder: &crate::RandomState,
-  group_name: &str,
-  key: &str,
-) -> u64 {
+pub(crate) fn define_id(hash_builder: &RandomState, group_name: &str, key: &str) -> u64 {
   let mut hasher = hash_builder.build_hasher();
   group_name.hash(&mut hasher);
   key.hash(&mut hasher);

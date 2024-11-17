@@ -1,13 +1,9 @@
 pub mod projs;
 use criterion::{black_box, Criterion};
+use dev_utils::all_files;
 use itertools::Itertools;
 use serde_json::Value;
-use std::{
-  fs::{metadata, read_to_string},
-  panic,
-  path::{Path, PathBuf},
-  time::Duration,
-};
+use std::{fs::read_to_string, panic, path::Path, time::Duration};
 
 enum TypedSupport {
   AllTyped,
@@ -199,21 +195,6 @@ impl BenchResult {
 }
 
 pub type ResList = Vec<(String, [(String, Vec<BenchResult>); 2])>;
-pub fn all_files() -> impl Iterator<Item = PathBuf> {
-  walkdir::WalkDir::new("tech").into_iter().filter_map(|res| {
-    res.ok().and_then(|entry| {
-      let path = entry.path();
-      let file_name = path.file_name().unwrap().to_str().unwrap();
-      let md = metadata(path).unwrap();
-      if md.is_file() && file_name.ends_with("lib") && !file_name.ends_with("golden.lib")
-      {
-        Some(entry.into_path())
-      } else {
-        None
-      }
-    })
-  })
-}
 pub fn bench_all(
   c: &mut Criterion,
   projs: impl Clone + Iterator<Item = impl Proj>,
@@ -229,7 +210,7 @@ pub fn bench_all(
   };
   let mut res_list = Vec::new();
   let tag = if regression { "regression" } else { "comparsion" };
-  for path in all_files() {
+  for path in all_files("tech") {
     let file_path = path.display().to_string();
     let parse_res = {
       let group_name = format!("[{tag}-parse] {file_path} ");
