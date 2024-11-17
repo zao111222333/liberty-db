@@ -42,9 +42,9 @@ pub struct Sensitization {
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
-  #[size = 48]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -351,9 +351,9 @@ pub struct InputVoltage {
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
-  #[size = 120]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -406,9 +406,9 @@ pub struct OutputVoltage {
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
-  #[size = 120]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -492,9 +492,9 @@ pub struct OperatingConditions {
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
-  #[size = 192]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -578,9 +578,9 @@ pub struct FpgaIsd {
   #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
-  #[size = 96]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -943,9 +943,9 @@ pub struct WireLoad {
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
-  #[size = 120]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1123,9 +1123,9 @@ pub struct WireLoadSection {
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
-  #[size = 48]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1218,9 +1218,9 @@ pub struct BaseCurves {
   #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
-  #[size = 72]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

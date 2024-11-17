@@ -25,9 +25,9 @@ pub struct Cell {
   #[liberty(name)]
   pub name: ArcStr,
   /// group comments
-  #[size = 744]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -417,9 +417,9 @@ impl GroupFn for Cell {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TestCell {
   /// group comments
-  #[size = 24]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

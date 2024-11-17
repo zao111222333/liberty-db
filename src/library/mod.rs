@@ -34,9 +34,9 @@ pub struct Library {
   #[default = "arcstr::literal!(\"undefined\")"]
   pub name: ArcStr,
   /// group comments
-  #[size = 1152]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -726,7 +726,7 @@ impl Library {
     f: &mut fmt::Formatter<'_>,
   ) -> Result<(), fmt::Error> {
     let ff = &mut crate::ast::CodeFormatter::<'_, fmt::Formatter<'_>, I>::new(f);
-    crate::ast::fmt_library_beginning(&self.comments.this, ff)?;
+    crate::ast::fmt_library_beginning(self.comments_this(), ff)?;
     GroupAttri::fmt_liberty(self, Self::KEY, ff)?;
     f.write_char('\n')
   }

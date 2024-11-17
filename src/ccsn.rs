@@ -53,9 +53,9 @@ pub struct CCSNStage {
   #[id(borrow = "&[ArcStr]")]
   pub name: Vec<ArcStr>,
   /// group comments
-  #[size = 288]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -305,9 +305,9 @@ pub struct ReceiverCapacitance {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   pub name: Option<ArcStr>,
   /// group comments
-  #[size = 48]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

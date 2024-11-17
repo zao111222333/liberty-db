@@ -65,9 +65,9 @@ pub struct TLatch {
   #[size = 8]
   pub name: ArcStr,
   /// group comments
-  #[size = 144]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

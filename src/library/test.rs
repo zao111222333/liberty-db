@@ -11,7 +11,7 @@ use super::*;
 fn parse_cmp(text: &str, want: &str) -> Library {
   match Library::parse_lib(text) {
     Ok(mut library) => {
-      library.comments.this.push("test".into());
+      library.comments_this_entry().or_insert("test".into());
       let s = library.to_string();
       println!("{s}");
       dev_utils::text_diff(&s, want);
@@ -123,15 +123,23 @@ library (define) {
 #[test]
 fn comment() {
   let mut library = Library::default();
-  library.comments.this.push("comment1".into());
-  library.comments.this.push("comment2\ncomment3".into());
-  library.comments.technology.push("comment1".into());
-  library.comments.technology.push("comment2\ncomment3".into());
-  library.comments.time_unit.push("one line comment".into());
+  library.comments_this_entry().or_insert("comment1".into());
+  library
+    .comments_this_entry()
+    .and_modify(|comment| comment.push_str("\ncomment2\ncomment3"));
+  library.comments_technology_entry().or_insert("comment1".into());
+  library
+    .comments_technology_entry()
+    .and_modify(|comment| comment.push_str("\ncomment2\ncomment3"));
+  library
+    .comments_time_unit_entry()
+    .or_insert("one line comment".into());
   let mut cell_test1 = Cell::default();
   cell_test1.name = "test1".into();
-  cell_test1.comments.this.push("comment1\ncomment2".into());
-  cell_test1.comments.this.push("comment3".into());
+  cell_test1.comments_this_entry().or_insert("comment1".into());
+  cell_test1
+    .comments_this_entry()
+    .and_modify(|comment| comment.push_str("\ncomment2\ncomment3"));
   library.cell.insert(cell_test1);
   library.cell = library.cell.into_iter().collect();
   fmt_cmp(
@@ -171,7 +179,7 @@ library (undefined) {
 fn entry() {
   use num_traits::Zero;
   let mut library = Library::default();
-  library.comments.this.push("comment1".into());
+  library.comments_this_entry().or_insert("comment1".into());
   library
     .cell
     .entry("CELL1".into())

@@ -14,9 +14,9 @@ use crate::{
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct InternalPower {
   /// group comments
-  #[size = 120]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

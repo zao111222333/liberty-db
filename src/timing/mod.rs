@@ -56,9 +56,9 @@ pub struct Timing {
   #[liberty(name)]
   pub name: Vec<ArcStr>,
   /// group comments
-  #[size = 864]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

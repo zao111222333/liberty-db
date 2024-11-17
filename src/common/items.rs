@@ -131,9 +131,9 @@ pub struct Domain {
   #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
-  #[size = 192]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -261,9 +261,9 @@ pub struct DummyGroup {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 24]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

@@ -20,9 +20,9 @@ pub struct Bundle {
   #[liberty(name)]
   pub name: NameList,
   /// group comments
-  #[size = 144]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

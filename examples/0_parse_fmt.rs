@@ -52,10 +52,10 @@ fn main() {
   simple_logger::SimpleLogger::new().init().unwrap();
   match Library::parse_lib(TEMPLATE) {
     Ok(ref mut library) => {
-      library.comments.this.push("line1\nline2".into());
-      library.comments.this.push("line3".into());
-      library.comments.time_unit.push("line4\nline5".into());
-      library.comments.time_unit.push("line6".into());
+      library.comments_this_entry().or_insert("line1\nline2".into());
+      library.comments_this_entry().and_modify(|s| s.push_str("line3"));
+      library.comments_time_unit_entry().or_insert("line4\nline5".into());
+      library.comments_time_unit_entry().and_modify(|s| s.push_str("line6"));
       println!("{library}");
       println!("\niteration cell");
       for cell in &library.cell {

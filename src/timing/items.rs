@@ -197,9 +197,9 @@ pub struct CellDegradation {
   #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
-  #[size = 72]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

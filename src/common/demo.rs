@@ -11,14 +11,14 @@ use core::fmt::Write;
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(liberty_macros::Group)]
-// #[derive(liberty_macros::Nothing)]
+#[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing {
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,
   /// group comments
   #[liberty(comments)]
-  comments: GroupComments<Self>,
+  comments: GroupComments,
   #[liberty(complex)]
   #[default = "vec![unsafe{ NotNan::new_unchecked(0.0) }]"]
   pub values: Vec<NotNan<f64>>,
@@ -39,9 +39,9 @@ pub(crate) struct Pin {
   #[id(borrow = "&str")]
   name: ArcStr,
   /// group comments
-  #[size = 24]
+  #[size = 32]
   #[liberty(comments)]
-  comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -66,9 +66,9 @@ pub(crate) struct FF {
   #[liberty(name)]
   variable2: ArcStr,
   /// group comments
-  #[size = 48]
+  #[size = 32]
   #[liberty(comments)]
-  comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -114,7 +114,7 @@ pub(crate) struct Cell {
   name: ArcStr,
   /// group comments
   #[liberty(comments)]
-  comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,
@@ -321,8 +321,8 @@ liberty_db::common::demo::Cell (INV) {
 | }
 }"#,
     );
-    cell.comments.area.push("xc".into());
-    cell.comments.area.push("xc".into());
+    cell.comments_this_entry().or_insert("xc".into());
+    cell.comments_area_entry().or_insert("xc".into());
     println!("{}", cell.display());
   }
 }

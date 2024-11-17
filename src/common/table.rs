@@ -19,9 +19,9 @@ pub struct TableLookUpMultiSegment {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 168]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -74,9 +74,9 @@ pub struct DriverWaveform {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   pub driver_waveform_name: Option<ArcStr>,
   /// group comments
-  #[size = 168]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -109,9 +109,9 @@ pub struct TableLookUp2D {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 96]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -142,9 +142,9 @@ pub struct CompactLutTemplate {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 192]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -273,9 +273,9 @@ pub struct Vector3D {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 120]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -307,9 +307,9 @@ pub struct ReferenceTimeVector3D {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 144]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -345,9 +345,9 @@ pub struct Vector4D {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 144]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -382,9 +382,9 @@ pub struct Vector3DGrpup {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 24]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -406,9 +406,9 @@ pub struct ReferenceTimeVector3DGrpup {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 24]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -430,9 +430,9 @@ pub struct Vector4DGrpup {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 24]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -459,9 +459,9 @@ pub struct TableLookUp3D {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 120]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -492,9 +492,9 @@ pub struct TableLookUp1D {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 72]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -525,9 +525,9 @@ pub struct CompactCcsTable {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 72]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -553,9 +553,9 @@ pub struct TableLookUp {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 144]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -667,9 +667,9 @@ pub struct TableTemple {
   #[id(borrow = "&str")]
   pub name: ArcStr,
   /// group comments
-  #[size = 216]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

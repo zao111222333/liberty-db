@@ -52,9 +52,9 @@ pub struct FF {
   #[id(borrow = "&str")]
   pub variable2: ArcStr,
   /// group comments
-  #[size = 192]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -149,9 +149,9 @@ pub struct FFBank {
   #[liberty(name)]
   pub bits: usize,
   /// group comments
-  #[size = 192]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -241,9 +241,9 @@ pub struct Latch {
   #[id(borrow = "&str")]
   pub variable2: ArcStr,
   /// group comments
-  #[size = 192]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -337,9 +337,9 @@ pub struct LatchBank {
   #[liberty(name)]
   pub bits: usize,
   /// group comments
-  #[size = 192]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

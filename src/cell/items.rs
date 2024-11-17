@@ -31,9 +31,9 @@ pub struct LeakagePower {
   #[liberty(name)]
   pub name: Vec<ArcStr>,
   /// group comments
-  #[size = 144]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -149,9 +149,9 @@ pub struct Statetable {
   #[liberty(name)]
   pub internal_nodes: Vec<ArcStr>,
   /// group comments
-  #[size = 48]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -331,9 +331,9 @@ pub struct PgPin {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   name: Option<ArcStr>,
   /// group comments
-  #[size = 240]
+  #[size = 32]
   #[liberty(comments)]
-  pub comments: GroupComments<Self>,
+  comments: GroupComments,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

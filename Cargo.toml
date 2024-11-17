@@ -64,7 +64,7 @@ derivative = "2.2"
 ryu = "1.0"
 itoa = "1.0"
 biodivine-lib-bdd = { version = "0.5.22", features = ["serde"] }
-mut_set = "0.5.8"
+mut_set = "0.5.9"
 # mut_set = { version="0.5.2", features = ["__dbg_disable_mem_layout"] }
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
