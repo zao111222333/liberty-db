@@ -43,7 +43,7 @@ use num_traits::Zero;
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CCSNStage {
@@ -295,7 +295,7 @@ impl SimpleAttri for StageType {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReceiverCapacitance {
@@ -349,7 +349,7 @@ impl GroupFn for ReceiverCapacitance {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.33+340.2&end=339.34+340.4
 /// ">Reference</a>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PropagatingCcb {
   /// `input_ccb_name`

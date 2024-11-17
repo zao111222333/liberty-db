@@ -19,7 +19,11 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
 
 /// when we need to re-golden
 /// cargo test --no-default-features --test regression -- make_golden --exact --show-output
-#[cfg(all(not(feature = "fast_hash"), not(feature = "hash_match")))]
+#[cfg(all(
+  not(feature = "fast_hash"),
+  not(feature = "hash_match"),
+  not(feature = "vec2map")
+))]
 #[allow(dead_code)]
 #[test]
 fn make_golden() {
@@ -27,6 +31,7 @@ fn make_golden() {
     fs::File,
     io::{BufWriter, Write},
   };
+  _ = simple_logger::SimpleLogger::new().init();
   for test_lib_path in all_files("dev/tech") {
     let golden_lib_path = golden_path(&test_lib_path);
     let library =

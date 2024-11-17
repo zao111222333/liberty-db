@@ -60,7 +60,10 @@ enum FieldType {
 pub(crate) fn parse_fields_type(
   fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
 ) -> syn::Result<(
+  // attri map
   HashMap<&Ident, (AttriType, Option<usize>)>,
+  // default map
+  HashMap<&Ident, proc_macro2::TokenStream>,
   // Name
   Vec<&syn::Field>,
   // attributes name
@@ -71,81 +74,75 @@ pub(crate) fn parse_fields_type(
   let mut _name_vec = Vec::new();
   let mut _attributes_name = None;
   let mut _comments_name = None;
-  let mut err_buf = None;
-  let attri_type_map: HashMap<&Ident, (AttriType, Option<usize>)> = fields
-    .iter()
-    .filter_map(|field| {
-      if let (Some(field_name), field_attrs) = (&field.ident, &field.attrs) {
-        match parse_field_pos(field_attrs) {
-          Ok(pos) => match parse_field_attrs(field_attrs) {
-            Ok(Some(t)) => match t {
-              FieldType::Internal(InternalType::Name) => {
-                _name_vec.push(field);
-                None
-              }
-              FieldType::Internal(InternalType::AttributeList) => {
-                if let Some(name) = &_attributes_name {
-                  err_buf = Some(syn::Error::new(
-                    proc_macro2::Span::call_site(),
-                    format!("duplicated attributes {}.", name),
-                  ));
-                } else {
-                  _attributes_name = Some(field_name);
-                }
-                None
-              }
-              FieldType::Internal(InternalType::Comment) => {
-                if let Some(name) = &_comments_name {
-                  err_buf = Some(syn::Error::new(
-                    proc_macro2::Span::call_site(),
-                    format!("duplicated comment {}.", name),
-                  ));
-                } else {
-                  _comments_name = Some(field_name);
-                }
-                None
-              }
-              FieldType::Attri(attri_type) => Some((field_name, (attri_type, pos))),
-            },
-            Ok(None) => None,
-            Err(e) => {
-              err_buf = Some(e);
-              None
-            }
-          },
-          Err(e) => {
-            err_buf = Some(e);
-            None
+  let mut attri_type_map = HashMap::new();
+  let mut default_map = HashMap::new();
+  for field in fields {
+    if let (Some(field_name), field_attrs) = (&field.ident, &field.attrs) {
+      let pos = parse_field_pos(field_attrs)?;
+      let attr = parse_field_attrs(field_attrs)?;
+      if let Some(default) = parse_field_default(field_attrs)? {
+        _ = default_map.insert(field_name, default);
+      }
+      let attr = match attr {
+        Some(t) => t,
+        None => {
+          return Err(syn::Error::new(
+            proc_macro2::Span::call_site(),
+            format!("{}: Can not find #[liberty ...].", field_name),
+          ));
+        }
+      };
+      match attr {
+        FieldType::Internal(InternalType::Name) => {
+          _name_vec.push(field);
+        }
+        FieldType::Internal(InternalType::AttributeList) => {
+          if let Some(name) = &_attributes_name {
+            return Err(syn::Error::new(
+              proc_macro2::Span::call_site(),
+              format!("duplicated attributes {}.", name),
+            ));
+          } else {
+            _attributes_name = Some(field_name);
           }
         }
-      } else {
-        err_buf = Some(syn::Error::new(
-          proc_macro2::Span::call_site(),
-          "field error.".to_string(),
-        ));
-        None
+        FieldType::Internal(InternalType::Comment) => {
+          if let Some(name) = &_comments_name {
+            return Err(syn::Error::new(
+              proc_macro2::Span::call_site(),
+              format!("duplicated comment {}.", name),
+            ));
+          } else {
+            _comments_name = Some(field_name);
+          }
+        }
+        FieldType::Attri(attri_type) => {
+          _ = attri_type_map.insert(field_name, (attri_type, pos));
+        }
       }
-    })
-    .collect();
-  if let Some(e) = err_buf {
-    Err(e)
-  } else {
-    match (_attributes_name, _comments_name) {
-      (None, None) => Err(syn::Error::new(
+    } else {
+      return Err(syn::Error::new(
         proc_macro2::Span::call_site(),
-        "Can not find attributes & comment".to_string(),
-      )),
-      (None, Some(_)) => Err(syn::Error::new(
-        proc_macro2::Span::call_site(),
-        "Can not find attributes".to_string(),
-      )),
-      (Some(_), None) => Err(syn::Error::new(
-        proc_macro2::Span::call_site(),
-        "Can not find comment".to_string(),
-      )),
-      (Some(attributes_name), Some(comments_name)) => {
-        Ok((attri_type_map, _name_vec, attributes_name, comments_name))
-      }
+        "field error.".to_string(),
+      ));
+    }
+  }
+
+  match (_attributes_name, _comments_name) {
+    (None, None) => Err(syn::Error::new(
+      proc_macro2::Span::call_site(),
+      "Can not find attributes & comment".to_string(),
+    )),
+    (None, Some(_)) => Err(syn::Error::new(
+      proc_macro2::Span::call_site(),
+      "Can not find attributes".to_string(),
+    )),
+    (Some(_), None) => Err(syn::Error::new(
+      proc_macro2::Span::call_site(),
+      "Can not find comment".to_string(),
+    )),
+    (Some(attributes_name), Some(comments_name)) => {
+      Ok((attri_type_map, default_map, _name_vec, attributes_name, comments_name))
     }
   }
 }
@@ -252,6 +249,31 @@ fn parse_field_pos(field_attrs: &[syn::Attribute]) -> syn::Result<Option<usize>>
             }
           }
           return Err(syn::Error::new(attr.meta.span(), "Expected integer literal"));
+        }
+      };
+    }
+  }
+  Ok(None)
+}
+fn parse_field_default(
+  field_attrs: &[syn::Attribute],
+) -> syn::Result<Option<proc_macro2::TokenStream>> {
+  for attr in field_attrs {
+    if attr.path().is_ident("default") {
+      match &attr.meta {
+        syn::Meta::List(_) | syn::Meta::Path(_) => {
+          return Err(syn::Error::new(attr.meta.span(), "expected #[default = \"123\" ]"))
+        }
+        syn::Meta::NameValue(s) => {
+          if let syn::Expr::Lit(expr_lit) = &s.value {
+            if let syn::Lit::Str(lit_str) = &expr_lit.lit {
+              return Ok(Some(syn::parse_str(&lit_str.value())?));
+            }
+          }
+          return Err(syn::Error::new(
+            attr.meta.span(),
+            "Expected String literal, #[default = \"123\" ]",
+          ));
         }
       };
     }
@@ -416,6 +438,18 @@ fn parse_group_type(
     }
   }
   Ok(group_type)
+}
+
+#[test]
+fn size_type_test() {
+  // let attr: Attribute = parse_quote!(#[id]);
+  // let attr: Attribute = parse_quote!(#[id(borrow="&[ArcStr]")] );
+  let attr: syn::Attribute =
+    syn::parse_quote!(#[default = "arcstr::literal!(\"undefined\")"]);
+  let s = dbg!(parse_field_default(&[attr])).unwrap().unwrap();
+  println!("{s}");
+  // let t: proc_macro2::TokenStream = syn::parse_str(&s).unwrap();
+  // println!("{t:?}");
 }
 
 #[test]

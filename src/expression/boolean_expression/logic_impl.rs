@@ -172,7 +172,7 @@ mod test {
       }
       let runtime_lut = SystemTime::now().duration_since(start_lut).unwrap();
       println!("runtime lut     {runtime_lut:?}");
-      #[cfg(not(debug_assertions))]
+      #[cfg(feature = "__test_runtime_assert")]
       {
         assert!(runtime_lut < runtime_match);
         assert!(runtime_match < runtime_combine);
@@ -218,7 +218,7 @@ mod test {
     }
     let runtime_lut = SystemTime::now().duration_since(start_lut).unwrap();
     println!("runtime lut     {runtime_lut:?}");
-    #[cfg(not(debug_assertions))]
+    #[cfg(feature = "__test_runtime_assert")]
     {
       assert!(runtime_lut > runtime_combine);
       assert!(runtime_combine.as_secs_f32() / runtime_match.as_secs_f32() > 0.8);

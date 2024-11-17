@@ -31,7 +31,7 @@ use core::fmt::{self, Write};
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.10&end=88.16
 /// ">Reference</a>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -293,8 +293,8 @@ impl GroupFn for Sensitization {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.15&end=39.16
 /// ">Reference</a>
-#[derive(Debug, Clone, Default)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct VoltageMap {
   /// name
@@ -340,9 +340,9 @@ impl ComplexAttri for VoltageMap {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=61.32&end=61.33
 /// ">Reference</a>
-#[derive(Debug, Clone, Default)]
-#[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct InputVoltage {
   /// name
@@ -395,9 +395,9 @@ impl GroupFn for InputVoltage {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.22&end=75.23
 /// ">Reference</a>
-#[derive(Debug, Clone, Default)]
-#[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct OutputVoltage {
   /// name
@@ -481,10 +481,9 @@ impl SimpleAttri for DelayModel {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.3&end=72.4
 /// ">Reference</a>
-#[derive(Debug, Clone, derivative::Derivative)]
-#[derivative(Default)]
-#[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct OperatingConditions {
   /// name
@@ -554,7 +553,7 @@ pub struct OperatingConditions {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(5.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(5.0) }"]
   pub voltage: NotNan<f64>,
 }
 impl GroupFn for OperatingConditions {}
@@ -568,10 +567,9 @@ impl GroupFn for OperatingConditions {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=63.22+63.25&end=63.23+63.27
 /// ">Reference</a>
-#[derive(Debug, Clone, derivative::Derivative)]
-#[derivative(Default)]
-#[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FpgaIsd {
   /// name
@@ -934,7 +932,7 @@ impl ComplexAttri for DefineCellArea {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.16&end=94.17
 /// ">Reference</a>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -1114,7 +1112,7 @@ impl ComplexAttri for FanoutLength {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.16&end=94.17
 /// ">Reference</a>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -1209,7 +1207,7 @@ impl SimpleAttri for BaseCurveType {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.32+40.2&end=39.33+40.15
 /// ">Reference</a>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]

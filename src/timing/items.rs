@@ -187,7 +187,7 @@ pub type Mode = [ArcStr; 2];
 /// ">Reference</a>
 ///
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CellDegradation {

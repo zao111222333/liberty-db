@@ -24,11 +24,21 @@ pub enum Level {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Edge {
   /// Fall
-  #[strum(serialize = "f", serialize = "F")]
+  #[strum(serialize = "falling")]
   F,
   /// Rise
-  #[strum(serialize = "r", serialize = "R")]
+  #[strum(serialize = "rising")]
   R,
+}
+
+impl SimpleAttri for Edge {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
+  }
 }
 
 impl<'a> core::ops::Not for &'a Edge {
@@ -45,8 +55,7 @@ impl<'a> core::ops::Not for &'a Edge {
 /// `UnInit`
 #[derive(Debug, Clone, Copy)]
 #[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
-#[derive(derivative::Derivative)]
-#[derivative(PartialEq, Hash, Eq)]
+#[derive(PartialEq, Hash, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum UnInit {
   /// `Unknown`

@@ -62,14 +62,15 @@ cargo bench --bench dev
 
 ## TODO
 
-+ `intrinsic_parasitic` group
-+ `leakage_current` group
-+ `dynamic_current` group
 + stream input
 + Linked Group
 + like IndexMap, only sort once and store
 + CI: only do comparsion after tag new version
 + CI: fast regression self in build.yml
++ Fix error when `make_golden`
+  + `intrinsic_parasitic` group
+  + `leakage_current` group
+  + `dynamic_current` group
 + ~~user `define`~~
 + ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~
 + ~~fix missing newline at endding~~

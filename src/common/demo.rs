@@ -8,7 +8,7 @@ use crate::{
   ArcStr, NotNan,
 };
 use core::fmt::Write;
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::Nothing)]
@@ -20,7 +20,8 @@ pub(crate) struct Timing {
   #[liberty(comments)]
   comments: GroupComments<Self>,
   #[liberty(complex)]
-  values: Vec<NotNan<f64>>,
+  #[default = "vec![unsafe{ NotNan::new_unchecked(0.0) }]"]
+  pub values: Vec<NotNan<f64>>,
   #[liberty(simple(type = Option))]
   t1: Option<TimingType>,
   #[liberty(simple(type = Option))]
@@ -29,7 +30,7 @@ pub(crate) struct Timing {
 impl GroupFn for Timing {}
 
 #[mut_set::derive::item(sort)]
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub(crate) struct Pin {
@@ -53,7 +54,7 @@ impl GroupFn for Pin {}
 
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct FF {
   #[id(borrow = "&str")]
@@ -106,7 +107,7 @@ impl NamedGroup for FF {
   }
 }
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 #[derive(liberty_macros::Group)]
 pub(crate) struct Cell {
   #[liberty(name)]
@@ -185,6 +186,7 @@ liberty_db::common::demo::Timing () {
       r#"
 liberty_db::common::demo::Pin (A) {
 | timing () {
+| | values ("0.0");
 | | t1 : combinational;
 | }
 }"#,
@@ -199,12 +201,12 @@ liberty_db::common::demo::Pin (A) {
       r#"
 liberty_db::common::demo::Pin (B) {
 | timing () {
+| | values ("0.0");
 | | t1 : combinational;
 | }
 }"#,
     );
   }
-
   #[test]
   fn cell_test() {
     use crate::ast::GroupAttri;
@@ -250,11 +252,13 @@ liberty_db::common::demo::Cell (INV) {
 | }
 | pin (A) {
 | | timing () {
+| | | values ("0.0");
 | | | t1 : combinational;
 | | }
 | }
 | pin (Y) {
 | | timing () {
+| | | values ("0.0");
 | | | t1 : foo_error; /* user defined attribute */
 | | | test_table ("1, 2", \
 | | | "4, 5, 6", \
@@ -311,7 +315,8 @@ liberty_db::common::demo::Cell (INV) {
 | }
 | pin (A) {
 | | timing () {
-| | | t2 : combinational;
+| | | values ("0.0");
+| | | t1 : combinational;
 | | }
 | }
 }"#,

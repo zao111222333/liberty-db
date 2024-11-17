@@ -56,6 +56,7 @@
     // Some explicitly allowed Clippy lints, must have clear reason to allow
     clippy::allow_attributes_without_reason,
     clippy::pattern_type_mismatch, // TODO: 
+    clippy::too_long_first_doc_paragraph,
     clippy::partial_pub_fields,
     clippy::single_char_lifetime_names,
     clippy::while_let_on_iterator,

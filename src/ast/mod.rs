@@ -352,11 +352,12 @@ pub enum DefinedType {
   Group,
 }
 
+#[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Debug, Default)]
 pub(crate) struct ParseScope {
   pub(crate) line_num: usize,
   pub(crate) define_map: HashMap<u64, DefinedType, mut_set::NoHashBuildHasher>,
-  pub(crate)hasher: RandomState,
+  pub(crate) hasher: RandomState,
 }
 
 #[inline]
@@ -577,7 +578,6 @@ pub(crate) trait ComplexAttri: Sized {
 
 /// `GroupComments`
 pub type GroupComments<T> = <T as Group>::Comments;
-
 /// `AttriComment`
 pub type AttriComment = Vec<ArcStr>;
 /// Group Functions

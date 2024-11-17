@@ -10,7 +10,7 @@ use crate::{
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Bundle {

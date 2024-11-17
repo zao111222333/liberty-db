@@ -36,14 +36,14 @@ mod group;
 /// // Complex group attribute, Vec
 /// #[liberty(group(type=Vec))]
 /// ```
-#[proc_macro_derive(Group, attributes(liberty))]
+#[proc_macro_derive(Group, attributes(liberty, default))]
 pub fn macro_group(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let toks = group::inner(&ast).unwrap_or_else(|err| err.to_compile_error());
   toks.into()
 }
 
-#[proc_macro_derive(Nothing, attributes(liberty))]
+#[proc_macro_derive(Nothing, attributes(liberty, default))]
 pub fn macro_nothing(_: TokenStream) -> TokenStream {
   quote::quote!().into()
 }

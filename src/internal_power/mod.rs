@@ -8,7 +8,7 @@ use crate::{
   timing::items::Mode,
 };
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]

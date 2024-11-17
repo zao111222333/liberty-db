@@ -36,9 +36,12 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html"]
 
 [features]
-default = ["fast_hash", "hash_match"]
+default = ["fast_hash", "hash_match", "vec2map"]
 fast_hash = ["dep:ahash"]
+# use str's hash to do match, rather than directly match str
 hash_match = ["liberty-macros/hash_match"]
+# better parse performance, but no error information when occuring duplicated id
+vec2map = ["liberty-macros/vec2map"]
 __test_runtime_assert = []
 
 [workspace.dependencies]
@@ -61,7 +64,7 @@ derivative = "2.2"
 ryu = "1.0"
 itoa = "1.0"
 biodivine-lib-bdd = { version = "0.5.22", features = ["serde"] }
-mut_set = "0.5.7"
+mut_set = "0.5.8"
 # mut_set = { version="0.5.2", features = ["__dbg_disable_mem_layout"] }
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
@@ -95,7 +98,7 @@ arcstr.workspace = true
 ordered-float.workspace = true
 fast-float2.workspace = true
 nom.workspace = true
-derivative.workspace = true
+# derivative.workspace = true
 ryu.workspace = true
 itoa.workspace = true
 biodivine-lib-bdd.workspace = true

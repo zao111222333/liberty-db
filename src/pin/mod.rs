@@ -35,7 +35,7 @@ pub use items::*;
 /// and group statements that you can use within the `pin` group
 /// + Descriptions of the attributes and groups you can use in a `pin` group
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Pin {
@@ -1134,7 +1134,19 @@ pub struct Pin {
   // TODO
   // minimum_period ()  { }
   // TODO
-  pub tlatch: (),
+  /// In timing analysis, use a tlatch group to describe the relationship between the data pin
+  /// and the enable pin on a transparent level-sensitive latch.
+  /// You define the tlatch group in a pin group, but it is only effective if you also define the
+  /// timing_model_type attribute in the cell that the pin belongs to. For more information
+  /// about the timing_model_type attribute,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=372.33&end=372.37
+  /// ">Reference-Definition</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<TLatch>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TLatch>::deserialize_with")]
+  pub tlatch: GroupSet<TLatch>,
   /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
   /// The timing group can be used to identify the name or names of multiple timing arcs.
   /// A timing group identifies multiple timing arcs, by identifying a timing arc in a [pin](crate::pin::Pin) group

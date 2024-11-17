@@ -22,7 +22,7 @@ use core::{
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[mut_set::derive::item(sort)]
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct LeakagePower {
@@ -136,7 +136,7 @@ mod test_sort {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[mut_set::derive::item(sort)]
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Statetable {
@@ -322,7 +322,7 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PgPin {

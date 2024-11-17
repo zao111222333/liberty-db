@@ -18,6 +18,7 @@ proc-macro = true
 [features]
 default = []
 hash_match = []
+vec2map = []
 
 [dependencies]
 foldhash.workspace = true

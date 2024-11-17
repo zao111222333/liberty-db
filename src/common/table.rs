@@ -9,7 +9,7 @@ use core::fmt::{self, Write};
 
 use super::parse_f64;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -47,9 +47,9 @@ pub struct TableLookUpMultiSegment {
   pub values: Values,
 }
 
-#[derive(Debug, Default, Clone)]
-#[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DriverWaveform {
   #[size = 8]
@@ -98,9 +98,9 @@ pub struct DriverWaveform {
   pub values: Values,
 }
 
-#[derive(Debug, Default, Clone)]
-#[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp2D {
   // TODO: unit
@@ -132,7 +132,7 @@ pub struct TableLookUp2D {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=41.20&end=41.21
 /// ">Reference</a>
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -263,7 +263,7 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
 }
 
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector3D {
@@ -296,7 +296,7 @@ pub struct Vector3D {
   pub values: Vec<NotNan<f64>>,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -334,7 +334,7 @@ pub struct ReferenceTimeVector3D {
   pub values: Vec<NotNan<f64>>,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -373,7 +373,7 @@ pub struct Vector4D {
 }
 
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Vector3DGrpup {
@@ -397,7 +397,7 @@ pub struct Vector3DGrpup {
 }
 
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ReferenceTimeVector3DGrpup {
@@ -420,7 +420,7 @@ pub struct ReferenceTimeVector3DGrpup {
   pub vector: GroupSet<ReferenceTimeVector3D>,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -448,7 +448,7 @@ impl GroupFn for Vector3DGrpup {}
 impl GroupFn for Vector4DGrpup {}
 impl GroupFn for ReferenceTimeVector3D {}
 impl GroupFn for ReferenceTimeVector3DGrpup {}
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -480,13 +480,13 @@ pub struct TableLookUp3D {
   pub values: Values,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp1D {
-  // TODO: unit
-  unit: (),
+  // // TODO: unit
+  // unit: (),
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
@@ -513,13 +513,13 @@ impl GroupFn for TableLookUp1D {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
 /// ">Reference-Definition</a>
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CompactCcsTable {
-  // TODO: unit
-  unit: (),
+  // // TODO: unit
+  // unit: (),
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
@@ -541,13 +541,13 @@ pub struct CompactCcsTable {
 }
 impl GroupFn for CompactCcsTable {}
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp {
-  // TODO: unit
-  unit: (),
+  // // TODO: unit
+  // unit: (),
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
@@ -657,7 +657,7 @@ impl ComplexAttri for Values {
   }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]

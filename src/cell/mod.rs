@@ -16,7 +16,7 @@ use crate::{
 
 /// cell
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Cell {
@@ -411,7 +411,7 @@ impl GroupFn for Cell {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
 /// ">Reference</a>
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(mut_set::derive::Dummy)]
 #[derive(serde::Serialize, serde::Deserialize)]

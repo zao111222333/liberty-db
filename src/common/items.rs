@@ -70,8 +70,8 @@ impl SimpleAttri for SdfEdgeType {
   }
 }
 
-#[derive(Debug, Clone, Default)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdVector {
   #[id]
@@ -121,7 +121,7 @@ impl SimpleAttri for VariableType {
 /// &end
 /// =39.24
 /// ">Reference-Definition</a>
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -251,7 +251,7 @@ impl FromStr for WordSet {
   }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -271,7 +271,7 @@ pub struct DummyGroup {
 }
 impl GroupFn for DummyGroup {}
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Formula(pub ArcStr);
 // type Aaa = mexprp::Expression<f64>;

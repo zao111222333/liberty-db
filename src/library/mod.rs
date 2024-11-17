@@ -23,8 +23,7 @@ pub use items::*;
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Clone, derivative::Derivative)]
-#[derivative(Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Library {
@@ -32,7 +31,7 @@ pub struct Library {
   #[id(borrow = "&str")]
   #[size = 8]
   #[liberty(name)]
-  #[derivative(Default(value = "arcstr::literal!(\"undefined\")"))]
+  #[default = "arcstr::literal!(\"undefined\")"]
   pub name: ArcStr,
   /// group comments
   #[size = 1152]
@@ -51,7 +50,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(complex)]
-  #[derivative(Default(value = "arcstr::literal!(\"cmos\")"))]
+  #[default = "arcstr::literal!(\"cmos\")"]
   pub technology: ArcStr,
   /// Use the `delay_model`  attribute to specify which delay model
   /// to use in the delay calculations.
@@ -387,7 +386,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(80.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(80.0) }"]
   pub slew_upper_threshold_pct_rise: NotNan<f64>,
   /// Use the `slew_lower_threshold_pct_rise`  attribute to set the default lower threshold point
   /// that is used to model the delay of a pin rising from 0 to 1.
@@ -400,7 +399,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(20.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(20.0) }"]
   pub slew_lower_threshold_pct_rise: NotNan<f64>,
   /// Use the `slew_derate_from_library`  attribute to specify how the transition times need to be derated to match the transition times between the characterization trip points
   ///
@@ -410,7 +409,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(1.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(1.0) }"]
   pub slew_derate_from_library: NotNan<f64>,
   /// Use the `slew_lower_threshold_pct_fall`  attribute to set the default lower threshold point
   /// that is used to model the delay of a pin falling from 1 to 0.
@@ -423,7 +422,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(20.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(20.0) }"]
   pub slew_lower_threshold_pct_fall: NotNan<f64>,
   /// Use the `slew_upper_threshold_pct_fall`  attribute to set the default upper threshold point
   /// that is used to model the delay of a pin falling from 1 to 0.
@@ -436,7 +435,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(80.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(80.0) }"]
   pub slew_upper_threshold_pct_fall: NotNan<f64>,
   /// Use the `input_threshold_pct_fall`  attribute to set the default threshold point
   /// on an input pin signal falling from 1 to 0.
@@ -449,7 +448,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"]
   pub input_threshold_pct_fall: NotNan<f64>,
   /// Use the `input_threshold_pct_rise`  attribute to set the default threshold point
   /// on an input pin signal rising from 0 to 1.
@@ -462,7 +461,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"]
   pub input_threshold_pct_rise: NotNan<f64>,
   /// Use the `output_threshold_pct_rise`  attribute to set the value
   /// of the threshold point on an output pin signal rising from 0 to 1.
@@ -474,7 +473,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"]
   pub output_threshold_pct_rise: NotNan<f64>,
   /// Use the `output_threshold_pct_fall`  attribute to set the value of the threshold point
   /// on an output pin signal falling from 1 to 0.
@@ -486,7 +485,7 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[derivative(Default(value = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"))]
+  #[default = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"]
   pub output_threshold_pct_fall: NotNan<f64>,
   /// The `is_soi`  attribute specifies that the cell is a
   /// silicon-on-insulator (SOI) cell.

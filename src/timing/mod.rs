@@ -48,7 +48,7 @@ use items::{CellDegradation, TimingSenseType};
 /// ">Reference-Instatnce-In-Pin</a>
 ///
 #[mut_set::derive::item(sort)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Timing {
@@ -63,7 +63,6 @@ pub struct Timing {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-
   /// Use this attribute to indicate that a constraint arc is for
   /// a clock gating relation between the data and clock pin,
   /// instead of a constraint found in standard sequential devices,

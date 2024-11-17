@@ -133,6 +133,7 @@ fn comment() {
   cell_test1.comments.this.push("comment1\ncomment2".into());
   cell_test1.comments.this.push("comment3".into());
   library.cell.insert(cell_test1);
+  library.cell = library.cell.into_iter().collect();
   fmt_cmp(
     &library,
     r#"/* comment1

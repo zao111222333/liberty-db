@@ -16,9 +16,9 @@ use core::fmt::Write;
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=157.22&end=157.40
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Default)]
-#[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FF {
   /// The `variable1` (`variable[0]`) value is the state of the
@@ -109,7 +109,7 @@ pub struct FF {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=157.22&end=157.40
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -205,7 +205,7 @@ pub struct FFBank {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=183.3&end=183.5
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -297,7 +297,7 @@ pub struct Latch {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=183.3&end=183.5
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]

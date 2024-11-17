@@ -1,5 +1,10 @@
-use crate::ast::{
-  CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope, SimpleAttri,
+use crate::{
+  ast::{
+    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
+    Indentation, ParseScope, SimpleAttri,
+  },
+  expression::logic::Edge,
+  ArcStr,
 };
 use core::{
   fmt::{self, Write},
@@ -37,6 +42,46 @@ impl SimpleAttri for AntennaDiodeType {
     crate::ast::nom_parse_from_str(i, scope)
   }
 }
+
+/// In timing analysis, use a tlatch group to describe the relationship between the data pin
+/// and the enable pin on a transparent level-sensitive latch.
+/// You define the tlatch group in a pin group, but it is only effective if you also define the
+/// timing_model_type attribute in the cell that the pin belongs to. For more information
+/// about the timing_model_type attribute,
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=372.33&end=372.37
+/// ">Reference-Definition</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct TLatch {
+  /// Name of the pin
+  #[liberty(name)]
+  #[id(borrow = "&str")]
+  #[size = 8]
+  pub name: ArcStr,
+  /// group comments
+  #[size = 144]
+  #[liberty(comments)]
+  pub comments: GroupComments<Self>,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  /// Valid values are rising and falling.
+  #[size = 1]
+  #[liberty(simple(type = Option))]
+  pub edge_type: Option<Edge>,
+  #[size = 1]
+  #[liberty(simple(type = Option))]
+  pub tdisable: Option<bool>,
+}
+
+impl GroupFn for TLatch {}
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

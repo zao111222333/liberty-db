@@ -14,6 +14,7 @@ fn hash_one<T: Hash>(t: &T) -> u64 {
 }
 fn group_field_fn(
   field_name: &Ident,
+  default: Option<&proc_macro2::TokenStream>,
   arrti_type: &AttriType,
   attributes_name: &Ident,
   comments_name: &Ident,
@@ -22,11 +23,20 @@ fn group_field_fn(
   proc_macro2::TokenStream,
   proc_macro2::TokenStream,
   proc_macro2::TokenStream,
+  proc_macro2::TokenStream,
+  proc_macro2::TokenStream,
 )> {
   let s_field_name = field_name.to_string();
   let attri_comment: proc_macro2::TokenStream;
   let write_field: proc_macro2::TokenStream;
+  let mut parser_init = if let Some(default) = default {
+    quote! { let mut #field_name = #default; }
+  } else {
+    quote! { let mut #field_name = Default::default(); }
+  };
+
   let parser_arm: proc_macro2::TokenStream;
+  let mut parser_post = quote! {#field_name,};
   match arrti_type {
     AttriType::Simple(SimpleType::Option) => {
       attri_comment = quote! {
@@ -43,11 +53,11 @@ fn group_field_fn(
         input = new_input;
         match simple_res {
           Ok(simple) => {
-            res.#field_name=Some(simple);
+            #field_name=Some(simple);
           },
           Err(undefined) => {
             log::error!("Line={}; Key={}; Value={:?}",scope.line_num,key,undefined);
-            crate::ast::attributs_set_undefined_simple(&mut res.#attributes_name, key, undefined);
+            crate::ast::attributs_set_undefined_simple(&mut #attributes_name, key, undefined);
           },
         }
       };
@@ -65,11 +75,11 @@ fn group_field_fn(
         input = new_input;
         match simple_res {
           Ok(simple) => {
-            res.#field_name=simple;
+            #field_name=simple;
           },
           Err(undefined) => {
             log::error!("Line={}; Key={}; Value={:?}",scope.line_num,key,undefined);
-            crate::ast::attributs_set_undefined_simple(&mut res.#attributes_name, key, undefined);
+            crate::ast::attributs_set_undefined_simple(&mut #attributes_name, key, undefined);
           },
         }
       };
@@ -86,10 +96,10 @@ fn group_field_fn(
         let (new_input,complex_res) = crate::ast::ComplexAttri::nom_parse(input, scope)?;
         input = new_input;
         match complex_res {
-          Ok(complex) => res.#field_name=complex,
+          Ok(complex) => #field_name=complex,
           Err((e,undefined)) => {
             log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
-            crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
+            crate::ast::attributs_set_undefined_complex(&mut #attributes_name, key, undefined);
           },
         }
       };
@@ -108,10 +118,10 @@ fn group_field_fn(
         let (new_input,complex_res) = crate::ast::ComplexAttri::nom_parse(input, scope)?;
         input = new_input;
         match complex_res {
-          Ok(complex) => res.#field_name=Some(complex),
+          Ok(complex) => #field_name=Some(complex),
           Err((e,undefined)) => {
             log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
-            crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
+            crate::ast::attributs_set_undefined_complex(&mut #attributes_name, key, undefined);
           },
         }
       };
@@ -128,11 +138,11 @@ fn group_field_fn(
         input = new_input;
         match complex_res{
           Ok(complex) => {
-            res.#field_name.push(complex);
+            #field_name.push(complex);
           },
           Err((e,undefined)) => {
             log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
-            crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
+            crate::ast::attributs_set_undefined_complex(&mut #attributes_name, key, undefined);
           },
         }
         let n: usize;
@@ -147,21 +157,40 @@ fn group_field_fn(
           crate::ast::ComplexAttri::fmt_liberty(complex, #s_field_name, f)?;
         }
       };
-      parser_arm = quote! {
-        let (new_input,complex_res) = crate::ast::ComplexAttri::nom_parse(input, scope)?;
-        input = new_input;
-        match complex_res{
-          Ok(complex) => {
-            if let Some(_) = res.#field_name.replace(
+      cfg_if::cfg_if! {
+        if #[cfg(feature = "vec2map")] {
+          // Vec then into HashMap
+          parser_init = quote! {
+            let mut #field_name = Vec::new();
+          };
+          let insert = quote! {
+            #field_name.push(complex);
+          };
+          parser_post = quote! {
+            #field_name: #field_name.into_iter().collect(),
+          };
+        } else {
+          // Directly into HashMap
+          let insert = quote! {
+            if let Some(_) = #field_name.replace(
               complex,
             ){
               let e = crate::ast::IdError::RepeatAttri;
               log::error!("Line={}, error={}",scope.line_num,e);
             }
+          };
+        }
+      }
+      parser_arm = quote! {
+        let (new_input,complex_res) = crate::ast::ComplexAttri::nom_parse(input, scope)?;
+        input = new_input;
+        match complex_res {
+          Ok(complex) => {
+            #insert
           },
           Err((e,undefined)) => {
             log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
-            crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
+            crate::ast::attributs_set_undefined_complex(&mut #attributes_name, key, undefined);
           },
         }
         let n: usize;
@@ -182,7 +211,7 @@ fn group_field_fn(
         input = new_input;
         match group_res{
           Ok(group) => {
-            res.#field_name.push(group);
+            #field_name.push(group);
           },
           Err(e) => {
             log::error!("Line={}, error={}",scope.line_num,e);
@@ -201,17 +230,36 @@ fn group_field_fn(
           crate::ast::GroupAttri::fmt_liberty(group, #s_field_name, f)?;
         }
       };
+      cfg_if::cfg_if! {
+        if #[cfg(feature = "vec2map")] {
+          // Vec then into HashMap
+          parser_init = quote! {
+            let mut #field_name = Vec::new();
+          };
+          let insert = quote! {
+            #field_name.push(group);
+          };
+          parser_post = quote! {
+            #field_name: #field_name.into_iter().collect(),
+          };
+        } else {
+          // Directly into HashMap
+          let insert = quote! {
+            if let Some(_) = #field_name.replace(
+              group,
+            ){
+              let e = crate::ast::IdError::RepeatAttri;
+              log::error!("Line={}, error={}",scope.line_num,e);
+            }
+          };
+        }
+      }
       parser_arm = quote! {
         let (new_input,group_res) = crate::ast::GroupAttri::nom_parse(input, key, scope)?;
         input = new_input;
         match group_res{
           Ok(group) => {
-            if let Some(old) = res.#field_name.replace(
-              group,
-            ){
-              let e = crate::ast::IdError::RepeatIdx;
-              log::error!("Line={}, error={}",scope.line_num,e);
-            }
+            #insert
           },
           Err(e) => {
             log::error!("Line={}, error={}",scope.line_num,e);
@@ -235,11 +283,11 @@ fn group_field_fn(
         input = new_input;
         match group_res{
           Ok(group) => {
-            if let Some(old) = res.#field_name{
+            if let Some(old) = #field_name{
               let e = crate::ast::IdError::RepeatAttri;
               log::error!("Line={}, error={}",scope.line_num,e);
             }
-            res.#field_name = Some(group);
+            #field_name = Some(group);
           },
           Err(e) => {
             log::error!("Line={}, error={}",scope.line_num,e);
@@ -257,21 +305,25 @@ fn group_field_fn(
       Ok((
         attri_comment,
         write_field,
+        parser_init,
         quote!(
           #s_field_hash => {
             #parser_arm
           },
         ),
+        parser_post,
       ))
     } else {
       Ok((
         attri_comment,
         write_field,
+        parser_init,
         quote!(
           #s_field_name => {
             #parser_arm
           },
         ),
+        parser_post,
       ))
     }
   }
@@ -288,10 +340,40 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
 
   if let Fields::Named(named) = &st.fields {
     let fields = &named.named;
-    let (attri_type_map, name_vec, attributes_name, comments_name) =
+    let (attri_type_map, default_map, name_vec, attributes_name, comments_name) =
       parse_fields_type(fields)?;
     let mut attri_comments = quote! {};
+
+    let mut parser_inits = quote! {};
+    parser_inits = if let Some(default) = default_map.get(attributes_name) {
+      quote! {
+        let mut #attributes_name = #default;
+        #parser_inits
+      }
+    } else {
+      quote! {
+        let mut #attributes_name = Default::default();
+        #parser_inits
+      }
+    };
     let mut parser_arms = quote! {};
+    let mut parser_posts =
+      name_vec.iter().fold(quote! {#attributes_name, }, |old, name| {
+        let i = name.ident.as_ref().unwrap();
+        if let Some(defalut) = default_map.get(i) {
+          quote! {#old #i: #defalut,}
+        } else {
+          old
+        }
+      });
+    let defalut_impl = fields.iter().fold(quote! {}, |old, field| {
+      let i = field.ident.as_ref().unwrap();
+      if let Some(defalut) = default_map.get(i) {
+        quote! {#old #i: #defalut,}
+      } else {
+        quote! {#old #i: Default::default(),}
+      }
+    });
     let mut write_simple_complex = quote! {};
     let mut write_group = quote! {};
     let comments_self = Ident::new("this", Span::call_site());
@@ -315,20 +397,30 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       (Some(a), Some(b)) => a.cmp(b),
     });
     for (field_name, arrti_type, _) in field_name_arrti_type_old_pos {
-      let (attri_comment, write_field, parser_arm) = group_field_fn(
-        field_name,
-        arrti_type,
-        attributes_name,
-        comments_name,
-        &comments_self,
-      )?;
+      let (attri_comment, write_field, parser_init, parser_arm, parser_post) =
+        group_field_fn(
+          field_name,
+          default_map.get(field_name),
+          arrti_type,
+          attributes_name,
+          comments_name,
+          &comments_self,
+        )?;
       attri_comments = quote! {
         #attri_comments
         #attri_comment
       };
+      parser_inits = quote! {
+        #parser_inits
+        #parser_init
+      };
       parser_arms = quote! {
         #parser_arms
         #parser_arm
+      };
+      parser_posts = quote! {
+        #parser_posts
+        #parser_post
       };
       match arrti_type {
         AttriType::Simple(_) | AttriType::Complex(_) => {
@@ -404,6 +496,15 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     let key_id = quote!(crate::ast::hash_one(key));
 
     let impl_group = quote! {
+      #[doc(hidden)]
+      impl Default for #ident {
+        #[inline]
+        fn default() -> Self {
+          Self {
+            #defalut_impl
+          }
+        }
+      }
       #named_group_impl
       #[doc(hidden)]
       #[derive(Default,Debug,Clone)]
@@ -440,11 +541,12 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           scope: &mut crate::ast::ParseScope,
         ) -> nom::IResult<&'a str, Result<Self,crate::ast::IdError>, nom::error::Error<&'a str>> {
           let (mut input,title) = crate::ast::parser::title(i, &mut scope.line_num)?;
-          let mut res = Self::default();
+          #parser_inits
           loop {
             match crate::ast::parser::key(input) {
               Err(nom::Err::Error(_)) => {
                 (input,_) = crate::ast::parser::end_group(input)?;
+                let mut res = Self{#parser_posts ..Default::default()};
                 <Self as crate::ast::GroupFn>::post_parse_process(&mut res, scope);
                 #change_id_return
               },
@@ -458,7 +560,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
                     let (new_input,undefined) = crate::ast::parser::undefine(input, key, scope)?;
                     input = new_input;
                     crate::ast::attributs_set_undefined_attri(
-                      &mut res.#attributes_name,
+                      &mut #attributes_name,
                       key,
                       group_name,
                       scope,
