@@ -262,6 +262,16 @@ impl Not for State {
   }
 }
 
+#[expect(
+  clippy::indexing_slicing,
+  clippy::arithmetic_side_effects,
+  clippy::as_conversions
+)]
+const fn lut(l: State, r: State, lut: &'static [State; 196]) -> State {
+  let idx = (l as u8) * 14 + (r as u8);
+  lut[idx as usize]
+}
+
 impl State {
   const LUT_AND: [Self; 196] = [
     Self::L,
@@ -463,13 +473,8 @@ impl State {
   ];
   #[must_use]
   #[inline]
-  #[expect(
-    clippy::indexing_slicing,
-    clippy::arithmetic_side_effects,
-    clippy::as_conversions
-  )]
   const fn lut_bitand(self, rhs: Self) -> Self {
-    Self::LUT_AND[(self as usize) * 14 + (rhs as usize)]
+    lut(self, rhs, &Self::LUT_AND)
   }
   #[must_use]
   #[inline]
@@ -878,13 +883,8 @@ impl State {
   ];
   #[must_use]
   #[inline]
-  #[expect(
-    clippy::indexing_slicing,
-    clippy::arithmetic_side_effects,
-    clippy::as_conversions
-  )]
   const fn lut_bitor(self, rhs: Self) -> Self {
-    Self::LUT_OR[(self as usize) * 14 + (rhs as usize)]
+    lut(self, rhs, &Self::LUT_OR)
   }
   #[must_use]
   #[inline]
@@ -1293,13 +1293,8 @@ impl State {
   ];
   #[must_use]
   #[inline]
-  #[expect(
-    clippy::indexing_slicing,
-    clippy::arithmetic_side_effects,
-    clippy::as_conversions
-  )]
   const fn lut_bitxor(self, rhs: Self) -> Self {
-    Self::LUT_XOR[(self as usize) * 14 + (rhs as usize)]
+    lut(self, rhs, &Self::LUT_XOR)
   }
   #[must_use]
   #[inline]

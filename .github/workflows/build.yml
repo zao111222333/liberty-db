@@ -135,15 +135,10 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-tarpaulin
-      - run: cargo tarpaulin --verbose --lib --examples --workspace --exclude liberty-macros --exclude-files dev/* --all-features --out xml html --output-dir target/codecov
+      - run: cargo tarpaulin --verbose --release --lib --examples --workspace --exclude liberty-macros --exclude-files dev/* --all-features --out xml html --output-dir target/codecov
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v4
         with:
           files: target/codecov/cobertura.xml
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
-      # - name: Archive code coverage results
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: code-coverage-report
-      #     path: target/codecov/cobertura.xml
