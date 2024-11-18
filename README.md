@@ -62,15 +62,21 @@ cargo bench --bench dev
 
 ## TODO
 
-+ stream input
-+ Linked Group
-+ like IndexMap, only sort once and store
-+ CI: only do comparsion after tag new version
-+ CI: fast regression self in build.yml
-+ Fix error when `make_golden`
-  + `intrinsic_parasitic` group
-  + `leakage_current` group
-  + `dynamic_current` group
++ Parse:
+  + Only `Vec<NotNan<f64>>` and `Value` complex attributes need quotes vector, use `fast_float2::parse_partial`
+  + Fix error when `make_golden`
+    + `intrinsic_parasitic` group
+    + `leakage_current` group
+    + `dynamic_current` group
+  + async
+  + stream input
++ CI:
+  + only do comparsion after tag new version
+  + fast regression self in build.yml
++ Other:
+  + Linked Group
+  + like IndexMap, only sort once and store
+  + bitcode support
 + ~~user `define`~~
 + ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~
 + ~~fix missing newline at endding~~

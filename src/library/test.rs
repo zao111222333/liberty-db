@@ -222,3 +222,52 @@ library (undefined) {
 "#,
   );
 }
+
+// #[test]
+// fn serde() {
+//   use num_traits::Zero;
+//   let mut library = Library::default();
+//   library.comments_this_entry().or_insert("comment1".into());
+//   library
+//     .cell
+//     .entry("CELL1".into())
+//     .and_modify(|cell| cell.area = Some(NotNan::one()))
+//     .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+//   library
+//     .cell
+//     .entry("CELL2".into())
+//     .and_modify(|cell| cell.area = Some(NotNan::one()))
+//     .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+//   library
+//     .cell
+//     .entry("CELL2".into())
+//     .and_modify(|cell| cell.area = Some(NotNan::one()))
+//     .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+//   let want = r#"/* comment1 */
+// library (undefined) {
+// | technology (cmos);
+// | delay_model : table_lookup;
+// | time_unit : 1ns;
+// | voltage_unit : 1V;
+// | slew_upper_threshold_pct_rise : 80.0;
+// | slew_lower_threshold_pct_rise : 20.0;
+// | slew_derate_from_library : 1.0;
+// | slew_lower_threshold_pct_fall : 20.0;
+// | slew_upper_threshold_pct_fall : 80.0;
+// | input_threshold_pct_fall : 50.0;
+// | input_threshold_pct_rise : 50.0;
+// | output_threshold_pct_rise : 50.0;
+// | output_threshold_pct_fall : 50.0;
+// | cell (CELL1) {
+// | | area : 0.0;
+// | }
+// | cell (CELL2) {
+// | | area : 1.0;
+// | }
+// }
+// "#;
+//   fmt_cmp(&library, want);
+//   let serialized = bson::bson!(library).unwrap();
+//   println!("serialized = {}", serialized);
+//   fmt_cmp(&bson::from_bson(&serialized).unwrap(), want);
+// }
