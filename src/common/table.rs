@@ -1,14 +1,13 @@
+use arcstr::literal;
+
 use crate::{
   ast::{
-    Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
+    self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
     ParseScope, SimpleAttri,
   },
   ArcStr, NotNan,
 };
 use core::fmt::{self, Write};
-
-use super::parse_f64;
-
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
@@ -231,11 +230,8 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
 
 impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -254,11 +250,8 @@ pub enum VariableTypeCompactLutTemplateIndex3 {
 
 impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::nom_parse_from_str(i, scope)
   }
 }
 
@@ -595,34 +588,51 @@ pub struct Values {
 
 impl ComplexAttri for Values {
   #[inline]
-  #[expect(clippy::arithmetic_side_effects)]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    _iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut size1 = 0;
-    let mut size2 = 0;
-    // FIXME: optimize it
-    let mut table_len_mismatch = false;
-    let inner = iter
-      .flat_map(|v| {
-        size2 += 1;
-        let l = v.len();
-        #[expect(clippy::else_if_without_else)]
-        if l != 0 {
-          if size1 == 0 {
-            size1 = l;
-          } else if size1 != l {
-            table_len_mismatch = true;
-          }
-        }
-        v.iter().map(parse_f64)
-      })
-      .collect::<Result<Vec<NotNan<f64>>, _>>()?;
-    if table_len_mismatch {
-      Err(ComplexParseError::LengthDismatch)
-    } else {
-      Ok(Self { size1, size2, inner })
+    unreachable!()
+  }
+  #[inline]
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    match ast::parser::complex_values(i, &mut scope.line_num) {
+      Ok((i, vec)) => {
+        let mut size1 = 0;
+        let mut size2 = 0;
+        let mut table_len_mismatch = false;
+        let inner = vec
+          .into_iter()
+          .flat_map(|(n, v)| {
+            scope.line_num += n;
+            size2 += 1;
+            let l = v.len();
+            #[expect(clippy::else_if_without_else)]
+            if l != 0 {
+              if size1 == 0 {
+                size1 = l;
+              } else if size1 != l {
+                table_len_mismatch = true;
+              }
+            }
+            v
+          })
+          .collect();
+        Ok((
+          i,
+          if table_len_mismatch {
+            Err((
+              ComplexParseError::LengthDismatch,
+              ast::ComplexWrapper(vec![literal!("PARSER_ERROR")]),
+            ))
+          } else {
+            Ok(Self { size1, size2, inner })
+          },
+        ))
+      }
+      Err(_) => {
+        Err(nom::Err::Error(nom::error::Error::new(i, nom::error::ErrorKind::ManyMN)))
+      }
     }
   }
   #[inline]
@@ -630,28 +640,18 @@ impl ComplexAttri for Values {
     !self.inner.is_empty()
   }
   #[inline]
-  fn fmt_self<T: Write, I: crate::ast::Indentation>(
+  fn fmt_self<T: Write, I: ast::Indentation>(
     &self,
-    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+    f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let indent = f.indentation();
     let mut iter = self.inner.chunks(self.size1);
     if let Some(v) = iter.next() {
-      crate::ast::join_fmt(
-        v.iter(),
-        f,
-        |float, ff| ff.write_float(float.into_inner()),
-        ", ",
-      )?;
+      ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")?;
     }
     while let Some(v) = iter.next() {
       write!(f, ", \\\n{indent}")?;
-      crate::ast::join_fmt(
-        v.iter(),
-        f,
-        |float, ff| ff.write_float(float.into_inner()),
-        ", ",
-      )?;
+      ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")?;
     }
     Ok(())
   }
@@ -804,11 +804,8 @@ pub enum Variable {
 }
 impl SimpleAttri for Variable {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::nom_parse_from_str(i, scope)
   }
 }
 

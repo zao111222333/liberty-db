@@ -36,26 +36,35 @@ pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub enum ComplexWrapper {
-  Single(Vec<ArcStr>),
-  Multi(Vec<Vec<ArcStr>>),
-}
+// pub enum ComplexWrapper {
+//   Single(Vec<ArcStr>),
+//   Multi(Vec<Vec<ArcStr>>),
+// }
+pub struct ComplexWrapper(pub(crate) Vec<ArcStr>);
 impl ComplexWrapper {
-  fn collect(mut vec: Vec<(Vec<&str>, usize)>) -> Self {
-    if vec.len() <= 1 {
-      vec.pop().map_or(Self::Single(Vec::new()), |first| {
-        Self::Single(first.0.into_iter().map_into::<ArcStr>().collect())
-      })
-    } else {
-      Self::Multi(
-        vec
-          .into_iter()
-          .map(|(v, _)| v.into_iter().map_into::<ArcStr>().collect())
-          .collect(),
-      )
-    }
+  fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope) -> Self {
+    Self(
+      vec
+        .into_iter()
+        .map(|(n, s)| {
+          scope.line_num += n;
+          ArcStr::from(s)
+        })
+        .collect(),
+    )
   }
 }
+// impl ComplexWrapper {
+//   fn collect(mut vec: Vec<&str>) -> Self {
+//     if vec.len() <= 1 {
+//       vec.pop().map_or(Self::Single(Vec::new()), |first| {
+//         Self::Single(first.0.into_iter().map_into::<ArcStr>().collect())
+//       })
+//     } else {
+//       Self::Multi(vec.into_iter().map_into::<ArcStr>().collect().collect())
+//     }
+//   }
+// }
 /// Wrapper for group attribute
 ///
 /// ``` text
@@ -527,7 +536,7 @@ pub fn join_fmt_no_quote<
 /// Complex Attribute in Liberty
 pub(crate) trait ComplexAttri: Sized {
   /// basic `parser`
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError>;
@@ -537,15 +546,17 @@ pub(crate) trait ComplexAttri: Sized {
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
     let (input, vec) = parser::complex(i, &mut scope.line_num)?;
     let mut line_num = 0;
-    let iter = vec.iter().map(|(v, n)| {
-      line_num += n;
-      v
-    });
-    let res = Self::parse(iter, scope);
+    let res = Self::parse(
+      vec.iter().map(|(n, s)| {
+        line_num += n;
+        s
+      }),
+      scope,
+    );
     scope.line_num += line_num;
     match res {
       Ok(s) => Ok((input, Ok(s))),
-      Err(e) => Ok((input, Err((e, ComplexWrapper::collect(vec))))),
+      Err(e) => Ok((input, Err((e, ComplexWrapper::collect(vec, scope))))),
     }
   }
   #[inline]
@@ -834,24 +845,7 @@ impl Format for ComplexWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    match self {
-      Self::Single(signle) => {
-        ComplexAttri::fmt_liberty(signle, key, f).and(write!(f, "{DEFINED_COMMENT}"))
-      }
-      Self::Multi(multi) => {
-        let indent = f.indentation();
-        write!(f, "\n{indent}{key} (")?;
-        let mut iter = multi.iter();
-        if let Some(v) = iter.next() {
-          join_fmt(v.iter(), f, |s, ff| write!(ff, "{s}"), ", ")?;
-        }
-        while let Some(v) = iter.next() {
-          write!(f, ", \\\n{indent}")?;
-          join_fmt(v.iter(), f, |s, ff| write!(ff, "{s}"), ", ")?;
-        }
-        write!(f, "); {DEFINED_COMMENT}")
-      }
-    }
+    ComplexAttri::fmt_liberty(&self.0, key, f).and(write!(f, "{DEFINED_COMMENT}"))
   }
 }
 

@@ -260,16 +260,15 @@ impl CapacitiveLoadUnit {
 
 impl ComplexAttri for CapacitiveLoadUnit {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let val = match i.next() {
+    let val = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let ff_pf = match i.next() {
+    let ff_pf = match iter.next() {
       Some(&s) => match s {
         "ff" => true,
         "pf" => false,
@@ -277,7 +276,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { ff_pf, val })

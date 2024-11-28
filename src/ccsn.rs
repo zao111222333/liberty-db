@@ -360,17 +360,16 @@ pub struct PropagatingCcb {
 
 impl ComplexAttri for PropagatingCcb {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let input_ccb_name = match i.next() {
+    let input_ccb_name = match iter.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let output_ccb_name = i.next().map(|&s| ArcStr::from(s));
-    if i.next().is_some() {
+    let output_ccb_name = iter.next().map(|&s| ArcStr::from(s));
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { input_ccb_name, output_ccb_name })

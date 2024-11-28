@@ -435,26 +435,25 @@ pub struct RetentionPin {
 }
 impl ComplexAttri for RetentionPin {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let pin_class: PinClass = match i.next() {
+    let pin_class: PinClass = match iter.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::Other),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let disable_value: OneZero = match i.next() {
+    let disable_value: OneZero = match iter.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::Other),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       Err(ComplexParseError::LengthDismatch)
     } else {
       Ok(Self { pin_class, disable_value })

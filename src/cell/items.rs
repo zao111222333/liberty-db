@@ -690,26 +690,25 @@ pub struct PinOpposite {
 
 impl ComplexAttri for PinOpposite {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let name_list1: WordSet = match i.next() {
+    let name_list1: WordSet = match iter.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::Other),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let name_list2: WordSet = match i.next() {
+    let name_list2: WordSet = match iter.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::Other),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       Err(ComplexParseError::LengthDismatch)
     } else {
       Ok(Self { name_list1, name_list2 })

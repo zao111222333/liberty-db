@@ -143,15 +143,13 @@ mod test {
         ment2 */
         t1 : "combinational";
         values ( \
-            1,"2,3",4,\ // comment1
-            5,\ /* comment2 */
-            6\ /* comment3 */
+            "1,2,3,4"\ // comment1
         );
     }
     "#,
       r#"
 liberty_db::common::demo::Timing () {
-| values ("1.0, 2.0, 3.0, 4.0, 5.0, 6.0");
+| values ("1.0, 2.0, 3.0, 4.0");
 | t1 : combinational;
 }"#,
     );
@@ -160,14 +158,13 @@ liberty_db::common::demo::Timing () {
         t1: ombinational;
         t2: combinational;
         values ( \
-            -1e2,"2,3,",\
-            1,"2,3,",\
+            "-1e2,2,3"\
         );
         }
     "#,
       r#"
 liberty_db::common::demo::Timing () {
-| values ("-100.0, 2.0, 3.0, 1.0, 2.0, 3.0");
+| values ("-100.0, 2.0, 3.0");
 | t2 : combinational;
 | t1 : ombinational; /* user defined attribute */
 }"#,
@@ -232,7 +229,7 @@ liberty_db::common::demo::Pin (B) {
                 test_table (\
                     "1,2,",\
                     "4,5,6",\
-                    4 , 5 , 6);
+                    "4 , 5 , 6");
             }
         }
         statetable ("CLK EN SE",ENL) {
@@ -260,9 +257,7 @@ liberty_db::common::demo::Cell (INV) {
 | | timing () {
 | | | values ("0.0");
 | | | t1 : foo_error; /* user defined attribute */
-| | | test_table ("1, 2", \
-| | | "4, 5, 6", \
-| | | "4, 5, 6");  /* user defined attribute */
+| | | test_table ("1,2,", "4,5,6", "4 , 5 , 6"); /* user defined attribute */
 | | }
 | }
 | statetable ("CLK EN SE", ENL) {

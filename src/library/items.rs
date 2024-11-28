@@ -162,19 +162,18 @@ pub struct SensitizationVector {
 
 impl ComplexAttri for SensitizationVector {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let id: usize = match i.next() {
+    let id: usize = match iter.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(ComplexParseError::Int(e)),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let states = match i.next() {
+    let states = match iter.next() {
       Some(&s) => match s
         .split_ascii_whitespace()
         .map(|t| match t {
@@ -191,7 +190,7 @@ impl ComplexAttri for SensitizationVector {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { id, states })
@@ -306,20 +305,19 @@ pub struct VoltageMap {
 }
 impl ComplexAttri for VoltageMap {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let name = match i.next() {
+    let name = match iter.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let voltage = match i.next() {
+    let voltage = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { name, voltage })
@@ -739,27 +737,26 @@ pub enum AttributeType {
 }
 impl ComplexAttri for Define {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let attribute_name = match i.next() {
+    let attribute_name = match iter.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let group_name = match i.next() {
+    let group_name = match iter.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let attribute_type = match i.next() {
+    let attribute_type = match iter.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::UnsupportedWord),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     let define_id = crate::ast::define_id(&scope.hasher, &group_name, &attribute_name);
@@ -804,20 +801,19 @@ pub struct DefineGroup {
 }
 impl ComplexAttri for DefineGroup {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let group = match i.next() {
+    let group = match iter.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let parent_name = match i.next() {
+    let parent_name = match iter.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     let define_id = crate::ast::define_id(&scope.hasher, &parent_name, &group);
@@ -897,23 +893,22 @@ pub enum ResourceType {
 }
 impl ComplexAttri for DefineCellArea {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let area_name = match i.next() {
+    let area_name = match iter.next() {
       Some(&s) => ArcStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let resource_type = match i.next() {
+    let resource_type = match iter.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(_) => return Err(ComplexParseError::UnsupportedWord),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { area_name, resource_type })
@@ -1054,27 +1049,26 @@ pub struct FanoutLength {
 }
 impl ComplexAttri for FanoutLength {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a Vec<&'a str>>>(
-    iter: I,
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter.flat_map(IntoIterator::into_iter);
-    let fanout = match i.next() {
+    let fanout = match iter.next() {
       Some(&s) => match s.parse() {
         Ok(f) => f,
         Err(e) => return Err(ComplexParseError::Int(e)),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let length = match i.next() {
+    let length = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let average_capacitance = i.next().and_then(|s| s.parse().ok());
-    let standard_deviation = i.next().and_then(|s| s.parse().ok());
-    let number_of_nets = i.next().and_then(|s| s.parse().ok());
+    let average_capacitance = iter.next().and_then(|s| s.parse().ok());
+    let standard_deviation = iter.next().and_then(|s| s.parse().ok());
+    let number_of_nets = iter.next().and_then(|s| s.parse().ok());
 
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self {

@@ -247,7 +247,12 @@ impl FromStr for WordSet {
 
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self { inner: s.split(' ').map(ArcStr::from).collect() })
+    Ok(Self {
+      inner: s
+        .split(' ')
+        .filter_map(|s| if s.is_empty() { None } else { Some(ArcStr::from(s)) })
+        .collect(),
+    })
   }
 }
 
