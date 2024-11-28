@@ -36,15 +36,15 @@ impl Indentation for DefaultIndentation {
     }else{
       const LUT: &'static [&'static str] = &[
         "",
-        "  ",
-        "    ",
-        "      ",
-        "        ",
-        "          ",
-        "            ",
-        "              ",
-        "                ",
-        "                  ",
+        "\t",
+        "\t\t",
+        "\t\t\t",
+        "\t\t\t\t",
+        "\t\t\t\t\t",
+        "\t\t\t\t\t\t",
+        "\t\t\t\t\t\t\t",
+        "\t\t\t\t\t\t\t\t",
+        "\t\t\t\t\t\t\t\t\t",
       ];
     }
   }

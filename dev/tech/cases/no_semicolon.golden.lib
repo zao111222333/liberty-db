@@ -1,28 +1,28 @@
 
 liberty_db::library::Library (some) {
-  technology (cmos);
-  delay_model : table_lookup;
-  time_unit : 1ns;
-  voltage_unit : 1V;
-  slew_upper_threshold_pct_rise : 80.0;
-  slew_lower_threshold_pct_rise : 20.0;
-  slew_derate_from_library : 1.0;
-  slew_lower_threshold_pct_fall : 20.0;
-  slew_upper_threshold_pct_fall : 80.0;
-  input_threshold_pct_fall : 50.0;
-  input_threshold_pct_rise : 50.0;
-  output_threshold_pct_rise : 50.0;
-  output_threshold_pct_fall : 50.0;
-  wire_load (1000000) {
-    area : 0.0;
-    capacitance : 1.0;
-    resistance : 0.00001;
-    slope : 0.0;
-    fanout_length (1, 0.0);
-    fanout_length (2, 0.0);
-    fanout_length (3, 0.0);
-    fanout_length (4, 0.0);
-    fanout_length (5, 0.0);
-    fanout_length (6, 0.0);
-  }
+	technology (cmos);
+	delay_model : table_lookup;
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	wire_load (1000000) {
+		area : 0.0;
+		capacitance : 1.0;
+		resistance : 0.00001;
+		slope : 0.0;
+		fanout_length (1, 0.0);
+		fanout_length (2, 0.0);
+		fanout_length (3, 0.0);
+		fanout_length (4, 0.0);
+		fanout_length (5, 0.0);
+		fanout_length (6, 0.0);
+	}
 }

@@ -62,7 +62,7 @@ jobs:
       - name: Build
         run: cargo build --verbose
       - name: Run Tests
-        run: cargo test --verbose --features __test_runtime_assert --lib --release
+        run: cargo test --verbose --features __test_runtime_assert --release
   # Checks code style.
   clippy:
     needs: check
