@@ -70,8 +70,6 @@ mut_set = "0.5.9"
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
 num-traits = "0.2"
-lazy_static = "1.5.0"
-prettytable-rs = "^0.10"
 cfg-if = "1.0.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 sysinfo = "0.32"
@@ -106,10 +104,6 @@ biodivine-lib-bdd.workspace = true
 mut_set.workspace = true
 duplicate.workspace = true
 num-traits.workspace = true
-# TODO: remove it
-lazy_static.workspace = true
-# TODO: remove it
-prettytable-rs.workspace = true
 cfg-if.workspace = true
 
 [dev-dependencies]

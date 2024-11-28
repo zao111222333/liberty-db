@@ -144,6 +144,9 @@ pub struct Cell {
   #[size = 8]
   #[liberty(simple(type = Option))]
   pub io_type: Option<ArcStr>,
+  #[size = 1]
+  #[liberty(simple(type = Option))]
+  pub is_filler_cell: Option<bool>,
   /// The `is_pad`  attribute identifies a pad pin on
   /// any I/O cell. You can also specify the `is_pad` attribute
   /// on PG pins.
@@ -380,6 +383,112 @@ pub struct Cell {
   #[size = 168]
   #[liberty(group(type = Option))]
   pub statetable: Option<Statetable>,
+  /// Use the `dynamic_current` group to specify a current waveform vector when the power
+  /// and ground current is dependent on the logical condition of a cell. A `dynamic_current`
+  /// group is defined in a cell group, as shown here:
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=147.3&end=147.5
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<DynamicCurrent>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<DynamicCurrent>::deserialize_with")]
+  pub dynamic_current: GroupSet<DynamicCurrent>,
+  /// The `intrinsic_parasitic` group specifies the state-dependent intrinsic capacitance and
+  /// intrinsic resistance of a `cell`.
+  /// Syntax
+  /// ``` text
+  /// library( library_name ) {
+  ///   ......
+  ///   lu_table_template ( template_name ) {
+  ///     variable_1 : pg_voltage | pg_voltage_difference;
+  ///     index_1 ( "float, ..., float" );
+  ///   }
+  ///   cell (cell_name) {
+  ///     mode_definition (mode_name) {
+  ///       mode_value (mode_value) {
+  ///         when : boolean_expression ;
+  ///         sdf_cond : boolean_expression ;
+  ///       }
+  ///     }
+  ///     ...
+  ///     intrinsic_parasitic () {
+  ///       mode (mode_name, mode_value) ;
+  ///       when : boolean expression ;
+  ///       intrinsic_resistance(pg_pin_name) {
+  ///         related_output : output_pin_name ;
+  ///         value : float ;
+  ///         reference_pg_pin : pg_pin_name;
+  ///         lut_values ( template_name ) {
+  ///           index_1 ("float, ... float" );
+  ///           values ("float, ... float" );
+  ///         }
+  ///       }
+  ///       intrinsic_capacitance(pg_pin_name) {
+  ///         value : float ;
+  ///         reference_pg_pin : pg_pin_name;
+  ///         lut_values ( template_name ) {
+  ///           index_1 ("float, ... float" );
+  ///           values ("float, ... float" );
+  ///         }
+  ///       }
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// Simple Attributes
+  /// + when
+  /// + reference_pg_pin
+  ///
+  /// Complex Attribute
+  /// + mode
+  ///
+  /// Groups
+  /// + intrinsic_capacitance
+  /// + intrinsic_resistance
+  /// + total_capacitance
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=176.24+177.2&end=176.49+177.25
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<IntrinsicParasitic>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<IntrinsicParasitic>::deserialize_with")]
+  pub intrinsic_parasitic: GroupSet<IntrinsicParasitic>,
+  /// A `leakage_current` group is defined within a cell group or a model group to specify
+  /// leakage current values that are dependent on the state of the cell.
+  ///
+  /// Syntax
+  /// ``` text
+  /// library (name) {
+  /// cell(cell_name) {
+  ///   ...
+  ///   leakage_current() {
+  ///     when : boolean expression;
+  ///     pg_current(pg_pin_name) {
+  ///       value : float;
+  ///     }
+  ///     ...
+  ///   }
+  /// }
+  /// ```
+  /// Simple Attributes
+  /// + when
+  /// + value
+  ///
+  /// Complex Attribute
+  /// + mode
+  ///
+  /// Group
+  /// + pg_current
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=194.49+195.2&end=194.50+195.20
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<LeakageCurrent>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<LeakageCurrent>::deserialize_with")]
+  pub leakage_current: GroupSet<LeakageCurrent>,
   #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Pin>::serialize_with")]

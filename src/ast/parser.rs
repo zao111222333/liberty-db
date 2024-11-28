@@ -5,14 +5,11 @@
 use crate::{ast::GroupWrapper, ArcStr, NotNan};
 use nom::{
   branch::alt,
-  bytes::streaming::{escaped, is_not, tag, take, take_until, take_while},
-  character::{
-    complete::digit1,
-    streaming::{char, one_of},
-  },
+  bytes::complete::{escaped, is_not, tag, take, take_until, take_while},
+  character::complete::{char, digit1, one_of},
   combinator::{map, map_opt, opt},
   error::{ContextError, Error, ErrorKind, FromExternalError, ParseError},
-  multi::{many0, many_till, separated_list0},
+  multi::{many0, separated_list0},
   sequence::{delimited, pair, preceded, terminated, tuple},
   IResult, InputTakeAtPosition,
 };
@@ -267,16 +264,16 @@ where
   i.split_at_position1(|item| !char_in_word(item), ErrorKind::Alpha)
 }
 
-#[inline]
-pub(crate) fn word_all<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
-where
-  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
-{
-  i.split_at_position1(
-    |item| !(item.is_alphanumeric() || "/_.+-: \t[]".contains(item)),
-    ErrorKind::Alpha,
-  )
-}
+// #[inline]
+// pub(crate) fn word_all<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
+// where
+//   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
+// {
+//   i.split_at_position1(
+//     |item| !(item.is_alphanumeric() || "/_.+-: \t[]".contains(item)),
+//     ErrorKind::Alpha,
+//   )
+// }
 
 #[inline]
 pub(super) fn char_in_formula(c: char) -> bool {
@@ -366,6 +363,7 @@ pub(crate) fn simple<'a>(
 }
 #[inline]
 fn float_one(i: &str) -> IResult<&str, NotNan<f64>, Error<&str>> {
+  #[expect(clippy::string_slice, clippy::undocumented_unsafe_blocks)]
   match fast_float2::parse_partial(i) {
     Ok((f, pos)) => Ok((&i[pos..], unsafe { NotNan::new_unchecked(f) })),
     Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Float))),
@@ -384,16 +382,23 @@ fn float_vec(i: &str) -> IResult<&str, Vec<NotNan<f64>>, Error<&str>> {
 }
 
 #[inline]
+fn int_usize(i: &str) -> IResult<&str, usize, Error<&str>> {
+  #[expect(clippy::unwrap_used)]
+  map(digit1, |s: &str| s.parse().unwrap())(i)
+}
+
+#[inline]
+#[expect(clippy::type_complexity)]
 pub(crate) fn complex_id_vector<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, (&'a str, Vec<NotNan<f64>>), Error<&'a str>> {
+) -> IResult<&'a str, (usize, Vec<NotNan<f64>>), Error<&'a str>> {
   map(
     tuple((
       space,
       char('('),
       comment_space_newline_slash,
-      digit1,
+      int_usize,
       space,
       char(','),
       comment_space_newline_slash,
@@ -405,9 +410,36 @@ pub(crate) fn complex_id_vector<'a>(
         comment_space_newline_many1,
       )),
     )),
-    |(_, _, n0, id_str, _, _, n1, vec, n2, _, n3)| {
+    |(_, _, n0, id, _, _, n1, vec, n2, _, n3)| {
       *line_num += n0 + n1 + n2 + n3;
-      (id_str, vec)
+      (id, vec)
+    },
+  )(i)
+}
+
+#[inline]
+pub(crate) fn complex_multi_line<'a, T, F: nom::Parser<&'a str, T, Error<&'a str>>>(
+  i: &'a str,
+  line_num: &mut usize,
+  f: F,
+) -> IResult<&'a str, Vec<(usize, T)>, Error<&'a str>> {
+  map(
+    tuple((
+      space,
+      char('('),
+      comment_space_newline_slash,
+      separated_list0(char(','), pair(comment_space_newline_slash, terminated(f, space))),
+      opt(char(',')),
+      comment_space_newline_slash,
+      char(')'),
+      alt((
+        preceded(pair(space, char(';')), comment_space_newline),
+        comment_space_newline_many1,
+      )),
+    )),
+    |(_, _, n0, vec, _, n1, _, n2)| {
+      *line_num += n0 + n1 + n2;
+      vec
     },
   )(i)
 }
@@ -437,31 +469,31 @@ pub(crate) fn complex_float_vec<'a>(
   )(i)
 }
 
-#[inline]
-fn single_line_complex(i: &str) -> IResult<&str, Vec<&str>, Error<&str>> {
-  map(
-    separated_list0(
-      pair(char(','), space),
-      alt((
-        delimited(
-          char('"'),
-          terminated(
-            separated_list0(pair(char(','), space), preceded(space, word_all)),
-            opt(pair(char(','), space)),
-          ),
-          char('"'),
-        ),
-        separated_list0(pair(char(','), space), delimited(space, word, space)),
-      )),
-    ),
-    |v| {
-      v.into_iter()
-        .flat_map(IntoIterator::into_iter)
-        .map(str::trim_end)
-        .collect()
-    },
-  )(i)
-}
+// #[inline]
+// fn single_line_complex(i: &str) -> IResult<&str, Vec<&str>, Error<&str>> {
+//   map(
+//     separated_list0(
+//       pair(char(','), space),
+//       alt((
+//         delimited(
+//           char('"'),
+//           terminated(
+//             separated_list0(pair(char(','), space), preceded(space, word_all)),
+//             opt(pair(char(','), space)),
+//           ),
+//           char('"'),
+//         ),
+//         separated_list0(pair(char(','), space), delimited(space, word, space)),
+//       )),
+//     ),
+//     |v| {
+//       v.into_iter()
+//         .flat_map(IntoIterator::into_iter)
+//         .map(str::trim_end)
+//         .collect()
+//     },
+//   )(i)
+// }
 
 #[inline]
 #[expect(clippy::type_complexity)]
@@ -469,28 +501,53 @@ pub(crate) fn complex_values<'a>(
   i: &'a str,
   line_num: &mut usize,
 ) -> IResult<&'a str, Vec<(usize, Vec<NotNan<f64>>)>, Error<&'a str>> {
-  map(
-    tuple((
-      space,
-      char('('),
-      comment_space_newline_slash,
-      separated_list0(
-        char(','),
-        pair(comment_space_newline_slash, terminated(float_vec, space)),
+  complex_multi_line(i, line_num, float_vec)
+}
+
+#[inline]
+// #[expect(clippy::type_complexity)]
+pub(crate) fn complex_ccs_power_values<'a>(
+  i: &'a str,
+  line_num: &mut usize,
+) -> IResult<&'a str, Vec<(usize, crate::common::table::CcsPowerValue)>, Error<&'a str>> {
+  #[inline]
+  fn complex_ccs_power_value(
+    i: &str,
+  ) -> IResult<&str, crate::common::table::CcsPowerValue, Error<&str>> {
+    delimited(
+      pair(char('"'), space),
+      map(
+        tuple((
+          terminated(float_one, delimited(space, char(','), space)),
+          terminated(float_one, delimited(space, char(','), space)),
+          separated_list0(
+            delimited(space, char(','), space),
+            map(
+              tuple((
+                terminated(int_usize, delimited(space, char(','), space)),
+                terminated(float_one, delimited(space, char(','), space)),
+                float_one,
+              )),
+              |(bc_id, point_time, point_current)| crate::common::table::CcsPowerPoint {
+                bc_id,
+                point_time,
+                point_current,
+              },
+            ),
+          ),
+          pair(opt(char(',')), space),
+        )),
+        |(init_time, init_current, points, _)| crate::common::table::CcsPowerValue {
+          init_time,
+          init_current,
+          points,
+        },
       ),
-      opt(char(',')),
-      comment_space_newline_slash,
-      char(')'),
-      alt((
-        preceded(pair(space, char(';')), comment_space_newline),
-        comment_space_newline_many1,
-      )),
-    )),
-    |(_, _, n0, vec, _, n1, _, n2)| {
-      *line_num += n0 + n1 + n2;
-      vec
-    },
-  )(i)
+      char('"'),
+    )(i)
+  }
+
+  complex_multi_line(i, line_num, complex_ccs_power_value)
 }
 
 #[expect(clippy::type_complexity)]
@@ -519,29 +576,6 @@ pub(crate) fn complex<'a>(
     |(_, _, n0, vec, _, n1, _, n2)| {
       *line_num += n0 + n1 + n2;
       vec
-    },
-  )(i)
-}
-
-#[expect(clippy::type_complexity)]
-pub(crate) fn complex_old<'a>(
-  i: &'a str,
-  line_num: &mut usize,
-) -> IResult<&'a str, Vec<(Vec<&'a str>, usize)>, Error<&'a str>> {
-  map(
-    tuple((
-      space,
-      char('('),
-      comment_space_newline_slash,
-      many_till(pair(single_line_complex, comment_space_newline_slash), char(')')),
-      alt((
-        preceded(pair(space, char(';')), comment_space_newline),
-        comment_space_newline_many1,
-      )),
-    )),
-    |(_, _, n0, (res, _), n1)| {
-      *line_num += n0 + n1;
-      res
     },
   )(i)
 }

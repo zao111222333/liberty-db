@@ -11966,8 +11966,8 @@
  		base_curves_group : "nc_compact_ccs_curve_1";
  		variable_1 : "input_net_transition";
  		index_1("0.0160000,0.0320000,0.0640000,0.1280000,0.2560000,0.5120000,1.0240000");
- 		variable_2 : "curve_parameters";
- 		index_2("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
+ 		* variable_2 : "curve_parameters";
+ 		* index_2("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
  	}
  	operating_conditions ("dlvl_ff0p85v25c_i0p85v") {
  		process : 1.010000;

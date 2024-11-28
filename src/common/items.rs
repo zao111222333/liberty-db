@@ -250,7 +250,7 @@ impl FromStr for WordSet {
     Ok(Self {
       inner: s
         .split(' ')
-        .filter_map(|s| if s.is_empty() { None } else { Some(ArcStr::from(s)) })
+        .filter_map(|_s| if _s.is_empty() { None } else { Some(ArcStr::from(_s)) })
         .collect(),
     })
   }

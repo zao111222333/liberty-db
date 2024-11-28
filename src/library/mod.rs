@@ -294,6 +294,23 @@ pub struct Library {
   #[size = 8]
   #[liberty(simple(type = Option))]
   pub default_wire_load_selection: Option<ArcStr>,
+  /// The `em_temp_degradation_factor` attribute specifies the electromigration exponential
+  /// degradation factor.
+  ///
+  /// Syntax:
+  /// `em_temp_degradation_factor : valuefloat ;`
+  ///
+  /// value:
+  /// A floating-point number in centigrade units consistent with other temperature specifications throughout the library.
+  ///
+  /// Example
+  /// `em_temp_degradation_factor : 40.0 ;`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=26.3&end=26.13
+  /// ">Reference</a>
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub em_temp_degradation_factor: Option<NotNan<f64>>,
   /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=42.25&end=42.30

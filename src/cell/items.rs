@@ -1,10 +1,10 @@
 use crate::{
   ast::{
     join_fmt, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
+    GroupSet, Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
   },
-  common::items::WordSet,
-  expression::IdBooleanExpression,
+  common::{items::WordSet, table::CompactCcsPower},
+  expression::{logic, IdBooleanExpression},
   pin::Direction,
   timing::items::Mode,
   ArcStr, NotNan,
@@ -440,6 +440,1099 @@ pub struct PgPin {
 }
 impl GroupFn for PgPin {}
 
+/// Use the `dynamic_current` group to specify a current waveform vector when the power
+/// and ground current is dependent on the logical condition of a cell. A `dynamic_current`
+/// group is defined in a cell group, as shown here:
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=147.3&end=147.5
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct DynamicCurrent {
+  #[size = 8]
+  #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  #[id]
+  #[size = 80]
+  #[liberty(simple(type = Option))]
+  pub when: Option<IdBooleanExpression>,
+  #[id]
+  #[size = 64]
+  #[liberty(simple)]
+  pub related_inputs: WordSet,
+  #[id]
+  #[size = 64]
+  #[liberty(simple)]
+  pub related_outputs: WordSet,
+  #[size = 24]
+  #[liberty(complex(type = Option))]
+  pub typical_capacitances: Option<Vec<NotNan<f64>>>,
+  /// Use the switching_group group to specify a current waveform vector when the power
+  /// and ground current is dependent on pin switching conditions.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=150.18&end=150.19
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<SwitchingGroup>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<SwitchingGroup>::deserialize_with")]
+  pub switching_group: GroupSet<SwitchingGroup>,
+}
+impl GroupFn for DynamicCurrent {}
+
+/// Use the switching_group group to specify a current waveform vector when the power
+/// and ground current is dependent on pin switching conditions.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=150.18&end=150.19
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct SwitchingGroup {
+  #[size = 8]
+  #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  /// The `input_switching_condition` attribute specifies the sense of the toggling input. If
+  /// more than one `switching_group` group is specified within the `dynamic_current` group,
+  /// you can place the attribute in any order.
+  /// The valid values are rise and fall. rise represents a rising pin and fall represents a
+  /// falling pin.
+  /// Syntax
+  /// `input_switching_condition (enum(rise, fall));`
+  ///
+  /// `enum(rise, fall)`
+  /// Enumerated type specifying the rise or fall condition.
+  ///
+  /// Example
+  /// `input_switching_condition (rise);`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.5&end=151.15
+  /// ">Reference</a>
+  #[id]
+  #[size = 1]
+  #[liberty(complex(type = Option))]
+  pub input_switching_condition: Option<logic::Edge>,
+  /// Use the `output_switching_condition` attribute to specify the sense of the toggling
+  /// output. If there is more than one `switching_group` group specified within the
+  /// `dynamic_current` group, you can place the attribute in any order. The order in the list of
+  /// the `output_switching_condition` attribute is mapped to the same order of output pins in
+  /// the `related_outputs` attribute.
+  /// The valid values are rise and fall. rise represents a rising pin and fall represents a
+  /// falling pin.
+  /// Syntax
+  /// `output_switching_condition (enum(rise, fall));`
+  ///
+  /// `enum(rise, fall)`
+  /// Enumerated type specifying the rise or fall condition.
+  ///
+  /// Example
+  /// `output_switching_condition (rise, fall);`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.17&end=151.29
+  /// ">Reference</a>
+  #[id]
+  #[size = 1]
+  #[liberty(complex(type = Option))]
+  pub output_switching_condition: Option<logic::Edge>,
+  /// The `min_input_switching_count` attribute specifies the minimum number of
+  /// bits in the input bus that are switching simultaneously. The following applies to the
+  /// `min_input_switching_count` attribute:
+  /// + The count must be an integer.
+  /// + The count must be greater than 0 and less than the `max_input_switching_count`
+  /// value.
+  /// Syntax
+  /// ``` text
+  /// switching_group() {
+  /// min_input_switching_count : integer ;
+  /// max_input_switching_count : integer ;
+  /// ...
+  /// }
+  /// ```
+  /// Example
+  /// ``` text
+  /// switching_group() {
+  /// min_input_switching_count : 1 ;
+  /// max_input_switching_count : 3 ;
+  /// ...
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=152.3&end=152.22
+  /// ">Reference</a>
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub min_input_switching_count: Option<usize>,
+  /// The `max_input_switching_count` attribute specifies the maximum number of
+  /// bits in the input bus that are switching simultaneously. The following applies to the
+  /// `max_input_switching_count` attribute:
+  /// + The count must be an integer.
+  /// + The count must be greater than the `min_input_switching_count` value.
+  /// + The count within a `dynamic_current` should cover the total number of input bits
+  /// specified in `related_inputs`.
+  /// Syntax
+  /// ``` text
+  /// switching_group() {
+  /// min_input_switching_count : integer ;
+  /// max_input_switching_count : integer ;
+  /// ...
+  /// }
+  /// ```
+  /// Example
+  /// ``` text
+  /// switching_group() {
+  /// min_input_switching_count : 1 ;
+  /// max_input_switching_count : 3 ;
+  /// ...
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=152.24+153.2&end=152.38+153.7
+  /// ">Reference</a>
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub max_input_switching_count: Option<usize>,
+  /// Use the `pg_current` group to specify current waveform data in a vector group. If all
+  /// vectors under the group are dense, data in this group is represented as a dense table. If
+  /// all vectors under the group are sparse in cross type, data in this group is represented as a
+  /// sparse cross table. If all vectors under the group are sparse in diagonal type, data in this
+  /// group is represented as a sparse diagonal table.
+  /// ``` text
+  /// library (name) {
+  /// cell (name) {
+  /// dynamic_current () {
+  /// ...
+  /// switching_group() {
+  /// ...
+  /// pg_current () {}
+  /// ...
+  /// }
+  /// }
+  /// }
+  /// }
+  /// }
+  /// ```
+  /// Group
+  ///
+  /// `compact_ccs_power`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=153.9&end=153.28
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<PgCurrent>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<PgCurrent>::deserialize_with")]
+  pub pg_current: GroupSet<PgCurrent>,
+}
+impl GroupFn for SwitchingGroup {}
+
+/// Use the `pg_current` group to specify current waveform data in a vector group. If all
+/// vectors under the group are dense, data in this group is represented as a dense table. If
+/// all vectors under the group are sparse in cross type, data in this group is represented as a
+/// sparse cross table. If all vectors under the group are sparse in diagonal type, data in this
+/// group is represented as a sparse diagonal table.
+/// ``` text
+/// library (name) {
+/// cell (name) {
+/// dynamic_current () {
+/// ...
+/// switching_group() {
+/// ...
+/// pg_current () {}
+/// ...
+/// }
+/// }
+/// }
+/// }
+/// }
+/// ```
+/// Group
+///
+/// `compact_ccs_power`
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=153.9&end=153.28
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PgCurrent {
+  #[size = 8]
+  #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  /// The `compact_ccs_power` group contains a detailed description for compact CCS
+  /// power data. The `compact_ccs_power` group includes the following optional attributes:
+  /// `base_curves_group`, `index_1`, `index_2`, `index_3` and `index_4`. The description for these
+  /// attributes in the `compact_ccs_power` group is the same as in the `compact_lut_template`
+  /// group. However, the attributes have a higher priority in the `compact_ccs_power` group.
+  /// For more information, see `compact_lut_template` Group on page 41.
+  /// The `index_output` attribute is also optional. It is used only on cross type tables. For
+  /// more information about the `index_output` attribute, see `index_output` Simple Attribute on
+  /// page 156.
+  /// ``` text
+  /// library (name) {
+  ///   cell(cell_name) {
+  ///     dynamic_current() {
+  ///       switching_group() {
+  ///         pg_current(pg_pin_name) {
+  ///           compact_ccs_power (template_name) {
+  ///             base_curves_group : bc_name;
+  ///             index_output : pin_name;
+  ///             index_1 ("float, ..., float");
+  ///             index_2 ("float, ..., float");
+  ///             index_3 ("float, ..., float");
+  ///             index_4 ("string, ..., string");
+  ///             values ("float | integer, ..., float | integer");
+  ///           } /* end of compact_ccs_power */
+  ///         }
+  ///       }
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// Complex Attributes
+  /// `base_curves_group : bc_name;`
+  /// `index_output : pin_name;`
+  /// `index_1 ("float, ..., float");`
+  /// `index_2 ("float, ..., float");`
+  /// `index_3 ("float, ..., float");`
+  /// `index_4 ("string, ..., string");`
+  /// `values ("float | integer, ..., float | integer");`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=153.30+154.2&end=153.40+154.25
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<CompactCcsPower>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CompactCcsPower>::deserialize_with")]
+  pub compact_ccs_power: GroupSet<CompactCcsPower>,
+}
+impl GroupFn for PgCurrent {}
+
+/// The `intrinsic_parasitic` group specifies the state-dependent intrinsic capacitance and
+/// intrinsic resistance of a `cell`.
+/// Syntax
+/// ``` text
+/// library( library_name ) {
+///   ......
+///   lu_table_template ( template_name ) {
+///     variable_1 : pg_voltage | pg_voltage_difference;
+///     index_1 ( "float, ..., float" );
+///   }
+///   cell (cell_name) {
+///     mode_definition (mode_name) {
+///       mode_value (mode_value) {
+///         when : boolean_expression ;
+///         sdf_cond : boolean_expression ;
+///       }
+///     }
+///     ...
+///     intrinsic_parasitic () {
+///       mode (mode_name, mode_value) ;
+///       when : boolean expression ;
+///       intrinsic_resistance(pg_pin_name) {
+///         related_output : output_pin_name ;
+///         value : float ;
+///         reference_pg_pin : pg_pin_name;
+///         lut_values ( template_name ) {
+///           index_1 ("float, ... float" );
+///           values ("float, ... float" );
+///         }
+///       }
+///       intrinsic_capacitance(pg_pin_name) {
+///         value : float ;
+///         reference_pg_pin : pg_pin_name;
+///         lut_values ( template_name ) {
+///           index_1 ("float, ... float" );
+///           values ("float, ... float" );
+///         }
+///       }
+///     }
+///   }
+/// }
+/// ```
+/// Simple Attributes
+/// + when
+/// + reference_pg_pin
+///
+/// Complex Attribute
+/// + mode
+///
+/// Groups
+/// + intrinsic_capacitance
+/// + intrinsic_resistance
+/// + total_capacitance
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=176.24+177.2&end=176.49+177.25
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct IntrinsicParasitic {
+  #[size = 8]
+  #[liberty(name)]
+  name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  #[id]
+  #[liberty(simple(type = Option))]
+  pub when: Option<IdBooleanExpression>,
+  /// The `reference_pg_pin` attribute specifies the reference pin for the
+  /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
+  /// be a valid PG pin.
+  ///
+  /// Syntax
+  /// `reference_pg_pin : pg_pin_name ;`
+  ///
+  /// Example
+  /// `reference_pg_pin : G1 ;`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.3&end=178.9
+  /// ">Reference</a>
+  #[id]
+  #[liberty(simple(type = Option))]
+  pub reference_pg_pin: Option<ArcStr>,
+  /// The `mode` attribute pertains to an individual `cell`. The cell is active when the `mode` attribute
+  /// is instantiated with a name and a value. You can specify multiple instances of this attribute.
+  /// However, specify only one instance for each `cell`.
+  /// Define the mode attribute within an `intrinsic_parasitic` group.
+  ///
+  /// Syntax
+  /// `mode (mode_name, mode_value) ;`
+  ///
+  /// Example
+  /// `mode (rw, read) ;`
+  ///
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.11&end=178.18
+  /// ">Reference</a>
+  #[liberty(complex(type = Option))]
+  pub mode: Option<[ArcStr; 2]>,
+  /// Use this group to specify the intrinsic capacitance of a `cell`.
+  /// Syntax
+  /// ``` text
+  /// intrinsic_parasitic () {
+  ///   intrinsic_capacitance (pg_pin_name) {
+  ///     value : float ;
+  ///     reference_pg_pin : pg_pin_name;
+  ///     lut_values ( template_name ) {
+  ///       index_1 ("float, ... float" );
+  ///       values ("float, ... float" );
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// The `pg_pin_name` specifies a power and ground pin where the capacitance is derived.
+  /// You can have more than one `intrinsic_capacitance` group. You can place these
+  /// groups in any order within an `intrinsic_parasitic` group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.20&end=178.34
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<IntrinsicCapacitance>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<IntrinsicCapacitance>::deserialize_with")]
+  pub intrinsic_capacitance: GroupSet<IntrinsicCapacitance>,
+  /// Use this group to specify the intrinsic resistance between a power pin and an output pin of
+  /// a cell.
+  ///
+  /// Syntax
+  /// ``` text
+  /// intrinsic_parasitic () {
+  ///   intrinsic_resistance (pg_pin_name) {
+  ///     related_output : output_pin_name ;
+  ///     value : float ;
+  ///     reference_pg_pin : pg_pin_name;
+  ///     lut_values ( template_name ) {
+  ///       index_1 ("float, ... float" );
+  ///       values ("float, ... float" );
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// The `pg_pin_name` specifies a power or ground pin. You can place the
+  /// `intrinsic_resistance` groups in any order within an `intrinsic_parasitic` group. If
+  /// some of the `intrinsic_resistance` group is not defined, the value of resistance defaults
+  /// to +infinity. The channel connection between the power and ground pins and the output
+  /// pin is defined as a closed channel if the resistance value is greater than 1 megaohm.
+  /// Otherwise, the channel is opened. The `intrinsic_resistance` group is not required if
+  /// the channel is closed.
+  ///
+  /// Simple Attributes
+  /// + `related_output`
+  /// + `value`
+  /// + `reference_pg_pin`
+  /// Group
+  /// + `lut_values`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=180.10&end=180.36
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<IntrinsicResistance>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<IntrinsicResistance>::deserialize_with")]
+  pub intrinsic_resistance: GroupSet<IntrinsicResistance>,
+  /// The `total_capacitance` group specifies the macro cell’s total capacitance on a power
+  /// or ground net within the `intrinsic_parasitic` group. The following applies to the
+  /// `total_capacitance` group:
+  /// + The `total_capacitance` group can be placed in any order if there is more than one
+  /// `total_capacitance` group within an `intrinsic_parasitic` group.
+  /// + The total capacitance parasitics modeling in macro cells is not state dependent, which
+  /// means that there is no state condition specified in `intrinsic_parasitic`.
+  ///
+  /// Syntax
+  /// ``` text
+  /// cell (cell_name) {
+  ///   ...
+  ///   intrinsic_parasitic () {
+  ///     total_capacitance (pg_pin_name) {
+  ///       value : float ;
+  ///     }
+  ///   ...
+  ///   }
+  ///   ...
+  /// }
+  /// ```
+  ///
+  /// Example
+  /// ``` text
+  /// cell (my_cell) {
+  ///   ...
+  ///   intrinsic_parasitic () {
+  ///     total_capacitance (VDD) {
+  ///       value : 0.2 ;
+  ///     }
+  ///   ...
+  ///   }
+  /// ...
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=182.12&end=182.42
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<PgPinWithValue>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<PgPinWithValue>::deserialize_with")]
+  pub total_capacitance: GroupSet<PgPinWithValue>,
+}
+impl GroupFn for IntrinsicParasitic {}
+
+/// Use this group to specify the intrinsic capacitance of a `cell`.
+/// Syntax
+/// ``` text
+/// intrinsic_parasitic () {
+///   intrinsic_capacitance (pg_pin_name) {
+///     value : float ;
+///     reference_pg_pin : pg_pin_name;
+///     lut_values ( template_name ) {
+///       index_1 ("float, ... float" );
+///       values ("float, ... float" );
+///     }
+///   }
+/// }
+/// ```
+/// The `pg_pin_name` specifies a power and ground pin where the capacitance is derived.
+/// You can have more than one `intrinsic_capacitance` group. You can place these
+/// groups in any order within an `intrinsic_parasitic` group.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.20&end=178.34
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct IntrinsicCapacitance {
+  #[size = 8]
+  #[liberty(name)]
+  name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  /// The `value` attribute specifies the value of the intrinsic capacitance.
+  /// By default, the intrinsic capacitance value is zero.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.8&end=179.9
+  /// ">Reference</a>
+  #[id]
+  #[liberty(simple)]
+  pub value: NotNan<f64>,
+  /// The `reference_pg_pin` attribute specifies the reference pin for the
+  /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
+  /// be a valid PG pin.
+  /// Syntax
+  /// `reference_pg_pin : pg_pin_name ;`
+  ///
+  /// Example
+  /// `reference_pg_pin : G1 ;`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
+  /// ">Reference</a>
+  #[id]
+  #[liberty(simple(type = Option))]
+  pub reference_pg_pin: Option<ArcStr>,
+  /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
+  /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
+  /// tables, define the lut_values group. You can add the `lut_values` group to both the
+  /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The `lut_values` group
+  /// uses the `variable_1` variable, which is defined within the lu_table_template group,
+  /// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
+  /// `pg_voltage_difference`.
+  ///
+  /// Syntax
+  /// ``` text
+  /// lut_values ( template_name ) {
+  /// index_1 ("float, ... float" );
+  /// values ("float, ... float" );
+  /// }
+  /// ```
+  ///
+  /// Example
+  /// ``` text
+  /// lut_values ( test_voltage ) {
+  /// index_1 ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
+  /// values ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.23+180.2&end=179.34+180.8
+  /// ">Reference</a>
+  #[size = 128]
+  #[liberty(group(type = Option))]
+  pub lut_values: Option<LutValues>,
+}
+impl GroupFn for IntrinsicCapacitance {}
+
+/// Use this group to specify the intrinsic resistance between a power pin and an output pin of
+/// a cell.
+///
+/// Syntax
+/// ``` text
+/// intrinsic_parasitic () {
+///   intrinsic_resistance (pg_pin_name) {
+///     related_output : output_pin_name ;
+///     value : float ;
+///     reference_pg_pin : pg_pin_name;
+///     lut_values ( template_name ) {
+///       index_1 ("float, ... float" );
+///       values ("float, ... float" );
+///     }
+///   }
+/// }
+/// ```
+/// The `pg_pin_name` specifies a power or ground pin. You can place the
+/// `intrinsic_resistance` groups in any order within an `intrinsic_parasitic` group. If
+/// some of the `intrinsic_resistance` group is not defined, the value of resistance defaults
+/// to +infinity. The channel connection between the power and ground pins and the output
+/// pin is defined as a closed channel if the resistance value is greater than 1 megaohm.
+/// Otherwise, the channel is opened. The `intrinsic_resistance` group is not required if
+/// the channel is closed.
+///
+/// Simple Attributes
+/// + `related_output`
+/// + `value`
+/// + `reference_pg_pin`
+/// Group
+/// + `lut_values`
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=180.10&end=180.36
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct IntrinsicResistance {
+  #[size = 8]
+  #[liberty(name)]
+  name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  /// Specifies the value of the intrinsic resistance. If this attribute is not defined, the value of
+  /// the intrinsic resistance defaults to +infinity.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=181.9&end=181.10
+  /// ">Reference</a>
+  #[liberty(simple)]
+  #[default = "unsafe{ NotNan::new_unchecked(f64::INFINITY) }"]
+  pub value: NotNan<f64>,
+  /// Use this attribute to specify the output pin.
+  /// Syntax
+  /// ``` text
+  /// related_output : output_pin_name ;
+  /// ``` text
+  ///
+  /// `output_pin_name`
+  /// The name of the output pin.
+  /// Example
+  /// `related_output : "A & B" ;`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
+  /// ">Reference</a>
+  #[id]
+  #[liberty(simple(type = Option))]
+  pub related_output: Option<ArcStr>,
+  /// The `reference_pg_pin` attribute specifies the reference pin for the
+  /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
+  /// be a valid PG pin.
+  /// Syntax
+  /// `reference_pg_pin : pg_pin_name ;`
+  ///
+  /// Example
+  /// `reference_pg_pin : G1 ;`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
+  /// ">Reference</a>
+  #[id]
+  #[liberty(simple(type = Option))]
+  pub reference_pg_pin: Option<ArcStr>,
+  /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
+  /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
+  /// tables, define the lut_values group. You can add the `lut_values` group to both the
+  /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The `lut_values` group
+  /// uses the `variable_1` variable, which is defined within the lu_table_template group,
+  /// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
+  /// `pg_voltage_difference`.
+  ///
+  /// Syntax
+  /// ``` text
+  /// lut_values ( template_name ) {
+  /// index_1 ("float, ... float" );
+  /// values ("float, ... float" );
+  /// }
+  /// ```
+  ///
+  /// Example
+  /// ``` text
+  /// lut_values ( test_voltage ) {
+  /// index_1 ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
+  /// values ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.23+180.2&end=179.34+180.8
+  /// ">Reference</a>
+  #[size = 128]
+  #[liberty(group(type = Option))]
+  pub lut_values: Option<LutValues>,
+}
+impl GroupFn for IntrinsicResistance {}
+
+/// The `total_capacitance` group specifies the macro cell’s total capacitance on a power
+/// or ground net within the `intrinsic_parasitic` group. The following applies to the
+/// `total_capacitance` group:
+/// + The `total_capacitance` group can be placed in any order if there is more than one
+/// `total_capacitance` group within an `intrinsic_parasitic` group.
+/// + The total capacitance parasitics modeling in macro cells is not state dependent, which
+/// means that there is no state condition specified in `intrinsic_parasitic`.
+///
+/// Syntax
+/// ``` text
+/// cell (cell_name) {
+///   ...
+///   intrinsic_parasitic () {
+///     total_capacitance (pg_pin_name) {
+///       value : float ;
+///     }
+///   ...
+///   }
+///   ...
+/// }
+/// ```
+///
+/// Example
+/// ``` text
+/// cell (my_cell) {
+///   ...
+///   intrinsic_parasitic () {
+///     total_capacitance (VDD) {
+///       value : 0.2 ;
+///     }
+///   ...
+///   }
+/// ...
+/// }
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=182.12&end=182.42
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PgPinWithValue {
+  #[id]
+  #[size = 8]
+  #[liberty(name)]
+  pg_pin_name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  #[size = 8]
+  #[liberty(simple)]
+  pub value: NotNan<f64>,
+}
+impl GroupFn for PgPinWithValue {}
+
+/// The `gate_leakage` group specifies the cell’s gate leakage current on input or inout pins
+/// within the `leakage_current` group in a cell. The following applies to `gate_leakage`
+///
+/// groups:
+/// + Groups can be placed in any order if there is more than one `gate_leakage` group
+/// within a `leakage_current` group.
+/// + The leakage current of a cell is characterized with opened outputs, which means that
+/// modeling cell outputs do not drive any other cells. Outputs are assumed to have zero
+/// static current during the measurement.
+/// + A missing `gate_leakage` group is allowed for certain pins.
+/// + Current conservation is applicable if it can be applied to higher error tolerance.
+/// Syntax
+/// `gate_leakage (input_pin_name)`
+///
+/// Example
+/// ``` text
+/// cell (my_cell) {
+///   ...
+///   leakage_current {
+///     ...
+///   }
+///   ...
+///   gate_leakage (A) {
+///     input_low_value : -0.5 ;
+///     input_high_value : 0.6 ;
+///   }
+/// }
+/// ```
+/// Simple Attributes
+/// + `input_low_value`
+/// + `input_high_value`
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=197.9&end=197.38
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct GateLeakage {
+  #[id]
+  #[size = 8]
+  #[liberty(name)]
+  input_pin_name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  /// The `input_low_value` attribute specifies gate leakage current on an input or inout pin
+  /// when the pin is in a low state condition.
+  /// The following applies to the `input_low_value` attribute:
+  /// + A negative floating-point number value is required.
+  /// + The gate leakage current flow is measured from the power pin of a cell to the ground
+  /// pin of its driver cell.
+  /// + The input pin is pulled up to low.
+  /// + The `input_low_value` attribute is not required for a gate_leakage group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=198.3&end=198.22
+  /// ">Reference</a>
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub input_low_value: Option<NotNan<f64>>,
+  /// The `input_high_value` attribute specifies gate leakage current on an input or inout pin
+  /// when the pin is in a high state condition.
+  /// + The gate leakage current flow is measured from the power pin of its driver cell to the
+  /// ground pin of the cell itself.
+  /// + A positive floating-point number value is required.
+  /// + The input pin is pulled up to high.
+  /// + The `input_high_value` attribute is not required for a gate_leakage group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=198.24&end=198.38
+  /// ">Reference</a>
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub input_high_value: Option<NotNan<f64>>,
+}
+impl GroupFn for GateLeakage {}
+
+/// A `leakage_current` group is defined within a cell group or a model group to specify
+/// leakage current values that are dependent on the state of the cell.
+///
+/// Syntax
+/// ``` text
+/// library (name) {
+/// cell(cell_name) {
+///   ...
+///   leakage_current() {
+///     when : boolean expression;
+///     pg_current(pg_pin_name) {
+///       value : float;
+///     }
+///     ...
+///   }
+/// }
+/// ```
+/// Simple Attributes
+/// + when
+/// + value
+///
+/// Complex Attribute
+/// + mode
+///
+/// Group
+/// + pg_current
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=194.49+195.2&end=194.50+195.20
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LeakageCurrent {
+  #[size = 8]
+  #[liberty(name)]
+  name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  #[id]
+  #[size = 80]
+  #[liberty(simple(type = Option))]
+  pub when: Option<IdBooleanExpression>,
+  /// When a cell has a single power and ground pin, omit the `pg_current` group and specify
+  /// the leakage current value. Otherwise, specify the value in the `pg_current` group. Current
+  /// conservation is applied for each leakage_current group. The value attribute specifies
+  /// the absolute value of leakage current on a single power and ground pin.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=195.34+196.2&end=195.35+196.9
+  /// ">Reference</a>
+  #[size = 16]
+  #[liberty(simple(type = Option))]
+  pub value: Option<NotNan<f64>>,
+  /// The `mode` attribute pertains to an individual `cell`. The cell is active when the `mode` attribute
+  /// is instantiated with a name and a value. You can specify multiple instances of this attribute.
+  /// However, specify only one instance for each `cell`.
+  /// Define the mode attribute within an `intrinsic_parasitic` group.
+  ///
+  /// Syntax
+  /// `mode (mode_name, mode_value) ;`
+  ///
+  /// Example
+  /// `mode (rw, read) ;`
+  ///
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.11&end=178.18
+  /// ">Reference</a>
+  #[liberty(complex(type = Option))]
+  pub mode: Option<[ArcStr; 2]>,
+  /// Use this group to specify a power or ground pin where leakage current is to be measured.
+  ///
+  /// Syntax
+  /// ``` text
+  /// cell(cell_name) {
+  ///   ...
+  ///   leakage_current() {
+  ///     when : boolean expression;
+  ///     pg_current(pg_pin_name) {
+  ///       value : float;
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// `pg_pin_name`
+  ///
+  /// Specifies the power or ground pin where the leakage current is to be measured.
+  /// Simple Attribute
+  ///
+  /// `value`
+  ///
+  /// Use this attribute in the `pg_current` group to specify the leakage current value when a cell
+  /// has multiple power and ground pins. The leakage current is measured toward a cell. For
+  /// power pins, the current is positive if it is dragged into a cell. For ground pins, the current
+  /// is negative, indicating that current flows out of a cell. If all power and ground pins are
+  /// specified within a `leakage_current` group, the sum of the leakage currents should be
+  /// zero.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=196.17&end=196.36
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<PgPinWithValue>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<PgPinWithValue>::deserialize_with")]
+  pub pg_current: GroupSet<PgPinWithValue>,
+  /// The `gate_leakage` group specifies the cell’s gate leakage current on input or inout pins
+  /// within the `leakage_current` group in a cell. The following applies to `gate_leakage`
+  ///
+  /// groups:
+  /// + Groups can be placed in any order if there is more than one `gate_leakage` group
+  /// within a `leakage_current` group.
+  /// + The leakage current of a cell is characterized with opened outputs, which means that
+  /// modeling cell outputs do not drive any other cells. Outputs are assumed to have zero
+  /// static current during the measurement.
+  /// + A missing `gate_leakage` group is allowed for certain pins.
+  /// + Current conservation is applicable if it can be applied to higher error tolerance.
+  /// Syntax
+  /// `gate_leakage (input_pin_name)`
+  ///
+  /// Example
+  /// ``` text
+  /// cell (my_cell) {
+  ///   ...
+  ///   leakage_current {
+  ///     ...
+  ///   }
+  ///   ...
+  ///   gate_leakage (A) {
+  ///     input_low_value : -0.5 ;
+  ///     input_high_value : 0.6 ;
+  ///   }
+  /// }
+  /// ```
+  /// Simple Attributes
+  /// + `input_low_value`
+  /// + `input_high_value`
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=197.9&end=197.38
+  /// ">Reference</a>
+  #[size = 64]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<GateLeakage>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<GateLeakage>::deserialize_with")]
+  pub gate_leakage: GroupSet<GateLeakage>,
+}
+impl GroupFn for LeakageCurrent {}
+
+/// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
+/// consists of intrinsic parasitic values for different values of VDD. To use these lookup
+/// tables, define the lut_values group. You can add the `lut_values` group to both the
+/// `intrinsic_resistance` and `intrinsic_capacitance` groups. The `lut_values` group
+/// uses the `variable_1` variable, which is defined within the lu_table_template group,
+/// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
+/// `pg_voltage_difference`.
+///
+/// Syntax
+/// ``` text
+/// lut_values ( template_name ) {
+/// index_1 ("float, ... float" );
+/// values ("float, ... float" );
+/// }
+/// ```
+///
+/// Example
+/// ``` text
+/// lut_values ( test_voltage ) {
+/// index_1 ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
+/// values ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
+/// }
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.23+180.2&end=179.34+180.8
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LutValues {
+  #[liberty(name)]
+  name: Option<ArcStr>,
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  #[liberty(complex)]
+  pub index_1: Vec<NotNan<f64>>,
+  #[liberty(complex)]
+  pub values: Vec<NotNan<f64>>,
+}
+impl GroupFn for LutValues {}
+
 /// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
 /// The `pg_type`  attribute also supports back-bias modeling.
 /// The `pg_type`  attribute can have the following values:
@@ -510,7 +1603,7 @@ impl SimpleAttri for PgType {
 /// Syntax:
 /// ``` text
 /// switch_cell_type : coarse_grain | fine_grain;
-/// ```
+/// ``` text
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=210.8&end=210.13
 /// ">Reference-Definition</a>
@@ -601,7 +1694,7 @@ impl SimpleAttri for LevelShifterType {
 /// Syntax:
 /// ```text
 /// clock_gating_integrated_cell:generic|value_id;
-/// ```
+/// ``` text
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=103.19&end=103.24
 /// ">Reference</a>
@@ -659,7 +1752,7 @@ impl SimpleAttri for ClockGatingIntegratedCell {
 ///
 /// ``` text
 /// pin_opposite ("name_list1", "name_list2") ;
-/// ```
+/// ``` text
 ///
 /// + `name_list1`: A `name_list` of output pins requires the supplied output values to be opposite.
 /// + `name_list2`: A `name_list` of input pins requires the supplied input values to be opposite.
@@ -667,7 +1760,7 @@ impl SimpleAttri for ClockGatingIntegratedCell {
 /// In the following example, pins IP and OP are logically inverse.
 /// ``` text
 /// pin_opposite ("IP", "OP") ;
-/// ```
+/// ``` text
 /// The `pin_opposite` attribute also incorporates the functionality of the `pin_equal` complex
 /// attribute.
 ///
@@ -675,7 +1768,7 @@ impl SimpleAttri for ClockGatingIntegratedCell {
 /// in the first group are opposite of the pins in the second group.
 /// ``` text
 /// pin_opposite ("Q1 Q2 Q3", "QB1 QB2") ;
-/// ```
+/// ``` text
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=124.9&end=124.22
 /// ">Reference</a>

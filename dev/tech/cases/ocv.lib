@@ -19,30 +19,16 @@ library(tcbn22ullbwp30p140tt0p8v25c){
   slew_derate_from_library : 0.5 ;  
   time_unit : "1ns" ;  
   voltage_unit : "1V" ;  
-  default_cell_leakage_power : 0 ;  
-  default_fall_delay_intercept : 0 ;  
-  default_fall_pin_resistance : 0 ;  
+  default_cell_leakage_power : 0 ;    
   default_fanout_load : 1 ;  
   default_inout_pin_cap : 0.0004666399909183383 ;  
-  default_inout_pin_fall_res : 0 ;  
-  default_inout_pin_rise_res : 0 ;  
   default_input_pin_cap : 0.0004666399909183383 ;  
-  default_intrinsic_fall : 0 ;  
-  default_intrinsic_rise : 0 ;  
   default_leakage_power_density : 0 ;  
   default_max_capacitance : 0 ;  
   default_max_fanout : 0 ;  
   default_max_transition : 0.8715000152587891 ;  
-  default_max_utilization : 0 ;  
-  default_min_porosity : 0 ;  
   default_operating_conditions : "tt0p8v25c" ;  
   default_output_pin_cap : 0 ;  
-  default_output_pin_fall_res : 0 ;  
-  default_output_pin_rise_res : 0 ;  
-  default_rise_delay_intercept : 0 ;  
-  default_rise_pin_resistance : 0 ;  
-  default_slope_fall : 0 ;  
-  default_slope_rise : 0 ;  
   default_wire_load : "ZeroWireload" ;  
   default_wire_load_area : 0 ;  
   default_wire_load_capacitance : 0 ;  
@@ -250,8 +236,8 @@ library(tcbn22ullbwp30p140tt0p8v25c){
       rise_capacitance : 0.00022854325000000003 ;
       max_capacitance : 0 ;
       min_capacitance : 0 ;
-      rise_capacitance_range("0.00016121125, 0.00022854325000000003");
-      fall_capacitance_range("0.00018363312499999998, 0.00022861487499999995");
+      rise_capacitance_range(0.00016121125, 0.00022854325000000003);
+      fall_capacitance_range(0.00018363312499999998, 0.00022861487499999995);
 
       internal_power(){
         related_pg_pin : VDD ;
@@ -281,8 +267,8 @@ library(tcbn22ullbwp30p140tt0p8v25c){
       rise_capacitance : 0.00022563925 ;
       max_capacitance : 0 ;
       min_capacitance : 0 ;
-      rise_capacitance_range("0.000180931375, 0.00022563925");
-      fall_capacitance_range("0.0001786035, 0.00022370775");
+      rise_capacitance_range(0.000180931375, 0.00022563925);
+      fall_capacitance_range(0.0001786035, 0.00022370775);
 
       internal_power(){
         related_pg_pin : VDD ;

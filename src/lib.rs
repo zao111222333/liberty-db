@@ -127,6 +127,8 @@
     clippy::indexing_slicing,
     clippy::arithmetic_side_effects,
     clippy::field_reassign_with_default,
+    clippy::undocumented_unsafe_blocks,
+    clippy::or_fun_call,
   )
 )]
 

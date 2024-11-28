@@ -365,6 +365,215 @@ pub struct Vector4D {
   pub values: Vec<NotNan<f64>>,
 }
 
+/// The `compact_ccs_power` group contains a detailed description for compact CCS
+/// power data. The `compact_ccs_power` group includes the following optional attributes:
+/// `base_curves_group`, `index_1`, `index_2`, `index_3` and `index_4`. The description for these
+/// attributes in the `compact_ccs_power` group is the same as in the `compact_lut_template`
+/// group. However, the attributes have a higher priority in the `compact_ccs_power` group.
+/// For more information, see `compact_lut_template` Group on page 41.
+/// The `index_output` attribute is also optional. It is used only on cross type tables. For
+/// more information about the `index_output` attribute, see `index_output` Simple Attribute on
+/// page 156.
+/// ``` text
+/// library (name) {
+///   cell(cell_name) {
+///     dynamic_current() {
+///       switching_group() {
+///         pg_current(pg_pin_name) {
+///           compact_ccs_power (template_name) {
+///             base_curves_group : bc_name;
+///             index_output : pin_name;
+///             index_1 ("float, ..., float");
+///             index_2 ("float, ..., float");
+///             index_3 ("float, ..., float");
+///             index_4 ("string, ..., string");
+///             values ("float | integer, ..., float | integer");
+///           } /* end of compact_ccs_power */
+///         }
+///       }
+///     }
+///   }
+/// }
+/// ```
+/// Complex Attributes
+/// `base_curves_group : bc_name;`
+/// `index_output : pin_name;`
+/// `index_1 ("float, ..., float");`
+/// `index_2 ("float, ..., float");`
+/// `index_3 ("float, ..., float");`
+/// `index_4 ("string, ..., string");`
+/// `values ("float | integer, ..., float | integer");`
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=153.30+154.2&end=153.40+154.25
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set::derive::item(sort)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct CompactCcsPower {
+  // TODO: unit
+  #[size = 8]
+  #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  name: Option<ArcStr>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  #[size = 8]
+  #[liberty(simple(type = Option))]
+  pub base_curves_group: Option<ArcStr>,
+  #[size = 8]
+  #[liberty(simple(type = Option))]
+  pub index_output: Option<ArcStr>,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_1: Vec<NotNan<f64>>,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_2: Vec<NotNan<f64>>,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_3: Vec<NotNan<f64>>,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_4: Vec<ArcStr>,
+  /// The values attribute is required in the `compact_ccs_power` group. The data within the
+  /// quotation marks (" "), or line, represent the current waveform for one index combination.
+  /// Each value is determined by the corresponding curve parameter. In the following line,
+  /// "t0, c0, 1, t1, c1, 2, t2, c2, 3, t3, c3, 4, t4, c4"
+  /// the size is 14 = 8+3*2. Therefore, the curve parameters are as follows:
+  ///
+  /// "init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, \
+  /// point_time2, point_current2, bc_id3, point_time3, point_current3,
+  /// bc_id4,\
+  /// end_time, end_current"
+  ///
+  /// The elements in the values attribute are floating-point numbers for time and current and
+  /// integers for the base curve ID. The number of current waveform segments can be different
+  /// for each slew and load combination, which means that each line size can be different.
+  /// Liberty syntax supports tables with varying sizes, as shown:
+  /// ``` text
+  /// compact_ccs_power (template_name) {
+  ///   ...
+  ///   index_1("0.1, 0.2"); /* input_net_transition */
+  ///   index_2("1.0, 2.0"); /* total_output_net_capacitance */
+  ///   index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current"); /* curve_parameters */
+  ///   values ("t0, c0, 1, t1, c1, 2, t2, c2, 3, t3, c3, 4, t4, c4", \ /* segment=4 */
+  ///     "t0, c0, 1, t1, c1, 2, t2, c2", \ /* segment=2 */
+  ///     "t0, c0, 1, t1, c1, 2, t2, c2, 3, t3, c3", \ /* segment=3 */
+  ///     "t0, c0, 1, t1, c1, 2, t2, c2, 3, t3, c3"); /* segment=3 */
+  /// }
+  /// ```
+  ///
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=154.27+155.2&end=154.43+155.12
+  /// ">Reference</a>
+  #[size = 24]
+  #[liberty(complex)]
+  pub values: Vec<CcsPowerValue>,
+}
+
+#[derive(Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct CcsPowerValue {
+  pub init_time: NotNan<f64>,
+  pub init_current: NotNan<f64>,
+  pub points: Vec<CcsPowerPoint>,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct CcsPowerPoint {
+  pub bc_id: usize,
+  pub point_time: NotNan<f64>,
+  pub point_current: NotNan<f64>,
+}
+
+impl ComplexAttri for Vec<CcsPowerValue> {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    _iter: I,
+    _scope: &mut ParseScope,
+  ) -> Result<Self, ComplexParseError> {
+    unreachable!()
+  }
+  #[inline]
+  #[expect(clippy::arithmetic_side_effects)]
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    match ast::parser::complex_ccs_power_values(i, &mut scope.line_num) {
+      Ok((_i, vec)) => {
+        let res = vec
+          .into_iter()
+          .map(|(n, v)| {
+            scope.line_num += n;
+            v
+          })
+          .collect();
+        Ok((_i, Ok(res)))
+      }
+      Err(_) => {
+        Err(nom::Err::Error(nom::error::Error::new(i, nom::error::ErrorKind::ManyMN)))
+      }
+    }
+  }
+  #[inline]
+  #[expect(clippy::items_after_statements)]
+  fn fmt_self<T: Write, I: ast::Indentation>(
+    &self,
+    f: &mut ast::CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    let indent = f.indentation();
+    let mut iter = self.iter();
+    #[inline]
+    fn fmt_point<T: Write, I: ast::Indentation>(
+      point: &CcsPowerPoint,
+      f: &mut ast::CodeFormatter<'_, T, I>,
+    ) -> fmt::Result {
+      f.write_int(point.bc_id)?;
+      f.write_str(", ")?;
+      f.write_float(point.point_time.into_inner())?;
+      f.write_str(", ")?;
+      f.write_float(point.point_current.into_inner())
+    }
+    #[inline]
+    fn fmt_value<T: Write, I: ast::Indentation>(
+      value: &CcsPowerValue,
+      f: &mut ast::CodeFormatter<'_, T, I>,
+    ) -> fmt::Result {
+      write!(f, "\"")?;
+      f.write_float(value.init_time.into_inner())?;
+      f.write_str(", ")?;
+      f.write_float(value.init_current.into_inner())?;
+      if !value.points.is_empty() {
+        f.write_str(", ")?;
+        ast::join_fmt_no_quote(
+          value.points.iter(),
+          f,
+          |point, ff| fmt_point(point, ff),
+          ", ",
+        )?;
+      }
+      write!(f, "\"")
+    }
+    if let Some(value) = iter.next() {
+      fmt_value(value, f)?;
+    }
+    while let Some(value) = iter.next() {
+      write!(f, ", \\\n{indent}")?;
+      fmt_value(value, f)?;
+    }
+    Ok(())
+  }
+}
+
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -441,6 +650,7 @@ impl GroupFn for Vector3DGrpup {}
 impl GroupFn for Vector4DGrpup {}
 impl GroupFn for ReferenceTimeVector3D {}
 impl GroupFn for ReferenceTimeVector3DGrpup {}
+impl GroupFn for CompactCcsPower {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
@@ -595,9 +805,10 @@ impl ComplexAttri for Values {
     unreachable!()
   }
   #[inline]
+  #[expect(clippy::arithmetic_side_effects)]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
     match ast::parser::complex_values(i, &mut scope.line_num) {
-      Ok((i, vec)) => {
+      Ok((_i, vec)) => {
         let mut size1 = 0;
         let mut size2 = 0;
         let mut table_len_mismatch = false;
@@ -619,7 +830,7 @@ impl ComplexAttri for Values {
           })
           .collect();
         Ok((
-          i,
+          _i,
           if table_len_mismatch {
             Err((
               ComplexParseError::LengthDismatch,
@@ -1043,5 +1254,23 @@ liberty_db::common::table::CompactCcsTable (c_ccs_pwr_template_6) {
 | | "-0.7696603, -101.1912245");
 }"#,
     );
+  }
+  #[test]
+  fn compact_ccs_power_table() {
+    let table = test_parse_fmt::<super::CompactCcsPower>(
+      r#" (c_ccs_pwr_template_3) {
+        values ("0.0358012, 0.0206745, 2505, 0.0480925, 1.1701594, 2506, 1.4011397, 0.0724034", \
+          "-0.0481277, 0.0206745, 13, -0.0477729, 0.0, 13, -0.026014, -1.267817, 1198, 71.4506979, 0.0698575", \
+          "-0.6273036, 0.0206745, 3, -0.1100034, 3.4377912, 294, 3.8867416, 0.0715863");
+      }
+    "#,
+      r#"
+liberty_db::common::table::CompactCcsPower (c_ccs_pwr_template_3) {
+| values ("0.0358012, 0.0206745, 2505, 0.0480925, 1.1701594, 2506, 1.4011397, 0.0724034", \
+| | "-0.0481277, 0.0206745, 13, -0.0477729, 0.0, 13, -0.026014, -1.267817, 1198, 71.4506979, 0.0698575", \
+| | "-0.6273036, 0.0206745, 3, -0.1100034, 3.4377912, 294, 3.8867416, 0.0715863");
+}"#,
+    );
+    println!("{table:?}");
   }
 }

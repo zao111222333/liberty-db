@@ -308,12 +308,7 @@ impl ComplexAttri for super::items::IdVector {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
     match ast::parser::complex_id_vector(i, &mut scope.line_num) {
-      Ok((i, (id_str, vec))) => match id_str.parse() {
-        Ok(id) => Ok((i, Ok(Self { id, vec }))),
-        Err(_) => {
-          Err(nom::Err::Error(nom::error::Error::new(i, nom::error::ErrorKind::Digit)))
-        }
-      },
+      Ok((i, (id, vec))) => Ok((i, Ok(Self { id, vec }))),
       Err(_) => {
         Err(nom::Err::Error(nom::error::Error::new(i, nom::error::ErrorKind::Many0)))
       }

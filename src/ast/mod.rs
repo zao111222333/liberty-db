@@ -34,14 +34,12 @@ pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
+#[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
-// pub enum ComplexWrapper {
-//   Single(Vec<ArcStr>),
-//   Multi(Vec<Vec<ArcStr>>),
-// }
 pub struct ComplexWrapper(pub(crate) Vec<ArcStr>);
 impl ComplexWrapper {
+  #[expect(clippy::arithmetic_side_effects)]
   fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope) -> Self {
     Self(
       vec
@@ -493,7 +491,7 @@ pub(crate) enum ComplexParseError {
 }
 
 #[inline]
-pub fn join_fmt<
+pub(crate) fn join_fmt<
   'a,
   T: Sized + 'a,
   I: Iterator<Item = T>,
@@ -511,7 +509,7 @@ pub fn join_fmt<
 }
 
 #[inline]
-pub fn join_fmt_no_quote<
+pub(crate) fn join_fmt_no_quote<
   'a,
   T: Sized + 'a,
   I: Iterator<Item = T>,

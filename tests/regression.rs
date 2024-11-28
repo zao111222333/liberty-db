@@ -34,6 +34,7 @@ fn make_golden() {
   _ = simple_logger::SimpleLogger::new().init();
   for test_lib_path in all_files("dev/tech") {
     let golden_lib_path = golden_path(&test_lib_path);
+    log::info!("{}", test_lib_path.display());
     let library =
       Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
     let golden_lib = File::create(golden_lib_path).unwrap();

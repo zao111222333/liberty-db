@@ -70,11 +70,11 @@ cargo bench --bench dev
     + check all rules
 
 + Parse:
-  + Only `Vec<NotNan<f64>>` and `Value` complex attributes need quotes vector, use `fast_float2::parse_partial`
-  + Fix error when `make_golden`
-    + `intrinsic_parasitic` group
-    + `leakage_current` group
-    + `dynamic_current` group
+  + ~~Only `Vec<NotNan<f64>>` and `Value` complex attributes need quotes vector, use `fast_float2::parse_partial`~~
+  + ~~Fix error when `make_golden`~~
+    + ~~`intrinsic_parasitic` group~~
+    + ~~`leakage_current` group~~
+    + ~~`dynamic_current` group~~
   + async
   + stream input
 + CI:

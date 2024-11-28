@@ -1787,8 +1787,8 @@ pub struct TimingTableLookUp {
   // #[liberty(complex)]
   pub size1: usize,
   pub size2: usize,
-  pub norminal: Vec<NotNan<f64>>,
-  pub lvf: Vec<LVFValue>,
+  pub values: Vec<NotNan<f64>>,
+  pub lvf_values: Vec<LVFValue>,
 }
 #[derive(Debug, Default, Clone, Copy)]
 pub struct LVFValue {
@@ -1798,6 +1798,8 @@ pub struct LVFValue {
 }
 
 impl TimingTableLookUp {
+  #[inline]
+  #[expect(clippy::result_unit_err)]
   pub fn supper(
     cell_fall: Option<TableLookUp>,
     mean_shift: Option<TableLookUp>,
