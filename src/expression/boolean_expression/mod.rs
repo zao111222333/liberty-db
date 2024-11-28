@@ -24,12 +24,12 @@ use core::{
   str::FromStr,
 };
 use itertools::Itertools;
-use std::collections::HashSet;
+use std::{collections::HashSet, sync::LazyLock};
 
 use super::SdfExpression;
-lazy_static::lazy_static! {
-  static ref UNKNOWN: Box<Expr> = Box::new(Expr::Variable("_unknown_".to_owned()));
-}
+
+static UNKNOWN: LazyLock<Box<Expr>> =
+  LazyLock::new(|| Box::new(Expr::Variable("_unknown_".to_owned())));
 
 pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
   #[inline]
