@@ -1,18 +1,18 @@
-use crate::ast::{ComplexAttri, ComplexParseError, ParseScope, SimpleAttri};
+use crate::ast::{self, ComplexAttri, ParseScope, SimpleAttri};
 use core::{cmp::Ordering, hash::Hash};
 
 /// Level
 #[derive(Ord, PartialOrd)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Level {
   /// High
-  #[strum(serialize = "h", serialize = "1", serialize = "H")]
+  #[token("h", "1", "H")]
   H,
   /// Low
-  #[strum(serialize = "l", serialize = "0", serialize = "L")]
+  #[token("l", "0", "L")]
   L,
 }
 
@@ -20,24 +20,25 @@ pub enum Level {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Edge {
   /// Fall
-  #[strum(serialize = "falling")]
+  #[token("falling")]
   F,
   /// Rise
-  #[strum(serialize = "rising")]
+  #[token("rising")]
   R,
 }
 
 impl SimpleAttri for Edge {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -61,27 +62,18 @@ impl SimpleAttri for Edge {
 /// ">Reference</a>
 impl ComplexAttri for Edge {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let res = match iter.next() {
-      Some(&s) => match s {
-        "rise" => Self::R,
-        "fall" => Self::F,
-        _ => return Err(ComplexParseError::UnsupportedWord),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(res)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    use nom::{branch::alt, bytes::complete::tag, combinator::map};
+    ast::parser::complex1(
+      i,
+      &mut scope.line_num,
+      alt((map(tag("rise"), |_| Self::R), map(tag("fall"), |_| Self::F))),
+    )
   }
   #[inline]
-  fn fmt_self<T: core::fmt::Write, I: crate::ast::Indentation>(
+  fn fmt_self<T: core::fmt::Write, I: ast::Indentation>(
     &self,
-    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+    f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     use core::fmt::Write;
     f.write_str(match self {
@@ -104,15 +96,15 @@ impl<'a> core::ops::Not for &'a Edge {
 
 /// `UnInit`
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(PartialEq, Hash, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum UnInit {
   /// `Unknown`
-  #[strum(serialize = "x", serialize = "X")]
+  #[token("x", "X")]
   X,
   /// `HighImpedance`
-  #[strum(serialize = "z", serialize = "Z")]
+  #[token("z", "Z")]
   Z,
 }
 
@@ -135,47 +127,48 @@ impl Ord for UnInit {
 /// H L R F
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(liberty_macros::EnumToken)]
 pub enum Normal {
   /// R
-  #[strum(serialize = "R")]
+  #[token("R")]
   R,
   /// F
-  #[strum(serialize = "F")]
+  #[token("F")]
   F,
   /// H
-  #[strum(serialize = "H")]
+  #[token("H")]
   H,
   /// L
-  #[strum(serialize = "L")]
+  #[token("L")]
   L,
 }
 
 impl SimpleAttri for Normal {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 /// H L R F
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(liberty_macros::EnumToken)]
 pub enum Static {
   /// X
-  #[strum(serialize = "X")]
+  #[token("X")]
   X,
   /// Z
-  #[strum(serialize = "Z")]
+  #[token("Z")]
   Z,
   /// H
-  #[strum(serialize = "H")]
+  #[token("H")]
   H,
   /// L
-  #[strum(serialize = "L")]
+  #[token("L")]
   L,
 }
 
@@ -184,49 +177,49 @@ pub enum Static {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(liberty_macros::EnumToken)]
 pub enum State {
   /// L
-  #[strum(serialize = "L")]
+  #[token("L")]
   L,
   /// H
-  #[strum(serialize = "H")]
+  #[token("H")]
   H,
   /// X
-  #[strum(serialize = "X")]
+  #[token("X")]
   X,
   /// Z
-  #[strum(serialize = "Z")]
+  #[token("Z")]
   Z,
   /// LH
-  #[strum(serialize = "LH")]
+  #[token("LH")]
   LH,
   /// HL
-  #[strum(serialize = "HL")]
+  #[token("HL")]
   HL,
   /// LX
-  #[strum(serialize = "LX")]
+  #[token("LX")]
   LX,
   /// LZ
-  #[strum(serialize = "LZ")]
+  #[token("LZ")]
   LZ,
   /// HX
-  #[strum(serialize = "HX")]
+  #[token("HX")]
   HX,
   /// HZ
-  #[strum(serialize = "HZ")]
+  #[token("HZ")]
   HZ,
   /// XL
-  #[strum(serialize = "XL")]
+  #[token("XL")]
   XL,
   /// ZL
-  #[strum(serialize = "ZL")]
+  #[token("ZL")]
   ZL,
   /// XH
-  #[strum(serialize = "XH")]
+  #[token("XH")]
   XH,
   /// ZH
-  #[strum(serialize = "ZH")]
+  #[token("ZH")]
   ZH,
 }
 
@@ -387,7 +380,7 @@ impl State {
 
 // /// Operator1
 // #[derive(Debug, Clone, Copy, PartialEq)]
-// // #[derive(strum_macros::Display, strum_macros::EnumString)]
+// // #[derive(liberty_macros::EnumToken)]
 // pub enum Operator1 {
 //   /// invert previous expression & invert following expression
 //   Not,
@@ -448,16 +441,16 @@ impl State {
 // /// =133.11
 // /// ">Reference</a>
 // #[derive(Debug, Clone, Copy, PartialEq)]
-// // #[derive(strum_macros::Display, strum_macros::EnumString)]
+// // #[derive(liberty_macros::EnumToken)]
 // pub enum Operator2 {
 //   /// FIXME: only sapce `" "` between two expression means `AND`
-//   // #[strum(serialize = "*",serialize = " ",serialize = "&")]
+//   // #[token("*"," ","&")]
 //   And,
 //   /// Or
-//   // #[strum(serialize = "+",serialize = "|")]
+//   // #[token("+","|")]
 //   Or,
 //   /// Xor
-//   // #[strum(serialize = "^")]
+//   // #[token("^")]
 //   Xor,
 // }
 

@@ -530,33 +530,35 @@ pub(crate) fn join_fmt_no_quote<
   }
   Ok(())
 }
+pub(crate) trait NomParseTerm: core::fmt::Display + Sized {
+  fn nom_parse<'a>(i: &'a str) -> IResult<&'a str, Self, Error<&'a str>>;
+}
 
 /// Complex Attribute in Liberty
 pub(crate) trait ComplexAttri: Sized {
-  /// basic `parser`
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
-    scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError>;
+  // basic `parser`
+  // fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+  //   iter: I,
+  //   scope: &mut ParseScope,
+  // ) -> Result<Self, ComplexParseError>;
   /// `nom_parse`, auto implement
-  #[expect(clippy::arithmetic_side_effects)]
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
-    let (input, vec) = parser::complex(i, &mut scope.line_num)?;
-    let mut line_num = 0;
-    let res = Self::parse(
-      vec.iter().map(|(n, s)| {
-        line_num += n;
-        s
-      }),
-      scope,
-    );
-    scope.line_num += line_num;
-    match res {
-      Ok(s) => Ok((input, Ok(s))),
-      Err(e) => Ok((input, Err((e, ComplexWrapper::collect(vec, scope))))),
-    }
-  }
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self>;
+  // {
+  //   let (input, vec) = parser::complex(i, &mut scope.line_num)?;
+  //   let mut line_num = 0;
+  //   let res = Self::parse(
+  //     vec.iter().map(|(n, s)| {
+  //       line_num += n;
+  //       s
+  //     }),
+  //     scope,
+  //   );
+  //   scope.line_num += line_num;
+  //   match res {
+  //     Ok(s) => Ok((input, Ok(s))),
+  //     Err(e) => Ok((input, Err((e, ComplexWrapper::collect(vec, scope))))),
+  //   }
+  // }
   #[inline]
   fn is_set(&self) -> bool {
     true

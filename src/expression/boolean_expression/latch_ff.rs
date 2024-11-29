@@ -4,7 +4,7 @@
 
 use super::{BooleanExpression, BooleanExpressionLike, UNKNOWN};
 use crate::{
-  ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
+  ast::{self, Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
   ArcStr,
 };
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
@@ -411,9 +411,9 @@ impl NamedGroup for LatchFF_type {
       })
   }
   #[inline]
-  fn fmt_name<T: Write, I: crate::ast::Indentation>(
+  fn fmt_name<T: Write, I: ast::Indentation>(
     &self,
-    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+    f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     write!(f, "{}, {}", self.variable1, self.variable2)
   }
@@ -453,9 +453,9 @@ impl NamedGroup for LatchFFBank_type {
       })
   }
   #[inline]
-  fn fmt_name<T: Write, I: crate::ast::Indentation>(
+  fn fmt_name<T: Write, I: ast::Indentation>(
     &self,
-    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+    f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     write!(f, "{}, {}, {}", self.variable1, self.variable2, self.bits)
   }
@@ -876,42 +876,44 @@ pub trait LatchFF: __LatchFF {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ClearPresetState {
   /// 0
-  #[strum(serialize = "L")]
+  #[token("L")]
   L,
   /// 1
-  #[strum(serialize = "H")]
+  #[token("H")]
   H,
   /// No Change
-  #[strum(serialize = "N")]
+  #[token("N")]
   N,
   /// Toggle the current value from `1` to `0`, `0` to `1`, or `X` to `X`
-  #[strum(serialize = "T")]
+  #[token("T")]
   T,
   /// Unknown
-  #[strum(serialize = "X")]
+  #[token("X")]
   X,
 }
 
-impl crate::ast::SimpleAttri for ClearPresetState {
+impl ast::SimpleAttri for ClearPresetState {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
 #[cfg(test)]
 mod test {
+  use crate::ast;
   use crate::expression::{FFBank, IdBooleanExpression, Latch, LatchBank, LatchFF, FF};
   #[test]
   fn special_boolean_expression() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = ast::test_parse_fmt::<FF>(
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
         clocked_on : "\"1A\" + \"1B\"";
@@ -944,7 +946,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn jk_flip_flop() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = ast::test_parse_fmt::<FF>(
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
         clocked_on : "CP";
@@ -977,7 +979,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example19() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = ast::test_parse_fmt::<FF>(
       r#"(IQ, IQN) {  
         next_state : "D" ;  
         clocked_on : "CP" ;  
@@ -1018,7 +1020,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example20() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = ast::test_parse_fmt::<FF>(
       r#"(IQ, IQN) {  
         next_state : "(TE*TI)+(TE’*J*K’)+(TE’*J’*K’*IQ)+(TE’*J*K*IQ’)" ;  
         clocked_on : "CP" ;  
@@ -1057,7 +1059,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example21() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = ast::test_parse_fmt::<FF>(
       r#"(IQ, IQN) {   
         next_state : "D * CLR’" ;   
         clocked_on : "CP" ;
@@ -1090,7 +1092,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example22() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = ast::test_parse_fmt::<FF>(
       r#"(IQ, IQN) {  
         next_state : "D" ;  
         clocked_on : "CLK" ;  
@@ -1131,7 +1133,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example23() {
-    let ff = crate::ast::test_parse_fmt::<FFBank>(
+    let ff = ast::test_parse_fmt::<FFBank>(
       r#"(IQ, IQN, 4) {    
         next_state : "D" ;    
         clocked_on : "CLK" ;    
@@ -1169,7 +1171,7 @@ liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
   /// ">Reference</a>
   #[test]
   fn example25() {
-    let latch = crate::ast::test_parse_fmt::<Latch>(
+    let latch = ast::test_parse_fmt::<Latch>(
       r#"(IQ, IQN) {
         enable : "G" ;
         data_in : "D" ;
@@ -1201,7 +1203,7 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example26() {
-    let latch = crate::ast::test_parse_fmt::<Latch>(
+    let latch = ast::test_parse_fmt::<Latch>(
       r#"(IQ, IQN) {  
         clear : "S’" ;  
         preset : "R’" ;  

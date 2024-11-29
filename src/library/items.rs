@@ -5,13 +5,10 @@
 
 use crate::{
   ast::{
-    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
+    self, Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
     GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
   },
-  common::{
-    items::{Formula, IdVector},
-    parse_f64,
-  },
+  common::items::{Formula, IdVector},
   expression::logic,
   ArcStr, NotNan,
 };
@@ -162,38 +159,42 @@ pub struct SensitizationVector {
 
 impl ComplexAttri for SensitizationVector {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let id: usize = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(e) => return Err(ComplexParseError::Int(e)),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let states = match iter.next() {
-      Some(&s) => match s
-        .split_ascii_whitespace()
-        .map(|t| match t {
-          "1" => Ok(logic::Static::H),
-          "0" => Ok(logic::Static::L),
-          "X" => Ok(logic::Static::X),
-          "Z" => Ok(logic::Static::Z),
-          _ => Err(ComplexParseError::UnsupportedWord),
-        })
-        .collect::<Result<Vec<logic::Static>, _>>()
-      {
-        Ok(states) => states,
-        Err(_) => return Err(ComplexParseError::UnsupportedWord),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    #[inline]
+    fn term<'a>(
+      i: &'a str,
+    ) -> nom::IResult<&'a str, &'a str, nom::error::Error<&'a str>> {
+      #[inline]
+      fn char_in_word(c: char) -> bool {
+        " 10XZ".contains(c)
+      }
+      use nom::InputTakeAtPosition;
+      i.split_at_position1(|item| !char_in_word(item), nom::error::ErrorKind::Alpha)
     }
-    Ok(Self { id, states })
+    ast::parser::complex2(
+      i,
+      &mut scope.line_num,
+      ast::parser::parse_usize,
+      ast::parser::unquote,
+      |id, state_str| Self {
+        id,
+        states: match state_str
+          .split_ascii_whitespace()
+          .filter(|t| !t.is_empty())
+          .map(|t| match t {
+            "1" => Ok(logic::Static::H),
+            "0" => Ok(logic::Static::L),
+            "X" => Ok(logic::Static::X),
+            "Z" => Ok(logic::Static::Z),
+            _ => Err(ComplexParseError::UnsupportedWord),
+          })
+          .collect::<Result<Vec<logic::Static>, _>>()
+        {
+          Ok(states) => states,
+          Err(_) => unreachable!(),
+        },
+      },
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -202,7 +203,7 @@ impl ComplexAttri for SensitizationVector {
   ) -> fmt::Result {
     f.write_int(self.id)?;
     f.write_str(", ")?;
-    crate::ast::join_fmt(
+    ast::join_fmt(
       self.states.iter(),
       f,
       |state, ff| {
@@ -228,7 +229,7 @@ mod test_sensitization {
 
   #[test]
   fn sensitization() {
-    let sense = crate::ast::test_parse_fmt::<Sensitization>(
+    let sense = ast::test_parse_fmt::<Sensitization>(
       r#"(sensitization_nand2) {
         pin_names ( IN1, IN2, OUT1 );
         vector ( 1, "0 0 1" );
@@ -266,7 +267,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
         }
       ]
     );
-    let sense1 = crate::ast::test_parse_fmt::<Sensitization>(
+    let sense1 = ast::test_parse_fmt::<Sensitization>(
       r#"(sensitization_nand2) {
         vector ( 1, "0 0 1" );
         vector ( 2, "0 X 9" );
@@ -305,22 +306,14 @@ pub struct VoltageMap {
 }
 impl ComplexAttri for VoltageMap {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let name = match iter.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let voltage = match iter.next() {
-      Some(s) => parse_f64(s)?,
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(Self { name, voltage })
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    ast::parser::complex2(
+      i,
+      &mut scope.line_num,
+      ast::parser::parse_arcstr,
+      ast::parser::parse_float,
+      |name, voltage| Self { name, voltage },
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -454,21 +447,22 @@ impl GroupFn for OutputVoltage {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq, Default)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DelayModel {
   /// `table_lookup`
   #[default]
-  #[strum(serialize = "table_lookup")]
+  #[token("table_lookup")]
   TableLookup,
 }
 impl SimpleAttri for DelayModel {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -615,23 +609,24 @@ impl GroupFn for FpgaIsd {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum FPGASlew {
   /// `FAST`
-  #[strum(serialize = "FAST")]
+  #[token("FAST")]
   FAST,
   /// `SLOW`
-  #[strum(serialize = "SLOW")]
+  #[token("SLOW")]
   SLOW,
 }
 impl SimpleAttri for FPGASlew {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -644,26 +639,27 @@ impl SimpleAttri for FPGASlew {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TreeType {
   /// `best_case_tree`
-  #[strum(serialize = "best_case_tree")]
+  #[token("best_case_tree")]
   BestCaseTree,
   /// `balanced_tree`
-  #[strum(serialize = "balanced_tree")]
+  #[token("balanced_tree")]
   BalancedTree,
   /// `worst_case_tree`
-  #[strum(serialize = "worst_case_tree")]
+  #[token("worst_case_tree")]
   WorstCaseTree,
 }
 impl SimpleAttri for TreeType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -718,52 +714,40 @@ pub struct Define {
 #[derive(Debug, Clone, Copy, Default)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum AttributeType {
   /// Boolean
   #[default]
-  #[strum(serialize = "Boolean", serialize = "boolean")]
+  #[token("Boolean", "boolean")]
   Boolean,
   /// string
-  #[strum(serialize = "string")]
+  #[token("string")]
   String,
   /// integer
-  #[strum(serialize = "integer")]
+  #[token("integer")]
   Integer,
   /// float
-  #[strum(serialize = "float")]
+  #[token("float")]
   Float,
 }
 impl ComplexAttri for Define {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let attribute_name = match iter.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let group_name = match iter.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let attribute_type = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::UnsupportedWord),
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    ast::parser::complex3(
+      i,
+      &mut scope.line_num,
+      ast::parser::parse_arcstr,
+      ast::parser::parse_arcstr,
+      <AttributeType as ast::NomParseTerm>::nom_parse,
+      |attribute_name, group_name, attribute_type| {
+        let define_id = ast::define_id(&scope.hasher, &group_name, &attribute_name);
+        _ = scope
+          .define_map
+          .insert(define_id, DefinedType::Simple(attribute_type));
+        Self { attribute_name, group_name, attribute_type }
       },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    let define_id = crate::ast::define_id(&scope.hasher, &group_name, &attribute_name);
-    _ = scope
-      .define_map
-      .insert(define_id, DefinedType::Simple(attribute_type));
-    Ok(Self { attribute_name, group_name, attribute_type })
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -801,24 +785,18 @@ pub struct DefineGroup {
 }
 impl ComplexAttri for DefineGroup {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let group = match iter.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let parent_name = match iter.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    let define_id = crate::ast::define_id(&scope.hasher, &parent_name, &group);
-    _ = scope.define_map.insert(define_id, DefinedType::Group);
-    Ok(Self { group, parent_name })
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    ast::parser::complex2(
+      i,
+      &mut scope.line_num,
+      ast::parser::parse_arcstr,
+      ast::parser::parse_arcstr,
+      |group, parent_name| {
+        let define_id = ast::define_id(&scope.hasher, &parent_name, &group);
+        _ = scope.define_map.insert(define_id, DefinedType::Group);
+        Self { group, parent_name }
+      },
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -874,44 +852,39 @@ pub struct DefineCellArea {
 #[derive(Debug, Clone, Copy, Default)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ResourceType {
   /// `pad_slots`
   #[default]
-  #[strum(serialize = "pad_slots")]
+  #[token("pad_slots")]
   PadSlots,
   /// `pad_input_driver_sites`
-  #[strum(serialize = "pad_input_driver_sites")]
+  #[token("pad_input_driver_sites")]
   PadInputDriverSites,
   /// `pad_output_driver_sites`
-  #[strum(serialize = "pad_output_driver_sites")]
+  #[token("pad_output_driver_sites")]
   PadOutputDriverSites,
   /// `pad_driver_sites`
-  #[strum(serialize = "pad_driver_sites")]
+  #[token("pad_driver_sites")]
   PadDriverSites,
 }
 impl ComplexAttri for DefineCellArea {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let area_name = match iter.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let resource_type = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::UnsupportedWord),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(Self { area_name, resource_type })
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    use nom::{branch::alt, bytes::complete::tag, combinator::map};
+    ast::parser::complex2(
+      i,
+      &mut scope.line_num,
+      ast::parser::parse_arcstr,
+      alt((
+        map(tag("pad_slots"), |_| ResourceType::PadSlots),
+        map(tag("pad_input_driver_sites"), |_| ResourceType::PadInputDriverSites),
+        map(tag("pad_output_driver_sites"), |_| ResourceType::PadOutputDriverSites),
+        map(tag("pad_driver_sites"), |_| ResourceType::PadDriverSites),
+      )),
+      |area_name, resource_type| Self { area_name, resource_type },
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -1033,51 +1006,51 @@ pub struct FanoutLength {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.19&end=96.20
   /// ">Reference</a>
   #[id]
-  pub fanout: u32,
+  pub fanout: usize,
   /// A floating-point number representing the estimated amount of metal
   /// that is statistically found on a network with the given number of pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.22&end=96.23
   /// ">Reference</a>
   pub length: NotNan<f64>,
+  /// + average_capacitance
+  /// + standard_deviation
+  /// + number_of_nets
+  pub extra_info: Option<FanoutLengthExtra>,
+}
+#[derive(Debug, Clone, Default, Copy)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct FanoutLengthExtra {
   /// average_capacitance
-  pub average_capacitance: Option<NotNan<f64>>,
+  pub average_capacitance: NotNan<f64>,
   /// standard_deviation
-  pub standard_deviation: Option<NotNan<f64>>,
+  pub standard_deviation: NotNan<f64>,
   /// number_of_nets
-  pub number_of_nets: Option<u32>,
+  pub number_of_nets: usize,
 }
 impl ComplexAttri for FanoutLength {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let fanout = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(e) => return Err(ComplexParseError::Int(e)),
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    ast::parser::complex5_opt(
+      i,
+      &mut scope.line_num,
+      ast::parser::parse_usize,
+      ast::parser::parse_float,
+      ast::parser::parse_float,
+      ast::parser::parse_float,
+      ast::parser::parse_usize,
+      |fanout, length, extra_info| Self {
+        fanout,
+        length,
+        extra_info: extra_info.map(
+          |(average_capacitance, standard_deviation, number_of_nets)| FanoutLengthExtra {
+            average_capacitance,
+            standard_deviation,
+            number_of_nets,
+          },
+        ),
       },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let length = match iter.next() {
-      Some(s) => parse_f64(s)?,
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let average_capacitance = iter.next().and_then(|s| s.parse().ok());
-    let standard_deviation = iter.next().and_then(|s| s.parse().ok());
-    let number_of_nets = iter.next().and_then(|s| s.parse().ok());
-
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(Self {
-      fanout,
-      length,
-      average_capacitance,
-      standard_deviation,
-      number_of_nets,
-    })
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -1087,15 +1060,13 @@ impl ComplexAttri for FanoutLength {
     f.write_int(self.fanout)?;
     f.write_str(", ")?;
     f.write_float(self.length.into_inner())?;
-    if let (Some(average_capacitance), Some(standard_deviation), Some(number_of_nets)) =
-      (self.average_capacitance, self.standard_deviation, self.number_of_nets)
-    {
+    if let Some(extra_info) = self.extra_info {
       f.write_str(", ")?;
-      f.write_float(average_capacitance.into_inner())?;
+      f.write_float(extra_info.average_capacitance.into_inner())?;
       f.write_str(", ")?;
-      f.write_float(standard_deviation.into_inner())?;
+      f.write_float(extra_info.standard_deviation.into_inner())?;
       f.write_str(", ")?;
-      f.write_int(number_of_nets)?;
+      f.write_int(extra_info.number_of_nets)?;
     }
     Ok(())
   }
@@ -1155,25 +1126,26 @@ impl GroupFn for WireLoadSection {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd, Default)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum BaseCurveType {
   /// The `ccs_half_curve`  value allows you to model compact CCS power
-  #[strum(serialize = "ccs_half_curve")]
+  #[token("ccs_half_curve")]
   #[default]
   CcsHalfCurve,
   /// You must specify `ccs_half_curve` before specifying `ccs_timing_half_curve`.
-  #[strum(serialize = "ccs_timing_half_curve")]
+  #[token("ccs_timing_half_curve")]
   CcsTimingHalfCurve,
 }
 
 impl SimpleAttri for BaseCurveType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 

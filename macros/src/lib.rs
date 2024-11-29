@@ -2,6 +2,7 @@ use proc_macro::TokenStream;
 use syn::{parse_macro_input, DeriveInput};
 
 mod attribute;
+mod enum_token;
 mod group;
 
 /// ```
@@ -46,4 +47,11 @@ pub fn macro_group(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(Nothing, attributes(liberty, default))]
 pub fn macro_nothing(_: TokenStream) -> TokenStream {
   quote::quote!().into()
+}
+
+#[proc_macro_derive(EnumToken, attributes(token))]
+pub fn macro_enum(input: TokenStream) -> TokenStream {
+  let ast = parse_macro_input!(input as DeriveInput);
+  let toks = enum_token::inner(&ast).unwrap_or_else(|err| err.to_compile_error());
+  toks.into()
 }

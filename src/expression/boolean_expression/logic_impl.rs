@@ -60,7 +60,6 @@ impl Not for Static {
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::IntoEnumIterator;
 
   impl State {
     fn combine_op2(self, rhs: Self, f: fn(Static, Static) -> Static) -> Self {

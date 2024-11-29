@@ -1,16 +1,12 @@
 use crate::{
   ast::{
-    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    Indentation, ParseScope, SimpleAttri,
+    self, Attributes, CodeFormatter, ComplexAttri, GroupComments, GroupFn, Indentation,
+    ParseScope, SimpleAttri,
   },
   expression::logic::Edge,
   ArcStr,
 };
-use core::{
-  fmt::{self, Write},
-  str::FromStr,
-};
-use strum_macros::{Display, EnumString};
+use core::fmt::{self, Write};
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -20,26 +16,28 @@ use strum_macros::{Display, EnumString};
 /// &end
 /// =228.4
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum AntennaDiodeType {
   /// `power`
-  #[strum(serialize = "power")]
+  #[token("power")]
   Power,
   /// `ground`
-  #[strum(serialize = "ground")]
+  #[token("ground")]
   Ground,
   /// `power_and_ground`
-  #[strum(serialize = "power_and_ground")]
+  #[token("power_and_ground")]
   PowerAndGround,
 }
 impl SimpleAttri for AntennaDiodeType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -91,199 +89,215 @@ impl GroupFn for TLatch {}
 /// &end
 /// =228.22
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Direction {
-  #[strum(serialize = "input")]
+  #[token("input")]
   Input,
-  #[strum(serialize = "output")]
+  #[token("output")]
   Output,
-  #[strum(serialize = "inout")]
+  #[token("inout")]
   Inout,
-  #[strum(serialize = "internal")]
+  #[token("internal")]
   Internal,
 }
 impl SimpleAttri for Direction {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DontFault {
-  #[strum(serialize = "sa0")]
+  #[token("sa0")]
   Sa0,
-  #[strum(serialize = "sa1")]
+  #[token("sa1")]
   Sa1,
-  #[strum(serialize = "sao1")]
+  #[token("sao1")]
   Sao1,
 }
 impl SimpleAttri for DontFault {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DriverType {
-  #[strum(serialize = "pull_up")]
+  #[token("pull_up")]
   PullUp,
-  #[strum(serialize = "pull_down")]
+  #[token("pull_down")]
   PullDown,
-  #[strum(serialize = "open_drain")]
+  #[token("open_drain")]
   OpenDrain,
-  #[strum(serialize = "open_source")]
+  #[token("open_source")]
   OpenSource,
-  #[strum(serialize = "bus_hold")]
+  #[token("bus_hold")]
   BusHold,
-  #[strum(serialize = "resistive")]
+  #[token("resistive")]
   Resistive,
-  #[strum(serialize = "resistive_0")]
+  #[token("resistive_0")]
   Resistive0,
-  #[strum(serialize = "resistive_1")]
+  #[token("resistive_1")]
   Resistive1,
 }
 impl SimpleAttri for DriverType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum NextstateType {
-  #[strum(serialize = "data")]
+  #[token("data")]
   Data,
-  #[strum(serialize = "preset")]
+  #[token("preset")]
   Preset,
-  #[strum(serialize = "clear")]
+  #[token("clear")]
   Clear,
-  #[strum(serialize = "load")]
+  #[token("load")]
   Load,
-  #[strum(serialize = "scan_in")]
+  #[token("scan_in")]
   ScanIn,
-  #[strum(serialize = "scan_enable")]
+  #[token("scan_enable")]
   ScanEnable,
 }
 impl SimpleAttri for NextstateType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PinFuncType {
-  #[strum(serialize = "clock_enable")]
+  #[token("clock_enable")]
   ClockEnable,
-  #[strum(serialize = "active_high")]
+  #[token("active_high")]
   ActiveHigh,
-  #[strum(serialize = "active_low")]
+  #[token("active_low")]
   ActiveLow,
-  #[strum(serialize = "active_rising")]
+  #[token("active_rising")]
   ActiveRising,
-  #[strum(serialize = "active_falling")]
+  #[token("active_falling")]
   ActiveFalling,
 }
 impl SimpleAttri for PinFuncType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum RestoreEdgeType {
-  #[strum(serialize = "edge_trigger")]
+  #[token("edge_trigger")]
   EdgeTrigger,
-  #[strum(serialize = "leading")]
+  #[token("leading")]
   Leading,
-  #[strum(serialize = "trailing")]
+  #[token("trailing")]
   Trailing,
 }
 impl SimpleAttri for RestoreEdgeType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SignalType {
-  #[strum(serialize = "test_scan_in")]
+  #[token("test_scan_in")]
   TestScanIn,
-  #[strum(serialize = "test_scan_in_inverted")]
+  #[token("test_scan_in_inverted")]
   TestScanInInverted,
-  #[strum(serialize = "test_scan_out")]
+  #[token("test_scan_out")]
   TestScanOut,
-  #[strum(serialize = "test_scan_out_inverted")]
+  #[token("test_scan_out_inverted")]
   TestScanOutInverted,
-  #[strum(serialize = "test_scan_enable")]
+  #[token("test_scan_enable")]
   TestScanEnable,
-  #[strum(serialize = "test_scan_enable_inverted")]
+  #[token("test_scan_enable_inverted")]
   TestScanEnableInverted,
-  #[strum(serialize = "test_scan_clock")]
+  #[token("test_scan_clock")]
   TestScanClock,
-  #[strum(serialize = "test_scan_clock_a")]
+  #[token("test_scan_clock_a")]
   TestScanClockA,
-  #[strum(serialize = "test_scan_clock_b")]
+  #[token("test_scan_clock_b")]
   TestScanClockB,
-  #[strum(serialize = "test_clock")]
+  #[token("test_clock")]
   TestClock,
 }
 impl SimpleAttri for SignalType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 #[derive(Default)]
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SlewControl {
-  #[strum(serialize = "low")]
+  #[token("low")]
   Low,
-  #[strum(serialize = "medium")]
+  #[token("medium")]
   Medium,
-  #[strum(serialize = "high")]
+  #[token("high")]
   High,
   #[default]
-  #[strum(serialize = "none")]
+  #[token("none")]
   None,
 }
 impl SimpleAttri for SlewControl {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -301,33 +315,36 @@ impl SimpleAttri for SlewControl {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=267.24&end=267.26
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum OneZero {
   /// 1
-  #[strum(serialize = "1")]
+  #[token("1")]
   One,
   /// 0
-  #[strum(serialize = "0")]
+  #[token("0")]
   Zero,
 }
 impl SimpleAttri for OneZero {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
-enum OneValue {
-  #[strum(serialize = "1")]
+#[derive(liberty_macros::EnumToken)]
+pub enum OneValue {
+  #[token("1")]
   One,
-  #[strum(serialize = "0")]
+  #[token("0")]
   Zero,
-  #[strum(serialize = "x")]
+  #[token("x")]
   Unkown,
 }
 /// Two values that define the value of the differential signals.
@@ -347,11 +364,12 @@ enum OneValue {
 pub struct TwoValue(OneValue, OneValue);
 impl SimpleAttri for TwoValue {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 impl fmt::Display for TwoValue {
@@ -360,24 +378,17 @@ impl fmt::Display for TwoValue {
     write!(f, "{}{}", self.0, self.1)
   }
 }
-impl FromStr for TwoValue {
-  type Err = strum::ParseError;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    if s.len() != 2 {
-      return Err(strum::ParseError::VariantNotFound);
-    }
-    let mut i = s.chars();
-    if let Some(c1) = i.next() {
-      if let Some(c2) = i.next() {
-        let mut tmp = [0; 1];
-        return Ok(Self(
-          OneValue::from_str(c1.encode_utf8(&mut tmp))?,
-          OneValue::from_str(c2.encode_utf8(&mut tmp))?,
-        ));
-      }
-    }
-    Err(strum::ParseError::VariantNotFound)
+impl ast::NomParseTerm for TwoValue {
+  fn nom_parse<'a>(
+    i: &'a str,
+  ) -> nom::IResult<&'a str, Self, nom::error::Error<&'a str>> {
+    nom::combinator::map(
+      nom::sequence::pair(
+        <OneValue as ast::NomParseTerm>::nom_parse,
+        <OneValue as ast::NomParseTerm>::nom_parse,
+      ),
+      |(v1, v2)| Self(v1, v2),
+    )(i)
   }
 }
 
@@ -388,18 +399,19 @@ impl FromStr for TwoValue {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=282.3&end=282.23
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PinClass {
+  /// `save_restore`
+  #[token("save_restore")]
+  SaveRestore,
   /// `save`
-  #[strum(serialize = "save")]
+  #[token("save")]
   Save,
   /// `restore`
-  #[strum(serialize = "restore")]
+  #[token("restore")]
   Restore,
-  /// `save_restore`
-  #[strum(serialize = "save_restore")]
-  SaveRestore,
 }
 /// The `retention_pin` complex attribute identifies the retention pins of a retention cell. The
 /// attribute defines the following information:
@@ -433,31 +445,17 @@ pub struct RetentionPin {
   /// `disable_value`
   pub disable_value: OneZero,
 }
+
 impl ComplexAttri for RetentionPin {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let pin_class: PinClass = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::Other),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let disable_value: OneZero = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::Other),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      Err(ComplexParseError::LengthDismatch)
-    } else {
-      Ok(Self { pin_class, disable_value })
-    }
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    ast::parser::complex2(
+      i,
+      &mut scope.line_num,
+      <PinClass as ast::NomParseTerm>::nom_parse,
+      <OneZero as ast::NomParseTerm>::nom_parse,
+      |pin_class, disable_value| Self { pin_class, disable_value },
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -470,18 +468,24 @@ impl ComplexAttri for RetentionPin {
 
 #[cfg(test)]
 mod test {
+
   use super::*;
   #[test]
   fn two_value() {
-    assert_eq!(Ok(TwoValue(OneValue::Unkown, OneValue::One)), TwoValue::from_str("x1"));
-    assert_eq!(Ok(TwoValue(OneValue::Zero, OneValue::One)), TwoValue::from_str("01"));
-    assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1"));
-    assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("111"));
-    assert_eq!(Err(strum::ParseError::VariantNotFound), TwoValue::from_str("1-"));
+    assert_eq!(
+      Ok(("", TwoValue(OneValue::Unkown, OneValue::One))),
+      <TwoValue as ast::NomParseTerm>::nom_parse("x1")
+    );
+    assert_eq!(
+      Ok(("", TwoValue(OneValue::Zero, OneValue::One))),
+      <TwoValue as ast::NomParseTerm>::nom_parse("01")
+    );
+    assert!(<TwoValue as ast::NomParseTerm>::nom_parse("1").is_err());
+    assert!(<TwoValue as ast::NomParseTerm>::nom_parse("1-").is_err());
   }
   #[test]
   fn retention_pin() {
-    let pin = crate::ast::test_parse_fmt::<crate::Cell>(
+    let pin = ast::test_parse_fmt::<crate::Cell>(
       r#"(cell1){
         pin(A){
           retention_pin (save_restore, 1);

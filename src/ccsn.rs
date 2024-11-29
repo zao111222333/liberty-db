@@ -4,8 +4,8 @@
 
 use crate::{
   ast::{
-    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    GroupSet, Indentation, ParseScope, SimpleAttri,
+    self, Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
+    GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
   },
   common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
@@ -250,27 +250,28 @@ impl GroupFn for CCSNStage {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd, Default)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum StageType {
   /// `pull_up`, in which the output voltage of the channel-connecting block is always pulled up (rising);
-  #[strum(serialize = "pull_up")]
+  #[token("pull_up")]
   PullUp,
   /// in which the output voltage of the channel-connecting block is always pulled down (falling)
-  #[strum(serialize = "pull_down")]
+  #[token("pull_down")]
   PullDown,
   /// both, in which the output voltage of the channel-connecting block is pulled up or down
-  #[strum(serialize = "both")]
+  #[token("both")]
   #[default]
   Both,
 }
 impl SimpleAttri for StageType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <StageType as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -360,19 +361,14 @@ pub struct PropagatingCcb {
 
 impl ComplexAttri for PropagatingCcb {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let input_ccb_name = match iter.next() {
-      Some(&s) => ArcStr::from(s),
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let output_ccb_name = iter.next().map(|&s| ArcStr::from(s));
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(Self { input_ccb_name, output_ccb_name })
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    ast::parser::complex2_opt(
+      i,
+      &mut scope.line_num,
+      ast::parser::parse_arcstr,
+      ast::parser::parse_arcstr,
+      |input_ccb_name, output_ccb_name| Self { input_ccb_name, output_ccb_name },
+    )
   }
   #[expect(clippy::or_fun_call)]
   #[inline]

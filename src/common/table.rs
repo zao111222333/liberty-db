@@ -1,5 +1,3 @@
-use arcstr::literal;
-
 use crate::{
   ast::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
@@ -219,19 +217,23 @@ impl GroupFn for CompactLutTemplate {}
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
 /// ">Reference</a>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(strum_macros::Display, strum_macros::EnumString)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VariableTypeCompactLutTemplateIndex12 {
-  #[strum(serialize = "input_net_transition")]
+  #[token("input_net_transition")]
   InputNetTransition,
-  #[strum(serialize = "total_output_net_capacitance")]
+  #[token("total_output_net_capacitance")]
   TotalOutputNetCapacitance,
 }
 
 impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -241,17 +243,21 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.30&end=42.31
 /// ">Reference</a>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(strum_macros::Display, strum_macros::EnumString)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VariableTypeCompactLutTemplateIndex3 {
-  #[strum(serialize = "curve_parameters")]
+  #[token("curve_parameters")]
   CurveParameters,
 }
 
 impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -499,17 +505,14 @@ pub struct CcsPowerPoint {
 
 impl ComplexAttri for Vec<CcsPowerValue> {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    _iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    unreachable!()
-  }
-  #[inline]
   #[expect(clippy::arithmetic_side_effects)]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
-    match ast::parser::complex_ccs_power_values(i, &mut scope.line_num) {
-      Ok((_i, vec)) => {
+    match ast::parser::complex_multi_line(
+      i,
+      &mut scope.line_num,
+      ast::parser::complex_ccs_power_value,
+    ) {
+      Ok((_i, Ok(vec))) => {
         let res = vec
           .into_iter()
           .map(|(n, v)| {
@@ -519,9 +522,8 @@ impl ComplexAttri for Vec<CcsPowerValue> {
           .collect();
         Ok((_i, Ok(res)))
       }
-      Err(_) => {
-        Err(nom::Err::Error(nom::error::Error::new(i, nom::error::ErrorKind::ManyMN)))
-      }
+      Ok((_i, Err(e))) => Ok((_i, Err(e))),
+      Err(e) => Err(e),
     }
   }
   #[inline]
@@ -798,21 +800,15 @@ pub struct Values {
 
 impl ComplexAttri for Values {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    _iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    unreachable!()
-  }
-  #[inline]
   #[expect(clippy::arithmetic_side_effects)]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
-    match ast::parser::complex_values(i, &mut scope.line_num) {
-      Ok((_i, vec)) => {
+    match ast::parser::complex_multi_line(i, &mut scope.line_num, ast::parser::float_vec)
+    {
+      Ok((_i, Ok(vec))) => {
         let mut size1 = 0;
         let mut size2 = 0;
         let mut table_len_mismatch = false;
-        let inner = vec
+        let inner: Vec<NotNan<f64>> = vec
           .into_iter()
           .flat_map(|(n, v)| {
             scope.line_num += n;
@@ -832,18 +828,23 @@ impl ComplexAttri for Values {
         Ok((
           _i,
           if table_len_mismatch {
+            let mut buf = ryu::Buffer::new();
             Err((
               ComplexParseError::LengthDismatch,
-              ast::ComplexWrapper(vec![literal!("PARSER_ERROR")]),
+              ast::ComplexWrapper(
+                inner
+                  .into_iter()
+                  .map(|f| ArcStr::from(buf.format(f.into_inner())))
+                  .collect(),
+              ),
             ))
           } else {
             Ok(Self { size1, size2, inner })
           },
         ))
       }
-      Err(_) => {
-        Err(nom::Err::Error(nom::error::Error::new(i, nom::error::ErrorKind::ManyMN)))
-      }
+      Ok((_i, Err(e))) => Ok((_i, Err(e))),
+      Err(e) => Err(e),
     }
   }
   #[inline]
@@ -921,7 +922,7 @@ impl GroupFn for TableTemple {}
 /// + `output_net_length`
 /// + `output_net_wire_cap`
 /// + `output_net_pin_cap`
-/// + `related_out_total_output_net_capacitance`
+/// + `related_out_total_output_net_capacitancetance`
 /// + `related_out_output_net_length`
 /// + `related_out_output_net_wire_cap`
 /// + `related_out_output_net_pin_cap`
@@ -938,7 +939,7 @@ impl GroupFn for TableTemple {}
 /// in the templates for constraint tables:
 /// + `constrained_pin_transition`
 /// + `related_pin_transition`
-/// + `related_out_total_output_net_capacitance`
+/// + `related_out_total_output_net_capacitancetance`
 /// + `related_out_output_net_length`
 /// + `related_out_output_net_wire_cap`
 /// + `related_out_output_net_pin_cap`
@@ -1016,59 +1017,113 @@ pub enum Variable {
 impl SimpleAttri for Variable {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
-impl core::str::FromStr for Variable {
-  type Err = strum::ParseError;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(match s {
-      "input_voltage" => Self::Voltage(VoltageVariable::InputVoltage),
-      "output_voltage" => Self::Voltage(VoltageVariable::OutputVoltage),
-      "input_noise_height" => Self::Voltage(VoltageVariable::InputNoiseHeight),
-      "input_transition_time" => Self::Time(TimeVariable::InputTransitionTime),
-      "input_net_transition" => Self::Time(TimeVariable::InputNetTransition),
-      "constrained_pin_transition" => Self::Time(TimeVariable::ConstrainedPinTransition),
-      "related_pin_transition" => Self::Time(TimeVariable::RelatedPinTransition),
-      "driver_slew" => Self::Time(TimeVariable::DriverSlew),
-      "output_transition" => Self::Time(TimeVariable::OutputTransition),
-      "output_pin_transition" => Self::Time(TimeVariable::OutputPinTransition),
-      "connect_delay" => Self::Time(TimeVariable::ConnectDelay),
-      "input_noise_width" => Self::Time(TimeVariable::InputNoiseWidth),
-      "time" => Self::Time(TimeVariable::Time),
-      "total_output_net_capacitance" => {
-        Self::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance)
-      }
-      "output_net_wire_cap" => Self::Capacitance(CapacitanceVariable::OutputNetWireCap),
-      "output_net_pin_cap" => Self::Capacitance(CapacitanceVariable::OutputNetPinCap),
-      "related_out_total_output_net_capaci" => {
-        Self::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance)
-      }
-      "related_out_output_net_wire_cap" => {
-        Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap)
-      }
-      "related_out_output_net_pin_cap" => {
-        Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap)
-      }
-      "fanout_pin_capacitance" => {
-        Self::Capacitance(CapacitanceVariable::FanoutPinCapacitance)
-      }
-      "output_net_length" => Self::Length(LengthVariable::OutputNetLength),
-      "related_out_output_net_length" => {
-        Self::Length(LengthVariable::RelatedOutOutputNetLength)
-      }
-      "fanout_number" => Self::Scalar(ScalarVariable::FanoutNumber),
-      "normalized_voltage" => Self::Scalar(ScalarVariable::NormalizedVoltage),
-      "rc_product" => Self::RcProduct,
-      _ => {
-        return Err(strum::ParseError::VariantNotFound);
-      }
-    })
+impl ast::NomParseTerm for Variable {
+  fn nom_parse<'a>(
+    i: &'a str,
+  ) -> nom::IResult<&'a str, Self, nom::error::Error<&'a str>> {
+    use nom::{
+      branch::alt,
+      bytes::complete::tag,
+      character::complete::char,
+      combinator::map,
+      sequence::{delimited, preceded},
+    };
+    #[rustfmt::skip]
+    fn _nom_parse<'a>(
+      i: &'a str,
+    ) -> nom::IResult<&'a str, Variable, nom::error::Error<&'a str>> {
+      //       "input_voltage" => Self::Voltage(VoltageVariable::InputVoltage),
+      //       "input_transition_time" => Self::Time(TimeVariable::InputTransitionTime),
+      //       "input_net_transition" => Self::Time(TimeVariable::InputNetTransition),
+      //       "input_noise_height" => Self::Voltage(VoltageVariable::InputNoiseHeight),
+      //       "input_noise_width" => Self::Time(TimeVariable::InputNoiseWidth),
+      //       "driver_slew" => Self::Time(TimeVariable::DriverSlew),
+      //       "connect_delay" => Self::Time(TimeVariable::ConnectDelay),
+      //       "constrained_pin_transition" => Self::Time(TimeVariable::ConstrainedPinTransition),
+      //       "time" => Self::Time(TimeVariable::Time),
+      //       "total_output_net_capacitance" => Self::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance),
+      //       "output_transition" => Self::Time(TimeVariable::OutputTransition),
+      //       "output_pin_transition" => Self::Time(TimeVariable::OutputPinTransition),
+      //       "output_voltage" => Self::Voltage(VoltageVariable::OutputVoltage),
+      //       "output_net_wire_cap" => Self::Capacitance(CapacitanceVariable::OutputNetWireCap),
+      //       "output_net_length" => Self::Length(LengthVariable::OutputNetLength),
+      //       "output_net_pin_cap" => Self::Capacitance(CapacitanceVariable::OutputNetPinCap),
+      //       "related_pin_transition" => Self::Time(TimeVariable::RelatedPinTransition),
+      //       "related_out_total_output_net_capacitance" => Self::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance),
+      //       "related_out_output_net_wire_cap" => Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap),
+      //       "related_out_output_net_length" => Self::Length(LengthVariable::RelatedOutOutputNetLength),
+      //       "related_out_output_net_pin_cap" => Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap),
+      //       "fanout_pin_capacitance" => Self::Capacitance(CapacitanceVariable::FanoutPinCapacitance),
+      //       "fanout_number" => Self::Scalar(ScalarVariable::FanoutNumber),
+      //       "normalized_voltage" => Self::Scalar(ScalarVariable::NormalizedVoltage),
+      //       "rc_product" => Self::RcProduct,
+      alt((
+        map(tag("driver_slew"),|_| Variable::Time(TimeVariable::DriverSlew)),
+        map(tag("connect_delay"),|_| Variable::Time(TimeVariable::ConnectDelay)),
+        map(tag("constrained_pin_transition"),|_| Variable::Time(TimeVariable::ConstrainedPinTransition)),
+        map(tag("time"),|_| Variable::Time(TimeVariable::Time)),
+        map(tag("fanout_pin_capacitance"),|_| Variable::Capacitance(CapacitanceVariable::FanoutPinCapacitance)),
+        map(tag("fanout_number"),|_| Variable::Scalar(ScalarVariable::FanoutNumber)),
+        map(tag("normalized_voltage"),|_| Variable::Scalar(ScalarVariable::NormalizedVoltage)),
+        map(tag("rc_product"),|_| Variable::RcProduct),
+        map(tag("total_output_net_capacitance"),|_| Variable::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance)),
+        preceded(tag("input_"),
+          alt((
+            map(tag("voltage"),|_| Variable::Voltage(VoltageVariable::InputVoltage)),
+            map(tag("transition_time"),|_| Variable::Time(TimeVariable::InputTransitionTime)),
+            map(tag("net_transition"),|_| Variable::Time(TimeVariable::InputNetTransition)),
+            preceded(tag("noise_"),
+              alt((
+                map(tag("height"),|_| Variable::Voltage(VoltageVariable::InputNoiseHeight)),
+                map(tag("width"),|_| Variable::Time(TimeVariable::InputNoiseWidth)),
+              ))
+            )
+          ))
+        ),
+        preceded(tag("output_"),
+          alt((
+            map(tag("transition"),|_| Variable::Time(TimeVariable::OutputTransition)),
+            map(tag("pin_transition"),|_| Variable::Time(TimeVariable::OutputPinTransition)),
+            map(tag("voltage"),|_| Variable::Voltage(VoltageVariable::OutputVoltage)),
+            preceded(tag("net_"),
+              alt((
+                map(tag("wire_cap"),|_| Variable::Capacitance(CapacitanceVariable::OutputNetWireCap)),
+                map(tag("length"),|_| Variable::Length(LengthVariable::OutputNetLength)),
+                map(tag("pin_cap"),|_| Variable::Capacitance(CapacitanceVariable::OutputNetPinCap)),
+              ))
+            )
+          ))
+        ),
+        preceded(tag("related_"),
+          alt((
+            map(tag("pin_transition"),|_| Variable::Time(TimeVariable::RelatedPinTransition)),
+            preceded(tag("out_"),
+              alt((
+                map(tag("total_output_net_capacitance"),|_| Variable::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance)),
+                preceded(tag("output_net_"),
+                  alt((
+                    map(tag("wire_cap"),|_| Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap)),
+                    map(tag("length"),|_| Variable::Length(LengthVariable::RelatedOutOutputNetLength)),
+                    map(tag("pin_cap"),|_| Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap)),
+                  ))
+                )
+              ))
+            )
+          ))
+        ),
+      ))(i)
+    }
+    alt((delimited(char('"'), _nom_parse, char('"')), _nom_parse))(i)
   }
 }
-
 impl fmt::Display for Variable {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -1086,109 +1141,109 @@ impl fmt::Display for Variable {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimeVariable {
   /// `input_transition_time`
-  #[strum(serialize = "input_transition_time")]
+  #[token("input_transition_time")]
   InputTransitionTime,
   /// `input_net_transition`
-  #[strum(serialize = "input_net_transition")]
+  #[token("input_net_transition")]
   InputNetTransition,
   ///`constrained_pin_transition`
-  #[strum(serialize = "constrained_pin_transition")]
+  #[token("constrained_pin_transition")]
   ConstrainedPinTransition,
   ///`related_pin_transition`
-  #[strum(serialize = "related_pin_transition")]
+  #[token("related_pin_transition")]
   RelatedPinTransition,
   /// `driver_slew`
-  #[strum(serialize = "driver_slew")]
+  #[token("driver_slew")]
   DriverSlew,
   /// `output_transition`
-  #[strum(serialize = "output_transition")]
+  #[token("output_transition")]
   OutputTransition,
   /// `output_pin_transition`
-  #[strum(serialize = "output_pin_transition")]
+  #[token("output_pin_transition")]
   OutputPinTransition,
   /// `connect_delay`
-  #[strum(serialize = "connect_delay")]
+  #[token("connect_delay")]
   ConnectDelay,
   /// `input_noise_width`
-  #[strum(serialize = "input_noise_width")]
+  #[token("input_noise_width")]
   InputNoiseWidth,
   /// `time`
-  #[strum(serialize = "time")]
+  #[token("time")]
   Time,
 }
 
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VoltageVariable {
   /// `input_voltage`
-  #[strum(serialize = "input_voltage")]
+  #[token("input_voltage")]
   InputVoltage,
   /// `output_voltage`
-  #[strum(serialize = "output_voltage")]
+  #[token("output_voltage")]
   OutputVoltage,
   /// `input_noise_height`
-  #[strum(serialize = "input_noise_height")]
+  #[token("input_noise_height")]
   InputNoiseHeight,
 }
 
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum CapacitanceVariable {
   /// `total_output_net_capacitance`
-  #[strum(serialize = "total_output_net_capacitance")]
+  #[token("total_output_net_capacitance")]
   TotalOutputNetCapacitance,
   /// `output_net_wire_cap`
-  #[strum(serialize = "output_net_wire_cap")]
+  #[token("output_net_wire_cap")]
   OutputNetWireCap,
   /// `output_net_pin_cap`
-  #[strum(serialize = "output_net_pin_cap")]
+  #[token("output_net_pin_cap")]
   OutputNetPinCap,
-  /// `related_out_total_output_net_capaci`
-  #[strum(serialize = "related_out_total_output_net_capaci")]
+  /// `related_out_total_output_net_capacitance`
+  #[token("related_out_total_output_net_capacitance")]
   RelatedOutTotalOutputNetCapacitance,
   /// `related_out_output_net_wire_cap`
-  #[strum(serialize = "related_out_output_net_wire_cap")]
+  #[token("related_out_output_net_wire_cap")]
   RelatedOutOutputNetWireCap,
   /// `related_out_output_net_pin_cap`
-  #[strum(serialize = "related_out_output_net_pin_cap")]
+  #[token("related_out_output_net_pin_cap")]
   RelatedOutOutputNetPinCap,
   /// `fanout_pin_capacitance`
-  #[strum(serialize = "fanout_pin_capacitance")]
+  #[token("fanout_pin_capacitance")]
   FanoutPinCapacitance,
 }
 
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LengthVariable {
   /// `output_net_length`
-  #[strum(serialize = "output_net_length")]
+  #[token("output_net_length")]
   OutputNetLength,
   /// `related_out_output_net_length`
-  #[strum(serialize = "related_out_output_net_length")]
+  #[token("related_out_output_net_length")]
   RelatedOutOutputNetLength,
 }
 
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ScalarVariable {
   /// `fanout_number`
-  #[strum(serialize = "fanout_number")]
+  #[token("fanout_number")]
   FanoutNumber,
   /// The `normalized_voltage`  variable is specified under the
   /// `lu_table_template`  table to describe a collection of waveforms under
@@ -1199,17 +1254,51 @@ pub enum ScalarVariable {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=65.38&end=65.41
   /// ">Reference-Definition</a>
-  #[strum(serialize = "normalized_voltage")]
+  #[token("normalized_voltage")]
   NormalizedVoltage,
 }
 
 #[cfg(test)]
 mod test {
+  use super::*;
   use crate::ast::test_parse_fmt;
 
   #[test]
+  fn variable() {
+    for s in [
+      "input_voltage",
+      "input_transition_time",
+      "input_net_transition",
+      "input_noise_height",
+      "input_noise_width",
+      "driver_slew",
+      "connect_delay",
+      "constrained_pin_transition",
+      "time",
+      "total_output_net_capacitance",
+      "output_transition",
+      "output_pin_transition",
+      "output_voltage",
+      "output_net_wire_cap",
+      "output_net_length",
+      "output_net_pin_cap",
+      "related_pin_transition",
+      "related_out_total_output_net_capacitance",
+      "related_out_output_net_wire_cap",
+      "related_out_output_net_length",
+      "related_out_output_net_pin_cap",
+      "fanout_pin_capacitance",
+      "fanout_number",
+      "normalized_voltage",
+      "rc_product",
+    ] {
+      let (_, v) = <Variable as ast::NomParseTerm>::nom_parse(s).unwrap();
+      assert_eq!(s, &v.to_string());
+    }
+  }
+  #[test]
   fn table() {
-    let table = test_parse_fmt::<super::TableLookUp>(
+    let table = test_parse_fmt::<TableLookUp>(
       r#" ("CCS_RCV_TEMPLATE_0") {
       index_1("0.0186051, 0.0372112, 0.0744591");
       index_2("0.1000000, 0.2500000, 0.5000000");
@@ -1230,7 +1319,7 @@ liberty_db::common::table::TableLookUp (CCS_RCV_TEMPLATE_0) {
   }
   #[test]
   fn compact_ccs_table() {
-    let table = test_parse_fmt::<super::CompactCcsTable>(
+    let table = test_parse_fmt::<CompactCcsTable>(
       r#" ("c_ccs_pwr_template_6") {
         values("-0.0119931,-101.1912245,", \
           "-0.0119953,-101.1912245,", \
@@ -1257,7 +1346,7 @@ liberty_db::common::table::CompactCcsTable (c_ccs_pwr_template_6) {
   }
   #[test]
   fn compact_ccs_power_table() {
-    let table = test_parse_fmt::<super::CompactCcsPower>(
+    let table = test_parse_fmt::<CompactCcsPower>(
       r#" (c_ccs_pwr_template_3) {
         values ("0.0358012, 0.0206745, 2505, 0.0480925, 1.1701594, 2506, 1.4011397, 0.0724034", \
           "-0.0481277, 0.0206745, 13, -0.0477729, 0.0, 13, -0.026014, -1.267817, 1198, 71.4506979, 0.0698575", \

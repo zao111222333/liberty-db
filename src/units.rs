@@ -4,10 +4,7 @@
 //! </script>
 
 use crate::{
-  ast::{
-    CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope, SimpleAttri,
-  },
-  common::parse_f64,
+  ast::{self, CodeFormatter, ComplexAttri, Indentation, ParseScope, SimpleAttri},
   NotNan,
 };
 use core::fmt::{self, Write};
@@ -21,21 +18,21 @@ use core::fmt::{self, Write};
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Default, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimeUnit {
   /// 1ps, 1e-12
-  #[strum(serialize = "1ps")]
+  #[token("1ps")]
   _1ps,
   /// 10ps, 1e-11
-  #[strum(serialize = "10ps")]
+  #[token("10ps")]
   _10ps,
   /// 100ps, 1e-10
-  #[strum(serialize = "100ps")]
+  #[token("100ps")]
   _100ps,
   /// 1ns, 1e-9
   #[default]
-  #[strum(serialize = "1ns")]
+  #[token("1ns")]
   _1ns,
 }
 
@@ -54,11 +51,12 @@ impl TimeUnit {
 
 impl SimpleAttri for TimeUnit {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <TimeUnit as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -71,21 +69,21 @@ impl SimpleAttri for TimeUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Default, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VoltageUnit {
   /// 1mV, 1e-3
-  #[strum(serialize = "1mV")]
+  #[token("1mV")]
   _1mV,
   /// 10mV, 1e-2
-  #[strum(serialize = "10mV")]
+  #[token("10mV")]
   _10mV,
   /// 100mV, 1e-1
-  #[strum(serialize = "100mV")]
+  #[token("100mV")]
   _100mV,
   /// 1V, 1e0
   #[default]
-  #[strum(serialize = "1V")]
+  #[token("1V")]
   _1V,
 }
 
@@ -104,11 +102,12 @@ impl VoltageUnit {
 
 impl SimpleAttri for VoltageUnit {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -122,29 +121,29 @@ impl SimpleAttri for VoltageUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum CurrentUnit {
   /// 1uA, 1e-6
-  #[strum(serialize = "1uA")]
+  #[token("1uA")]
   _1uA,
   /// 10uA, 1e-5
-  #[strum(serialize = "10uA")]
+  #[token("10uA")]
   _10uA,
   /// 100uA, 1e-4
-  #[strum(serialize = "100uA")]
+  #[token("100uA")]
   _100uA,
   /// 1mA, 1e-3
-  #[strum(serialize = "1mA")]
+  #[token("1mA")]
   _1mA,
   /// 10mA, 1e-2
-  #[strum(serialize = "10mA")]
+  #[token("10mA")]
   _10mA,
   /// 100mA, 1e-1
-  #[strum(serialize = "100mA")]
+  #[token("100mA")]
   _100mA,
   /// 1A, 1e0
-  #[strum(serialize = "1A")]
+  #[token("1A")]
   _1A,
 }
 
@@ -166,11 +165,12 @@ impl CurrentUnit {
 
 impl SimpleAttri for CurrentUnit {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -184,20 +184,20 @@ impl SimpleAttri for CurrentUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PullingResistanceUnit {
   /// 1ohm, 1
-  #[strum(serialize = "1ohm")]
+  #[token("1ohm")]
   _1ohm,
   /// 10ohm, 10
-  #[strum(serialize = "10ohm")]
+  #[token("10ohm")]
   _10ohm,
   /// 100ohm, 100
-  #[strum(serialize = "100ohm")]
+  #[token("100ohm")]
   _100ohm,
   /// 1kohm, 1000
-  #[strum(serialize = "1kohm")]
+  #[token("1kohm")]
   _1kohm,
 }
 
@@ -216,11 +216,12 @@ impl PullingResistanceUnit {
 
 impl SimpleAttri for PullingResistanceUnit {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -260,26 +261,15 @@ impl CapacitiveLoadUnit {
 
 impl ComplexAttri for CapacitiveLoadUnit {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let val = match iter.next() {
-      Some(s) => parse_f64(s)?,
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let ff_pf = match iter.next() {
-      Some(&s) => match s {
-        "ff" => true,
-        "pf" => false,
-        _ => return Err(ComplexParseError::UnsupportedWord),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(Self { ff_pf, val })
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    use nom::{branch::alt, bytes::complete::tag, combinator::map};
+    ast::parser::complex2(
+      i,
+      &mut scope.line_num,
+      ast::parser::parse_float,
+      alt((map(tag("ff"), |_| true), map(tag("pf"), |_| false))),
+      |val, ff_pf| Self { ff_pf, val },
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -307,47 +297,47 @@ impl ComplexAttri for CapacitiveLoadUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LeakagePowerUnit {
   /// 1pW, 1e-12
-  #[strum(serialize = "1pW")]
+  #[token("1pW")]
   _1pW,
   /// 10pW, 1e-11
-  #[strum(serialize = "10pW")]
+  #[token("10pW")]
   _10pW,
   /// 100pW, 1e-10
-  #[strum(serialize = "100pW")]
+  #[token("100pW")]
   _100pW,
   /// 1nW, 1e-9
-  #[strum(serialize = "1nW")]
+  #[token("1nW")]
   _1nW,
   /// 10nW, 1e-8
-  #[strum(serialize = "10nW")]
+  #[token("10nW")]
   _10nW,
   /// 100nW, 1e-7
-  #[strum(serialize = "100nW")]
+  #[token("100nW")]
   _100nW,
   /// 1uW, 1e-6
-  #[strum(serialize = "1uW")]
+  #[token("1uW")]
   _1uW,
   /// 10uW, 1e-5
-  #[strum(serialize = "10uW")]
+  #[token("10uW")]
   _10uW,
   /// 100uW, 1e-4
-  #[strum(serialize = "100uW")]
+  #[token("100uW")]
   _100uW,
   /// 1mW, 1e-3
-  #[strum(serialize = "1mW")]
+  #[token("1mW")]
   _1mW,
   /// 10mW, 1e-2
-  #[strum(serialize = "10mW")]
+  #[token("10mW")]
   _10mW,
   /// 100mW, 1e-1
-  #[strum(serialize = "100mW")]
+  #[token("100mW")]
   _100mW,
   /// 1W, 1e0
-  #[strum(serialize = "1W")]
+  #[token("1W")]
   _1W,
 }
 
@@ -374,10 +364,11 @@ impl LeakagePowerUnit {
 }
 impl SimpleAttri for LeakagePowerUnit {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }

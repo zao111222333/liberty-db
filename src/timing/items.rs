@@ -8,8 +8,6 @@ use crate::{
   expression::logic,
   ArcStr, NotNan,
 };
-
-use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
 ///
 /// <a name ="reference_link" href="
@@ -86,9 +84,8 @@ use strum_macros::{Display, EnumString};
 /// &end
 /// =203.55
 /// ">Reference-Instance</a>
-#[derive(
-  Debug, Clone, Copy, PartialEq, Display, EnumString, Default, Hash, Eq, PartialOrd, Ord
-)]
+#[derive(Debug, Clone, Copy, PartialEq, Default, Hash, Eq, PartialOrd, Ord)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimingSenseType {
   /// Combines incoming `rise` delays with local `rise` delays
@@ -101,7 +98,7 @@ pub enum TimingSenseType {
   /// &end
   /// =t.m0.x37.h4.y2b12.ff1.fs2.fc2.sc0.ls0.ws0
   /// ">Reference</a>
-  #[strum(serialize = "positive_unate")]
+  #[token("positive_unate")]
   PositiveUnate,
   /// Combines incoming `rise` delays with local `fall` delays
   /// and compares incoming `fall` delays with local `rise` delays.
@@ -113,7 +110,7 @@ pub enum TimingSenseType {
   /// &end
   /// =t.m0.x37.h4.y2b15.ff1.fs2.fc2.sc0.ls0.ws0
   /// ">Reference</a>
-  #[strum(serialize = "negative_unate")]
+  #[token("negative_unate")]
   NegativeUnate,
   /// Combines local delays with the `worst-case` incoming delay value.
   /// The non-unate timing sense represents a function whose
@@ -127,7 +124,7 @@ pub enum TimingSenseType {
   /// &end
   /// =t.m0.x37.h4.y2b19.ff1.fs2.fc2.sc0.ls0.ws0
   /// ">Reference</a>
-  #[strum(serialize = "non_unate")]
+  #[token("non_unate")]
   #[default]
   NonUnate,
 }
@@ -146,7 +143,11 @@ impl TimingSenseType {
 impl SimpleAttri for TimingSenseType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 /// You define the mode attribute within a timing group.

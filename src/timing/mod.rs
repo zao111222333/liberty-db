@@ -1372,7 +1372,7 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub fall_delay_intercept: Option<(i64, NotNan<f64>)>,
+  pub fall_delay_intercept: Option<(usize, NotNan<f64>)>,
   #[size = 16]
   #[liberty(complex(type=Option))]
   pub propagating_ccb: Option<PropagatingCcb>,
@@ -1395,7 +1395,7 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub fall_pin_resistance: Option<(i64, NotNan<f64>)>,
+  pub fall_pin_resistance: Option<(usize, NotNan<f64>)>,
   /// You define the mode attribute within a timing group.
   /// A mode attribute pertains to an individual timing arc.
   /// The timing arc is active when mode is instantiated with a name and a value.
@@ -1441,7 +1441,7 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub rise_delay_intercept: Option<(i64, NotNan<f64>)>,
+  pub rise_delay_intercept: Option<(usize, NotNan<f64>)>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1461,7 +1461,7 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub rise_pin_resistance: Option<(i64, NotNan<f64>)>,
+  pub rise_pin_resistance: Option<(usize, NotNan<f64>)>,
   /// The `cell_degradation` group describes a cell performance degradation
   /// design rule for compiling a design. A cell degradation design rule
   /// specifies the maximum capacitive load a cell can drive without causing

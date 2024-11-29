@@ -1,7 +1,7 @@
 use crate::{
   ast::{
-    join_fmt, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    GroupSet, Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
+    self, join_fmt, parser::parse_arcstr, CodeFormatter, ComplexAttri, GroupComments,
+    GroupFn, GroupSet, Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
   },
   common::{items::WordSet, table::CompactCcsPower},
   expression::{logic, IdBooleanExpression},
@@ -37,7 +37,7 @@ pub struct LeakagePower {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[size = 8]
   #[liberty(simple(type = Option))]
@@ -65,7 +65,7 @@ mod test_sort {
 
   #[test]
   fn test_leakage_sort() {
-    let cell = crate::ast::test_parse::<crate::Cell>(
+    let cell = ast::test_parse::<crate::Cell>(
       r#"(CELL) {
       leakage_power () {
         related_pg_pin : VDD;
@@ -155,7 +155,7 @@ pub struct Statetable {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   #[size = 24]
   #[liberty(simple)]
   pub table: Table,
@@ -164,24 +164,22 @@ impl GroupFn for Statetable {}
 
 impl NamedGroup for Statetable {
   #[inline]
-  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), crate::ast::IdError> {
+  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), ast::IdError> {
     let l = v.len();
     if l == 2 {
       v.pop()
-        .map_or(Err(crate::ast::IdError::Other("Unkown pop error".into())), |var2| {
-          v.pop().map_or(
-            Err(crate::ast::IdError::Other("Unkown pop error".into())),
-            |var1| {
+        .map_or(Err(ast::IdError::Other("Unkown pop error".into())), |var2| {
+          v.pop()
+            .map_or(Err(ast::IdError::Other("Unkown pop error".into())), |var1| {
               self.input_nodes =
                 var1.split_ascii_whitespace().map(ArcStr::from).collect();
               self.internal_nodes =
                 var2.split_ascii_whitespace().map(ArcStr::from).collect();
               Ok(())
-            },
-          )
+            })
         })
     } else {
-      Err(crate::ast::IdError::length_dismatch(2, l, v))
+      Err(ast::IdError::length_dismatch(2, l, v))
     }
   }
   #[inline]
@@ -252,7 +250,7 @@ impl SimpleAttri for Table {
   }
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    let (input, simple_multi) = crate::ast::parser::simple_multi(i, &mut scope.line_num)?;
+    let (input, simple_multi) = ast::parser::simple_multi(i, &mut scope.line_num)?;
     simple_multi
       .parse()
       .map_or(Ok((input, Err(ArcStr::from(simple_multi)))), |s| Ok((input, Ok(s))))
@@ -287,7 +285,7 @@ mod test_statetable {
   use super::*;
   #[test]
   fn statetable_test() {
-    _ = crate::ast::test_parse_fmt::<Statetable>(
+    _ = ast::test_parse_fmt::<Statetable>(
       r#"(" CLK EN SE",ENL) {
         table : "	H   L  L : - : L ,\
         H   L  H : - : H ,\
@@ -337,7 +335,7 @@ pub struct PgPin {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -465,7 +463,7 @@ pub struct DynamicCurrent {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   #[id]
   #[size = 80]
   #[liberty(simple(type = Option))]
@@ -518,7 +516,7 @@ pub struct SwitchingGroup {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   /// The `input_switching_condition` attribute specifies the sense of the toggling input. If
   /// more than one `switching_group` group is specified within the `dynamic_current` group,
   /// you can place the attribute in any order.
@@ -697,7 +695,7 @@ pub struct PgCurrent {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   /// The `compact_ccs_power` group contains a detailed description for compact CCS
   /// power data. The `compact_ccs_power` group includes the following optional attributes:
   /// `base_curves_group`, `index_1`, `index_2`, `index_3` and `index_4`. The description for these
@@ -821,7 +819,7 @@ pub struct IntrinsicParasitic {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   #[id]
   #[liberty(simple(type = Option))]
   pub when: Option<IdBooleanExpression>,
@@ -1004,7 +1002,7 @@ pub struct IntrinsicCapacitance {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   /// The `value` attribute specifies the value of the intrinsic capacitance.
   /// By default, the intrinsic capacitance value is zero.
   /// <a name ="reference_link" href="
@@ -1111,7 +1109,7 @@ pub struct IntrinsicResistance {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   /// Specifies the value of the intrinsic resistance. If this attribute is not defined, the value of
   /// the intrinsic resistance defaults to +infinity.
   /// <a name ="reference_link" href="
@@ -1239,7 +1237,7 @@ pub struct PgPinWithValue {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   #[size = 8]
   #[liberty(simple)]
   pub value: NotNan<f64>,
@@ -1299,7 +1297,7 @@ pub struct GateLeakage {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   /// The `input_low_value` attribute specifies gate leakage current on an input or inout pin
   /// when the pin is in a low state condition.
   /// The following applies to the `input_low_value` attribute:
@@ -1377,7 +1375,7 @@ pub struct LeakageCurrent {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   #[id]
   #[size = 80]
   #[liberty(simple(type = Option))]
@@ -1525,7 +1523,7 @@ pub struct LutValues {
   comments: GroupComments,
   /// group undefined attributes
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   #[liberty(complex)]
   pub index_1: Vec<NotNan<f64>>,
   #[liberty(complex)]
@@ -1555,45 +1553,49 @@ impl GroupFn for LutValues {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd, Default)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PgType {
   /// `primary_power`
-  #[strum(serialize = "primary_power")]
+  #[token("primary_power")]
   PrimaryPower,
   /// `primary_ground`
-  #[strum(serialize = "primary_ground")]
+  #[token("primary_ground")]
   PrimaryGround,
   /// `backup_power`
-  #[strum(serialize = "backup_power")]
+  #[token("backup_power")]
   BackupPower,
   /// `backup_ground`
-  #[strum(serialize = "backup_ground")]
+  #[token("backup_ground")]
   #[default]
   BackupGround,
   /// `internal_power`
-  #[strum(serialize = "internal_power")]
+  #[token("internal_power")]
   InternalPower,
   /// `internal_ground`
-  #[strum(serialize = "internal_ground")]
+  #[token("internal_ground")]
   InternalGround,
   /// `pwell`
-  #[strum(serialize = "pwell")]
+  #[token("pwell")]
   Pwell,
   /// `nwell`
-  #[strum(serialize = "nwell")]
+  #[token("nwell")]
   Nwell,
   /// `deepnwell`
-  #[strum(serialize = "deepnwell")]
+  #[token("deepnwell")]
   DeepNwell,
   /// `deeppwell`
-  #[strum(serialize = "deeppwell")]
+  #[token("deeppwell")]
   DeepPwell,
 }
 impl SimpleAttri for PgType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -1610,20 +1612,24 @@ impl SimpleAttri for PgType {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SwitchCellType {
   /// `coarse_grain`
-  #[strum(serialize = "coarse_grain")]
+  #[token("coarse_grain")]
   CoarseGrain,
   /// `fine_grain`
-  #[strum(serialize = "fine_grain")]
+  #[token("fine_grain")]
   FineGrain,
 }
 impl SimpleAttri for SwitchCellType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -1636,20 +1642,24 @@ impl SimpleAttri for SwitchCellType {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum FpgaCellType {
   /// `rising_edge_clock_cell`
-  #[strum(serialize = "rising_edge_clock_cell")]
+  #[token("rising_edge_clock_cell")]
   RisingEdgeClockCell,
   /// `falling_edge_clock_cell`
-  #[strum(serialize = "falling_edge_clock_cell")]
+  #[token("falling_edge_clock_cell")]
   FallingEdgeClockCell,
 }
 impl SimpleAttri for FpgaCellType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 /// The `level_shifter_type`  attribute specifies the
@@ -1668,23 +1678,27 @@ impl SimpleAttri for FpgaCellType {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LevelShifterType {
   /// `LH`: Low to High
-  #[strum(serialize = "LH")]
+  #[token("LH")]
   LH,
   /// `HL`: High to Low
-  #[strum(serialize = "HL")]
+  #[token("HL")]
   HL,
   /// `HL_LH`: High to Low and Low to High
-  #[strum(serialize = "HL_LH")]
+  #[token("HL_LH")]
   HL_LH,
 }
 impl SimpleAttri for LevelShifterType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -1694,7 +1708,7 @@ impl SimpleAttri for LevelShifterType {
 /// Syntax:
 /// ```text
 /// clock_gating_integrated_cell:generic|value_id;
-/// ``` text
+/// ```
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=103.19&end=103.24
 /// ">Reference</a>
@@ -1710,17 +1724,39 @@ pub enum ClockGatingIntegratedCell {
   /// by accessing the state tables and state functions of the library cell pins
   Generic(ArcStr),
 }
-impl FromStr for ClockGatingIntegratedCell {
-  type Err = ();
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    match s {
-      "containlatch_negedge" => Ok(Self::ContainlatchNegedge),
-      "registerslatch_posedge_postcontrol" => Ok(Self::RegisterslatchPosedgePostcontrol),
-      "latchlatch_negedge_precontrol" => Ok(Self::LatchlatchNegedgePrecontrol),
-      "latchnone_posedge_control_obs" => Ok(Self::LatchnonePosedgeControlObs),
-      _ => Ok(Self::Generic(s.into())),
-    }
+
+impl ast::NomParseTerm for ClockGatingIntegratedCell {
+  fn nom_parse<'a>(
+    i: &'a str,
+  ) -> nom::IResult<&'a str, Self, nom::error::Error<&'a str>> {
+    use nom::{
+      branch::alt, bytes::complete::tag, character::complete::char, combinator::map,
+      sequence::delimited,
+    };
+    alt((
+      delimited(
+        char('"'),
+        alt((
+          map(tag("containlatch_negedge"), |_| Self::ContainlatchNegedge),
+          map(tag("registerslatch_posedge_postcontrol"), |_| {
+            Self::RegisterslatchPosedgePostcontrol
+          }),
+          map(tag("latchlatch_negedge_precontrol"), |_| {
+            Self::LatchlatchNegedgePrecontrol
+          }),
+          map(tag("latchnone_posedge_control_obs"), |_| Self::LatchnonePosedgeControlObs),
+          map(parse_arcstr, Self::Generic),
+        )),
+        char('"'),
+      ),
+      map(tag("containlatch_negedge"), |_| Self::ContainlatchNegedge),
+      map(tag("registerslatch_posedge_postcontrol"), |_| {
+        Self::RegisterslatchPosedgePostcontrol
+      }),
+      map(tag("latchlatch_negedge_precontrol"), |_| Self::LatchlatchNegedgePrecontrol),
+      map(tag("latchnone_posedge_control_obs"), |_| Self::LatchnonePosedgeControlObs),
+      map(parse_arcstr, Self::Generic),
+    ))(i)
   }
 }
 
@@ -1742,7 +1778,11 @@ impl fmt::Display for ClockGatingIntegratedCell {
 impl SimpleAttri for ClockGatingIntegratedCell {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -1783,35 +1823,20 @@ pub struct PinOpposite {
 
 impl ComplexAttri for PinOpposite {
   #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError> {
-    let name_list1: WordSet = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::Other),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    let name_list2: WordSet = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::Other),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      Err(ComplexParseError::LengthDismatch)
-    } else {
-      Ok(Self { name_list1, name_list2 })
-    }
-  }
-  #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     write!(f, "{}, {}", self.name_list1, self.name_list2)
+  }
+  #[inline]
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+    ast::parser::complex2(
+      i,
+      &mut scope.line_num,
+      nom::combinator::map_res(ast::parser::unquote, |s| s.parse()),
+      nom::combinator::map_res(ast::parser::unquote, |s| s.parse()),
+      |name_list1, name_list2| Self { name_list1, name_list2 },
+    )
   }
 }

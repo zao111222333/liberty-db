@@ -1,6 +1,7 @@
 use crate::{
   ast::{
-    join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
+    self, join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope,
+    SimpleAttri,
   },
   ArcStr, NotNan,
 };
@@ -12,7 +13,6 @@ use core::{
 };
 use itertools::Itertools;
 use std::collections::HashSet;
-use strum_macros::{Display, EnumString};
 
 /// The `sdf_edges` attribute defines the edge specification on both
 /// the start pin and the end pin. The default is noedge.
@@ -45,18 +45,18 @@ use strum_macros::{Display, EnumString};
 /// &end
 /// =203.47
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Default, EnumString, Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SdfEdgeType {
   #[default]
-  #[strum(serialize = "noedge")]
+  #[token("noedge")]
   Noedge,
-  #[strum(serialize = "start_edge")]
+  #[token("start_edge")]
   StartEdge,
-  #[strum(serialize = "end_edge")]
+  #[token("end_edge")]
   EndEdge,
-  #[strum(serialize = "both_edges")]
+  #[token("both_edges")]
   BothEdges,
 }
 
@@ -66,7 +66,11 @@ impl SimpleAttri for SdfEdgeType {
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 
@@ -80,26 +84,26 @@ pub struct IdVector {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Display, EnumString)]
+#[derive(liberty_macros::EnumToken)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VariableType {
-  #[strum(serialize = "input_net_transition")]
+  #[token("input_net_transition")]
   InputNetTransition,
-  #[strum(serialize = "normalized_voltage")]
+  #[token("normalized_voltage")]
   NormalizedVoltage,
-  #[strum(serialize = "total_output_net_capacitance")]
+  #[token("total_output_net_capacitance")]
   TotalOutputNetCapacitance,
-  #[strum(serialize = "related_out_total_output_net_capacitance")]
+  #[token("related_out_total_output_net_capacitance")]
   RelatedOutTotalOutputNetCapacitance,
-  #[strum(serialize = "constrained_pin_transition")]
+  #[token("constrained_pin_transition")]
   ConstrainedPinTransition,
-  #[strum(serialize = "fanout_number")]
+  #[token("fanout_number")]
   FanoutNumber,
-  #[strum(serialize = "fanout_pin_capacitance")]
+  #[token("fanout_pin_capacitance")]
   FanoutPinCapacitance,
-  #[strum(serialize = "driver_slew")]
+  #[token("driver_slew")]
   DriverSlew,
-  #[strum(serialize = "input_transition_time")]
+  #[token("input_transition_time")]
   InputTransitionTime,
 }
 
@@ -109,7 +113,11 @@ impl SimpleAttri for VariableType {
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
 }
 

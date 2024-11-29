@@ -16,6 +16,8 @@ use nom::{
   IResult,
 };
 
+use crate::ast;
+
 /// only not(variable) and variable
 #[inline]
 pub(super) fn as_sdf_str(expr: &Expr) -> String {
@@ -340,6 +342,19 @@ fn terminal(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
     _ => Err(BoolExprErr::NoIdea1),
   }
 }
+
+// impl ast::NomParseTerm for super::BooleanExpression {
+//   #[inline]
+//   fn nom_parse<'a>(i: &'a str) -> IResult<&'a str, Self, nom::error::Error<&'a str>> {
+//     nom::combinator::map_res(token_vec, |tokens| {
+//       if _s.is_empty() {
+//         Ok(Self { expr: *(parse_formula(&tokens)?) })
+//       } else {
+//         Err(BoolExprErr::Nom)
+//       }
+//     })(i)
+//   }
+// }
 
 impl core::str::FromStr for super::BooleanExpression {
   type Err = BoolExprErr;
