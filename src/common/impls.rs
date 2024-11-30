@@ -17,7 +17,7 @@ impl SimpleAttri for NotNan<f64> {
   #[inline]
   #[expect(clippy::undocumented_unsafe_blocks)]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::parser::simple_basic(i, &mut scope.line_num, ast::parser::parse_float)
+    ast::parser::simple_basic(i, &mut scope.line_num, ast::parser::unquote_float)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -31,13 +31,13 @@ impl SimpleAttri for NotNan<f64> {
 impl SimpleAttri for bool {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::parser::simple_basic(i, &mut scope.line_num, ast::parser::parse_bool)
+    ast::parser::simple_basic(i, &mut scope.line_num, ast::parser::unquote_bool)
   }
 }
 impl SimpleAttri for usize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::parser::simple_basic(i, &mut scope.line_num, ast::parser::parse_usize)
+    ast::parser::simple_basic(i, &mut scope.line_num, ast::parser::unquote_usize)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -51,7 +51,7 @@ impl SimpleAttri for usize {
 impl SimpleAttri for isize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(i, &mut scope.line_num, ast::parser::unquote_isize)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -201,7 +201,7 @@ impl<const N: usize> NameAttri for [ArcStr; N] {
 impl SimpleAttri for ArcStr {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(i, &mut scope.line_num, ast::parser::unquote_arcstr)
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -252,7 +252,7 @@ impl ComplexAttri for super::items::IdVector {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_usize,
+      ast::parser::unquote_usize,
       ast::parser::float_vec,
       |id, vec| Self { id, vec },
     )
@@ -294,7 +294,7 @@ impl ComplexAttri for Vec<NotNan<f64>> {
 impl ComplexAttri for ArcStr {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
-    ast::parser::complex1(i, &mut scope.line_num, ast::parser::parse_arcstr)
+    ast::parser::complex1(i, &mut scope.line_num, ast::parser::unquote_arcstr)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -311,7 +311,7 @@ impl ComplexAttri for ArcStr {
 impl ComplexAttri for NotNan<f64> {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
-    ast::parser::complex1(i, &mut scope.line_num, ast::parser::parse_float)
+    ast::parser::complex1(i, &mut scope.line_num, ast::parser::unquote_float)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -327,8 +327,8 @@ impl ComplexAttri for [NotNan<f64>; 2] {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_float,
-      ast::parser::parse_float,
+      ast::parser::unquote_float,
+      ast::parser::unquote_float,
       |v1, v2| [v1, v2],
     )
   }
@@ -348,8 +348,8 @@ impl ComplexAttri for [ArcStr; 2] {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_arcstr,
-      ast::parser::parse_arcstr,
+      ast::parser::unquote_arcstr,
+      ast::parser::unquote_arcstr,
       |v1, v2| [v1, v2],
     )
   }
@@ -406,9 +406,9 @@ impl ComplexAttri for (NotNan<f64>, NotNan<f64>, ArcStr) {
     ast::parser::complex3(
       i,
       &mut scope.line_num,
-      ast::parser::parse_float,
-      ast::parser::parse_float,
-      ast::parser::parse_arcstr,
+      ast::parser::unquote_float,
+      ast::parser::unquote_float,
+      ast::parser::unquote_arcstr,
       |v1, v2, v3| (v1, v2, v3),
     )
   }
@@ -430,8 +430,8 @@ impl ComplexAttri for (usize, NotNan<f64>) {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_usize,
-      ast::parser::parse_float,
+      ast::parser::unquote_usize,
+      ast::parser::unquote_float,
       |v1, v2| (v1, v2),
     )
   }
@@ -452,8 +452,8 @@ impl ComplexAttri for (NotNan<f64>, NotNan<f64>) {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_float,
-      ast::parser::parse_float,
+      ast::parser::unquote_float,
+      ast::parser::unquote_float,
       |v1, v2| (v1, v2),
     )
   }

@@ -4,6 +4,7 @@
   clippy::arithmetic_side_effects,
   clippy::wildcard_enum_match_arm
 )]
+use crate::ast;
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt;
 use nom::{
@@ -15,8 +16,6 @@ use nom::{
   sequence::{delimited, pair, tuple},
   IResult,
 };
-
-use crate::ast;
 
 /// only not(variable) and variable
 #[inline]
@@ -343,18 +342,19 @@ fn terminal(data: &[Token]) -> Result<Box<Expr>, BoolExprErr> {
   }
 }
 
-// impl ast::NomParseTerm for super::BooleanExpression {
-//   #[inline]
-//   fn nom_parse<'a>(i: &'a str) -> IResult<&'a str, Self, nom::error::Error<&'a str>> {
-//     nom::combinator::map_res(token_vec, |tokens| {
-//       if _s.is_empty() {
-//         Ok(Self { expr: *(parse_formula(&tokens)?) })
-//       } else {
-//         Err(BoolExprErr::Nom)
-//       }
-//     })(i)
-//   }
-// }
+impl ast::NomParseTerm for super::BooleanExpression {
+  #[inline]
+  fn nom_parse<'a>(i: &'a str) -> IResult<&'a str, Self, nom::error::Error<&'a str>> {
+    use nom::combinator::{map, map_res};
+    alt((
+      map(ast::parser::word, |s| Self { expr: Expr::Variable(s.to_string()) }),
+      map(
+        map_res(ast::parser::unquote_f(token_vec), |tokens| parse_formula(&tokens)),
+        |exp| Self { expr: *exp },
+      ),
+    ))(i)
+  }
+}
 
 impl core::str::FromStr for super::BooleanExpression {
   type Err = BoolExprErr;

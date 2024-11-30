@@ -1,7 +1,7 @@
 use crate::{
   ast::{
-    self, join_fmt, parser::parse_arcstr, CodeFormatter, ComplexAttri, GroupComments,
-    GroupFn, GroupSet, Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
+    self, join_fmt, CodeFormatter, ComplexAttri, GroupComments, GroupFn, GroupSet,
+    Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
   },
   common::{items::WordSet, table::CompactCcsPower},
   expression::{logic, IdBooleanExpression},
@@ -1745,7 +1745,7 @@ impl ast::NomParseTerm for ClockGatingIntegratedCell {
             Self::LatchlatchNegedgePrecontrol
           }),
           map(tag("latchnone_posedge_control_obs"), |_| Self::LatchnonePosedgeControlObs),
-          map(parse_arcstr, Self::Generic),
+          map(ast::parser::parse_arcstr, Self::Generic),
         )),
         char('"'),
       ),
@@ -1755,7 +1755,7 @@ impl ast::NomParseTerm for ClockGatingIntegratedCell {
       }),
       map(tag("latchlatch_negedge_precontrol"), |_| Self::LatchlatchNegedgePrecontrol),
       map(tag("latchnone_posedge_control_obs"), |_| Self::LatchnonePosedgeControlObs),
-      map(parse_arcstr, Self::Generic),
+      map(ast::parser::parse_arcstr, Self::Generic),
     ))(i)
   }
 }
@@ -1834,8 +1834,8 @@ impl ComplexAttri for PinOpposite {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      nom::combinator::map_res(ast::parser::unquote, |s| s.parse()),
-      nom::combinator::map_res(ast::parser::unquote, |s| s.parse()),
+      <WordSet as ast::NomParseTerm>::nom_parse,
+      <WordSet as ast::NomParseTerm>::nom_parse,
       |name_list1, name_list2| Self { name_list1, name_list2 },
     )
   }

@@ -4,8 +4,8 @@
 
 use crate::{
   ast::{
-    self, Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments,
-    GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
+    self, Attributes, CodeFormatter, ComplexAttri, GroupComments, GroupFn, GroupSet,
+    Indentation, ParseScope, SimpleAttri,
   },
   common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
@@ -365,8 +365,8 @@ impl ComplexAttri for PropagatingCcb {
     ast::parser::complex2_opt(
       i,
       &mut scope.line_num,
-      ast::parser::parse_arcstr,
-      ast::parser::parse_arcstr,
+      ast::parser::unquote_arcstr,
+      ast::parser::unquote_arcstr,
       |input_ccb_name, output_ccb_name| Self { input_ccb_name, output_ccb_name },
     )
   }

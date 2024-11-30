@@ -66,7 +66,7 @@ mod test_comment {
 }
 
 #[inline]
-fn space(i: &str) -> IResult<&str, (), Error<&str>> {
+pub(crate) fn space(i: &str) -> IResult<&str, (), Error<&str>> {
   map(take_while(move |c: char| matches!(c, '\t' | '\r' | ' ')), |_| ())(i)
 }
 #[inline]
@@ -277,14 +277,6 @@ where
 }
 
 #[inline]
-pub(crate) fn parse_arcstr<'a, E>(i: &'a str) -> IResult<&'a str, ArcStr, E>
-where
-  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
-{
-  map(word, ArcStr::from)(i)
-}
-
-#[inline]
 pub(super) fn char_in_formula(c: char) -> bool {
   c.is_ascii_alphanumeric() || " /_.+-*^:".contains(c)
 }
@@ -398,14 +390,6 @@ pub(crate) fn simple<'a>(
   )(i)
 }
 #[inline]
-pub(crate) fn parse_float(i: &str) -> IResult<&str, NotNan<f64>, Error<&str>> {
-  #[expect(clippy::string_slice, clippy::undocumented_unsafe_blocks)]
-  match fast_float2::parse_partial(i) {
-    Ok((f, pos)) => Ok((&i[pos..], unsafe { NotNan::new_unchecked(f) })),
-    Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Float))),
-  }
-}
-#[inline]
 pub(crate) fn float_vec(i: &str) -> IResult<&str, Vec<NotNan<f64>>, Error<&str>> {
   delimited(
     pair(char('"'), space),
@@ -417,15 +401,67 @@ pub(crate) fn float_vec(i: &str) -> IResult<&str, Vec<NotNan<f64>>, Error<&str>>
   )(i)
 }
 
+pub(crate) fn unquote_f<'a, T, F: nom::Parser<&'a str, T, Error<&'a str>>>(
+  f: F,
+) -> impl FnMut(&'a str) -> IResult<&'a str, T, Error<&'a str>> {
+  delimited(pair(char('"'), space), f, pair(space, char('"')))
+}
 #[inline]
-pub(crate) fn parse_usize(i: &str) -> IResult<&str, usize, Error<&str>> {
+pub(crate) fn parse_arcstr<'a, E>(i: &'a str) -> IResult<&'a str, ArcStr, E>
+where
+  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
+{
+  map(word, ArcStr::from)(i)
+}
+#[inline]
+fn parse_float(i: &str) -> IResult<&str, NotNan<f64>, Error<&str>> {
+  #[expect(clippy::string_slice, clippy::undocumented_unsafe_blocks)]
+  match fast_float2::parse_partial(i) {
+    Ok((f, pos)) => Ok((&i[pos..], unsafe { NotNan::new_unchecked(f) })),
+    Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Float))),
+  }
+}
+
+#[inline]
+pub(crate) fn unquote_float(i: &str) -> IResult<&str, NotNan<f64>, Error<&str>> {
+  alt((parse_float, unquote_f(parse_float)))(i)
+}
+#[inline]
+fn parse_usize(i: &str) -> IResult<&str, usize, Error<&str>> {
   #[expect(clippy::unwrap_used)]
   map(digit1, |s: &str| s.parse().unwrap())(i)
 }
 
 #[inline]
-pub(crate) fn parse_bool(i: &str) -> IResult<&str, bool, Error<&str>> {
-  alt((map(tag("true"), |_| true), map(tag("false"), |_| false)))(i)
+pub(crate) fn unquote_arcstr(i: &str) -> IResult<&str, ArcStr, Error<&str>> {
+  map(alt((unquote, word)), ArcStr::from)(i)
+}
+#[inline]
+pub(crate) fn unquote_usize(i: &str) -> IResult<&str, usize, Error<&str>> {
+  map(alt((digit1, unquote_f(digit1))), |s: &str| s.parse().unwrap())(i)
+}
+
+#[inline]
+pub(crate) fn unquote_isize(i: &str) -> IResult<&str, isize, Error<&str>> {
+  map(
+    alt((pair(opt(char('-')), digit1), unquote_f(pair(opt(char('-')), digit1)))),
+    |(sign, s)| {
+      let n: isize = s.parse().unwrap();
+      if sign.is_some() {
+        -n
+      } else {
+        n
+      }
+    },
+  )(i)
+}
+
+#[inline]
+pub(crate) fn unquote_bool(i: &str) -> IResult<&str, bool, Error<&str>> {
+  alt((
+    alt((map(tag("true"), |_| true), map(tag("false"), |_| false))),
+    unquote_f(alt((map(tag("true"), |_| true), map(tag("false"), |_| false)))),
+  ))(i)
 }
 
 #[inline]

@@ -1,8 +1,6 @@
-use crate::{
-  ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri},
-  ArcStr,
-};
-use core::fmt::{self, Write};
+use crate::ArcStr;
+// ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri},
+// use core::fmt::{self, Write};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
 ///
@@ -26,45 +24,46 @@ use core::fmt::{self, Write};
 /// &end
 /// =203.45
 /// ">Reference-Instance</a>
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[derive(Default)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct SdfExpression {
-  inner: ArcStr,
-}
-impl fmt::Display for SdfExpression {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    fmt::Display::fmt(&self.inner, f)
-  }
-}
-impl core::str::FromStr for SdfExpression {
-  type Err = core::convert::Infallible;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self { inner: ArcStr::from_str(s)? })
-  }
-}
-impl SimpleAttri for SdfExpression {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
-  }
-  #[inline]
-  fn fmt_self<T: Write, I: Indentation>(
-    &self,
-    f: &mut CodeFormatter<'_, T, I>,
-  ) -> fmt::Result {
-    f.write_fmt(format_args!("\"{self}\""))
-  }
-}
-impl SdfExpression {
-  #[must_use]
-  #[inline]
-  pub const fn new(s: ArcStr) -> Self {
-    Self { inner: s }
-  }
-}
+// #[derive(Debug, Clone, PartialEq, Eq)]
+// #[derive(Default)]
+// #[derive(serde::Serialize, serde::Deserialize)]
+pub type SdfExpression = ArcStr;
+// pub struct SdfExpression {
+//   inner: ArcStr,
+// }
+// impl fmt::Display for SdfExpression {
+//   #[inline]
+//   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//     fmt::Display::fmt(&self.inner, f)
+//   }
+// }
+// impl core::str::FromStr for SdfExpression {
+//   type Err = core::convert::Infallible;
+//   #[inline]
+//   fn from_str(s: &str) -> Result<Self, Self::Err> {
+//     Ok(Self { inner: ArcStr::from_str(s)? })
+//   }
+// }
+// impl SimpleAttri for SdfExpression {
+//   #[inline]
+//   fn nom_parse<'a>(
+//     i: &'a str,
+//     scope: &mut ParseScope,
+//   ) -> crate::ast::SimpleParseRes<'a, Self> {
+//     crate::ast::nom_parse_from_str(i, scope)
+//   }
+//   #[inline]
+//   fn fmt_self<T: Write, I: Indentation>(
+//     &self,
+//     f: &mut CodeFormatter<'_, T, I>,
+//   ) -> fmt::Result {
+//     f.write_fmt(format_args!("\"{self}\""))
+//   }
+// }
+// impl SdfExpression {
+//   #[must_use]
+//   #[inline]
+//   pub const fn new(s: ArcStr) -> Self {
+//     Self { inner: s }
+//   }
+// }

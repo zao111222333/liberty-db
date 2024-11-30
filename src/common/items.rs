@@ -9,7 +9,6 @@ use core::{
   cmp::Ordering,
   fmt::{self, Write},
   hash,
-  str::FromStr,
 };
 use itertools::Itertools;
 use std::collections::HashSet;
@@ -62,10 +61,7 @@ pub enum SdfEdgeType {
 
 impl SimpleAttri for SdfEdgeType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_basic(
       i,
       &mut scope.line_num,
@@ -109,10 +105,7 @@ pub enum VariableType {
 
 impl SimpleAttri for VariableType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_basic(
       i,
       &mut scope.line_num,
@@ -145,7 +138,7 @@ pub struct Domain {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
   #[size = 8]
   #[liberty(simple(type = Option))]
   pub calc_mode: Option<ArcStr>,
@@ -173,7 +166,7 @@ impl GroupFn for Domain {}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WordSet {
-  pub inner: HashSet<ArcStr, crate::ast::RandomState>,
+  pub inner: HashSet<ArcStr, ast::RandomState>,
 }
 impl fmt::Display for WordSet {
   #[expect(clippy::unwrap_in_result)]
@@ -217,13 +210,31 @@ impl PartialOrd for WordSet {
   }
 }
 
-impl SimpleAttri for WordSet {
+impl ast::NomParseTerm for WordSet {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  ) -> nom::IResult<&'a str, Self, nom::error::Error<&'a str>> {
+    use nom::{
+      branch::alt, character::complete::space1, combinator::map, multi::separated_list1,
+    };
+    alt((
+      map(ast::parser::word, |s| Self { inner: HashSet::from_iter([ArcStr::from(s)]) }),
+      map(ast::parser::unquote_f(separated_list1(space1, ast::parser::word)), |v| Self {
+        inner: v.into_iter().map(ArcStr::from).collect(),
+      }),
+    ))(i)
+  }
+}
+
+impl SimpleAttri for WordSet {
+  #[inline]
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -250,19 +261,19 @@ impl hash::Hash for WordSet {
   }
 }
 
-impl FromStr for WordSet {
-  type Err = fmt::Error;
+// impl FromStr for WordSet {
+//   type Err = fmt::Error;
 
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self {
-      inner: s
-        .split(' ')
-        .filter_map(|_s| if _s.is_empty() { None } else { Some(ArcStr::from(_s)) })
-        .collect(),
-    })
-  }
-}
+//   #[inline]
+//   fn from_str(s: &str) -> Result<Self, Self::Err> {
+//     Ok(Self {
+//       inner: s
+//         .split(' ')
+//         .filter_map(|_s| if _s.is_empty() { None } else { Some(ArcStr::from(_s)) })
+//         .collect(),
+//     })
+//   }
+// }
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -280,7 +291,7 @@ pub struct DummyGroup {
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
+  pub attributes: ast::Attributes,
 }
 impl GroupFn for DummyGroup {}
 

@@ -1006,6 +1006,33 @@ impl GroupFn for TableTemple {}
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[liberty_macros::macro_match(
+  "input_voltage" = Variable::Voltage(VoltageVariable::InputVoltage),
+  "input_transition_time" = Variable::Time(TimeVariable::InputTransitionTime),
+  "input_net_transition" = Variable::Time(TimeVariable::InputNetTransition),
+  "input_noise_height" = Variable::Voltage(VoltageVariable::InputNoiseHeight),
+  "input_noise_width" = Variable::Time(TimeVariable::InputNoiseWidth),
+  "driver_slew" = Variable::Time(TimeVariable::DriverSlew),
+  "connect_delay" = Variable::Time(TimeVariable::ConnectDelay),
+  "constrained_pin_transition" = Variable::Time(TimeVariable::ConstrainedPinTransition),
+  "time" = Variable::Time(TimeVariable::Time),
+  "total_output_net_capacitance" = Variable::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance),
+  "output_transition" = Variable::Time(TimeVariable::OutputTransition),
+  "output_pin_transition" = Variable::Time(TimeVariable::OutputPinTransition),
+  "output_voltage" = Variable::Voltage(VoltageVariable::OutputVoltage),
+  "output_net_wire_cap" = Variable::Capacitance(CapacitanceVariable::OutputNetWireCap),
+  "output_net_length" = Variable::Length(LengthVariable::OutputNetLength),
+  "output_net_pin_cap" = Variable::Capacitance(CapacitanceVariable::OutputNetPinCap),
+  "related_pin_transition" = Variable::Time(TimeVariable::RelatedPinTransition),
+  "related_out_total_output_net_capacitance" = Variable::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance),
+  "related_out_output_net_wire_cap" = Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap),
+  "related_out_output_net_length" = Variable::Length(LengthVariable::RelatedOutOutputNetLength),
+  "related_out_output_net_pin_cap" = Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap),
+  "fanout_pin_capacitance" = Variable::Capacitance(CapacitanceVariable::FanoutPinCapacitance),
+  "fanout_number" = Variable::Scalar(ScalarVariable::FanoutNumber),
+  "normalized_voltage" = Variable::Scalar(ScalarVariable::NormalizedVoltage),
+  "rc_product" = Variable::RcProduct,
+)]
 pub enum Variable {
   Time(TimeVariable),
   Voltage(VoltageVariable),
@@ -1022,119 +1049,6 @@ impl SimpleAttri for Variable {
       &mut scope.line_num,
       <Self as ast::NomParseTerm>::nom_parse,
     )
-  }
-}
-
-impl ast::NomParseTerm for Variable {
-  fn nom_parse<'a>(
-    i: &'a str,
-  ) -> nom::IResult<&'a str, Self, nom::error::Error<&'a str>> {
-    use nom::{
-      branch::alt,
-      bytes::complete::tag,
-      character::complete::char,
-      combinator::map,
-      sequence::{delimited, preceded},
-    };
-    #[rustfmt::skip]
-    fn _nom_parse<'a>(
-      i: &'a str,
-    ) -> nom::IResult<&'a str, Variable, nom::error::Error<&'a str>> {
-      //       "input_voltage" => Self::Voltage(VoltageVariable::InputVoltage),
-      //       "input_transition_time" => Self::Time(TimeVariable::InputTransitionTime),
-      //       "input_net_transition" => Self::Time(TimeVariable::InputNetTransition),
-      //       "input_noise_height" => Self::Voltage(VoltageVariable::InputNoiseHeight),
-      //       "input_noise_width" => Self::Time(TimeVariable::InputNoiseWidth),
-      //       "driver_slew" => Self::Time(TimeVariable::DriverSlew),
-      //       "connect_delay" => Self::Time(TimeVariable::ConnectDelay),
-      //       "constrained_pin_transition" => Self::Time(TimeVariable::ConstrainedPinTransition),
-      //       "time" => Self::Time(TimeVariable::Time),
-      //       "total_output_net_capacitance" => Self::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance),
-      //       "output_transition" => Self::Time(TimeVariable::OutputTransition),
-      //       "output_pin_transition" => Self::Time(TimeVariable::OutputPinTransition),
-      //       "output_voltage" => Self::Voltage(VoltageVariable::OutputVoltage),
-      //       "output_net_wire_cap" => Self::Capacitance(CapacitanceVariable::OutputNetWireCap),
-      //       "output_net_length" => Self::Length(LengthVariable::OutputNetLength),
-      //       "output_net_pin_cap" => Self::Capacitance(CapacitanceVariable::OutputNetPinCap),
-      //       "related_pin_transition" => Self::Time(TimeVariable::RelatedPinTransition),
-      //       "related_out_total_output_net_capacitance" => Self::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance),
-      //       "related_out_output_net_wire_cap" => Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap),
-      //       "related_out_output_net_length" => Self::Length(LengthVariable::RelatedOutOutputNetLength),
-      //       "related_out_output_net_pin_cap" => Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap),
-      //       "fanout_pin_capacitance" => Self::Capacitance(CapacitanceVariable::FanoutPinCapacitance),
-      //       "fanout_number" => Self::Scalar(ScalarVariable::FanoutNumber),
-      //       "normalized_voltage" => Self::Scalar(ScalarVariable::NormalizedVoltage),
-      //       "rc_product" => Self::RcProduct,
-      alt((
-        map(tag("driver_slew"),|_| Variable::Time(TimeVariable::DriverSlew)),
-        map(tag("connect_delay"),|_| Variable::Time(TimeVariable::ConnectDelay)),
-        map(tag("constrained_pin_transition"),|_| Variable::Time(TimeVariable::ConstrainedPinTransition)),
-        map(tag("time"),|_| Variable::Time(TimeVariable::Time)),
-        map(tag("fanout_pin_capacitance"),|_| Variable::Capacitance(CapacitanceVariable::FanoutPinCapacitance)),
-        map(tag("fanout_number"),|_| Variable::Scalar(ScalarVariable::FanoutNumber)),
-        map(tag("normalized_voltage"),|_| Variable::Scalar(ScalarVariable::NormalizedVoltage)),
-        map(tag("rc_product"),|_| Variable::RcProduct),
-        map(tag("total_output_net_capacitance"),|_| Variable::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance)),
-        preceded(tag("input_"),
-          alt((
-            map(tag("voltage"),|_| Variable::Voltage(VoltageVariable::InputVoltage)),
-            map(tag("transition_time"),|_| Variable::Time(TimeVariable::InputTransitionTime)),
-            map(tag("net_transition"),|_| Variable::Time(TimeVariable::InputNetTransition)),
-            preceded(tag("noise_"),
-              alt((
-                map(tag("height"),|_| Variable::Voltage(VoltageVariable::InputNoiseHeight)),
-                map(tag("width"),|_| Variable::Time(TimeVariable::InputNoiseWidth)),
-              ))
-            )
-          ))
-        ),
-        preceded(tag("output_"),
-          alt((
-            map(tag("transition"),|_| Variable::Time(TimeVariable::OutputTransition)),
-            map(tag("pin_transition"),|_| Variable::Time(TimeVariable::OutputPinTransition)),
-            map(tag("voltage"),|_| Variable::Voltage(VoltageVariable::OutputVoltage)),
-            preceded(tag("net_"),
-              alt((
-                map(tag("wire_cap"),|_| Variable::Capacitance(CapacitanceVariable::OutputNetWireCap)),
-                map(tag("length"),|_| Variable::Length(LengthVariable::OutputNetLength)),
-                map(tag("pin_cap"),|_| Variable::Capacitance(CapacitanceVariable::OutputNetPinCap)),
-              ))
-            )
-          ))
-        ),
-        preceded(tag("related_"),
-          alt((
-            map(tag("pin_transition"),|_| Variable::Time(TimeVariable::RelatedPinTransition)),
-            preceded(tag("out_"),
-              alt((
-                map(tag("total_output_net_capacitance"),|_| Variable::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance)),
-                preceded(tag("output_net_"),
-                  alt((
-                    map(tag("wire_cap"),|_| Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap)),
-                    map(tag("length"),|_| Variable::Length(LengthVariable::RelatedOutOutputNetLength)),
-                    map(tag("pin_cap"),|_| Variable::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap)),
-                  ))
-                )
-              ))
-            )
-          ))
-        ),
-      ))(i)
-    }
-    alt((delimited(char('"'), _nom_parse, char('"')), _nom_parse))(i)
-  }
-}
-impl fmt::Display for Variable {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::Time(v) => v.fmt(f),
-      Self::Voltage(v) => v.fmt(f),
-      Self::Capacitance(v) => v.fmt(f),
-      Self::Length(v) => v.fmt(f),
-      Self::Scalar(v) => v.fmt(f),
-      Self::RcProduct => write!(f, "rc_product"),
-    }
   }
 }
 

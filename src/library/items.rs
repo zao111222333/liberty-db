@@ -5,8 +5,8 @@
 
 use crate::{
   ast::{
-    self, Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
-    GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
+    self, Attributes, CodeFormatter, ComplexAttri, DefinedType, GroupComments, GroupFn,
+    GroupSet, Indentation, ParseScope, SimpleAttri,
   },
   common::items::{Formula, IdVector},
   expression::logic,
@@ -160,40 +160,26 @@ pub struct SensitizationVector {
 impl ComplexAttri for SensitizationVector {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
-    #[inline]
-    fn term<'a>(
-      i: &'a str,
-    ) -> nom::IResult<&'a str, &'a str, nom::error::Error<&'a str>> {
-      #[inline]
-      fn char_in_word(c: char) -> bool {
-        " 10XZ".contains(c)
-      }
-      use nom::InputTakeAtPosition;
-      i.split_at_position1(|item| !char_in_word(item), nom::error::ErrorKind::Alpha)
-    }
+    use nom::{
+      branch::alt,
+      character::complete::{char, space1},
+      combinator::map,
+      multi::separated_list1,
+    };
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_usize,
-      ast::parser::unquote,
-      |id, state_str| Self {
-        id,
-        states: match state_str
-          .split_ascii_whitespace()
-          .filter(|t| !t.is_empty())
-          .map(|t| match t {
-            "1" => Ok(logic::Static::H),
-            "0" => Ok(logic::Static::L),
-            "X" => Ok(logic::Static::X),
-            "Z" => Ok(logic::Static::Z),
-            _ => Err(ComplexParseError::UnsupportedWord),
-          })
-          .collect::<Result<Vec<logic::Static>, _>>()
-        {
-          Ok(states) => states,
-          Err(_) => unreachable!(),
-        },
-      },
+      ast::parser::unquote_usize,
+      ast::parser::unquote_f(separated_list1(
+        space1,
+        alt((
+          map(char('0'), |_| logic::Static::L),
+          map(char('1'), |_| logic::Static::H),
+          map(char('X'), |_| logic::Static::X),
+          map(char('Z'), |_| logic::Static::Z),
+        )),
+      )),
+      |id, states| Self { id, states },
     )
   }
   #[inline]
@@ -310,8 +296,8 @@ impl ComplexAttri for VoltageMap {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_arcstr,
-      ast::parser::parse_float,
+      ast::parser::unquote_arcstr,
+      ast::parser::unquote_float,
       |name, voltage| Self { name, voltage },
     )
   }
@@ -737,8 +723,8 @@ impl ComplexAttri for Define {
     ast::parser::complex3(
       i,
       &mut scope.line_num,
-      ast::parser::parse_arcstr,
-      ast::parser::parse_arcstr,
+      ast::parser::unquote_arcstr,
+      ast::parser::unquote_arcstr,
       <AttributeType as ast::NomParseTerm>::nom_parse,
       |attribute_name, group_name, attribute_type| {
         let define_id = ast::define_id(&scope.hasher, &group_name, &attribute_name);
@@ -789,8 +775,8 @@ impl ComplexAttri for DefineGroup {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_arcstr,
-      ast::parser::parse_arcstr,
+      ast::parser::unquote_arcstr,
+      ast::parser::unquote_arcstr,
       |group, parent_name| {
         let define_id = ast::define_id(&scope.hasher, &parent_name, &group);
         _ = scope.define_map.insert(define_id, DefinedType::Group);
@@ -872,17 +858,11 @@ pub enum ResourceType {
 impl ComplexAttri for DefineCellArea {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
-    use nom::{branch::alt, bytes::complete::tag, combinator::map};
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_arcstr,
-      alt((
-        map(tag("pad_slots"), |_| ResourceType::PadSlots),
-        map(tag("pad_input_driver_sites"), |_| ResourceType::PadInputDriverSites),
-        map(tag("pad_output_driver_sites"), |_| ResourceType::PadOutputDriverSites),
-        map(tag("pad_driver_sites"), |_| ResourceType::PadDriverSites),
-      )),
+      ast::parser::unquote_arcstr,
+      <ResourceType as ast::NomParseTerm>::nom_parse,
       |area_name, resource_type| Self { area_name, resource_type },
     )
   }
@@ -1034,11 +1014,11 @@ impl ComplexAttri for FanoutLength {
     ast::parser::complex5_opt(
       i,
       &mut scope.line_num,
-      ast::parser::parse_usize,
-      ast::parser::parse_float,
-      ast::parser::parse_float,
-      ast::parser::parse_float,
-      ast::parser::parse_usize,
+      ast::parser::unquote_usize,
+      ast::parser::unquote_float,
+      ast::parser::unquote_float,
+      ast::parser::unquote_float,
+      ast::parser::unquote_usize,
       |fanout, length, extra_info| Self {
         fanout,
         length,

@@ -6,7 +6,7 @@ mod fmt;
 pub mod parser;
 use crate::{library::AttributeType, ArcStr, NotNan};
 use core::hash::{BuildHasher, Hash, Hasher};
-use core::{fmt::Write, num::ParseIntError, str::FromStr};
+use core::{fmt::Write, num::ParseIntError};
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
 use itertools::Itertools;
 use nom::{error::Error, IResult};
@@ -427,15 +427,15 @@ pub(crate) type SimpleParseRes<'a, T> =
   IResult<&'a str, Result<T, ArcStr>, Error<&'a str>>;
 pub(crate) type ComplexParseRes<'a, T> =
   IResult<&'a str, Result<T, (ComplexParseError, ComplexWrapper)>, Error<&'a str>>;
-#[inline]
-pub(crate) fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
-  i: &'a str,
-  scope: &mut ParseScope,
-) -> SimpleParseRes<'a, T> {
-  let (input, s) = parser::simple(i, &mut scope.line_num)?;
-  s.parse()
-    .map_or(Ok((input, Err(ArcStr::from(s)))), |simple| Ok((input, Ok(simple))))
-}
+// #[inline]
+// pub(crate) fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
+//   i: &'a str,
+//   scope: &mut ParseScope,
+// ) -> SimpleParseRes<'a, T> {
+//   let (input, s) = parser::simple(i, &mut scope.line_num)?;
+//   s.parse()
+//     .map_or(Ok((input, Err(ArcStr::from(s)))), |simple| Ok((input, Ok(simple))))
+// }
 
 /// Simple Attribute in Liberty
 pub(crate) trait SimpleAttri: Sized + core::fmt::Display {
@@ -485,9 +485,6 @@ pub(crate) enum ComplexParseError {
   /// other error
   #[error("other")]
   Other,
-  /// unsurpport word
-  #[error("unsurpport word")]
-  UnsupportedWord,
 }
 
 #[inline]

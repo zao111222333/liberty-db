@@ -7,7 +7,7 @@ pub mod logic;
 mod logic_impl;
 mod parser;
 use crate::{
-  ast::{CodeFormatter, Indentation, ParseScope},
+  ast::{self, CodeFormatter, Indentation, ParseScope},
   ArcStr,
 };
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
@@ -33,8 +33,8 @@ static UNKNOWN: LazyLock<Box<Expr>> =
 
 pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
   #[inline]
-  fn get_nodes(&self) -> HashSet<ArcStr, crate::ast::RandomState> {
-    let mut node_set = HashSet::with_hasher(crate::ast::RandomState::new());
+  fn get_nodes(&self) -> HashSet<ArcStr, ast::RandomState> {
+    let mut node_set = HashSet::with_hasher(ast::RandomState::new());
     _get_nodes(self.borrow(), &mut node_set);
     node_set
   }
@@ -101,13 +101,18 @@ impl From<BooleanExpression> for Expr {
     val.expr
   }
 }
-impl crate::ast::SimpleAttri for BooleanExpression {
+impl ast::SimpleAttri for BooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  ) -> ast::SimpleParseRes<'a, Self> {
+    // ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -117,13 +122,18 @@ impl crate::ast::SimpleAttri for BooleanExpression {
     f.write_fmt(format_args!("\"{self}\""))
   }
 }
-impl crate::ast::SimpleAttri for IdBooleanExpression {
+impl ast::SimpleAttri for IdBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+  ) -> ast::SimpleParseRes<'a, Self> {
+    // ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_basic(
+      i,
+      &mut scope.line_num,
+      <Self as ast::NomParseTerm>::nom_parse,
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -216,7 +226,7 @@ impl IdBooleanExpression {
         as_sdf_str(&expr)
       })
       .join(") || ( ");
-    SdfExpression::new(format!("( {s} )").into())
+    SdfExpression::from(format!("( {s} )"))
   }
 }
 
@@ -264,6 +274,18 @@ impl From<BooleanExpression> for IdBooleanExpression {
   }
 }
 
+impl ast::NomParseTerm for IdBooleanExpression {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+  ) -> nom::IResult<&'a str, Self, nom::error::Error<&'a str>> {
+    use nom::combinator::map;
+    map(<BooleanExpression as ast::NomParseTerm>::nom_parse, |expr| {
+      expr.into()
+    })(i)
+  }
+}
+
 impl FromStr for IdBooleanExpression {
   type Err = BoolExprErr;
   #[inline]
@@ -288,7 +310,7 @@ impl fmt::Display for IdBooleanExpression {
 }
 
 #[inline]
-fn _get_nodes(expr: &Expr, node_set: &mut HashSet<ArcStr, crate::ast::RandomState>) {
+fn _get_nodes(expr: &Expr, node_set: &mut HashSet<ArcStr, ast::RandomState>) {
   match expr {
     Expr::Const(_) => (),
     Expr::Variable(node) => {
@@ -429,7 +451,7 @@ mod test {
   #[test]
   fn sdf() {
     assert_eq!(
-      SdfExpression::new("( A == 1'b0 && B == 1'b1 && C == 1'b1) || ( A == 1'b1 && B == 1'b0 && C == 1'b1) || ( A == 1'b1 && B == 1'b1 && C == 1'b1 )".into()), 
+      SdfExpression::from("( A == 1'b0 && B == 1'b1 && C == 1'b1) || ( A == 1'b1 && B == 1'b0 && C == 1'b1) || ( A == 1'b1 && B == 1'b1 && C == 1'b1 )"), 
       IdBooleanExpression::from_str("(A+B)*C").unwrap().sdf(),
     );
   }

@@ -1,4 +1,4 @@
-use crate::ast::{self, ComplexAttri, ParseScope, SimpleAttri};
+use crate::ast::{self, parser::unquote_f, ComplexAttri, ParseScope, SimpleAttri};
 use core::{cmp::Ordering, hash::Hash};
 
 /// Level
@@ -67,7 +67,11 @@ impl ComplexAttri for Edge {
     ast::parser::complex1(
       i,
       &mut scope.line_num,
-      alt((map(tag("rise"), |_| Self::R), map(tag("fall"), |_| Self::F))),
+      alt((
+        unquote_f(alt((map(tag("rise"), |_| Self::R), map(tag("fall"), |_| Self::F)))),
+        map(tag("rise"), |_| Self::R),
+        map(tag("fall"), |_| Self::F),
+      )),
     )
   }
   #[inline]

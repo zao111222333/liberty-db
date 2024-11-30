@@ -4,6 +4,8 @@ use syn::{parse_macro_input, DeriveInput};
 mod attribute;
 mod enum_token;
 mod group;
+mod macro_match;
+mod trie_tree;
 
 /// ```
 /// // UndefinedAttribute
@@ -53,5 +55,13 @@ pub fn macro_nothing(_: TokenStream) -> TokenStream {
 pub fn macro_enum(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let toks = enum_token::inner(&ast).unwrap_or_else(|err| err.to_compile_error());
+  toks.into()
+}
+
+#[proc_macro_attribute]
+pub fn macro_match(attr: TokenStream, item: TokenStream) -> TokenStream {
+  let args = parse_macro_input!(attr as macro_match::MacroArgs);
+  let input = parse_macro_input!(item as DeriveInput);
+  let toks = macro_match::inner(args, input).unwrap_or_else(|err| err.to_compile_error());
   toks.into()
 }

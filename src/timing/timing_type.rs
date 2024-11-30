@@ -705,8 +705,44 @@ impl fmt::Display for ArcNoChange {
 /// min_clock_tree_path |non_seq_setup_rising | non_seq_setup_falling | non_seq_hold_rising |
 /// non_seq_hold_falling | nochange_high_high | nochange_high_low | nochange_low_high | nochange_low_low ;`
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-// #[derive(liberty_macros::SingleSimple)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[liberty_macros::macro_match(
+  "combinational" = TimingType::Combinational(ArcCombinational::Combinational(None)),
+  "combinational_rise" = TimingType::Combinational(ArcCombinational::Combinational(Some(logic::Edge::R))),
+  "combinational_fall" = TimingType::Combinational(ArcCombinational::Combinational(Some(logic::Edge::F))),
+  "three_state_disable" = TimingType::Combinational(ArcCombinational::ThreeStateDisable(None)),
+  "three_state_disable_rise" = TimingType::Combinational(ArcCombinational::ThreeStateDisable(Some(logic::Edge::R))),
+  "three_state_disable_fall" = TimingType::Combinational(ArcCombinational::ThreeStateDisable(Some(logic::Edge::F))),
+  "three_state_enable" = TimingType::Combinational(ArcCombinational::ThreeStateEnable(None)),
+  "three_state_enable_rise" = TimingType::Combinational(ArcCombinational::ThreeStateEnable(Some(logic::Edge::R))),
+  "three_state_enable_fall" = TimingType::Combinational(ArcCombinational::ThreeStateEnable(Some(logic::Edge::F))),
+  "rising_edge" = TimingType::Sequential(ArcSequential::Edge(logic::Edge::R)),
+  "falling_edge" = TimingType::Sequential(ArcSequential::Edge(logic::Edge::F)),
+  "preset" = TimingType::Sequential(ArcSequential::Preset),
+  "clear" = TimingType::Sequential(ArcSequential::Clear),
+  "hold_rising" = TimingType::Sequential(ArcSequential::Hold(logic::Edge::R)),
+  "hold_falling" = TimingType::Sequential(ArcSequential::Hold(logic::Edge::F)),
+  "setup_rising" = TimingType::Sequential(ArcSequential::Setup(logic::Edge::R)),
+  "setup_falling" = TimingType::Sequential(ArcSequential::Setup(logic::Edge::F)),
+  "recovery_rising" = TimingType::Sequential(ArcSequential::Recovery(logic::Edge::R)),
+  "recovery_falling" = TimingType::Sequential(ArcSequential::Recovery(logic::Edge::F)),
+  "skew_rising" = TimingType::Sequential(ArcSequential::Skew(logic::Edge::R)),
+  "skew_falling" = TimingType::Sequential(ArcSequential::Skew(logic::Edge::F)),
+  "removal_rising" = TimingType::Sequential(ArcSequential::Removal(logic::Edge::R)),
+  "removal_falling" = TimingType::Sequential(ArcSequential::Removal(logic::Edge::F)),
+  "min_pulse_width" = TimingType::Sequential(ArcSequential::MinPulseWidth),
+  "minimum_period" = TimingType::Sequential(ArcSequential::MinimumPeriod),
+  "max_clock_tree_path" = TimingType::Sequential(ArcSequential::ClockTreePath(MaxMin::Max)),
+  "min_clock_tree_path" = TimingType::Sequential(ArcSequential::ClockTreePath(MaxMin::Min)),
+  "non_seq_setup_rising" = TimingType::NonSequential(ArcNonSequential::NonSeqSetup(logic::Edge::R)),
+  "non_seq_setup_falling" = TimingType::NonSequential(ArcNonSequential::NonSeqSetup(logic::Edge::F)),
+  "non_seq_hold_rising" = TimingType::NonSequential(ArcNonSequential::NonSeqHold(logic::Edge::R)),
+  "non_seq_hold_falling" = TimingType::NonSequential(ArcNonSequential::NonSeqHold(logic::Edge::F)),
+  "nochange_high_high" = TimingType::NoChange(ArcNoChange::NoChange(logic::Level::H, logic::Level::H)),
+  "nochange_high_low" = TimingType::NoChange(ArcNoChange::NoChange(logic::Level::H, logic::Level::L)),
+  "nochange_low_high" = TimingType::NoChange(ArcNoChange::NoChange(logic::Level::L, logic::Level::H)),
+  "nochange_low_low" = TimingType::NoChange(ArcNoChange::NoChange(logic::Level::L, logic::Level::L)),
+)]
 pub enum TimingType {
   /// [`Combinational`](crate::timing::ArcCombinational)
   Combinational(ArcCombinational),
@@ -726,174 +762,6 @@ impl SimpleAttri for TimingType {
       &mut scope.line_num,
       <Self as ast::NomParseTerm>::nom_parse,
     )
-  }
-}
-
-impl ast::NomParseTerm for TimingType {
-  fn nom_parse<'a>(
-    i: &'a str,
-  ) -> nom::IResult<&'a str, Self, nom::error::Error<&'a str>> {
-    use nom::{
-      branch::alt,
-      bytes::complete::tag,
-      character::complete::char,
-      combinator::map,
-      sequence::{delimited, preceded},
-    };
-    #[rustfmt::skip]
-    fn _nom_parse<'a>(
-      i: &'a str,
-    ) -> nom::IResult<&'a str, TimingType, nom::error::Error<&'a str>> {
-      // "combinational" TimingType::COMBINATIONAL,
-      // "combinational_rise" TimingType::COMBINATIONAL_RISE,
-      // "combinational_fall" TimingType::COMBINATIONAL_FALL,
-      // "three_state_disable" TimingType::THREE_STATE_DISABLE,
-      // "three_state_disable_rise" TimingType::THREE_STATE_DISABLE_RISE,
-      // "three_state_disable_fall" TimingType::THREE_STATE_DISABLE_FALL,
-      // "three_state_enable" TimingType::THREE_STATE_ENABLE,
-      // "three_state_enable_rise" TimingType::THREE_STATE_ENABLE_RISE,
-      // "three_state_enable_fall" TimingType::THREE_STATE_ENABLE_FALL,
-      // "rising_edge" TimingType::RISING_EDGE,
-      // "falling_edge" TimingType::FALLING_EDGE,
-      // "preset" TimingType::PRESET,
-      // "clear" TimingType::CLEAR,
-      // "hold_rising" TimingType::HOLD_RISING,
-      // "hold_falling" TimingType::HOLD_FALLING,
-      // "setup_rising" TimingType::SETUP_RISING,
-      // "setup_falling" TimingType::SETUP_FALLING,
-      // "recovery_rising" TimingType::RECOVERY_RISING,
-      // "recovery_falling" TimingType::RECOVERY_FALLING,
-      // "skew_rising" TimingType::SKEW_RISING,
-      // "skew_falling" TimingType::SKEW_FALLING,
-      // "removal_rising" TimingType::REMOVAL_RISING,
-      // "removal_falling" TimingType::REMOVAL_FALLING,
-      // "min_pulse_width" TimingType::MIN_PULSE_WIDTH,
-      // "minimum_period" TimingType::MINIMUM_PERIOD,
-      // "max_clock_tree_path" TimingType::MAX_CLOCK_TREE_PATH,
-      // "min_clock_tree_path" TimingType::MIN_CLOCK_TREE_PATH,
-      // "non_seq_setup_rising" TimingType::NON_SEQ_SETUP_RISING,
-      // "non_seq_setup_falling" TimingType::NON_SEQ_SETUP_FALLING,
-      // "non_seq_hold_rising" TimingType::NON_SEQ_HOLD_RISING,
-      // "non_seq_hold_falling" TimingType::NON_SEQ_HOLD_FALLING,
-      // "nochange_high_high" TimingType::NOCHANGE_HIGH_HIGH,
-      // "nochange_high_low" TimingType::NOCHANGE_HIGH_LOW,
-      // "nochange_low_high" TimingType::NOCHANGE_LOW_HIGH,
-      // "nochange_low_low" TimingType::NOCHANGE_LOW_LOW,
-      alt((
-        map(tag("clear"),|_| TimingType::CLEAR),
-        map(tag("preset"),|_| TimingType::PRESET),
-        map(tag("max_clock_tree_path"),|_| TimingType::MAX_CLOCK_TREE_PATH),
-        map(tag("min_clock_tree_path"),|_| TimingType::MIN_CLOCK_TREE_PATH),
-        map(tag("rising_edge"),|_| TimingType::RISING_EDGE),
-        map(tag("falling_edge"),|_| TimingType::FALLING_EDGE),
-        preceded(tag("combinationa"),
-          alt((
-            map(tag("l_rise"),|_| TimingType::COMBINATIONAL_RISE),
-            map(tag("l_fall"),|_| TimingType::COMBINATIONAL_FALL),
-            map(tag("l"),|_| TimingType::COMBINATIONAL),
-          ))
-        ),
-        preceded(tag("three_state_"),
-          alt((
-            preceded(tag("disabl"),
-              alt((
-                map(tag("e_rise"),|_| TimingType::THREE_STATE_DISABLE_RISE),
-                map(tag("e_fall"),|_| TimingType::THREE_STATE_DISABLE_FALL),
-                map(tag("e"),|_| TimingType::THREE_STATE_DISABLE),
-              ))
-            ),
-            preceded(tag("enabl"),
-              alt((
-                map(tag("e_rise"),|_| TimingType::THREE_STATE_ENABLE_RISE),
-                map(tag("e_fall"),|_| TimingType::THREE_STATE_ENABLE_FALL),
-                map(tag("e"),|_| TimingType::THREE_STATE_ENABLE),
-              ))
-            )
-          ))
-        ),
-        preceded(tag("hold_"),
-          alt((
-            map(tag("rising"),|_| TimingType::HOLD_RISING),
-            map(tag("falling"),|_| TimingType::HOLD_FALLING),
-          ))
-        ),
-        preceded(tag("setup_"),
-          alt((
-            map(tag("rising"),|_| TimingType::SETUP_RISING),
-            map(tag("falling"),|_| TimingType::SETUP_FALLING),
-          ))
-        ),
-        preceded(tag("recovery_"),
-          alt((
-            map(tag("rising"),|_| TimingType::RECOVERY_RISING),
-            map(tag("falling"),|_| TimingType::RECOVERY_FALLING),
-          ))
-        ),
-        preceded(tag("skew_"),
-          alt((
-            map(tag("rising"),|_| TimingType::SKEW_RISING),
-            map(tag("falling"),|_| TimingType::SKEW_FALLING),
-          ))
-        ),
-        preceded(tag("removal_"),
-          alt((
-            map(tag("rising"),|_| TimingType::REMOVAL_RISING),
-            map(tag("falling"),|_| TimingType::REMOVAL_FALLING),
-          ))
-        ),
-        preceded(tag("non_seq_"),
-          alt((
-            preceded(tag("setup_"),
-              alt((
-                map(tag("rising"),|_| TimingType::NON_SEQ_SETUP_RISING),
-                map(tag("falling"),|_| TimingType::NON_SEQ_SETUP_FALLING),
-              ))
-            ),
-            preceded(tag("hold_"),
-              alt((
-                map(tag("rising"),|_| TimingType::NON_SEQ_HOLD_RISING),
-                map(tag("falling"),|_| TimingType::NON_SEQ_HOLD_FALLING),
-              ))
-            ),
-          ))
-        ),
-        preceded(tag("min"),
-          alt((
-            map(tag("_pulse_width"),|_| TimingType::MIN_PULSE_WIDTH),
-            map(tag("imum_period"),|_| TimingType::MINIMUM_PERIOD),
-          ))
-        ),
-        preceded(tag("nochange_"),
-          alt((
-            preceded(tag("high_"),
-              alt((
-                map(tag("high"),|_| TimingType::NOCHANGE_HIGH_HIGH),
-                map(tag("low"),|_| TimingType::NOCHANGE_HIGH_LOW),
-              ))
-            ),
-            preceded(tag("low_"),
-              alt((
-                map(tag("high"),|_| TimingType::NOCHANGE_LOW_HIGH),
-                map(tag("low"),|_| TimingType::NOCHANGE_LOW_LOW),
-              ))
-            ),
-          ))
-        ),
-      ))(i)
-    }
-    alt((delimited(char('"'), _nom_parse, char('"')), _nom_parse))(i)
-  }
-}
-
-impl fmt::Display for TimingType {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::Combinational(t) => t.fmt(f),
-      Self::Sequential(t) => t.fmt(f),
-      Self::NonSequential(t) => t.fmt(f),
-      Self::NoChange(t) => t.fmt(f),
-    }
   }
 }
 
@@ -991,48 +859,6 @@ impl TimingType {
   /// `NOCHANGE_LOW_LOW`
   pub const NOCHANGE_LOW_LOW: Self =
     Self::NoChange(ArcNoChange::NoChange(logic::Level::L, logic::Level::L));
-  const LIST: [Self; 35] = [
-    Self::COMBINATIONAL,
-    Self::COMBINATIONAL_RISE,
-    Self::COMBINATIONAL_FALL,
-    Self::THREE_STATE_DISABLE,
-    Self::THREE_STATE_DISABLE_RISE,
-    Self::THREE_STATE_DISABLE_FALL,
-    Self::THREE_STATE_ENABLE,
-    Self::THREE_STATE_ENABLE_RISE,
-    Self::THREE_STATE_ENABLE_FALL,
-    Self::RISING_EDGE,
-    Self::FALLING_EDGE,
-    Self::PRESET,
-    Self::CLEAR,
-    Self::HOLD_RISING,
-    Self::HOLD_FALLING,
-    Self::SETUP_RISING,
-    Self::SETUP_FALLING,
-    Self::RECOVERY_RISING,
-    Self::RECOVERY_FALLING,
-    Self::SKEW_RISING,
-    Self::SKEW_FALLING,
-    Self::REMOVAL_RISING,
-    Self::REMOVAL_FALLING,
-    Self::MIN_PULSE_WIDTH,
-    Self::MINIMUM_PERIOD,
-    Self::MAX_CLOCK_TREE_PATH,
-    Self::MIN_CLOCK_TREE_PATH,
-    Self::NON_SEQ_SETUP_RISING,
-    Self::NON_SEQ_SETUP_FALLING,
-    Self::NON_SEQ_HOLD_RISING,
-    Self::NON_SEQ_HOLD_FALLING,
-    Self::NOCHANGE_HIGH_HIGH,
-    Self::NOCHANGE_HIGH_LOW,
-    Self::NOCHANGE_LOW_HIGH,
-    Self::NOCHANGE_LOW_LOW,
-  ];
-  /// `iter`
-  #[inline]
-  pub fn iter() -> impl Iterator<Item = Self> {
-    Self::LIST.iter().copied()
-  }
 }
 
 #[cfg(test)]

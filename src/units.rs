@@ -266,8 +266,15 @@ impl ComplexAttri for CapacitiveLoadUnit {
     ast::parser::complex2(
       i,
       &mut scope.line_num,
-      ast::parser::parse_float,
-      alt((map(tag("ff"), |_| true), map(tag("pf"), |_| false))),
+      ast::parser::unquote_float,
+      alt((
+        ast::parser::unquote_f(alt((
+          map(tag("ff"), |_| true),
+          map(tag("pf"), |_| false),
+        ))),
+        map(tag("ff"), |_| true),
+        map(tag("pf"), |_| false),
+      )),
       |val, ff_pf| Self { ff_pf, val },
     )
   }
