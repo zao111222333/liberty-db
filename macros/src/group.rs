@@ -1,5 +1,4 @@
 use crate::attribute::*;
-use core::hash::{BuildHasher, Hash, Hasher};
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn::{Data, DeriveInput, Fields};
