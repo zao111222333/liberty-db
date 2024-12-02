@@ -21,7 +21,7 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
 /// cargo test --no-default-features --test regression -- make_golden --exact --show-output
 #[cfg(all(
   not(feature = "fast_hash"),
-  not(feature = "hash_match"),
+  not(feature = "hashmatch"),
   not(feature = "vec2map")
 ))]
 #[allow(dead_code)]

@@ -17,7 +17,7 @@ proc-macro = true
 
 [features]
 default = []
-hash_match = []
+hashmatch = []
 vec2map = []
 
 [dependencies]

@@ -11,7 +11,7 @@ use core::fmt::Write;
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::Nothing)]
+// #[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing {
   /// group undefined attributes
   #[liberty(attributes)]

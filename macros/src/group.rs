@@ -4,19 +4,13 @@ use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn::{Data, DeriveInput, Fields};
 
-#[allow(clippy::manual_hash_one)]
-fn hash_one<T: Hash>(t: &T) -> u64 {
-  const HASHER: foldhash::fast::FixedState = foldhash::fast::FixedState::with_seed(41);
-  let mut hasher = HASHER.build_hasher();
-  t.hash(&mut hasher);
-  hasher.finish()
-}
 fn group_field_fn(
   field_name: &Ident,
   default: Option<&proc_macro2::TokenStream>,
   arrti_type: &AttriType,
   attributes_name: &Ident,
   comments_name: &Ident,
+  hashmatch: bool,
 ) -> syn::Result<(
   proc_macro2::TokenStream,
   proc_macro2::TokenStream,
@@ -25,7 +19,6 @@ fn group_field_fn(
   proc_macro2::TokenStream,
 )> {
   let s_field_name = field_name.to_string();
-  let field_hash = hash_one(&s_field_name);
   let comment_fn_name =
     Ident::new(&format!("comments_{s_field_name}"), Span::call_site());
   let comment_this_fn = Ident::new("comments_this", Span::call_site());
@@ -34,11 +27,11 @@ fn group_field_fn(
   let mut comment_fn = quote! {
     #[inline]
     pub fn #comment_fn_name(&self)-> Option<&String> {
-      self.#comments_name.0.get(&#field_hash)
+      self.#comments_name.0.get(&hashmatch::hash_arm!(#s_field_name))
     }
     #[inline]
     pub fn #comment_fn_entry<'a>(&'a mut self)-> std::collections::hash_map::Entry<'a, u64, String> {
-      self.#comments_name.0.entry(#field_hash)
+      self.#comments_name.0.entry(hashmatch::hash_arm!(#s_field_name))
     }
   };
   let write_field: proc_macro2::TokenStream;
@@ -300,34 +293,25 @@ fn group_field_fn(
       };
     }
   }
-  cfg_if::cfg_if! {
-    if #[cfg(feature = "hash_match")] {
-      let s_field_hash = hash_one(&s_field_name);
-      Ok((
-        comment_fn,
-        write_field,
-        parser_init,
-        quote!(
-          #s_field_hash => {
-            #parser_arm
-          },
-        ),
-        parser_post,
-      ))
+  Ok((
+    comment_fn,
+    write_field,
+    parser_init,
+    if hashmatch {
+      quote!(
+        hashmatch::hash_arm!(#s_field_name) => {
+          #parser_arm
+        },
+      )
     } else {
-      Ok((
-        comment_fn,
-        write_field,
-        parser_init,
-        quote!(
-          #s_field_name => {
-            #parser_arm
-          },
-        ),
-        parser_post,
-      ))
-    }
-  }
+      quote!(
+        #s_field_name => {
+          #parser_arm
+        },
+      )
+    },
+    parser_post,
+  ))
 }
 
 pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -343,15 +327,15 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     let fields = &named.named;
     let (attri_type_map, default_map, name_vec, attributes_name, comments_name) =
       parse_fields_type(fields)?;
-    let this_hash = hash_one(&"this");
+    let this_str = "__this__";
     let mut comment_fns = quote! {
       #[inline]
       pub fn comments_this(&self)-> Option<&String> {
-        self.#comments_name.0.get(&#this_hash)
+        self.#comments_name.0.get(&hashmatch::hash_arm!(#this_str))
       }
       #[inline]
       pub fn comments_this_entry<'a>(&'a mut self)-> std::collections::hash_map::Entry<'a, u64, String> {
-        self.#comments_name.0.entry(#this_hash)
+        self.#comments_name.0.entry(hashmatch::hash_arm!(#this_str))
       }
     };
 
@@ -406,6 +390,17 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       (Some(_), None) => std::cmp::Ordering::Less,
       (Some(a), Some(b)) => a.cmp(b),
     });
+    let hashmatch = if field_name_arrti_type_old_pos.len() >= 40 {
+      cfg_if::cfg_if! {
+        if #[cfg(feature = "hashmatch")] {
+          true
+        }else{
+          false
+        }
+      }
+    } else {
+      false
+    };
     for (field_name, arrti_type, _) in field_name_arrti_type_old_pos {
       let (comment_fn, write_field, parser_init, parser_arm, parser_post) =
         group_field_fn(
@@ -414,6 +409,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           arrti_type,
           attributes_name,
           comments_name,
+          hashmatch,
         )?;
       comment_fns = quote! {
         #comment_fns
@@ -498,10 +494,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
       _ => quote!(),
     };
-    #[cfg(not(feature = "hash_match"))]
-    let key_id = quote!(key);
-    #[cfg(feature = "hash_match")]
-    let key_id = quote!(crate::ast::hash_one(key));
+    let key_id = if hashmatch { quote!(hashmatch::hash_str(key)) } else { quote!(key) };
 
     let impl_group = quote! {
       #[doc(hidden)]

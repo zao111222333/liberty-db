@@ -18,17 +18,6 @@ pub(crate) type RandomState = std::hash::RandomState;
 #[cfg(feature = "fast_hash")]
 pub(crate) type RandomState = ahash::RandomState;
 
-#[cfg(feature = "hash_match")]
-const HASHER: foldhash::fast::FixedState = foldhash::fast::FixedState::with_seed(41);
-#[inline]
-#[cfg(feature = "hash_match")]
-#[expect(clippy::manual_hash_one)]
-pub(crate) fn hash_one<T: Hash + ?Sized>(t: &T) -> u64 {
-  let mut hasher = HASHER.build_hasher();
-  t.hash(&mut hasher);
-  hasher.finish()
-}
-
 pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 
 /// Wrapper for simple attribute
