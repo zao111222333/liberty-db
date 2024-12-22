@@ -1,8 +1,4 @@
-use dev::{
-  gen_projs,
-  projs::{OpenTimerLibrary, Si2drLibertyLibrary},
-  run_bench,
-};
+use dev::{gen_projs, projs::OpenTimerLibrary, run_bench};
 use std::{
   fs::File,
   io::{BufWriter, Write},
@@ -22,7 +18,8 @@ fn main() {
   let regress_table = run_bench(
     gen_projs![
       (LibertyDbLatest, liberty_db_latest::Library),
-      (LibertyDb0p6p3, liberty_db_0p6p14::Library),
+      (LibertyDb0p7p, liberty_db_0p7p4::Library),
+      (LibertyDb0p6p, liberty_db_0p6p14::Library),
       // (LibertyDb0p6p2, liberty_db_0p6p2::Library),
       // (LibertyDb0p6p1, liberty_db_0p6p1::Library),
       // (LibertyDb0p6p0, liberty_db_0p6p0::Library),

@@ -912,12 +912,12 @@ impl ComplexAttri for Values {
 }
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
-pub(crate) struct DisplayValues<'a, V: Iterator<Item = &'a NotNan<f64>>> {
+pub(crate) struct DisplayValues<V: Iterator<Item = NotNan<f64>>> {
   pub(crate) size1: usize,
   pub(crate) inner: V,
 }
 
-impl<'a, V: Iterator<Item = &'a NotNan<f64>>> DisplayValues<'a, V> {
+impl<V: Iterator<Item = NotNan<f64>>> DisplayValues<V> {
   #[inline]
   fn fmt_self<T: Write, I: ast::Indentation>(
     self,
@@ -949,16 +949,16 @@ impl<'a, V: Iterator<Item = &'a NotNan<f64>>> DisplayValues<'a, V> {
 }
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
-pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = &'a NotNan<f64>>> {
+pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = NotNan<f64>>> {
   pub(crate) name: &'a Option<ArcStr>,
   pub(crate) index_1: &'a Vec<NotNan<f64>>,
   pub(crate) index_2: &'a Vec<NotNan<f64>>,
   pub(crate) index_3: &'a Vec<NotNan<f64>>,
   pub(crate) index_4: &'a Vec<NotNan<f64>>,
-  pub(crate) values: DisplayValues<'a, V>,
+  pub(crate) values: DisplayValues<V>,
 }
 
-impl<'a, V: Iterator<Item = &'a NotNan<f64>>> DisplayTableLookUp<'a, V> {
+impl<'a, V: Iterator<Item = NotNan<f64>>> DisplayTableLookUp<'a, V> {
   #[inline]
   pub(crate) fn fmt_self<T: Write, I: ast::Indentation>(
     self,

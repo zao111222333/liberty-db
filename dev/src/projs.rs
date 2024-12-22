@@ -62,6 +62,25 @@ impl ProjLibrary for liberty_db_latest::Library {
   }
 }
 
+impl ProjLibrary for liberty_db_0p7p4::Library {
+  const INFO: ProjInfo = ProjInfo {
+    name: "liberty-db",
+    url: "https://crates.io/crates/liberty-db/0.7.4",
+    lang: "rust",
+    version: "0.7.4",
+    typed_support: TypedSupport::AllTyped,
+    parsed_boolexpr: true,
+    other: "published at 2024-12-07",
+  };
+  fn parse(s: &str) -> Result<Self, ()> {
+    Self::parse_lib(s).map_err(|_| ())
+  }
+  fn write(&self) -> Result<(), ()> {
+    _ = black_box(self.to_string());
+    Ok(())
+  }
+}
+
 impl ProjLibrary for liberty_db_0p6p14::Library {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",

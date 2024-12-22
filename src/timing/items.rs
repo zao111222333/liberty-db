@@ -247,7 +247,8 @@ pub struct TimingTableLookUp {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Debug, Default, Clone, Copy)]
 pub struct LVFValue {
-  pub mean_shift: NotNan<f64>,
+  /// mean = nominal + mean_shift
+  pub mean: NotNan<f64>,
   pub std_dev: NotNan<f64>,
   pub skewness: NotNan<f64>,
 }
@@ -284,14 +285,14 @@ impl ParsingBuilder for Option<TimingTableLookUp> {
         {
           (
             izip!(
+              _value.values.inner.iter(),
               _mean_shift.values.inner,
               _std_dev.values.inner,
               _skewness.values.inner
             )
-            .map(|(mean_shift, std_dev, skewness)| LVFValue {
-              mean_shift,
-              std_dev,
-              skewness,
+            .map(|(value, mean_shift, std_dev, skewness)| {
+              let mean = value + mean_shift;
+              LVFValue { mean, std_dev, skewness }
             })
             .collect(),
             String::new(),
@@ -343,7 +344,10 @@ impl TimingTableLookUp {
       index_2: &self.index_2,
       index_3: &self.index_3,
       index_4: &self.index_4,
-      values: DisplayValues { size1: self.size1, inner: self.values.iter() },
+      values: DisplayValues {
+        size1: self.size1,
+        inner: self.values.iter().map(|f| *f),
+      },
     }
     .fmt_self("", key, f)?;
     if !self.lvf_values.is_empty() {
@@ -355,7 +359,8 @@ impl TimingTableLookUp {
         index_4: &self.index_4,
         values: DisplayValues {
           size1: self.size1,
-          inner: self.lvf_values.iter().map(|lvf| &lvf.mean_shift),
+          inner: izip!(self.values.iter(), self.lvf_values.iter())
+            .map(|(value, lvf)| lvf.mean - value),
         },
       }
       .fmt_self("ocv_mean_shift_", key, f)?;
@@ -367,7 +372,7 @@ impl TimingTableLookUp {
         index_4: &self.index_4,
         values: DisplayValues {
           size1: self.size1,
-          inner: self.lvf_values.iter().map(|lvf| &lvf.std_dev),
+          inner: self.lvf_values.iter().map(|lvf| lvf.std_dev),
         },
       }
       .fmt_self("ocv_std_dev_", key, f)?;
@@ -379,7 +384,7 @@ impl TimingTableLookUp {
         index_4: &self.index_4,
         values: DisplayValues {
           size1: self.size1,
-          inner: self.lvf_values.iter().map(|lvf| &lvf.skewness),
+          inner: self.lvf_values.iter().map(|lvf| lvf.skewness),
         },
       }
       .fmt_self("ocv_skewness_", key, f)?;
