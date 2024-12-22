@@ -17,6 +17,9 @@ pub struct InternalPower {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

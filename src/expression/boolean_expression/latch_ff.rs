@@ -55,6 +55,9 @@ pub struct FF {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -152,6 +155,9 @@ pub struct FFBank {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -244,6 +250,9 @@ pub struct Latch {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -340,6 +349,9 @@ pub struct LatchBank {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -395,7 +407,10 @@ pub struct LatchBank {
 )]
 impl NamedGroup for LatchFF_type {
   #[inline]
-  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), IdError> {
+  fn parse_set_name(
+    builder: &mut Self::Builder,
+    mut v: Vec<&str>,
+  ) -> Result<(), IdError> {
     let l = v.len();
     if l != 2 {
       return Err(IdError::length_dismatch(2, l, v));
@@ -404,8 +419,8 @@ impl NamedGroup for LatchFF_type {
       .map_or(Err(IdError::Other("Unkown pop error".into())), |variable2| {
         v.pop()
           .map_or(Err(IdError::Other("Unkown pop error".into())), |variable1| {
-            self.variable1 = variable1.into();
-            self.variable2 = variable2.into();
+            builder.variable1 = variable1.into();
+            builder.variable2 = variable2.into();
             Ok(())
           })
       })
@@ -426,7 +441,10 @@ impl NamedGroup for LatchFF_type {
 )]
 impl NamedGroup for LatchFFBank_type {
   #[inline]
-  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), IdError> {
+  fn parse_set_name(
+    builder: &mut Self::Builder,
+    mut v: Vec<&str>,
+  ) -> Result<(), IdError> {
     let l = v.len();
     if l != 3 {
       return Err(IdError::length_dismatch(3, l, v));
@@ -440,9 +458,9 @@ impl NamedGroup for LatchFFBank_type {
                 v.pop().map_or(
                   Err(IdError::Other("Unkown pop error".into())),
                   |variable1| {
-                    self.variable1 = variable1.into();
-                    self.variable2 = variable2.into();
-                    self.bits = bits;
+                    builder.variable1 = variable1.into();
+                    builder.variable2 = variable2.into();
+                    builder.bits = bits;
                     Ok(())
                   },
                 )
@@ -895,7 +913,7 @@ pub enum ClearPresetState {
   #[strum(serialize = "X")]
   X,
 }
-
+crate::impl_self_builder!(ClearPresetState);
 impl crate::ast::SimpleAttri for ClearPresetState {
   #[inline]
   fn nom_parse<'a>(

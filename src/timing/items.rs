@@ -143,6 +143,7 @@ impl TimingSenseType {
     }
   }
 }
+crate::impl_self_builder!(TimingSenseType);
 impl SimpleAttri for TimingSenseType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -200,6 +201,9 @@ pub struct CellDegradation {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

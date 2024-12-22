@@ -48,7 +48,7 @@ fn main() {
         );
         // Add `sdf_cond` from `when`
         if let Some(when) = &timing.when {
-          timing.sdf_cond = Some(when.sdf());
+          timing.sdf_cond = Some(when.sdf(&cell.extra_ctx.bdd_variables));
         }
         // remove LVF's LUT
         timing.ocv_mean_shift_cell_fall = None;

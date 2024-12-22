@@ -2,7 +2,7 @@ use core::fmt::Debug;
 use std::collections::HashMap;
 
 use proc_macro2::Ident;
-use syn::spanned::Spanned;
+use syn::{spanned::Spanned, Type};
 
 #[derive(Debug, Clone, Copy)]
 enum InternalType {
@@ -12,6 +12,8 @@ enum InternalType {
   AttributeList,
   /// `comment`
   Comment,
+  /// `extra_ctx`
+  ExtraCtx,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -70,10 +72,15 @@ pub(crate) fn parse_fields_type(
   &Ident,
   // comment name
   &Ident,
+  // extra_ctx name
+  &Ident,
+  // extra_ctx type
+  &Type,
 )> {
   let mut _name_vec = Vec::new();
   let mut _attributes_name = None;
   let mut _comments_name = None;
+  let mut _extra_ctx = None;
   let mut attri_type_map = HashMap::new();
   let mut default_map = HashMap::new();
   for field in fields {
@@ -116,6 +123,16 @@ pub(crate) fn parse_fields_type(
             _comments_name = Some(field_name);
           }
         }
+        FieldType::Internal(InternalType::ExtraCtx) => {
+          if let Some((name, _)) = &_extra_ctx {
+            return Err(syn::Error::new(
+              proc_macro2::Span::call_site(),
+              format!("duplicated extra_ctx {}.", name),
+            ));
+          } else {
+            _extra_ctx = Some((field_name, &field.ty));
+          }
+        }
         FieldType::Attri(attri_type) => {
           _ = attri_type_map.insert(field_name, (attri_type, pos));
         }
@@ -128,22 +145,32 @@ pub(crate) fn parse_fields_type(
     }
   }
 
-  match (_attributes_name, _comments_name) {
-    (None, None) => Err(syn::Error::new(
-      proc_macro2::Span::call_site(),
-      "Can not find attributes & comment".to_string(),
-    )),
-    (None, Some(_)) => Err(syn::Error::new(
+  match (_attributes_name, _comments_name, _extra_ctx) {
+    (None, _, _) => Err(syn::Error::new(
       proc_macro2::Span::call_site(),
       "Can not find attributes".to_string(),
     )),
-    (Some(_), None) => Err(syn::Error::new(
+    (_, None, _) => Err(syn::Error::new(
       proc_macro2::Span::call_site(),
       "Can not find comment".to_string(),
     )),
-    (Some(attributes_name), Some(comments_name)) => {
-      Ok((attri_type_map, default_map, _name_vec, attributes_name, comments_name))
-    }
+    (_, _, None) => Err(syn::Error::new(
+      proc_macro2::Span::call_site(),
+      "Can not find extra_ctx".to_string(),
+    )),
+    (
+      Some(attributes_name),
+      Some(comments_name),
+      Some((extra_ctx_name, extra_ctx_type)),
+    ) => Ok((
+      attri_type_map,
+      default_map,
+      _name_vec,
+      attributes_name,
+      comments_name,
+      extra_ctx_name,
+      extra_ctx_type,
+    )),
   }
 }
 
@@ -199,6 +226,9 @@ fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Field
                 return Ok(Some(FieldType::Internal(InternalType::AttributeList)))
               }
               "comments" => return Ok(Some(FieldType::Internal(InternalType::Comment))),
+              "extra_ctx" => {
+                return Ok(Some(FieldType::Internal(InternalType::ExtraCtx)))
+              }
               "simple" => {
                 let simple_type = parse_simple_type(tokens)?;
                 return Ok(Some(FieldType::Attri(AttriType::Simple(simple_type))));

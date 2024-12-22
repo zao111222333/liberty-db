@@ -45,6 +45,9 @@ pub struct Sensitization {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -159,7 +162,7 @@ pub struct SensitizationVector {
   id: usize,
   states: Vec<logic::Static>,
 }
-
+crate::impl_self_builder!(SensitizationVector);
 impl ComplexAttri for SensitizationVector {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -303,6 +306,7 @@ pub struct VoltageMap {
   /// voltage
   pub voltage: NotNan<f64>,
 }
+crate::impl_self_builder!(VoltageMap);
 impl ComplexAttri for VoltageMap {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -352,6 +356,9 @@ pub struct InputVoltage {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -407,6 +414,9 @@ pub struct OutputVoltage {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -462,6 +472,7 @@ pub enum DelayModel {
   #[strum(serialize = "table_lookup")]
   TableLookup,
 }
+crate::impl_self_builder!(DelayModel);
 impl SimpleAttri for DelayModel {
   #[inline]
   fn nom_parse<'a>(
@@ -493,6 +504,9 @@ pub struct OperatingConditions {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -579,6 +593,9 @@ pub struct FpgaIsd {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -625,6 +642,7 @@ pub enum FPGASlew {
   #[strum(serialize = "SLOW")]
   SLOW,
 }
+crate::impl_self_builder!(FPGASlew);
 impl SimpleAttri for FPGASlew {
   #[inline]
   fn nom_parse<'a>(
@@ -657,6 +675,7 @@ pub enum TreeType {
   #[strum(serialize = "worst_case_tree")]
   WorstCaseTree,
 }
+crate::impl_self_builder!(TreeType);
 impl SimpleAttri for TreeType {
   #[inline]
   fn nom_parse<'a>(
@@ -735,6 +754,7 @@ pub enum AttributeType {
   #[strum(serialize = "float")]
   Float,
 }
+crate::impl_self_builder!(Define);
 impl ComplexAttri for Define {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -799,6 +819,7 @@ pub struct DefineGroup {
   #[size = 8]
   pub parent_name: ArcStr,
 }
+crate::impl_self_builder!(DefineGroup);
 impl ComplexAttri for DefineGroup {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -891,6 +912,7 @@ pub enum ResourceType {
   #[strum(serialize = "pad_driver_sites")]
   PadDriverSites,
 }
+crate::impl_self_builder!(DefineCellArea);
 impl ComplexAttri for DefineCellArea {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -941,6 +963,9 @@ pub struct WireLoad {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1047,6 +1072,7 @@ pub struct FanoutLength {
   /// number_of_nets
   pub number_of_nets: Option<u32>,
 }
+crate::impl_self_builder!(FanoutLength);
 impl ComplexAttri for FanoutLength {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -1120,6 +1146,9 @@ pub struct WireLoadSection {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1166,7 +1195,7 @@ pub enum BaseCurveType {
   #[strum(serialize = "ccs_timing_half_curve")]
   CcsTimingHalfCurve,
 }
-
+crate::impl_self_builder!(BaseCurveType);
 impl SimpleAttri for BaseCurveType {
   #[inline]
   fn nom_parse<'a>(
@@ -1215,6 +1244,9 @@ pub struct BaseCurves {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

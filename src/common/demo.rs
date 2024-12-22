@@ -1,4 +1,4 @@
-#![allow(clippy::redundant_pub_crate, clippy::doc_markdown)]
+#![allow(clippy::redundant_pub_crate, clippy::doc_markdown, dead_code)]
 //! cargo expand common::demo
 //! cargo expand common::demo --no-default-features
 use crate::{
@@ -11,7 +11,7 @@ use core::fmt::Write;
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(liberty_macros::Group)]
-// #[derive(liberty_macros::Nothing)]
+#[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing {
   /// group undefined attributes
   #[liberty(attributes)]
@@ -19,6 +19,8 @@ pub(crate) struct Timing {
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   #[liberty(complex)]
   #[default = "vec![unsafe{ NotNan::new_unchecked(0.0) }]"]
   pub values: Vec<NotNan<f64>>,
@@ -42,6 +44,9 @@ pub(crate) struct Pin {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -69,6 +74,9 @@ pub(crate) struct FF {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -79,7 +87,10 @@ pub(crate) struct FF {
 impl GroupFn for FF {}
 impl NamedGroup for FF {
   #[inline]
-  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), crate::ast::IdError> {
+  fn parse_set_name(
+    builder: &mut Self::Builder,
+    mut v: Vec<&str>,
+  ) -> Result<(), crate::ast::IdError> {
     let l = v.len();
     if l != 2 {
       return Err(crate::ast::IdError::length_dismatch(2, l, v));
@@ -90,8 +101,8 @@ impl NamedGroup for FF {
         v.pop().map_or(
           Err(crate::ast::IdError::Other("Unkown pop error".into())),
           |variable1| {
-            self.variable1 = variable1.into();
-            self.variable2 = variable2.into();
+            builder.variable1 = variable1.into();
+            builder.variable2 = variable2.into();
             Ok(())
           },
         )
@@ -115,6 +126,8 @@ pub(crate) struct Cell {
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,

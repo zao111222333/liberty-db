@@ -33,6 +33,7 @@ pub enum AntennaDiodeType {
   #[strum(serialize = "power_and_ground")]
   PowerAndGround,
 }
+crate::impl_self_builder!(AntennaDiodeType);
 impl SimpleAttri for AntennaDiodeType {
   #[inline]
   fn nom_parse<'a>(
@@ -68,6 +69,9 @@ pub struct TLatch {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -103,6 +107,7 @@ pub enum Direction {
   #[strum(serialize = "internal")]
   Internal,
 }
+crate::impl_self_builder!(Direction);
 impl SimpleAttri for Direction {
   #[inline]
   fn nom_parse<'a>(
@@ -123,6 +128,7 @@ pub enum DontFault {
   #[strum(serialize = "sao1")]
   Sao1,
 }
+crate::impl_self_builder!(DontFault);
 impl SimpleAttri for DontFault {
   #[inline]
   fn nom_parse<'a>(
@@ -152,6 +158,7 @@ pub enum DriverType {
   #[strum(serialize = "resistive_1")]
   Resistive1,
 }
+crate::impl_self_builder!(DriverType);
 impl SimpleAttri for DriverType {
   #[inline]
   fn nom_parse<'a>(
@@ -177,6 +184,7 @@ pub enum NextstateType {
   #[strum(serialize = "scan_enable")]
   ScanEnable,
 }
+crate::impl_self_builder!(NextstateType);
 impl SimpleAttri for NextstateType {
   #[inline]
   fn nom_parse<'a>(
@@ -201,6 +209,7 @@ pub enum PinFuncType {
   #[strum(serialize = "active_falling")]
   ActiveFalling,
 }
+crate::impl_self_builder!(PinFuncType);
 impl SimpleAttri for PinFuncType {
   #[inline]
   fn nom_parse<'a>(
@@ -220,6 +229,7 @@ pub enum RestoreEdgeType {
   #[strum(serialize = "trailing")]
   Trailing,
 }
+crate::impl_self_builder!(RestoreEdgeType);
 impl SimpleAttri for RestoreEdgeType {
   #[inline]
   fn nom_parse<'a>(
@@ -254,6 +264,7 @@ pub enum SignalType {
   #[strum(serialize = "test_clock")]
   TestClock,
 }
+crate::impl_self_builder!(SignalType);
 impl SimpleAttri for SignalType {
   #[inline]
   fn nom_parse<'a>(
@@ -277,6 +288,7 @@ pub enum SlewControl {
   #[strum(serialize = "none")]
   None,
 }
+crate::impl_self_builder!(SlewControl);
 impl SimpleAttri for SlewControl {
   #[inline]
   fn nom_parse<'a>(
@@ -311,6 +323,7 @@ pub enum OneZero {
   #[strum(serialize = "0")]
   Zero,
 }
+crate::impl_self_builder!(OneZero);
 impl SimpleAttri for OneZero {
   #[inline]
   fn nom_parse<'a>(
@@ -345,6 +358,7 @@ enum OneValue {
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TwoValue(OneValue, OneValue);
+crate::impl_self_builder!(TwoValue);
 impl SimpleAttri for TwoValue {
   #[inline]
   fn nom_parse<'a>(
@@ -433,6 +447,7 @@ pub struct RetentionPin {
   /// `disable_value`
   pub disable_value: OneZero,
 }
+crate::impl_self_builder!(RetentionPin);
 impl ComplexAttri for RetentionPin {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(

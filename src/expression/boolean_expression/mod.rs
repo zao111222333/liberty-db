@@ -7,7 +7,7 @@ pub mod logic;
 mod logic_impl;
 mod parser;
 use crate::{
-  ast::{CodeFormatter, Indentation, ParseScope},
+  ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder},
   ArcStr,
 };
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
@@ -101,6 +101,8 @@ impl From<BooleanExpression> for Expr {
     val.expr
   }
 }
+
+crate::impl_self_builder!(BooleanExpression);
 impl crate::ast::SimpleAttri for BooleanExpression {
   #[inline]
   fn nom_parse<'a>(
@@ -122,7 +124,7 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
+  ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
     crate::ast::nom_parse_from_str(i, scope)
   }
   #[inline]
@@ -162,8 +164,12 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdBooleanExpression {
-  /// `sorted_nodes`
-  pub sorted_nodes: Vec<ArcStr>,
+  // share same BddVariableSet
+  // /// `sorted_nodes`
+  // pub sorted_nodes: Vec<ArcStr>,
+  // #[serde(serialize_with = "variables_serialize")]
+  // #[serde(deserialize_with = "variables_deserialize")]
+  // pub variables: Arc<BddVariableSet>,
   /// `BooleanExpression` itself
   pub expr: Expr,
   /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
@@ -191,7 +197,7 @@ impl From<Expr> for IdBooleanExpression {
 impl PartialEq for IdBooleanExpression {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
-    self.sorted_nodes == other.sorted_nodes && self.bdd == other.bdd
+    self.bdd == other.bdd
   }
 }
 
@@ -199,20 +205,12 @@ impl IdBooleanExpression {
   /// convert `BooleanExpression` to sdf
   #[must_use]
   #[inline]
-  pub fn sdf(&self) -> SdfExpression {
-    let variables = BddVariableSet::new(
-      self
-        .sorted_nodes
-        .iter()
-        .map(ArcStr::as_str)
-        .collect::<Vec<_>>()
-        .as_slice(),
-    );
+  pub fn sdf(&self, cell_variables: &BddVariableSet) -> SdfExpression {
     let s = self
       .bdd
       .sat_valuations()
       .map(|valuation| {
-        let expr = Bdd::from(valuation).to_boolean_expression(&variables);
+        let expr = Bdd::from(valuation).to_boolean_expression(&cell_variables);
         as_sdf_str(&expr)
       })
       .join(") || ( ");
@@ -225,10 +223,11 @@ impl Eq for IdBooleanExpression {}
 impl PartialOrd for IdBooleanExpression {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-    match self.sorted_nodes.partial_cmp(&other.sorted_nodes) {
-      Some(Ordering::Equal) | None => Some(Bdd::cmp_structural(&self.bdd, &other.bdd)),
-      ord => ord,
-    }
+    Some(Bdd::cmp_structural(&self.bdd, &other.bdd))
+    // match self.sorted_nodes.partial_cmp(&other.sorted_nodes) {
+    //   Some(Ordering::Equal) | None => Some(Bdd::cmp_structural(&self.bdd, &other.bdd)),
+    //   ord => ord,
+    // }
   }
 }
 impl Ord for IdBooleanExpression {
@@ -241,8 +240,16 @@ impl Ord for IdBooleanExpression {
 impl core::hash::Hash for IdBooleanExpression {
   #[inline]
   fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
-    self.sorted_nodes.hash(state);
     self.bdd.hash(state);
+  }
+}
+
+impl ParsingBuilder for IdBooleanExpression {
+  type Builder = BooleanExpression;
+  #[inline]
+  fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope) -> Self {
+    let bdd = scope.variables.eval_expression(&builder.expr);
+    Self { expr: builder.expr, bdd }
   }
 }
 
@@ -251,16 +258,12 @@ impl From<BooleanExpression> for IdBooleanExpression {
   fn from(value: BooleanExpression) -> Self {
     let mut builder = BddVariableSetBuilder::new();
     let node_set = value.get_nodes();
-    let sorted_nodes = node_set
-      .into_iter()
-      .sorted()
-      .inspect(|s| {
-        _ = builder.make_variable(s.as_str());
-      })
-      .collect();
+    node_set.into_iter().sorted().for_each(|s| {
+      _ = builder.make_variable(s.as_str());
+    });
     let variables = builder.build();
     let bdd = variables.eval_expression(&value.expr);
-    Self { sorted_nodes, expr: value.expr, bdd }
+    Self { expr: value.expr, bdd }
   }
 }
 
@@ -393,7 +396,8 @@ mod test {
       (true, "B*D+B*C+A*D+A*C", "(A+B)*(C+D)"),
       (false, "A+B^C", "A^B+C"),
       (true, "(A+B)+C", "A+(B+C)"),
-      (false, "A+B+C", "A+B+D"),
+      // skip this case, should guarantee same variables
+      // (false, "A+B+C", "A+B+D"),
       (true, "1A", "1"),
       (true, "1A+B", "1+B"),
     ] {
@@ -428,9 +432,12 @@ mod test {
   }
   #[test]
   fn sdf() {
+    let mut builder = BddVariableSetBuilder::new();
+    let [a, b, c, d] = builder.make(&["A", "B", "C", "D"]);
+    let variables = builder.build();
     assert_eq!(
       SdfExpression::new("( A == 1'b0 && B == 1'b1 && C == 1'b1) || ( A == 1'b1 && B == 1'b0 && C == 1'b1) || ( A == 1'b1 && B == 1'b1 && C == 1'b1 )".into()), 
-      IdBooleanExpression::from_str("(A+B)*C").unwrap().sdf(),
+      IdBooleanExpression::from_str("(A+B)*C").unwrap().sdf(&variables),
     );
   }
   #[test]
@@ -446,5 +453,17 @@ mod test {
       println!("{valuation}");
       assert!(x1.eval_in(&valuation));
     }
+  }
+  #[test]
+  fn lid_bdd2() {
+    let mut builder_1 = BddVariableSetBuilder::new();
+    let _ = builder_1.make(&["A", "B", "C", "D"]);
+    let variables = builder_1.build();
+    let x1 = variables.eval_expression_string("(A|B)&(C|D)");
+    let mut builder_2 = BddVariableSetBuilder::new();
+    _ = builder_2.make(&["A", "B", "C", "D", "E"]);
+    let variables = builder_2.build();
+    let x2 = variables.eval_expression_string("(A|B)&(C|D)");
+    assert_ne!(x1, x2);
   }
 }

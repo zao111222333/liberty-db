@@ -15,7 +15,7 @@ use super::{
   items::{Formula, NameList, WordSet},
   parse_f64,
 };
-
+crate::impl_self_builder!(NotNan<f64>);
 impl SimpleAttri for NotNan<f64> {
   #[inline]
   #[expect(clippy::undocumented_unsafe_blocks)]
@@ -36,13 +36,14 @@ impl SimpleAttri for NotNan<f64> {
     f.write_float(self.into_inner())
   }
 }
-
+crate::impl_self_builder!(bool);
 impl SimpleAttri for bool {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str(i, scope)
   }
 }
+crate::impl_self_builder!(usize);
 impl SimpleAttri for usize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -56,7 +57,7 @@ impl SimpleAttri for usize {
     f.write_int(*self)
   }
 }
-
+crate::impl_self_builder!(isize);
 impl SimpleAttri for isize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -206,7 +207,7 @@ impl<const N: usize> NameAttri for [ArcStr; N] {
     )
   }
 }
-
+crate::impl_self_builder!(ArcStr);
 impl SimpleAttri for ArcStr {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -228,7 +229,13 @@ impl SimpleAttri for ArcStr {
     }
   }
 }
-
+impl<const N: usize> ast::ParsingBuilder for [ArcStr; N] {
+  type Builder = Self;
+  #[inline]
+  fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope) -> Self {
+    builder
+  }
+}
 impl<const N: usize> ComplexAttri for [ArcStr; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -255,6 +262,13 @@ impl<const N: usize> ComplexAttri for [ArcStr; N] {
   }
 }
 
+impl<const N: usize> ast::ParsingBuilder for [NotNan<f64>; N] {
+  type Builder = Self;
+  #[inline]
+  fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope) -> Self {
+    builder
+  }
+}
 // FIXME
 impl<const N: usize> ComplexAttri for [NotNan<f64>; N] {
   #[inline]
@@ -281,23 +295,8 @@ impl<const N: usize> ComplexAttri for [NotNan<f64>; N] {
     ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")
   }
 }
-
+crate::impl_self_builder!(super::items::IdVector);
 impl ComplexAttri for super::items::IdVector {
-  // fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-  //   iter: I,
-  //   _scope: &mut ParseScope,
-  // ) -> Result<Self, ComplexParseError> {
-  //   let mut i = iter;
-  //   let id = if let Some(&id_str) = i.next() {
-  //     id_str.parse()?
-  //   } else {
-  //     return Err(ComplexParseError::LengthDismatch);
-  //   };
-  //   Ok(Self {
-  //     id,
-  //     vec: i.map(parse_f64).collect::<Result<Vec<_>, _>>()?,
-  //   })
-  // }
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
@@ -329,7 +328,7 @@ impl ComplexAttri for super::items::IdVector {
     )
   }
 }
-
+crate::impl_self_builder!(Vec<NotNan<f64>>);
 impl ComplexAttri for Vec<NotNan<f64>> {
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
@@ -358,7 +357,6 @@ impl ComplexAttri for Vec<NotNan<f64>> {
     ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")
   }
 }
-
 impl ComplexAttri for ArcStr {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -411,6 +409,7 @@ impl ComplexAttri for NotNan<f64> {
     f.write_float(self.into_inner())
   }
 }
+crate::impl_self_builder!(Vec<ArcStr>);
 impl ComplexAttri for Vec<ArcStr> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -436,6 +435,7 @@ impl ComplexAttri for Vec<ArcStr> {
     )
   }
 }
+crate::impl_self_builder!(Vec<usize>);
 impl ComplexAttri for Vec<usize> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -459,7 +459,7 @@ impl ComplexAttri for Vec<usize> {
     join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_int(*i), ", ")
   }
 }
-
+crate::impl_self_builder!((NotNan<f64>, NotNan<f64>, ArcStr));
 impl ComplexAttri for (NotNan<f64>, NotNan<f64>, ArcStr) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -496,6 +496,7 @@ impl ComplexAttri for (NotNan<f64>, NotNan<f64>, ArcStr) {
     f.write_str(&self.2)
   }
 }
+crate::impl_self_builder!((i64, NotNan<f64>));
 impl ComplexAttri for (i64, NotNan<f64>) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -526,7 +527,7 @@ impl ComplexAttri for (i64, NotNan<f64>) {
     f.write_float(self.1.into_inner())
   }
 }
-
+crate::impl_self_builder!((NotNan<f64>, NotNan<f64>));
 impl ComplexAttri for (NotNan<f64>, NotNan<f64>) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -564,6 +565,7 @@ impl fmt::Display for Formula {
     self.0.fmt(f)
   }
 }
+crate::impl_self_builder!(Formula);
 impl SimpleAttri for Formula {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {

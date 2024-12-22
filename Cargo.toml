@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.7.4"
+version = "0.8.0"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -36,12 +36,10 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html"]
 
 [features]
-default = ["fast_hash", "hashmatch", "vec2map"]
+default = ["fast_hash", "hashmatch"]
 fast_hash = ["dep:ahash"]
 # use str's hash to do match, rather than directly match str
 hashmatch = ["liberty-macros/hashmatch"]
-# better parse performance, but no error information when occuring duplicated id
-vec2map = ["liberty-macros/vec2map"]
 __test_runtime_assert = []
 
 [workspace.dependencies]

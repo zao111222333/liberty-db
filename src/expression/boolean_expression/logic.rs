@@ -30,7 +30,7 @@ pub enum Edge {
   #[strum(serialize = "rising")]
   R,
 }
-
+crate::impl_self_builder!(Edge);
 impl SimpleAttri for Edge {
   #[inline]
   fn nom_parse<'a>(
@@ -150,7 +150,7 @@ pub enum Normal {
   #[strum(serialize = "L")]
   L,
 }
-
+crate::impl_self_builder!(Normal);
 impl SimpleAttri for Normal {
   #[inline]
   fn nom_parse<'a>(

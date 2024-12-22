@@ -5,7 +5,10 @@
 mod items;
 mod test;
 use crate::{
-  ast::{Attributes, DefaultIndentation, GroupComments, GroupFn, GroupSet, ParseScope},
+  ast::{
+    Attributes, BuilderScope, DefaultIndentation, GroupComments, GroupFn, GroupSet,
+    ParseScope, ParsingBuilder,
+  },
   cell::Cell,
   common::table::{CompactLutTemplate, DriverWaveform, TableTemple},
   units, ArcStr, NotNan,
@@ -37,6 +40,9 @@ pub struct Library {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -728,7 +734,10 @@ impl Library {
       match <Self as GroupAttri>::nom_parse(input2, Self::KEY, &mut scope) {
         Err(e) => Err(ParserError::nom(scope.line_num, e)),
         Ok((_, Err(e))) => Err(ParserError::IdError(scope.line_num, e)),
-        Ok((_, Ok(l))) => Ok(l),
+        Ok((_, Ok(builder))) => {
+          let mut builder_scope = BuilderScope::default();
+          Ok(ParsingBuilder::build(builder, &mut builder_scope))
+        }
       }
     } else {
       Err(ParserError::Other(

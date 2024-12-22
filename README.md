@@ -3,7 +3,7 @@
 [![pipeline](https://github.com/zao111222333/liberty-db/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/zao111222333/liberty-db/actions/workflows/build.yml)
 [![pipeline](https://github.com/zao111222333/liberty-db/actions/workflows/bench_deploy.yml/badge.svg?branch=master)](https://github.com/zao111222333/liberty-db/actions/workflows/bench_deploy.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![liberty-db](https://shields.io/crates/v/liberty-db.svg?style=flat-square&label=liberty-db)](https://crates.io/crates/liberty-db)
+[![liberty-db](https://shields.io/crates/v/liberty-db.svg?style=flat-square&label=crates.io)](https://crates.io/crates/liberty-db)
 [![Docs](https://docs.rs/liberty-db/badge.svg)](https://docs.rs/liberty-db)
 [![Benchmark](https://img.shields.io/badge/Benchmark-8A2BE2)](https://zao111222333.github.io/liberty-db/bench)
 [![codecov](https://codecov.io/github/zao111222333/liberty-db/graph/badge.svg?token=AI2BVDIFOI)](https://codecov.io/github/zao111222333/liberty-db)
@@ -63,9 +63,9 @@ cargo bench --bench dev
 ## TODO
 
 + Reconstruction:
-  + parser to `GroupBuilder`, e.g., use `Vec` to store `GroupSet`, no comment attribute
+  + ~~parser to `GroupBuilder`, e.g., use `Vec` to store `GroupSet`, no comment attribute~~
   + build/link `GroupBuilder` to `Group`, providing parent's `scope`, e.g.
-    + all `Pin` name set to build BDD
+    + ~~all `Pin` name set to build BDD~~
     + supper group like `timing::TimingTableLookUp`
     + check all rules
 

@@ -4,16 +4,38 @@
 mod items;
 #[cfg(test)]
 mod test;
+use std::{fmt::Debug, mem};
+
 pub use items::*;
 
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
-  common::table::TableLookUp2D,
+  common::{items::NameList, table::TableLookUp2D},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
   ArcStr, NotNan,
 };
 
+#[derive(Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct CellExtraCtx {
+  pub bdd_variables: biodivine_lib_bdd::BddVariableSet,
+}
+impl Debug for CellExtraCtx {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.debug_struct("CellExtraCtx")
+      // .field("bdd_variables", &self.bdd_variables)
+      .finish()
+  }
+}
+impl Default for CellExtraCtx {
+  #[inline]
+  fn default() -> Self {
+    Self {
+      bdd_variables: biodivine_lib_bdd::BddVariableSetBuilder::new().build(),
+    }
+  }
+}
 /// cell
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
@@ -28,6 +50,9 @@ pub struct Cell {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 80]
+  #[liberty(extra_ctx)]
+  pub extra_ctx: CellExtraCtx,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -510,7 +535,52 @@ pub struct Cell {
   #[serde(deserialize_with = "GroupSet::<Bundle>::deserialize_with")]
   pub bundle: GroupSet<Bundle>,
 }
-impl GroupFn for Cell {}
+impl GroupFn for Cell {
+  #[inline]
+  fn before_build(builder: &mut Self::Builder, scope: &mut crate::ast::BuilderScope) {
+    // update variable
+    let mut variable_builder = biodivine_lib_bdd::BddVariableSetBuilder::new();
+    let mut vec: Vec<&str> = Vec::new();
+    for pin in &builder.pin {
+      match &pin.name {
+        NameList::Name(name) => _ = vec.push(&name),
+        NameList::List(word_set) => {
+          for name in &word_set.inner {
+            _ = vec.push(&name)
+          }
+        }
+      }
+    }
+    for pg_pin in &builder.pg_pin {
+      _ = vec.push(&pg_pin.name);
+    }
+    for ff in &builder.ff {
+      _ = vec.push(&ff.variable1);
+      _ = vec.push(&ff.variable2);
+    }
+    for latch in &builder.latch {
+      _ = vec.push(&latch.variable1);
+      _ = vec.push(&latch.variable2);
+    }
+    for ff in &builder.ff_bank {
+      _ = vec.push(&ff.variable1);
+      _ = vec.push(&ff.variable2);
+    }
+    for latch in &builder.latch_bank {
+      _ = vec.push(&latch.variable1);
+      _ = vec.push(&latch.variable2);
+    }
+    vec.sort();
+    _ = variable_builder.make_variables(&vec);
+    scope.variables = variable_builder.build();
+  }
+  fn after_build(&mut self, scope: &mut crate::ast::BuilderScope) {
+    self.extra_ctx.bdd_variables = mem::replace(
+      &mut scope.variables,
+      biodivine_lib_bdd::BddVariableSetBuilder::new().build(),
+    )
+  }
+}
 
 /// The `test_cell`  group is in a `cell` group or `model` group.
 ///
@@ -529,6 +599,9 @@ pub struct TestCell {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

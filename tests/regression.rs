@@ -19,11 +19,7 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
 
 /// when we need to re-golden
 /// cargo test --no-default-features --test regression -- make_golden --exact --show-output
-#[cfg(all(
-  not(feature = "fast_hash"),
-  not(feature = "hashmatch"),
-  not(feature = "vec2map")
-))]
+#[cfg(all(not(feature = "fast_hash"), not(feature = "hashmatch"),))]
 #[allow(dead_code)]
 #[test]
 fn make_golden() {

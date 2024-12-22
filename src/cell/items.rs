@@ -34,6 +34,9 @@ pub struct LeakagePower {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -67,6 +70,9 @@ mod test_sort {
   fn test_leakage_sort() {
     let cell = crate::ast::test_parse::<crate::Cell>(
       r#"(CELL) {
+      pin(A){}
+      pin(B){}
+      pin(Y){}
       leakage_power () {
         related_pg_pin : VDD;
         value : 1;
@@ -152,6 +158,9 @@ pub struct Statetable {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -164,7 +173,10 @@ impl GroupFn for Statetable {}
 
 impl NamedGroup for Statetable {
   #[inline]
-  fn parse_set_name(&mut self, mut v: Vec<&str>) -> Result<(), crate::ast::IdError> {
+  fn parse_set_name(
+    builder: &mut Self::Builder,
+    mut v: Vec<&str>,
+  ) -> Result<(), crate::ast::IdError> {
     let l = v.len();
     if l == 2 {
       v.pop()
@@ -172,9 +184,9 @@ impl NamedGroup for Statetable {
           v.pop().map_or(
             Err(crate::ast::IdError::Other("Unkown pop error".into())),
             |var1| {
-              self.input_nodes =
+              builder.input_nodes =
                 var1.split_ascii_whitespace().map(ArcStr::from).collect();
-              self.internal_nodes =
+              builder.internal_nodes =
                 var2.split_ascii_whitespace().map(ArcStr::from).collect();
               Ok(())
             },
@@ -244,7 +256,7 @@ impl FromStr for Table {
     })
   }
 }
-
+crate::impl_self_builder!(Table);
 impl SimpleAttri for Table {
   #[inline]
   fn is_set(&self) -> bool {
@@ -328,12 +340,15 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 pub struct PgPin {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
-  name: Option<ArcStr>,
+  #[id(borrow = "&str")]
+  name: ArcStr,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -462,6 +477,9 @@ pub struct DynamicCurrent {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -515,6 +533,9 @@ pub struct SwitchingGroup {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -694,6 +715,9 @@ pub struct PgCurrent {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -818,6 +842,9 @@ pub struct IntrinsicParasitic {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1001,6 +1028,9 @@ pub struct IntrinsicCapacitance {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1108,6 +1138,9 @@ pub struct IntrinsicResistance {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1236,6 +1269,9 @@ pub struct PgPinWithValue {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1296,6 +1332,9 @@ pub struct GateLeakage {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1374,6 +1413,9 @@ pub struct LeakageCurrent {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1523,6 +1565,8 @@ pub struct LutValues {
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
@@ -1590,6 +1634,7 @@ pub enum PgType {
   #[strum(serialize = "deeppwell")]
   DeepPwell,
 }
+crate::impl_self_builder!(PgType);
 impl SimpleAttri for PgType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1620,6 +1665,7 @@ pub enum SwitchCellType {
   #[strum(serialize = "fine_grain")]
   FineGrain,
 }
+crate::impl_self_builder!(SwitchCellType);
 impl SimpleAttri for SwitchCellType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1646,6 +1692,7 @@ pub enum FpgaCellType {
   #[strum(serialize = "falling_edge_clock_cell")]
   FallingEdgeClockCell,
 }
+crate::impl_self_builder!(FpgaCellType);
 impl SimpleAttri for FpgaCellType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1681,6 +1728,7 @@ pub enum LevelShifterType {
   #[strum(serialize = "HL_LH")]
   HL_LH,
 }
+crate::impl_self_builder!(LevelShifterType);
 impl SimpleAttri for LevelShifterType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1738,7 +1786,7 @@ impl fmt::Display for ClockGatingIntegratedCell {
     }
   }
 }
-
+crate::impl_self_builder!(ClockGatingIntegratedCell);
 impl SimpleAttri for ClockGatingIntegratedCell {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1780,7 +1828,7 @@ pub struct PinOpposite {
   pub name_list1: WordSet,
   pub name_list2: WordSet,
 }
-
+crate::impl_self_builder!(PinOpposite);
 impl ComplexAttri for PinOpposite {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(

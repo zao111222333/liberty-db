@@ -51,7 +51,7 @@ impl TimeUnit {
     }
   }
 }
-
+crate::impl_self_builder!(TimeUnit);
 impl SimpleAttri for TimeUnit {
   #[inline]
   fn nom_parse<'a>(
@@ -101,7 +101,7 @@ impl VoltageUnit {
     }
   }
 }
-
+crate::impl_self_builder!(VoltageUnit);
 impl SimpleAttri for VoltageUnit {
   #[inline]
   fn nom_parse<'a>(
@@ -163,7 +163,7 @@ impl CurrentUnit {
     }
   }
 }
-
+crate::impl_self_builder!(CurrentUnit);
 impl SimpleAttri for CurrentUnit {
   #[inline]
   fn nom_parse<'a>(
@@ -213,7 +213,7 @@ impl PullingResistanceUnit {
     }
   }
 }
-
+crate::impl_self_builder!(PullingResistanceUnit);
 impl SimpleAttri for PullingResistanceUnit {
   #[inline]
   fn nom_parse<'a>(
@@ -257,7 +257,7 @@ impl CapacitiveLoadUnit {
     }
   }
 }
-
+crate::impl_self_builder!(CapacitiveLoadUnit);
 impl ComplexAttri for CapacitiveLoadUnit {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -372,6 +372,7 @@ impl LeakagePowerUnit {
     }
   }
 }
+crate::impl_self_builder!(LeakagePowerUnit);
 impl SimpleAttri for LeakagePowerUnit {
   #[inline]
   fn nom_parse<'a>(

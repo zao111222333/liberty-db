@@ -4,8 +4,8 @@
 
 use crate::{
   ast::{
-    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    GroupSet, Indentation, ParseScope, SimpleAttri,
+    Attributes, BuilderScope, CodeFormatter, ComplexAttri, ComplexParseError,
+    GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
   },
   common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
@@ -56,6 +56,9 @@ pub struct CCSNStage {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -223,14 +226,14 @@ pub struct CCSNStage {
 
 impl GroupFn for CCSNStage {
   #[inline]
-  fn post_parse_process(&mut self, _scope: &mut ParseScope) {
-    if let Some(miller_cap_fall) = self.miller_cap_fall.as_mut() {
+  fn before_build(builder: &mut Self::Builder, _scope: &mut BuilderScope) {
+    if let Some(miller_cap_fall) = builder.miller_cap_fall.as_mut() {
       if miller_cap_fall.is_sign_negative() {
         miller_cap_fall.set_zero();
         log::warn!("miller_cap_fall is negative!");
       }
     }
-    if let Some(miller_cap_rise) = self.miller_cap_rise.as_mut() {
+    if let Some(miller_cap_rise) = builder.miller_cap_rise.as_mut() {
       if miller_cap_rise.is_sign_negative() {
         miller_cap_rise.set_zero();
         log::warn!("miller_cap_rise is negative!");
@@ -264,6 +267,7 @@ pub enum StageType {
   #[default]
   Both,
 }
+crate::impl_self_builder!(StageType);
 impl SimpleAttri for StageType {
   #[inline]
   fn nom_parse<'a>(
@@ -308,6 +312,9 @@ pub struct ReceiverCapacitance {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -357,7 +364,7 @@ pub struct PropagatingCcb {
   /// `output_ccb_name`
   pub output_ccb_name: Option<ArcStr>,
 }
-
+crate::impl_self_builder!(PropagatingCcb);
 impl ComplexAttri for PropagatingCcb {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(

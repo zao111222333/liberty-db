@@ -21,6 +21,9 @@ pub struct TableLookUpMultiSegment {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -76,6 +79,9 @@ pub struct DriverWaveform {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -111,6 +117,9 @@ pub struct TableLookUp2D {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -144,6 +153,9 @@ pub struct CompactLutTemplate {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -227,7 +239,7 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
   #[strum(serialize = "total_output_net_capacitance")]
   TotalOutputNetCapacitance,
 }
-
+crate::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
 impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -247,7 +259,7 @@ pub enum VariableTypeCompactLutTemplateIndex3 {
   #[strum(serialize = "curve_parameters")]
   CurveParameters,
 }
-
+crate::impl_self_builder!(VariableTypeCompactLutTemplateIndex3);
 impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -269,6 +281,9 @@ pub struct Vector3D {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -303,6 +318,9 @@ pub struct ReferenceTimeVector3D {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -341,6 +359,9 @@ pub struct Vector4D {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -423,6 +444,9 @@ pub struct CompactCcsPower {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -496,7 +520,7 @@ pub struct CcsPowerPoint {
   pub point_time: NotNan<f64>,
   pub point_current: NotNan<f64>,
 }
-
+crate::impl_self_builder!(Vec<CcsPowerValue>);
 impl ComplexAttri for Vec<CcsPowerValue> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -587,6 +611,9 @@ pub struct Vector3DGrpup {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -611,6 +638,9 @@ pub struct ReferenceTimeVector3DGrpup {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -635,6 +665,9 @@ pub struct Vector4DGrpup {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -665,6 +698,9 @@ pub struct TableLookUp3D {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -698,6 +734,9 @@ pub struct TableLookUp1D {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -731,6 +770,9 @@ pub struct CompactCcsTable {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -759,6 +801,9 @@ pub struct TableLookUp {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -795,7 +840,7 @@ pub struct Values {
   pub size2: usize,
   pub inner: Vec<NotNan<f64>>,
 }
-
+crate::impl_self_builder!(Values);
 impl ComplexAttri for Values {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -881,6 +926,9 @@ pub struct TableTemple {
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  extra_ctx: (),
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1013,6 +1061,7 @@ pub enum Variable {
   Length(LengthVariable),
   Scalar(ScalarVariable),
 }
+crate::impl_self_builder!(Variable);
 impl SimpleAttri for Variable {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {

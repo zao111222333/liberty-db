@@ -20,6 +20,37 @@ pub(crate) type RandomState = ahash::RandomState;
 
 pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 
+pub(crate) struct BuilderScope {
+  pub(crate) variables: biodivine_lib_bdd::BddVariableSet,
+}
+impl Default for BuilderScope {
+  #[inline]
+  fn default() -> Self {
+    Self {
+      variables: biodivine_lib_bdd::BddVariableSetBuilder::new().build(),
+    }
+  }
+}
+// type Scope;
+pub(crate) trait ParsingBuilder: Sized {
+  // type Scope;
+  type Builder;
+  fn build(builder: Self::Builder, scope: &mut BuilderScope) -> Self;
+}
+
+#[macro_export]
+macro_rules! impl_self_builder {
+  ($t:ty) => {
+    impl crate::ast::ParsingBuilder for $t {
+      type Builder = Self;
+      #[inline]
+      fn build(builder: Self::Builder, _scope: &mut crate::ast::BuilderScope) -> Self {
+        builder
+      }
+    }
+  };
+}
+
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;
 /// Wrapper for complex attribute
@@ -41,17 +72,6 @@ impl ComplexWrapper {
     )
   }
 }
-// impl ComplexWrapper {
-//   fn collect(mut vec: Vec<&str>) -> Self {
-//     if vec.len() <= 1 {
-//       vec.pop().map_or(Self::Single(Vec::new()), |first| {
-//         Self::Single(first.0.into_iter().map_into::<ArcStr>().collect())
-//       })
-//     } else {
-//       Self::Multi(vec.into_iter().map_into::<ArcStr>().collect().collect())
-//     }
-//   }
-// }
 /// Wrapper for group attribute
 ///
 /// ``` text
@@ -427,9 +447,12 @@ pub(crate) fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
 }
 
 /// Simple Attribute in Liberty
-pub(crate) trait SimpleAttri: Sized + core::fmt::Display {
+pub(crate) trait SimpleAttri: Sized + core::fmt::Display + ParsingBuilder {
   /// `nom_parse`, auto implement
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self>;
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope,
+  ) -> SimpleParseRes<'a, Self::Builder>;
   #[inline]
   fn is_set(&self) -> bool {
     true
@@ -521,16 +544,19 @@ pub(crate) fn join_fmt_no_quote<
 }
 
 /// Complex Attribute in Liberty
-pub(crate) trait ComplexAttri: Sized {
+pub(crate) trait ComplexAttri: Sized + ParsingBuilder {
   /// basic `parser`
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
     scope: &mut ParseScope,
-  ) -> Result<Self, ComplexParseError>;
+  ) -> Result<Self::Builder, ComplexParseError>;
   /// `nom_parse`, auto implement
   #[expect(clippy::arithmetic_side_effects)]
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope,
+  ) -> ComplexParseRes<'a, Self::Builder> {
     let (input, vec) = parser::complex(i, &mut scope.line_num)?;
     let mut line_num = 0;
     let res = Self::parse(
@@ -574,10 +600,15 @@ pub(crate) trait ComplexAttri: Sized {
   }
 }
 /// Group Functions
-pub(crate) trait GroupFn {
-  /// `post_parse_process` call back
+pub(crate) trait GroupFn: ParsingBuilder {
+  /// `before_build` call back
   #[inline]
-  fn post_parse_process(&mut self, _scope: &mut ParseScope) {}
+  #[expect(unused_variables)]
+  fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope) {}
+  /// `after_build` call back
+  #[inline]
+  #[expect(unused_variables)]
+  fn after_build(&mut self, scope: &mut BuilderScope) {}
 }
 /// Export Group APIs
 #[expect(private_bounds)]
@@ -589,13 +620,13 @@ pub trait Group: Sized + GroupAttri {
   }
 }
 /// `GroupAttri`, internal Group APIs
-pub(crate) trait GroupAttri: Sized {
+pub(crate) trait GroupAttri: Sized + ParsingBuilder {
   /// `nom_parse`, will be implemented by macros
   fn nom_parse<'a>(
     i: &'a str,
     group_name: &str,
     scope: &mut ParseScope,
-  ) -> IResult<&'a str, Result<Self, IdError>, Error<&'a str>>;
+  ) -> IResult<&'a str, Result<Self::Builder, IdError>, Error<&'a str>>;
   /// `fmt_liberty`
   fn fmt_liberty<T: Write, I: Indentation>(
     &self,
@@ -640,7 +671,7 @@ impl IdError {
 /// need to impl `NamedGroup` manually
 pub(crate) trait NamedGroup: GroupAttri {
   /// parse name from `v: &[&str]` and then set self
-  fn parse_set_name(&mut self, v: Vec<&str>) -> Result<(), IdError>;
+  fn parse_set_name(builder: &mut Self::Builder, v: Vec<&str>) -> Result<(), IdError>;
   /// `fmt_liberty`
   fn fmt_name<T: Write, I: Indentation>(
     &self,
@@ -708,11 +739,13 @@ impl<'a, G: GroupAttri> core::fmt::Display for GroupDisplay<'a, G> {
 #[inline]
 pub(crate) fn test_parse<G: GroupAttri + Group>(input: &str) -> G {
   let mut scope = ParseScope::default();
-  let g = match G::nom_parse(input, "", &mut scope) {
+  let builder = match G::nom_parse(input, "", &mut scope) {
     Ok((_, Ok(g))) => g,
     Ok((_, Err(e))) => panic!("{e:#?}"),
     Err(e) => panic!("{e:#?}"),
   };
+  let mut builder_scope = BuilderScope::default();
+  let g = <G as ParsingBuilder>::build(builder, &mut builder_scope);
   println!("{}", g.display());
   g
 }
@@ -721,11 +754,13 @@ pub(crate) fn test_parse<G: GroupAttri + Group>(input: &str) -> G {
 #[inline]
 pub(crate) fn test_parse_fmt<G: GroupAttri + Group>(input: &str, fmt_want: &str) -> G {
   let mut scope = ParseScope::default();
-  let g = match G::nom_parse(input, "", &mut scope) {
+  let builder = match G::nom_parse(input, "", &mut scope) {
     Ok((_, Ok(g))) => g,
     Ok((_, Err(e))) => panic!("{e:#?}"),
     Err(e) => panic!("{e:#?}"),
   };
+  let mut builder_scope = BuilderScope::default();
+  let g = <G as ParsingBuilder>::build(builder, &mut builder_scope);
   let fmt_str = g.display().to_string();
   println!("{fmt_str}");
   dev_utils::text_diff(fmt_want, fmt_str.as_str());
