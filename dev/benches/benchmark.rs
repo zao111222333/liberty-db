@@ -11,7 +11,7 @@ fn main() {
   let projs_table = run_bench(
     gen_projs![
       (LibertyDb, liberty_db_latest::Library),
-      (Si2drLiberty, Si2drLibertyLibrary),
+      // (Si2drLiberty, Si2drLibertyLibrary),
       (OPenTimer, OpenTimerLibrary),
       (LibertyIo, liberty_io::Group),
       (LibertyParse, libertyparse::Liberty),
