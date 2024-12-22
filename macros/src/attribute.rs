@@ -40,7 +40,7 @@ pub(crate) enum ComplexType {
   Set,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub(crate) enum AttriType {
   /// `simple`
   Simple(SimpleType),
@@ -48,9 +48,11 @@ pub(crate) enum AttriType {
   Complex(ComplexType),
   /// `group`
   Group(GroupType),
+  /// `supergroup`
+  SuperGroup(Vec<(Ident, Type)>),
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 enum FieldType {
   /// `Internal`
   Internal(InternalType),
@@ -241,6 +243,11 @@ fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Field
                 let group_type = parse_group_type(tokens)?;
                 return Ok(Some(FieldType::Attri(AttriType::Group(group_type))));
               }
+              "supergroup" => {
+                return Ok(Some(FieldType::Attri(AttriType::SuperGroup(
+                  parse_supergroup_type(tokens)?,
+                ))));
+              }
               _ => {
                 return Err(syn::Error::new(
                   proc_macro2::Span::call_site(),
@@ -417,6 +424,36 @@ fn parse_complex_type(
   Ok(complex_type)
 }
 
+fn parse_supergroup_type(
+  tokens: proc_macro2::token_stream::IntoIter,
+) -> syn::Result<Vec<(Ident, Type)>> {
+  struct KeyValue {
+    key: Ident,
+    value: Type,
+  }
+  impl syn::parse::Parse for KeyValue {
+    fn parse(input: syn::parse::ParseStream) -> syn::parse::Result<Self> {
+      let key = input.parse()?;
+      let _: syn::Token![:] = input.parse()?;
+      let value = input.parse()?;
+      Ok(KeyValue { key, value })
+    }
+  }
+  struct FieldsParser {
+    fields: syn::punctuated::Punctuated<KeyValue, syn::Token![,]>,
+  }
+  impl syn::parse::Parse for FieldsParser {
+    fn parse(input: syn::parse::ParseStream) -> syn::parse::Result<Self> {
+      let content;
+      syn::parenthesized!(content in input);
+      let fields = syn::punctuated::Punctuated::parse_terminated(&content)?;
+      Ok(FieldsParser { fields })
+    }
+  }
+  let token = tokens.collect();
+  let parser = syn::parse2::<FieldsParser>(token)?;
+  Ok(parser.fields.into_iter().map(|kv| (kv.key, kv.value)).collect())
+}
 fn parse_group_type(
   mut tokens: proc_macro2::token_stream::IntoIter,
 ) -> syn::Result<GroupType> {
@@ -509,6 +546,13 @@ pub struct Foo {
     group_option: i64,
     #[liberty(group(type=Vec))]
     group_vec: i64,
+    #[liberty(supergroup(
+      cell_fall: Option<TableLookUp>,
+      ocv_mean_shift_cell_fall: Option<TableLookUp>,
+      ocv_std_dev_cell_fall: Option<TableLookUp>,
+      ocv_skewness_cell_fall: Option<TableLookUp>,
+    ))]
+    pub cell_fall: Option<TimingTableLookUp>,
 }"#;
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();
   if let Data::Struct(st) = &ast.data {

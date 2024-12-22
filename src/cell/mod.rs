@@ -4,7 +4,7 @@
 mod items;
 #[cfg(test)]
 mod test;
-use std::{fmt::Debug, mem};
+use core::{fmt::Debug, mem};
 
 pub use items::*;
 
@@ -22,7 +22,8 @@ pub struct CellExtraCtx {
   pub bdd_variables: biodivine_lib_bdd::BddVariableSet,
 }
 impl Debug for CellExtraCtx {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  #[inline]
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     f.debug_struct("CellExtraCtx")
       // .field("bdd_variables", &self.bdd_variables)
       .finish()
@@ -543,34 +544,34 @@ impl GroupFn for Cell {
     let mut vec: Vec<&str> = Vec::new();
     for pin in &builder.pin {
       match &pin.name {
-        NameList::Name(name) => _ = vec.push(&name),
+        NameList::Name(name) => vec.push(name),
         NameList::List(word_set) => {
           for name in &word_set.inner {
-            _ = vec.push(&name)
+            vec.push(name);
           }
         }
       }
     }
     for pg_pin in &builder.pg_pin {
-      _ = vec.push(&pg_pin.name);
+      vec.push(&pg_pin.name);
     }
     for ff in &builder.ff {
-      _ = vec.push(&ff.variable1);
-      _ = vec.push(&ff.variable2);
+      vec.push(&ff.variable1);
+      vec.push(&ff.variable2);
     }
     for latch in &builder.latch {
-      _ = vec.push(&latch.variable1);
-      _ = vec.push(&latch.variable2);
+      vec.push(&latch.variable1);
+      vec.push(&latch.variable2);
     }
     for ff in &builder.ff_bank {
-      _ = vec.push(&ff.variable1);
-      _ = vec.push(&ff.variable2);
+      vec.push(&ff.variable1);
+      vec.push(&ff.variable2);
     }
     for latch in &builder.latch_bank {
-      _ = vec.push(&latch.variable1);
-      _ = vec.push(&latch.variable2);
+      vec.push(&latch.variable1);
+      vec.push(&latch.variable2);
     }
-    vec.sort();
+    vec.sort_unstable();
     _ = variable_builder.make_variables(&vec);
     scope.variables = variable_builder.build();
   }
@@ -578,7 +579,7 @@ impl GroupFn for Cell {
     self.extra_ctx.bdd_variables = mem::replace(
       &mut scope.variables,
       biodivine_lib_bdd::BddVariableSetBuilder::new().build(),
-    )
+    );
   }
 }
 

@@ -45,7 +45,7 @@ impl core::str::FromStr for SdfExpression {
     Ok(Self { inner: ArcStr::from_str(s)? })
   }
 }
-crate::impl_self_builder!(SdfExpression);
+crate::ast::impl_self_builder!(SdfExpression);
 impl SimpleAttri for SdfExpression {
   #[inline]
   fn nom_parse<'a>(

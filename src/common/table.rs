@@ -239,7 +239,7 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
   #[strum(serialize = "total_output_net_capacitance")]
   TotalOutputNetCapacitance,
 }
-crate::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
+crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
 impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -259,7 +259,7 @@ pub enum VariableTypeCompactLutTemplateIndex3 {
   #[strum(serialize = "curve_parameters")]
   CurveParameters,
 }
-crate::impl_self_builder!(VariableTypeCompactLutTemplateIndex3);
+crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex3);
 impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -520,7 +520,7 @@ pub struct CcsPowerPoint {
   pub point_time: NotNan<f64>,
   pub point_current: NotNan<f64>,
 }
-crate::impl_self_builder!(Vec<CcsPowerValue>);
+crate::ast::impl_self_builder!(Vec<CcsPowerValue>);
 impl ComplexAttri for Vec<CcsPowerValue> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -791,8 +791,6 @@ impl GroupFn for CompactCcsTable {}
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TableLookUp {
-  // // TODO: unit
-  // unit: (),
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
@@ -840,7 +838,7 @@ pub struct Values {
   pub size2: usize,
   pub inner: Vec<NotNan<f64>>,
 }
-crate::impl_self_builder!(Values);
+crate::ast::impl_self_builder!(Values);
 impl ComplexAttri for Values {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -910,6 +908,82 @@ impl ComplexAttri for Values {
       ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")?;
     }
     Ok(())
+  }
+}
+
+#[expect(clippy::field_scoped_visibility_modifiers)]
+pub(crate) struct DisplayValues<'a, V: Iterator<Item = &'a NotNan<f64>>> {
+  pub(crate) size1: usize,
+  pub(crate) inner: V,
+}
+
+impl<'a, V: Iterator<Item = &'a NotNan<f64>>> DisplayValues<'a, V> {
+  #[inline]
+  fn fmt_self<T: Write, I: ast::Indentation>(
+    self,
+    f: &mut ast::CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    use itertools::Itertools;
+    let indent = f.indentation();
+    let chunks = self.inner.chunks(self.size1);
+    let mut iter = chunks.into_iter();
+    if let Some(v) = iter.next() {
+      ast::join_fmt(
+        v.into_iter(),
+        f,
+        |float, ff| ff.write_float(float.into_inner()),
+        ", ",
+      )?;
+    }
+    while let Some(v) = iter.next() {
+      write!(f, ", \\\n{indent}")?;
+      ast::join_fmt(
+        v.into_iter(),
+        f,
+        |float, ff| ff.write_float(float.into_inner()),
+        ", ",
+      )?;
+    }
+    Ok(())
+  }
+}
+
+#[expect(clippy::field_scoped_visibility_modifiers)]
+pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = &'a NotNan<f64>>> {
+  pub(crate) name: &'a Option<ArcStr>,
+  pub(crate) index_1: &'a Vec<NotNan<f64>>,
+  pub(crate) index_2: &'a Vec<NotNan<f64>>,
+  pub(crate) index_3: &'a Vec<NotNan<f64>>,
+  pub(crate) index_4: &'a Vec<NotNan<f64>>,
+  pub(crate) values: DisplayValues<'a, V>,
+}
+
+impl<'a, V: Iterator<Item = &'a NotNan<f64>>> DisplayTableLookUp<'a, V> {
+  #[inline]
+  pub(crate) fn fmt_self<T: Write, I: ast::Indentation>(
+    self,
+    key1: &str,
+    key2: &str,
+    f: &mut ast::CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    use core::fmt::Write;
+    let indent = f.indentation();
+    f.write_fmt(format_args!("\n{indent}{key1}{key2} ("))?;
+    ast::NameAttri::fmt_self(self.name, f)?;
+    f.write_fmt(format_args!(") {{"))?;
+    f.indent(1);
+    ComplexAttri::fmt_liberty(self.index_1, "index_1", f)?;
+    ComplexAttri::fmt_liberty(self.index_2, "index_2", f)?;
+    ComplexAttri::fmt_liberty(self.index_3, "index_3", f)?;
+    ComplexAttri::fmt_liberty(self.index_4, "index_4", f)?;
+    let indent1 = f.indentation();
+    write!(f, "\n{indent1}values (")?;
+    f.indent(1);
+    self.values.fmt_self(f)?;
+    f.dedent(1);
+    write!(f, ");")?;
+    f.dedent(1);
+    f.write_fmt(format_args!("\n{indent}}}"))
   }
 }
 
@@ -1061,7 +1135,7 @@ pub enum Variable {
   Length(LengthVariable),
   Scalar(ScalarVariable),
 }
-crate::impl_self_builder!(Variable);
+crate::ast::impl_self_builder!(Variable);
 impl SimpleAttri for Variable {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {

@@ -193,10 +193,10 @@ liberty_db::cell::Cell (dff4) {
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : recovery_rising;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("1.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("1.0");
 | | | }
 | | }
@@ -207,10 +207,10 @@ liberty_db::cell::Cell (dff4) {
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : recovery_rising;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("1.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("1.0");
 | | | }
 | | }
@@ -223,20 +223,20 @@ liberty_db::cell::Cell (dff4) {
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : hold_rising;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("1.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("1.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : setup_rising;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("1.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("1.0");
 | | | }
 | | }
@@ -248,10 +248,10 @@ liberty_db::cell::Cell (dff4) {
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : rising_edge;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("2.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("2.0");
 | | | }
 | | }
@@ -279,10 +279,10 @@ liberty_db::cell::Cell (dff4) {
 | | timing () {
 | | | related_pin : CLK;
 | | | timing_type : rising_edge;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("2.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("2.0");
 | | | }
 | | }
@@ -663,10 +663,10 @@ liberty_db::cell::Cell (DLT2) {
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : recovery_falling;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("1.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("1.0");
 | | | }
 | | }
@@ -678,20 +678,20 @@ liberty_db::cell::Cell (DLT2) {
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : hold_falling;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("1.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("1.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : setup_falling;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("1.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("1.0");
 | | | }
 | | }
@@ -703,10 +703,10 @@ liberty_db::cell::Cell (DLT2) {
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : recovery_falling;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("1.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("1.0");
 | | | }
 | | }
@@ -725,20 +725,20 @@ liberty_db::cell::Cell (DLT2) {
 | | }
 | | timing () {
 | | | related_pin : D;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("2.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("2.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : rising_edge;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("2.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("2.0");
 | | | }
 | | }
@@ -765,20 +765,20 @@ liberty_db::cell::Cell (DLT2) {
 | | }
 | | timing () {
 | | | related_pin : D;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("2.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("2.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : rising_edge;
-| | | cell_fall (scalar) {
+| | | cell_rise (scalar) {
 | | | | values ("2.0");
 | | | }
-| | | cell_rise (scalar) {
+| | | cell_fall (scalar) {
 | | | | values ("2.0");
 | | | }
 | | }

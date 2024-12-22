@@ -20,6 +20,7 @@ pub(crate) type RandomState = ahash::RandomState;
 
 pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 
+#[expect(clippy::field_scoped_visibility_modifiers)]
 pub(crate) struct BuilderScope {
   pub(crate) variables: biodivine_lib_bdd::BddVariableSet,
 }
@@ -33,15 +34,13 @@ impl Default for BuilderScope {
 }
 // type Scope;
 pub(crate) trait ParsingBuilder: Sized {
-  // type Scope;
   type Builder;
   fn build(builder: Self::Builder, scope: &mut BuilderScope) -> Self;
 }
 
-#[macro_export]
 macro_rules! impl_self_builder {
   ($t:ty) => {
-    impl crate::ast::ParsingBuilder for $t {
+    impl $crate::ast::ParsingBuilder for $t {
       type Builder = Self;
       #[inline]
       fn build(builder: Self::Builder, _scope: &mut crate::ast::BuilderScope) -> Self {
@@ -50,6 +49,7 @@ macro_rules! impl_self_builder {
     }
   };
 }
+pub(crate) use impl_self_builder;
 
 /// Wrapper for simple attribute
 pub type SimpleWrapper = ArcStr;

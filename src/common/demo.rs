@@ -4,14 +4,16 @@
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
-  timing::TimingType,
+  timing::{TimingTableLookUp, TimingType},
   ArcStr, NotNan,
 };
 use core::fmt::Write;
+
+use super::table::TableLookUp;
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(liberty_macros::Group)]
-#[derive(liberty_macros::Nothing)]
+// #[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing {
   /// group undefined attributes
   #[liberty(attributes)]
@@ -28,6 +30,13 @@ pub(crate) struct Timing {
   t1: Option<TimingType>,
   #[liberty(simple(type = Option))]
   t2: Option<TimingType>,
+  #[liberty(supergroup(
+    cell_fall: Option<TableLookUp>,
+    ocv_mean_shift_cell_fall: Option<TableLookUp>,
+    ocv_std_dev_cell_fall: Option<TableLookUp>,
+    ocv_skewness_cell_fall: Option<TableLookUp>,
+  ))]
+  pub cell_fall: Option<TimingTableLookUp>,
 }
 impl GroupFn for Timing {}
 

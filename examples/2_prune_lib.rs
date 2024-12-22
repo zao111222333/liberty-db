@@ -51,24 +51,24 @@ fn main() {
           timing.sdf_cond = Some(when.sdf(&cell.extra_ctx.bdd_variables));
         }
         // remove LVF's LUT
-        timing.ocv_mean_shift_cell_fall = None;
-        timing.ocv_mean_shift_cell_rise = None;
-        timing.ocv_mean_shift_fall_transition = None;
-        timing.ocv_mean_shift_rise_transition = None;
-        timing.ocv_mean_shift_fall_constraint = None;
-        timing.ocv_mean_shift_rise_constraint = None;
-        timing.ocv_std_dev_cell_fall = None;
-        timing.ocv_std_dev_cell_rise = None;
-        timing.ocv_std_dev_fall_transition = None;
-        timing.ocv_std_dev_rise_transition = None;
-        timing.ocv_std_dev_fall_constraint = None;
-        timing.ocv_std_dev_rise_constraint = None;
-        timing.ocv_skewness_cell_fall = None;
-        timing.ocv_skewness_cell_rise = None;
-        timing.ocv_skewness_fall_transition = None;
-        timing.ocv_skewness_rise_transition = None;
-        timing.ocv_skewness_fall_constraint = None;
-        timing.ocv_skewness_rise_constraint = None;
+        if let Some(table) = timing.cell_rise.as_mut() {
+          table.lvf_values.clear()
+        };
+        if let Some(table) = timing.cell_fall.as_mut() {
+          table.lvf_values.clear()
+        };
+        if let Some(table) = timing.rise_transition.as_mut() {
+          table.lvf_values.clear()
+        };
+        if let Some(table) = timing.fall_transition.as_mut() {
+          table.lvf_values.clear()
+        };
+        if let Some(table) = timing.rise_constraint.as_mut() {
+          table.lvf_values.clear()
+        };
+        if let Some(table) = timing.fall_constraint.as_mut() {
+          table.lvf_values.clear()
+        };
       }
     }
   }

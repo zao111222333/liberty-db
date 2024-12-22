@@ -61,12 +61,19 @@ cargo bench --bench dev
 ```
 
 ## TODO
-
-+ Reconstruction:
++ CI:
+  + only do comparsion after tag new version
+  + fast regression self in build.yml
++ Other:
+  + BDD use ArcStr
+  + Linked Group
+  + like IndexMap, only sort once and store
+  + bitcode support
++ ~~Reconstruction:~~
   + ~~parser to `GroupBuilder`, e.g., use `Vec` to store `GroupSet`, no comment attribute~~
-  + build/link `GroupBuilder` to `Group`, providing parent's `scope`, e.g.
+  + ~~build/link `GroupBuilder` to `Group`, providing parent's `scope`, e.g.~~
     + ~~all `Pin` name set to build BDD~~
-    + supper group like `timing::TimingTableLookUp`
+    + ~~supper group like `timing::TimingTableLookUp`~~
     + check all rules
 
 + Parse:
@@ -77,14 +84,7 @@ cargo bench --bench dev
     + ~~`dynamic_current` group~~
   + async
   + stream input
-+ CI:
-  + only do comparsion after tag new version
-  + fast regression self in build.yml
-+ Other:
-  + BDD use ArcStr
-  + Linked Group
-  + like IndexMap, only sort once and store
-  + bitcode support
+
 + Finished
   + ~~user `define`~~
   + ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~

@@ -256,7 +256,7 @@ impl FromStr for Table {
     })
   }
 }
-crate::impl_self_builder!(Table);
+crate::ast::impl_self_builder!(Table);
 impl SimpleAttri for Table {
   #[inline]
   fn is_set(&self) -> bool {
@@ -1529,9 +1529,9 @@ impl GroupFn for LeakageCurrent {}
 
 /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
 /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
-/// tables, define the lut_values group. You can add the `lut_values` group to both the
+/// tables, define the `lut_values` group. You can add the `lut_values` group to both the
 /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The `lut_values` group
-/// uses the `variable_1` variable, which is defined within the lu_table_template group,
+/// uses the `variable_1` variable, which is defined within the `lu_table_template` group,
 /// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
 /// `pg_voltage_difference`.
 ///
@@ -1634,7 +1634,7 @@ pub enum PgType {
   #[strum(serialize = "deeppwell")]
   DeepPwell,
 }
-crate::impl_self_builder!(PgType);
+crate::ast::impl_self_builder!(PgType);
 impl SimpleAttri for PgType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1665,7 +1665,7 @@ pub enum SwitchCellType {
   #[strum(serialize = "fine_grain")]
   FineGrain,
 }
-crate::impl_self_builder!(SwitchCellType);
+crate::ast::impl_self_builder!(SwitchCellType);
 impl SimpleAttri for SwitchCellType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1692,7 +1692,7 @@ pub enum FpgaCellType {
   #[strum(serialize = "falling_edge_clock_cell")]
   FallingEdgeClockCell,
 }
-crate::impl_self_builder!(FpgaCellType);
+crate::ast::impl_self_builder!(FpgaCellType);
 impl SimpleAttri for FpgaCellType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1728,7 +1728,7 @@ pub enum LevelShifterType {
   #[strum(serialize = "HL_LH")]
   HL_LH,
 }
-crate::impl_self_builder!(LevelShifterType);
+crate::ast::impl_self_builder!(LevelShifterType);
 impl SimpleAttri for LevelShifterType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1786,7 +1786,7 @@ impl fmt::Display for ClockGatingIntegratedCell {
     }
   }
 }
-crate::impl_self_builder!(ClockGatingIntegratedCell);
+crate::ast::impl_self_builder!(ClockGatingIntegratedCell);
 impl SimpleAttri for ClockGatingIntegratedCell {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
@@ -1828,7 +1828,7 @@ pub struct PinOpposite {
   pub name_list1: WordSet,
   pub name_list2: WordSet,
 }
-crate::impl_self_builder!(PinOpposite);
+crate::ast::impl_self_builder!(PinOpposite);
 impl ComplexAttri for PinOpposite {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(

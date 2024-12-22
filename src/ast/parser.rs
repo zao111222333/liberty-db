@@ -550,7 +550,6 @@ pub(crate) fn complex_ccs_power_values<'a>(
   complex_multi_line(i, line_num, complex_ccs_power_value)
 }
 
-#[expect(clippy::type_complexity)]
 #[inline]
 pub(crate) fn complex<'a>(
   i: &'a str,

@@ -59,7 +59,7 @@ pub enum SdfEdgeType {
   #[strum(serialize = "both_edges")]
   BothEdges,
 }
-crate::impl_self_builder!(SdfEdgeType);
+crate::ast::impl_self_builder!(SdfEdgeType);
 impl SimpleAttri for SdfEdgeType {
   #[inline]
   fn nom_parse<'a>(
@@ -102,7 +102,7 @@ pub enum VariableType {
   #[strum(serialize = "input_transition_time")]
   InputTransitionTime,
 }
-crate::impl_self_builder!(VariableType);
+crate::ast::impl_self_builder!(VariableType);
 impl SimpleAttri for VariableType {
   #[inline]
   fn nom_parse<'a>(
@@ -211,7 +211,7 @@ impl PartialOrd for WordSet {
     }
   }
 }
-crate::impl_self_builder!(WordSet);
+crate::ast::impl_self_builder!(WordSet);
 impl SimpleAttri for WordSet {
   #[inline]
   fn nom_parse<'a>(

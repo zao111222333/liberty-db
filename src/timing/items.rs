@@ -4,11 +4,16 @@
 use core::ops::Not;
 
 use crate::{
-  ast::{self, GroupComments, GroupFn, ParseScope, SimpleAttri},
+  ast::{
+    self, fmt_comment_liberty, BuilderScope, GroupComments, GroupFn, ParseScope,
+    ParsingBuilder, SimpleAttri,
+  },
+  common::table::{DisplayTableLookUp, DisplayValues, TableLookUp},
   expression::logic,
   ArcStr, NotNan,
 };
 
+use itertools::izip;
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
 ///
@@ -143,7 +148,7 @@ impl TimingSenseType {
     }
   }
 }
-crate::impl_self_builder!(TimingSenseType);
+crate::ast::impl_self_builder!(TimingSenseType);
 impl SimpleAttri for TimingSenseType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
@@ -224,3 +229,161 @@ pub struct CellDegradation {
   pub values: Vec<NotNan<f64>>,
 }
 impl GroupFn for CellDegradation {}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Default)]
+pub struct TimingTableLookUp {
+  pub name: Option<ArcStr>,
+  pub comments: String,
+  pub index_1: Vec<NotNan<f64>>,
+  pub index_2: Vec<NotNan<f64>>,
+  pub index_3: Vec<NotNan<f64>>,
+  pub index_4: Vec<NotNan<f64>>,
+  pub size1: usize,
+  pub size2: usize,
+  pub values: Vec<NotNan<f64>>,
+  pub lvf_values: Vec<LVFValue>,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Default, Clone, Copy)]
+pub struct LVFValue {
+  pub mean_shift: NotNan<f64>,
+  pub std_dev: NotNan<f64>,
+  pub skewness: NotNan<f64>,
+}
+
+impl ParsingBuilder for Option<TimingTableLookUp> {
+  /// `value`, `mean_shift`, `std_dev`, `skewness`
+  type Builder = (
+    // value
+    Option<<TableLookUp as ParsingBuilder>::Builder>,
+    // mean_shift
+    Option<<TableLookUp as ParsingBuilder>::Builder>,
+    // std_dev
+    Option<<TableLookUp as ParsingBuilder>::Builder>,
+    // skewness
+    Option<<TableLookUp as ParsingBuilder>::Builder>,
+  );
+  #[inline]
+  fn build(builder: Self::Builder, _scope: &mut BuilderScope) -> Self {
+    #[inline]
+    fn eq_index(
+      lhs: &<TableLookUp as ParsingBuilder>::Builder,
+      rhs: &<TableLookUp as ParsingBuilder>::Builder,
+    ) -> bool {
+      lhs.index_1 == rhs.index_1
+        && lhs.index_2 == rhs.index_2
+        && lhs.index_3 == rhs.index_3
+        && lhs.index_4 == rhs.index_4
+    }
+    match builder {
+      (Some(_value), Some(_mean_shift), Some(_std_dev), Some(_skewness)) => {
+        let (lvf_values, comments) = if eq_index(&_value, &_mean_shift)
+          && eq_index(&_mean_shift, &_std_dev)
+          && eq_index(&_std_dev, &_skewness)
+        {
+          (
+            izip!(
+              _mean_shift.values.inner,
+              _std_dev.values.inner,
+              _skewness.values.inner
+            )
+            .map(|(mean_shift, std_dev, skewness)| LVFValue {
+              mean_shift,
+              std_dev,
+              skewness,
+            })
+            .collect(),
+            String::new(),
+          )
+        } else {
+          log::error!("LVF LUTs' index mismatch");
+          (Vec::new(), String::from("LVF LUTs' index mismatch"))
+        };
+        Some(TimingTableLookUp {
+          name: _value.name,
+          comments,
+          index_1: _value.index_1,
+          index_2: _value.index_2,
+          index_3: _value.index_3,
+          index_4: _value.index_4,
+          size1: _value.values.size1,
+          size2: _value.values.size2,
+          values: _value.values.inner,
+          lvf_values,
+        })
+      }
+      (Some(_value), None, None, None) => Some(TimingTableLookUp {
+        name: _value.name,
+        comments: String::new(),
+        index_1: _value.index_1,
+        index_2: _value.index_2,
+        index_3: _value.index_3,
+        index_4: _value.index_4,
+        size1: _value.values.size1,
+        size2: _value.values.size2,
+        values: _value.values.inner,
+        lvf_values: Vec::new(),
+      }),
+      _ => None,
+    }
+  }
+}
+impl TimingTableLookUp {
+  #[inline]
+  pub(crate) fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation>(
+    &self,
+    key: &str,
+    f: &mut ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    fmt_comment_liberty(Some(&self.comments), f)?;
+    DisplayTableLookUp {
+      name: &self.name,
+      index_1: &self.index_1,
+      index_2: &self.index_2,
+      index_3: &self.index_3,
+      index_4: &self.index_4,
+      values: DisplayValues { size1: self.size1, inner: self.values.iter() },
+    }
+    .fmt_self("", key, f)?;
+    if !self.lvf_values.is_empty() {
+      DisplayTableLookUp {
+        name: &self.name,
+        index_1: &self.index_1,
+        index_2: &self.index_2,
+        index_3: &self.index_3,
+        index_4: &self.index_4,
+        values: DisplayValues {
+          size1: self.size1,
+          inner: self.lvf_values.iter().map(|lvf| &lvf.mean_shift),
+        },
+      }
+      .fmt_self("ocv_mean_shift_", key, f)?;
+      DisplayTableLookUp {
+        name: &self.name,
+        index_1: &self.index_1,
+        index_2: &self.index_2,
+        index_3: &self.index_3,
+        index_4: &self.index_4,
+        values: DisplayValues {
+          size1: self.size1,
+          inner: self.lvf_values.iter().map(|lvf| &lvf.std_dev),
+        },
+      }
+      .fmt_self("ocv_std_dev_", key, f)?;
+      DisplayTableLookUp {
+        name: &self.name,
+        index_1: &self.index_1,
+        index_2: &self.index_2,
+        index_3: &self.index_3,
+        index_4: &self.index_4,
+        values: DisplayValues {
+          size1: self.size1,
+          inner: self.lvf_values.iter().map(|lvf| &lvf.skewness),
+        },
+      }
+      .fmt_self("ocv_skewness_", key, f)?;
+    }
+    Ok(())
+  }
+}

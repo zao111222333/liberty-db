@@ -913,7 +913,7 @@ pub enum ClearPresetState {
   #[strum(serialize = "X")]
   X,
 }
-crate::impl_self_builder!(ClearPresetState);
+crate::ast::impl_self_builder!(ClearPresetState);
 impl crate::ast::SimpleAttri for ClearPresetState {
   #[inline]
   fn nom_parse<'a>(

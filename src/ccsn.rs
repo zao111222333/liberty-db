@@ -267,7 +267,7 @@ pub enum StageType {
   #[default]
   Both,
 }
-crate::impl_self_builder!(StageType);
+crate::ast::impl_self_builder!(StageType);
 impl SimpleAttri for StageType {
   #[inline]
   fn nom_parse<'a>(
@@ -364,7 +364,7 @@ pub struct PropagatingCcb {
   /// `output_ccb_name`
   pub output_ccb_name: Option<ArcStr>,
 }
-crate::impl_self_builder!(PropagatingCcb);
+crate::ast::impl_self_builder!(PropagatingCcb);
 impl ComplexAttri for PropagatingCcb {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(

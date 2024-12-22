@@ -717,7 +717,7 @@ pub enum TimingType {
   /// [`NoChange`](crate::timing::ArcNoChange)
   NoChange(ArcNoChange),
 }
-crate::impl_self_builder!(TimingType);
+crate::ast::impl_self_builder!(TimingType);
 impl SimpleAttri for TimingType {
   #[inline]
   fn nom_parse<'a>(

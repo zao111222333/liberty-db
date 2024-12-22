@@ -102,7 +102,7 @@ impl From<BooleanExpression> for Expr {
   }
 }
 
-crate::impl_self_builder!(BooleanExpression);
+crate::ast::impl_self_builder!(BooleanExpression);
 impl crate::ast::SimpleAttri for BooleanExpression {
   #[inline]
   fn nom_parse<'a>(
@@ -210,7 +210,7 @@ impl IdBooleanExpression {
       .bdd
       .sat_valuations()
       .map(|valuation| {
-        let expr = Bdd::from(valuation).to_boolean_expression(&cell_variables);
+        let expr = Bdd::from(valuation).to_boolean_expression(cell_variables);
         as_sdf_str(&expr)
       })
       .join(") || ( ");
