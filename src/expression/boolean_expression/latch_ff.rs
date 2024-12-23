@@ -2,7 +2,7 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use super::{BooleanExpression, BooleanExpressionLike, UNKNOWN};
+use super::{BooleanExpression, BooleanExpressionLike, LogicBooleanExpression, UNKNOWN};
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
   ArcStr,
@@ -65,7 +65,7 @@ pub struct FF {
   /// The clear  attribute gives the active value for the clear input.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub clear: Option<BooleanExpression>,
+  pub clear: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
   #[size = 1]
@@ -85,7 +85,7 @@ pub struct FF {
   /// ">Reference-Definition</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub clocked_on: Option<BooleanExpression>,
+  pub clocked_on: Option<LogicBooleanExpression>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
   /// the active edge of the clock signals and are required in all `ff`  groups.
   /// For example, use `clocked_on : "CP"`  to describe a rising-edge-triggered device
@@ -95,15 +95,15 @@ pub struct FF {
   /// ">Reference-Definition</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub clocked_on_also: Option<BooleanExpression>,
+  pub clocked_on_also: Option<LogicBooleanExpression>,
   /// The value of `variable1` after the active edge.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub next_state: Option<BooleanExpression>,
+  pub next_state: Option<LogicBooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub preset: Option<BooleanExpression>,
+  pub preset: Option<LogicBooleanExpression>,
 }
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
@@ -165,7 +165,7 @@ pub struct FFBank {
   /// The clear  attribute gives the active value for the clear input.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub clear: Option<BooleanExpression>,
+  pub clear: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
   #[size = 1]
@@ -185,7 +185,7 @@ pub struct FFBank {
   /// ">Reference-Definition</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub clocked_on: Option<BooleanExpression>,
+  pub clocked_on: Option<LogicBooleanExpression>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
   /// the active edge of the clock signals and are required in all `ff`  groups.
   /// For example, use `clocked_on : "CP"`  to describe a rising-edge-triggered device
@@ -195,15 +195,15 @@ pub struct FFBank {
   /// ">Reference-Definition</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub clocked_on_also: Option<BooleanExpression>,
+  pub clocked_on_also: Option<LogicBooleanExpression>,
   /// The value of `variable1` after the active edge.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub next_state: Option<BooleanExpression>,
+  pub next_state: Option<LogicBooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub preset: Option<BooleanExpression>,
+  pub preset: Option<LogicBooleanExpression>,
 }
 
 /// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
@@ -260,7 +260,7 @@ pub struct Latch {
   /// The clear  attribute gives the active value for the clear input.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub clear: Option<BooleanExpression>,
+  pub clear: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
   #[size = 1]
@@ -280,7 +280,7 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub enable: Option<BooleanExpression>,
+  pub enable: Option<LogicBooleanExpression>,
   /// The `enable_also`  attribute gives the state of the `enable`
   /// input when you are describing master and slave cells.
   /// The `enable_also`  attribute is optional.
@@ -290,15 +290,15 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub enable_also: Option<BooleanExpression>,
+  pub enable_also: Option<LogicBooleanExpression>,
   /// The value of `variable1` after the active edge.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub data_in: Option<BooleanExpression>,
+  pub data_in: Option<LogicBooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub preset: Option<BooleanExpression>,
+  pub preset: Option<LogicBooleanExpression>,
 }
 
 /// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
@@ -359,7 +359,7 @@ pub struct LatchBank {
   /// The clear  attribute gives the active value for the clear input.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub clear: Option<BooleanExpression>,
+  pub clear: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
   #[size = 1]
@@ -379,7 +379,7 @@ pub struct LatchBank {
   /// ">Reference-Definition</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub enable: Option<BooleanExpression>,
+  pub enable: Option<LogicBooleanExpression>,
   /// The `enable_also`  attribute gives the state of the `enable`
   /// input when you are describing master and slave cells.
   /// The `enable_also`  attribute is optional.
@@ -389,15 +389,15 @@ pub struct LatchBank {
   /// ">Reference-Definition</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub enable_also: Option<BooleanExpression>,
+  pub enable_also: Option<LogicBooleanExpression>,
   /// The value of `variable1` after the active edge.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub data_in: Option<BooleanExpression>,
+  pub data_in: Option<LogicBooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub preset: Option<BooleanExpression>,
+  pub preset: Option<LogicBooleanExpression>,
 }
 
 #[duplicate::duplicate_item(
@@ -494,7 +494,7 @@ impl __LatchFF for Latch_type {
     &self.variable2
   }
   #[inline]
-  fn clear(&self) -> &Option<BooleanExpression> {
+  fn clear(&self) -> &Option<LogicBooleanExpression> {
     &self.clear
   }
   #[inline]
@@ -511,14 +511,14 @@ impl __LatchFF for Latch_type {
   }
   #[inline]
   fn active_also(&self) -> Option<Box<Expr>> {
-    self.enable_also.as_ref().map(|e| Box::new(e.expr.clone()))
+    self.enable_also.as_ref().map(|e| Box::new(e.0.expr.clone()))
   }
   #[inline]
-  fn next_state(&self) -> &Option<BooleanExpression> {
+  fn next_state(&self) -> &Option<LogicBooleanExpression> {
     &self.data_in
   }
   #[inline]
-  fn preset(&self) -> &Option<BooleanExpression> {
+  fn preset(&self) -> &Option<LogicBooleanExpression> {
     &self.preset
   }
 }
@@ -538,7 +538,7 @@ impl __LatchFF for FF_type {
     &self.variable2
   }
   #[inline]
-  fn clear(&self) -> &Option<BooleanExpression> {
+  fn clear(&self) -> &Option<LogicBooleanExpression> {
     &self.clear
   }
   #[inline]
@@ -570,11 +570,11 @@ impl __LatchFF for FF_type {
     })
   }
   #[inline]
-  fn next_state(&self) -> &Option<BooleanExpression> {
+  fn next_state(&self) -> &Option<LogicBooleanExpression> {
     &self.next_state
   }
   #[inline]
-  fn preset(&self) -> &Option<BooleanExpression> {
+  fn preset(&self) -> &Option<LogicBooleanExpression> {
     &self.preset
   }
 }
@@ -582,13 +582,13 @@ impl __LatchFF for FF_type {
 trait __LatchFF {
   fn variable1(&self) -> &ArcStr;
   fn variable2(&self) -> &ArcStr;
-  fn clear(&self) -> &Option<BooleanExpression>;
+  fn clear(&self) -> &Option<LogicBooleanExpression>;
   fn clear_preset_var1(&self) -> &Option<ClearPresetState>;
   fn clear_preset_var2(&self) -> &Option<ClearPresetState>;
   fn active(&self) -> Option<Box<Expr>>;
   fn active_also(&self) -> Option<Box<Expr>>;
-  fn next_state(&self) -> &Option<BooleanExpression>;
-  fn preset(&self) -> &Option<BooleanExpression>;
+  fn next_state(&self) -> &Option<LogicBooleanExpression>;
+  fn preset(&self) -> &Option<LogicBooleanExpression>;
 }
 
 #[duplicate::duplicate_item(
@@ -748,7 +748,7 @@ pub trait LatchFF: __LatchFF {
     };
     BooleanExpression { expr }
   }
-  /// Get the `BooleanExpression` of (variable1,variable2)
+  /// Get the `LogicBooleanExpression` of (variable1,variable2)
   #[expect(clippy::too_many_lines)]
   #[inline]
   fn variable_expr(&self) -> (BooleanExpression, BooleanExpression) {
@@ -926,10 +926,11 @@ impl crate::ast::SimpleAttri for ClearPresetState {
 
 #[cfg(test)]
 mod test {
-  use crate::expression::{FFBank, IdBooleanExpression, Latch, LatchBank, LatchFF, FF};
+  use crate::expression::{BddBooleanExpression, FFBank, Latch, LatchBank, LatchFF, FF};
   #[test]
   fn special_boolean_expression() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+      &["J", "K", "IQ", "1A", "1B"],
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
         clocked_on : "\"1A\" + \"1B\"";
@@ -945,11 +946,11 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     let var2_expr = ff.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
@@ -962,7 +963,8 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn jk_flip_flop() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+      &["J", "K", "IQ", "CP"],
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
         clocked_on : "CP";
@@ -978,11 +980,11 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     let var2_expr = ff.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
@@ -995,7 +997,8 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example19() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+      &["D", "CP", "CD", "PD"],
       r#"(IQ, IQN) {  
         next_state : "D" ;  
         clocked_on : "CP" ;  
@@ -1019,11 +1022,11 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     let var2_expr = ff.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
@@ -1036,7 +1039,8 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example20() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+      &["TE", "TI", "J", "K", "IQ", "CD", "CP", "PD"],
       r#"(IQ, IQN) {  
         next_state : "(TE*TI)+(TE’*J*K’)+(TE’*J’*K’*IQ)+(TE’*J*K*IQ’)" ;  
         clocked_on : "CP" ;  
@@ -1060,11 +1064,11 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     let var2_expr = ff.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
@@ -1075,7 +1079,8 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example21() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+      &["D", "CLR", "CP"],
       r#"(IQ, IQN) {   
         next_state : "D * CLR’" ;   
         clocked_on : "CP" ;
@@ -1091,11 +1096,11 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     let var2_expr = ff.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
@@ -1108,7 +1113,8 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example22() {
-    let ff = crate::ast::test_parse_fmt::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+      &["D", "CLK", "CLKN", "CDN", "PDN"],
       r#"(IQ, IQN) {  
         next_state : "D" ;  
         clocked_on : "CLK" ;  
@@ -1134,11 +1140,11 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     let var2_expr = ff.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
@@ -1149,7 +1155,8 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example23() {
-    let ff = crate::ast::test_parse_fmt::<FFBank>(
+    let ff = crate::ast::test_parse_fmt_variables::<FFBank>(
+      &["CLK", "CLR", "PRE", "D"],
       r#"(IQ, IQN, 4) {    
         next_state : "D" ;    
         clocked_on : "CLK" ;    
@@ -1173,11 +1180,11 @@ liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
     let var2_expr = ff.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = ff.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
@@ -1187,7 +1194,8 @@ liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
   /// ">Reference</a>
   #[test]
   fn example25() {
-    let latch = crate::ast::test_parse_fmt::<Latch>(
+    let latch = crate::ast::test_parse_fmt_variables::<Latch>(
+      &["G", "D", "CD"],
       r#"(IQ, IQN) {
         enable : "G" ;
         data_in : "D" ;
@@ -1205,11 +1213,11 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
     let var2_expr = latch.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = latch.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
@@ -1219,7 +1227,8 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example26() {
-    let latch = crate::ast::test_parse_fmt::<Latch>(
+    let latch = crate::ast::test_parse_fmt_variables::<Latch>(
+      &["S", "R"],
       r#"(IQ, IQN) {  
         clear : "S’" ;  
         preset : "R’" ;  
@@ -1239,11 +1248,11 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
     let var2_expr = latch.variable2_expr();
     println!("{var1_expr}");
     println!("{var2_expr}");
-    let id_var1_expr: IdBooleanExpression = var1_expr.into();
-    let id_var2_expr: IdBooleanExpression = var2_expr.into();
+    let id_var1_expr: BddBooleanExpression = var1_expr.into();
+    let id_var2_expr: BddBooleanExpression = var2_expr.into();
     let (var1_expr_, var2_expr_) = latch.variable_expr();
-    let id_var1_expr_: IdBooleanExpression = var1_expr_.into();
-    let id_var2_expr_: IdBooleanExpression = var2_expr_.into();
+    let id_var1_expr_: BddBooleanExpression = var1_expr_.into();
+    let id_var2_expr_: BddBooleanExpression = var2_expr_.into();
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }

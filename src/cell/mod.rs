@@ -19,21 +19,21 @@ use crate::{
 #[derive(Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CellExtraCtx {
-  pub bdd_variables: biodivine_lib_bdd::BddVariableSet,
+  pub logic_variables: biodivine_lib_bdd::BddVariableSet,
+  pub pg_variables: biodivine_lib_bdd::BddVariableSet,
 }
 impl Debug for CellExtraCtx {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    f.debug_struct("CellExtraCtx")
-      // .field("bdd_variables", &self.bdd_variables)
-      .finish()
+    f.debug_struct("CellExtraCtx").finish()
   }
 }
 impl Default for CellExtraCtx {
   #[inline]
   fn default() -> Self {
     Self {
-      bdd_variables: biodivine_lib_bdd::BddVariableSetBuilder::new().build(),
+      logic_variables: biodivine_lib_bdd::BddVariableSet::new(&[]),
+      pg_variables: biodivine_lib_bdd::BddVariableSet::new(&[]),
     }
   }
 }
@@ -540,45 +540,64 @@ impl GroupFn for Cell {
   #[inline]
   fn before_build(builder: &mut Self::Builder, scope: &mut crate::ast::BuilderScope) {
     // update variable
-    let mut variable_builder = biodivine_lib_bdd::BddVariableSetBuilder::new();
-    let mut vec: Vec<&str> = Vec::new();
+    let mut logic_variables: Vec<&str> = Vec::new();
     for pin in &builder.pin {
       match &pin.name {
-        NameList::Name(name) => vec.push(name),
+        NameList::Name(name) => {
+          logic_variables.push(name);
+        }
         NameList::List(word_set) => {
           for name in &word_set.inner {
-            vec.push(name);
+            logic_variables.push(name);
           }
         }
       }
     }
-    for pg_pin in &builder.pg_pin {
-      vec.push(&pg_pin.name);
+    for pin in &builder.bundle {
+      match &pin.name {
+        NameList::Name(name) => {
+          logic_variables.push(name);
+        }
+        NameList::List(word_set) => {
+          for name in &word_set.inner {
+            logic_variables.push(name);
+          }
+        }
+      }
     }
     for ff in &builder.ff {
-      vec.push(&ff.variable1);
-      vec.push(&ff.variable2);
+      logic_variables.push(&ff.variable1);
+      logic_variables.push(&ff.variable2);
     }
     for latch in &builder.latch {
-      vec.push(&latch.variable1);
-      vec.push(&latch.variable2);
+      logic_variables.push(&latch.variable1);
+      logic_variables.push(&latch.variable2);
     }
     for ff in &builder.ff_bank {
-      vec.push(&ff.variable1);
-      vec.push(&ff.variable2);
+      logic_variables.push(&ff.variable1);
+      logic_variables.push(&ff.variable2);
     }
     for latch in &builder.latch_bank {
-      vec.push(&latch.variable1);
-      vec.push(&latch.variable2);
+      logic_variables.push(&latch.variable1);
+      logic_variables.push(&latch.variable2);
     }
-    vec.sort_unstable();
-    _ = variable_builder.make_variables(&vec);
-    scope.variables = variable_builder.build();
+    logic_variables.sort_unstable();
+    scope.cell_extra_ctx.logic_variables =
+      biodivine_lib_bdd::BddVariableSet::new(&logic_variables);
+    let mut pg_variable: Vec<&str> =
+      builder.pg_pin.iter().map(|pg_pin| pg_pin.name.as_str()).collect();
+    pg_variable.sort_unstable();
+    scope.cell_extra_ctx.pg_variables =
+      biodivine_lib_bdd::BddVariableSet::new(&pg_variable);
   }
   fn after_build(&mut self, scope: &mut crate::ast::BuilderScope) {
-    self.extra_ctx.bdd_variables = mem::replace(
-      &mut scope.variables,
-      biodivine_lib_bdd::BddVariableSetBuilder::new().build(),
+    self.extra_ctx.logic_variables = mem::replace(
+      &mut scope.cell_extra_ctx.logic_variables,
+      biodivine_lib_bdd::BddVariableSet::new(&[]),
+    );
+    self.extra_ctx.pg_variables = mem::replace(
+      &mut scope.cell_extra_ctx.pg_variables,
+      biodivine_lib_bdd::BddVariableSet::new(&[]),
     );
   }
 }

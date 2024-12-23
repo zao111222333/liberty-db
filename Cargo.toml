@@ -62,7 +62,8 @@ nom = "7.1"
 derivative = "2.2"
 ryu = "1.0"
 itoa = "1.0"
-biodivine-lib-bdd = { version = "0.5.22", features = ["serde"] }
+# biodivine-lib-bdd = { version = "0.5.22", features = ["serde"] }
+biodivine-lib-bdd = { git = "https://github.com/zao111222333/biodivine-lib-bdd.git", features = ["serde"] }
 mut_set = "0.5.9"
 # mut_set = { version="0.5.2", features = ["__dbg_disable_mem_layout"] }
 # mut_set = { path = "../mut_set" }
@@ -78,10 +79,8 @@ ahash = { version = "0.8", features = ["no-rng"]}
 # but that's okay since the matching is static and any error will
 # be find during compiling with `#[deny(unreachable_patterns)]`
 foldhash = "0.1.3"
-# nohash-hasher = "0.2.0"
 dev_utils = { path = "dev/utils" }
 hashmatch = "0.1.1"
-
 
 [dependencies]
 liberty-macros = { path = "macros" }

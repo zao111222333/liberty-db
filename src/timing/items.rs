@@ -247,7 +247,7 @@ pub struct TimingTableLookUp {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Debug, Default, Clone, Copy)]
 pub struct LVFValue {
-  /// mean = nominal + mean_shift
+  /// `mean` = `nominal` + `mean_shift`
   pub mean: NotNan<f64>,
   pub std_dev: NotNan<f64>,
   pub skewness: NotNan<f64>,
@@ -266,6 +266,7 @@ impl ParsingBuilder for Option<TimingTableLookUp> {
     Option<<TableLookUp as ParsingBuilder>::Builder>,
   );
   #[inline]
+  #[expect(clippy::arithmetic_side_effects)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope) -> Self {
     #[inline]
     fn eq_index(
@@ -332,6 +333,7 @@ impl ParsingBuilder for Option<TimingTableLookUp> {
 }
 impl TimingTableLookUp {
   #[inline]
+  #[expect(clippy::arithmetic_side_effects)]
   pub(crate) fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation>(
     &self,
     key: &str,
@@ -346,7 +348,7 @@ impl TimingTableLookUp {
       index_4: &self.index_4,
       values: DisplayValues {
         size1: self.size1,
-        inner: self.values.iter().map(|f| *f),
+        inner: self.values.iter().copied(),
       },
     }
     .fmt_self("", key, f)?;

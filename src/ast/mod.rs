@@ -21,18 +21,10 @@ pub(crate) type RandomState = ahash::RandomState;
 pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
+#[derive(Default)]
 pub(crate) struct BuilderScope {
-  pub(crate) variables: biodivine_lib_bdd::BddVariableSet,
+  pub(crate) cell_extra_ctx: crate::cell::CellExtraCtx,
 }
-impl Default for BuilderScope {
-  #[inline]
-  fn default() -> Self {
-    Self {
-      variables: biodivine_lib_bdd::BddVariableSetBuilder::new().build(),
-    }
-  }
-}
-// type Scope;
 pub(crate) trait ParsingBuilder: Sized {
   type Builder;
   fn build(builder: Self::Builder, scope: &mut BuilderScope) -> Self;
@@ -760,6 +752,30 @@ pub(crate) fn test_parse_fmt<G: GroupAttri + Group>(input: &str, fmt_want: &str)
     Err(e) => panic!("{e:#?}"),
   };
   let mut builder_scope = BuilderScope::default();
+  let g = <G as ParsingBuilder>::build(builder, &mut builder_scope);
+  let fmt_str = g.display().to_string();
+  println!("{fmt_str}");
+  dev_utils::text_diff(fmt_want, fmt_str.as_str());
+  g
+}
+
+#[cfg(test)]
+#[inline]
+pub(crate) fn test_parse_fmt_variables<G: GroupAttri + Group>(
+  variable: &[&str],
+  input: &str,
+  fmt_want: &str,
+) -> G {
+  use biodivine_lib_bdd::BddVariableSet;
+
+  let mut scope = ParseScope::default();
+  let builder = match G::nom_parse(input, "", &mut scope) {
+    Ok((_, Ok(g))) => g,
+    Ok((_, Err(e))) => panic!("{e:#?}"),
+    Err(e) => panic!("{e:#?}"),
+  };
+  let mut builder_scope = BuilderScope::default();
+  builder_scope.cell_extra_ctx.logic_variables = BddVariableSet::new(variable);
   let g = <G as ParsingBuilder>::build(builder, &mut builder_scope);
   let fmt_str = g.display().to_string();
   println!("{fmt_str}");

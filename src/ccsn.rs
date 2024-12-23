@@ -10,7 +10,7 @@ use crate::{
   common::table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
   },
-  expression::IdBooleanExpression,
+  expression::LogicBooleanExpression,
   timing::items::Mode,
   ArcStr, NotNan,
 };
@@ -138,8 +138,8 @@ pub struct CCSNStage {
   pub stage_type: Option<StageType>,
   #[size = 80]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
-  pub when: Option<IdBooleanExpression>,
+  #[id(borrow = "Option<&LogicBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  pub when: Option<LogicBooleanExpression>,
   /// The pin-based mode  attribute is provided in the `ccsn_first_stage`  
   /// and `ccsn_last_stage` groups for conditional data modeling.
   /// If the `mode`  attribute is specified, `mode_name`  and `mode_value`  must be
@@ -321,8 +321,8 @@ pub struct ReceiverCapacitance {
   pub attributes: Attributes,
   #[size = 80]
   #[liberty(simple(type=Option))]
-  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
-  pub when: Option<IdBooleanExpression>,
+  #[id(borrow = "Option<&LogicBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  pub when: Option<LogicBooleanExpression>,
   #[size = 64]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]

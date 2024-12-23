@@ -70,7 +70,7 @@ impl ProjLibrary for liberty_db_0p7p4::Library {
     version: "0.7.4",
     typed_support: TypedSupport::AllTyped,
     parsed_boolexpr: true,
-    other: "published at 2024-12-07",
+    other: "published at 2024-12-01",
   };
   fn parse(s: &str) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())

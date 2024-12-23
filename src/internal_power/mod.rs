@@ -4,7 +4,7 @@ use crate::{
     items::{Domain, WordSet},
     table::TableLookUp,
   },
-  expression::IdBooleanExpression,
+  expression::LogicBooleanExpression,
   timing::items::Mode,
 };
 
@@ -41,8 +41,11 @@ pub struct InternalPower {
   // switching_together_group
   #[size = 80]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
-  pub when: Option<IdBooleanExpression>,
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!"
+  )]
+  pub when: Option<LogicBooleanExpression>,
   // NOTICE: Complex Attribute
   #[size = 16]
   #[liberty(complex(type = Option))]

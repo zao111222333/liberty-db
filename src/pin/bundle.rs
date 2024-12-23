@@ -1,7 +1,7 @@
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
   common::items::NameList,
-  expression::IdBooleanExpression,
+  expression::LogicBooleanExpression,
   pin::{Direction, NextstateType},
   timing::Timing,
   ArcStr, NotNan,
@@ -41,7 +41,7 @@ pub struct Bundle {
   pub capacitance: Option<NotNan<f64>>,
   #[size = 80]
   #[liberty(simple(type = Option))]
-  pub function: Option<IdBooleanExpression>,
+  pub function: Option<LogicBooleanExpression>,
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub nextstate_type: Option<NextstateType>,

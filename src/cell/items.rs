@@ -4,7 +4,7 @@ use crate::{
     GroupSet, Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
   },
   common::{items::WordSet, table::CompactCcsPower},
-  expression::{logic, IdBooleanExpression},
+  expression::{logic, LogicBooleanExpression, PowerGroundBooleanExpression},
   pin::Direction,
   timing::items::Mode,
   ArcStr, NotNan,
@@ -44,21 +44,21 @@ pub struct LeakagePower {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
   #[size = 8]
   #[liberty(simple(type = Option))]
-  power_level: Option<ArcStr>,
+  pub power_level: Option<ArcStr>,
   #[id]
   #[size = 64]
   #[liberty(simple)]
-  related_pg_pin: WordSet,
-  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  pub related_pg_pin: WordSet,
+  #[id(borrow = "Option<&LogicBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   #[size = 80]
   #[liberty(simple(type = Option))]
-  when: Option<IdBooleanExpression>,
+  pub when: Option<LogicBooleanExpression>,
   #[size = 8]
   #[liberty(simple)]
-  value: NotNan<f64>,
+  pub value: NotNan<f64>,
   #[size = 16]
   #[liberty(complex(type = Option))]
-  mode: Option<Mode>,
+  pub mode: Option<Mode>,
 }
 impl GroupFn for LeakagePower {}
 
@@ -436,7 +436,7 @@ pub struct PgPin {
   /// ">Reference-Definition</a>
   #[size = 80]
   #[liberty(simple(type = Option))]
-  pub pg_function: Option<IdBooleanExpression>,
+  pub pg_function: Option<PowerGroundBooleanExpression>,
   /// The `switch_function`  string attribute identifies the condition
   /// when the attached design partition is turned off by the input `switch_pin`.
   /// For a coarse-grain switch cell, the `switch_function`  attribute can be defined
@@ -451,7 +451,7 @@ pub struct PgPin {
   /// ">Reference-Definition</a>
   #[size = 80]
   #[liberty(simple(type = Option))]
-  pub switch_function: Option<IdBooleanExpression>,
+  pub switch_function: Option<LogicBooleanExpression>,
 }
 impl GroupFn for PgPin {}
 
@@ -487,7 +487,7 @@ pub struct DynamicCurrent {
   #[id]
   #[size = 80]
   #[liberty(simple(type = Option))]
-  pub when: Option<IdBooleanExpression>,
+  pub when: Option<LogicBooleanExpression>,
   #[id]
   #[size = 64]
   #[liberty(simple)]
@@ -851,7 +851,7 @@ pub struct IntrinsicParasitic {
   pub attributes: crate::ast::Attributes,
   #[id]
   #[liberty(simple(type = Option))]
-  pub when: Option<IdBooleanExpression>,
+  pub when: Option<LogicBooleanExpression>,
   /// The `reference_pg_pin` attribute specifies the reference pin for the
   /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
   /// be a valid PG pin.
@@ -1423,7 +1423,7 @@ pub struct LeakageCurrent {
   #[id]
   #[size = 80]
   #[liberty(simple(type = Option))]
-  pub when: Option<IdBooleanExpression>,
+  pub when: Option<LogicBooleanExpression>,
   /// When a cell has a single power and ground pin, omit the `pg_current` group and specify
   /// the leakage current value. Otherwise, specify the value in the `pg_current` group. Current
   /// conservation is applied for each leakage_current group. The value attribute specifies

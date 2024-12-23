@@ -18,5 +18,13 @@ liberty_db::library::Library (some) {
 			clocked_on : "\"1A\"+\"1B\"";
 			next_state : "J*K*!IQ+J*!K+!J*!K*IQ";
 		}
+		pin (1A) {
+		}
+		pin (1B) {
+		}
+		pin (J) {
+		}
+		pin (K) {
+		}
 	}
 }

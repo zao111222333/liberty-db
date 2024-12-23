@@ -6,16 +6,12 @@ mod latch_ff;
 pub mod logic;
 mod logic_impl;
 mod parser;
-use crate::{
-  ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder},
-  ArcStr,
-};
+use crate::ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder};
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 use parser::{as_sdf_str, BoolExprErr};
 
 pub use biodivine_lib_bdd::{
   boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
-  BddVariableSetBuilder,
 };
 use core::{
   borrow::Borrow,
@@ -24,7 +20,11 @@ use core::{
   str::FromStr,
 };
 use itertools::Itertools;
-use std::{collections::HashSet, sync::LazyLock};
+use std::{
+  collections::HashSet,
+  ops::{Deref, DerefMut},
+  sync::LazyLock,
+};
 
 use super::SdfExpression;
 
@@ -33,7 +33,7 @@ static UNKNOWN: LazyLock<Box<Expr>> =
 
 pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
   #[inline]
-  fn get_nodes(&self) -> HashSet<ArcStr, crate::ast::RandomState> {
+  fn get_nodes(&self) -> HashSet<&str, crate::ast::RandomState> {
     let mut node_set = HashSet::with_hasher(crate::ast::RandomState::new());
     _get_nodes(self.borrow(), &mut node_set);
     node_set
@@ -49,7 +49,7 @@ pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
 
 impl BooleanExpressionLike for Expr {}
 impl BooleanExpressionLike for BooleanExpression {}
-impl BooleanExpressionLike for IdBooleanExpression {}
+impl BooleanExpressionLike for BddBooleanExpression {}
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=132.36+132.41&end=132.38+133.13
@@ -119,7 +119,7 @@ impl crate::ast::SimpleAttri for BooleanExpression {
     f.write_fmt(format_args!("\"{self}\""))
   }
 }
-impl crate::ast::SimpleAttri for IdBooleanExpression {
+impl crate::ast::SimpleAttri for LogicBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -133,6 +133,52 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     f.write_fmt(format_args!("\"{self}\""))
+  }
+}
+impl crate::ast::SimpleAttri for PowerGroundBooleanExpression {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
+    crate::ast::nom_parse_from_str(i, scope)
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    f.write_fmt(format_args!("\"{self}\""))
+  }
+}
+
+impl Deref for LogicBooleanExpression {
+  type Target = BddBooleanExpression;
+  #[inline]
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+impl DerefMut for LogicBooleanExpression {
+  #[inline]
+  fn deref_mut(&mut self) -> &mut Self::Target {
+    &mut self.0
+  }
+}
+
+impl Deref for PowerGroundBooleanExpression {
+  type Target = BddBooleanExpression;
+  #[inline]
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+impl DerefMut for PowerGroundBooleanExpression {
+  #[inline]
+  fn deref_mut(&mut self) -> &mut Self::Target {
+    &mut self.0
   }
 }
 
@@ -163,45 +209,50 @@ impl crate::ast::SimpleAttri for IdBooleanExpression {
 /// </script>
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct IdBooleanExpression {
-  // share same BddVariableSet
-  // /// `sorted_nodes`
-  // pub sorted_nodes: Vec<ArcStr>,
-  // #[serde(serialize_with = "variables_serialize")]
-  // #[serde(deserialize_with = "variables_deserialize")]
-  // pub variables: Arc<BddVariableSet>,
+pub struct BddBooleanExpression {
   /// `BooleanExpression` itself
   pub expr: Expr,
   /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
   /// as `id`, to impl `hash` and `compare`
   pub bdd: Bdd,
 }
-impl Borrow<Expr> for IdBooleanExpression {
+
+#[derive(Debug, Clone)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PowerGroundBooleanExpression(pub BddBooleanExpression);
+
+#[derive(Debug, Clone)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LogicBooleanExpression(pub BddBooleanExpression);
+
+impl Borrow<Expr> for BddBooleanExpression {
   #[inline]
   fn borrow(&self) -> &Expr {
     &self.expr
   }
 }
-impl From<IdBooleanExpression> for Expr {
+impl From<BddBooleanExpression> for Expr {
   #[inline]
-  fn from(val: IdBooleanExpression) -> Self {
+  fn from(val: BddBooleanExpression) -> Self {
     val.expr
   }
 }
-impl From<Expr> for IdBooleanExpression {
+impl From<Expr> for BddBooleanExpression {
   #[inline]
   fn from(expr: Expr) -> Self {
     BooleanExpression::from(expr).into()
   }
 }
-impl PartialEq for IdBooleanExpression {
+impl PartialEq for BddBooleanExpression {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
     self.bdd == other.bdd
   }
 }
 
-impl IdBooleanExpression {
+impl BddBooleanExpression {
   /// convert `BooleanExpression` to sdf
   #[must_use]
   #[inline]
@@ -218,56 +269,58 @@ impl IdBooleanExpression {
   }
 }
 
-impl Eq for IdBooleanExpression {}
+impl Eq for BddBooleanExpression {}
 #[expect(clippy::non_canonical_partial_ord_impl)]
-impl PartialOrd for IdBooleanExpression {
+impl PartialOrd for BddBooleanExpression {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
     Some(Bdd::cmp_structural(&self.bdd, &other.bdd))
-    // match self.sorted_nodes.partial_cmp(&other.sorted_nodes) {
-    //   Some(Ordering::Equal) | None => Some(Bdd::cmp_structural(&self.bdd, &other.bdd)),
-    //   ord => ord,
-    // }
   }
 }
-impl Ord for IdBooleanExpression {
+impl Ord for BddBooleanExpression {
   #[inline]
   fn cmp(&self, other: &Self) -> Ordering {
     self.partial_cmp(other).unwrap_or(Ordering::Equal)
   }
 }
 
-impl core::hash::Hash for IdBooleanExpression {
+impl core::hash::Hash for BddBooleanExpression {
   #[inline]
   fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
     self.bdd.hash(state);
   }
 }
 
-impl ParsingBuilder for IdBooleanExpression {
+impl ParsingBuilder for LogicBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope) -> Self {
-    let bdd = scope.variables.eval_expression(&builder.expr);
-    Self { expr: builder.expr, bdd }
+    let bdd = scope.cell_extra_ctx.logic_variables.eval_expression(&builder.expr);
+    Self(BddBooleanExpression { expr: builder.expr, bdd })
   }
 }
 
-impl From<BooleanExpression> for IdBooleanExpression {
+impl ParsingBuilder for PowerGroundBooleanExpression {
+  type Builder = BooleanExpression;
+  #[inline]
+  fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope) -> Self {
+    let bdd = scope.cell_extra_ctx.pg_variables.eval_expression(&builder.expr);
+    Self(BddBooleanExpression { expr: builder.expr, bdd })
+  }
+}
+
+impl From<BooleanExpression> for BddBooleanExpression {
   #[inline]
   fn from(value: BooleanExpression) -> Self {
-    let mut builder = BddVariableSetBuilder::new();
-    let node_set = value.get_nodes();
-    node_set.into_iter().sorted().for_each(|s| {
-      _ = builder.make_variable(s.as_str());
-    });
-    let variables = builder.build();
+    let mut node_set: Vec<&str> = value.get_nodes().into_iter().collect();
+    node_set.sort_unstable();
+    let variables = BddVariableSet::new(&node_set);
     let bdd = variables.eval_expression(&value.expr);
     Self { expr: value.expr, bdd }
   }
 }
 
-impl FromStr for IdBooleanExpression {
+impl FromStr for BddBooleanExpression {
   type Err = BoolExprErr;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -283,19 +336,29 @@ impl fmt::Display for BooleanExpression {
   }
 }
 
-impl fmt::Display for IdBooleanExpression {
+impl fmt::Display for LogicBooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    parser::_fmt(&self.expr, f)
+    parser::_fmt(&self.0.expr, f)
+  }
+}
+
+impl fmt::Display for PowerGroundBooleanExpression {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    parser::_fmt(&self.0.expr, f)
   }
 }
 
 #[inline]
-fn _get_nodes(expr: &Expr, node_set: &mut HashSet<ArcStr, crate::ast::RandomState>) {
+fn _get_nodes<'a>(
+  expr: &'a Expr,
+  node_set: &mut HashSet<&'a str, crate::ast::RandomState>,
+) {
   match expr {
     Expr::Const(_) => (),
     Expr::Variable(node) => {
-      _ = node_set.insert(ArcStr::from(node));
+      _ = node_set.insert(node);
     }
     Expr::Not(e) => _get_nodes(e, node_set),
     Expr::And(e1, e2) | Expr::Or(e1, e2) | Expr::Xor(e1, e2) => {
@@ -363,14 +426,14 @@ mod test {
     ] {
       println!("----");
       println!("origin:   {s}");
-      let bool_expr = IdBooleanExpression::from_str(s);
+      let bool_expr = BddBooleanExpression::from_str(s);
       if should_success {
         if let Ok(e) = bool_expr {
-          let fmt_s = format!("{e}");
+          let fmt_s = format!("{}", BooleanExpression { expr: e.clone().expr });
           println!("parsed:   {fmt_s}");
-          let fmt_bool_expr = IdBooleanExpression::from_str(&fmt_s);
+          let fmt_bool_expr = BddBooleanExpression::from_str(&fmt_s);
           if let Ok(fmt_e) = fmt_bool_expr {
-            println!("reparsed: {fmt_e}");
+            println!("reparsed: {}", BooleanExpression { expr: fmt_e.clone().expr });
             assert_eq!(e, fmt_e);
           } else {
             println!("{e:?}");
@@ -406,10 +469,16 @@ mod test {
       println!("s2: {s2}");
       if same {
         println!("they should same");
-        assert_eq!(IdBooleanExpression::from_str(s1), IdBooleanExpression::from_str(s2));
+        assert_eq!(
+          BddBooleanExpression::from_str(s1),
+          BddBooleanExpression::from_str(s2)
+        );
       } else {
         println!("they are different");
-        assert_ne!(IdBooleanExpression::from_str(s1), IdBooleanExpression::from_str(s2));
+        assert_ne!(
+          BddBooleanExpression::from_str(s1),
+          BddBooleanExpression::from_str(s2)
+        );
       }
     }
   }
@@ -419,9 +488,9 @@ mod test {
     let a = Box::new(Expr::Variable("A".to_owned()));
     let b = Box::new(Expr::Variable("B".to_owned()));
     let c = Box::new(Expr::Variable("C".to_owned()));
-    let cond: IdBooleanExpression =
+    let cond: BddBooleanExpression =
       BooleanExpression { expr: Expr::Cond(a.clone(), b.clone(), c.clone()) }.into();
-    let or_and: IdBooleanExpression = BooleanExpression {
+    let or_and: BddBooleanExpression = BooleanExpression {
       expr: Expr::Or(
         Box::new(Expr::And(a.clone(), b)),
         Box::new(Expr::And(Box::new(Expr::Not(a)), c)),
@@ -432,19 +501,15 @@ mod test {
   }
   #[test]
   fn sdf() {
-    let mut builder = BddVariableSetBuilder::new();
-    let [a, b, c, d] = builder.make(&["A", "B", "C", "D"]);
-    let variables = builder.build();
+    let variables = BddVariableSet::new(&["A", "B", "C", "D"]);
     assert_eq!(
       SdfExpression::new("( A == 1'b0 && B == 1'b1 && C == 1'b1) || ( A == 1'b1 && B == 1'b0 && C == 1'b1) || ( A == 1'b1 && B == 1'b1 && C == 1'b1 )".into()), 
-      IdBooleanExpression::from_str("(A+B)*C").unwrap().sdf(&variables),
+      BddBooleanExpression::from_str("(A+B)*C").unwrap().sdf(&variables),
     );
   }
   #[test]
   fn lid_bdd() {
-    let mut builder = BddVariableSetBuilder::new();
-    let [a, b, c, d] = builder.make(&["A", "B", "C", "D"]);
-    let variables = builder.build();
+    let variables = BddVariableSet::new(&["A", "B", "C", "D"]);
     let x1 = variables.eval_expression_string("(A|B)&(C|D)");
     let x2 = variables.eval_expression_string("B&D | B&C | A&D | A&C");
     assert_eq!(x1, x2);
@@ -456,13 +521,9 @@ mod test {
   }
   #[test]
   fn lid_bdd2() {
-    let mut builder_1 = BddVariableSetBuilder::new();
-    let _ = builder_1.make(&["A", "B", "C", "D"]);
-    let variables = builder_1.build();
+    let variables = BddVariableSet::new(&["A", "B", "C", "D"]);
     let x1 = variables.eval_expression_string("(A|B)&(C|D)");
-    let mut builder_2 = BddVariableSetBuilder::new();
-    _ = builder_2.make(&["A", "B", "C", "D", "E"]);
-    let variables = builder_2.build();
+    let variables = BddVariableSet::new(&["A", "B", "C", "D", "E"]);
     let x2 = variables.eval_expression_string("(A|B)&(C|D)");
     assert_ne!(x1, x2);
   }

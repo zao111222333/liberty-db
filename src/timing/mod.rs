@@ -19,7 +19,7 @@ use crate::{
       CompactCcsTable, ReferenceTimeVector3DGrpup, TableLookUp, TableLookUpMultiSegment,
     },
   },
-  expression::{BooleanExpression, IdBooleanExpression, SdfExpression},
+  expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
   ArcStr, NotNan,
 };
 pub use items::*;
@@ -1323,8 +1323,11 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   #[size = 80]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&IdBooleanExpression>", check_fn = "mut_set::borrow_option!")]
-  pub when: Option<IdBooleanExpression>,
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!"
+  )]
+  pub when: Option<LogicBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
