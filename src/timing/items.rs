@@ -2,6 +2,7 @@
 //! `Timing`.
 
 use core::ops::Not;
+use std::ops::{Add, Mul, Sub};
 
 use crate::{
   ast::{
@@ -237,20 +238,152 @@ pub struct TimingTableLookUp {
   pub comments: String,
   pub index_1: Vec<NotNan<f64>>,
   pub index_2: Vec<NotNan<f64>>,
-  pub index_3: Vec<NotNan<f64>>,
-  pub index_4: Vec<NotNan<f64>>,
   pub size1: usize,
   pub size2: usize,
   pub values: Vec<NotNan<f64>>,
   pub lvf_values: Vec<LVFValue>,
 }
+
+impl TimingTableLookUp {
+  #[inline]
+  fn find_pos(len: usize, pos: usize) -> Option<(usize, usize)> {
+    if len <= 1 {
+      None
+    } else {
+      Some(if pos == 0 {
+        (0, 1)
+      } else if pos == len {
+        (len - 2, len - 1)
+      } else {
+        (pos - 1, pos)
+      })
+    }
+  }
+  #[inline]
+  fn get_value(&self, ix: usize, iy: usize) -> NotNan<f64> {
+    self.values[ix * self.index_2.len() + iy]
+  }
+  #[inline]
+  fn get_lvf_value(&self, ix: usize, iy: usize) -> LVFValue {
+    self.lvf_values[ix * self.index_2.len() + iy]
+  }
+  pub fn lookup(&self, idx1: &NotNan<f64>, idx2: &NotNan<f64>) -> Option<NotNan<f64>> {
+    match self.index_1.binary_search(idx1) {
+      Ok(i1_) => match self.index_2.binary_search(idx2) {
+        Ok(i_1) => Some(self.get_value(i1_, i_1)),
+        Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
+          let q_1 = self.get_value(i1_, i_1);
+          let q_2 = self.get_value(i1_, i_2);
+          let x_1 = self.index_2[i_1];
+          let x_2 = self.index_2[i_2];
+          q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
+        }),
+      },
+      Err(pos1) => Self::find_pos(self.index_1.len(), pos1).and_then(|(i1_, i2_)| {
+        let x1_ = self.index_1[i1_];
+        let x2_ = self.index_1[i2_];
+        match self.index_2.binary_search(idx2) {
+          Ok(i_1) => {
+            let q1_ = self.get_value(i1_, i_1);
+            let q2_ = self.get_value(i2_, i_1);
+            Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+          }
+          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).and_then(|(i_1, i_2)| {
+            let q11 = self.get_value(i1_, i_1);
+            let q12 = self.get_value(i1_, i_2);
+            let q21 = self.get_value(i2_, i_1);
+            let q22 = self.get_value(i2_, i_2);
+            let x_1 = self.index_2[i_1];
+            let x_2 = self.index_2[i_2];
+            let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
+            let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
+            Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+          }),
+        }
+      }),
+    }
+  }
+  pub fn lookup_lvf(&self, idx1: &NotNan<f64>, idx2: &NotNan<f64>) -> Option<LVFValue> {
+    match self.index_1.binary_search(idx1) {
+      Ok(i1_) => match self.index_2.binary_search(idx2) {
+        Ok(i_1) => Some(self.get_lvf_value(i1_, i_1)),
+        Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
+          let q_1 = self.get_lvf_value(i1_, i_1);
+          let q_2 = self.get_lvf_value(i1_, i_2);
+          let x_1 = self.index_2[i_1];
+          let x_2 = self.index_2[i_2];
+          q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
+        }),
+      },
+      Err(pos1) => Self::find_pos(self.index_1.len(), pos1).and_then(|(i1_, i2_)| {
+        let x1_ = self.index_1[i1_];
+        let x2_ = self.index_1[i2_];
+        match self.index_2.binary_search(idx2) {
+          Ok(i_1) => {
+            let q1_ = self.get_lvf_value(i1_, i_1);
+            let q2_ = self.get_lvf_value(i2_, i_1);
+            Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+          }
+          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).and_then(|(i_1, i_2)| {
+            let q11 = self.get_lvf_value(i1_, i_1);
+            let q12 = self.get_lvf_value(i1_, i_2);
+            let q21 = self.get_lvf_value(i2_, i_1);
+            let q22 = self.get_lvf_value(i2_, i_2);
+            let x_1 = self.index_2[i_1];
+            let x_2 = self.index_2[i_2];
+            let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
+            let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
+            Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+          }),
+        }
+      }),
+    }
+  }
+}
+
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct LVFValue {
   /// `mean` = `nominal` + `mean_shift`
   pub mean: NotNan<f64>,
   pub std_dev: NotNan<f64>,
   pub skewness: NotNan<f64>,
+}
+
+impl Add for LVFValue {
+  type Output = Self;
+  #[inline]
+  fn add(self, rhs: Self) -> Self::Output {
+    Self {
+      mean: self.mean + rhs.mean,
+      std_dev: self.std_dev + rhs.std_dev,
+      skewness: self.skewness + rhs.skewness,
+    }
+  }
+}
+impl Sub for LVFValue {
+  type Output = Self;
+  #[inline]
+  /// TODO: check
+  fn sub(self, rhs: Self) -> Self::Output {
+    Self {
+      mean: self.mean - rhs.mean,
+      // TODO: check - or + ?
+      std_dev: self.std_dev - rhs.std_dev,
+      skewness: self.skewness - rhs.skewness,
+    }
+  }
+}
+impl Mul<NotNan<f64>> for LVFValue {
+  type Output = Self;
+  #[inline]
+  fn mul(self, rhs: NotNan<f64>) -> Self::Output {
+    Self {
+      mean: self.mean * rhs,
+      std_dev: self.std_dev * rhs,
+      skewness: self.skewness * rhs,
+    }
+  }
 }
 
 impl ParsingBuilder for Option<TimingTableLookUp> {
@@ -273,10 +406,7 @@ impl ParsingBuilder for Option<TimingTableLookUp> {
       lhs: &<TableLookUp as ParsingBuilder>::Builder,
       rhs: &<TableLookUp as ParsingBuilder>::Builder,
     ) -> bool {
-      lhs.index_1 == rhs.index_1
-        && lhs.index_2 == rhs.index_2
-        && lhs.index_3 == rhs.index_3
-        && lhs.index_4 == rhs.index_4
+      lhs.index_1 == rhs.index_1 && lhs.index_2 == rhs.index_2
     }
     match builder {
       (Some(_value), Some(_mean_shift), Some(_std_dev), Some(_skewness)) => {
@@ -307,8 +437,6 @@ impl ParsingBuilder for Option<TimingTableLookUp> {
           comments,
           index_1: _value.index_1,
           index_2: _value.index_2,
-          index_3: _value.index_3,
-          index_4: _value.index_4,
           size1: _value.values.size1,
           size2: _value.values.size2,
           values: _value.values.inner,
@@ -320,8 +448,6 @@ impl ParsingBuilder for Option<TimingTableLookUp> {
         comments: String::new(),
         index_1: _value.index_1,
         index_2: _value.index_2,
-        index_3: _value.index_3,
-        index_4: _value.index_4,
         size1: _value.values.size1,
         size2: _value.values.size2,
         values: _value.values.inner,
@@ -344,8 +470,6 @@ impl TimingTableLookUp {
       name: &self.name,
       index_1: &self.index_1,
       index_2: &self.index_2,
-      index_3: &self.index_3,
-      index_4: &self.index_4,
       values: DisplayValues {
         size1: self.size1,
         inner: self.values.iter().copied(),
@@ -357,8 +481,6 @@ impl TimingTableLookUp {
         name: &self.name,
         index_1: &self.index_1,
         index_2: &self.index_2,
-        index_3: &self.index_3,
-        index_4: &self.index_4,
         values: DisplayValues {
           size1: self.size1,
           inner: izip!(self.values.iter(), self.lvf_values.iter())
@@ -370,8 +492,6 @@ impl TimingTableLookUp {
         name: &self.name,
         index_1: &self.index_1,
         index_2: &self.index_2,
-        index_3: &self.index_3,
-        index_4: &self.index_4,
         values: DisplayValues {
           size1: self.size1,
           inner: self.lvf_values.iter().map(|lvf| lvf.std_dev),
@@ -382,8 +502,6 @@ impl TimingTableLookUp {
         name: &self.name,
         index_1: &self.index_1,
         index_2: &self.index_2,
-        index_3: &self.index_3,
-        index_4: &self.index_4,
         values: DisplayValues {
           size1: self.size1,
           inner: self.lvf_values.iter().map(|lvf| lvf.skewness),

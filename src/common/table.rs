@@ -953,8 +953,6 @@ pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = NotNan<f64>>> {
   pub(crate) name: &'a Option<ArcStr>,
   pub(crate) index_1: &'a Vec<NotNan<f64>>,
   pub(crate) index_2: &'a Vec<NotNan<f64>>,
-  pub(crate) index_3: &'a Vec<NotNan<f64>>,
-  pub(crate) index_4: &'a Vec<NotNan<f64>>,
   pub(crate) values: DisplayValues<V>,
 }
 
@@ -974,8 +972,6 @@ impl<'a, V: Iterator<Item = NotNan<f64>>> DisplayTableLookUp<'a, V> {
     f.indent(1);
     ComplexAttri::fmt_liberty(self.index_1, "index_1", f)?;
     ComplexAttri::fmt_liberty(self.index_2, "index_2", f)?;
-    ComplexAttri::fmt_liberty(self.index_3, "index_3", f)?;
-    ComplexAttri::fmt_liberty(self.index_4, "index_4", f)?;
     let indent1 = f.indentation();
     write!(f, "\n{indent1}values (")?;
     f.indent(1);

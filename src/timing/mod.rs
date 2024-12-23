@@ -2235,4 +2235,78 @@ liberty_db::timing::Timing () {
 }"#,
     );
   }
+  #[test]
+  fn table_lookup() {
+    use crate::ast::GroupAttri;
+    let timing = crate::ast::test_parse::<Timing>(
+      r#"(){
+        cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+        ocv_mean_shift_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "0, 0, 0", \
+            "0, 0, 0", \
+            "0, 0, 0", \
+          ) ;
+        }
+        ocv_std_dev_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+        ocv_skewness_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+      }
+    "#,
+    );
+    let table = timing.cell_rise.unwrap();
+    let assert_fn = |idx1: f64, idx2: f64, want: f64| {
+      assert_eq!(
+        Some(NotNan::new(want).unwrap()),
+        table.lookup(&NotNan::new(idx1).unwrap(), &NotNan::new(idx2).unwrap())
+      );
+    };
+    assert_fn(10.0, 30.0, 100.0);
+    assert_fn(30.0, 60.0, 900.0);
+    assert_fn(10.0, 42.0, 160.0);
+    assert_fn(14.0, 30.0, 220.0);
+    // 100 + (400-100)*0.4 = 220
+    // 200 + (500-200)*0.4 = 320
+    // 220 + (320-220)*0.6 = 280
+    assert_fn(14.0, 42.0, 280.0);
+    let assert_lvf_fn = |idx1: f64, idx2: f64, want: f64| {
+      assert_eq!(
+        Some(LVFValue {
+          mean: NotNan::new(want).unwrap(),
+          std_dev: NotNan::new(want).unwrap(),
+          skewness: NotNan::new(want).unwrap()
+        }),
+        table.lookup_lvf(&NotNan::new(idx1).unwrap(), &NotNan::new(idx2).unwrap())
+      );
+    };
+    assert_lvf_fn(10.0, 30.0, 100.0);
+    assert_lvf_fn(30.0, 60.0, 900.0);
+    assert_lvf_fn(10.0, 42.0, 160.0);
+    assert_lvf_fn(14.0, 30.0, 220.0);
+  }
 }
