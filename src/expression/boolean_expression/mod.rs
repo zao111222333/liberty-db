@@ -17,14 +17,11 @@ use core::{
   borrow::Borrow,
   cmp::Ordering,
   fmt::{self, Write},
+  ops::{Deref, DerefMut},
   str::FromStr,
 };
 use itertools::Itertools;
-use std::{
-  collections::HashSet,
-  ops::{Deref, DerefMut},
-  sync::LazyLock,
-};
+use std::{collections::HashSet, sync::LazyLock};
 
 use super::SdfExpression;
 

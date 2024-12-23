@@ -46,6 +46,12 @@ library(gscl45nm) {
       clear_preset_var1  	: L;
       clear_preset_var2  	: L;
     }
+    pin (D) {}
+    pin (CK) {}
+    pin (SE) {}
+    pin (SI) {}
+    pin (SN) {}
+    pin (RN) {}
   }
 }"#;
 fn main() {
