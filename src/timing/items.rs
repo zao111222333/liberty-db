@@ -1,8 +1,7 @@
 //! All item structure inside
 //! `Timing`.
-
-use core::ops::Not;
-use std::ops::{Add, Mul, Sub};
+#![allow(clippy::multiple_inherent_impl)]
+use core::ops::{Add, Mul, Not, Sub};
 
 use crate::{
   ast::{
@@ -243,10 +242,14 @@ pub struct TimingTableLookUp {
   pub values: Vec<NotNan<f64>>,
   pub lvf_values: Vec<LVFValue>,
 }
-
+#[expect(
+  clippy::similar_names,
+  clippy::indexing_slicing,
+  clippy::arithmetic_side_effects
+)]
 impl TimingTableLookUp {
   #[inline]
-  fn find_pos(len: usize, pos: usize) -> Option<(usize, usize)> {
+  const fn find_pos(len: usize, pos: usize) -> Option<(usize, usize)> {
     if len <= 1 {
       None
     } else {
@@ -267,6 +270,8 @@ impl TimingTableLookUp {
   fn get_lvf_value(&self, ix: usize, iy: usize) -> LVFValue {
     self.lvf_values[ix * self.index_2.len() + iy]
   }
+  #[must_use]
+  #[inline]
   pub fn lookup(&self, idx1: &NotNan<f64>, idx2: &NotNan<f64>) -> Option<NotNan<f64>> {
     match self.index_1.binary_search(idx1) {
       Ok(i1_) => match self.index_2.binary_search(idx2) {
@@ -288,7 +293,7 @@ impl TimingTableLookUp {
             let q2_ = self.get_value(i2_, i_1);
             Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
           }
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).and_then(|(i_1, i_2)| {
+          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
             let q11 = self.get_value(i1_, i_1);
             let q12 = self.get_value(i1_, i_2);
             let q21 = self.get_value(i2_, i_1);
@@ -297,12 +302,14 @@ impl TimingTableLookUp {
             let x_2 = self.index_2[i_2];
             let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
             let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
-            Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+            q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
           }),
         }
       }),
     }
   }
+  #[must_use]
+  #[inline]
   pub fn lookup_lvf(&self, idx1: &NotNan<f64>, idx2: &NotNan<f64>) -> Option<LVFValue> {
     match self.index_1.binary_search(idx1) {
       Ok(i1_) => match self.index_2.binary_search(idx2) {
@@ -324,7 +331,7 @@ impl TimingTableLookUp {
             let q2_ = self.get_lvf_value(i2_, i_1);
             Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
           }
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).and_then(|(i_1, i_2)| {
+          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
             let q11 = self.get_lvf_value(i1_, i_1);
             let q12 = self.get_lvf_value(i1_, i_2);
             let q21 = self.get_lvf_value(i2_, i_1);
@@ -333,7 +340,7 @@ impl TimingTableLookUp {
             let x_2 = self.index_2[i_2];
             let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
             let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
-            Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+            q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
           }),
         }
       }),
@@ -349,7 +356,7 @@ pub struct LVFValue {
   pub std_dev: NotNan<f64>,
   pub skewness: NotNan<f64>,
 }
-
+#[expect(clippy::arithmetic_side_effects)]
 impl Add for LVFValue {
   type Output = Self;
   #[inline]
@@ -361,6 +368,7 @@ impl Add for LVFValue {
     }
   }
 }
+#[expect(clippy::arithmetic_side_effects)]
 impl Sub for LVFValue {
   type Output = Self;
   #[inline]
@@ -374,6 +382,7 @@ impl Sub for LVFValue {
     }
   }
 }
+#[expect(clippy::arithmetic_side_effects)]
 impl Mul<NotNan<f64>> for LVFValue {
   type Output = Self;
   #[inline]
