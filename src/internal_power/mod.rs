@@ -41,10 +41,7 @@ pub struct InternalPower {
   // switching_together_group
   #[size = 80]
   #[liberty(simple(type = Option))]
-  #[id(
-    borrow = "Option<&LogicBooleanExpression>",
-    check_fn = "mut_set::borrow_option!"
-  )]
+  #[id(borrow = "Option<&LogicBooleanExpression>", check_fn = "mut_set::borrow_option!")]
   pub when: Option<LogicBooleanExpression>,
   // NOTICE: Complex Attribute
   #[size = 16]
