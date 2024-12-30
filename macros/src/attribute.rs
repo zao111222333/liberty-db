@@ -525,6 +525,7 @@ fn main() {
   let input = r#"
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Foo {
   #[liberty(attributes)]
   attributes: bool,
@@ -547,10 +548,10 @@ pub struct Foo {
     #[liberty(group(type=Vec))]
     group_vec: i64,
     #[liberty(supergroup(
-      cell_fall: Option<TableLookUp>,
-      ocv_mean_shift_cell_fall: Option<TableLookUp>,
-      ocv_std_dev_cell_fall: Option<TableLookUp>,
-      ocv_skewness_cell_fall: Option<TableLookUp>,
+      cell_fall: Option<TableLookUp<C>>,
+      ocv_mean_shift_cell_fall: Option<TableLookUp<C>>,
+      ocv_std_dev_cell_fall: Option<TableLookUp<C>>,
+      ocv_skewness_cell_fall: Option<TableLookUp<C>>,
     ))]
     pub cell_fall: Option<TimingTableLookUp>,
 }"#;

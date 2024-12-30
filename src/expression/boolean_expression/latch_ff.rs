@@ -2,10 +2,12 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 
-use super::{BooleanExpression, BooleanExpressionLike, LogicBooleanExpression, UNKNOWN};
+use super::{
+  BooleanExpression, BooleanExpressionLike as _, LogicBooleanExpression, UNKNOWN,
+};
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
-  ArcStr,
+  ArcStr, Ctx,
 };
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt::Write;
@@ -20,7 +22,8 @@ use core::fmt::Write;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct FF {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct FF<C: Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -34,7 +37,7 @@ pub struct FF {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -49,7 +52,7 @@ pub struct FF {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub variable2: ArcStr,
   /// group comments
   #[size = 32]
@@ -57,7 +60,7 @@ pub struct FF {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -116,7 +119,7 @@ pub struct FF {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct FFBank {
+pub struct FFBank<C: Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -130,7 +133,7 @@ pub struct FFBank {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -145,7 +148,7 @@ pub struct FFBank {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub variable2: ArcStr,
   /// bits
   #[size = 8]
@@ -157,7 +160,7 @@ pub struct FFBank {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -215,7 +218,7 @@ pub struct FFBank {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Latch {
+pub struct Latch<C: Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -229,7 +232,7 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -244,7 +247,7 @@ pub struct Latch {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub variable2: ArcStr,
   /// group comments
   #[size = 32]
@@ -252,7 +255,7 @@ pub struct Latch {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -310,7 +313,7 @@ pub struct Latch {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct LatchBank {
+pub struct LatchBank<C: Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -324,7 +327,7 @@ pub struct LatchBank {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub variable1: ArcStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -337,7 +340,7 @@ pub struct LatchBank {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=158.2&end=158.6
   /// ">Reference-Definition</a>
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pub variable2: ArcStr,
@@ -351,7 +354,7 @@ pub struct LatchBank {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -405,7 +408,7 @@ pub struct LatchBank {
   [Latch];
   [FF];
 )]
-impl NamedGroup for LatchFF_type {
+impl<C: Ctx> NamedGroup for LatchFF_type<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -439,7 +442,7 @@ impl NamedGroup for LatchFF_type {
   [LatchBank];
   [FFBank];
 )]
-impl NamedGroup for LatchFFBank_type {
+impl<C: Ctx> NamedGroup for LatchFFBank_type<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -484,7 +487,7 @@ impl NamedGroup for LatchFFBank_type {
   [LatchBank];
   [Latch];
 )]
-impl __LatchFF for Latch_type {
+impl<C: Ctx> __LatchFF for Latch_type<C> {
   #[inline]
   fn variable1(&self) -> &ArcStr {
     &self.variable1
@@ -494,16 +497,16 @@ impl __LatchFF for Latch_type {
     &self.variable2
   }
   #[inline]
-  fn clear(&self) -> &Option<LogicBooleanExpression> {
-    &self.clear
+  fn clear(&self) -> Option<&LogicBooleanExpression> {
+    self.clear.as_ref()
   }
   #[inline]
-  fn clear_preset_var1(&self) -> &Option<ClearPresetState> {
-    &self.clear_preset_var1
+  fn clear_preset_var1(&self) -> Option<&ClearPresetState> {
+    self.clear_preset_var1.as_ref()
   }
   #[inline]
-  fn clear_preset_var2(&self) -> &Option<ClearPresetState> {
-    &self.clear_preset_var2
+  fn clear_preset_var2(&self) -> Option<&ClearPresetState> {
+    self.clear_preset_var2.as_ref()
   }
   #[inline]
   fn active(&self) -> Option<Box<Expr>> {
@@ -514,12 +517,12 @@ impl __LatchFF for Latch_type {
     self.enable_also.as_ref().map(|e| Box::new(e.0.expr.clone()))
   }
   #[inline]
-  fn next_state(&self) -> &Option<LogicBooleanExpression> {
-    &self.data_in
+  fn next_state(&self) -> Option<&LogicBooleanExpression> {
+    self.data_in.as_ref()
   }
   #[inline]
-  fn preset(&self) -> &Option<LogicBooleanExpression> {
-    &self.preset
+  fn preset(&self) -> Option<&LogicBooleanExpression> {
+    self.preset.as_ref()
   }
 }
 
@@ -528,7 +531,7 @@ impl __LatchFF for Latch_type {
   [FFBank];
   [FF];
 )]
-impl __LatchFF for FF_type {
+impl<C: Ctx> __LatchFF for FF_type<C> {
   #[inline]
   fn variable1(&self) -> &ArcStr {
     &self.variable1
@@ -538,16 +541,16 @@ impl __LatchFF for FF_type {
     &self.variable2
   }
   #[inline]
-  fn clear(&self) -> &Option<LogicBooleanExpression> {
-    &self.clear
+  fn clear(&self) -> Option<&LogicBooleanExpression> {
+    self.clear.as_ref()
   }
   #[inline]
-  fn clear_preset_var1(&self) -> &Option<ClearPresetState> {
-    &self.clear_preset_var1
+  fn clear_preset_var1(&self) -> Option<&ClearPresetState> {
+    self.clear_preset_var1.as_ref()
   }
   #[inline]
-  fn clear_preset_var2(&self) -> &Option<ClearPresetState> {
-    &self.clear_preset_var2
+  fn clear_preset_var2(&self) -> Option<&ClearPresetState> {
+    self.clear_preset_var2.as_ref()
   }
   #[inline]
   fn active(&self) -> Option<Box<Expr>> {
@@ -570,25 +573,25 @@ impl __LatchFF for FF_type {
     })
   }
   #[inline]
-  fn next_state(&self) -> &Option<LogicBooleanExpression> {
-    &self.next_state
+  fn next_state(&self) -> Option<&LogicBooleanExpression> {
+    self.next_state.as_ref()
   }
   #[inline]
-  fn preset(&self) -> &Option<LogicBooleanExpression> {
-    &self.preset
+  fn preset(&self) -> Option<&LogicBooleanExpression> {
+    self.preset.as_ref()
   }
 }
 
 trait __LatchFF {
   fn variable1(&self) -> &ArcStr;
   fn variable2(&self) -> &ArcStr;
-  fn clear(&self) -> &Option<LogicBooleanExpression>;
-  fn clear_preset_var1(&self) -> &Option<ClearPresetState>;
-  fn clear_preset_var2(&self) -> &Option<ClearPresetState>;
+  fn clear(&self) -> Option<&LogicBooleanExpression>;
+  fn clear_preset_var1(&self) -> Option<&ClearPresetState>;
+  fn clear_preset_var2(&self) -> Option<&ClearPresetState>;
   fn active(&self) -> Option<Box<Expr>>;
   fn active_also(&self) -> Option<Box<Expr>>;
-  fn next_state(&self) -> &Option<LogicBooleanExpression>;
-  fn preset(&self) -> &Option<LogicBooleanExpression>;
+  fn next_state(&self) -> Option<&LogicBooleanExpression>;
+  fn preset(&self) -> Option<&LogicBooleanExpression>;
 }
 
 #[duplicate::duplicate_item(
@@ -598,7 +601,7 @@ trait __LatchFF {
   [LatchBank];
   [Latch];
 )]
-impl LatchFF for AllTypes {}
+impl<C: Ctx> LatchFF for AllTypes<C> {}
 #[duplicate::duplicate_item(
   AllTypes;
   [FFBank];
@@ -606,7 +609,7 @@ impl LatchFF for AllTypes {}
   [LatchBank];
   [Latch];
 )]
-impl GroupFn for AllTypes {}
+impl<C: Ctx> GroupFn for AllTypes<C> {}
 /// trait for `FF` and `FFBank`
 #[expect(private_bounds)]
 pub trait LatchFF: __LatchFF {
@@ -926,10 +929,13 @@ impl crate::ast::SimpleAttri for ClearPresetState {
 
 #[cfg(test)]
 mod test {
-  use crate::expression::{BddBooleanExpression, FFBank, Latch, LatchBank, LatchFF, FF};
+  use crate::{
+    expression::{BddBooleanExpression, FFBank, Latch, LatchBank, LatchFF, FF},
+    DefaultCtx,
+  };
   #[test]
   fn special_boolean_expression() {
-    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF<DefaultCtx>>(
       &["J", "K", "IQ", "1A", "1B"],
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
@@ -963,7 +969,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn jk_flip_flop() {
-    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF<DefaultCtx>>(
       &["J", "K", "IQ", "CP"],
       r#"(IQ,IQN) {
         next_state : "(J K IQ') + (J K') + (J' K' IQ)";
@@ -997,7 +1003,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example19() {
-    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF<DefaultCtx>>(
       &["D", "CP", "CD", "PD"],
       r#"(IQ, IQN) {  
         next_state : "D" ;  
@@ -1039,7 +1045,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example20() {
-    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF<DefaultCtx>>(
       &["TE", "TI", "J", "K", "IQ", "CD", "CP", "PD"],
       r#"(IQ, IQN) {  
         next_state : "(TE*TI)+(TE’*J*K’)+(TE’*J’*K’*IQ)+(TE’*J*K*IQ’)" ;  
@@ -1079,7 +1085,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example21() {
-    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF<DefaultCtx>>(
       &["D", "CLR", "CP"],
       r#"(IQ, IQN) {   
         next_state : "D * CLR’" ;   
@@ -1113,7 +1119,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example22() {
-    let ff = crate::ast::test_parse_fmt_variables::<FF>(
+    let ff = crate::ast::test_parse_fmt_variables::<FF<DefaultCtx>>(
       &["D", "CLK", "CLKN", "CDN", "PDN"],
       r#"(IQ, IQN) {  
         next_state : "D" ;  
@@ -1155,7 +1161,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example23() {
-    let ff = crate::ast::test_parse_fmt_variables::<FFBank>(
+    let ff = crate::ast::test_parse_fmt_variables::<FFBank<DefaultCtx>>(
       &["CLK", "CLR", "PRE", "D"],
       r#"(IQ, IQN, 4) {    
         next_state : "D" ;    
@@ -1194,7 +1200,7 @@ liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
   /// ">Reference</a>
   #[test]
   fn example25() {
-    let latch = crate::ast::test_parse_fmt_variables::<Latch>(
+    let latch = crate::ast::test_parse_fmt_variables::<Latch<DefaultCtx>>(
       &["G", "D", "CD"],
       r#"(IQ, IQN) {
         enable : "G" ;
@@ -1227,7 +1233,7 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
   /// ">Reference</a>
   #[test]
   fn example26() {
-    let latch = crate::ast::test_parse_fmt_variables::<Latch>(
+    let latch = crate::ast::test_parse_fmt_variables::<Latch<DefaultCtx>>(
       &["S", "R"],
       r#"(IQ, IQN) {  
         clear : "S’" ;  

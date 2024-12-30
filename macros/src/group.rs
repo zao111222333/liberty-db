@@ -608,7 +608,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         let i = name_vec[0].ident.clone().expect("name has no ident!");
         quote! {
           #[doc(hidden)]
-          impl crate::ast::NamedGroup for #ident {
+          impl<C: crate::Ctx> crate::ast::NamedGroup for #ident<C> {
             #[inline]
             fn parse_set_name(builder: &mut Self::Builder, v: Vec<&str>) -> Result<(), crate::ast::IdError> {
               <#t as crate::ast::NameAttri>::parse(v).map(|name| {builder.#i = name;})
@@ -630,7 +630,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
 
     let impl_group = quote! {
       #[doc(hidden)]
-      impl Default for #ident {
+      impl<C: crate::Ctx> Default for #ident<C> {
         #[inline]
         fn default() -> Self {
           Self {
@@ -640,20 +640,20 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
       #named_group_impl
       #[expect(dead_code)]
-      impl #ident {
+      impl<C: crate::Ctx> #ident<C> {
         #comment_fns
       }
       #[expect(clippy::field_scoped_visibility_modifiers,clippy::redundant_pub_crate)]
-      pub(crate) struct #builder_ident {
+      pub(crate) struct #builder_ident<C: crate::Ctx> {
         #builder_fields
       }
       #[doc(hidden)]
       #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
-      impl crate::ast::Group for #ident {}
+      impl<C: crate::Ctx> crate::ast::Group for #ident<C> {}
       #[doc(hidden)]
       #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
-      impl crate::ast::ParsingBuilder for #ident {
-        type Builder = #builder_ident;
+      impl<C: crate::Ctx> crate::ast::ParsingBuilder for #ident<C> {
+        type Builder = #builder_ident<C>;
         fn build(mut builder: Self::Builder, scope: &mut crate::ast::BuilderScope) -> Self {
           <Self as crate::ast::GroupFn>::before_build(&mut builder, scope);
           let mut g = Self {
@@ -665,7 +665,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
       #[doc(hidden)]
       #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
-      impl crate::ast::GroupAttri for #ident {
+      impl<C: crate::Ctx> crate::ast::GroupAttri for #ident<C> {
         fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
           use core::fmt::Write;
           let indent = f.indentation();

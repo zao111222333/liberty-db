@@ -42,12 +42,15 @@ fn make_golden() {
 #[cfg(test)]
 #[test]
 fn regression() {
+  use liberty_db::DefaultCtx;
+
   _ = simple_logger::SimpleLogger::new().init();
   for test_lib_path in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());
     let golden_lib_path = golden_path(&test_lib_path);
     let library =
-      Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
+      Library::<DefaultCtx>::parse_lib(read_to_string(test_lib_path).unwrap().as_str())
+        .unwrap();
     let golden = read_to_string(golden_lib_path).unwrap();
     let new = library.display().to_string();
     text_diff(golden.as_str(), new.as_str());

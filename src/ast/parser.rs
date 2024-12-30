@@ -11,7 +11,7 @@ use nom::{
   error::{ContextError, Error, ErrorKind, FromExternalError, ParseError},
   multi::{many0, separated_list0},
   sequence::{delimited, pair, preceded, terminated, tuple},
-  IResult, InputTakeAtPosition,
+  IResult, InputTakeAtPosition as _,
 };
 use std::collections::HashMap;
 

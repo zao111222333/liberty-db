@@ -4,7 +4,7 @@ use crate::{
   expression::LogicBooleanExpression,
   pin::{Direction, NextstateType},
   timing::Timing,
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
@@ -13,7 +13,8 @@ use crate::{
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Bundle {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Bundle<C: Ctx> {
   /// Name of the pin
   #[id]
   #[size = 48]
@@ -25,7 +26,7 @@ pub struct Bundle {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -47,9 +48,9 @@ pub struct Bundle {
   pub nextstate_type: Option<NextstateType>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Timing>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Timing>::deserialize_with")]
-  pub timing: GroupSet<Timing>,
+  #[serde(serialize_with = "GroupSet::<Timing<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Timing<C>>::deserialize_with")]
+  pub timing: GroupSet<Timing<C>>,
 }
 
-impl GroupFn for Bundle {}
+impl<C: Ctx> GroupFn for Bundle<C> {}

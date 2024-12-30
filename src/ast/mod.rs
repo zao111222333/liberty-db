@@ -5,10 +5,10 @@
 mod fmt;
 pub mod parser;
 use crate::{library::AttributeType, ArcStr, NotNan};
-use core::hash::{BuildHasher, Hash, Hasher};
+use core::hash::{BuildHasher as _, Hash, Hasher as _};
 use core::{fmt::Write, num::ParseIntError, str::FromStr};
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
-use itertools::Itertools;
+use itertools::Itertools as _;
 use nom::{error::Error, IResult};
 use std::collections::HashMap;
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
@@ -23,7 +23,7 @@ pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Default)]
 pub(crate) struct BuilderScope {
-  pub(crate) cell_extra_ctx: crate::cell::CellExtraCtx,
+  pub(crate) cell_extra_ctx: crate::cell::DefaultCellCtx,
 }
 pub(crate) trait ParsingBuilder: Sized {
   type Builder;
@@ -719,11 +719,17 @@ pub struct GroupDisplay<'a, G> {
   pub inner: &'a G,
 }
 
-impl<'a, G: GroupAttri> core::fmt::Display for GroupDisplay<'a, G> {
+impl<G: GroupAttri> core::fmt::Display for GroupDisplay<'_, G> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ff = DefaultCodeFormatter::new(f);
-    self.inner.fmt_liberty(core::any::type_name::<G>(), &mut ff)
+    self.inner.fmt_liberty(
+      core::any::type_name::<G>()
+        .to_owned()
+        .replace("<liberty_db::ctx::DefaultCtx>", "")
+        .as_str(),
+      &mut ff,
+    )
   }
 }
 

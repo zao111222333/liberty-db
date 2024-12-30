@@ -20,7 +20,7 @@ use crate::{
     },
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 pub use items::*;
 
@@ -50,7 +50,8 @@ pub use items::*;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Timing {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Timing<C: Ctx> {
   #[size = 24]
   #[liberty(name)]
   pub name: Vec<ArcStr>,
@@ -60,7 +61,7 @@ pub struct Timing {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1069,7 +1070,11 @@ pub struct Timing {
   /// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
   #[size = 11]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&TimingSenseType>", check_fn = "mut_set::borrow_option!")]
+  #[id(
+    borrow = "Option<&TimingSenseType>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   pub timing_sense: Option<TimingSenseType>,
   /// The `timing_type` attribute distinguishes between combinational
   /// and sequential cells by defining the type of timing arc.
@@ -1303,7 +1308,11 @@ pub struct Timing {
   /// the constrained pin and a negative pulse on the related pin.
   #[size = 3]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&TimingType>", check_fn = "mut_set::borrow_option!")]
+  #[id(
+    borrow = "Option<&TimingType>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   pub timing_type: Option<TimingType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -1323,7 +1332,11 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   #[size = 80]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&LogicBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   pub when: Option<LogicBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -1488,17 +1501,17 @@ pub struct Timing {
   /// ">Reference-Instance</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CellDegradation>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CellDegradation>::deserialize_with")]
-  pub cell_degradation: GroupSet<CellDegradation>,
+  #[serde(serialize_with = "GroupSet::<CellDegradation<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CellDegradation<C>>::deserialize_with")]
+  pub cell_degradation: GroupSet<CellDegradation<C>>,
   #[liberty(supergroup(
-    cell_rise: Option<TableLookUp>,
-    ocv_mean_shift_cell_rise: Option<TableLookUp>,
-    ocv_std_dev_cell_rise: Option<TableLookUp>,
-    ocv_skewness_cell_rise: Option<TableLookUp>,
+    cell_rise: Option<TableLookUp<C>>,
+    ocv_mean_shift_cell_rise: Option<TableLookUp<C>>,
+    ocv_std_dev_cell_rise: Option<TableLookUp<C>>,
+    ocv_skewness_cell_rise: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub cell_rise: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub cell_rise: Option<TimingTableLookUp<C>>,
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
   ///
   /// **Note:**
@@ -1524,194 +1537,196 @@ pub struct Timing {
   /// =204.10
   /// ">Reference-Instance</a>
   #[liberty(supergroup(
-    cell_fall: Option<TableLookUp>,
-    ocv_mean_shift_cell_fall: Option<TableLookUp>,
-    ocv_std_dev_cell_fall: Option<TableLookUp>,
-    ocv_skewness_cell_fall: Option<TableLookUp>,
+    cell_fall: Option<TableLookUp<C>>,
+    ocv_mean_shift_cell_fall: Option<TableLookUp<C>>,
+    ocv_std_dev_cell_fall: Option<TableLookUp<C>>,
+    ocv_skewness_cell_fall: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub cell_fall: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub cell_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    rise_transition: Option<TableLookUp>,
-    ocv_mean_shift_rise_transition: Option<TableLookUp>,
-    ocv_std_dev_rise_transition: Option<TableLookUp>,
-    ocv_skewness_rise_transition: Option<TableLookUp>,
+    rise_transition: Option<TableLookUp<C>>,
+    ocv_mean_shift_rise_transition: Option<TableLookUp<C>>,
+    ocv_std_dev_rise_transition: Option<TableLookUp<C>>,
+    ocv_skewness_rise_transition: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub rise_transition: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub rise_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    fall_transition: Option<TableLookUp>,
-    ocv_mean_shift_fall_transition: Option<TableLookUp>,
-    ocv_std_dev_fall_transition: Option<TableLookUp>,
-    ocv_skewness_fall_transition: Option<TableLookUp>,
+    fall_transition: Option<TableLookUp<C>>,
+    ocv_mean_shift_fall_transition: Option<TableLookUp<C>>,
+    ocv_std_dev_fall_transition: Option<TableLookUp<C>>,
+    ocv_skewness_fall_transition: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub fall_transition: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub fall_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    rise_constraint: Option<TableLookUp>,
-    ocv_mean_shift_rise_constraint: Option<TableLookUp>,
-    ocv_std_dev_rise_constraint: Option<TableLookUp>,
-    ocv_skewness_rise_constraint: Option<TableLookUp>,
+    rise_constraint: Option<TableLookUp<C>>,
+    ocv_mean_shift_rise_constraint: Option<TableLookUp<C>>,
+    ocv_std_dev_rise_constraint: Option<TableLookUp<C>>,
+    ocv_skewness_rise_constraint: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub rise_constraint: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub rise_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    fall_constraint: Option<TableLookUp>,
-    ocv_mean_shift_fall_constraint: Option<TableLookUp>,
-    ocv_std_dev_fall_constraint: Option<TableLookUp>,
-    ocv_skewness_fall_constraint: Option<TableLookUp>,
+    fall_constraint: Option<TableLookUp<C>>,
+    ocv_mean_shift_fall_constraint: Option<TableLookUp<C>>,
+    ocv_std_dev_fall_constraint: Option<TableLookUp<C>>,
+    ocv_skewness_fall_constraint: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub fall_constraint: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub fall_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retaining_rise: Option<TableLookUp>,
-    ocv_mean_shift_retaining_rise: Option<TableLookUp>,
-    ocv_std_dev_retaining_rise: Option<TableLookUp>,
-    ocv_skewness_retaining_rise: Option<TableLookUp>,
+    retaining_rise: Option<TableLookUp<C>>,
+    ocv_mean_shift_retaining_rise: Option<TableLookUp<C>>,
+    ocv_std_dev_retaining_rise: Option<TableLookUp<C>>,
+    ocv_skewness_retaining_rise: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub retaining_rise: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub retaining_rise: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retaining_fall: Option<TableLookUp>,
-    ocv_mean_shift_retaining_fall: Option<TableLookUp>,
-    ocv_std_dev_retaining_fall: Option<TableLookUp>,
-    ocv_skewness_retaining_fall: Option<TableLookUp>,
+    retaining_fall: Option<TableLookUp<C>>,
+    ocv_mean_shift_retaining_fall: Option<TableLookUp<C>>,
+    ocv_std_dev_retaining_fall: Option<TableLookUp<C>>,
+    ocv_skewness_retaining_fall: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub retaining_fall: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub retaining_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retain_rise_slew: Option<TableLookUp>,
-    ocv_mean_shift_retain_rise_slew: Option<TableLookUp>,
-    ocv_std_dev_retain_rise_slew: Option<TableLookUp>,
-    ocv_skewness_retain_rise_slew: Option<TableLookUp>,
+    retain_rise_slew: Option<TableLookUp<C>>,
+    ocv_mean_shift_retain_rise_slew: Option<TableLookUp<C>>,
+    ocv_std_dev_retain_rise_slew: Option<TableLookUp<C>>,
+    ocv_skewness_retain_rise_slew: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub retain_rise_slew: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub retain_rise_slew: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retain_fall_slew: Option<TableLookUp>,
-    ocv_mean_shift_retain_fall_slew: Option<TableLookUp>,
-    ocv_std_dev_retain_fall_slew: Option<TableLookUp>,
-    ocv_skewness_retain_fall_slew: Option<TableLookUp>,
+    retain_fall_slew: Option<TableLookUp<C>>,
+    ocv_mean_shift_retain_fall_slew: Option<TableLookUp<C>>,
+    ocv_std_dev_retain_fall_slew: Option<TableLookUp<C>>,
+    ocv_skewness_retain_fall_slew: Option<TableLookUp<C>>,
   ))]
-  #[size = 192]
-  pub retain_fall_slew: Option<TimingTableLookUp>,
+  #[size = 144]
+  pub retain_fall_slew: Option<TimingTableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub fall_propagation: Option<TableLookUp>,
+  pub fall_propagation: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub noise_immunity_above_high: Option<TableLookUp>,
+  pub noise_immunity_above_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub noise_immunity_below_low: Option<TableLookUp>,
+  pub noise_immunity_below_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub noise_immunity_high: Option<TableLookUp>,
+  pub noise_immunity_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub noise_immunity_low: Option<TableLookUp>,
+  pub noise_immunity_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub output_current_fall: Option<ReferenceTimeVector3DGrpup>,
+  pub output_current_fall: Option<ReferenceTimeVector3DGrpup<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub output_current_rise: Option<ReferenceTimeVector3DGrpup>,
+  pub output_current_rise: Option<ReferenceTimeVector3DGrpup<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_height_above_high: Option<TableLookUp>,
+  pub propogated_noise_height_above_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_height_below_low: Option<TableLookUp>,
+  pub propogated_noise_height_below_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_height_high: Option<TableLookUp>,
+  pub propogated_noise_height_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_height_low: Option<TableLookUp>,
+  pub propogated_noise_height_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_peak_time_ratio_above_high: Option<TableLookUp>,
+  pub propogated_noise_peak_time_ratio_above_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_peak_time_ratio_below_low: Option<TableLookUp>,
+  pub propogated_noise_peak_time_ratio_below_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_peak_time_ratio_high: Option<TableLookUp>,
+  pub propogated_noise_peak_time_ratio_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_peak_time_ratio_low: Option<TableLookUp>,
+  pub propogated_noise_peak_time_ratio_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_width_above_high: Option<TableLookUp>,
+  pub propogated_noise_width_above_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_width_below_low: Option<TableLookUp>,
+  pub propogated_noise_width_below_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_width_high: Option<TableLookUp>,
+  pub propogated_noise_width_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub propogated_noise_width_low: Option<TableLookUp>,
+  pub propogated_noise_width_low: Option<TableLookUp<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
-  pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
+  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
+  pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
-  pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment>,
+  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
+  pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub receiver_capacitance1_fall: Option<TableLookUp>,
+  pub receiver_capacitance1_fall: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub receiver_capacitance1_rise: Option<TableLookUp>,
+  pub receiver_capacitance1_rise: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub receiver_capacitance2_fall: Option<TableLookUp>,
+  pub receiver_capacitance2_fall: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub receiver_capacitance2_rise: Option<TableLookUp>,
+  pub receiver_capacitance2_rise: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub rise_propagation: Option<TableLookUp>,
+  pub rise_propagation: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub steady_state_current_high: Option<TableLookUp>,
+  pub steady_state_current_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub steady_state_current_low: Option<TableLookUp>,
+  pub steady_state_current_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
-  pub steady_state_current_tristate: Option<TableLookUp>,
+  pub steady_state_current_tristate: Option<TableLookUp<C>>,
   /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
   /// ">Reference-Definition</a>
   #[size = 128]
   #[liberty(group)]
-  pub compact_ccs_rise: Option<CompactCcsTable>,
+  pub compact_ccs_rise: Option<CompactCcsTable<C>>,
   /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
   /// ">Reference-Definition</a>
   #[size = 168]
   #[liberty(group)]
-  pub compact_ccs_fall: Option<CompactCcsTable>,
+  pub compact_ccs_fall: Option<CompactCcsTable<C>>,
 }
 
-impl GroupFn for Timing {}
+impl<C: Ctx> GroupFn for Timing<C> {}
 
 #[cfg(test)]
 mod test {
+  use crate::DefaultCtx;
+
   use super::*;
 
   #[test]
   fn lvf() {
     use crate::ast::GroupAttri;
-    _ = crate::ast::test_parse_fmt::<Timing>(
+    _ = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
       r#"(){
         cell_rise(delay_template_8x8){
           index_1("0.0023, 0.0091, 0.0228, 0.0502, 0.105, 0.2145, 0.4335, 0.8715");
@@ -2154,7 +2169,7 @@ liberty_db::timing::Timing () {
   #[test]
   fn lvf_index_mismatch() {
     use crate::ast::GroupAttri;
-    _ = crate::ast::test_parse_fmt::<Timing>(
+    _ = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
       r#"(){
         cell_rise(delay_template_8x8){
           index_1("0.0023, 0.0091, 0.0228, 0.0502, 0.105, 0.2145, 0.4335, 0.8715");
@@ -2238,7 +2253,7 @@ liberty_db::timing::Timing () {
   #[test]
   fn table_lookup() {
     use crate::ast::GroupAttri;
-    let timing = crate::ast::test_parse::<Timing>(
+    let timing = crate::ast::test_parse::<Timing<DefaultCtx>>(
       r#"(){
         cell_rise(delay_template_3x3){
           index_1("10, 20, 30");

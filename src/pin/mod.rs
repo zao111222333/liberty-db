@@ -8,7 +8,7 @@ use crate::{
   expression::{logic, BooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 mod bundle;
 mod items;
@@ -38,13 +38,18 @@ pub use items::*;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Pin {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Pin<C: Ctx> {
   /// Name of the pin
   /// `pin (name | name_list)`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=227.10&end=227.25
   /// ">Reference-Definition</a>
-  #[id]
+  #[id(
+    borrow = "crate::common::items::RefNameList<'_>",
+    check_fn = "crate::common::items::namelist_borrow",
+    with_ref = false
+  )]
   #[size = 48]
   #[liberty(name)]
   pub name: NameList,
@@ -54,7 +59,7 @@ pub struct Pin {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1127,9 +1132,9 @@ pub struct Pin {
   // electromigration () { }
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<InternalPower>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<InternalPower>::deserialize_with")]
-  pub internal_power: GroupSet<InternalPower>,
+  #[serde(serialize_with = "GroupSet::<InternalPower<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<InternalPower<C>>::deserialize_with")]
+  pub internal_power: GroupSet<InternalPower<C>>,
   // TODO
   // max_trans () { }
   // TODO
@@ -1147,9 +1152,9 @@ pub struct Pin {
   /// ">Reference-Definition</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<TLatch>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TLatch>::deserialize_with")]
-  pub tlatch: GroupSet<TLatch>,
+  #[serde(serialize_with = "GroupSet::<TLatch<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TLatch<C>>::deserialize_with")]
+  pub tlatch: GroupSet<TLatch<C>>,
   /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
   /// The timing group can be used to identify the name or names of multiple timing arcs.
   /// A timing group identifies multiple timing arcs, by identifying a timing arc in a [pin](crate::pin::Pin) group
@@ -1173,9 +1178,9 @@ pub struct Pin {
   ///
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Timing>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Timing>::deserialize_with")]
-  pub timing: GroupSet<Timing>,
+  #[serde(serialize_with = "GroupSet::<Timing<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Timing<C>>::deserialize_with")]
+  pub timing: GroupSet<Timing<C>>,
   /// Use the `receiver_capacitance`  group to specify capacitance values
   /// for composite current source (CCS) receiver modeling at the pin level.
   ///
@@ -1195,9 +1200,9 @@ pub struct Pin {
   /// ">Reference-Definition</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<ReceiverCapacitance>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<ReceiverCapacitance>::deserialize_with")]
-  pub receiver_capacitance: GroupSet<ReceiverCapacitance>,
+  #[serde(serialize_with = "GroupSet::<ReceiverCapacitance<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<ReceiverCapacitance<C>>::deserialize_with")]
+  pub receiver_capacitance: GroupSet<ReceiverCapacitance<C>>,
   /// In referenced CCS noise modeling,
   /// use the `input_ccb`  group to specify the CCS noise for
   /// an input channel-connected block (CCB).
@@ -1210,34 +1215,35 @@ pub struct Pin {
   /// ">Reference-Instance</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
-  pub input_ccb: GroupSet<CCSNStage>,
+  #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
+  pub input_ccb: GroupSet<CCSNStage<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
-  pub output_ccb: GroupSet<CCSNStage>,
+  #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
+  pub output_ccb: GroupSet<CCSNStage<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
-  pub ccsn_first_stage: GroupSet<CCSNStage>,
+  #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
+  pub ccsn_first_stage: GroupSet<CCSNStage<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CCSNStage>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CCSNStage>::deserialize_with")]
-  pub ccsn_last_stage: GroupSet<CCSNStage>,
+  #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
+  pub ccsn_last_stage: GroupSet<CCSNStage<C>>,
 }
 
-impl GroupFn for Pin {}
+impl<C: Ctx> GroupFn for Pin<C> {}
 
 #[cfg(test)]
 mod test {
+  use crate::DefaultCtx;
 
   #[test]
   fn pin_name_list() {
-    let cell = crate::ast::test_parse_fmt::<crate::Cell>(
+    let cell = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
       r#"(test_cell){
         pin (A) {}
         pin (B,C,D,E) {}

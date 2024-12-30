@@ -13,22 +13,47 @@ use crate::{
   common::{items::NameList, table::TableLookUp2D},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
+
+pub trait CellCtx {
+  fn logic_variables(&self) -> &biodivine_lib_bdd::BddVariableSet;
+  fn set_logic_variables(&mut self, variables: biodivine_lib_bdd::BddVariableSet);
+  fn pg_variables(&self) -> &biodivine_lib_bdd::BddVariableSet;
+  fn set_pg_variables(&mut self, variables: biodivine_lib_bdd::BddVariableSet);
+}
 
 #[derive(Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct CellExtraCtx {
+pub struct DefaultCellCtx {
   pub logic_variables: biodivine_lib_bdd::BddVariableSet,
   pub pg_variables: biodivine_lib_bdd::BddVariableSet,
 }
-impl Debug for CellExtraCtx {
+impl CellCtx for DefaultCellCtx {
   #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    f.debug_struct("CellExtraCtx").finish()
+  fn logic_variables(&self) -> &biodivine_lib_bdd::BddVariableSet {
+    &self.logic_variables
+  }
+  #[inline]
+  fn set_logic_variables(&mut self, variables: biodivine_lib_bdd::BddVariableSet) {
+    self.logic_variables = variables;
+  }
+  #[inline]
+  fn pg_variables(&self) -> &biodivine_lib_bdd::BddVariableSet {
+    &self.pg_variables
+  }
+  #[inline]
+  fn set_pg_variables(&mut self, variables: biodivine_lib_bdd::BddVariableSet) {
+    self.pg_variables = variables;
   }
 }
-impl Default for CellExtraCtx {
+impl Debug for DefaultCellCtx {
+  #[inline]
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    f.debug_struct("DefaultCellCtx").finish()
+  }
+}
+impl Default for DefaultCellCtx {
   #[inline]
   fn default() -> Self {
     Self {
@@ -42,8 +67,9 @@ impl Default for CellExtraCtx {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Cell {
-  #[id(borrow = "&str")]
+#[serde(bound = "C::Cell: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Cell<C: Ctx> {
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
@@ -53,7 +79,7 @@ pub struct Cell {
   comments: GroupComments,
   #[size = 80]
   #[liberty(extra_ctx)]
-  pub extra_ctx: CellExtraCtx,
+  pub extra_ctx: C::Cell,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -310,7 +336,7 @@ pub struct Cell {
   /// ">Reference-Definition</a>
   #[size = 240]
   #[liberty(group(type = Option))]
-  pub dc_current: Option<TableLookUp2D>,
+  pub dc_current: Option<TableLookUp2D<C>>,
   /// The `input_voltage_range`  attribute specifies the allowed
   /// voltage range of the level-shifter input pin and the voltage
   /// range for all input pins of the cell under all possible operating conditions
@@ -378,37 +404,37 @@ pub struct Cell {
   pub pin_opposite: Option<PinOpposite>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<PgPin>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<PgPin>::deserialize_with")]
-  pub pg_pin: GroupSet<PgPin>,
+  #[serde(serialize_with = "GroupSet::<PgPin<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<PgPin<C>>::deserialize_with")]
+  pub pg_pin: GroupSet<PgPin<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<FF>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<FF>::deserialize_with")]
-  pub ff: GroupSet<FF>,
+  #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]
+  pub ff: GroupSet<FF<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<FFBank>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<FFBank>::deserialize_with")]
-  pub ff_bank: GroupSet<FFBank>,
+  #[serde(serialize_with = "GroupSet::<FFBank<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<FFBank<C>>::deserialize_with")]
+  pub ff_bank: GroupSet<FFBank<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Latch>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Latch>::deserialize_with")]
-  pub latch: GroupSet<Latch>,
+  #[serde(serialize_with = "GroupSet::<Latch<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Latch<C>>::deserialize_with")]
+  pub latch: GroupSet<Latch<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<LatchBank>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<LatchBank>::deserialize_with")]
-  pub latch_bank: GroupSet<LatchBank>,
+  #[serde(serialize_with = "GroupSet::<LatchBank<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<LatchBank<C>>::deserialize_with")]
+  pub latch_bank: GroupSet<LatchBank<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<LeakagePower>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<LeakagePower>::deserialize_with")]
-  pub leakage_power: GroupSet<LeakagePower>,
+  #[serde(serialize_with = "GroupSet::<LeakagePower<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<LeakagePower<C>>::deserialize_with")]
+  pub leakage_power: GroupSet<LeakagePower<C>>,
   #[size = 168]
   #[liberty(group(type = Option))]
-  pub statetable: Option<Statetable>,
+  pub statetable: Option<Statetable<C>>,
   /// Use the `dynamic_current` group to specify a current waveform vector when the power
   /// and ground current is dependent on the logical condition of a cell. A `dynamic_current`
   /// group is defined in a cell group, as shown here:
@@ -417,9 +443,9 @@ pub struct Cell {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<DynamicCurrent>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<DynamicCurrent>::deserialize_with")]
-  pub dynamic_current: GroupSet<DynamicCurrent>,
+  #[serde(serialize_with = "GroupSet::<DynamicCurrent<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<DynamicCurrent<C>>::deserialize_with")]
+  pub dynamic_current: GroupSet<DynamicCurrent<C>>,
   /// The `intrinsic_parasitic` group specifies the state-dependent intrinsic capacitance and
   /// intrinsic resistance of a `cell`.
   /// Syntax
@@ -478,9 +504,9 @@ pub struct Cell {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<IntrinsicParasitic>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<IntrinsicParasitic>::deserialize_with")]
-  pub intrinsic_parasitic: GroupSet<IntrinsicParasitic>,
+  #[serde(serialize_with = "GroupSet::<IntrinsicParasitic<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<IntrinsicParasitic<C>>::deserialize_with")]
+  pub intrinsic_parasitic: GroupSet<IntrinsicParasitic<C>>,
   /// A `leakage_current` group is defined within a cell group or a model group to specify
   /// leakage current values that are dependent on the state of the cell.
   ///
@@ -512,14 +538,14 @@ pub struct Cell {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<LeakageCurrent>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<LeakageCurrent>::deserialize_with")]
-  pub leakage_current: GroupSet<LeakageCurrent>,
+  #[serde(serialize_with = "GroupSet::<LeakageCurrent<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<LeakageCurrent<C>>::deserialize_with")]
+  pub leakage_current: GroupSet<LeakageCurrent<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Pin>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Pin>::deserialize_with")]
-  pub pin: GroupSet<Pin>,
+  #[serde(serialize_with = "GroupSet::<Pin<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Pin<C>>::deserialize_with")]
+  pub pin: GroupSet<Pin<C>>,
   #[size = 24]
   #[liberty(group(type = Vec))]
   /// The `test_cell`  group is in a `cell` group or `model` group.
@@ -529,14 +555,14 @@ pub struct Cell {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
   /// ">Reference</a>
-  pub test_cell: Vec<TestCell>,
+  pub test_cell: Vec<TestCell<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Bundle>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Bundle>::deserialize_with")]
-  pub bundle: GroupSet<Bundle>,
+  #[serde(serialize_with = "GroupSet::<Bundle<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Bundle<C>>::deserialize_with")]
+  pub bundle: GroupSet<Bundle<C>>,
 }
-impl GroupFn for Cell {
+impl<C: Ctx> GroupFn for Cell<C> {
   #[inline]
   fn before_build(builder: &mut Self::Builder, scope: &mut crate::ast::BuilderScope) {
     // update variable
@@ -591,14 +617,14 @@ impl GroupFn for Cell {
       biodivine_lib_bdd::BddVariableSet::new(&pg_variable);
   }
   fn after_build(&mut self, scope: &mut crate::ast::BuilderScope) {
-    self.extra_ctx.logic_variables = mem::replace(
+    self.extra_ctx.set_logic_variables(mem::replace(
       &mut scope.cell_extra_ctx.logic_variables,
       biodivine_lib_bdd::BddVariableSet::new(&[]),
-    );
-    self.extra_ctx.pg_variables = mem::replace(
+    ));
+    self.extra_ctx.set_pg_variables(mem::replace(
       &mut scope.cell_extra_ctx.pg_variables,
       biodivine_lib_bdd::BddVariableSet::new(&[]),
-    );
+    ));
   }
 }
 
@@ -611,51 +637,52 @@ impl GroupFn for Cell {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
 /// ">Reference</a>
 #[derive(Debug, Clone)]
-#[derive(liberty_macros::Group)]
 #[derive(mut_set::derive::Dummy)]
+#[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TestCell {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct TestCell<C: Ctx> {
   /// group comments
   #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<FF>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<FF>::deserialize_with")]
-  pub ff: GroupSet<FF>,
+  #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]
+  pub ff: GroupSet<FF<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<FFBank>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<FFBank>::deserialize_with")]
-  pub ff_bank: GroupSet<FFBank>,
+  #[serde(serialize_with = "GroupSet::<FFBank<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<FFBank<C>>::deserialize_with")]
+  pub ff_bank: GroupSet<FFBank<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Latch>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Latch>::deserialize_with")]
-  pub latch: GroupSet<Latch>,
+  #[serde(serialize_with = "GroupSet::<Latch<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Latch<C>>::deserialize_with")]
+  pub latch: GroupSet<Latch<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<LatchBank>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<LatchBank>::deserialize_with")]
-  pub latch_bank: GroupSet<LatchBank>,
+  #[serde(serialize_with = "GroupSet::<LatchBank<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<LatchBank<C>>::deserialize_with")]
+  pub latch_bank: GroupSet<LatchBank<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Pin>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Pin>::deserialize_with")]
-  pub pin: GroupSet<Pin>,
+  #[serde(serialize_with = "GroupSet::<Pin<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Pin<C>>::deserialize_with")]
+  pub pin: GroupSet<Pin<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Statetable>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Statetable>::deserialize_with")]
-  pub statetable: GroupSet<Statetable>,
+  #[serde(serialize_with = "GroupSet::<Statetable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Statetable<C>>::deserialize_with")]
+  pub statetable: GroupSet<Statetable<C>>,
 }
 
-impl GroupFn for TestCell {}
+impl<C: Ctx> GroupFn for TestCell<C> {}

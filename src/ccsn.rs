@@ -12,10 +12,10 @@ use crate::{
   },
   expression::LogicBooleanExpression,
   timing::items::Mode,
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 use core::fmt::{self, Write};
-use num_traits::Zero;
+use num_traits::Zero as _;
 
 /// Use the `ccsn_first_stage` group to specify CCS noise for the first stage of the channel-
 /// connected block (CCB).
@@ -46,11 +46,12 @@ use num_traits::Zero;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct CCSNStage {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct CCSNStage<C: Ctx> {
   /// group name
   #[liberty(name)]
   #[size = 24]
-  #[id(borrow = "&[ArcStr]")]
+  #[id(borrow = "&[ArcStr]", with_ref = false)]
   pub name: Vec<ArcStr>,
   /// group comments
   #[size = 32]
@@ -58,7 +59,7 @@ pub struct CCSNStage {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -123,7 +124,7 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   pub related_ccb_node: Option<ArcStr>,
   /// Use the `stage_type`  attribute to specify the stage type of the channel-connecting block output voltage.
   ///
@@ -138,7 +139,11 @@ pub struct CCSNStage {
   pub stage_type: Option<StageType>,
   #[size = 80]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&LogicBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   pub when: Option<LogicBooleanExpression>,
   /// The pin-based mode  attribute is provided in the `ccsn_first_stage`  
   /// and `ccsn_last_stage` groups for conditional data modeling.
@@ -163,7 +168,7 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[size = 240]
   #[liberty(group(type = Option))]
-  pub dc_current: Option<TableLookUp2D>,
+  pub dc_current: Option<TableLookUp2D<C>>,
   /// Use the `output_voltage_fall`  group to specify vector groups that describe
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
   /// whose output node’s voltage values are falling.
@@ -178,7 +183,7 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[size = 128]
   #[liberty(group(type = Option))]
-  pub output_voltage_fall: Option<Vector3DGrpup>,
+  pub output_voltage_fall: Option<Vector3DGrpup<C>>,
   /// Use the `output_voltage_rise`  group to specify `vector` groups that describe
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
   /// whose output node’s voltage values are rising.
@@ -189,7 +194,7 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[size = 128]
   #[liberty(group(type = Option))]
-  pub output_voltage_rise: Option<Vector3DGrpup>,
+  pub output_voltage_rise: Option<Vector3DGrpup<C>>,
   /// The `propagated_noise_low`  group uses `vector` groups to specify the
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
   /// whose output node’s voltage values are falling.
@@ -205,7 +210,7 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[size = 128]
   #[liberty(group(type = Option))]
-  pub propagated_noise_low: Option<Vector4DGrpup>,
+  pub propagated_noise_low: Option<Vector4DGrpup<C>>,
   /// The `propagated_noise_high`  group uses `vector` groups to specify the
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
   /// whose output node’s voltage values are rising.
@@ -221,10 +226,10 @@ pub struct CCSNStage {
   /// ">Reference-Definition</a>
   #[size = 128]
   #[liberty(group(type = Option))]
-  pub propagated_noise_high: Option<Vector4DGrpup>,
+  pub propagated_noise_high: Option<Vector4DGrpup<C>>,
 }
 
-impl GroupFn for CCSNStage {
+impl<C: Ctx> GroupFn for CCSNStage<C> {
   #[inline]
   fn before_build(builder: &mut Self::Builder, _scope: &mut BuilderScope) {
     if let Some(miller_cap_fall) = builder.miller_cap_fall.as_mut() {
@@ -302,11 +307,12 @@ impl SimpleAttri for StageType {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct ReceiverCapacitance {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct ReceiverCapacitance<C: Ctx> {
   /// group name
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   pub name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -314,39 +320,43 @@ pub struct ReceiverCapacitance {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 80]
   #[liberty(simple(type=Option))]
-  #[id(borrow = "Option<&LogicBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   pub when: Option<LogicBooleanExpression>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
-  pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment>,
+  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
+  pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment>::deserialize_with")]
-  pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment>,
+  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
+  pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment<C>>,
   #[size = 336]
   #[liberty(group)]
-  pub receiver_capacitance1_fall: Option<TableLookUp>,
+  pub receiver_capacitance1_fall: Option<TableLookUp<C>>,
   #[size = 336]
   #[liberty(group)]
-  pub receiver_capacitance1_rise: Option<TableLookUp>,
+  pub receiver_capacitance1_rise: Option<TableLookUp<C>>,
   #[size = 336]
   #[liberty(group)]
-  pub receiver_capacitance2_fall: Option<TableLookUp>,
+  pub receiver_capacitance2_fall: Option<TableLookUp<C>>,
   #[size = 336]
   #[liberty(group)]
-  pub receiver_capacitance2_rise: Option<TableLookUp>,
+  pub receiver_capacitance2_rise: Option<TableLookUp<C>>,
 }
-impl GroupFn for ReceiverCapacitance {}
+impl<C: Ctx> GroupFn for ReceiverCapacitance<C> {}
 
 /// The `propagating_ccb`  attribute lists all the channel-connected block noise groups that propagate
 /// the noise to the output pin in a particular timing arc.

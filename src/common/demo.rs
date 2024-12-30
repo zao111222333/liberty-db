@@ -5,16 +5,17 @@ use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
   timing::{TimingTableLookUp, TimingType},
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 use core::fmt::Write;
 
 use super::table::TableLookUp;
 #[derive(Debug, Clone)]
-#[derive(serde::Serialize, serde::Deserialize)]
 #[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
 // #[derive(liberty_macros::Nothing)]
-pub(crate) struct Timing {
+pub(crate) struct Timing<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,
@@ -22,7 +23,7 @@ pub(crate) struct Timing {
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   #[liberty(complex)]
   #[default = "vec![unsafe{ NotNan::new_unchecked(0.0) }]"]
   pub values: Vec<NotNan<f64>>,
@@ -31,23 +32,25 @@ pub(crate) struct Timing {
   #[liberty(simple(type = Option))]
   t2: Option<TimingType>,
   #[liberty(supergroup(
-    cell_fall: Option<TableLookUp>,
-    ocv_mean_shift_cell_fall: Option<TableLookUp>,
-    ocv_std_dev_cell_fall: Option<TableLookUp>,
-    ocv_skewness_cell_fall: Option<TableLookUp>,
+    cell_fall: Option<TableLookUp<C>>,
+    ocv_mean_shift_cell_fall: Option<TableLookUp<C>>,
+    ocv_std_dev_cell_fall: Option<TableLookUp<C>>,
+    ocv_skewness_cell_fall: Option<TableLookUp<C>>,
   ))]
-  pub cell_fall: Option<TimingTableLookUp>,
+  pub cell_fall: Option<TimingTableLookUp<C>>,
 }
-impl GroupFn for Timing {}
+impl<C: Ctx> GroupFn for Timing<C> {}
 
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+// #[derive(liberty_macros::Nothing)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub(crate) struct Pin {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub(crate) struct Pin<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   name: ArcStr,
   /// group comments
   #[size = 32]
@@ -55,27 +58,28 @@ pub(crate) struct Pin {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   attributes: Attributes,
   #[size = 24]
   #[liberty(group(type = Vec))]
-  timing: Vec<Timing>,
+  timing: Vec<Timing<C>>,
 }
-impl GroupFn for Pin {}
+impl<C: Ctx> GroupFn for Pin<C> {}
 
 #[mut_set::derive::item(sort)]
-#[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-pub(crate) struct FF {
-  #[id(borrow = "&str")]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub(crate) struct FF<C: Ctx> {
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   variable1: ArcStr,
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   variable2: ArcStr,
@@ -85,7 +89,7 @@ pub(crate) struct FF {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -93,8 +97,8 @@ pub(crate) struct FF {
   #[liberty(simple(type = Option))]
   next_state: Option<ArcStr>,
 }
-impl GroupFn for FF {}
-impl NamedGroup for FF {
+impl<C: Ctx> GroupFn for FF<C> {}
+impl<C: Ctx> NamedGroup for FF<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -129,36 +133,45 @@ impl NamedGroup for FF {
 
 #[derive(Debug)]
 #[derive(liberty_macros::Group)]
-pub(crate) struct Cell {
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub(crate) struct Cell<C: Ctx> {
   #[liberty(name)]
   name: ArcStr,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,
   #[liberty(simple(type = Option))]
   area: Option<NotNan<f64>>,
   #[liberty(group(type = Set))]
-  ff: GroupSet<FF>,
+  #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]
+  ff: GroupSet<FF<C>>,
   #[liberty(group(type = Set))]
-  pin: GroupSet<Pin>,
+  #[serde(serialize_with = "GroupSet::<Pin<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Pin<C>>::deserialize_with")]
+  pin: GroupSet<Pin<C>>,
   #[liberty(group(type = Option))]
-  statetable: Option<Statetable>,
+  statetable: Option<Statetable<C>>,
 }
-impl GroupFn for Cell {}
+impl<C: Ctx> GroupFn for Cell<C> {}
 
 #[cfg(test)]
 mod test {
-  use crate::ast::{DefaultIndentation, Group};
+  use crate::{
+    ast::{DefaultIndentation, Group},
+    DefaultCtx,
+  };
 
   use super::*;
   #[test]
   fn timing_test() {
-    _ = crate::ast::test_parse_fmt::<Timing>(
+    _ = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
       r#"(w){
         // www
         /* com
@@ -175,7 +188,7 @@ liberty_db::common::demo::Timing () {
 | t1 : combinational;
 }"#,
     );
-    _ = crate::ast::test_parse_fmt::<Timing>(
+    _ = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
       r#"( w ){
         t1: ombinational;
         t2: combinational;
@@ -195,7 +208,7 @@ liberty_db::common::demo::Timing () {
 
   #[test]
   fn pin_test() {
-    _ = crate::ast::test_parse_fmt::<Pin>(
+    _ = crate::ast::test_parse_fmt::<Pin<DefaultCtx>>(
       r#"(A){
         timing(w){
             t1: combinational;
@@ -210,7 +223,7 @@ liberty_db::common::demo::Pin (A) {
 | }
 }"#,
     );
-    _ = crate::ast::test_parse_fmt::<Pin>(
+    _ = crate::ast::test_parse_fmt::<Pin<DefaultCtx>>(
       r#"(B){
         timing(w){
             t1: combinational;
@@ -229,7 +242,7 @@ liberty_db::common::demo::Pin (B) {
   #[test]
   fn cell_test() {
     use crate::ast::GroupAttri;
-    _ = crate::ast::test_parse_fmt::<Cell>(
+    _ = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
       r#"(INV){
         // should ok
         area : 5.4;
@@ -291,7 +304,7 @@ liberty_db::common::demo::Cell (INV) {
 | }
 }"#,
     );
-    let mut cell = crate::ast::test_parse_fmt::<Cell>(
+    let mut cell = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
       r#"(INV){
         // should error
         area : 5.4;

@@ -2,7 +2,7 @@ use crate::{
   ast::{
     join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
   },
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 use core::{
   cmp::Ordering,
@@ -10,7 +10,7 @@ use core::{
   hash,
   str::FromStr,
 };
-use itertools::Itertools;
+use itertools::Itertools as _;
 use std::collections::HashSet;
 use strum_macros::{Display, EnumString};
 
@@ -121,14 +121,15 @@ impl SimpleAttri for VariableType {
 /// &end
 /// =39.24
 /// ">Reference-Definition</a>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Domain {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Domain<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub name: ArcStr,
   /// group comments
   #[size = 32]
@@ -136,7 +137,7 @@ pub struct Domain {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -163,7 +164,7 @@ pub struct Domain {
   #[liberty(complex)]
   pub index_3: Vec<NotNan<f64>>,
 }
-impl GroupFn for Domain {}
+impl<C: Ctx> GroupFn for Domain<C> {}
 /// sth. like "A B C" will save as set{A B C}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -259,14 +260,15 @@ impl FromStr for WordSet {
   }
 }
 
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct DummyGroup {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct DummyGroup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -274,13 +276,13 @@ pub struct DummyGroup {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
 }
-impl GroupFn for DummyGroup {}
+impl<C: Ctx> GroupFn for DummyGroup<C> {}
 
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -306,7 +308,24 @@ pub enum NameList {
   Name(ArcStr),
   List(WordSet),
 }
-
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum RefNameList<'a> {
+  Name(&'a str),
+  List(&'a WordSet),
+}
+impl<'a> From<&'a str> for RefNameList<'a> {
+  #[inline]
+  fn from(value: &'a str) -> Self {
+    Self::Name(value)
+  }
+}
+#[inline]
+pub(crate) fn namelist_borrow(id: &NameList) -> RefNameList<'_> {
+  match id {
+    NameList::Name(s) => RefNameList::Name(s.as_str()),
+    NameList::List(word_set) => RefNameList::List(word_set),
+  }
+}
 impl Default for NameList {
   #[inline]
   fn default() -> Self {

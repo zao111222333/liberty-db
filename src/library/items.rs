@@ -13,7 +13,7 @@ use crate::{
     parse_f64,
   },
   expression::logic,
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 use core::fmt::{self, Write};
 
@@ -31,13 +31,14 @@ use core::fmt::{self, Write};
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.10&end=88.16
 /// ">Reference</a>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Sensitization {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Sensitization<C: Ctx> {
   /// name
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
@@ -47,7 +48,7 @@ pub struct Sensitization {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -228,10 +229,11 @@ impl ComplexAttri for SensitizationVector {
 #[cfg(test)]
 mod test_sensitization {
   use super::*;
+  use crate::DefaultCtx;
 
   #[test]
   fn sensitization() {
-    let sense = crate::ast::test_parse_fmt::<Sensitization>(
+    let sense = crate::ast::test_parse_fmt::<Sensitization<DefaultCtx>>(
       r#"(sensitization_nand2) {
         pin_names ( IN1, IN2, OUT1 );
         vector ( 1, "0 0 1" );
@@ -269,7 +271,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
         }
       ]
     );
-    let sense1 = crate::ast::test_parse_fmt::<Sensitization>(
+    let sense1 = crate::ast::test_parse_fmt::<Sensitization<DefaultCtx>>(
       r#"(sensitization_nand2) {
         vector ( 1, "0 0 1" );
         vector ( 2, "0 X 9" );
@@ -287,7 +289,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
     assert!(sense1.attributes.len() == 1);
   }
 }
-impl GroupFn for Sensitization {}
+impl<C: Ctx> GroupFn for Sensitization<C> {}
 
 /// Use the `voltage_map`  attribute to associate a voltage name
 /// with relative voltage values referenced by the cell-level `pg_pin`  groups.
@@ -300,7 +302,7 @@ impl GroupFn for Sensitization {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct VoltageMap {
   /// name
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   pub name: ArcStr,
   /// voltage
@@ -346,9 +348,10 @@ impl ComplexAttri for VoltageMap {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct InputVoltage {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct InputVoltage<C: Ctx> {
   /// name
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
@@ -358,7 +361,7 @@ pub struct InputVoltage {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -392,7 +395,7 @@ pub struct InputVoltage {
   #[liberty(simple)]
   pub vimax: Formula,
 }
-impl GroupFn for InputVoltage {}
+impl<C: Ctx> GroupFn for InputVoltage<C> {}
 
 /// You define an `output_voltage` group in the `library` group to designate a set of output
 /// voltage level ranges to drive output cells.
@@ -404,9 +407,10 @@ impl GroupFn for InputVoltage {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct OutputVoltage {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct OutputVoltage<C: Ctx> {
   /// name
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
@@ -416,7 +420,7 @@ pub struct OutputVoltage {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -450,7 +454,7 @@ pub struct OutputVoltage {
   #[liberty(simple)]
   pub vomax: Formula,
 }
-impl GroupFn for OutputVoltage {}
+impl<C: Ctx> GroupFn for OutputVoltage<C> {}
 
 /// Use the `delay_model`  attribute to specify which delay model
 /// to use in the delay calculations.
@@ -494,9 +498,10 @@ impl SimpleAttri for DelayModel {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct OperatingConditions {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct OperatingConditions<C: Ctx> {
   /// name
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
@@ -506,7 +511,7 @@ pub struct OperatingConditions {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -568,7 +573,7 @@ pub struct OperatingConditions {
   #[default = "unsafe { NotNan::<f64>::new_unchecked(5.0) }"]
   pub voltage: NotNan<f64>,
 }
-impl GroupFn for OperatingConditions {}
+impl<C: Ctx> GroupFn for OperatingConditions<C> {}
 
 /// You can define one or more `fpga_isd`  groups at the library level
 /// to specify the drive current, I/O voltages, and slew rates for FPGA parts and cells
@@ -583,11 +588,12 @@ impl GroupFn for OperatingConditions {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct FpgaIsd {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct FpgaIsd<C: Ctx> {
   /// name
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub name: ArcStr,
   /// group comments
   #[size = 32]
@@ -595,7 +601,7 @@ pub struct FpgaIsd {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -622,7 +628,7 @@ pub struct FpgaIsd {
   #[liberty(simple(type = Option))]
   pub slew: Option<FPGASlew>,
 }
-impl GroupFn for FpgaIsd {}
+impl<C: Ctx> GroupFn for FpgaIsd<C> {}
 
 /// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
 ///
@@ -712,14 +718,14 @@ pub struct Define {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.10&end=36.11
   /// ">Reference</a>
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   pub attribute_name: ArcStr,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.12&end=36.13
   /// ">Reference</a>
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   pub group_name: ArcStr,
   /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
@@ -808,14 +814,14 @@ pub struct DefineGroup {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.33&end=37.34
   /// ">Reference</a>
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   pub group: ArcStr,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.35&end=37.36
   /// ">Reference</a>
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   pub parent_name: ArcStr,
 }
@@ -865,7 +871,7 @@ pub struct DefineCellArea {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.28&end=36.29
   /// ">Reference</a>
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   pub area_name: ArcStr,
   /// The resource type can be
@@ -953,9 +959,9 @@ impl ComplexAttri for DefineCellArea {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct WireLoad {
+pub struct WireLoad<C: Ctx> {
   /// name
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
@@ -965,7 +971,7 @@ pub struct WireLoad {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1026,7 +1032,7 @@ pub struct WireLoad {
   #[serde(deserialize_with = "GroupSet::<FanoutLength>::deserialize_with")]
   pub fanout_length: GroupSet<FanoutLength>,
 }
-impl GroupFn for WireLoad {}
+impl<C: Ctx> GroupFn for WireLoad<C> {}
 
 /// Use this attribute to define values for fanout and length
 /// when you create the wire load manually.
@@ -1136,9 +1142,9 @@ impl ComplexAttri for FanoutLength {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct WireLoadSection {
+pub struct WireLoadSection<C: Ctx> {
   /// name
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pub name: ArcStr,
@@ -1148,7 +1154,7 @@ pub struct WireLoadSection {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1161,7 +1167,7 @@ pub struct WireLoadSection {
   #[liberty(complex)]
   pub wire_load_from_area: (NotNan<f64>, NotNan<f64>, ArcStr),
 }
-impl GroupFn for WireLoadSection {}
+impl<C: Ctx> GroupFn for WireLoadSection<C> {}
 
 /// The `base_curve_type` attribute specifies the type of base curve.
 ///
@@ -1234,11 +1240,11 @@ impl SimpleAttri for BaseCurveType {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct BaseCurves {
+pub struct BaseCurves<C: Ctx> {
   /// name
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub name: ArcStr,
   /// group comments
   #[size = 32]
@@ -1246,7 +1252,7 @@ pub struct BaseCurves {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1281,14 +1287,15 @@ pub struct BaseCurves {
   pub curve_y: GroupSet<IdVector>,
 }
 
-impl GroupFn for BaseCurves {}
+impl<C: Ctx> GroupFn for BaseCurves<C> {}
 
 #[cfg(test)]
 mod test {
+  use crate::DefaultCtx;
 
   #[test]
   fn input_voltage() {
-    let g = crate::ast::test_parse_fmt::<super::InputVoltage>(
+    let g = crate::ast::test_parse_fmt::<super::InputVoltage<DefaultCtx>>(
       r#"(cmos_schmitt) {
         vil : 0.3 * VDD ;
         vih : 0.7 * VDD ;
@@ -1306,7 +1313,7 @@ liberty_db::library::items::InputVoltage (cmos_schmitt) {
   }
   #[test]
   fn base_curves() {
-    let g = crate::ast::test_parse_fmt::<super::BaseCurves>(
+    let g = crate::ast::test_parse_fmt::<super::BaseCurves<DefaultCtx>>(
       r#"("nc_compact_ccs_curve_1") {
       base_curve_type : "ccs_timing_half_curve";
       curve_x("0.1000000, 0.2000000, 0.3000000, 0.4000000, 0.5000000, 0.6000000, 0.7000000, 0.8000000, 0.9000000");

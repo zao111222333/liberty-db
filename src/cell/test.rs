@@ -1,4 +1,4 @@
-use crate::Group;
+use crate::{DefaultCtx, Group};
 
 use super::Cell;
 /// In the following example, pins IP and OP are logically inverse.
@@ -18,7 +18,7 @@ use super::Cell;
 /// ">Reference</a>
 #[test]
 fn example_pin_opposite() {
-  let cell = crate::ast::test_parse_fmt::<Cell>(
+  let cell = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
     r#"(test) {
   pin_opposite ("Q1 Q2 Q3 ", "QB1 QB2 ") ;
 }"#,
@@ -35,7 +35,7 @@ liberty_db::cell::Cell (test) {
 /// ">Reference</a>
 #[test]
 fn example23() {
-  let cell = crate::ast::test_parse_fmt::<Cell>(
+  let cell = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
     r#"(dff4) {
         area : 1 ;
         pin (CLK) {
@@ -312,7 +312,7 @@ liberty_db::cell::Cell (dff4) {
 /// ">Reference</a>
 #[test]
 fn example27() {
-  let cell = crate::ast::test_parse_fmt::<Cell>(
+  let cell = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
     r#"(latch4) {
         area: 16;
         pin (G) {     /* gate enable signal, active-high */
@@ -371,7 +371,7 @@ liberty_db::cell::Cell (latch4) {
 /// ">Reference</a>
 #[test]
 fn example_pll() {
-  let cell = crate::ast::test_parse_fmt::<Cell>(
+  let cell = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
     r#"(my_pll) {
         is_pll_cell : true;
         pin( REFCLK ) {
@@ -483,7 +483,7 @@ liberty_db::cell::Cell (my_pll) {
 /// ">Reference</a>
 #[test]
 fn example28() {
-  let cell = crate::ast::test_parse_fmt::<Cell>(
+  let cell = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
     r#"(DLT2) {/* note: 0 hold time */
         area : 1 ;
         single_bit_degenerate : FDB ;

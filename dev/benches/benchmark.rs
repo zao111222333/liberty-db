@@ -6,7 +6,7 @@ use std::{
 fn main() {
   let projs_table = run_bench(
     gen_projs![
-      (LibertyDb, liberty_db_latest::Library),
+      (LibertyDb, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
       // (Si2drLiberty, Si2drLibertyLibrary),
       (OPenTimer, OpenTimerLibrary),
       (LibertyIo, liberty_io::Group),
@@ -17,7 +17,7 @@ fn main() {
   );
   let regress_table = run_bench(
     gen_projs![
-      (LibertyDbLatest, liberty_db_latest::Library),
+      (LibertyDbLatest, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
       (LibertyDb0p7p, liberty_db_0p7p4::Library),
       (LibertyDb0p6p, liberty_db_0p6p14::Library),
       // (LibertyDb0p6p2, liberty_db_0p6p2::Library),

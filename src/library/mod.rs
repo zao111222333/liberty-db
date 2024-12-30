@@ -11,9 +11,9 @@ use crate::{
   },
   cell::Cell,
   common::table::{CompactLutTemplate, DriverWaveform, TableTemple},
-  units, ArcStr, NotNan,
+  units, ArcStr, Ctx, NotNan,
 };
-use core::fmt::{self, Write};
+use core::fmt::{self, Write as _};
 pub use items::*;
 
 /// The first line of the library group statement names the library.
@@ -29,9 +29,10 @@ pub use items::*;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Library {
+#[serde(bound = "C::Library: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Library<C: Ctx> {
   /// library name
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   #[default = "arcstr::literal!(\"undefined\")"]
@@ -42,7 +43,7 @@ pub struct Library {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Library,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -130,9 +131,9 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<OperatingConditions>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OperatingConditions>::deserialize_with")]
-  pub operating_conditions: GroupSet<OperatingConditions>,
+  #[serde(serialize_with = "GroupSet::<OperatingConditions<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OperatingConditions<C>>::deserialize_with")]
+  pub operating_conditions: GroupSet<OperatingConditions<C>>,
   /// Default operating conditions for the library
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.29+34.32&end=34.31+34.33
@@ -385,9 +386,9 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<InputVoltage>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<InputVoltage>::deserialize_with")]
-  pub input_voltage: GroupSet<InputVoltage>,
+  #[serde(serialize_with = "GroupSet::<InputVoltage<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<InputVoltage<C>>::deserialize_with")]
+  pub input_voltage: GroupSet<InputVoltage<C>>,
   /// You define an `output_voltage` group in the `library` group to designate a set of output
   /// voltage level ranges to drive output cells.
   /// <a name ="reference_link" href="
@@ -395,9 +396,9 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<OutputVoltage>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OutputVoltage>::deserialize_with")]
-  pub output_voltage: GroupSet<OutputVoltage>,
+  #[serde(serialize_with = "GroupSet::<OutputVoltage<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OutputVoltage<C>>::deserialize_with")]
+  pub output_voltage: GroupSet<OutputVoltage<C>>,
   /// Use the `slew_upper_threshold_pct_rise`  attribute to set the value of the upper threshold point
   /// that is used to model the delay of a pin rising from 0 to 1.
   /// You can specify this attribute at the pin-level to override the default.
@@ -539,18 +540,18 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<TableTemple>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableTemple>::deserialize_with")]
-  pub output_current_template: GroupSet<TableTemple>,
+  #[serde(serialize_with = "GroupSet::<TableTemple<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableTemple<C>>::deserialize_with")]
+  pub output_current_template: GroupSet<TableTemple<C>>,
   /// The `power_lut_template` group is defined within the `library` group, as shown here:
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=83.34&end=83.35
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<TableTemple>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableTemple>::deserialize_with")]
-  pub power_lut_template: GroupSet<TableTemple>,
+  #[serde(serialize_with = "GroupSet::<TableTemple<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableTemple<C>>::deserialize_with")]
+  pub power_lut_template: GroupSet<TableTemple<C>>,
   /// Use the `lu_table_template`  group to define templates of common information
   /// to use in lookup tables. Define the `lu_table_template`  group at the library level
   /// <a name ="reference_link" href="
@@ -558,9 +559,9 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<TableTemple>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableTemple>::deserialize_with")]
-  pub lu_table_template: GroupSet<TableTemple>,
+  #[serde(serialize_with = "GroupSet::<TableTemple<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<TableTemple<C>>::deserialize_with")]
+  pub lu_table_template: GroupSet<TableTemple<C>>,
   /// The `base_curves`  group is a library-level group that contains
   /// the detailed description of normalized base curves.
   ///
@@ -587,18 +588,18 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<BaseCurves>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<BaseCurves>::deserialize_with")]
-  pub base_curves: GroupSet<BaseCurves>,
+  #[serde(serialize_with = "GroupSet::<BaseCurves<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<BaseCurves<C>>::deserialize_with")]
+  pub base_curves: GroupSet<BaseCurves<C>>,
   /// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=41.20&end=41.21
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CompactLutTemplate>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CompactLutTemplate>::deserialize_with")]
-  pub compact_lut_template: GroupSet<CompactLutTemplate>,
+  #[serde(serialize_with = "GroupSet::<CompactLutTemplate<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CompactLutTemplate<C>>::deserialize_with")]
+  pub compact_lut_template: GroupSet<CompactLutTemplate<C>>,
   /// The library-level `normalized_driver_waveform`  group represents a collection
   /// of driver waveforms under various input slew values.
   /// The `index_1`  specifies the input slew and `index_2`  specifies the normalized voltage.
@@ -611,27 +612,27 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<DriverWaveform>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<DriverWaveform>::deserialize_with")]
-  pub normalized_driver_waveform: GroupSet<DriverWaveform>,
+  #[serde(serialize_with = "GroupSet::<DriverWaveform<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<DriverWaveform<C>>::deserialize_with")]
+  pub normalized_driver_waveform: GroupSet<DriverWaveform<C>>,
   /// A `wire_load`  group is defined in a `library`  group, as follows.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.16&end=94.17
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<WireLoad>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<WireLoad>::deserialize_with")]
-  pub wire_load: GroupSet<WireLoad>,
+  #[serde(serialize_with = "GroupSet::<WireLoad<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<WireLoad<C>>::deserialize_with")]
+  pub wire_load: GroupSet<WireLoad<C>>,
   /// A `wire_load_selection`  group is defined in a `library`  group, as follows.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.16&end=94.17
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<WireLoadSection>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<WireLoadSection>::deserialize_with")]
-  pub wire_load_selection: GroupSet<WireLoadSection>,
+  #[serde(serialize_with = "GroupSet::<WireLoadSection<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<WireLoadSection<C>>::deserialize_with")]
+  pub wire_load_selection: GroupSet<WireLoadSection<C>>,
   /// Wire load
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.36&end=34.36
@@ -655,9 +656,9 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<FpgaIsd>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<FpgaIsd>::deserialize_with")]
-  pub fpga_isd: GroupSet<FpgaIsd>,
+  #[serde(serialize_with = "GroupSet::<FpgaIsd<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<FpgaIsd<C>>::deserialize_with")]
+  pub fpga_isd: GroupSet<FpgaIsd<C>>,
   /// When you specify more than one `fpga_isd`  group, you **must** also define
   /// the library-level `default_fpga_isd`  attribute to specify which `fpga_isd`
   /// group is the default
@@ -682,27 +683,27 @@ pub struct Library {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Sensitization>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Sensitization>::deserialize_with")]
-  pub sensitization: GroupSet<Sensitization>,
+  #[serde(serialize_with = "GroupSet::<Sensitization<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Sensitization<C>>::deserialize_with")]
+  pub sensitization: GroupSet<Sensitization<C>>,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Cell>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Cell>::deserialize_with")]
-  pub cell: GroupSet<Cell>,
+  #[serde(serialize_with = "GroupSet::<Cell<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Cell<C>>::deserialize_with")]
+  pub cell: GroupSet<Cell<C>>,
 }
 
-impl GroupFn for Library {}
+impl<C: Ctx> GroupFn for Library<C> {}
 
-impl fmt::Display for Library {
+impl<C: Ctx> fmt::Display for Library<C> {
   /// Format [Library] struct as `.lib` file, see more at [examples](https://github.com/zao111222333/liberty-db/tree/master/examples)
   /// ```
-  /// use liberty_db::library::Library;
+  /// use liberty_db::{Library, DefaultCtx};
   /// use std::{
   /// fs::{self, File},
   /// io::{BufWriter, Write},
   /// path::Path};
-  /// let library  = Library::default();
+  /// let library  = Library::<DefaultCtx>::default();
   /// let mut writer = BufWriter::new(File::create(Path::new("out.lib")).unwrap());
   /// write!(&mut writer, "{}", library).unwrap();
   /// ```
@@ -712,7 +713,7 @@ impl fmt::Display for Library {
   }
 }
 use crate::ast::{parser, GroupAttri, ParserError};
-impl Library {
+impl<C: Ctx> Library<C> {
   const KEY: &'static str = "library";
   /// Parse `.lib` file as a [Library] struct.
   #[expect(clippy::arithmetic_side_effects)]

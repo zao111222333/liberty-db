@@ -5,17 +5,19 @@ use crate::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
     ParseScope, SimpleAttri,
   },
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 use core::fmt::{self, Write};
+
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TableLookUpMultiSegment {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct TableLookUpMultiSegment<C: Ctx> {
   #[liberty(name)]
   #[size = 8]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -23,7 +25,7 @@ pub struct TableLookUpMultiSegment {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -53,10 +55,11 @@ pub struct TableLookUpMultiSegment {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct DriverWaveform {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct DriverWaveform<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   pub name: Option<ArcStr>,
   /// The `driver_waveform_name`  string attribute differentiates the driver waveform table
   /// from other driver waveform tables when multiple tables are defined.
@@ -73,7 +76,7 @@ pub struct DriverWaveform {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   pub driver_waveform_name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -81,7 +84,7 @@ pub struct DriverWaveform {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -107,11 +110,12 @@ pub struct DriverWaveform {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TableLookUp2D {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct TableLookUp2D<C: Ctx> {
   // TODO: unit
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -119,7 +123,7 @@ pub struct TableLookUp2D {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -144,10 +148,10 @@ pub struct TableLookUp2D {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct CompactLutTemplate {
+pub struct CompactLutTemplate<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -155,7 +159,7 @@ pub struct CompactLutTemplate {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -223,7 +227,7 @@ pub struct CompactLutTemplate {
   pub index_3: Vec<ArcStr>,
 }
 
-impl GroupFn for CompactLutTemplate {}
+impl<C: Ctx> GroupFn for CompactLutTemplate<C> {}
 
 /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
 ///
@@ -271,11 +275,12 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Vector3D {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Vector3D<C: Ctx> {
   // TODO: unit
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -283,7 +288,7 @@ pub struct Vector3D {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -304,15 +309,16 @@ pub struct Vector3D {
   pub values: Vec<NotNan<f64>>,
 }
 
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct ReferenceTimeVector3D {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct ReferenceTimeVector3D<C: Ctx> {
   // TODO: unit
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -320,7 +326,7 @@ pub struct ReferenceTimeVector3D {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -345,15 +351,16 @@ pub struct ReferenceTimeVector3D {
   pub values: Vec<NotNan<f64>>,
 }
 
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Vector4D {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Vector4D<C: Ctx> {
   // TODO: unit
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -361,7 +368,7 @@ pub struct Vector4D {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -430,15 +437,16 @@ pub struct Vector4D {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct CompactCcsPower {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct CompactCcsPower<C: Ctx> {
   // TODO: unit
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -446,7 +454,7 @@ pub struct CompactCcsPower {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -602,10 +610,11 @@ impl ComplexAttri for Vec<CcsPowerValue> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Vector3DGrpup {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Vector3DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -613,26 +622,27 @@ pub struct Vector3DGrpup {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Vector3D>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Vector3D>::deserialize_with")]
-  pub vector: GroupSet<Vector3D>,
+  #[serde(serialize_with = "GroupSet::<Vector3D<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Vector3D<C>>::deserialize_with")]
+  pub vector: GroupSet<Vector3D<C>>,
 }
 
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct ReferenceTimeVector3DGrpup {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -640,26 +650,27 @@ pub struct ReferenceTimeVector3DGrpup {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<ReferenceTimeVector3D>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<ReferenceTimeVector3D>::deserialize_with")]
-  pub vector: GroupSet<ReferenceTimeVector3D>,
+  #[serde(serialize_with = "GroupSet::<ReferenceTimeVector3D<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<ReferenceTimeVector3D<C>>::deserialize_with")]
+  pub vector: GroupSet<ReferenceTimeVector3D<C>>,
 }
 
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Vector4DGrpup {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Vector4DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -667,32 +678,33 @@ pub struct Vector4DGrpup {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Vector4D>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Vector4D>::deserialize_with")]
-  pub vector: GroupSet<Vector4D>,
+  #[serde(serialize_with = "GroupSet::<Vector4D<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Vector4D<C>>::deserialize_with")]
+  pub vector: GroupSet<Vector4D<C>>,
 }
 
-impl GroupFn for Vector3DGrpup {}
-impl GroupFn for Vector4DGrpup {}
-impl GroupFn for ReferenceTimeVector3D {}
-impl GroupFn for ReferenceTimeVector3DGrpup {}
-impl GroupFn for CompactCcsPower {}
+impl<C: Ctx> GroupFn for Vector3DGrpup<C> {}
+impl<C: Ctx> GroupFn for Vector4DGrpup<C> {}
+impl<C: Ctx> GroupFn for ReferenceTimeVector3D<C> {}
+impl<C: Ctx> GroupFn for ReferenceTimeVector3DGrpup<C> {}
+impl<C: Ctx> GroupFn for CompactCcsPower<C> {}
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TableLookUp3D {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct TableLookUp3D<C: Ctx> {
   // TODO: unit
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -700,7 +712,7 @@ pub struct TableLookUp3D {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -719,16 +731,17 @@ pub struct TableLookUp3D {
   pub values: Values,
 }
 
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TableLookUp1D {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct TableLookUp1D<C: Ctx> {
   // // TODO: unit
   // unit: (),
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -736,7 +749,7 @@ pub struct TableLookUp1D {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -748,23 +761,24 @@ pub struct TableLookUp1D {
   #[liberty(complex)]
   pub values: Vec<NotNan<f64>>,
 }
-impl GroupFn for TableLookUp1D {}
+impl<C: Ctx> GroupFn for TableLookUp1D<C> {}
 
 /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
 ///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
 /// ">Reference-Definition</a>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct CompactCcsTable {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct CompactCcsTable<C: Ctx> {
   // // TODO: unit
   // unit: (),
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -772,7 +786,7 @@ pub struct CompactCcsTable {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -784,16 +798,17 @@ pub struct CompactCcsTable {
   #[liberty(complex)]
   pub values: Values,
 }
-impl GroupFn for CompactCcsTable {}
+impl<C: Ctx> GroupFn for CompactCcsTable<C> {}
 
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TableLookUp {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct TableLookUp<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -801,7 +816,7 @@ pub struct TableLookUp {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  pub extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -823,13 +838,13 @@ pub struct TableLookUp {
   pub values: Values,
 }
 
-impl GroupFn for TableLookUp {}
-impl GroupFn for TableLookUpMultiSegment {}
-impl GroupFn for TableLookUp2D {}
-impl GroupFn for TableLookUp3D {}
-impl GroupFn for DriverWaveform {}
-impl GroupFn for Vector3D {}
-impl GroupFn for Vector4D {}
+impl<C: Ctx> GroupFn for TableLookUp<C> {}
+impl<C: Ctx> GroupFn for TableLookUpMultiSegment<C> {}
+impl<C: Ctx> GroupFn for TableLookUp2D<C> {}
+impl<C: Ctx> GroupFn for TableLookUp3D<C> {}
+impl<C: Ctx> GroupFn for DriverWaveform<C> {}
+impl<C: Ctx> GroupFn for Vector3D<C> {}
+impl<C: Ctx> GroupFn for Vector4D<C> {}
 
 #[derive(Debug, Default, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -923,7 +938,7 @@ impl<V: Iterator<Item = NotNan<f64>>> DisplayValues<V> {
     self,
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    use itertools::Itertools;
+    use itertools::Itertools as _;
     let indent = f.indentation();
     let chunks = self.inner.chunks(self.size1);
     let mut iter = chunks.into_iter();
@@ -956,7 +971,7 @@ pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = NotNan<f64>>> {
   pub(crate) values: DisplayValues<V>,
 }
 
-impl<'a, V: Iterator<Item = NotNan<f64>>> DisplayTableLookUp<'a, V> {
+impl<V: Iterator<Item = NotNan<f64>>> DisplayTableLookUp<'_, V> {
   #[inline]
   pub(crate) fn fmt_self<T: Write, I: ast::Indentation>(
     self,
@@ -964,7 +979,7 @@ impl<'a, V: Iterator<Item = NotNan<f64>>> DisplayTableLookUp<'a, V> {
     key2: &str,
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    use core::fmt::Write;
+    use core::fmt::Write as _;
     let indent = f.indentation();
     f.write_fmt(format_args!("\n{indent}{key1}{key2} ("))?;
     ast::NameAttri::fmt_self(self.name, f)?;
@@ -983,14 +998,15 @@ impl<'a, V: Iterator<Item = NotNan<f64>>> DisplayTableLookUp<'a, V> {
   }
 }
 
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TableTemple {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct TableTemple<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub name: ArcStr,
   /// group comments
   #[size = 32]
@@ -998,7 +1014,7 @@ pub struct TableTemple {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1028,7 +1044,7 @@ pub struct TableTemple {
   #[liberty(complex(type = Option))]
   pub index_4: Option<Vec<NotNan<f64>>>,
 }
-impl GroupFn for TableTemple {}
+impl<C: Ctx> GroupFn for TableTemple<C> {}
 
 /// In Timing Delay Tables:
 ///
@@ -1324,11 +1340,11 @@ pub enum ScalarVariable {
 
 #[cfg(test)]
 mod test {
-  use crate::ast::test_parse_fmt;
+  use crate::{ast::test_parse_fmt, DefaultCtx};
 
   #[test]
   fn table() {
-    let table = test_parse_fmt::<super::TableLookUp>(
+    let table = test_parse_fmt::<super::TableLookUp<DefaultCtx>>(
       r#" ("CCS_RCV_TEMPLATE_0") {
       index_1("0.0186051, 0.0372112, 0.0744591");
       index_2("0.1000000, 0.2500000, 0.5000000");
@@ -1349,7 +1365,7 @@ liberty_db::common::table::TableLookUp (CCS_RCV_TEMPLATE_0) {
   }
   #[test]
   fn compact_ccs_table() {
-    let table = test_parse_fmt::<super::CompactCcsTable>(
+    let table = test_parse_fmt::<super::CompactCcsTable<DefaultCtx>>(
       r#" ("c_ccs_pwr_template_6") {
         values("-0.0119931,-101.1912245,", \
           "-0.0119953,-101.1912245,", \
@@ -1376,7 +1392,7 @@ liberty_db::common::table::CompactCcsTable (c_ccs_pwr_template_6) {
   }
   #[test]
   fn compact_ccs_power_table() {
-    let table = test_parse_fmt::<super::CompactCcsPower>(
+    let table = test_parse_fmt::<super::CompactCcsPower<DefaultCtx>>(
       r#" (c_ccs_pwr_template_3) {
         values ("0.0358012, 0.0206745, 2505, 0.0480925, 1.1701594, 2506, 1.4011397, 0.0724034", \
           "-0.0481277, 0.0206745, 13, -0.0477729, 0.0, 13, -0.026014, -1.267817, 1198, 71.4506979, 0.0698575", \

@@ -9,7 +9,7 @@ use crate::{
   ArcStr, NotNan,
 };
 use core::fmt::{self, Write};
-use itertools::Itertools;
+use itertools::Itertools as _;
 
 use super::{
   items::{Formula, NameList, WordSet},

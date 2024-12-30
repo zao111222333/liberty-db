@@ -1,4 +1,4 @@
-use liberty_db::Library;
+use liberty_db::{DefaultCtx, Library};
 use std::{
   env,
   fs::{read_to_string, File},
@@ -15,7 +15,9 @@ fn main() {
 
   let input_lib = Path::new(&args[1]);
   log::info!("Parsing [file] {} ...", input_lib.display());
-  let library = Library::parse_lib(read_to_string(input_lib).unwrap().as_str()).unwrap();
+  let library =
+    Library::<DefaultCtx>::parse_lib(read_to_string(input_lib).unwrap().as_str())
+      .unwrap();
   let out_file_name =
     format!("example1_{}", input_lib.file_name().unwrap().to_str().unwrap());
   log::info!("Output to [file] {} ...", out_file_name);

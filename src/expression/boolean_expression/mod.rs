@@ -1,4 +1,4 @@
-#![allow(clippy::unnecessary_box_returns)]
+#![allow(clippy::unnecessary_box_returns, clippy::used_underscore_items)]
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
@@ -20,7 +20,7 @@ use core::{
   ops::{Deref, DerefMut},
   str::FromStr,
 };
-use itertools::Itertools;
+use itertools::Itertools as _;
 use std::{collections::HashSet, sync::LazyLock};
 
 use super::SdfExpression;
@@ -390,8 +390,9 @@ fn _previous(expr: &mut Expr) {
 #[cfg(test)]
 mod test {
   use super::*;
+  use crate::DefaultCtx;
   use core::{f64::consts::E, str::FromStr};
-  use itertools::Itertools;
+  use itertools::Itertools as _;
   #[test]
   fn parse_fmt_self_check() {
     for (should_success, s) in [

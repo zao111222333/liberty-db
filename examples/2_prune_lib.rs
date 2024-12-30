@@ -1,4 +1,4 @@
-use liberty_db::{Library, NotNan};
+use liberty_db::{cell::CellCtx, DefaultCtx, Library, NotNan};
 use std::{
   env,
   fs::{read_to_string, File},
@@ -16,7 +16,8 @@ fn main() {
   let input_lib = Path::new(&args[1]);
   log::info!("Parsing [file] {} ...", input_lib.display());
   let mut library =
-    Library::parse_lib(read_to_string(input_lib).unwrap().as_str()).unwrap();
+    Library::<DefaultCtx>::parse_lib(read_to_string(input_lib).unwrap().as_str())
+      .unwrap();
   library.technology = "cmos".into();
   for operating_condition in library.operating_conditions.iter_mut() {
     operating_condition.voltage = unsafe { NotNan::<f64>::new_unchecked(0.8) };
@@ -48,7 +49,7 @@ fn main() {
         );
         // Add `sdf_cond` from `when`
         if let Some(when) = &timing.when {
-          timing.sdf_cond = Some(when.sdf(&cell.extra_ctx.logic_variables));
+          timing.sdf_cond = Some(when.sdf(cell.extra_ctx.logic_variables()));
         }
         // remove LVF's LUT
         if let Some(table) = timing.cell_rise.as_mut() {

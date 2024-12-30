@@ -1,4 +1,48 @@
 //! This crate implement `liberty` data structre in Rust.
+//!
+//! Demo:
+//! ``` rust
+//! use liberty_db::{DefaultCtx, Library};
+//! use std::{
+//!   fs::File,
+//!   io::{BufWriter, Write},
+//! };
+//! static TEMPLATE: &str = r#"
+//! library(demo) {
+//!   time_unit : "1ps";
+//!   voltage_unit : "10mV";
+//!   current_unit : "1uA";
+//!   operating_conditions ( typical ) {
+//!       process : 1;
+//!       voltage : 1.1;
+//!   }
+//!   lu_table_template(delay_template_4x5) {
+//!     variable_1 : total_output_net_capacitance;
+//!     variable_2 : input_net_transition;
+//!     index_1 ("1000.0, 1001.0, 1002.0, 1003.0");
+//!     index_2 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0");
+//!   }
+//!   cell (DFF) {
+//!     pin (D) {}
+//!     pin (CK) {}
+//!     pin (Q) {}
+//!   }
+//! }"#;
+//! let mut library = Library::<DefaultCtx>::parse_lib(TEMPLATE).unwrap();
+//! // modify library
+//! library.cell.get_mut("DFF").map(|cell_dff| {
+//!   cell_dff
+//!     .pin
+//!     .get_mut("CK".into())
+//!     .map(|pin_ck| pin_ck.clock = Some(true))
+//! });
+//! // print library
+//! println!("{library}");
+//! // write library
+//! let out_file = File::create("demo.lib").unwrap();
+//! let mut writer = BufWriter::new(out_file);
+//! write!(&mut writer, "{}", library).unwrap();
+//! ```
 //! <script>
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
@@ -64,6 +108,7 @@
     clippy::separated_literal_suffix,
     clippy::single_call_fn,
     clippy::pub_use,
+    clippy::or_fun_call,
     clippy::pub_with_shorthand,
     clippy::ignored_unit_patterns,
     clippy::mod_module_files,
@@ -164,5 +209,50 @@ pub use ast::Group;
 
 /// CCSN relative attributes
 pub mod ccsn;
+mod ctx;
+pub use ctx::{Ctx, DefaultCtx};
 mod types;
-pub mod util;
+
+#[test]
+fn demo() {
+  use crate::{DefaultCtx, Library};
+  use std::{
+    fs::File,
+    io::{BufWriter, Write},
+  };
+  static TEMPLATE: &str = r#"
+library(demo) {
+  time_unit : "1ps";
+  voltage_unit : "10mV";
+  current_unit : "1uA";
+  operating_conditions ( typical ) {
+      process : 1;
+      voltage : 1.1;
+  }
+  lu_table_template(delay_template_4x5) {
+    variable_1 : total_output_net_capacitance;
+    variable_2 : input_net_transition;
+    index_1 ("1000.0, 1001.0, 1002.0, 1003.0");
+    index_2 ("1000.0, 1001.0, 1002.0, 1003.0, 1004.0");
+  }
+  cell (DFF) {
+    pin (D) {}
+    pin (CK) {}
+    pin (Q) {}
+  }
+}"#;
+  let mut library = Library::<DefaultCtx>::parse_lib(TEMPLATE).unwrap();
+  // modify library
+  library.cell.get_mut("DFF").map(|cell_dff| {
+    cell_dff
+      .pin
+      .get_mut("CK".into())
+      .map(|pin_ck| pin_ck.clock = Some(true))
+  });
+  // print library
+  println!("{library}");
+  // write library
+  let out_file = File::create("demo.lib").unwrap();
+  let mut writer = BufWriter::new(out_file);
+  write!(&mut writer, "{}", library).unwrap();
+}

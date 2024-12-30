@@ -119,10 +119,10 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::common::items::DummyGroup;
+  use crate::{common::items::DummyGroup, DefaultCtx};
   #[test]
   fn more_than_10_indent() {
-    crate::ast::test_parse_fmt::<DummyGroup>(
+    crate::ast::test_parse_fmt::<DummyGroup<DefaultCtx>>(
       r#"(0){
         /* comment1 */
         level(1){
@@ -197,7 +197,7 @@ liberty_db::common::items::DummyGroup (0) {
   }
   #[test]
   fn unknown_complex() {
-    crate::ast::test_parse_fmt::<DummyGroup>(
+    crate::ast::test_parse_fmt::<DummyGroup<DefaultCtx>>(
       r#"(){
         unknown_complex (1,2,3,4,5);
         unknown_complex (1,2,3, \

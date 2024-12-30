@@ -83,7 +83,7 @@ impl ComplexAttri for Edge {
     &self,
     f: &mut crate::ast::CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    use core::fmt::Write;
+    use core::fmt::Write as _;
     f.write_str(match self {
       Self::F => "rise",
       Self::R => "fall",
@@ -91,7 +91,7 @@ impl ComplexAttri for Edge {
   }
 }
 
-impl<'a> core::ops::Not for &'a Edge {
+impl core::ops::Not for &Edge {
   type Output = Edge;
   #[inline]
   fn not(self) -> Self::Output {

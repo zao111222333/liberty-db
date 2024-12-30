@@ -3,12 +3,12 @@ use num_traits::One;
 
 use crate::{
   ast::{AttriValues, SimpleDefined},
-  NotNan,
+  DefaultCtx, NotNan,
 };
 
 use super::*;
 
-fn parse_cmp(text: &str, want: &str) -> Library {
+fn parse_cmp(text: &str, want: &str) -> Library<DefaultCtx> {
   match Library::parse_lib(text) {
     Ok(mut library) => {
       library.comments_this_entry().or_insert("test".into());
@@ -21,7 +21,7 @@ fn parse_cmp(text: &str, want: &str) -> Library {
   }
 }
 
-fn fmt_cmp(library: &Library, want: &str) {
+fn fmt_cmp(library: &Library<DefaultCtx>, want: &str) {
   let s = library.to_string();
   println!("{s}");
   dev_utils::text_diff(&s, want);

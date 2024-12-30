@@ -1,7 +1,7 @@
 //! All item structure inside
 //! `Timing`.
 #![allow(clippy::multiple_inherent_impl)]
-use core::ops::{Add, Mul, Not, Sub};
+use core::ops::{Add, Mul, Not as _, Sub};
 
 use crate::{
   ast::{
@@ -10,7 +10,7 @@ use crate::{
   },
   common::table::{DisplayTableLookUp, DisplayValues, TableLookUp},
   expression::logic,
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 
 use itertools::izip;
@@ -196,11 +196,12 @@ pub type Mode = [ArcStr; 2];
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct CellDegradation {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct CellDegradation<C: Ctx> {
   /// name
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   pub name: ArcStr,
   /// group comments
   #[size = 32]
@@ -208,7 +209,7 @@ pub struct CellDegradation {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -228,11 +229,12 @@ pub struct CellDegradation {
   #[liberty(complex)]
   pub values: Vec<NotNan<f64>>,
 }
-impl GroupFn for CellDegradation {}
+impl<C: Ctx> GroupFn for CellDegradation<C> {}
 
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Debug, Clone, Default)]
-pub struct TimingTableLookUp {
+pub struct TimingTableLookUp<C: Ctx> {
+  pub extra_ctx: C::Dummy,
   pub name: Option<ArcStr>,
   pub comments: String,
   pub index_1: Vec<NotNan<f64>>,
@@ -247,7 +249,7 @@ pub struct TimingTableLookUp {
   clippy::indexing_slicing,
   clippy::arithmetic_side_effects
 )]
-impl TimingTableLookUp {
+impl<C: Ctx> TimingTableLookUp<C> {
   #[inline]
   const fn find_pos(len: usize, pos: usize) -> Option<(usize, usize)> {
     if len <= 1 {
@@ -395,25 +397,25 @@ impl Mul<NotNan<f64>> for LVFValue {
   }
 }
 
-impl ParsingBuilder for Option<TimingTableLookUp> {
+impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
   /// `value`, `mean_shift`, `std_dev`, `skewness`
   type Builder = (
     // value
-    Option<<TableLookUp as ParsingBuilder>::Builder>,
+    Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
     // mean_shift
-    Option<<TableLookUp as ParsingBuilder>::Builder>,
+    Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
     // std_dev
-    Option<<TableLookUp as ParsingBuilder>::Builder>,
+    Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
     // skewness
-    Option<<TableLookUp as ParsingBuilder>::Builder>,
+    Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
   );
   #[inline]
   #[expect(clippy::arithmetic_side_effects)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope) -> Self {
     #[inline]
-    fn eq_index(
-      lhs: &<TableLookUp as ParsingBuilder>::Builder,
-      rhs: &<TableLookUp as ParsingBuilder>::Builder,
+    fn eq_index<C: Ctx>(
+      lhs: &<TableLookUp<C> as ParsingBuilder>::Builder,
+      rhs: &<TableLookUp<C> as ParsingBuilder>::Builder,
     ) -> bool {
       lhs.index_1 == rhs.index_1 && lhs.index_2 == rhs.index_2
     }
@@ -450,6 +452,7 @@ impl ParsingBuilder for Option<TimingTableLookUp> {
           size2: _value.values.size2,
           values: _value.values.inner,
           lvf_values,
+          extra_ctx: _value.extra_ctx,
         })
       }
       (Some(_value), None, None, None) => Some(TimingTableLookUp {
@@ -461,12 +464,13 @@ impl ParsingBuilder for Option<TimingTableLookUp> {
         size2: _value.values.size2,
         values: _value.values.inner,
         lvf_values: Vec::new(),
+        extra_ctx: _value.extra_ctx,
       }),
       _ => None,
     }
   }
 }
-impl TimingTableLookUp {
+impl<C: Ctx> TimingTableLookUp<C> {
   #[inline]
   #[expect(clippy::arithmetic_side_effects)]
   pub(crate) fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation>(

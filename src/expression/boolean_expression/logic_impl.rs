@@ -59,6 +59,7 @@ impl Not for Static {
 }
 #[cfg(test)]
 mod test {
+  use crate::DefaultCtx;
   use super::*;
   use crate::IntoEnumIterator;
 

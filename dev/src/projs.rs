@@ -43,7 +43,7 @@ macro_rules! gen_projs {
   };
 }
 
-impl ProjLibrary for liberty_db_latest::Library {
+impl ProjLibrary for liberty_db_latest::Library<liberty_db_latest::DefaultCtx> {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",
     url: "https://crates.io/crates/liberty-db",

@@ -7,7 +7,7 @@ use crate::{
   expression::{logic, LogicBooleanExpression, PowerGroundBooleanExpression},
   pin::Direction,
   timing::items::Mode,
-  ArcStr, NotNan,
+  ArcStr, Ctx, NotNan,
 };
 use core::{
   fmt::{self, Write},
@@ -25,8 +25,9 @@ use core::{
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct LeakagePower {
-  #[id(borrow = "&[ArcStr]")]
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct LeakagePower<C: Ctx> {
+  #[id(borrow = "&[ArcStr]", with_ref = false)]
   #[size = 24]
   #[liberty(name)]
   pub name: Vec<ArcStr>,
@@ -36,12 +37,12 @@ pub struct LeakagePower {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[size = 8]
   #[liberty(simple(type = Option))]
   pub power_level: Option<ArcStr>,
@@ -49,7 +50,11 @@ pub struct LeakagePower {
   #[size = 64]
   #[liberty(simple)]
   pub related_pg_pin: WordSet,
-  #[id(borrow = "Option<&LogicBooleanExpression>", check_fn = "mut_set::borrow_option!")]
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   #[size = 80]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
@@ -60,15 +65,16 @@ pub struct LeakagePower {
   #[liberty(complex(type = Option))]
   pub mode: Option<Mode>,
 }
-impl GroupFn for LeakagePower {}
+impl<C: Ctx> GroupFn for LeakagePower<C> {}
 
 #[cfg(test)]
 mod test_sort {
   use super::*;
+  use crate::DefaultCtx;
 
   #[test]
   fn test_leakage_sort() {
-    let cell = crate::ast::test_parse::<crate::Cell>(
+    let cell = crate::ast::test_parse::<crate::Cell<DefaultCtx>>(
       r#"(CELL) {
       pin(A){}
       pin(B){}
@@ -145,12 +151,13 @@ mod test_sort {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Statetable {
-  #[id(borrow = "&[ArcStr]")]
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Statetable<C: Ctx> {
+  #[id(borrow = "&[ArcStr]", with_ref = false)]
   #[size = 24]
   #[liberty(name)]
   pub input_nodes: Vec<ArcStr>,
-  #[id(borrow = "&[ArcStr]")]
+  #[id(borrow = "&[ArcStr]", with_ref = false)]
   #[size = 24]
   #[liberty(name)]
   pub internal_nodes: Vec<ArcStr>,
@@ -160,7 +167,7 @@ pub struct Statetable {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -169,9 +176,9 @@ pub struct Statetable {
   #[liberty(simple)]
   pub table: Table,
 }
-impl GroupFn for Statetable {}
+impl<C: Ctx> GroupFn for Statetable<C> {}
 
-impl NamedGroup for Statetable {
+impl<C: Ctx> NamedGroup for Statetable<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -297,9 +304,10 @@ impl SimpleAttri for Table {
 #[cfg(test)]
 mod test_statetable {
   use super::*;
+  use crate::DefaultCtx;
   #[test]
   fn statetable_test() {
-    _ = crate::ast::test_parse_fmt::<Statetable>(
+    _ = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
       r#"(" CLK EN SE",ENL) {
         table : "	H   L  L : - : L ,\
         H   L  H : - : H ,\
@@ -337,10 +345,11 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct PgPin {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct PgPin<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   name: ArcStr,
   /// group comments
   #[size = 32]
@@ -348,7 +357,7 @@ pub struct PgPin {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -453,7 +462,7 @@ pub struct PgPin {
   #[liberty(simple(type = Option))]
   pub switch_function: Option<LogicBooleanExpression>,
 }
-impl GroupFn for PgPin {}
+impl<C: Ctx> GroupFn for PgPin<C> {}
 
 /// Use the `dynamic_current` group to specify a current waveform vector when the power
 /// and ground current is dependent on the logical condition of a cell. A `dynamic_current`
@@ -468,10 +477,11 @@ impl GroupFn for PgPin {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct DynamicCurrent {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct DynamicCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -479,12 +489,16 @@ pub struct DynamicCurrent {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id]
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   #[size = 80]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
@@ -506,11 +520,11 @@ pub struct DynamicCurrent {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<SwitchingGroup>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<SwitchingGroup>::deserialize_with")]
-  pub switching_group: GroupSet<SwitchingGroup>,
+  #[serde(serialize_with = "GroupSet::<SwitchingGroup<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<SwitchingGroup<C>>::deserialize_with")]
+  pub switching_group: GroupSet<SwitchingGroup<C>>,
 }
-impl GroupFn for DynamicCurrent {}
+impl<C: Ctx> GroupFn for DynamicCurrent<C> {}
 
 /// Use the switching_group group to specify a current waveform vector when the power
 /// and ground current is dependent on pin switching conditions.
@@ -524,10 +538,11 @@ impl GroupFn for DynamicCurrent {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct SwitchingGroup {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct SwitchingGroup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -535,7 +550,7 @@ pub struct SwitchingGroup {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -556,7 +571,11 @@ pub struct SwitchingGroup {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.5&end=151.15
   /// ">Reference</a>
-  #[id]
+  #[id(
+    borrow = "Option<&logic::Edge>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   #[size = 1]
   #[liberty(complex(type = Option))]
   pub input_switching_condition: Option<logic::Edge>,
@@ -578,7 +597,11 @@ pub struct SwitchingGroup {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.17&end=151.29
   /// ">Reference</a>
-  #[id]
+  #[id(
+    borrow = "Option<&logic::Edge>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   #[size = 1]
   #[liberty(complex(type = Option))]
   pub output_switching_condition: Option<logic::Edge>,
@@ -667,11 +690,11 @@ pub struct SwitchingGroup {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<PgCurrent>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<PgCurrent>::deserialize_with")]
-  pub pg_current: GroupSet<PgCurrent>,
+  #[serde(serialize_with = "GroupSet::<PgCurrent<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<PgCurrent<C>>::deserialize_with")]
+  pub pg_current: GroupSet<PgCurrent<C>>,
 }
-impl GroupFn for SwitchingGroup {}
+impl<C: Ctx> GroupFn for SwitchingGroup<C> {}
 
 /// Use the `pg_current` group to specify current waveform data in a vector group. If all
 /// vectors under the group are dense, data in this group is represented as a dense table. If
@@ -706,10 +729,11 @@ impl GroupFn for SwitchingGroup {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct PgCurrent {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct PgCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!")]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   name: Option<ArcStr>,
   /// group comments
   #[size = 32]
@@ -717,7 +741,7 @@ pub struct PgCurrent {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -765,11 +789,11 @@ pub struct PgCurrent {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CompactCcsPower>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CompactCcsPower>::deserialize_with")]
-  pub compact_ccs_power: GroupSet<CompactCcsPower>,
+  #[serde(serialize_with = "GroupSet::<CompactCcsPower<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<CompactCcsPower<C>>::deserialize_with")]
+  pub compact_ccs_power: GroupSet<CompactCcsPower<C>>,
 }
-impl GroupFn for PgCurrent {}
+impl<C: Ctx> GroupFn for PgCurrent<C> {}
 
 /// The `intrinsic_parasitic` group specifies the state-dependent intrinsic capacitance and
 /// intrinsic resistance of a `cell`.
@@ -834,7 +858,8 @@ impl GroupFn for PgCurrent {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct IntrinsicParasitic {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct IntrinsicParasitic<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   name: Option<ArcStr>,
@@ -844,12 +869,16 @@ pub struct IntrinsicParasitic {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id]
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
   /// The `reference_pg_pin` attribute specifies the reference pin for the
@@ -864,7 +893,7 @@ pub struct IntrinsicParasitic {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.3&end=178.9
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[liberty(simple(type = Option))]
   pub reference_pg_pin: Option<ArcStr>,
   /// The `mode` attribute pertains to an individual `cell`. The cell is active when the `mode` attribute
@@ -905,9 +934,9 @@ pub struct IntrinsicParasitic {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<IntrinsicCapacitance>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<IntrinsicCapacitance>::deserialize_with")]
-  pub intrinsic_capacitance: GroupSet<IntrinsicCapacitance>,
+  #[serde(serialize_with = "GroupSet::<IntrinsicCapacitance<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<IntrinsicCapacitance<C>>::deserialize_with")]
+  pub intrinsic_capacitance: GroupSet<IntrinsicCapacitance<C>>,
   /// Use this group to specify the intrinsic resistance between a power pin and an output pin of
   /// a cell.
   ///
@@ -944,9 +973,9 @@ pub struct IntrinsicParasitic {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<IntrinsicResistance>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<IntrinsicResistance>::deserialize_with")]
-  pub intrinsic_resistance: GroupSet<IntrinsicResistance>,
+  #[serde(serialize_with = "GroupSet::<IntrinsicResistance<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<IntrinsicResistance<C>>::deserialize_with")]
+  pub intrinsic_resistance: GroupSet<IntrinsicResistance<C>>,
   /// The `total_capacitance` group specifies the macro cell’s total capacitance on a power
   /// or ground net within the `intrinsic_parasitic` group. The following applies to the
   /// `total_capacitance` group:
@@ -987,11 +1016,11 @@ pub struct IntrinsicParasitic {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<PgPinWithValue>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<PgPinWithValue>::deserialize_with")]
-  pub total_capacitance: GroupSet<PgPinWithValue>,
+  #[serde(serialize_with = "GroupSet::<PgPinWithValue<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<PgPinWithValue<C>>::deserialize_with")]
+  pub total_capacitance: GroupSet<PgPinWithValue<C>>,
 }
-impl GroupFn for IntrinsicParasitic {}
+impl<C: Ctx> GroupFn for IntrinsicParasitic<C> {}
 
 /// Use this group to specify the intrinsic capacitance of a `cell`.
 /// Syntax
@@ -1020,7 +1049,8 @@ impl GroupFn for IntrinsicParasitic {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct IntrinsicCapacitance {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct IntrinsicCapacitance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   name: Option<ArcStr>,
@@ -1030,7 +1060,7 @@ pub struct IntrinsicCapacitance {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1054,7 +1084,7 @@ pub struct IntrinsicCapacitance {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[liberty(simple(type = Option))]
   pub reference_pg_pin: Option<ArcStr>,
   /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
@@ -1085,9 +1115,9 @@ pub struct IntrinsicCapacitance {
   /// ">Reference</a>
   #[size = 128]
   #[liberty(group(type = Option))]
-  pub lut_values: Option<LutValues>,
+  pub lut_values: Option<LutValues<C>>,
 }
-impl GroupFn for IntrinsicCapacitance {}
+impl<C: Ctx> GroupFn for IntrinsicCapacitance<C> {}
 
 /// Use this group to specify the intrinsic resistance between a power pin and an output pin of
 /// a cell.
@@ -1130,7 +1160,8 @@ impl GroupFn for IntrinsicCapacitance {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct IntrinsicResistance {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct IntrinsicResistance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   name: Option<ArcStr>,
@@ -1140,7 +1171,7 @@ pub struct IntrinsicResistance {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1166,7 +1197,7 @@ pub struct IntrinsicResistance {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[liberty(simple(type = Option))]
   pub related_output: Option<ArcStr>,
   /// The `reference_pg_pin` attribute specifies the reference pin for the
@@ -1180,7 +1211,7 @@ pub struct IntrinsicResistance {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
   /// ">Reference</a>
-  #[id]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[liberty(simple(type = Option))]
   pub reference_pg_pin: Option<ArcStr>,
   /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
@@ -1211,9 +1242,9 @@ pub struct IntrinsicResistance {
   /// ">Reference</a>
   #[size = 128]
   #[liberty(group(type = Option))]
-  pub lut_values: Option<LutValues>,
+  pub lut_values: Option<LutValues<C>>,
 }
-impl GroupFn for IntrinsicResistance {}
+impl<C: Ctx> GroupFn for IntrinsicResistance<C> {}
 
 /// The `total_capacitance` group specifies the macro cell’s total capacitance on a power
 /// or ground net within the `intrinsic_parasitic` group. The following applies to the
@@ -1260,8 +1291,9 @@ impl GroupFn for IntrinsicResistance {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct PgPinWithValue {
-  #[id]
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct PgPinWithValue<C: Ctx> {
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   pg_pin_name: Option<ArcStr>,
@@ -1271,7 +1303,7 @@ pub struct PgPinWithValue {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1280,7 +1312,7 @@ pub struct PgPinWithValue {
   #[liberty(simple)]
   pub value: NotNan<f64>,
 }
-impl GroupFn for PgPinWithValue {}
+impl<C: Ctx> GroupFn for PgPinWithValue<C> {}
 
 /// The `gate_leakage` group specifies the cell’s gate leakage current on input or inout pins
 /// within the `leakage_current` group in a cell. The following applies to `gate_leakage`
@@ -1323,8 +1355,9 @@ impl GroupFn for PgPinWithValue {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct GateLeakage {
-  #[id]
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct GateLeakage<C: Ctx> {
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
   input_pin_name: Option<ArcStr>,
@@ -1334,7 +1367,7 @@ pub struct GateLeakage {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1367,7 +1400,7 @@ pub struct GateLeakage {
   #[liberty(simple(type = Option))]
   pub input_high_value: Option<NotNan<f64>>,
 }
-impl GroupFn for GateLeakage {}
+impl<C: Ctx> GroupFn for GateLeakage<C> {}
 
 /// A `leakage_current` group is defined within a cell group or a model group to specify
 /// leakage current values that are dependent on the state of the cell.
@@ -1405,7 +1438,8 @@ impl GroupFn for GateLeakage {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct LeakageCurrent {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct LeakageCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   name: Option<ArcStr>,
@@ -1415,12 +1449,16 @@ pub struct LeakageCurrent {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id]
+  #[id(
+    borrow = "Option<&LogicBooleanExpression>",
+    check_fn = "mut_set::borrow_option!",
+    with_ref = false
+  )]
   #[size = 80]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
@@ -1482,9 +1520,9 @@ pub struct LeakageCurrent {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<PgPinWithValue>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<PgPinWithValue>::deserialize_with")]
-  pub pg_current: GroupSet<PgPinWithValue>,
+  #[serde(serialize_with = "GroupSet::<PgPinWithValue<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<PgPinWithValue<C>>::deserialize_with")]
+  pub pg_current: GroupSet<PgPinWithValue<C>>,
   /// The `gate_leakage` group specifies the cell’s gate leakage current on input or inout pins
   /// within the `leakage_current` group in a cell. The following applies to `gate_leakage`
   ///
@@ -1521,11 +1559,11 @@ pub struct LeakageCurrent {
   /// ">Reference</a>
   #[size = 64]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<GateLeakage>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<GateLeakage>::deserialize_with")]
-  pub gate_leakage: GroupSet<GateLeakage>,
+  #[serde(serialize_with = "GroupSet::<GateLeakage<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<GateLeakage<C>>::deserialize_with")]
+  pub gate_leakage: GroupSet<GateLeakage<C>>,
 }
-impl GroupFn for LeakageCurrent {}
+impl<C: Ctx> GroupFn for LeakageCurrent<C> {}
 
 /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
 /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
@@ -1559,14 +1597,15 @@ impl GroupFn for LeakageCurrent {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct LutValues {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct LutValues<C: Ctx> {
   #[liberty(name)]
   name: Option<ArcStr>,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
@@ -1575,7 +1614,7 @@ pub struct LutValues {
   #[liberty(complex)]
   pub values: Vec<NotNan<f64>>,
 }
-impl GroupFn for LutValues {}
+impl<C: Ctx> GroupFn for LutValues<C> {}
 
 /// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
 /// The `pg_type`  attribute also supports back-bias modeling.

@@ -4,7 +4,7 @@ use crate::{
     Indentation, ParseScope, SimpleAttri,
   },
   expression::logic::Edge,
-  ArcStr,
+  ArcStr, Ctx,
 };
 use core::{
   fmt::{self, Write},
@@ -59,10 +59,11 @@ impl SimpleAttri for AntennaDiodeType {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TLatch {
+#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct TLatch<C: Ctx> {
   /// Name of the pin
   #[liberty(name)]
-  #[id(borrow = "&str")]
+  #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   pub name: ArcStr,
   /// group comments
@@ -71,7 +72,7 @@ pub struct TLatch {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: (),
+  extra_ctx: C::Dummy,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -85,7 +86,7 @@ pub struct TLatch {
   pub tdisable: Option<bool>,
 }
 
-impl GroupFn for TLatch {}
+impl<C: Ctx> GroupFn for TLatch<C> {}
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -485,6 +486,8 @@ impl ComplexAttri for RetentionPin {
 
 #[cfg(test)]
 mod test {
+  use crate::DefaultCtx;
+
   use super::*;
   #[test]
   fn two_value() {
@@ -496,7 +499,7 @@ mod test {
   }
   #[test]
   fn retention_pin() {
-    let pin = crate::ast::test_parse_fmt::<crate::Cell>(
+    let pin = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
       r#"(cell1){
         pin(A){
           retention_pin (save_restore, 1);

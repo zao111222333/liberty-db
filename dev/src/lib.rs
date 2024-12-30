@@ -1,7 +1,7 @@
 pub mod projs;
 use criterion::{black_box, Criterion};
 use dev_utils::all_files;
-use itertools::Itertools;
+use itertools::Itertools as _;
 use serde_json::Value;
 use std::{fs::read_to_string, panic, path::Path, time::Duration};
 

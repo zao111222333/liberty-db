@@ -1,4 +1,4 @@
-use liberty_db::{library::Library, Group};
+use liberty_db::{DefaultCtx, Group, Library};
 
 static TEMPLATE: &str = r#"
 library(gscl45nm) {
@@ -56,7 +56,7 @@ library(gscl45nm) {
 }"#;
 fn main() {
   simple_logger::SimpleLogger::new().init().unwrap();
-  match Library::parse_lib(TEMPLATE) {
+  match Library::<DefaultCtx>::parse_lib(TEMPLATE) {
     Ok(ref mut library) => {
       library.comments_this_entry().or_insert("line1\nline2".into());
       library.comments_this_entry().and_modify(|s| s.push_str("line3"));
