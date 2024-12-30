@@ -59,9 +59,8 @@ impl Not for Static {
 }
 #[cfg(test)]
 mod test {
-  use crate::DefaultCtx;
   use super::*;
-  use crate::IntoEnumIterator;
+  use crate::{DefaultCtx, IntoEnumIterator};
 
   impl State {
     fn combine_op2(self, rhs: Self, f: fn(Static, Static) -> Static) -> Self {
