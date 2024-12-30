@@ -22,7 +22,7 @@ use core::fmt::Write;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct FF<C: Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -60,7 +60,7 @@ pub struct FF<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::FFLatch,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -115,10 +115,11 @@ pub struct FF<C: Ctx> {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=157.22&end=157.40
 /// ">Reference-Definition</a>
+#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct FFBank<C: Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -160,7 +161,7 @@ pub struct FFBank<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::FFLatch,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -218,6 +219,7 @@ pub struct FFBank<C: Ctx> {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Latch<C: Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -255,7 +257,7 @@ pub struct Latch<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::FFLatch,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -313,6 +315,7 @@ pub struct Latch<C: Ctx> {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item(sort)]
 #[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LatchBank<C: Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
@@ -354,7 +357,7 @@ pub struct LatchBank<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::FFLatch,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

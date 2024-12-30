@@ -13,7 +13,7 @@ use core::fmt::{self, Write};
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUpMultiSegment<C: Ctx> {
   #[liberty(name)]
   #[size = 8]
@@ -25,7 +25,7 @@ pub struct TableLookUpMultiSegment<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -55,7 +55,7 @@ pub struct TableLookUpMultiSegment<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct DriverWaveform<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -84,7 +84,7 @@ pub struct DriverWaveform<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -110,7 +110,7 @@ pub struct DriverWaveform<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp2D<C: Ctx> {
   // TODO: unit
   #[size = 8]
@@ -123,7 +123,7 @@ pub struct TableLookUp2D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -159,7 +159,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -275,7 +275,7 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector3D<C: Ctx> {
   // TODO: unit
   #[size = 8]
@@ -288,7 +288,7 @@ pub struct Vector3D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -313,7 +313,7 @@ pub struct Vector3D<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct ReferenceTimeVector3D<C: Ctx> {
   // TODO: unit
   #[size = 8]
@@ -326,7 +326,7 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -355,7 +355,7 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector4D<C: Ctx> {
   // TODO: unit
   #[size = 8]
@@ -368,7 +368,7 @@ pub struct Vector4D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -441,7 +441,7 @@ pub struct Vector4D<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct CompactCcsPower<C: Ctx> {
   // TODO: unit
   #[size = 8]
@@ -454,7 +454,7 @@ pub struct CompactCcsPower<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -610,7 +610,7 @@ impl ComplexAttri for Vec<CcsPowerValue> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector3DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -622,7 +622,7 @@ pub struct Vector3DGrpup<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -638,7 +638,7 @@ pub struct Vector3DGrpup<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -650,7 +650,7 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -666,7 +666,7 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector4DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -678,7 +678,7 @@ pub struct Vector4DGrpup<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -699,7 +699,7 @@ impl<C: Ctx> GroupFn for CompactCcsPower<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp3D<C: Ctx> {
   // TODO: unit
   #[size = 8]
@@ -712,7 +712,7 @@ pub struct TableLookUp3D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -735,7 +735,7 @@ pub struct TableLookUp3D<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp1D<C: Ctx> {
   // // TODO: unit
   // unit: (),
@@ -749,7 +749,7 @@ pub struct TableLookUp1D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -772,7 +772,7 @@ impl<C: Ctx> GroupFn for TableLookUp1D<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct CompactCcsTable<C: Ctx> {
   // // TODO: unit
   // unit: (),
@@ -786,7 +786,7 @@ pub struct CompactCcsTable<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -804,7 +804,7 @@ impl<C: Ctx> GroupFn for CompactCcsTable<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -816,7 +816,7 @@ pub struct TableLookUp<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  pub extra_ctx: C::Dummy,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1002,7 +1002,7 @@ impl<V: Iterator<Item = NotNan<f64>>> DisplayTableLookUp<'_, V> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableTemple<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -1014,7 +1014,7 @@ pub struct TableTemple<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

@@ -35,7 +35,7 @@ use core::fmt::{self, Write};
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Sensitization<C: Ctx> {
   /// name
   #[id(borrow = "&str", with_ref = false)]
@@ -48,7 +48,7 @@ pub struct Sensitization<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -348,7 +348,7 @@ impl ComplexAttri for VoltageMap {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct InputVoltage<C: Ctx> {
   /// name
   #[id(borrow = "&str", with_ref = false)]
@@ -361,7 +361,7 @@ pub struct InputVoltage<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -407,7 +407,7 @@ impl<C: Ctx> GroupFn for InputVoltage<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct OutputVoltage<C: Ctx> {
   /// name
   #[id(borrow = "&str", with_ref = false)]
@@ -420,7 +420,7 @@ pub struct OutputVoltage<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -498,7 +498,7 @@ impl SimpleAttri for DelayModel {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct OperatingConditions<C: Ctx> {
   /// name
   #[id(borrow = "&str", with_ref = false)]
@@ -511,7 +511,7 @@ pub struct OperatingConditions<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -588,7 +588,7 @@ impl<C: Ctx> GroupFn for OperatingConditions<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct FpgaIsd<C: Ctx> {
   /// name
   #[size = 8]
@@ -601,7 +601,7 @@ pub struct FpgaIsd<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -971,7 +971,7 @@ pub struct WireLoad<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1154,7 +1154,7 @@ pub struct WireLoadSection<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1252,7 +1252,7 @@ pub struct BaseCurves<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

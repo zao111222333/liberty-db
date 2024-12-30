@@ -7,7 +7,6 @@
 
 mod timing_type;
 pub use timing_type::*;
-pub mod builder;
 pub mod impls;
 pub mod items;
 use crate::{
@@ -50,7 +49,7 @@ pub use items::*;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Timing: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Timing<C: Ctx> {
   #[size = 24]
   #[liberty(name)]
@@ -61,7 +60,7 @@ pub struct Timing<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Timing,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

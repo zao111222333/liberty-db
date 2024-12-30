@@ -13,7 +13,7 @@ use crate::{
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::InternalPower: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct InternalPower<C: Ctx> {
   /// group comments
   #[size = 32]
@@ -21,7 +21,7 @@ pub struct InternalPower<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::InternalPower,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

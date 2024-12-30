@@ -38,7 +38,7 @@ pub use items::*;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Pin: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Pin<C: Ctx> {
   /// Name of the pin
   /// `pin (name | name_list)`
@@ -59,7 +59,7 @@ pub struct Pin<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Pin,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

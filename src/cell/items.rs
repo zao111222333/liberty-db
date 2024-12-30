@@ -25,7 +25,7 @@ use core::{
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LeakagePower<C: Ctx> {
   #[id(borrow = "&[ArcStr]", with_ref = false)]
   #[size = 24]
@@ -37,7 +37,7 @@ pub struct LeakagePower<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -151,7 +151,7 @@ mod test_sort {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Statetable<C: Ctx> {
   #[id(borrow = "&[ArcStr]", with_ref = false)]
   #[size = 24]
@@ -167,7 +167,7 @@ pub struct Statetable<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -345,7 +345,7 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct PgPin<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -357,7 +357,7 @@ pub struct PgPin<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -477,7 +477,7 @@ impl<C: Ctx> GroupFn for PgPin<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct DynamicCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -489,7 +489,7 @@ pub struct DynamicCurrent<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -538,7 +538,7 @@ impl<C: Ctx> GroupFn for DynamicCurrent<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct SwitchingGroup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -550,7 +550,7 @@ pub struct SwitchingGroup<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -729,7 +729,7 @@ impl<C: Ctx> GroupFn for SwitchingGroup<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct PgCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -741,7 +741,7 @@ pub struct PgCurrent<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -858,7 +858,7 @@ impl<C: Ctx> GroupFn for PgCurrent<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct IntrinsicParasitic<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -869,7 +869,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1049,7 +1049,7 @@ impl<C: Ctx> GroupFn for IntrinsicParasitic<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct IntrinsicCapacitance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -1060,7 +1060,7 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1160,7 +1160,7 @@ impl<C: Ctx> GroupFn for IntrinsicCapacitance<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct IntrinsicResistance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -1171,7 +1171,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1291,7 +1291,7 @@ impl<C: Ctx> GroupFn for IntrinsicResistance<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct PgPinWithValue<C: Ctx> {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[size = 8]
@@ -1303,7 +1303,7 @@ pub struct PgPinWithValue<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1355,7 +1355,7 @@ impl<C: Ctx> GroupFn for PgPinWithValue<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct GateLeakage<C: Ctx> {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[size = 8]
@@ -1367,7 +1367,7 @@ pub struct GateLeakage<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1438,7 +1438,7 @@ impl<C: Ctx> GroupFn for GateLeakage<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LeakageCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -1449,7 +1449,7 @@ pub struct LeakageCurrent<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1597,7 +1597,7 @@ impl<C: Ctx> GroupFn for LeakageCurrent<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LutValues<C: Ctx> {
   #[liberty(name)]
   name: Option<ArcStr>,
@@ -1605,7 +1605,7 @@ pub struct LutValues<C: Ctx> {
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,

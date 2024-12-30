@@ -525,7 +525,7 @@ fn main() {
   let input = r#"
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Foo {
   #[liberty(attributes)]
   attributes: bool,

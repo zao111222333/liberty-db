@@ -46,7 +46,7 @@ use num_traits::Zero as _;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct CCSNStage<C: Ctx> {
   /// group name
   #[liberty(name)]
@@ -59,7 +59,7 @@ pub struct CCSNStage<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -307,7 +307,7 @@ impl SimpleAttri for StageType {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct ReceiverCapacitance<C: Ctx> {
   /// group name
   #[size = 8]
@@ -320,7 +320,7 @@ pub struct ReceiverCapacitance<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

@@ -13,7 +13,7 @@ use super::table::TableLookUp;
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 // #[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing<C: Ctx> {
   /// group undefined attributes
@@ -23,7 +23,7 @@ pub(crate) struct Timing<C: Ctx> {
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   #[liberty(complex)]
   #[default = "vec![unsafe{ NotNan::new_unchecked(0.0) }]"]
   pub values: Vec<NotNan<f64>>,
@@ -46,7 +46,7 @@ impl<C: Ctx> GroupFn for Timing<C> {}
 #[derive(liberty_macros::Group)]
 // #[derive(liberty_macros::Nothing)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub(crate) struct Pin<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
@@ -58,7 +58,7 @@ pub(crate) struct Pin<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -73,7 +73,7 @@ impl<C: Ctx> GroupFn for Pin<C> {}
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub(crate) struct FF<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
@@ -89,7 +89,7 @@ pub(crate) struct FF<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -134,7 +134,7 @@ impl<C: Ctx> NamedGroup for FF<C> {
 #[derive(Debug)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub(crate) struct Cell<C: Ctx> {
   #[liberty(name)]
   name: ArcStr,
@@ -142,7 +142,7 @@ pub(crate) struct Cell<C: Ctx> {
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,

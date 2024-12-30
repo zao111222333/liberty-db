@@ -640,7 +640,7 @@ impl<C: Ctx> GroupFn for Cell<C> {
 #[derive(mut_set::derive::Dummy)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Dummy: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TestCell<C: Ctx> {
   /// group comments
   #[size = 32]
@@ -648,7 +648,7 @@ pub struct TestCell<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Dummy,
+  extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

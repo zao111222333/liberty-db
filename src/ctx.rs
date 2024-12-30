@@ -1,17 +1,42 @@
 pub trait Ctx: serde::Serialize + serde::de::DeserializeOwned + Default {
+  type Library: core::fmt::Debug
+    + Clone
+    + Default
+    + serde::Serialize
+    + serde::de::DeserializeOwned;
   type Cell: crate::cell::CellCtx
     + core::fmt::Debug
     + Clone
     + Default
     + serde::Serialize
     + serde::de::DeserializeOwned;
-  type Library: core::fmt::Debug
+  type FFLatch: core::fmt::Debug
+    + Clone
+    + Default
+    + serde::Serialize
+    + serde::de::DeserializeOwned;
+  type Pin: core::fmt::Debug
+    + Clone
+    + Default
+    + serde::Serialize
+    + serde::de::DeserializeOwned;
+  type Timing: core::fmt::Debug
+    + Clone
+    + Default
+    + serde::Serialize
+    + serde::de::DeserializeOwned;
+  type InternalPower: core::fmt::Debug
+    + Clone
+    + Default
+    + serde::Serialize
+    + serde::de::DeserializeOwned;
+  type Table: core::fmt::Debug
     + Clone
     + Default
     + serde::Serialize
     + serde::de::DeserializeOwned;
   /// TODO: Specify more types of Ctx
-  type Dummy: core::fmt::Debug
+  type Other: core::fmt::Debug
     + Clone
     + Default
     + serde::Serialize
@@ -24,7 +49,12 @@ pub trait Ctx: serde::Serialize + serde::de::DeserializeOwned + Default {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefaultCtx;
 impl Ctx for DefaultCtx {
-  type Cell = crate::cell::DefaultCellCtx;
   type Library = ();
-  type Dummy = ();
+  type Cell = crate::cell::DefaultCellCtx;
+  type FFLatch = ();
+  type Pin = ();
+  type Timing = ();
+  type InternalPower = ();
+  type Table = ();
+  type Other = ();
 }
