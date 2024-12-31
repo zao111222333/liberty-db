@@ -443,7 +443,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       attributes_name,
       comments_name,
       extra_ctx_name,
-      extra_ctx_type,
+      _extra_ctx_type,
     ) = parse_fields_type(fields)?;
     let this_str = "__this__";
     let mut comment_fns = quote! {
@@ -458,16 +458,16 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     };
     let mut builder_fields = quote! {
       pub(crate) #attributes_name: crate::ast::Attributes,
-      pub(crate) #extra_ctx_name: #extra_ctx_type,
+      ____p: core::marker::PhantomData<C>,
     };
     let mut builder_inits = quote! {
       #attributes_name: Default::default(),
-      #extra_ctx_name: Default::default(),
+      ____p: core::marker::PhantomData,
     };
     let mut build_arms = quote! {
       #comments_name: Default::default(),
       #attributes_name: builder.#attributes_name,
-      #extra_ctx_name: builder.#extra_ctx_name,
+      #extra_ctx_name: Default::default(),
     };
     for name_field in &name_vec {
       let i = name_field.ident.clone().unwrap();

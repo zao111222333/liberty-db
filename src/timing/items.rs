@@ -452,7 +452,7 @@ impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
           size2: _value.values.size2,
           values: _value.values.inner,
           lvf_values,
-          extra_ctx: _value.extra_ctx,
+          extra_ctx: Default::default(),
         })
       }
       (Some(_value), None, None, None) => Some(TimingTableLookUp {
@@ -464,7 +464,7 @@ impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
         size2: _value.values.size2,
         values: _value.values.inner,
         lvf_values: Vec::new(),
-        extra_ctx: _value.extra_ctx,
+        extra_ctx: Default::default(),
       }),
       _ => None,
     }
