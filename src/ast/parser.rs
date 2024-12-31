@@ -2,7 +2,7 @@
 //!
 //! All parser utilis.
 //!
-use crate::{ast::GroupWrapper, ArcStr, NotNan};
+use crate::{ast::GroupWrapper, ArcStr};
 use nom::{
   branch::alt,
   bytes::complete::{escaped, is_not, tag, take, take_until, take_while},
@@ -362,15 +362,15 @@ pub(crate) fn simple<'a>(
   )(i)
 }
 #[inline]
-fn float_one(i: &str) -> IResult<&str, NotNan<f64>, Error<&str>> {
+pub(crate) fn float_one(i: &str) -> IResult<&str, f64, Error<&str>> {
   #[expect(clippy::string_slice, clippy::undocumented_unsafe_blocks)]
   match fast_float2::parse_partial(i) {
-    Ok((f, pos)) => Ok((&i[pos..], unsafe { NotNan::new_unchecked(f) })),
+    Ok((f, pos)) => Ok((&i[pos..], f)),
     Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Float))),
   }
 }
 #[inline]
-fn float_vec(i: &str) -> IResult<&str, Vec<NotNan<f64>>, Error<&str>> {
+fn float_vec(i: &str) -> IResult<&str, Vec<f64>, Error<&str>> {
   delimited(
     pair(char('"'), space),
     terminated(
@@ -392,7 +392,7 @@ fn int_usize(i: &str) -> IResult<&str, usize, Error<&str>> {
 pub(crate) fn complex_id_vector<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, (usize, Vec<NotNan<f64>>), Error<&'a str>> {
+) -> IResult<&'a str, (usize, Vec<f64>), Error<&'a str>> {
   map(
     tuple((
       space,
@@ -448,7 +448,7 @@ pub(crate) fn complex_multi_line<'a, T, F: nom::Parser<&'a str, T, Error<&'a str
 pub(crate) fn complex_float_vec<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<NotNan<f64>>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<f64>, Error<&'a str>> {
   map(
     tuple((
       space,
@@ -500,7 +500,7 @@ pub(crate) fn complex_float_vec<'a>(
 pub(crate) fn complex_values<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<(usize, Vec<NotNan<f64>>)>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<(usize, Vec<f64>)>, Error<&'a str>> {
   complex_multi_line(i, line_num, float_vec)
 }
 
@@ -601,25 +601,11 @@ mod test_key {
       )
     );
     assert_eq!(
-      Ok((
-        "}",
-        vec![
-          unsafe { NotNan::new_unchecked(3.0) },
-          unsafe { NotNan::new_unchecked(4.0) },
-          unsafe { NotNan::new_unchecked(5.0) },
-        ]
-      )),
+      Ok(("}", vec![3.0, 4.0, 5.0,])),
       complex_float_vec(r#" ("3, 4, 5"); }"#, &mut 1)
     );
     assert_eq!(
-      Ok((
-        "}",
-        vec![
-          unsafe { NotNan::new_unchecked(3.0) },
-          unsafe { NotNan::new_unchecked(4.0) },
-          unsafe { NotNan::new_unchecked(5.0) },
-        ]
-      )),
+      Ok(("}", vec![3.0, 4.0, 5.0,])),
       complex_float_vec(r#" ("3, 4, 5,"); }"#, &mut 1)
     );
     assert_eq!(

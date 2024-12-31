@@ -5,7 +5,7 @@ use crate::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
     ParseScope, SimpleAttri,
   },
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 use core::fmt::{self, Write};
 
@@ -36,16 +36,16 @@ pub struct TableLookUpMultiSegment<C: Ctx> {
   segment: usize,
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_2: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<NotNan<f64>>,
+  pub index_3: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_4: Vec<NotNan<f64>>,
+  pub index_4: Vec<f64>,
   #[size = 40]
   #[liberty(complex)]
   pub values: Values,
@@ -91,16 +91,16 @@ pub struct DriverWaveform<C: Ctx> {
   pub attributes: Attributes,
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_2: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<NotNan<f64>>,
+  pub index_3: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_4: Vec<NotNan<f64>>,
+  pub index_4: Vec<f64>,
   #[size = 40]
   #[liberty(complex)]
   pub values: Values,
@@ -130,10 +130,10 @@ pub struct TableLookUp2D<C: Ctx> {
   pub attributes: Attributes,
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_2: Vec<f64>,
   #[size = 40]
   #[liberty(complex)]
   pub values: Values,
@@ -184,7 +184,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
@@ -202,7 +202,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_2: Vec<f64>,
   /// The string values in `index_3`  are determined by the `base_curve_type` value
   /// in the `base_curve`  group. When `ccs_timing_half_curve` is the
   /// `base_curve_type`  value, the following six string values (parameters)
@@ -293,20 +293,20 @@ pub struct Vector3D<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id]
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[size = 8]
   #[liberty(complex)]
-  pub index_1: NotNan<f64>,
-  #[id]
+  pub index_1: f64,
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[size = 8]
   #[liberty(complex)]
-  pub index_2: NotNan<f64>,
+  pub index_2: f64,
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<NotNan<f64>>,
+  pub index_3: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub values: Vec<NotNan<f64>>,
+  pub values: Vec<f64>,
 }
 
 #[mut_set::derive::item(sort)]
@@ -331,24 +331,24 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id]
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[size = 8]
   #[liberty(simple)]
-  pub reference_time: NotNan<f64>,
-  #[id]
+  pub reference_time: f64,
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[size = 8]
   #[liberty(complex)]
-  pub index_1: NotNan<f64>,
-  #[id]
+  pub index_1: f64,
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[size = 8]
   #[liberty(complex)]
-  pub index_2: NotNan<f64>,
+  pub index_2: f64,
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<NotNan<f64>>,
+  pub index_3: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub values: Vec<NotNan<f64>>,
+  pub values: Vec<f64>,
 }
 
 #[mut_set::derive::item(sort)]
@@ -373,24 +373,24 @@ pub struct Vector4D<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id]
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[size = 8]
   #[liberty(complex)]
-  pub index_1: NotNan<f64>,
-  #[id]
+  pub index_1: f64,
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[size = 8]
   #[liberty(complex)]
-  pub index_2: NotNan<f64>,
-  #[id]
+  pub index_2: f64,
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[size = 8]
   #[liberty(complex)]
-  pub index_3: NotNan<f64>,
+  pub index_3: f64,
   #[size = 24]
   #[liberty(complex)]
-  pub index_4: Vec<NotNan<f64>>,
+  pub index_4: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub values: Vec<NotNan<f64>>,
+  pub values: Vec<f64>,
 }
 
 /// The `compact_ccs_power` group contains a detailed description for compact CCS
@@ -467,13 +467,13 @@ pub struct CompactCcsPower<C: Ctx> {
   pub index_output: Option<ArcStr>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_2: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<NotNan<f64>>,
+  pub index_3: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<ArcStr>,
@@ -516,8 +516,8 @@ pub struct CompactCcsPower<C: Ctx> {
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CcsPowerValue {
-  pub init_time: NotNan<f64>,
-  pub init_current: NotNan<f64>,
+  pub init_time: f64,
+  pub init_current: f64,
   pub points: Vec<CcsPowerPoint>,
 }
 
@@ -525,8 +525,8 @@ pub struct CcsPowerValue {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CcsPowerPoint {
   pub bc_id: usize,
-  pub point_time: NotNan<f64>,
-  pub point_current: NotNan<f64>,
+  pub point_time: f64,
+  pub point_current: f64,
 }
 crate::ast::impl_self_builder!(Vec<CcsPowerValue>);
 impl ComplexAttri for Vec<CcsPowerValue> {
@@ -571,9 +571,9 @@ impl ComplexAttri for Vec<CcsPowerValue> {
     ) -> fmt::Result {
       f.write_int(point.bc_id)?;
       f.write_str(", ")?;
-      f.write_float(point.point_time.into_inner())?;
+      f.write_float(point.point_time)?;
       f.write_str(", ")?;
-      f.write_float(point.point_current.into_inner())
+      f.write_float(point.point_current)
     }
     #[inline]
     fn fmt_value<T: Write, I: ast::Indentation>(
@@ -581,9 +581,9 @@ impl ComplexAttri for Vec<CcsPowerValue> {
       f: &mut ast::CodeFormatter<'_, T, I>,
     ) -> fmt::Result {
       write!(f, "\"")?;
-      f.write_float(value.init_time.into_inner())?;
+      f.write_float(value.init_time)?;
       f.write_str(", ")?;
-      f.write_float(value.init_current.into_inner())?;
+      f.write_float(value.init_current)?;
       if !value.points.is_empty() {
         f.write_str(", ")?;
         ast::join_fmt_no_quote(
@@ -719,13 +719,13 @@ pub struct TableLookUp3D<C: Ctx> {
   pub attributes: Attributes,
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_2: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<NotNan<f64>>,
+  pub index_3: Vec<f64>,
   #[size = 40]
   #[liberty(complex)]
   pub values: Values,
@@ -756,10 +756,10 @@ pub struct TableLookUp1D<C: Ctx> {
   pub attributes: Attributes,
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub values: Vec<NotNan<f64>>,
+  pub values: Vec<f64>,
 }
 impl<C: Ctx> GroupFn for TableLookUp1D<C> {}
 
@@ -823,16 +823,16 @@ pub struct TableLookUp<C: Ctx> {
   pub attributes: Attributes,
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_2: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<NotNan<f64>>,
+  pub index_3: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_4: Vec<NotNan<f64>>,
+  pub index_4: Vec<f64>,
   #[size = 40]
   #[liberty(complex)]
   pub values: Values,
@@ -851,7 +851,7 @@ impl<C: Ctx> GroupFn for Vector4D<C> {}
 pub struct Values {
   pub size1: usize,
   pub size2: usize,
-  pub inner: Vec<NotNan<f64>>,
+  pub inner: Vec<f64>,
 }
 crate::ast::impl_self_builder!(Values);
 impl ComplexAttri for Values {
@@ -916,23 +916,23 @@ impl ComplexAttri for Values {
     let indent = f.indentation();
     let mut iter = self.inner.chunks(self.size1);
     if let Some(v) = iter.next() {
-      ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")?;
+      ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(*float), ", ")?;
     }
     while let Some(v) = iter.next() {
       write!(f, ", \\\n{indent}")?;
-      ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")?;
+      ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(*float), ", ")?;
     }
     Ok(())
   }
 }
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
-pub(crate) struct DisplayValues<V: Iterator<Item = NotNan<f64>>> {
+pub(crate) struct DisplayValues<V: Iterator<Item = f64>> {
   pub(crate) size1: usize,
   pub(crate) inner: V,
 }
 
-impl<V: Iterator<Item = NotNan<f64>>> DisplayValues<V> {
+impl<V: Iterator<Item = f64>> DisplayValues<V> {
   #[inline]
   fn fmt_self<T: Write, I: ast::Indentation>(
     self,
@@ -943,35 +943,25 @@ impl<V: Iterator<Item = NotNan<f64>>> DisplayValues<V> {
     let chunks = self.inner.chunks(self.size1);
     let mut iter = chunks.into_iter();
     if let Some(v) = iter.next() {
-      ast::join_fmt(
-        v.into_iter(),
-        f,
-        |float, ff| ff.write_float(float.into_inner()),
-        ", ",
-      )?;
+      ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_float(float), ", ")?;
     }
     while let Some(v) = iter.next() {
       write!(f, ", \\\n{indent}")?;
-      ast::join_fmt(
-        v.into_iter(),
-        f,
-        |float, ff| ff.write_float(float.into_inner()),
-        ", ",
-      )?;
+      ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_float(float), ", ")?;
     }
     Ok(())
   }
 }
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
-pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = NotNan<f64>>> {
+pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = f64>> {
   pub(crate) name: &'a Option<ArcStr>,
-  pub(crate) index_1: &'a Vec<NotNan<f64>>,
-  pub(crate) index_2: &'a Vec<NotNan<f64>>,
+  pub(crate) index_1: &'a Vec<f64>,
+  pub(crate) index_2: &'a Vec<f64>,
   pub(crate) values: DisplayValues<V>,
 }
 
-impl<V: Iterator<Item = NotNan<f64>>> DisplayTableLookUp<'_, V> {
+impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
   #[inline]
   pub(crate) fn fmt_self<T: Write, I: ast::Indentation>(
     self,
@@ -1033,16 +1023,16 @@ pub struct TableTemple<C: Ctx> {
   pub variable_4: Option<Variable>,
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub index_1: Option<Vec<NotNan<f64>>>,
+  pub index_1: Option<Vec<f64>>,
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub index_2: Option<Vec<NotNan<f64>>>,
+  pub index_2: Option<Vec<f64>>,
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub index_3: Option<Vec<NotNan<f64>>>,
+  pub index_3: Option<Vec<f64>>,
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub index_4: Option<Vec<NotNan<f64>>>,
+  pub index_4: Option<Vec<f64>>,
 }
 impl<C: Ctx> GroupFn for TableTemple<C> {}
 

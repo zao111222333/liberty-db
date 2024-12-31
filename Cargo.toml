@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.8.1"
+version = "0.8.2"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -64,7 +64,7 @@ ryu = "1.0"
 itoa = "1.0"
 biodivine-lib-bdd = { version = "0.5.23", features = ["serde"] }
 # biodivine-lib-bdd = { git = "https://github.com/zao111222333/biodivine-lib-bdd.git", features = ["serde"] }
-mut_set = "0.6.0"
+mut_set = "0.6.1"
 # mut_set = { version="0.5.2", features = ["__dbg_disable_mem_layout"] }
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"

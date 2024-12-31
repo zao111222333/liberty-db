@@ -13,7 +13,7 @@ use crate::{
     parse_f64,
   },
   expression::logic,
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 use core::fmt::{self, Write};
 
@@ -306,7 +306,7 @@ pub struct VoltageMap {
   #[size = 8]
   pub name: ArcStr,
   /// voltage
-  pub voltage: NotNan<f64>,
+  pub voltage: f64,
 }
 crate::ast::impl_self_builder!(VoltageMap);
 impl ComplexAttri for VoltageMap {
@@ -334,7 +334,7 @@ impl ComplexAttri for VoltageMap {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     write!(f, "{}, ", self.name)?;
-    f.write_float(self.voltage.into_inner())
+    f.write_float(self.voltage)
   }
 }
 
@@ -529,7 +529,7 @@ pub struct OperatingConditions<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub parameteri: Option<NotNan<f64>>,
+  pub parameteri: Option<f64>,
   /// Use the `process`  attribute to specify a scaling factor to account for variations in the outcome of the actual semiconductor manufacturing steps.
   ///
   /// A floating-point number from 0 through 100.
@@ -538,7 +538,7 @@ pub struct OperatingConditions<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub process: NotNan<f64>,
+  pub process: f64,
   /// Use the process_label  attribute to specify the name of the current process.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.9&end=73.10
@@ -552,7 +552,7 @@ pub struct OperatingConditions<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub temperature: NotNan<f64>,
+  pub temperature: f64,
   /// Use the `tree_type`  attribute to specify the environment interconnect model.
   ///
   /// Valid values are `best_case_tree`, `balanced_tree`, and `worst_case_tree`.
@@ -570,8 +570,8 @@ pub struct OperatingConditions<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(5.0) }"]
-  pub voltage: NotNan<f64>,
+  #[default = "5.0"]
+  pub voltage: f64,
 }
 impl<C: Ctx> GroupFn for OperatingConditions<C> {}
 
@@ -982,21 +982,21 @@ pub struct WireLoad<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub area: NotNan<f64>,
+  pub area: f64,
   /// Use this attribute to specify capacitance per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=95.5&end=95.6
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub capacitance: NotNan<f64>,
+  pub capacitance: f64,
   /// Use this attribute to specify wire resistance per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=95.15&end=95.16
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub resistance: NotNan<f64>,
+  pub resistance: f64,
   /// Use this attribute to characterize linear fanout length behavior
   /// beyond the scope of the longest length specified
   /// in the `fanout_length`  attribute.
@@ -1005,7 +1005,7 @@ pub struct WireLoad<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub slope: NotNan<f64>,
+  pub slope: f64,
   /// Use this attribute to define values for fanout and length
   /// when you create the wire load manually.
   /// fanoutAn integer representing the total number of pins, minus one, on the net driven by the given output.lengthA floating-point number representing the estimated amount of metal that is statistically found on a network with the given number of pins.
@@ -1070,11 +1070,11 @@ pub struct FanoutLength {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.22&end=96.23
   /// ">Reference</a>
-  pub length: NotNan<f64>,
+  pub length: f64,
   /// average_capacitance
-  pub average_capacitance: Option<NotNan<f64>>,
+  pub average_capacitance: Option<f64>,
   /// standard_deviation
-  pub standard_deviation: Option<NotNan<f64>>,
+  pub standard_deviation: Option<f64>,
   /// number_of_nets
   pub number_of_nets: Option<u32>,
 }
@@ -1118,14 +1118,14 @@ impl ComplexAttri for FanoutLength {
   ) -> fmt::Result {
     f.write_int(self.fanout)?;
     f.write_str(", ")?;
-    f.write_float(self.length.into_inner())?;
+    f.write_float(self.length)?;
     if let (Some(average_capacitance), Some(standard_deviation), Some(number_of_nets)) =
       (self.average_capacitance, self.standard_deviation, self.number_of_nets)
     {
       f.write_str(", ")?;
-      f.write_float(average_capacitance.into_inner())?;
+      f.write_float(average_capacitance)?;
       f.write_str(", ")?;
-      f.write_float(standard_deviation.into_inner())?;
+      f.write_float(standard_deviation)?;
       f.write_str(", ")?;
       f.write_int(number_of_nets)?;
     }
@@ -1165,7 +1165,7 @@ pub struct WireLoadSection<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub wire_load_from_area: (NotNan<f64>, NotNan<f64>, ArcStr),
+  pub wire_load_from_area: (f64, f64, ArcStr),
 }
 impl<C: Ctx> GroupFn for WireLoadSection<C> {}
 
@@ -1279,7 +1279,7 @@ pub struct BaseCurves<C: Ctx> {
   pub base_curve_type: BaseCurveType,
   #[size = 24]
   #[liberty(complex)]
-  pub curve_x: Vec<NotNan<f64>>,
+  pub curve_x: Vec<f64>,
   #[size = 64]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<IdVector>::serialize_with")]

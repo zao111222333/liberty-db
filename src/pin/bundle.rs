@@ -4,7 +4,7 @@ use crate::{
   expression::LogicBooleanExpression,
   pin::{Direction, NextstateType},
   timing::Timing,
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
@@ -39,7 +39,7 @@ pub struct Bundle<C: Ctx> {
   pub direction: Option<Direction>,
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub capacitance: Option<NotNan<f64>>,
+  pub capacitance: Option<f64>,
   #[size = 80]
   #[liberty(simple(type = Option))]
   pub function: Option<LogicBooleanExpression>,

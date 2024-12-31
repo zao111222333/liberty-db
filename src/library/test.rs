@@ -3,7 +3,7 @@ use num_traits::One;
 
 use crate::{
   ast::{AttriValues, SimpleDefined},
-  DefaultCtx, NotNan,
+  DefaultCtx,
 };
 
 use super::*;
@@ -95,10 +95,10 @@ library (define) {
   assert_eq!(
     &library.attributes["my_define_float"],
     &AttriValues::Simple(SimpleDefined::Float(vec![
-      Ok(NotNan::new(1.0_f64).unwrap()),
-      Ok(NotNan::new(2.0_f64).unwrap()),
-      Ok(NotNan::new(3.0_f64).unwrap()),
-      Ok(NotNan::new(4.0_f64).unwrap()),
+      Ok(1.0),
+      Ok(2.0),
+      Ok(3.0),
+      Ok(4.0),
       Err("abc".into()),
     ]))
   );
@@ -183,18 +183,18 @@ fn entry() {
   library
     .cell
     .entry("CELL1".into())
-    .and_modify(|cell| cell.area = Some(NotNan::one()))
-    .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+    .and_modify(|cell| cell.area = Some(1.0))
+    .or_insert_with(|cell| cell.area = Some(0.0));
   library
     .cell
     .entry("CELL2".into())
-    .and_modify(|cell| cell.area = Some(NotNan::one()))
-    .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+    .and_modify(|cell| cell.area = Some(1.0))
+    .or_insert_with(|cell| cell.area = Some(0.0));
   library
     .cell
     .entry("CELL2".into())
-    .and_modify(|cell| cell.area = Some(NotNan::one()))
-    .or_insert_with(|cell| cell.area = Some(NotNan::zero()));
+    .and_modify(|cell| cell.area = Some(1.0))
+    .or_insert_with(|cell| cell.area = Some(0.0));
   fmt_cmp(
     &library,
     r#"/* comment1 */

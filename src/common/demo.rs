@@ -5,7 +5,7 @@ use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
   timing::{TimingTableLookUp, TimingType},
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 use core::fmt::Write;
 
@@ -25,8 +25,8 @@ pub(crate) struct Timing<C: Ctx> {
   #[liberty(extra_ctx)]
   extra_ctx: C::Other,
   #[liberty(complex)]
-  #[default = "vec![unsafe{ NotNan::new_unchecked(0.0) }]"]
-  pub values: Vec<NotNan<f64>>,
+  #[default = "vec![0.0]"]
+  pub values: Vec<f64>,
   #[liberty(simple(type = Option))]
   t1: Option<TimingType>,
   #[liberty(simple(type = Option))]
@@ -147,7 +147,7 @@ pub(crate) struct Cell<C: Ctx> {
   #[liberty(attributes)]
   attributes: Attributes,
   #[liberty(simple(type = Option))]
-  area: Option<NotNan<f64>>,
+  area: Option<f64>,
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]

@@ -12,7 +12,7 @@ use crate::{
   },
   expression::LogicBooleanExpression,
   timing::items::Mode,
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 use core::fmt::{self, Write};
 use num_traits::Zero as _;
@@ -66,10 +66,10 @@ pub struct CCSNStage<C: Ctx> {
   pub attributes: Attributes,
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub load_cap_fall: Option<NotNan<f64>>,
+  pub load_cap_fall: Option<f64>,
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub load_cap_rise: Option<NotNan<f64>>,
+  pub load_cap_rise: Option<f64>,
   /// Use the `is_inverting`  attribute to specify whether the channel-connecting block is inverting.
   /// This attribute is mandatory if the `is_needed` attribute value is true.
   /// If the channel-connecting block is inverting, set the attribute to true.
@@ -107,7 +107,7 @@ pub struct CCSNStage<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub miller_cap_fall: Option<NotNan<f64>>,
+  pub miller_cap_fall: Option<f64>,
   /// Use the `miller_cap_rise`  attribute to specify the Miller capacitance value for the channel-connecting block.
   /// A floating-point number representing the Miller capacitance value. The value must be greater or equal to zero.
   /// <a name ="reference_link" href="
@@ -115,7 +115,7 @@ pub struct CCSNStage<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub miller_cap_rise: Option<NotNan<f64>>,
+  pub miller_cap_rise: Option<f64>,
   /// The optional `related_ccb_node`  attribute specifies the SPICE node
   /// in the subcircuit netlist that is used for the `dc_current`  
   /// table characterization and waveform measurements.

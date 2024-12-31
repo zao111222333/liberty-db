@@ -1,4 +1,4 @@
-use liberty_db::{cell::CellCtx, DefaultCtx, Library, NotNan};
+use liberty_db::{cell::CellCtx, DefaultCtx, Library};
 use std::{
   env,
   fs::{read_to_string, File},
@@ -20,7 +20,7 @@ fn main() {
       .unwrap();
   library.technology = "cmos".into();
   for operating_condition in library.operating_conditions.iter_mut() {
-    operating_condition.voltage = unsafe { NotNan::<f64>::new_unchecked(0.8) };
+    operating_condition.voltage = 0.8;
   }
   log::warn!("Attributes Items: {:?}", library.attributes);
   for cell in library.cell.iter_mut() {

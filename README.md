@@ -73,7 +73,7 @@ fn main(){
 }
 ```
 
-And can see more [examples](examples), and run them if you clone this repo:
+See more [examples](examples), and run them if you clone this repo:
 
 ``` shell
 # example0

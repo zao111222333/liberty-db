@@ -37,9 +37,9 @@ pub trait LogicLike: fmt::Display + fmt::Debug {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ChangePattern {
   /// settle down time
-  pub settle_down_time: NotNan<f64>,
+  pub settle_down_time: f64,
   /// transition time
-  pub transition_time: NotNan<f64>,
+  pub transition_time: f64,
 }
 
 impl Ord for ChangePattern {
@@ -85,7 +85,7 @@ impl fmt::Display for ChangePattern {
 impl ChangePattern {
   #[inline]
   /// new ChangePattern
-  pub fn new(settle_down_time: NotNan<f64>, transition_time: NotNan<f64>) -> Self {
+  pub fn new(settle_down_time: f64, transition_time: f64) -> Self {
     Self { settle_down_time, transition_time }
   }
   /// combine change pattern

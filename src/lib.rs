@@ -178,7 +178,6 @@
 )]
 pub use arcstr::{self, ArcStr};
 pub use biodivine_lib_bdd;
-pub use ordered_float::{self, NotNan};
 pub use strum::IntoEnumIterator;
 /// `bus` group structure.
 pub mod bus;

@@ -7,7 +7,7 @@ use crate::{
   expression::{logic, LogicBooleanExpression, PowerGroundBooleanExpression},
   pin::Direction,
   timing::items::Mode,
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 use core::{
   fmt::{self, Write},
@@ -60,7 +60,7 @@ pub struct LeakagePower<C: Ctx> {
   pub when: Option<LogicBooleanExpression>,
   #[size = 8]
   #[liberty(simple)]
-  pub value: NotNan<f64>,
+  pub value: f64,
   #[size = 16]
   #[liberty(complex(type = Option))]
   pub mode: Option<Mode>,
@@ -135,7 +135,7 @@ mod test_sort {
       cell
         .leakage_power
         .iter_sort()
-        .map(|leakage| leakage.value.into_inner() as i8)
+        .map(|leakage| leakage.value as i8)
         .collect::<Vec<_>>()
     );
   }
@@ -512,7 +512,7 @@ pub struct DynamicCurrent<C: Ctx> {
   pub related_outputs: WordSet,
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub typical_capacitances: Option<Vec<NotNan<f64>>>,
+  pub typical_capacitances: Option<Vec<f64>>,
   /// Use the switching_group group to specify a current waveform vector when the power
   /// and ground current is dependent on pin switching conditions.
   /// <a name ="reference_link" href="
@@ -1070,9 +1070,9 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.8&end=179.9
   /// ">Reference</a>
-  #[id]
+  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
   #[liberty(simple)]
-  pub value: NotNan<f64>,
+  pub value: f64,
   /// The `reference_pg_pin` attribute specifies the reference pin for the
   /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
   /// be a valid PG pin.
@@ -1182,8 +1182,8 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=181.9&end=181.10
   /// ">Reference</a>
   #[liberty(simple)]
-  #[default = "unsafe{ NotNan::new_unchecked(f64::INFINITY) }"]
-  pub value: NotNan<f64>,
+  #[default = "f64::INFINITY"]
+  pub value: f64,
   /// Use this attribute to specify the output pin.
   /// Syntax
   /// ``` text
@@ -1310,7 +1310,7 @@ pub struct PgPinWithValue<C: Ctx> {
   pub attributes: crate::ast::Attributes,
   #[size = 8]
   #[liberty(simple)]
-  pub value: NotNan<f64>,
+  pub value: f64,
 }
 impl<C: Ctx> GroupFn for PgPinWithValue<C> {}
 
@@ -1385,7 +1385,7 @@ pub struct GateLeakage<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub input_low_value: Option<NotNan<f64>>,
+  pub input_low_value: Option<f64>,
   /// The `input_high_value` attribute specifies gate leakage current on an input or inout pin
   /// when the pin is in a high state condition.
   /// + The gate leakage current flow is measured from the power pin of its driver cell to the
@@ -1398,7 +1398,7 @@ pub struct GateLeakage<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub input_high_value: Option<NotNan<f64>>,
+  pub input_high_value: Option<f64>,
 }
 impl<C: Ctx> GroupFn for GateLeakage<C> {}
 
@@ -1471,7 +1471,7 @@ pub struct LeakageCurrent<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub value: Option<NotNan<f64>>,
+  pub value: Option<f64>,
   /// The `mode` attribute pertains to an individual `cell`. The cell is active when the `mode` attribute
   /// is instantiated with a name and a value. You can specify multiple instances of this attribute.
   /// However, specify only one instance for each `cell`.
@@ -1610,9 +1610,9 @@ pub struct LutValues<C: Ctx> {
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[liberty(complex)]
-  pub values: Vec<NotNan<f64>>,
+  pub values: Vec<f64>,
 }
 impl<C: Ctx> GroupFn for LutValues<C> {}
 

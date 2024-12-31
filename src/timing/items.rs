@@ -10,10 +10,11 @@ use crate::{
   },
   common::table::{DisplayTableLookUp, DisplayValues, TableLookUp},
   expression::logic,
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 
 use itertools::izip;
+use ordered_float::NotNan;
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
 ///
@@ -220,14 +221,14 @@ pub struct CellDegradation<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   /// /* lookup table */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub values: Vec<NotNan<f64>>,
+  pub values: Vec<f64>,
 }
 impl<C: Ctx> GroupFn for CellDegradation<C> {}
 
@@ -237,11 +238,11 @@ pub struct TimingTableLookUp<C: Ctx> {
   pub extra_ctx: C::Table,
   pub name: Option<ArcStr>,
   pub comments: String,
-  pub index_1: Vec<NotNan<f64>>,
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
+  pub index_2: Vec<f64>,
   pub size1: usize,
   pub size2: usize,
-  pub values: Vec<NotNan<f64>>,
+  pub values: Vec<f64>,
   pub lvf_values: Vec<LVFValue>,
 }
 #[expect(
@@ -265,7 +266,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
     }
   }
   #[inline]
-  fn get_value(&self, ix: usize, iy: usize) -> NotNan<f64> {
+  fn get_value(&self, ix: usize, iy: usize) -> f64 {
     self.values[ix * self.index_2.len() + iy]
   }
   #[inline]
@@ -274,9 +275,17 @@ impl<C: Ctx> TimingTableLookUp<C> {
   }
   #[must_use]
   #[inline]
-  pub fn lookup(&self, idx1: &NotNan<f64>, idx2: &NotNan<f64>) -> Option<NotNan<f64>> {
-    match self.index_1.binary_search(idx1) {
-      Ok(i1_) => match self.index_2.binary_search(idx2) {
+  pub fn lookup(&self, idx1: &f64, idx2: &f64) -> Option<f64> {
+    let idx1_ = unsafe { NotNan::new_unchecked(*idx1) };
+    let idx2_ = unsafe { NotNan::new_unchecked(*idx2) };
+    match self
+      .index_1
+      .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx1_))
+    {
+      Ok(i1_) => match self
+        .index_2
+        .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx2_))
+      {
         Ok(i_1) => Some(self.get_value(i1_, i_1)),
         Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
           let q_1 = self.get_value(i1_, i_1);
@@ -289,7 +298,10 @@ impl<C: Ctx> TimingTableLookUp<C> {
       Err(pos1) => Self::find_pos(self.index_1.len(), pos1).and_then(|(i1_, i2_)| {
         let x1_ = self.index_1[i1_];
         let x2_ = self.index_1[i2_];
-        match self.index_2.binary_search(idx2) {
+        match self
+          .index_2
+          .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx2_))
+        {
           Ok(i_1) => {
             let q1_ = self.get_value(i1_, i_1);
             let q2_ = self.get_value(i2_, i_1);
@@ -312,9 +324,17 @@ impl<C: Ctx> TimingTableLookUp<C> {
   }
   #[must_use]
   #[inline]
-  pub fn lookup_lvf(&self, idx1: &NotNan<f64>, idx2: &NotNan<f64>) -> Option<LVFValue> {
-    match self.index_1.binary_search(idx1) {
-      Ok(i1_) => match self.index_2.binary_search(idx2) {
+  pub fn lookup_lvf(&self, idx1: &f64, idx2: &f64) -> Option<LVFValue> {
+    let idx1_ = unsafe { NotNan::new_unchecked(*idx1) };
+    let idx2_ = unsafe { NotNan::new_unchecked(*idx2) };
+    match self
+      .index_1
+      .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx1_))
+    {
+      Ok(i1_) => match self
+        .index_2
+        .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx2_))
+      {
         Ok(i_1) => Some(self.get_lvf_value(i1_, i_1)),
         Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
           let q_1 = self.get_lvf_value(i1_, i_1);
@@ -327,7 +347,10 @@ impl<C: Ctx> TimingTableLookUp<C> {
       Err(pos1) => Self::find_pos(self.index_1.len(), pos1).and_then(|(i1_, i2_)| {
         let x1_ = self.index_1[i1_];
         let x2_ = self.index_1[i2_];
-        match self.index_2.binary_search(idx2) {
+        match self
+          .index_2
+          .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx2_))
+        {
           Ok(i_1) => {
             let q1_ = self.get_lvf_value(i1_, i_1);
             let q2_ = self.get_lvf_value(i2_, i_1);
@@ -351,12 +374,21 @@ impl<C: Ctx> TimingTableLookUp<C> {
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct LVFValue {
   /// `mean` = `nominal` + `mean_shift`
-  pub mean: NotNan<f64>,
-  pub std_dev: NotNan<f64>,
-  pub skewness: NotNan<f64>,
+  pub mean: f64,
+  pub std_dev: f64,
+  pub skewness: f64,
+}
+impl PartialEq for LVFValue {
+  fn eq(&self, other: &Self) -> bool {
+    unsafe {
+      NotNan::new_unchecked(self.mean) == NotNan::new_unchecked(other.mean)
+        && NotNan::new_unchecked(self.std_dev) == NotNan::new_unchecked(other.std_dev)
+        && NotNan::new_unchecked(self.skewness) == NotNan::new_unchecked(other.skewness)
+    }
+  }
 }
 #[expect(clippy::arithmetic_side_effects)]
 impl Add for LVFValue {
@@ -385,10 +417,10 @@ impl Sub for LVFValue {
   }
 }
 #[expect(clippy::arithmetic_side_effects)]
-impl Mul<NotNan<f64>> for LVFValue {
+impl Mul<f64> for LVFValue {
   type Output = Self;
   #[inline]
-  fn mul(self, rhs: NotNan<f64>) -> Self::Output {
+  fn mul(self, rhs: f64) -> Self::Output {
     Self {
       mean: self.mean * rhs,
       std_dev: self.std_dev * rhs,

@@ -2,7 +2,7 @@ use crate::{
   ast::{
     join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
   },
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 use core::{
   cmp::Ordering,
@@ -76,7 +76,7 @@ impl SimpleAttri for SdfEdgeType {
 pub struct IdVector {
   #[id]
   pub id: usize,
-  pub vec: Vec<NotNan<f64>>,
+  pub vec: Vec<f64>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -156,13 +156,13 @@ pub struct Domain<C: Ctx> {
   pub variable_3: Option<VariableType>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_1: Vec<NotNan<f64>>,
+  pub index_1: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_2: Vec<NotNan<f64>>,
+  pub index_2: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<NotNan<f64>>,
+  pub index_3: Vec<f64>,
 }
 impl<C: Ctx> GroupFn for Domain<C> {}
 /// sth. like "A B C" will save as set{A B C}
@@ -293,7 +293,7 @@ pub struct Formula(pub ArcStr);
 // #[derive(serde::Serialize, serde::Deserialize)]
 // #[derive(Clone, Debug, Eq, PartialEq)]
 // pub enum _Formula {
-//   Float(NotNan<f64>),
+//   Float(f64),
 //   Variable(ArcStr),
 //   Neg(Box<_Formula>),
 //   Add(Box<_Formula>, Box<_Formula>),

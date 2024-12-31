@@ -6,7 +6,7 @@ use crate::{
     self, is_word, join_fmt_no_quote, CodeFormatter, ComplexAttri, ComplexParseError,
     ComplexParseRes, IdError, Indentation, NameAttri, ParseScope, SimpleAttri,
   },
-  ArcStr, NotNan,
+  ArcStr,
 };
 use core::fmt::{self, Write};
 use itertools::Itertools as _;
@@ -15,25 +15,19 @@ use super::{
   items::{Formula, NameList, WordSet},
   parse_f64,
 };
-crate::ast::impl_self_builder!(NotNan<f64>);
-impl SimpleAttri for NotNan<f64> {
+crate::ast::impl_self_builder!(f64);
+impl SimpleAttri for f64 {
   #[inline]
   #[expect(clippy::undocumented_unsafe_blocks)]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    #[inline]
-    fn f(i: &str) -> nom::IResult<&str, NotNan<f64>, nom::error::Error<&str>> {
-      nom::combinator::map(nom::number::complete::double, |f| unsafe {
-        NotNan::<f64>::new_unchecked(f)
-      })(i)
-    }
-    ast::parser::simple_custom(i, &mut scope.line_num, f)
+    ast::parser::simple_custom(i, &mut scope.line_num, ast::parser::float_one)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(self.into_inner())
+    f.write_float(*self)
   }
 }
 crate::ast::impl_self_builder!(bool);
@@ -262,7 +256,7 @@ impl<const N: usize> ComplexAttri for [ArcStr; N] {
   }
 }
 
-impl<const N: usize> ast::ParsingBuilder for [NotNan<f64>; N] {
+impl<const N: usize> ast::ParsingBuilder for [f64; N] {
   type Builder = Self;
   #[inline]
   fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope) -> Self {
@@ -270,15 +264,15 @@ impl<const N: usize> ast::ParsingBuilder for [NotNan<f64>; N] {
   }
 }
 // FIXME
-impl<const N: usize> ComplexAttri for [NotNan<f64>; N] {
+impl<const N: usize> ComplexAttri for [f64; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let v = iter.map(parse_f64).collect::<Result<Vec<NotNan<f64>>, _>>()?;
+    let v = iter.map(parse_f64).collect::<Result<Vec<f64>, _>>()?;
     if v.len() == N {
-      TryInto::<[NotNan<f64>; N]>::try_into(v).map_or(Err(ComplexParseError::Other), Ok)
+      TryInto::<[f64; N]>::try_into(v).map_or(Err(ComplexParseError::Other), Ok)
     } else {
       Err(ComplexParseError::LengthDismatch)
     }
@@ -292,7 +286,7 @@ impl<const N: usize> ComplexAttri for [NotNan<f64>; N] {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")
+    ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(*float), ", ")
   }
 }
 crate::ast::impl_self_builder!(super::items::IdVector);
@@ -320,16 +314,11 @@ impl ComplexAttri for super::items::IdVector {
   ) -> fmt::Result {
     f.write_int(self.id)?;
     write!(f, ", \\\n{}", f.indentation())?;
-    ast::join_fmt(
-      self.vec.iter(),
-      f,
-      |float, ff| ff.write_float(float.into_inner()),
-      ", ",
-    )
+    ast::join_fmt(self.vec.iter(), f, |float, ff| ff.write_float(*float), ", ")
   }
 }
-crate::ast::impl_self_builder!(Vec<NotNan<f64>>);
-impl ComplexAttri for Vec<NotNan<f64>> {
+crate::ast::impl_self_builder!(Vec<f64>);
+impl ComplexAttri for Vec<f64> {
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
     _scope: &mut ParseScope,
@@ -354,7 +343,7 @@ impl ComplexAttri for Vec<NotNan<f64>> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(float.into_inner()), ", ")
+    ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(*float), ", ")
   }
 }
 impl ComplexAttri for ArcStr {
@@ -385,7 +374,7 @@ impl ComplexAttri for ArcStr {
     }
   }
 }
-impl ComplexAttri for NotNan<f64> {
+impl ComplexAttri for f64 {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -406,7 +395,7 @@ impl ComplexAttri for NotNan<f64> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(self.into_inner())
+    f.write_float(*self)
   }
 }
 crate::ast::impl_self_builder!(Vec<ArcStr>);
@@ -459,8 +448,8 @@ impl ComplexAttri for Vec<usize> {
     join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_int(*i), ", ")
   }
 }
-crate::ast::impl_self_builder!((NotNan<f64>, NotNan<f64>, ArcStr));
-impl ComplexAttri for (NotNan<f64>, NotNan<f64>, ArcStr) {
+crate::ast::impl_self_builder!((f64, f64, ArcStr));
+impl ComplexAttri for (f64, f64, ArcStr) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -489,15 +478,15 @@ impl ComplexAttri for (NotNan<f64>, NotNan<f64>, ArcStr) {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(self.0.into_inner())?;
+    f.write_float(self.0)?;
     f.write_str(", ")?;
-    f.write_float(self.1.into_inner())?;
+    f.write_float(self.1)?;
     f.write_str(", ")?;
     f.write_str(&self.2)
   }
 }
-crate::ast::impl_self_builder!((i64, NotNan<f64>));
-impl ComplexAttri for (i64, NotNan<f64>) {
+crate::ast::impl_self_builder!((i64, f64));
+impl ComplexAttri for (i64, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -524,11 +513,11 @@ impl ComplexAttri for (i64, NotNan<f64>) {
   ) -> fmt::Result {
     f.write_int(self.0)?;
     f.write_str(", ")?;
-    f.write_float(self.1.into_inner())
+    f.write_float(self.1)
   }
 }
-crate::ast::impl_self_builder!((NotNan<f64>, NotNan<f64>));
-impl ComplexAttri for (NotNan<f64>, NotNan<f64>) {
+crate::ast::impl_self_builder!((f64, f64));
+impl ComplexAttri for (f64, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -553,9 +542,9 @@ impl ComplexAttri for (NotNan<f64>, NotNan<f64>) {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(self.0.into_inner())?;
+    f.write_float(self.0)?;
     f.write_str(", ")?;
-    f.write_float(self.1.into_inner())
+    f.write_float(self.1)
   }
 }
 

@@ -4,12 +4,13 @@
 
 mod fmt;
 pub mod parser;
-use crate::{library::AttributeType, ArcStr, NotNan};
+use crate::{library::AttributeType, ArcStr};
 use core::hash::{BuildHasher as _, Hash, Hasher as _};
 use core::{fmt::Write, num::ParseIntError, str::FromStr};
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
-use itertools::Itertools as _;
+use itertools::{izip, Itertools as _};
 use nom::{error::Error, IResult};
+use ordered_float::NotNan;
 use std::collections::HashMap;
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
@@ -18,7 +19,7 @@ pub(crate) type RandomState = std::hash::RandomState;
 #[cfg(feature = "fast_hash")]
 pub(crate) type RandomState = ahash::RandomState;
 
-pub(crate) type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
+pub type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Default)]
@@ -112,7 +113,7 @@ pub(crate) enum UndefinedAttriValue {
   Group(GroupWrapper),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SimpleDefined {
   /// Boolean `Simple`
@@ -122,7 +123,67 @@ pub enum SimpleDefined {
   /// integer `Simple`
   Integer(Vec<Result<isize, ArcStr>>),
   /// float `Simple`
-  Float(Vec<Result<NotNan<f64>, ArcStr>>),
+  Float(Vec<Result<f64, ArcStr>>),
+}
+impl PartialEq for SimpleDefined {
+  #[inline]
+  fn eq(&self, other: &Self) -> bool {
+    match (self, other) {
+      (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
+      (Self::String(l0), Self::String(r0)) => l0 == r0,
+      (Self::Integer(l0), Self::Integer(r0)) => l0 == r0,
+      (Self::Float(l0), Self::Float(r0)) => {
+        l0.len() == r0.len()
+          && izip!(l0, r0).all(|lr| match lr {
+            (Ok(l), Ok(r)) => unsafe {
+              NotNan::new_unchecked(*l) == NotNan::new_unchecked(*r)
+            },
+            (Err(l), Err(r)) => l == r,
+            _ => false,
+          })
+      }
+      _ => false,
+    }
+  }
+}
+impl Eq for SimpleDefined {}
+impl PartialOrd for SimpleDefined {
+  #[inline]
+  fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    Some(self.cmp(other))
+  }
+}
+impl Ord for SimpleDefined {
+  #[inline]
+  fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    match (self, other) {
+      (SimpleDefined::Boolean(l), SimpleDefined::Boolean(r)) => l.cmp(r),
+      (SimpleDefined::String(l), SimpleDefined::String(r)) => l.cmp(r),
+      (SimpleDefined::Integer(l), SimpleDefined::Integer(r)) => l.cmp(r),
+      (SimpleDefined::Float(l), SimpleDefined::Float(r)) => match l.len().cmp(&r.len()) {
+        std::cmp::Ordering::Less => std::cmp::Ordering::Less,
+        std::cmp::Ordering::Greater => std::cmp::Ordering::Greater,
+        std::cmp::Ordering::Equal => l
+          .iter()
+          .map(|res| match res {
+            Ok(f) => Ok(unsafe { NotNan::new_unchecked(*f) }),
+            Err(s) => Err(s),
+          })
+          .cmp(r.iter().map(|res| match res {
+            Ok(f) => Ok(unsafe { NotNan::new_unchecked(*f) }),
+            Err(s) => Err(s),
+          })),
+      },
+      (SimpleDefined::Boolean(_), _) => std::cmp::Ordering::Less,
+      (_, SimpleDefined::Boolean(_)) => std::cmp::Ordering::Greater,
+      (_, SimpleDefined::Float(_)) => std::cmp::Ordering::Less,
+      (SimpleDefined::Float(_), _) => std::cmp::Ordering::Greater,
+      (SimpleDefined::String(_), SimpleDefined::Integer(_)) => std::cmp::Ordering::Less,
+      (SimpleDefined::Integer(_), SimpleDefined::String(_)) => {
+        std::cmp::Ordering::Greater
+      }
+    }
+  }
 }
 
 #[inline]
@@ -409,20 +470,20 @@ pub(crate) fn define_id(hash_builder: &RandomState, group_name: &str, key: &str)
 //   }
 // }
 
-#[derive(Debug, Clone)]
-#[derive(Hash, PartialEq, Eq)]
-#[derive(Ord, PartialOrd)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub enum DefinedAttribute {
-  /// Boolean
-  Boolean(Vec<bool>),
-  /// string
-  String(Vec<ArcStr>),
-  /// integer
-  Integer(Vec<isize>),
-  /// float
-  Float(Vec<NotNan<f64>>),
-}
+// #[derive(Debug, Clone)]
+// #[derive(Hash, PartialEq, Eq)]
+// #[derive(Ord, PartialOrd)]
+// #[derive(serde::Serialize, serde::Deserialize)]
+// pub enum DefinedAttribute {
+//   /// Boolean
+//   Boolean(Vec<bool>),
+//   /// string
+//   String(Vec<ArcStr>),
+//   /// integer
+//   Integer(Vec<isize>),
+//   /// float
+//   Float(Vec<f64>),
+// }
 
 pub(crate) type SimpleParseRes<'a, T> =
   IResult<&'a str, Result<T, ArcStr>, Error<&'a str>>;

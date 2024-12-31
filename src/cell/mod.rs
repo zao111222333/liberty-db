@@ -13,7 +13,7 @@ use crate::{
   common::{items::NameList, table::TableLookUp2D},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 
 pub trait CellCtx {
@@ -86,7 +86,7 @@ pub struct Cell<C: Ctx> {
   pub attributes: Attributes,
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub area: Option<NotNan<f64>>,
+  pub area: Option<f64>,
   /// The `dont_use`  attribute with a true value indicates
   /// that a cell should not be added to a design
   /// during optimization
@@ -151,7 +151,7 @@ pub struct Cell<C: Ctx> {
   pub cell_footprint: Option<ArcStr>,
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub cell_leakage_power: Option<NotNan<f64>>,
+  pub cell_leakage_power: Option<f64>,
   /// The `em_temp_degradation_factor` attribute specifies the electromigration
   /// exponential degradation factor
   /// <a name ="reference_link" href="
@@ -159,7 +159,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub em_temp_degradation_factor: Option<NotNan<f64>>,
+  pub em_temp_degradation_factor: Option<f64>,
   /// interprets a combination timing arc between the clock pin and the output pin as a rising edge arc or as a falling edge arc
   ///
   /// Valid values are `rising_edge_clock_cell`  and `falling_edge_clock_cell`.
@@ -364,7 +364,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub input_voltage_range: Option<(NotNan<f64>, NotNan<f64>)>,
+  pub input_voltage_range: Option<(f64, f64)>,
   /// The `input_voltage_range`  and `output_voltage_range`  attributes
   /// should always be defined together.
   /// <a name ="reference_link" href="
@@ -372,7 +372,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub output_voltage_range: Option<(NotNan<f64>, NotNan<f64>)>,
+  pub output_voltage_range: Option<(f64, f64)>,
   /// Use the pin_opposite attribute to describe functionally opposite (logically inverse) groups
   /// of input or output pins.
   /// Syntax

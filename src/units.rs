@@ -8,7 +8,6 @@ use crate::{
     CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope, SimpleAttri,
   },
   common::parse_f64,
-  NotNan,
 };
 use core::fmt::{self, Write};
 
@@ -42,12 +41,12 @@ pub enum TimeUnit {
 impl TimeUnit {
   #[inline]
   #[must_use]
-  pub const fn value(&self) -> NotNan<f64> {
+  pub const fn value(&self) -> f64 {
     match self {
-      Self::_1ps => unsafe { NotNan::new_unchecked(1E-12_f64) },
-      Self::_10ps => unsafe { NotNan::new_unchecked(1E-11_f64) },
-      Self::_100ps => unsafe { NotNan::new_unchecked(1E-10_f64) },
-      Self::_1ns => unsafe { NotNan::new_unchecked(1E-9_f64) },
+      Self::_1ps => 1E-12_f64,
+      Self::_10ps => 1E-11_f64,
+      Self::_100ps => 1E-10_f64,
+      Self::_1ns => 1E-9_f64,
     }
   }
 }
@@ -92,12 +91,12 @@ pub enum VoltageUnit {
 impl VoltageUnit {
   #[inline]
   #[must_use]
-  pub const fn value(&self) -> NotNan<f64> {
+  pub const fn value(&self) -> f64 {
     match self {
-      Self::_1mV => unsafe { NotNan::new_unchecked(1E-3_f64) },
-      Self::_10mV => unsafe { NotNan::new_unchecked(1E-2_f64) },
-      Self::_100mV => unsafe { NotNan::new_unchecked(1E-1_f64) },
-      Self::_1V => unsafe { NotNan::new_unchecked(1E0_f64) },
+      Self::_1mV => 1E-3_f64,
+      Self::_10mV => 1E-2_f64,
+      Self::_100mV => 1E-1_f64,
+      Self::_1V => 1E0_f64,
     }
   }
 }
@@ -151,15 +150,15 @@ pub enum CurrentUnit {
 impl CurrentUnit {
   #[inline]
   #[must_use]
-  pub const fn value(&self) -> NotNan<f64> {
+  pub const fn value(&self) -> f64 {
     match self {
-      Self::_1uA => unsafe { NotNan::new_unchecked(1E-6_f64) },
-      Self::_10uA => unsafe { NotNan::new_unchecked(1E-5_f64) },
-      Self::_100uA => unsafe { NotNan::new_unchecked(1E-4_f64) },
-      Self::_1mA => unsafe { NotNan::new_unchecked(1E-3_f64) },
-      Self::_10mA => unsafe { NotNan::new_unchecked(1E-2_f64) },
-      Self::_100mA => unsafe { NotNan::new_unchecked(1E-1_f64) },
-      Self::_1A => unsafe { NotNan::new_unchecked(1E0_f64) },
+      Self::_1uA => 1E-6_f64,
+      Self::_10uA => 1E-5_f64,
+      Self::_100uA => 1E-4_f64,
+      Self::_1mA => 1E-3_f64,
+      Self::_10mA => 1E-2_f64,
+      Self::_100mA => 1E-1_f64,
+      Self::_1A => 1E0_f64,
     }
   }
 }
@@ -204,12 +203,12 @@ pub enum PullingResistanceUnit {
 impl PullingResistanceUnit {
   #[inline]
   #[must_use]
-  pub const fn value(&self) -> NotNan<f64> {
+  pub const fn value(&self) -> f64 {
     match self {
-      Self::_1ohm => unsafe { NotNan::new_unchecked(1E0_f64) },
-      Self::_10ohm => unsafe { NotNan::new_unchecked(1E1_f64) },
-      Self::_100ohm => unsafe { NotNan::new_unchecked(1E2_f64) },
-      Self::_1kohm => unsafe { NotNan::new_unchecked(1E3_f64) },
+      Self::_1ohm => 1E0_f64,
+      Self::_10ohm => 1E1_f64,
+      Self::_100ohm => 1E2_f64,
+      Self::_1kohm => 1E3_f64,
     }
   }
 }
@@ -242,14 +241,14 @@ pub struct CapacitiveLoadUnit {
   ///
   /// `pf`: `false`
   pub ff_pf: bool,
-  pub val: NotNan<f64>,
+  pub val: f64,
 }
 
 impl CapacitiveLoadUnit {
   #[inline]
   #[must_use]
   #[expect(clippy::arithmetic_side_effects, clippy::float_arithmetic)]
-  pub fn value(&self) -> NotNan<f64> {
+  pub fn value(&self) -> f64 {
     if self.ff_pf {
       self.val * 1e-15
     } else {
@@ -286,7 +285,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(self.val.into_inner())?;
+    f.write_float(self.val)?;
     if self.ff_pf {
       f.write_str(", ff")
     } else {
@@ -354,21 +353,21 @@ pub enum LeakagePowerUnit {
 impl LeakagePowerUnit {
   #[inline]
   #[must_use]
-  pub const fn value(&self) -> NotNan<f64> {
+  pub const fn value(&self) -> f64 {
     match self {
-      Self::_1pW => unsafe { NotNan::new_unchecked(1E-12_f64) },
-      Self::_10pW => unsafe { NotNan::new_unchecked(1E-11_f64) },
-      Self::_100pW => unsafe { NotNan::new_unchecked(1E-10_f64) },
-      Self::_1nW => unsafe { NotNan::new_unchecked(1E-9_f64) },
-      Self::_10nW => unsafe { NotNan::new_unchecked(1E-8_f64) },
-      Self::_100nW => unsafe { NotNan::new_unchecked(1E-7_f64) },
-      Self::_1uW => unsafe { NotNan::new_unchecked(1E-6_f64) },
-      Self::_10uW => unsafe { NotNan::new_unchecked(1E-5_f64) },
-      Self::_100uW => unsafe { NotNan::new_unchecked(1E-4_f64) },
-      Self::_1mW => unsafe { NotNan::new_unchecked(1E-3_f64) },
-      Self::_10mW => unsafe { NotNan::new_unchecked(1E-2_f64) },
-      Self::_100mW => unsafe { NotNan::new_unchecked(1E-1_f64) },
-      Self::_1W => unsafe { NotNan::new_unchecked(1E-0_f64) },
+      Self::_1pW => 1E-12_f64,
+      Self::_10pW => 1E-11_f64,
+      Self::_100pW => 1E-10_f64,
+      Self::_1nW => 1E-9_f64,
+      Self::_10nW => 1E-8_f64,
+      Self::_100nW => 1E-7_f64,
+      Self::_1uW => 1E-6_f64,
+      Self::_10uW => 1E-5_f64,
+      Self::_100uW => 1E-4_f64,
+      Self::_1mW => 1E-3_f64,
+      Self::_10mW => 1E-2_f64,
+      Self::_100mW => 1E-1_f64,
+      Self::_1W => 1E-0_f64,
     }
   }
 }

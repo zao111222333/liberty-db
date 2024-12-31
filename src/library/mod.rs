@@ -11,7 +11,7 @@ use crate::{
   },
   cell::Cell,
   common::table::{CompactLutTemplate, DriverWaveform, TableTemple},
-  units, ArcStr, Ctx, NotNan,
+  units, ArcStr, Ctx,
 };
 use core::fmt::{self, Write as _};
 pub use items::*;
@@ -105,7 +105,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub nom_process: Option<NotNan<f64>>,
+  pub nom_process: Option<f64>,
   /// The `nom_temperature`  attribute defines the temperature (in centigrade),
   /// one of the nominal operating conditions for a library.
   ///
@@ -115,14 +115,14 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub nom_temperature: Option<NotNan<f64>>,
+  pub nom_temperature: Option<f64>,
   /// The `nom_voltage`  attribute defines voltage, one of the nominal operating conditions for a library.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=28.26&end=28.27
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub nom_voltage: Option<NotNan<f64>>,
+  pub nom_voltage: Option<f64>,
   /// Use this group to define operating conditions;
   /// that is, `process`, `voltage`, and `temperature`.
   /// You define an `operating_conditions`  group at the library-level, as shown here:
@@ -202,14 +202,14 @@ pub struct Library<C: Ctx> {
   /// Used in TSMC library
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_leakage_power_density: Option<NotNan<f64>>,
+  pub default_leakage_power_density: Option<f64>,
   /// Default leakage power
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.4&end=34.5
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_cell_leakage_power: Option<NotNan<f64>>,
+  pub default_cell_leakage_power: Option<f64>,
   /// Default connection class
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.7&end=34.8
@@ -223,63 +223,63 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_fanout_load: Option<NotNan<f64>>,
+  pub default_fanout_load: Option<f64>,
   /// Capacitance of inout pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.13&end=34.14
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_inout_pin_cap: Option<NotNan<f64>>,
+  pub default_inout_pin_cap: Option<f64>,
   /// Capacitance of input pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.16&end=34.17
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_input_pin_cap: Option<NotNan<f64>>,
+  pub default_input_pin_cap: Option<f64>,
   /// Maximum capacitance of output pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.19&end=34.21
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_max_capacitance: Option<NotNan<f64>>,
+  pub default_max_capacitance: Option<f64>,
   /// Maximum fanout of all output pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.23&end=34.24
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_max_fanout: Option<NotNan<f64>>,
+  pub default_max_fanout: Option<f64>,
   /// Maximum transition of output pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.26&end=34.27
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_max_transition: Option<NotNan<f64>>,
+  pub default_max_transition: Option<f64>,
   /// Capacitance of output pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.33&end=34.34
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_output_pin_cap: Option<NotNan<f64>>,
+  pub default_output_pin_cap: Option<f64>,
   /// Wire load area
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.37&end=34.37
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_wire_load_area: Option<NotNan<f64>>,
+  pub default_wire_load_area: Option<f64>,
   /// Wire load capacitance
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.38&end=34.39
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_wire_load_capacitance: Option<NotNan<f64>>,
+  pub default_wire_load_capacitance: Option<f64>,
   /// Wire load mode
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.41&end=34.41
@@ -293,7 +293,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub default_wire_load_resistance: Option<NotNan<f64>>,
+  pub default_wire_load_resistance: Option<f64>,
   /// Wire load selection
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.45&end=34.45
@@ -317,7 +317,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub em_temp_degradation_factor: Option<NotNan<f64>>,
+  pub em_temp_degradation_factor: Option<f64>,
   /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=42.25&end=42.30
@@ -410,8 +410,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(80.0) }"]
-  pub slew_upper_threshold_pct_rise: NotNan<f64>,
+  #[default = "80.0"]
+  pub slew_upper_threshold_pct_rise: f64,
   /// Use the `slew_lower_threshold_pct_rise`  attribute to set the default lower threshold point
   /// that is used to model the delay of a pin rising from 0 to 1.
   /// You can specify this attribute at the pin-level to override the default.
@@ -423,8 +423,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(20.0) }"]
-  pub slew_lower_threshold_pct_rise: NotNan<f64>,
+  #[default = "20.0"]
+  pub slew_lower_threshold_pct_rise: f64,
   /// Use the `slew_derate_from_library`  attribute to specify how the transition times need to be derated to match the transition times between the characterization trip points
   ///
   /// A floating-point number between 0.0 and 1.0. The default is 1.0.
@@ -433,8 +433,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(1.0) }"]
-  pub slew_derate_from_library: NotNan<f64>,
+  #[default = "1.0"]
+  pub slew_derate_from_library: f64,
   /// Use the `slew_lower_threshold_pct_fall`  attribute to set the default lower threshold point
   /// that is used to model the delay of a pin falling from 1 to 0.
   /// You can specify this attribute at the pin-level to override the default.
@@ -446,8 +446,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(20.0) }"]
-  pub slew_lower_threshold_pct_fall: NotNan<f64>,
+  #[default = "20.0"]
+  pub slew_lower_threshold_pct_fall: f64,
   /// Use the `slew_upper_threshold_pct_fall`  attribute to set the default upper threshold point
   /// that is used to model the delay of a pin falling from 1 to 0.
   /// You can specify this attribute at the pin-level to override the default.
@@ -459,8 +459,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(80.0) }"]
-  pub slew_upper_threshold_pct_fall: NotNan<f64>,
+  #[default = "80.0"]
+  pub slew_upper_threshold_pct_fall: f64,
   /// Use the `input_threshold_pct_fall`  attribute to set the default threshold point
   /// on an input pin signal falling from 1 to 0.
   /// You can specify this attribute at the pin-level to override the default.
@@ -472,8 +472,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"]
-  pub input_threshold_pct_fall: NotNan<f64>,
+  #[default = "50.0"]
+  pub input_threshold_pct_fall: f64,
   /// Use the `input_threshold_pct_rise`  attribute to set the default threshold point
   /// on an input pin signal rising from 0 to 1.
   /// You can specify this attribute at the pin-level to override the default.
@@ -485,8 +485,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"]
-  pub input_threshold_pct_rise: NotNan<f64>,
+  #[default = "50.0"]
+  pub input_threshold_pct_rise: f64,
   /// Use the `output_threshold_pct_rise`  attribute to set the value
   /// of the threshold point on an output pin signal rising from 0 to 1.
   ///
@@ -497,8 +497,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"]
-  pub output_threshold_pct_rise: NotNan<f64>,
+  #[default = "50.0"]
+  pub output_threshold_pct_rise: f64,
   /// Use the `output_threshold_pct_fall`  attribute to set the value of the threshold point
   /// on an output pin signal falling from 1 to 0.
   ///
@@ -509,8 +509,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "unsafe { NotNan::<f64>::new_unchecked(50.0) }"]
-  pub output_threshold_pct_fall: NotNan<f64>,
+  #[default = "50.0"]
+  pub output_threshold_pct_fall: f64,
   /// The `is_soi`  attribute specifies that the cell is a
   /// silicon-on-insulator (SOI) cell.
   /// The default is false, which means that the cell is a
@@ -532,7 +532,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub soft_error_rate_confidence: Option<NotNan<f64>>,
+  pub soft_error_rate_confidence: Option<f64>,
   /// Use the `output_current_template`  group to describe a table template
   /// for composite current source (CCS) modeling.
   /// <a name ="reference_link" href="

@@ -19,7 +19,7 @@ use crate::{
     },
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
-  ArcStr, Ctx, NotNan,
+  ArcStr, Ctx,
 };
 pub use items::*;
 
@@ -165,7 +165,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub fall_resistance: Option<NotNan<f64>>,
+  pub fall_resistance: Option<f64>,
   /// The `fpga_arc_condition` attribute specifies a Boolean condition that enables
   /// a timing arc.
   ///
@@ -346,7 +346,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub intrinsic_fall: Option<NotNan<f64>>,
+  pub intrinsic_fall: Option<f64>,
   /// On an output pin, `intrinsic_rise` defines the 0-to-Z propagation time
   /// for a three-state-disable timing type and a Z-to-1 propagation time
   /// for a three-state-enable timing type.
@@ -382,7 +382,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub intrinsic_rise: Option<NotNan<f64>>,
+  pub intrinsic_rise: Option<f64>,
   /// The `related_bus_equivalent` attribute generates a single timing arc
   /// for all paths from points in a group through an internal pin (I) to given endpoints.
   ///
@@ -606,7 +606,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub rise_resistance: Option<NotNan<f64>>,
+  pub rise_resistance: Option<f64>,
   /// The `sdf_cond` attribute is defined in the state-dependent timing group
   /// to support SDF file generation and condition matching during back-annotation.
   /// #### Syntax
@@ -802,7 +802,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub slope_fall: Option<NotNan<f64>>,
+  pub slope_fall: Option<f64>,
   /// The `slope_rise` attribute represents the incremental delay
   /// to add to the slope of the input waveform for a logic 0-to-1 transition.
   ///
@@ -834,7 +834,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub slope_rise: Option<NotNan<f64>>,
+  pub slope_rise: Option<f64>,
   /// The `steady_state_resistance_above_high` attribute specifies a
   /// steady-state resistance value for a region of a current-voltage (I-V) curve
   /// when the output is high and the noise is over the high voltage rail.
@@ -868,7 +868,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub steady_state_resistance_above_high: Option<NotNan<f64>>,
+  pub steady_state_resistance_above_high: Option<f64>,
   /// The `steady_state_resistance_below_low` attribute specifies a steady-state
   /// resistance value for a region of a current-voltage (I-V) curve
   /// when the output is low and the noise is below the low voltage rail.
@@ -902,7 +902,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub steady_state_resistance_below_low: Option<NotNan<f64>>,
+  pub steady_state_resistance_below_low: Option<f64>,
   /// The `steady_state_resistance_high` attribute specifies a steady-state
   /// resistance value for a region of a current-voltage (I-V) curve when
   /// the output is high and the noise is below the high voltage rail.
@@ -936,7 +936,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub steady_state_resistance_high: Option<NotNan<f64>>,
+  pub steady_state_resistance_high: Option<f64>,
   /// The `steady_state_resistance_low` attribute specifies a steady-state
   /// resistance value for a region of a current-voltage (I-V) curve
   /// when the output is low and the noise is over the low voltage rail.
@@ -971,7 +971,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
-  pub steady_state_resistance_low: Option<NotNan<f64>>,
+  pub steady_state_resistance_low: Option<f64>,
   /// Used for noise modeling, the `tied_off` attribute allows you
   /// to specify the I-V characteristics and steady-state resistance values
   /// on tied-off cells.
@@ -1386,7 +1386,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub fall_delay_intercept: Option<(i64, NotNan<f64>)>,
+  pub fall_delay_intercept: Option<(i64, f64)>,
   #[size = 16]
   #[liberty(complex(type=Option))]
   pub propagating_ccb: Option<PropagatingCcb>,
@@ -1409,7 +1409,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub fall_pin_resistance: Option<(i64, NotNan<f64>)>,
+  pub fall_pin_resistance: Option<(i64, f64)>,
   /// You define the mode attribute within a timing group.
   /// A mode attribute pertains to an individual timing arc.
   /// The timing arc is active when mode is instantiated with a name and a value.
@@ -1455,7 +1455,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub rise_delay_intercept: Option<(i64, NotNan<f64>)>,
+  pub rise_delay_intercept: Option<(i64, f64)>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1475,7 +1475,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 24]
   #[liberty(complex(type = Option))]
-  pub rise_pin_resistance: Option<(i64, NotNan<f64>)>,
+  pub rise_pin_resistance: Option<(i64, f64)>,
   /// The `cell_degradation` group describes a cell performance degradation
   /// design rule for compiling a design. A cell degradation design rule
   /// specifies the maximum capacitive load a cell can drive without causing
@@ -2295,10 +2295,7 @@ liberty_db::timing::Timing () {
     );
     let table = timing.cell_rise.unwrap();
     let assert_fn = |idx1: f64, idx2: f64, want: f64| {
-      assert_eq!(
-        Some(NotNan::new(want).unwrap()),
-        table.lookup(&NotNan::new(idx1).unwrap(), &NotNan::new(idx2).unwrap())
-      );
+      assert_eq!(Some(want), table.lookup(&idx1, &idx2));
     };
     assert_fn(10.0, 30.0, 100.0);
     assert_fn(30.0, 60.0, 900.0);
@@ -2310,12 +2307,8 @@ liberty_db::timing::Timing () {
     assert_fn(14.0, 42.0, 280.0);
     let assert_lvf_fn = |idx1: f64, idx2: f64, want: f64| {
       assert_eq!(
-        Some(LVFValue {
-          mean: NotNan::new(want).unwrap(),
-          std_dev: NotNan::new(want).unwrap(),
-          skewness: NotNan::new(want).unwrap()
-        }),
-        table.lookup_lvf(&NotNan::new(idx1).unwrap(), &NotNan::new(idx2).unwrap())
+        Some(LVFValue { mean: want, std_dev: want, skewness: want }),
+        table.lookup_lvf(&idx1, &idx2)
       );
     };
     assert_lvf_fn(10.0, 30.0, 100.0);
