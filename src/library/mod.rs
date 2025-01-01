@@ -43,7 +43,7 @@ pub struct Library<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Library,
+  pub extra_ctx: C::Library,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

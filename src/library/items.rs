@@ -48,7 +48,7 @@ pub struct Sensitization<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -361,7 +361,7 @@ pub struct InputVoltage<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -420,7 +420,7 @@ pub struct OutputVoltage<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -511,7 +511,7 @@ pub struct OperatingConditions<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -601,7 +601,7 @@ pub struct FpgaIsd<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -971,7 +971,7 @@ pub struct WireLoad<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1154,7 +1154,7 @@ pub struct WireLoadSection<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1252,7 +1252,7 @@ pub struct BaseCurves<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

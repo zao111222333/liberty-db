@@ -162,8 +162,8 @@ impl SimpleAttri for NameList {
   #[inline]
   fn is_set(&self) -> bool {
     match self {
-      NameList::Name(s) => !s.is_empty(),
-      NameList::List(word_set) => word_set.is_set(),
+      Self::Name(s) => !s.is_empty(),
+      Self::List(word_set) => word_set.is_set(),
     }
   }
   #[inline]

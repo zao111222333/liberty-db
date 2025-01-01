@@ -23,7 +23,7 @@ pub(crate) struct Timing<C: Ctx> {
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   #[liberty(complex)]
   #[default = "vec![0.0]"]
   pub values: Vec<f64>,
@@ -58,7 +58,7 @@ pub(crate) struct Pin<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -89,7 +89,7 @@ pub(crate) struct FF<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -142,7 +142,7 @@ pub(crate) struct Cell<C: Ctx> {
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,

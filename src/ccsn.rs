@@ -59,7 +59,7 @@ pub struct CCSNStage<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -320,7 +320,7 @@ pub struct ReceiverCapacitance<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

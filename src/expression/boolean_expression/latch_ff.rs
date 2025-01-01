@@ -60,7 +60,7 @@ pub struct FF<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::FFLatch,
+  pub extra_ctx: C::FFLatch,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -161,7 +161,7 @@ pub struct FFBank<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::FFLatch,
+  pub extra_ctx: C::FFLatch,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -257,7 +257,7 @@ pub struct Latch<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::FFLatch,
+  pub extra_ctx: C::FFLatch,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -357,7 +357,7 @@ pub struct LatchBank<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::FFLatch,
+  pub extra_ctx: C::FFLatch,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]

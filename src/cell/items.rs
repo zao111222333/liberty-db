@@ -40,7 +40,7 @@ pub struct LeakagePower<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -174,7 +174,7 @@ pub struct Statetable<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -364,7 +364,7 @@ pub struct PgPin<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -496,7 +496,7 @@ pub struct DynamicCurrent<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -565,7 +565,7 @@ pub struct SwitchingGroup<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -756,7 +756,7 @@ pub struct PgCurrent<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -884,7 +884,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1075,7 +1075,7 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1186,7 +1186,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1318,7 +1318,7 @@ pub struct PgPinWithValue<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1382,7 +1382,7 @@ pub struct GateLeakage<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1464,7 +1464,7 @@ pub struct LeakageCurrent<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -1620,7 +1620,7 @@ pub struct LutValues<C: Ctx> {
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  extra_ctx: C::Other,
+  pub extra_ctx: C::Other,
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,

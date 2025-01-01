@@ -25,7 +25,7 @@ pub struct TableLookUpMultiSegment<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -84,7 +84,7 @@ pub struct DriverWaveform<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -122,7 +122,7 @@ pub struct TableLookUp2D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -158,7 +158,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -286,7 +286,7 @@ pub struct Vector3D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -323,7 +323,7 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -364,7 +364,7 @@ pub struct Vector4D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -449,7 +449,7 @@ pub struct CompactCcsPower<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -617,7 +617,7 @@ pub struct Vector3DGrpup<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -645,7 +645,7 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -673,7 +673,7 @@ pub struct Vector4DGrpup<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -706,7 +706,7 @@ pub struct TableLookUp3D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -743,7 +743,7 @@ pub struct TableLookUp1D<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -780,7 +780,7 @@ pub struct CompactCcsTable<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
@@ -998,7 +998,7 @@ pub struct TableTemple<C: Ctx> {
   comments: GroupComments,
   #[size = 0]
   #[liberty(extra_ctx)]
-  extra_ctx: C::Table,
+  pub extra_ctx: C::Table,
   /// group undefined attributes
   #[size = 40]
   #[liberty(attributes)]
