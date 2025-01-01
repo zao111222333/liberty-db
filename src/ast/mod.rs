@@ -470,21 +470,6 @@ pub(crate) fn define_id(hash_builder: &RandomState, group_name: &str, key: &str)
 //   }
 // }
 
-// #[derive(Debug, Clone)]
-// #[derive(Hash, PartialEq, Eq)]
-// #[derive(Ord, PartialOrd)]
-// #[derive(serde::Serialize, serde::Deserialize)]
-// pub enum DefinedAttribute {
-//   /// Boolean
-//   Boolean(Vec<bool>),
-//   /// string
-//   String(Vec<ArcStr>),
-//   /// integer
-//   Integer(Vec<isize>),
-//   /// float
-//   Float(Vec<f64>),
-// }
-
 pub(crate) type SimpleParseRes<'a, T> =
   IResult<&'a str, Result<T, ArcStr>, Error<&'a str>>;
 pub(crate) type ComplexParseRes<'a, T> =

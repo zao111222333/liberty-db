@@ -264,17 +264,6 @@ where
   i.split_at_position1(|item| !char_in_word(item), ErrorKind::Alpha)
 }
 
-// #[inline]
-// pub(crate) fn word_all<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
-// where
-//   E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
-// {
-//   i.split_at_position1(
-//     |item| !(item.is_alphanumeric() || "/_.+-: \t[]".contains(item)),
-//     ErrorKind::Alpha,
-//   )
-// }
-
 #[inline]
 pub(super) fn char_in_formula(c: char) -> bool {
   c.is_ascii_alphanumeric() || " /_.+-*^:".contains(c)
@@ -468,32 +457,6 @@ pub(crate) fn complex_float_vec<'a>(
   )(i)
 }
 
-// #[inline]
-// fn single_line_complex(i: &str) -> IResult<&str, Vec<&str>, Error<&str>> {
-//   map(
-//     separated_list0(
-//       pair(char(','), space),
-//       alt((
-//         delimited(
-//           char('"'),
-//           terminated(
-//             separated_list0(pair(char(','), space), preceded(space, word_all)),
-//             opt(pair(char(','), space)),
-//           ),
-//           char('"'),
-//         ),
-//         separated_list0(pair(char(','), space), delimited(space, word, space)),
-//       )),
-//     ),
-//     |v| {
-//       v.into_iter()
-//         .flat_map(IntoIterator::into_iter)
-//         .map(str::trim_end)
-//         .collect()
-//     },
-//   )(i)
-// }
-
 #[inline]
 #[expect(clippy::type_complexity)]
 pub(crate) fn complex_values<'a>(
@@ -504,7 +467,6 @@ pub(crate) fn complex_values<'a>(
 }
 
 #[inline]
-// #[expect(clippy::type_complexity)]
 pub(crate) fn complex_ccs_power_values<'a>(
   i: &'a str,
   line_num: &mut usize,
@@ -615,96 +577,16 @@ mod test_key {
         &mut 1
       )
     );
+    assert_eq!(
+      Ok(("}", vec![(0, "init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current")])),
+      complex(
+        r#" ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current") ;
+        }"#,
+        &mut 1
+      )
+    );
   }
-  // #[test]
-  // fn test_complex() {
-  //   assert_eq!(
-  //     Ok(("}", vec![("3", 0), ("4", 0), ("5", 0)])),
-  //     complex(r#" (3, 4, 5); }"#, &mut 1)
-  //   );
-  //   assert_eq!(
-  //     Ok(("}", vec![("1", 0), ("2", 0), ("3", 0)])),
-  //     complex(r#" (1,2,3); }"#, &mut 1)
-  //   );
-  //   assert_eq!(Ok(("}", vec![("1", 0)])), complex(r#" (1); }"#, &mut 1));
-  //   assert_eq!(
-  //     Ok(("}", vec![("1", 0), ("2", 0), ("3", 0)])),
-  //     complex(
-  //       r#" (1,2,3)
-  //    }"#,
-  //       &mut 1
-  //     )
-  //   );
-  //   assert_eq!(
-  //     Ok(("}", vec![("1", 0), ("2", 0), ("3", 0)])),
-  //     complex(
-  //       r#" ("1,2,", 3 );
-  //         }"#,
-  //       &mut 1
-  //     )
-  //   );
-  //   assert_eq!(
-  //     Ok(("}", vec![("1", 0), ("2", 0), ("3", 0)])),
-  //     complex(
-  //       r#" ( \
-  //           1,2,3 \
-  //         )
-  //    }"#,
-  //       &mut 1
-  //     )
-  //   );
-  //   assert_eq!(
-  //     Ok(("}", vec![("1", 0), ("2", 1), ("3", 0), ("4", 0)])),
-  //     complex(
-  //       r#" (1,2,\
-  //             3,4);
-  //       }"#,
-  //       &mut 1
-  //     )
-  //   );
-  //   assert_eq!(
-  //     Ok(("}", vec![("1", 0), ("2", 1), ("3", 0)])),
-  //     complex(
-  //       r#" (1,2,\
-  //             3,);
-  //       }"#,
-  //       &mut 1
-  //     )
-  //   );
 
-  //   // assert_eq!(
-  //   //   Ok(("}", vec![(vec!["Q1 Q2 Q3", "QB1 QB2"], 0)])),
-  //   //   complex(
-  //   //     r#" (" Q1 Q2 Q3 ", "QB1 QB2") ;
-  //   //     }"#,
-  //   //     &mut 1
-  //   //   )
-  //   // );
-  //   assert_eq!(
-  //     Ok((
-  //       "}",
-  //       vec![
-  //         ("init_time", 0),
-  //         ("init_current", 0),
-  //         ("bc_id1", 0),
-  //         ("point_time1", 0),
-  //         ("point_current1", 0),
-  //         ("bc_id2", 0),
-  //         ("[point_time2", 0),
-  //         ("point_current2", 0),
-  //         ("bc_id3", 0),
-  //         ("...]", 0),
-  //         ("end_time", 0),
-  //         ("end_current", 0),
-  //       ],
-  //     )),
-  //     complex(
-  //       r#" (init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current);
-  //       }"#,
-  //       &mut 1
-  //     )
-  //   );
-  // }
   #[test]
   fn test1() {
     use nom::error::VerboseError;
