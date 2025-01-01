@@ -3,7 +3,10 @@ use crate::{
     join_fmt, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
     GroupSet, Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
   },
-  common::{items::WordSet, table::CompactCcsPower},
+  common::{
+    items::{NameList, WordSet},
+    table::CompactCcsPower,
+  },
   expression::{logic, LogicBooleanExpression, PowerGroundBooleanExpression},
   pin::Direction,
   timing::items::Mode,
@@ -46,10 +49,14 @@ pub struct LeakagePower<C: Ctx> {
   #[size = 8]
   #[liberty(simple(type = Option))]
   pub power_level: Option<ArcStr>,
-  #[id]
+  #[id(
+    borrow = "crate::common::items::RefNameList<'_>",
+    check_fn = "crate::common::items::namelist_borrow",
+    with_ref = false
+  )]
   #[size = 64]
   #[liberty(simple)]
-  pub related_pg_pin: WordSet,
+  pub related_pg_pin: NameList,
   #[id(
     borrow = "Option<&LogicBooleanExpression>",
     check_fn = "mut_set::borrow_option!",
@@ -502,14 +509,22 @@ pub struct DynamicCurrent<C: Ctx> {
   #[size = 80]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
-  #[id]
+  #[id(
+    borrow = "crate::common::items::RefNameList<'_>",
+    check_fn = "crate::common::items::namelist_borrow",
+    with_ref = false
+  )]
   #[size = 64]
   #[liberty(simple)]
-  pub related_inputs: WordSet,
-  #[id]
+  pub related_inputs: NameList,
+  #[id(
+    borrow = "crate::common::items::RefNameList<'_>",
+    check_fn = "crate::common::items::namelist_borrow",
+    with_ref = false
+  )]
   #[size = 64]
   #[liberty(simple)]
-  pub related_outputs: WordSet,
+  pub related_outputs: NameList,
   #[size = 24]
   #[liberty(complex(type = Option))]
   pub typical_capacitances: Option<Vec<f64>>,

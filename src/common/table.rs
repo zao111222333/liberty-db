@@ -112,7 +112,6 @@ pub struct DriverWaveform<C: Ctx> {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp2D<C: Ctx> {
-  // TODO: unit
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
@@ -277,7 +276,6 @@ impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector3D<C: Ctx> {
-  // TODO: unit
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
@@ -315,7 +313,6 @@ pub struct Vector3D<C: Ctx> {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct ReferenceTimeVector3D<C: Ctx> {
-  // TODO: unit
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
@@ -357,7 +354,6 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector4D<C: Ctx> {
-  // TODO: unit
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
@@ -443,7 +439,6 @@ pub struct Vector4D<C: Ctx> {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct CompactCcsPower<C: Ctx> {
-  // TODO: unit
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
@@ -701,7 +696,6 @@ impl<C: Ctx> GroupFn for CompactCcsPower<C> {}
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp3D<C: Ctx> {
-  // TODO: unit
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
@@ -737,7 +731,7 @@ pub struct TableLookUp3D<C: Ctx> {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp1D<C: Ctx> {
-  // // TODO: unit
+  //
   // unit: (),
   #[size = 8]
   #[liberty(name)]
@@ -774,7 +768,7 @@ impl<C: Ctx> GroupFn for TableLookUp1D<C> {}
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct CompactCcsTable<C: Ctx> {
-  // // TODO: unit
+  //
   // unit: (),
   #[size = 8]
   #[liberty(name)]

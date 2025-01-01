@@ -363,7 +363,7 @@ pub(crate) fn simple<'a>(
 }
 #[inline]
 pub(crate) fn float_one(i: &str) -> IResult<&str, f64, Error<&str>> {
-  #[expect(clippy::string_slice, clippy::undocumented_unsafe_blocks)]
+  #[expect(clippy::string_slice)]
   match fast_float2::parse_partial(i) {
     Ok((f, pos)) => Ok((&i[pos..], f)),
     Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Float))),
@@ -388,7 +388,6 @@ fn int_usize(i: &str) -> IResult<&str, usize, Error<&str>> {
 }
 
 #[inline]
-#[expect(clippy::type_complexity)]
 pub(crate) fn complex_id_vector<'a>(
   i: &'a str,
   line_num: &mut usize,

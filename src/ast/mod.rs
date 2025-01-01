@@ -4,13 +4,17 @@
 
 mod fmt;
 pub mod parser;
-use crate::{library::AttributeType, ArcStr};
-use core::hash::{BuildHasher as _, Hash, Hasher as _};
-use core::{fmt::Write, num::ParseIntError, str::FromStr};
+use crate::{common::f64_into_hash_ord_fn, library::AttributeType, ArcStr};
+use core::{
+  cmp::Ordering,
+  fmt::Write,
+  hash::{BuildHasher as _, Hash as _, Hasher as _},
+  num::ParseIntError,
+  str::FromStr,
+};
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
 use itertools::{izip, Itertools as _};
 use nom::{error::Error, IResult};
-use ordered_float::NotNan;
 use std::collections::HashMap;
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
@@ -83,13 +87,13 @@ pub struct GroupWrapper {
 }
 impl Ord for GroupWrapper {
   #[inline]
-  fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+  fn cmp(&self, other: &Self) -> Ordering {
     self.title.cmp(&other.title)
   }
 }
 impl PartialOrd for GroupWrapper {
   #[inline]
-  fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+  fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
     Some(self.cmp(other))
   }
 }
@@ -135,9 +139,7 @@ impl PartialEq for SimpleDefined {
       (Self::Float(l0), Self::Float(r0)) => {
         l0.len() == r0.len()
           && izip!(l0, r0).all(|lr| match lr {
-            (Ok(l), Ok(r)) => unsafe {
-              NotNan::new_unchecked(*l) == NotNan::new_unchecked(*r)
-            },
+            (Ok(l), Ok(r)) => f64_into_hash_ord_fn(l) == f64_into_hash_ord_fn(r),
             (Err(l), Err(r)) => l == r,
             _ => false,
           })
@@ -149,39 +151,37 @@ impl PartialEq for SimpleDefined {
 impl Eq for SimpleDefined {}
 impl PartialOrd for SimpleDefined {
   #[inline]
-  fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+  fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
     Some(self.cmp(other))
   }
 }
 impl Ord for SimpleDefined {
   #[inline]
-  fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+  fn cmp(&self, other: &Self) -> Ordering {
     match (self, other) {
-      (SimpleDefined::Boolean(l), SimpleDefined::Boolean(r)) => l.cmp(r),
-      (SimpleDefined::String(l), SimpleDefined::String(r)) => l.cmp(r),
-      (SimpleDefined::Integer(l), SimpleDefined::Integer(r)) => l.cmp(r),
-      (SimpleDefined::Float(l), SimpleDefined::Float(r)) => match l.len().cmp(&r.len()) {
-        std::cmp::Ordering::Less => std::cmp::Ordering::Less,
-        std::cmp::Ordering::Greater => std::cmp::Ordering::Greater,
-        std::cmp::Ordering::Equal => l
+      (Self::Boolean(l), Self::Boolean(r)) => l.cmp(r),
+      (Self::String(l), Self::String(r)) => l.cmp(r),
+      (Self::Integer(l), Self::Integer(r)) => l.cmp(r),
+      (Self::Float(l), Self::Float(r)) => match l.len().cmp(&r.len()) {
+        Ordering::Less => Ordering::Less,
+        Ordering::Greater => Ordering::Greater,
+        Ordering::Equal => l
           .iter()
           .map(|res| match res {
-            Ok(f) => Ok(unsafe { NotNan::new_unchecked(*f) }),
+            Ok(f) => Ok(f64_into_hash_ord_fn(f)),
             Err(s) => Err(s),
           })
           .cmp(r.iter().map(|res| match res {
-            Ok(f) => Ok(unsafe { NotNan::new_unchecked(*f) }),
+            Ok(f) => Ok(f64_into_hash_ord_fn(f)),
             Err(s) => Err(s),
           })),
       },
-      (SimpleDefined::Boolean(_), _) => std::cmp::Ordering::Less,
-      (_, SimpleDefined::Boolean(_)) => std::cmp::Ordering::Greater,
-      (_, SimpleDefined::Float(_)) => std::cmp::Ordering::Less,
-      (SimpleDefined::Float(_), _) => std::cmp::Ordering::Greater,
-      (SimpleDefined::String(_), SimpleDefined::Integer(_)) => std::cmp::Ordering::Less,
-      (SimpleDefined::Integer(_), SimpleDefined::String(_)) => {
-        std::cmp::Ordering::Greater
-      }
+      (Self::Boolean(_), _)
+      | (_, Self::Float(_))
+      | (Self::String(_), Self::Integer(_)) => Ordering::Less,
+      (Self::Float(_), _)
+      | (_, Self::Boolean(_))
+      | (Self::Integer(_), Self::String(_)) => Ordering::Greater,
     }
   }
 }

@@ -1,7 +1,7 @@
 use crate::{
   ast::{Attributes, GroupComments, GroupFn},
   common::{
-    items::{Domain, WordSet},
+    items::{Domain, NameList},
     table::TableLookUp,
   },
   expression::LogicBooleanExpression,
@@ -30,14 +30,22 @@ pub struct InternalPower<C: Ctx> {
   // equal_or_opposite_output
   // falling_together_group
   // power_level
-  #[id]
+  #[id(
+    borrow = "crate::common::items::RefNameList<'_>",
+    check_fn = "crate::common::items::namelist_borrow",
+    with_ref = false
+  )]
   #[size = 64]
   #[liberty(simple)]
-  pub related_pin: WordSet,
-  #[id]
+  pub related_pin: NameList,
+  #[id(
+    borrow = "crate::common::items::RefNameList<'_>",
+    check_fn = "crate::common::items::namelist_borrow",
+    with_ref = false
+  )]
   #[size = 64]
   #[liberty(simple)]
-  pub related_pg_pin: WordSet,
+  pub related_pg_pin: NameList,
   // rising_together_group
   // switching_interval
   // switching_together_group

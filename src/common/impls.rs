@@ -8,7 +8,10 @@ use crate::{
   },
   ArcStr,
 };
-use core::fmt::{self, Write};
+use core::{
+  fmt::{self, Write},
+  str::FromStr,
+};
 use itertools::Itertools as _;
 
 use super::{
@@ -18,7 +21,6 @@ use super::{
 crate::ast::impl_self_builder!(f64);
 impl SimpleAttri for f64 {
   #[inline]
-  #[expect(clippy::undocumented_unsafe_blocks)]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_custom(i, &mut scope.line_num, ast::parser::float_one)
   }
@@ -117,8 +119,7 @@ impl NameAttri for ArcStr {
 impl NameAttri for NameList {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, IdError> {
-    let l = v.len();
-    match l {
+    match v.len() {
       0 => Err(IdError::length_dismatch(1, 0, v)),
       #[expect(clippy::indexing_slicing)]
       1 => Ok(Self::Name(v[0].into())),
@@ -131,6 +132,60 @@ impl NameAttri for NameList {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     write!(f, "{self}")
+  }
+}
+impl FromStr for NameList {
+  type Err = ();
+  #[inline]
+  #[expect(clippy::unwrap_in_result, clippy::unwrap_used)]
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    let mut v: Vec<_> = s
+      .split(' ')
+      .filter_map(|_s| if _s.is_empty() { None } else { Some(ArcStr::from(_s)) })
+      .collect();
+    match v.len() {
+      0 => Err(()),
+      1 => Ok(Self::Name(v.pop().unwrap())),
+      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(ArcStr::from).collect() })),
+    }
+  }
+}
+crate::ast::impl_self_builder!(NameList);
+impl SimpleAttri for NameList {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope,
+  ) -> ast::SimpleParseRes<'a, Self::Builder> {
+    ast::nom_parse_from_str(i, scope)
+  }
+  #[inline]
+  fn is_set(&self) -> bool {
+    match self {
+      NameList::Name(s) => !s.is_empty(),
+      NameList::List(word_set) => word_set.is_set(),
+    }
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    match self {
+      Self::Name(s) => {
+        if is_word(s) {
+          write!(f, "{s}")
+        } else {
+          write!(f, "\"{s}\"")
+        }
+      }
+      Self::List(set) => join_fmt_no_quote(
+        set.inner.iter().sorted(),
+        f,
+        |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
+        " ",
+      ),
+    }
   }
 }
 
@@ -263,7 +318,7 @@ impl<const N: usize> ast::ParsingBuilder for [f64; N] {
     builder
   }
 }
-// FIXME
+
 impl<const N: usize> ComplexAttri for [f64; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(

@@ -5,7 +5,7 @@ use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
   ccsn::{CCSNStage, ReceiverCapacitance},
   common::items::{NameList, WordSet},
-  expression::{logic, BooleanExpression},
+  expression::{logic, BooleanExpression, PowerGroundBooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
   ArcStr, Ctx,
@@ -141,10 +141,9 @@ pub struct Pin<C: Ctx> {
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub alive_during_partial_power_down: Option<bool>,
-  // TODO
   #[size = 32]
   #[liberty(simple(type = Option))]
-  pub power_down_function: Option<BooleanExpression>,
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

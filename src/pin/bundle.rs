@@ -16,7 +16,11 @@ use crate::{
 #[serde(bound = "C::Pin: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Bundle<C: Ctx> {
   /// Name of the pin
-  #[id]
+  #[id(
+    borrow = "crate::common::items::RefNameList<'_>",
+    check_fn = "crate::common::items::namelist_borrow",
+    with_ref = false
+  )]
   #[size = 48]
   #[liberty(name)]
   pub name: NameList,

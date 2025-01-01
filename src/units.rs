@@ -247,7 +247,7 @@ pub struct CapacitiveLoadUnit {
 impl CapacitiveLoadUnit {
   #[inline]
   #[must_use]
-  #[expect(clippy::arithmetic_side_effects, clippy::float_arithmetic)]
+  #[expect(clippy::float_arithmetic)]
   pub fn value(&self) -> f64 {
     if self.ff_pf {
       self.val * 1e-15

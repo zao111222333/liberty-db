@@ -13,7 +13,7 @@ use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
   ccsn::PropagatingCcb,
   common::{
-    items::{SdfEdgeType, WordSet},
+    items::{NameList, SdfEdgeType, WordSet},
     table::{
       CompactCcsTable, ReferenceTimeVector3DGrpup, TableLookUp, TableLookUpMultiSegment,
     },
@@ -567,10 +567,14 @@ pub struct Timing<C: Ctx> {
   /// &end
   /// =203.42
   /// ">Reference-Instance</a>
-  #[id]
+  #[id(
+    borrow = "crate::common::items::RefNameList<'_>",
+    check_fn = "crate::common::items::namelist_borrow",
+    with_ref = false
+  )]
   #[size = 64]
   #[liberty(simple)]
-  pub related_pin: WordSet,
+  pub related_pin: NameList,
   /// The `rise_resistance` attribute represents the load-dependent output resistance,
   /// or drive capability, for a logic 0-to-1 transition.
   ///

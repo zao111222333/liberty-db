@@ -8,13 +8,15 @@ use crate::{
     self, fmt_comment_liberty, BuilderScope, GroupComments, GroupFn, ParseScope,
     ParsingBuilder, SimpleAttri,
   },
-  common::table::{DisplayTableLookUp, DisplayValues, TableLookUp},
+  common::{
+    f64_into_hash_ord_fn,
+    table::{DisplayTableLookUp, DisplayValues, TableLookUp},
+  },
   expression::logic,
   ArcStr, Ctx,
 };
 
 use itertools::izip;
-use ordered_float::NotNan;
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
 ///
@@ -275,37 +277,33 @@ impl<C: Ctx> TimingTableLookUp<C> {
   }
   #[must_use]
   #[inline]
+  #[expect(clippy::float_arithmetic)]
   pub fn lookup(&self, idx1: &f64, idx2: &f64) -> Option<f64> {
-    let idx1_ = unsafe { NotNan::new_unchecked(*idx1) };
-    let idx2_ = unsafe { NotNan::new_unchecked(*idx2) };
-    match self
-      .index_1
-      .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx1_))
-    {
-      Ok(i1_) => match self
-        .index_2
-        .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx2_))
-      {
-        Ok(i_1) => Some(self.get_value(i1_, i_1)),
-        Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
-          let q_1 = self.get_value(i1_, i_1);
-          let q_2 = self.get_value(i1_, i_2);
-          let x_1 = self.index_2[i_1];
-          let x_2 = self.index_2[i_2];
-          q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
-        }),
-      },
+    let idx1_ = f64_into_hash_ord_fn(idx1);
+    let idx2_ = f64_into_hash_ord_fn(idx2);
+    match self.index_1.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx1_)) {
+      Ok(i1_) => {
+        match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
+          Ok(i_1) => Some(self.get_value(i1_, i_1)),
+          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
+            let q_1 = self.get_value(i1_, i_1);
+            let q_2 = self.get_value(i1_, i_2);
+            let x_1 = self.index_2[i_1];
+            let x_2 = self.index_2[i_2];
+            // q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
+            (q_2 - q_1).mul_add((idx2 - x_1) / (x_2 - x_1), q_1)
+          }),
+        }
+      }
       Err(pos1) => Self::find_pos(self.index_1.len(), pos1).and_then(|(i1_, i2_)| {
         let x1_ = self.index_1[i1_];
         let x2_ = self.index_1[i2_];
-        match self
-          .index_2
-          .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx2_))
-        {
+        match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
           Ok(i_1) => {
             let q1_ = self.get_value(i1_, i_1);
             let q2_ = self.get_value(i2_, i_1);
-            Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+            // Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+            Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
           }
           Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
             let q11 = self.get_value(i1_, i_1);
@@ -314,9 +312,12 @@ impl<C: Ctx> TimingTableLookUp<C> {
             let q22 = self.get_value(i2_, i_2);
             let x_1 = self.index_2[i_1];
             let x_2 = self.index_2[i_2];
-            let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
-            let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
-            q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
+            // let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
+            let q1_ = (q12 - q11).mul_add((idx2 - x_1) / (x_2 - x_1), q11);
+            // let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
+            let q2_ = (q22 - q21).mul_add((idx2 - x_1) / (x_2 - x_1), q21);
+            // q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
+            (q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_)
           }),
         }
       }),
@@ -324,37 +325,33 @@ impl<C: Ctx> TimingTableLookUp<C> {
   }
   #[must_use]
   #[inline]
+  #[expect(clippy::float_arithmetic)]
   pub fn lookup_lvf(&self, idx1: &f64, idx2: &f64) -> Option<LVFValue> {
-    let idx1_ = unsafe { NotNan::new_unchecked(*idx1) };
-    let idx2_ = unsafe { NotNan::new_unchecked(*idx2) };
-    match self
-      .index_1
-      .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx1_))
-    {
-      Ok(i1_) => match self
-        .index_2
-        .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx2_))
-      {
-        Ok(i_1) => Some(self.get_lvf_value(i1_, i_1)),
-        Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
-          let q_1 = self.get_lvf_value(i1_, i_1);
-          let q_2 = self.get_lvf_value(i1_, i_2);
-          let x_1 = self.index_2[i_1];
-          let x_2 = self.index_2[i_2];
-          q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
-        }),
-      },
+    let idx1_ = f64_into_hash_ord_fn(idx1);
+    let idx2_ = f64_into_hash_ord_fn(idx2);
+    match self.index_1.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx1_)) {
+      Ok(i1_) => {
+        match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
+          Ok(i_1) => Some(self.get_lvf_value(i1_, i_1)),
+          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
+            let q_1 = self.get_lvf_value(i1_, i_1);
+            let q_2 = self.get_lvf_value(i1_, i_2);
+            let x_1 = self.index_2[i_1];
+            let x_2 = self.index_2[i_2];
+            // q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
+            (q_2 - q_1).mul_add((idx2 - x_1) / (x_2 - x_1), q_1)
+          }),
+        }
+      }
       Err(pos1) => Self::find_pos(self.index_1.len(), pos1).and_then(|(i1_, i2_)| {
         let x1_ = self.index_1[i1_];
         let x2_ = self.index_1[i2_];
-        match self
-          .index_2
-          .binary_search_by(|v| unsafe { NotNan::new_unchecked(*v) }.cmp(&idx2_))
-        {
+        match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
           Ok(i_1) => {
             let q1_ = self.get_lvf_value(i1_, i_1);
             let q2_ = self.get_lvf_value(i2_, i_1);
-            Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+            // Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
+            Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
           }
           Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
             let q11 = self.get_lvf_value(i1_, i_1);
@@ -363,9 +360,12 @@ impl<C: Ctx> TimingTableLookUp<C> {
             let q22 = self.get_lvf_value(i2_, i_2);
             let x_1 = self.index_2[i_1];
             let x_2 = self.index_2[i_2];
-            let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
-            let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
-            q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
+            // let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
+            let q1_ = (q12 - q11).mul_add((idx2 - x_1) / (x_2 - x_1), q11);
+            // let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
+            let q2_ = (q22 - q21).mul_add((idx2 - x_1) / (x_2 - x_1), q21);
+            // q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
+            (q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_)
           }),
         }
       }),
@@ -381,16 +381,27 @@ pub struct LVFValue {
   pub std_dev: f64,
   pub skewness: f64,
 }
-impl PartialEq for LVFValue {
-  fn eq(&self, other: &Self) -> bool {
-    unsafe {
-      NotNan::new_unchecked(self.mean) == NotNan::new_unchecked(other.mean)
-        && NotNan::new_unchecked(self.std_dev) == NotNan::new_unchecked(other.std_dev)
-        && NotNan::new_unchecked(self.skewness) == NotNan::new_unchecked(other.skewness)
+impl LVFValue {
+  #[inline]
+  #[must_use]
+  /// self * a + b
+  pub fn mul_add(self, a: f64, b: Self) -> Self {
+    Self {
+      mean: self.mean.mul_add(a, b.mean),
+      std_dev: self.std_dev.mul_add(a, b.std_dev),
+      skewness: self.skewness.mul_add(a, b.skewness),
     }
   }
 }
-#[expect(clippy::arithmetic_side_effects)]
+impl PartialEq for LVFValue {
+  #[inline]
+  fn eq(&self, other: &Self) -> bool {
+    f64_into_hash_ord_fn(&self.mean) == f64_into_hash_ord_fn(&other.mean)
+      && f64_into_hash_ord_fn(&self.std_dev) == f64_into_hash_ord_fn(&other.std_dev)
+      && f64_into_hash_ord_fn(&self.skewness) == f64_into_hash_ord_fn(&other.skewness)
+  }
+}
+#[expect(clippy::float_arithmetic)]
 impl Add for LVFValue {
   type Output = Self;
   #[inline]
@@ -402,7 +413,7 @@ impl Add for LVFValue {
     }
   }
 }
-#[expect(clippy::arithmetic_side_effects)]
+#[expect(clippy::float_arithmetic)]
 impl Sub for LVFValue {
   type Output = Self;
   #[inline]
@@ -416,7 +427,7 @@ impl Sub for LVFValue {
     }
   }
 }
-#[expect(clippy::arithmetic_side_effects)]
+#[expect(clippy::float_arithmetic)]
 impl Mul<f64> for LVFValue {
   type Output = Self;
   #[inline]
@@ -442,7 +453,7 @@ impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
     Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
   );
   #[inline]
-  #[expect(clippy::arithmetic_side_effects)]
+  #[expect(clippy::float_arithmetic)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope) -> Self {
     #[inline]
     fn eq_index<C: Ctx>(
@@ -504,7 +515,7 @@ impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
 }
 impl<C: Ctx> TimingTableLookUp<C> {
   #[inline]
-  #[expect(clippy::arithmetic_side_effects)]
+  #[expect(clippy::float_arithmetic)]
   pub(crate) fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation>(
     &self,
     key: &str,

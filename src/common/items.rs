@@ -187,12 +187,10 @@ impl fmt::Display for WordSet {
 impl Ord for WordSet {
   #[inline]
   fn cmp(&self, other: &Self) -> Ordering {
-    if self.inner.is_subset(&other.inner) {
-      Ordering::Less
-    } else if self.inner.is_superset(&other.inner) {
-      Ordering::Greater
-    } else {
-      Ordering::Equal
+    match self.inner.len().cmp(&other.inner.len()) {
+      Ordering::Less => Ordering::Less,
+      Ordering::Greater => Ordering::Greater,
+      Ordering::Equal => self.inner.iter().sorted().cmp(other.inner.iter().sorted()),
     }
   }
 }
@@ -201,14 +199,14 @@ impl Ord for WordSet {
 impl PartialOrd for WordSet {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-    if self.inner.len() == other.inner.len() {
-      self.inner.iter().sorted().partial_cmp(other.inner.iter().sorted())
-    } else if self.inner.is_subset(&other.inner) {
-      Some(Ordering::Less)
-    } else if self.inner.is_superset(&other.inner) {
-      Some(Ordering::Greater)
-    } else {
-      None
+    match self.inner.len().cmp(&other.inner.len()) {
+      Ordering::Less => self.inner.is_subset(&other.inner).then_some(Ordering::Less),
+      Ordering::Greater => {
+        self.inner.is_superset(&other.inner).then_some(Ordering::Greater)
+      }
+      Ordering::Equal => {
+        self.inner.iter().sorted().partial_cmp(other.inner.iter().sorted())
+      }
     }
   }
 }
