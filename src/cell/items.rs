@@ -1653,7 +1653,12 @@ impl<C: Ctx> GroupFn for LutValues<C> {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd, Default)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(
+  strum_macros::EnumString,
+  strum_macros::EnumIter,
+  strum_macros::Display,
+  strum_macros::AsRefStr
+)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PgType {
   /// `primary_power`
