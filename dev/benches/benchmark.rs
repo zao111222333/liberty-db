@@ -1,20 +1,28 @@
-use dev::{gen_projs, projs::OpenTimerLibrary, run_bench};
+#[cfg(target_os = "linux")]
+use dev::projs::OpenTimerLibrary;
+use dev::{gen_projs, run_bench};
 use std::{
   fs::File,
   io::{BufWriter, Write},
 };
 fn main() {
-  let projs_table = run_bench(
-    gen_projs![
-      (LibertyDb, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
-      // (Si2drLiberty, Si2drLibertyLibrary),
-      (OPenTimer, OpenTimerLibrary),
-      (LibertyIo, liberty_io::Group),
-      (LibertyParse, libertyparse::Liberty),
-      (Liberty2json, liberty2json::Liberty),
-    ],
-    false,
-  );
+  #[cfg(target_os = "linux")]
+  let projs = gen_projs![
+    (LibertyDb, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
+    // (Si2drLiberty, Si2drLibertyLibrary),
+    (OPenTimer, OpenTimerLibrary),
+    (LibertyIo, liberty_io::Group),
+    (LibertyParse, libertyparse::Liberty),
+    (Liberty2json, liberty2json::Liberty),
+  ];
+  #[cfg(not(target_os = "linux"))]
+  let projs = gen_projs![
+    (LibertyDb, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
+    (LibertyIo, liberty_io::Group),
+    (LibertyParse, libertyparse::Liberty),
+    (Liberty2json, liberty2json::Liberty),
+  ];
+  let projs_table = run_bench(projs, false);
   let regress_table = run_bench(
     gen_projs![
       (LibertyDbLatest, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
