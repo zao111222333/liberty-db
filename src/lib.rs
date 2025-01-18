@@ -99,6 +99,7 @@
 #![allow(
     // Some explicitly allowed Clippy lints, must have clear reason to allow
     clippy::allow_attributes_without_reason,
+    clippy::default_numeric_fallback,
     clippy::pattern_type_mismatch, // TODO: 
     clippy::too_long_first_doc_paragraph,
     clippy::partial_pub_fields,
@@ -176,6 +177,7 @@
     clippy::or_fun_call,
   )
 )]
+extern crate alloc;
 pub use biodivine_lib_bdd;
 pub use strum::IntoEnumIterator;
 /// `bus` group structure.
@@ -218,7 +220,7 @@ fn demo() {
   use crate::{DefaultCtx, Library};
   use std::{
     fs::File,
-    io::{BufWriter, Write},
+    io::{BufWriter, Write as _},
   };
   static TEMPLATE: &str = r#"
 library(demo) {
@@ -254,5 +256,5 @@ library(demo) {
   // write library
   let out_file = File::create("demo.lib").unwrap();
   let mut writer = BufWriter::new(out_file);
-  write!(&mut writer, "{}", library).unwrap();
+  write!(&mut writer, "{library}").unwrap();
 }

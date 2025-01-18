@@ -933,7 +933,7 @@ impl crate::ast::SimpleAttri for ClearPresetState {
 #[cfg(test)]
 mod test {
   use crate::{
-    expression::{BddBooleanExpression, FFBank, Latch, LatchBank, LatchFF, FF},
+    expression::{BddBooleanExpression, FFBank, Latch, LatchBank, LatchFF as _, FF},
     DefaultCtx,
   };
   #[test]

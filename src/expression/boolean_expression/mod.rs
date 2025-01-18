@@ -391,7 +391,7 @@ fn _previous(expr: &mut Expr) {
 mod test {
   use super::*;
   use crate::DefaultCtx;
-  use core::{f64::consts::E, str::FromStr};
+  use core::{f64::consts::E, str::FromStr as _};
   use itertools::Itertools as _;
   #[test]
   fn parse_fmt_self_check() {

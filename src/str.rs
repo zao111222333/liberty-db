@@ -1,5 +1,10 @@
-use core::fmt;
-use std::{borrow::Cow, mem::MaybeUninit, ptr::NonNull, rc::Rc, sync::Arc};
+#![expect(
+  clippy::unnecessary_safety_doc,
+  clippy::string_slice,
+  clippy::partialeq_ne_impl
+)]
+use alloc::{borrow::Cow, rc::Rc, sync::Arc};
+use core::{fmt, mem::MaybeUninit, ptr::NonNull};
 
 pub use arcstr::{literal, ArcStr};
 
@@ -7,6 +12,7 @@ pub use arcstr::{literal, ArcStr};
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[repr(transparent)]
+#[expect(clippy::unsafe_derive_deserialize)]
 pub struct LibertyStr(pub ArcStr);
 
 impl core::ops::Deref for LibertyStr {
@@ -90,7 +96,6 @@ impl_index! {
 
 macro_rules! impl_peq {
     (@one $a:ty, $b:ty) => {
-        #[allow(clippy::extra_unused_lifetimes)]
         impl<'a> PartialEq<$b> for $a {
             #[inline]
             fn eq(&self, s: &$b) -> bool {
@@ -204,7 +209,7 @@ impl<'a> From<&'a LibertyStr> for Cow<'a, str> {
   }
 }
 
-impl<'a> From<LibertyStr> for Cow<'a, str> {
+impl From<LibertyStr> for Cow<'_, str> {
   #[inline]
   fn from(s: LibertyStr) -> Self {
     s.0.into()
@@ -217,9 +222,9 @@ impl From<&String> for LibertyStr {
     Self(ArcStr::from(s))
   }
 }
-impl From<&LibertyStr> for LibertyStr {
+impl From<&Self> for LibertyStr {
   #[inline]
-  fn from(s: &LibertyStr) -> Self {
+  fn from(s: &Self) -> Self {
     s.clone()
   }
 }
@@ -227,6 +232,7 @@ impl From<&LibertyStr> for LibertyStr {
 impl LibertyStr {
   /// Construct a new empty string.
   #[inline]
+  #[must_use]
   pub const fn new() -> Self {
     Self(ArcStr::new())
   }
@@ -249,6 +255,7 @@ impl LibertyStr {
   /// }
   /// ```
   #[inline]
+  #[must_use]
   pub fn try_alloc(copy_from: &str) -> Option<Self> {
     ArcStr::try_alloc(copy_from).map(Into::into)
   }
@@ -278,6 +285,7 @@ impl LibertyStr {
   /// assert_eq!(arcstr, "aaaaaaaaaa")
   /// ```
   #[inline]
+  #[must_use]
   pub unsafe fn try_init_with_unchecked<F>(n: usize, initializer: F) -> Option<Self>
   where
     F: FnOnce(&mut [MaybeUninit<u8>]),
@@ -310,6 +318,7 @@ impl LibertyStr {
   /// assert_eq!(arcstr, "aaaaaaaaaa")
   /// ```
   #[inline]
+  #[must_use]
   pub unsafe fn init_with_unchecked<F>(n: usize, initializer: F) -> Self
   where
     F: FnOnce(&mut [MaybeUninit<u8>]),
@@ -365,6 +374,7 @@ impl LibertyStr {
   /// assert_eq!(s.as_str(), "abc");
   /// ```
   #[inline]
+  #[must_use]
   pub fn as_str(&self) -> &str {
     self
   }
@@ -379,6 +389,7 @@ impl LibertyStr {
   /// assert_eq!(a.len(), 3);
   /// ```
   #[inline]
+  #[must_use]
   pub fn len(&self) -> usize {
     self.0.len()
   }
@@ -393,6 +404,7 @@ impl LibertyStr {
   /// assert!(ArcStr::new().is_empty());
   /// ```
   #[inline]
+  #[must_use]
   pub fn is_empty(&self) -> bool {
     self.0.is_empty()
   }
@@ -410,7 +422,8 @@ impl LibertyStr {
   /// assert_eq!(s.to_string(), "abc");
   /// ```
   #[inline]
-  #[allow(clippy::inherent_to_string_shadow_display)]
+  #[must_use]
+  #[expect(clippy::inherent_to_string_shadow_display)]
   pub fn to_string(&self) -> String {
     self.0.to_string()
   }
@@ -425,6 +438,7 @@ impl LibertyStr {
   /// assert_eq!(foobar.as_bytes(), b"foobar");
   /// ```
   #[inline]
+  #[must_use]
   pub fn as_bytes(&self) -> &[u8] {
     self.0.as_bytes()
   }
@@ -446,6 +460,7 @@ impl LibertyStr {
   /// assert_eq!(s, "abcd");
   /// ```
   #[inline]
+  #[must_use]
   pub fn into_raw(this: Self) -> NonNull<()> {
     ArcStr::into_raw(this.0)
   }
@@ -470,6 +485,7 @@ impl LibertyStr {
   /// assert_eq!(s, "abcd");
   /// ```
   #[inline]
+  #[must_use]
   pub unsafe fn from_raw(ptr: NonNull<()>) -> Self {
     ArcStr::from_raw(ptr).into()
   }
@@ -501,6 +517,7 @@ impl LibertyStr {
   /// assert!(ArcStr::ptr_eq(&strange_new_foobar, &wild_blue_foobar));
   /// ```
   #[inline]
+  #[must_use]
   pub fn ptr_eq(lhs: &Self, rhs: &Self) -> bool {
     core::ptr::eq(lhs.0.as_ptr(), rhs.0.as_ptr())
   }
@@ -529,7 +546,7 @@ impl LibertyStr {
   ///
   /// # Examples
   ///
-  /// ### Dynamic ArcStr
+  /// ### Dynamic `ArcStr`
   /// ```
   /// # use arcstr::ArcStr;
   /// let foobar = ArcStr::from("foobar");
@@ -539,7 +556,7 @@ impl LibertyStr {
   /// assert_eq!(Some(2), ArcStr::strong_count(&also_foobar));
   /// ```
   ///
-  /// ### Static ArcStr
+  /// ### Static `ArcStr`
   /// ```
   /// # use arcstr::ArcStr;
   /// let baz = arcstr::literal!("baz");
@@ -548,6 +565,7 @@ impl LibertyStr {
   /// assert_eq!(None, ArcStr::strong_count(&ArcStr::default()));
   /// ```
   #[inline]
+  #[must_use]
   pub fn strong_count(this: &Self) -> Option<usize> {
     ArcStr::strong_count(&this.0)
   }
@@ -561,7 +579,7 @@ impl LibertyStr {
   /// If the `ArcStr` is already static, then this is a noop.
   ///
   /// # Caveats
-  /// Calling this function on an ArcStr will cause us to never free it, thus
+  /// Calling this function on an `ArcStr` will cause us to never free it, thus
   /// leaking it's memory. Doing this excessively can lead to problems.
   ///
   /// # Examples
@@ -580,10 +598,11 @@ impl LibertyStr {
   /// assert_eq!(ArcStr::as_static(&s), Some("foobar"));
   /// ```
   #[inline]
+  #[must_use]
   pub fn leak(&self) -> &'static str {
-    &self.0.leak()
+    self.0.leak()
   }
-  /// Returns true if `this` is a "static" ArcStr. For example, if it was
+  /// Returns true if `this` is a "static" `ArcStr`. For example, if it was
   /// created from a call to [`arcstr::literal!`][crate::literal]),
   /// returned by `ArcStr::new`, etc.
   ///
@@ -609,11 +628,12 @@ impl LibertyStr {
   /// assert!(!ArcStr::is_static(&nonstatic));
   /// ```
   #[inline]
+  #[must_use]
   pub fn is_static(this: &Self) -> bool {
     ArcStr::is_static(&this.0)
   }
 
-  /// Returns true if `this` is a "static"/`"literal"` ArcStr. For example, if
+  /// Returns true if `this` is a "static"/`"literal"` `ArcStr`. For example, if
   /// it was created from a call to [`literal!`][crate::literal]), returned by
   /// `ArcStr::new`, etc.
   ///
@@ -639,6 +659,7 @@ impl LibertyStr {
   /// assert_eq!(ArcStr::as_static(&nonstatic), None);
   /// ```
   #[inline]
+  #[must_use]
   pub fn as_static(this: &Self) -> Option<&'static str> {
     ArcStr::as_static(&this.0)
   }
@@ -659,6 +680,8 @@ impl LibertyStr {
   /// let repeated = ArcStr::try_repeat(source, 10);
   /// assert_eq!(repeated.unwrap(), "AAAAAAAAAA");
   /// ```
+  #[inline]
+  #[must_use]
   pub fn try_repeat(source: &str, n: usize) -> Option<Self> {
     ArcStr::try_repeat(source, n).map(Into::into)
   }
@@ -688,6 +711,8 @@ impl LibertyStr {
   /// // this will panic at runtime
   /// let huge = ArcStr::repeat("A", usize::MAX);
   /// ```
+  #[inline]
+  #[must_use]
   pub fn repeat(source: &str, n: usize) -> Self {
     ArcStr::repeat(source, n).into()
   }

@@ -165,7 +165,7 @@ impl<C: Ctx> GroupFn for Cell<C> {}
 #[cfg(test)]
 mod test {
   use crate::{
-    ast::{DefaultIndentation, Group},
+    ast::{DefaultIndentation, Group as _},
     DefaultCtx,
   };
 
