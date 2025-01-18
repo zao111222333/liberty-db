@@ -7,7 +7,7 @@ use super::{
 };
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
-  ArcStr, Ctx,
+  Ctx, LibertyStr,
 };
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt::Write;
@@ -38,7 +38,7 @@ pub struct FF<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub variable1: ArcStr,
+  pub variable1: LibertyStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -53,7 +53,7 @@ pub struct FF<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub variable2: ArcStr,
+  pub variable2: LibertyStr,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -135,7 +135,7 @@ pub struct FFBank<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub variable1: ArcStr,
+  pub variable1: LibertyStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -150,7 +150,7 @@ pub struct FFBank<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub variable2: ArcStr,
+  pub variable2: LibertyStr,
   /// bits
   #[size = 8]
   #[liberty(name)]
@@ -235,7 +235,7 @@ pub struct Latch<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub variable1: ArcStr,
+  pub variable1: LibertyStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -250,7 +250,7 @@ pub struct Latch<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub variable2: ArcStr,
+  pub variable2: LibertyStr,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -331,7 +331,7 @@ pub struct LatchBank<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub variable1: ArcStr,
+  pub variable1: LibertyStr,
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -346,7 +346,7 @@ pub struct LatchBank<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub variable2: ArcStr,
+  pub variable2: LibertyStr,
   /// bits
   #[size = 8]
   #[liberty(name)]
@@ -492,11 +492,11 @@ impl<C: Ctx> NamedGroup for LatchFFBank_type<C> {
 )]
 impl<C: Ctx> __LatchFF for Latch_type<C> {
   #[inline]
-  fn variable1(&self) -> &ArcStr {
+  fn variable1(&self) -> &LibertyStr {
     &self.variable1
   }
   #[inline]
-  fn variable2(&self) -> &ArcStr {
+  fn variable2(&self) -> &LibertyStr {
     &self.variable2
   }
   #[inline]
@@ -536,11 +536,11 @@ impl<C: Ctx> __LatchFF for Latch_type<C> {
 )]
 impl<C: Ctx> __LatchFF for FF_type<C> {
   #[inline]
-  fn variable1(&self) -> &ArcStr {
+  fn variable1(&self) -> &LibertyStr {
     &self.variable1
   }
   #[inline]
-  fn variable2(&self) -> &ArcStr {
+  fn variable2(&self) -> &LibertyStr {
     &self.variable2
   }
   #[inline]
@@ -586,8 +586,8 @@ impl<C: Ctx> __LatchFF for FF_type<C> {
 }
 
 trait __LatchFF {
-  fn variable1(&self) -> &ArcStr;
-  fn variable2(&self) -> &ArcStr;
+  fn variable1(&self) -> &LibertyStr;
+  fn variable2(&self) -> &LibertyStr;
   fn clear(&self) -> Option<&LogicBooleanExpression>;
   fn clear_preset_var1(&self) -> Option<&ClearPresetState>;
   fn clear_preset_var2(&self) -> Option<&ClearPresetState>;

@@ -2,7 +2,7 @@
 //!
 //! All parser utilis.
 //!
-use crate::{ast::GroupWrapper, ArcStr};
+use crate::{ast::GroupWrapper, LibertyStr};
 use nom::{
   branch::alt,
   bytes::complete::{escaped, is_not, tag, take, take_until, take_while},
@@ -174,7 +174,7 @@ pub(crate) fn undefine<'a>(
 ) -> IResult<&'a str, super::UndefinedAttriValue, Error<&'a str>> {
   let line_num_back: usize = scope.line_num;
   if let Ok((input, res)) = simple(i, &mut scope.line_num) {
-    return Ok((input, super::UndefinedAttriValue::Simple(ArcStr::from(res))));
+    return Ok((input, super::UndefinedAttriValue::Simple(LibertyStr::from(res))));
   }
   scope.line_num = line_num_back;
   if let Ok((input, vec)) = complex(i, &mut scope.line_num) {
@@ -187,7 +187,7 @@ pub(crate) fn undefine<'a>(
   match title(i, &mut scope.line_num) {
     Ok((mut input, title)) => {
       let mut res = GroupWrapper {
-        title: title.into_iter().map(ArcStr::from).collect(),
+        title: title.into_iter().map(LibertyStr::from).collect(),
         attri_map: HashMap::with_hasher(foldhash::fast::FixedState::default()),
       };
       loop {
@@ -314,7 +314,7 @@ pub(crate) fn simple_custom<'a, T>(
       space,
       alt((
         map(alt((func, delimited(char('"'), func, char('"')))), Ok),
-        map(alt((word, unquote)), |s| Err(ArcStr::from(s))),
+        map(alt((word, unquote)), |s| Err(LibertyStr::from(s))),
       )),
       alt((
         preceded(terminated(space, char(';')), comment_space_newline),

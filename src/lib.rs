@@ -176,7 +176,6 @@
     clippy::or_fun_call,
   )
 )]
-pub use arcstr::{self, ArcStr};
 pub use biodivine_lib_bdd;
 pub use strum::IntoEnumIterator;
 /// `bus` group structure.
@@ -193,6 +192,8 @@ pub mod internal_power;
 /// `Library` group structure, top level of liberty format.
 pub mod library;
 pub use library::Library;
+pub mod str;
+pub use str::LibertyStr;
 /// `pin` group structure.
 pub mod pin;
 pub use pin::Pin;

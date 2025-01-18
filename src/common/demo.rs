@@ -5,11 +5,12 @@ use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
   timing::{TimingTableLookUp, TimingType},
-  ArcStr, Ctx,
+  Ctx, LibertyStr,
 };
 use core::fmt::Write;
 
 use super::table::TableLookUp;
+
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -25,7 +26,7 @@ pub(crate) struct Timing<C: Ctx> {
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   #[liberty(complex)]
-  #[default = "vec![0.0]"]
+  #[liberty(default = vec![0.0])]
   pub values: Vec<f64>,
   #[liberty(simple(type = Option))]
   t1: Option<TimingType>,
@@ -51,7 +52,7 @@ pub(crate) struct Pin<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  name: ArcStr,
+  name: LibertyStr,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -78,11 +79,11 @@ pub(crate) struct FF<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  variable1: ArcStr,
+  variable1: LibertyStr,
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  variable2: ArcStr,
+  variable2: LibertyStr,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -95,7 +96,7 @@ pub(crate) struct FF<C: Ctx> {
   #[liberty(attributes)]
   attributes: Attributes,
   #[liberty(simple(type = Option))]
-  next_state: Option<ArcStr>,
+  next_state: Option<LibertyStr>,
 }
 impl<C: Ctx> GroupFn for FF<C> {}
 impl<C: Ctx> NamedGroup for FF<C> {
@@ -137,7 +138,7 @@ impl<C: Ctx> NamedGroup for FF<C> {
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub(crate) struct Cell<C: Ctx> {
   #[liberty(name)]
-  name: ArcStr,
+  name: LibertyStr,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,

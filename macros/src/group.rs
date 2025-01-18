@@ -1,12 +1,12 @@
 use crate::attribute::*;
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use syn::{Data, DeriveInput, Fields, GenericArgument, PathArguments, Type};
+use syn::{Data, DeriveInput, Expr, Fields, GenericArgument, PathArguments, Type};
 
 fn group_field_fn(
   field_name: &Ident,
   field_type: &Type,
-  default: Option<&proc_macro2::TokenStream>,
+  default: Option<&Expr>,
   arrti_type: &AttriType,
   attributes_name: &Ident,
   comments_name: &Ident,
@@ -729,19 +729,18 @@ fn main() {
   use syn::parse_str;
   let input = r#"
   #[derive(liberty_macros::Group)]
-  struct Timing {
-    /// group attributes attributes
-  #[liberty(attributes)]
-    pub attributes: Attributes,
+  pub(crate) struct Timing<C: Ctx> {
+    /// group undefined attributes
+    #[liberty(attributes)]
+    attributes: Attributes,
     /// group comments
-  #[liberty(comments)]
-    pub pub comments: GroupComments<Self>,
+    #[liberty(comments)]
+    comments: GroupComments,
+    #[liberty(extra_ctx)]
+    pub extra_ctx: C::Other,
     #[liberty(complex)]
-    values: Vec<f64>,
-    #[liberty(simple(type = Option))]
-    t1: Option<TimingType>,
-    #[liberty(simple(type = Option))]
-    t2: Option<TimingType>,
+    #[default = vec![0.0]]
+    pub values: Vec<f64>,
   }"#;
   let ast: &syn::DeriveInput = &parse_str(input).unwrap();
   let out = inner(ast).unwrap_or_else(|err| err.to_compile_error());

@@ -109,7 +109,7 @@ cargo bench --bench dev
   + only do comparsion after tag new version
   + fast regression self in build.yml
 + Other:
-  + BDD use ArcStr
+  + BDD use LibertyStr
   + Linked Group
   + like IndexMap, only sort once and store
   + bitcode support

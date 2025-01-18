@@ -4,7 +4,7 @@ use crate::{
   expression::LogicBooleanExpression,
   pin::{Direction, NextstateType},
   timing::Timing,
-  ArcStr, Ctx,
+  LibertyStr, Ctx,
 };
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
@@ -37,7 +37,7 @@ pub struct Bundle<C: Ctx> {
   pub attributes: Attributes,
   #[size = 24]
   #[liberty(complex)]
-  pub members: Vec<ArcStr>,
+  pub members: Vec<LibertyStr>,
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub direction: Option<Direction>,

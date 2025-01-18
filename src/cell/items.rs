@@ -10,7 +10,7 @@ use crate::{
   expression::{logic, LogicBooleanExpression, PowerGroundBooleanExpression},
   pin::Direction,
   timing::items::Mode,
-  ArcStr, Ctx,
+  Ctx, LibertyStr,
 };
 use core::{
   fmt::{self, Write},
@@ -30,10 +30,10 @@ use core::{
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LeakagePower<C: Ctx> {
-  #[id(borrow = "&[ArcStr]", with_ref = false)]
+  #[id(borrow = "&[LibertyStr]", with_ref = false)]
   #[size = 24]
   #[liberty(name)]
-  pub name: Vec<ArcStr>,
+  pub name: Vec<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -48,7 +48,7 @@ pub struct LeakagePower<C: Ctx> {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub power_level: Option<ArcStr>,
+  pub power_level: Option<LibertyStr>,
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
     check_fn = "crate::common::items::namelist_borrow",
@@ -160,14 +160,14 @@ mod test_sort {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Statetable<C: Ctx> {
-  #[id(borrow = "&[ArcStr]", with_ref = false)]
+  #[id(borrow = "&[LibertyStr]", with_ref = false)]
   #[size = 24]
   #[liberty(name)]
-  pub input_nodes: Vec<ArcStr>,
-  #[id(borrow = "&[ArcStr]", with_ref = false)]
+  pub input_nodes: Vec<LibertyStr>,
+  #[id(borrow = "&[LibertyStr]", with_ref = false)]
   #[size = 24]
   #[liberty(name)]
-  pub internal_nodes: Vec<ArcStr>,
+  pub internal_nodes: Vec<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -199,9 +199,9 @@ impl<C: Ctx> NamedGroup for Statetable<C> {
             Err(crate::ast::IdError::Other("Unkown pop error".into())),
             |var1| {
               builder.input_nodes =
-                var1.split_ascii_whitespace().map(ArcStr::from).collect();
+                var1.split_ascii_whitespace().map(LibertyStr::from).collect();
               builder.internal_nodes =
-                var2.split_ascii_whitespace().map(ArcStr::from).collect();
+                var2.split_ascii_whitespace().map(LibertyStr::from).collect();
               Ok(())
             },
           )
@@ -234,7 +234,7 @@ impl<C: Ctx> NamedGroup for Statetable<C> {
 #[derive(Default, Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Table {
-  pub v: Vec<ArcStr>,
+  pub v: Vec<LibertyStr>,
 }
 
 impl fmt::Display for Table {
@@ -263,7 +263,7 @@ impl FromStr for Table {
           if _l.is_empty() {
             None
           } else {
-            Some(ArcStr::from(_l))
+            Some(LibertyStr::from(_l))
           }
         })
         .collect(),
@@ -281,7 +281,7 @@ impl SimpleAttri for Table {
     let (input, simple_multi) = crate::ast::parser::simple_multi(i, &mut scope.line_num)?;
     simple_multi
       .parse()
-      .map_or(Ok((input, Err(ArcStr::from(simple_multi)))), |s| Ok((input, Ok(s))))
+      .map_or(Ok((input, Err(LibertyStr::from(simple_multi)))), |s| Ok((input, Ok(s))))
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -357,7 +357,7 @@ pub struct PgPin<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  name: ArcStr,
+  name: LibertyStr,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -389,7 +389,7 @@ pub struct PgPin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple)]
-  pub voltage_name: ArcStr,
+  pub voltage_name: LibertyStr,
   /// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
   /// The `pg_type`  attribute also supports back-bias modeling.
   /// The `pg_type`  attribute can have the following values:
@@ -417,19 +417,19 @@ pub struct PgPin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple)]
-  pub user_pg_type: ArcStr,
+  pub user_pg_type: LibertyStr,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple)]
-  pub physical_connection: ArcStr,
+  pub physical_connection: LibertyStr,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple)]
-  pub related_bias_pin: ArcStr,
+  pub related_bias_pin: LibertyStr,
   /// The `std_cell_main_rail`  Boolean attribute is defined in a `primary_power`
   /// power pin. When the attribute is set to true, the power and ground pin
   /// is used to determine which side of the voltage boundary
@@ -489,7 +489,7 @@ pub struct DynamicCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -558,7 +558,7 @@ pub struct SwitchingGroup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -749,7 +749,7 @@ pub struct PgCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -877,7 +877,7 @@ impl<C: Ctx> GroupFn for PgCurrent<C> {}
 pub struct IntrinsicParasitic<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -910,7 +910,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// ">Reference</a>
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[liberty(simple(type = Option))]
-  pub reference_pg_pin: Option<ArcStr>,
+  pub reference_pg_pin: Option<LibertyStr>,
   /// The `mode` attribute pertains to an individual `cell`. The cell is active when the `mode` attribute
   /// is instantiated with a name and a value. You can specify multiple instances of this attribute.
   /// However, specify only one instance for each `cell`.
@@ -926,7 +926,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.11&end=178.18
   /// ">Reference</a>
   #[liberty(complex(type = Option))]
-  pub mode: Option<[ArcStr; 2]>,
+  pub mode: Option<[LibertyStr; 2]>,
   /// Use this group to specify the intrinsic capacitance of a `cell`.
   /// Syntax
   /// ``` text
@@ -1068,7 +1068,7 @@ impl<C: Ctx> GroupFn for IntrinsicParasitic<C> {}
 pub struct IntrinsicCapacitance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1101,7 +1101,7 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   /// ">Reference</a>
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[liberty(simple(type = Option))]
-  pub reference_pg_pin: Option<ArcStr>,
+  pub reference_pg_pin: Option<LibertyStr>,
   /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
   /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
   /// tables, define the lut_values group. You can add the `lut_values` group to both the
@@ -1179,7 +1179,7 @@ impl<C: Ctx> GroupFn for IntrinsicCapacitance<C> {}
 pub struct IntrinsicResistance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1197,7 +1197,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=181.9&end=181.10
   /// ">Reference</a>
   #[liberty(simple)]
-  #[default = "f64::INFINITY"]
+  #[liberty(default = f64::INFINITY)]
   pub value: f64,
   /// Use this attribute to specify the output pin.
   /// Syntax
@@ -1214,7 +1214,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// ">Reference</a>
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[liberty(simple(type = Option))]
-  pub related_output: Option<ArcStr>,
+  pub related_output: Option<LibertyStr>,
   /// The `reference_pg_pin` attribute specifies the reference pin for the
   /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
   /// be a valid PG pin.
@@ -1228,7 +1228,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// ">Reference</a>
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[liberty(simple(type = Option))]
-  pub reference_pg_pin: Option<ArcStr>,
+  pub reference_pg_pin: Option<LibertyStr>,
   /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
   /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
   /// tables, define the lut_values group. You can add the `lut_values` group to both the
@@ -1311,7 +1311,7 @@ pub struct PgPinWithValue<C: Ctx> {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pg_pin_name: Option<ArcStr>,
+  pg_pin_name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1375,7 +1375,7 @@ pub struct GateLeakage<C: Ctx> {
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  input_pin_name: Option<ArcStr>,
+  input_pin_name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1457,7 +1457,7 @@ impl<C: Ctx> GroupFn for GateLeakage<C> {}
 pub struct LeakageCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1502,7 +1502,7 @@ pub struct LeakageCurrent<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.11&end=178.18
   /// ">Reference</a>
   #[liberty(complex(type = Option))]
-  pub mode: Option<[ArcStr; 2]>,
+  pub mode: Option<[LibertyStr; 2]>,
   /// Use this group to specify a power or ground pin where leakage current is to be measured.
   ///
   /// Syntax
@@ -1615,7 +1615,7 @@ impl<C: Ctx> GroupFn for LeakageCurrent<C> {}
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LutValues<C: Ctx> {
   #[liberty(name)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
@@ -1815,7 +1815,7 @@ pub enum ClockGatingIntegratedCell {
   LatchlatchNegedgePrecontrol,
   LatchnonePosedgeControlObs,
   /// by accessing the state tables and state functions of the library cell pins
-  Generic(ArcStr),
+  Generic(LibertyStr),
 }
 impl FromStr for ClockGatingIntegratedCell {
   type Err = ();

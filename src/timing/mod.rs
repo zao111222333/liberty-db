@@ -19,7 +19,7 @@ use crate::{
     },
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
-  ArcStr, Ctx,
+  LibertyStr, Ctx,
 };
 pub use items::*;
 
@@ -53,7 +53,7 @@ pub use items::*;
 pub struct Timing<C: Ctx> {
   #[size = 24]
   #[liberty(name)]
-  pub name: Vec<ArcStr>,
+  pub name: Vec<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -228,7 +228,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub fpga_domain_style: Option<ArcStr>,
+  pub fpga_domain_style: Option<LibertyStr>,
   /// Use pairs of `interdependence_id` attributes to identify interdependent pairs
   /// of `setup` and `hold` constraint tables. Interdependence data is supported
   /// in conditional constraint checking, the `interdependence_id` attribute increases

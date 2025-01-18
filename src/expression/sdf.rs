@@ -1,6 +1,6 @@
 use crate::{
   ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri},
-  ArcStr,
+  LibertyStr,
 };
 use core::fmt::{self, Write};
 
@@ -30,7 +30,7 @@ use core::fmt::{self, Write};
 #[derive(Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SdfExpression {
-  inner: ArcStr,
+  inner: LibertyStr,
 }
 impl fmt::Display for SdfExpression {
   #[inline]
@@ -42,7 +42,7 @@ impl core::str::FromStr for SdfExpression {
   type Err = core::convert::Infallible;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self { inner: ArcStr::from_str(s)? })
+    Ok(Self { inner: LibertyStr::from_str(s)? })
   }
 }
 crate::ast::impl_self_builder!(SdfExpression);
@@ -65,7 +65,7 @@ impl SimpleAttri for SdfExpression {
 impl SdfExpression {
   #[must_use]
   #[inline]
-  pub const fn new(s: ArcStr) -> Self {
+  pub const fn new(s: LibertyStr) -> Self {
     Self { inner: s }
   }
 }

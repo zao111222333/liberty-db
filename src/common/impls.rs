@@ -6,7 +6,7 @@ use crate::{
     self, is_word, join_fmt_no_quote, CodeFormatter, ComplexAttri, ComplexParseError,
     ComplexParseRes, IdError, Indentation, NameAttri, ParseScope, SimpleAttri,
   },
-  ArcStr,
+  LibertyStr,
 };
 use core::{
   fmt::{self, Write},
@@ -68,14 +68,14 @@ impl SimpleAttri for isize {
   }
 }
 
-impl NameAttri for Option<ArcStr> {
+impl NameAttri for Option<LibertyStr> {
   #[inline]
   fn parse(mut v: Vec<&str>) -> Result<Self, IdError> {
     let l = v.len();
     if l > 1 {
       Err(IdError::length_dismatch(1, l, v))
     } else {
-      Ok(v.pop().map(ArcStr::from))
+      Ok(v.pop().map(LibertyStr::from))
     }
   }
   #[inline]
@@ -93,7 +93,7 @@ impl NameAttri for Option<ArcStr> {
   }
 }
 
-impl NameAttri for ArcStr {
+impl NameAttri for LibertyStr {
   #[inline]
   fn parse(mut v: Vec<&str>) -> Result<Self, IdError> {
     let l = v.len();
@@ -123,7 +123,7 @@ impl NameAttri for NameList {
       0 => Err(IdError::length_dismatch(1, 0, v)),
       #[expect(clippy::indexing_slicing)]
       1 => Ok(Self::Name(v[0].into())),
-      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(ArcStr::from).collect() })),
+      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(LibertyStr::from).collect() })),
     }
   }
   #[inline]
@@ -141,12 +141,12 @@ impl FromStr for NameList {
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     let mut v: Vec<_> = s
       .split(' ')
-      .filter_map(|_s| if _s.is_empty() { None } else { Some(ArcStr::from(_s)) })
+      .filter_map(|_s| if _s.is_empty() { None } else { Some(LibertyStr::from(_s)) })
       .collect();
     match v.len() {
       0 => Err(()),
       1 => Ok(Self::Name(v.pop().unwrap())),
-      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(ArcStr::from).collect() })),
+      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(LibertyStr::from).collect() })),
     }
   }
 }
@@ -210,10 +210,10 @@ impl fmt::Display for NameList {
   }
 }
 
-impl NameAttri for Vec<ArcStr> {
+impl NameAttri for Vec<LibertyStr> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, IdError> {
-    Ok(v.into_iter().map(ArcStr::from).collect())
+    Ok(v.into_iter().map(LibertyStr::from).collect())
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -228,13 +228,13 @@ impl NameAttri for Vec<ArcStr> {
     )
   }
 }
-impl<const N: usize> NameAttri for [ArcStr; N] {
+impl<const N: usize> NameAttri for [LibertyStr; N] {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, IdError> {
     let l = v.len();
     if l == N {
-      match TryInto::<[ArcStr; N]>::try_into(
-        v.into_iter().map(ArcStr::from).collect::<Vec<ArcStr>>(),
+      match TryInto::<[LibertyStr; N]>::try_into(
+        v.into_iter().map(LibertyStr::from).collect::<Vec<LibertyStr>>(),
       ) {
         Ok(name) => Ok(name),
         Err(e) => Err(IdError::Other(format!("try_into error: {e:?}"))),
@@ -256,8 +256,8 @@ impl<const N: usize> NameAttri for [ArcStr; N] {
     )
   }
 }
-crate::ast::impl_self_builder!(ArcStr);
-impl SimpleAttri for ArcStr {
+crate::ast::impl_self_builder!(LibertyStr);
+impl SimpleAttri for LibertyStr {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str(i, scope)
@@ -278,22 +278,22 @@ impl SimpleAttri for ArcStr {
     }
   }
 }
-impl<const N: usize> ast::ParsingBuilder for [ArcStr; N] {
+impl<const N: usize> ast::ParsingBuilder for [LibertyStr; N] {
   type Builder = Self;
   #[inline]
   fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope) -> Self {
     builder
   }
 }
-impl<const N: usize> ComplexAttri for [ArcStr; N] {
+impl<const N: usize> ComplexAttri for [LibertyStr; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let v = iter.map(|&s| ArcStr::from(s)).collect::<Vec<ArcStr>>();
+    let v = iter.map(|&s| LibertyStr::from(s)).collect::<Vec<LibertyStr>>();
     if v.len() == N {
-      TryInto::<[ArcStr; N]>::try_into(v).map_or(Err(ComplexParseError::Other), Ok)
+      TryInto::<[LibertyStr; N]>::try_into(v).map_or(Err(ComplexParseError::Other), Ok)
     } else {
       Err(ComplexParseError::LengthDismatch)
     }
@@ -401,7 +401,7 @@ impl ComplexAttri for Vec<f64> {
     ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(*float), ", ")
   }
 }
-impl ComplexAttri for ArcStr {
+impl ComplexAttri for LibertyStr {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -453,14 +453,14 @@ impl ComplexAttri for f64 {
     f.write_float(*self)
   }
 }
-crate::ast::impl_self_builder!(Vec<ArcStr>);
-impl ComplexAttri for Vec<ArcStr> {
+crate::ast::impl_self_builder!(Vec<LibertyStr>);
+impl ComplexAttri for Vec<LibertyStr> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    Ok(iter.map(|&s| ArcStr::from(s)).collect())
+    Ok(iter.map(|&s| LibertyStr::from(s)).collect())
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -503,8 +503,8 @@ impl ComplexAttri for Vec<usize> {
     join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_int(*i), ", ")
   }
 }
-crate::ast::impl_self_builder!((f64, f64, ArcStr));
-impl ComplexAttri for (f64, f64, ArcStr) {
+crate::ast::impl_self_builder!((f64, f64, LibertyStr));
+impl ComplexAttri for (f64, f64, LibertyStr) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -519,8 +519,8 @@ impl ComplexAttri for (f64, f64, ArcStr) {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v3: ArcStr = match i.next() {
-      Some(&s) => ArcStr::from(s),
+    let v3: LibertyStr = match i.next() {
+      Some(&s) => LibertyStr::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if i.next().is_some() {
@@ -615,7 +615,7 @@ impl SimpleAttri for Formula {
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     #[inline]
     fn f(i: &str) -> nom::IResult<&str, Formula, nom::error::Error<&str>> {
-      nom::combinator::map(ast::parser::formula, |s| Formula(ArcStr::from(s)))(i)
+      nom::combinator::map(ast::parser::formula, |s| Formula(LibertyStr::from(s)))(i)
     }
     ast::parser::simple_custom(i, &mut scope.line_num, f)
   }

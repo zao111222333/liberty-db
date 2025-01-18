@@ -11,7 +11,7 @@ use crate::{
   },
   cell::Cell,
   common::table::{CompactLutTemplate, DriverWaveform, TableTemple},
-  units, ArcStr, Ctx,
+  units, Ctx, LibertyStr,
 };
 use core::fmt::{self, Write as _};
 pub use items::*;
@@ -35,8 +35,8 @@ pub struct Library<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  #[default = "arcstr::literal!(\"undefined\")"]
-  pub name: ArcStr,
+  #[liberty(default = arcstr::literal!("undefined").into())]
+  pub name: LibertyStr,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -57,8 +57,8 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(complex)]
-  #[default = "arcstr::literal!(\"cmos\")"]
-  pub technology: ArcStr,
+  #[liberty(default = arcstr::literal!("cmos").into())]
+  pub technology: LibertyStr,
   /// Use the `delay_model`  attribute to specify which delay model
   /// to use in the delay calculations.
   /// The `delay_model`  attribute must be the first attribute in the library
@@ -76,7 +76,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub date: ArcStr,
+  pub date: LibertyStr,
   /// You use the `comment`  attribute to include copyright
   /// or other product information in the library report. You can include only one comment line in a library
   /// <a name ="reference_link" href="
@@ -84,14 +84,14 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub comment: Option<ArcStr>,
+  pub comment: Option<LibertyStr>,
   /// The optional `revision`  attribute defines a revision number for your library.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=30.17&end=30.18
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub revision: Option<ArcStr>,
+  pub revision: Option<LibertyStr>,
   /// Used in TSMC PDK
   #[size = 1]
   #[liberty(simple(type = Option))]
@@ -140,14 +140,14 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub default_operating_conditions: Option<ArcStr>,
+  pub default_operating_conditions: Option<LibertyStr>,
   /// The optional `default_threshold_voltage_group`  attribute specifies a cell’s category based on its threshold voltage characteristics
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=23.20&end=23.21
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub default_threshold_voltage_group: Option<ArcStr>,
+  pub default_threshold_voltage_group: Option<LibertyStr>,
   /// Use this attribute to define new, temporary, or user-defined attributes
   /// for use in symbol and technology libraries.
   /// You can use either a space or a comma to separate the arguments.
@@ -198,7 +198,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub library_features: Vec<ArcStr>,
+  pub library_features: Vec<LibertyStr>,
   /// Used in TSMC library
   #[size = 16]
   #[liberty(simple(type = Option))]
@@ -216,7 +216,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub default_connection_class: Option<ArcStr>,
+  pub default_connection_class: Option<LibertyStr>,
   /// Fanout load of input pins
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.10&end=34.11
@@ -286,7 +286,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub default_wire_load_mode: Option<ArcStr>,
+  pub default_wire_load_mode: Option<LibertyStr>,
   /// Wire load resistance
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=34.42&end=34.43
@@ -300,7 +300,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub default_wire_load_selection: Option<ArcStr>,
+  pub default_wire_load_selection: Option<LibertyStr>,
   /// The `em_temp_degradation_factor` attribute specifies the electromigration exponential
   /// degradation factor.
   ///
@@ -410,7 +410,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "80.0"]
+  #[liberty(default = 80.0)]
   pub slew_upper_threshold_pct_rise: f64,
   /// Use the `slew_lower_threshold_pct_rise`  attribute to set the default lower threshold point
   /// that is used to model the delay of a pin rising from 0 to 1.
@@ -423,7 +423,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "20.0"]
+  #[liberty(default = 20.0)]
   pub slew_lower_threshold_pct_rise: f64,
   /// Use the `slew_derate_from_library`  attribute to specify how the transition times need to be derated to match the transition times between the characterization trip points
   ///
@@ -433,7 +433,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "1.0"]
+  #[liberty(default = 1.0)]
   pub slew_derate_from_library: f64,
   /// Use the `slew_lower_threshold_pct_fall`  attribute to set the default lower threshold point
   /// that is used to model the delay of a pin falling from 1 to 0.
@@ -446,7 +446,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "20.0"]
+  #[liberty(default = 20.0)]
   pub slew_lower_threshold_pct_fall: f64,
   /// Use the `slew_upper_threshold_pct_fall`  attribute to set the default upper threshold point
   /// that is used to model the delay of a pin falling from 1 to 0.
@@ -459,7 +459,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "80.0"]
+  #[liberty(default = 80.0)]
   pub slew_upper_threshold_pct_fall: f64,
   /// Use the `input_threshold_pct_fall`  attribute to set the default threshold point
   /// on an input pin signal falling from 1 to 0.
@@ -472,7 +472,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "50.0"]
+  #[liberty(default = 50.0)]
   pub input_threshold_pct_fall: f64,
   /// Use the `input_threshold_pct_rise`  attribute to set the default threshold point
   /// on an input pin signal rising from 0 to 1.
@@ -485,7 +485,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "50.0"]
+  #[liberty(default = 50.0)]
   pub input_threshold_pct_rise: f64,
   /// Use the `output_threshold_pct_rise`  attribute to set the value
   /// of the threshold point on an output pin signal rising from 0 to 1.
@@ -497,7 +497,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "50.0"]
+  #[liberty(default = 50.0)]
   pub output_threshold_pct_rise: f64,
   /// Use the `output_threshold_pct_fall`  attribute to set the value of the threshold point
   /// on an output pin signal falling from 1 to 0.
@@ -509,7 +509,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  #[default = "50.0"]
+  #[liberty(default = 50.0)]
   pub output_threshold_pct_fall: f64,
   /// The `is_soi`  attribute specifies that the cell is a
   /// silicon-on-insulator (SOI) cell.
@@ -639,12 +639,12 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub default_wire_load: Option<ArcStr>,
+  pub default_wire_load: Option<LibertyStr>,
   /// Used in TSMC library
   /// valid: `match_footprint`?
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub in_place_swap_mode: Option<ArcStr>,
+  pub in_place_swap_mode: Option<LibertyStr>,
   /// You can define one or more `fpga_isd`  groups at the library level
   /// to specify the drive current, I/O voltages, and slew rates for FPGA parts and cells
   ///
@@ -667,7 +667,7 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub default_fpga_isd: Option<ArcStr>,
+  pub default_fpga_isd: Option<LibertyStr>,
   /// The `sensitization` group defined at the library level describes
   /// the complete state patterns for a specific list of pins (defined by the `pin_names` attribute)
   /// that are referenced and instantiated as stimuli in the timing arc.
