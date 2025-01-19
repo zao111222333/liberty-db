@@ -1,3 +1,4 @@
+#![expect(unused_imports)]
 use crate::{ProjInfo, ProjLibrary, TypedSupport};
 use criterion::black_box;
 use std::{
@@ -52,6 +53,25 @@ impl ProjLibrary for liberty_db_latest::Library<liberty_db_latest::DefaultCtx> {
     typed_support: TypedSupport::AllTyped,
     parsed_boolexpr: true,
     other: "current version",
+  };
+  fn parse(s: &str) -> Result<Self, ()> {
+    Self::parse_lib(s).map_err(|_| ())
+  }
+  fn write(&self) -> Result<(), ()> {
+    _ = black_box(self.to_string());
+    Ok(())
+  }
+}
+
+impl ProjLibrary for liberty_db_0p8p3::Library<liberty_db_0p8p3::DefaultCtx> {
+  const INFO: ProjInfo = ProjInfo {
+    name: "liberty-db",
+    url: "https://crates.io/crates/liberty-db",
+    lang: "rust",
+    version: "0.8.3",
+    typed_support: TypedSupport::AllTyped,
+    parsed_boolexpr: true,
+    other: "published at 2024-12-01",
   };
   fn parse(s: &str) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
@@ -245,13 +265,18 @@ impl ProjLibrary for libertyparse::Liberty {
     Self::parse_str(s).map_err(|_| ())
   }
 }
+
+#[cfg(target_os = "linux")]
 #[derive(Debug, Clone, Copy)]
+#[cfg(target_os = "linux")]
 pub struct OpenTimerLibrary(*mut c_void);
+#[cfg(target_os = "linux")]
 extern "C" {
   fn ot_parse_lib(s: *const c_char) -> *mut c_void;
   fn ot_write_lib(ptr: *mut c_void, debug: c_int);
   fn ot_drop_lib(ptr: *mut c_void);
 }
+#[cfg(target_os = "linux")]
 impl ProjLibrary for OpenTimerLibrary {
   const INFO: ProjInfo = ProjInfo {
       name: "OpenTimer",
@@ -276,13 +301,17 @@ impl ProjLibrary for OpenTimerLibrary {
   }
 }
 
+#[cfg(target_os = "linux")]
 #[derive(Debug, Clone, Copy)]
+#[cfg(target_os = "linux")]
 pub struct Si2drLibertyLibrary(*mut c_void);
+#[cfg(target_os = "linux")]
 extern "C" {
   fn si2dr_liberty_parse_lib(s: *const c_char) -> *mut c_void;
   fn si2dr_liberty_write_lib(ptr: *mut c_void, debug: c_int);
   fn si2dr_liberty_drop_lib(ptr: *mut c_void);
 }
+#[cfg(target_os = "linux")]
 impl ProjLibrary for Si2drLibertyLibrary {
   const INFO: ProjInfo = ProjInfo {
     name: "si2dr_liberty",

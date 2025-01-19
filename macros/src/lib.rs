@@ -9,9 +9,9 @@ mod group;
 /// #[liberty(undefined)]
 /// // GroupComments
 /// #[liberty(comments)]
-/// // Auto vector Id: Vec<ArcStr>
+/// // Auto vector Id: Vec<LibertyStr>
 /// #[liberty(id(title=0))]
-/// // Auto slice Id: [ArcStr:2]
+/// // Auto slice Id: [LibertyStr:2]
 /// #[liberty(id(title=2))]
 /// // GroupId
 /// #[liberty(id)]
@@ -36,14 +36,14 @@ mod group;
 /// // Complex group attribute, Vec
 /// #[liberty(group(type=Vec))]
 /// ```
-#[proc_macro_derive(Group, attributes(liberty, default))]
+#[proc_macro_derive(Group, attributes(liberty))]
 pub fn macro_group(input: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(input as DeriveInput);
   let toks = group::inner(&ast).unwrap_or_else(|err| err.to_compile_error());
   toks.into()
 }
 
-#[proc_macro_derive(Nothing, attributes(liberty, default))]
+#[proc_macro_derive(Nothing, attributes(liberty))]
 pub fn macro_nothing(_: TokenStream) -> TokenStream {
   quote::quote!().into()
 }

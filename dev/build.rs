@@ -1,3 +1,4 @@
+#![expect(unused_imports, dead_code)]
 use std::{
   env, fs,
   path::{Path, PathBuf},
@@ -19,7 +20,7 @@ fn cpp_files(search_paths: &[PathBuf]) -> Vec<String> {
     })
     .collect()
 }
-
+#[cfg(target_os = "linux")]
 fn main() {
   let binding = env::var("OUT_DIR").unwrap();
   let out_dir = Path::new(&binding);
@@ -73,3 +74,6 @@ fn main() {
   println!("cargo:rustc-link-search=native={}", out_dir.display());
   println!("cargo:rustc-link-lib=dylib=projs");
 }
+
+#[cfg(not(target_os = "linux"))]
+fn main() {}

@@ -2,7 +2,7 @@ use core::fmt::Debug;
 use std::collections::HashMap;
 
 use proc_macro2::Ident;
-use syn::{spanned::Spanned, Type};
+use syn::{parse::ParseStream, spanned::Spanned, Expr, Token, Type};
 
 #[derive(Debug, Clone, Copy)]
 enum InternalType {
@@ -67,7 +67,7 @@ pub(crate) fn parse_fields_type(
   // attri map
   HashMap<&Ident, (AttriType, Option<usize>)>,
   // default map
-  HashMap<&Ident, proc_macro2::TokenStream>,
+  HashMap<&Ident, Expr>,
   // Name
   Vec<&syn::Field>,
   // attributes name
@@ -181,13 +181,13 @@ pub(crate) fn parse_fields_type(
 /// #[liberty(attributes)]
 /// // GroupComments
 /// #[liberty(comments)]
-/// // Auto vector Id: Vec<ArcStr>
+/// // Auto vector Id: Vec<LibertyStr>
 /// #[liberty(id(title=0))]
-/// // Auto Id: Option<ArcStr>
+/// // Auto Id: Option<LibertyStr>
 /// #[liberty(id(title=0.5))]
-/// // Auto Id: ArcStr
+/// // Auto Id: LibertyStr
 /// #[liberty(id(title=1))]
-/// // Auto slice Id: [ArcStr:2]
+/// // Auto slice Id: [LibertyStr:2]
 /// #[liberty(id(title=2))]
 /// // GroupId
 /// #[liberty(id)]
@@ -248,6 +248,9 @@ fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Field
                   parse_supergroup_type(tokens)?,
                 ))));
               }
+              "default" => {
+                continue;
+              }
               _ => {
                 return Err(syn::Error::new(
                   proc_macro2::Span::call_site(),
@@ -292,27 +295,30 @@ fn parse_field_pos(field_attrs: &[syn::Attribute]) -> syn::Result<Option<usize>>
   }
   Ok(None)
 }
-fn parse_field_default(
-  field_attrs: &[syn::Attribute],
-) -> syn::Result<Option<proc_macro2::TokenStream>> {
+fn parse_field_default(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Expr>> {
   for attr in field_attrs {
-    if attr.path().is_ident("default") {
-      match &attr.meta {
-        syn::Meta::List(_) | syn::Meta::Path(_) => {
-          return Err(syn::Error::new(attr.meta.span(), "expected #[default = \"123\" ]"))
+    if attr.path().is_ident("liberty") {
+      let res = attr.parse_args_with(|input: ParseStream| {
+        let mut default_expr = None;
+        if input.is_empty() {
+          return Ok(default_expr);
         }
-        syn::Meta::NameValue(s) => {
-          if let syn::Expr::Lit(expr_lit) = &s.value {
-            if let syn::Lit::Str(lit_str) = &expr_lit.lit {
-              return Ok(Some(syn::parse_str(&lit_str.value())?));
-            }
-          }
-          return Err(syn::Error::new(
-            attr.meta.span(),
-            "Expected String literal, #[default = \"123\" ]",
-          ));
+        let key: Ident = input.parse()?;
+
+        if key == "default" {
+          let _eq: Token![=] = input.parse()?;
+          let expr: Expr = input.parse()?;
+
+          default_expr = Some(expr);
         }
-      };
+        while !input.is_empty() {
+          _ = input.parse::<proc_macro2::TokenStream>()?;
+        }
+        Ok(default_expr)
+      });
+      if let Ok(Some(expr)) = res {
+        return Ok(Some(expr));
+      }
     }
   }
   Ok(None)
@@ -509,12 +515,14 @@ fn parse_group_type(
 
 #[test]
 fn size_type_test() {
+  use quote::ToTokens as _;
   // let attr: Attribute = parse_quote!(#[id]);
-  // let attr: Attribute = parse_quote!(#[id(borrow="&[ArcStr]")] );
-  let attr: syn::Attribute =
-    syn::parse_quote!(#[default = "arcstr::literal!(\"undefined\")"]);
-  let s = dbg!(parse_field_default(&[attr])).unwrap().unwrap();
-  println!("{s}");
+  // let attr: Attribute = parse_quote!(#[id(borrow="&[LibertyStr]")] );
+  let attr: Vec<syn::Attribute> = syn::parse_quote!(
+    #[liberty(group(type = Set))]
+    #[liberty(default = vec![0.0])]);
+  let s = parse_field_default(&attr).unwrap().unwrap();
+  println!("{}", s.to_token_stream());
   // let t: proc_macro2::TokenStream = syn::parse_str(&s).unwrap();
   // println!("{t:?}");
 }

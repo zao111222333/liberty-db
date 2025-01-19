@@ -7,9 +7,12 @@ use crate::{
   ast::{
     CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope, SimpleAttri,
   },
-  common::parse_f64,
+  common::{f64_into_hash_ord_fn, parse_f64},
 };
-use core::fmt::{self, Write};
+use core::{
+  cmp::Ordering,
+  fmt::{self, Write},
+};
 
 /// Valid values are 1ps, 10ps, 100ps, and 1ns. The default is 1ns.
 ///
@@ -19,8 +22,8 @@ use core::fmt::{self, Write};
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug, Default, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimeUnit {
   /// 1ps, 1e-12
@@ -69,8 +72,8 @@ impl SimpleAttri for TimeUnit {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug, Default, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VoltageUnit {
   /// 1mV, 1e-3
@@ -120,8 +123,8 @@ impl SimpleAttri for VoltageUnit {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum CurrentUnit {
   /// 1uA, 1e-6
@@ -182,8 +185,8 @@ impl SimpleAttri for CurrentUnit {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PullingResistanceUnit {
   /// 1ohm, 1
@@ -234,7 +237,7 @@ impl SimpleAttri for PullingResistanceUnit {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CapacitiveLoadUnit {
   /// `ff`: `true`
@@ -244,7 +247,39 @@ pub struct CapacitiveLoadUnit {
   pub val: f64,
 }
 
+impl Default for CapacitiveLoadUnit {
+  #[inline]
+  fn default() -> Self {
+    Self::_1pf
+  }
+}
+
+impl PartialEq for CapacitiveLoadUnit {
+  #[inline]
+  fn eq(&self, other: &Self) -> bool {
+    f64_into_hash_ord_fn(&self.value()) == f64_into_hash_ord_fn(&other.value())
+  }
+}
+
+impl Eq for CapacitiveLoadUnit {}
+
+impl PartialOrd for CapacitiveLoadUnit {
+  #[inline]
+  fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+    Some(self.cmp(other))
+  }
+}
+
+impl Ord for CapacitiveLoadUnit {
+  #[inline]
+  fn cmp(&self, other: &Self) -> Ordering {
+    f64_into_hash_ord_fn(&self.value()).cmp(&f64_into_hash_ord_fn(&other.value()))
+  }
+}
+
 impl CapacitiveLoadUnit {
+  #[expect(non_upper_case_globals)]
+  pub const _1pf: Self = Self { ff_pf: false, val: 1.0 };
   #[inline]
   #[must_use]
   #[expect(clippy::float_arithmetic)]
@@ -305,8 +340,8 @@ impl ComplexAttri for CapacitiveLoadUnit {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
-#[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LeakagePowerUnit {
   /// 1pW, 1e-12

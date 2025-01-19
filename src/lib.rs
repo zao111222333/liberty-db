@@ -99,6 +99,7 @@
 #![allow(
     // Some explicitly allowed Clippy lints, must have clear reason to allow
     clippy::allow_attributes_without_reason,
+    clippy::default_numeric_fallback,
     clippy::pattern_type_mismatch, // TODO: 
     clippy::too_long_first_doc_paragraph,
     clippy::partial_pub_fields,
@@ -176,7 +177,7 @@
     clippy::or_fun_call,
   )
 )]
-pub use arcstr::{self, ArcStr};
+extern crate alloc;
 pub use biodivine_lib_bdd;
 pub use strum::IntoEnumIterator;
 /// `bus` group structure.
@@ -193,12 +194,16 @@ pub mod internal_power;
 /// `Library` group structure, top level of liberty format.
 pub mod library;
 pub use library::Library;
+pub mod str;
+pub use str::LibertyStr;
 /// `pin` group structure.
 pub mod pin;
 pub use pin::Pin;
 /// `timing` group structure.
 pub mod timing;
 pub use timing::Timing;
+#[cfg(feature = "py")]
+mod py;
 pub mod units;
 
 pub mod ast;
@@ -215,7 +220,7 @@ fn demo() {
   use crate::{DefaultCtx, Library};
   use std::{
     fs::File,
-    io::{BufWriter, Write},
+    io::{BufWriter, Write as _},
   };
   static TEMPLATE: &str = r#"
 library(demo) {
@@ -251,5 +256,5 @@ library(demo) {
   // write library
   let out_file = File::create("demo.lib").unwrap();
   let mut writer = BufWriter::new(out_file);
-  write!(&mut writer, "{}", library).unwrap();
+  write!(&mut writer, "{library}").unwrap();
 }

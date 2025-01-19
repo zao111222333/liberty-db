@@ -8,7 +8,7 @@ use crate::{
   expression::{logic, BooleanExpression, PowerGroundBooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
-  ArcStr, Ctx,
+  Ctx, LibertyStr,
 };
 mod bundle;
 mod items;
@@ -66,10 +66,10 @@ pub struct Pin<C: Ctx> {
   pub attributes: Attributes,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub driver_waveform_rise: Option<ArcStr>,
+  pub driver_waveform_rise: Option<LibertyStr>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub driver_waveform_fall: Option<ArcStr>,
+  pub driver_waveform_fall: Option<LibertyStr>,
   /// The `related_power_pin`  and `related_ground_pin`  attributes
   /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
   /// The `related_power_pin`  and `related_ground_pin` attributes are used
@@ -85,7 +85,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple)]
-  pub related_ground_pin: ArcStr,
+  pub related_ground_pin: LibertyStr,
   /// The `retention_pin` complex attribute identifies the retention pins of a retention cell. The
   /// attribute defines the following information:
   /// + pin class
@@ -128,7 +128,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple)]
-  pub related_power_pin: ArcStr,
+  pub related_power_pin: LibertyStr,
   // NOTICE: Simple Attributes in a pin Group
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -353,7 +353,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub complementary_pin: Option<ArcStr>,
+  pub complementary_pin: Option<LibertyStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -551,7 +551,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub input_signal_level: Option<ArcStr>,
+  pub input_signal_level: Option<LibertyStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -562,7 +562,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub input_voltage: Option<ArcStr>,
+  pub input_voltage: Option<LibertyStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -573,7 +573,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub internal_node: Option<ArcStr>, /* Required in statetable cells */
+  pub internal_node: Option<LibertyStr>, /* Required in statetable cells */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -846,7 +846,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub output_signal_level: Option<ArcStr>,
+  pub output_signal_level: Option<LibertyStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -879,7 +879,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub output_voltage: Option<ArcStr>,
+  pub output_voltage: Option<LibertyStr>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

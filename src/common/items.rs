@@ -2,7 +2,7 @@ use crate::{
   ast::{
     join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
   },
-  ArcStr, Ctx,
+  Ctx, LibertyStr,
 };
 use core::{
   cmp::Ordering,
@@ -130,7 +130,7 @@ pub struct Domain<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub name: ArcStr,
+  pub name: LibertyStr,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -144,7 +144,7 @@ pub struct Domain<C: Ctx> {
   pub attributes: crate::ast::Attributes,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub calc_mode: Option<ArcStr>,
+  pub calc_mode: Option<LibertyStr>,
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub variable_1: Option<VariableType>,
@@ -169,7 +169,7 @@ impl<C: Ctx> GroupFn for Domain<C> {}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WordSet {
-  pub inner: HashSet<ArcStr, crate::ast::RandomState>,
+  pub inner: HashSet<LibertyStr, crate::ast::RandomState>,
 }
 impl fmt::Display for WordSet {
   #[expect(clippy::unwrap_in_result)]
@@ -252,7 +252,7 @@ impl FromStr for WordSet {
     Ok(Self {
       inner: s
         .split(' ')
-        .filter_map(|_s| if _s.is_empty() { None } else { Some(ArcStr::from(_s)) })
+        .filter_map(|_s| if _s.is_empty() { None } else { Some(LibertyStr::from(_s)) })
         .collect(),
     })
   }
@@ -267,7 +267,7 @@ pub struct DummyGroup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<ArcStr>,
+  name: Option<LibertyStr>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -284,7 +284,7 @@ impl<C: Ctx> GroupFn for DummyGroup<C> {}
 
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Formula(pub ArcStr);
+pub struct Formula(pub LibertyStr);
 // type Aaa = mexprp::Expression<f64>;
 
 // /// Recursive type for boolean expression tree.
@@ -292,7 +292,7 @@ pub struct Formula(pub ArcStr);
 // #[derive(Clone, Debug, Eq, PartialEq)]
 // pub enum _Formula {
 //   Float(f64),
-//   Variable(ArcStr),
+//   Variable(LibertyStr),
 //   Neg(Box<_Formula>),
 //   Add(Box<_Formula>, Box<_Formula>),
 //   Sub(Box<_Formula>, Box<_Formula>),
@@ -303,7 +303,7 @@ pub struct Formula(pub ArcStr);
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum NameList {
-  Name(ArcStr),
+  Name(LibertyStr),
   List(WordSet),
 }
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -327,6 +327,6 @@ pub(crate) fn namelist_borrow(id: &NameList) -> RefNameList<'_> {
 impl Default for NameList {
   #[inline]
   fn default() -> Self {
-    Self::Name(ArcStr::new())
+    Self::Name(LibertyStr::new())
   }
 }
