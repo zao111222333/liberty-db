@@ -20,9 +20,9 @@ macro_rules! impl_py_enum {
   ($t:tt) => {
     impl<'py> FromPyObject<'py> for $t {
       #[inline]
-      #[expect(clippy::option_if_let_else)]
+      // #[expect(clippy::option_if_let_else)]
       fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
-        match ob.extract::<std::borrow::Cow<'_, str>>()?.parse() {
+        match ob.extract::<alloc::borrow::Cow<'_, str>>()?.parse() {
           Ok(t) => Ok(t),
           Err(_) => Err(PyValueError::new_err("Matching variant not found")),
         }
@@ -108,8 +108,8 @@ impl<'py> IntoPyObject<'py> for &LibertyStr {
 // Same to https://docs.rs/pyo3/0.23.3/src/pyo3/conversions/std/string.rs.html#252-261
 impl<'py> FromPyObject<'py> for LibertyStr {
   #[inline]
-  fn extract_bound(obj: &Bound<'py, PyAny>) -> PyResult<Self> {
-    obj.downcast::<PyString>()?.to_cow().map(|s| ArcStr::from(s).into())
+  fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+    ob.downcast::<PyString>()?.to_cow().map(|s| ArcStr::from(s).into())
   }
 }
 

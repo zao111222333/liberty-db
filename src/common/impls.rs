@@ -123,7 +123,9 @@ impl NameAttri for NameList {
       0 => Err(IdError::length_dismatch(1, 0, v)),
       #[expect(clippy::indexing_slicing)]
       1 => Ok(Self::Name(v[0].into())),
-      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(LibertyStr::from).collect() })),
+      _ => Ok(Self::List(WordSet {
+        inner: v.into_iter().map(LibertyStr::from).collect(),
+      })),
     }
   }
   #[inline]
@@ -146,7 +148,9 @@ impl FromStr for NameList {
     match v.len() {
       0 => Err(()),
       1 => Ok(Self::Name(v.pop().unwrap())),
-      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(LibertyStr::from).collect() })),
+      _ => Ok(Self::List(WordSet {
+        inner: v.into_iter().map(LibertyStr::from).collect(),
+      })),
     }
   }
 }

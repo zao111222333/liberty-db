@@ -2,7 +2,7 @@ use crate::{
   ast::{
     join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
   },
-  LibertyStr, Ctx,
+  Ctx, LibertyStr,
 };
 use core::{
   cmp::Ordering,

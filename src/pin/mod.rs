@@ -8,7 +8,7 @@ use crate::{
   expression::{logic, BooleanExpression, PowerGroundBooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
-  LibertyStr, Ctx,
+  Ctx, LibertyStr,
 };
 mod bundle;
 mod items;

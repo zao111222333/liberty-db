@@ -13,7 +13,7 @@ use crate::{
     table::{DisplayTableLookUp, DisplayValues, TableLookUp},
   },
   expression::logic,
-  LibertyStr, Ctx,
+  Ctx, LibertyStr,
 };
 
 use itertools::izip;

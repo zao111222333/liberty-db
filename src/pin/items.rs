@@ -4,7 +4,7 @@ use crate::{
     Indentation, ParseScope, SimpleAttri,
   },
   expression::logic::Edge,
-  LibertyStr, Ctx,
+  Ctx, LibertyStr,
 };
 use core::{
   fmt::{self, Write},
