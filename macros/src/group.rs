@@ -223,7 +223,7 @@ fn group_field_fn(
       let ty = extract_generic_param(field_type, "GroupSet")?;
       comment_fn = quote! {};
       write_field = quote! {
-        for complex in self.#field_name.iter_sort(){
+        for complex in self.#field_name.iter(){
           crate::ast::ComplexAttri::fmt_liberty(complex, #s_field_name, f)?;
         }
       };
@@ -250,11 +250,15 @@ fn group_field_fn(
         pub(crate) #field_name: Vec<<#ty as crate::ast::ParsingBuilder>::Builder>,
       };
       build_arm = quote! {
-        #field_name: builder
-          .#field_name
-          .into_iter()
-          .map(|t| crate::ast::ParsingBuilder::build(t, scope))
-          .collect(),
+        #field_name: {
+          let mut map: crate::ast::GroupSet<#ty> = builder
+            .#field_name
+            .into_iter()
+            .map(|t| crate::ast::ParsingBuilder::build(t, scope))
+            .collect();
+          map.sort();
+          map
+        },
       };
     }
     AttriType::Group(GroupType::Vec) => {
@@ -299,7 +303,7 @@ fn group_field_fn(
       let ty = extract_generic_param(field_type, "GroupSet")?;
       comment_fn = quote! {};
       write_field = quote! {
-        for group in self.#field_name.iter_sort(){
+        for group in self.#field_name.iter(){
           crate::ast::fmt_comment_liberty(group.#comment_this_fn(), f)?;
           crate::ast::GroupAttri::fmt_liberty(group, #s_field_name, f)?;
         }
@@ -326,11 +330,15 @@ fn group_field_fn(
         pub(crate) #field_name: Vec<<#ty as crate::ast::ParsingBuilder>::Builder>,
       };
       build_arm = quote! {
-        #field_name: builder
-          .#field_name
-          .into_iter()
-          .map(|t| crate::ast::ParsingBuilder::build(t, scope))
-          .collect(),
+        #field_name: {
+          let mut map: crate::ast::GroupSet<#ty> = builder
+            .#field_name
+            .into_iter()
+            .map(|t| crate::ast::ParsingBuilder::build(t, scope))
+            .collect();
+          map.sort();
+          map
+        },
       };
     }
     AttriType::Group(GroupType::Option) => {

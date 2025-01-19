@@ -11,8 +11,8 @@
 ## Highlight Features
 
 + Support all `liberty` attributes with typed datastructure, rather than syntax tree (AST) only, in the definition of [Liberty Version R-2020.09, September 2020](https://zao111222333.github.io/liberty-db/2020.09/reference_manual.pdf)
-+ Support [`liberty` boolean expression syntax](https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=132.36+132.41&end=132.38+133.13), employ [binary decesion diagram (BDD)](https://github.com/sybila/biodivine-lib-bdd) to [identify (hashing)](https://docs.rs/liberty-db/latest/liberty_db/expression/struct.BddBooleanExpression.html)
-+ Parser & formatter are implemented by static macros, providing a decent preformance and tiny ~3MB `parser & formatter` binary. See [benchmark summary](https://zao111222333.github.io/liberty-db/bench)
++ Support [`liberty` boolean expression syntax](https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=132.36+132.41&end=132.38+133.13), use [binary decesion diagram (BDD)](https://github.com/sybila/biodivine-lib-bdd) to [identify (hashing)](https://docs.rs/liberty-db/latest/liberty_db/expression/struct.BddBooleanExpression.html)
++ Parser & formatter are implemented by static macros, providing a good preformance and tiny ~3MB `parser & formatter` binary. See [benchmark summary](https://zao111222333.github.io/liberty-db/bench)
 + Support generics [user-defined context](https://docs.rs/liberty-db/latest/liberty_db/trait.Ctx.html) for library, cell, and more.
 + Support `define define_group` user-defined attributes
 + Verified with library-complier, well defined [document](https://docs.rs/liberty-db/latest/liberty_db/library/struct.Library.html), and [examples](examples) provided
@@ -23,7 +23,7 @@ This library is implemented in [Rust](https://doc.rust-lang.org/book/ch01-00-get
 
 ```toml
 [dependencies]
-liberty_db = "0.8"
+liberty_db = "0.9"
 ```
 
 One basic demo here:

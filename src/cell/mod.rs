@@ -13,7 +13,7 @@ use crate::{
   common::{items::NameList, table::TableLookUp2D},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
-  LibertyStr, Ctx,
+  Ctx, LibertyStr,
 };
 
 pub trait CellCtx {

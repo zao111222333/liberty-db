@@ -141,7 +141,7 @@ mod test_sort {
       vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       cell
         .leakage_power
-        .iter_sort()
+        .iter()
         .map(|leakage| leakage.value as i8)
         .collect::<Vec<_>>()
     );
