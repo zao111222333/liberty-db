@@ -18,7 +18,7 @@ pub struct Bundle<C: Ctx> {
   /// Name of the pin
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "crate::common::items::namelist_borrow",
+    check_fn = "NameList::as_ref",
     with_ref = false
   )]
   #[size = 48]

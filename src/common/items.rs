@@ -317,11 +317,20 @@ impl<'a> From<&'a str> for RefNameList<'a> {
     Self::Name(value)
   }
 }
-#[inline]
-pub(crate) fn namelist_borrow(id: &NameList) -> RefNameList<'_> {
-  match id {
-    NameList::Name(s) => RefNameList::Name(s.as_str()),
-    NameList::List(word_set) => RefNameList::List(word_set),
+impl NameList {
+  #[inline]
+  pub fn as_ref(&self) -> RefNameList<'_> {
+    match self {
+      Self::Name(s) => RefNameList::Name(s.as_str()),
+      Self::List(word_set) => RefNameList::List(word_set),
+    }
+  }
+  #[inline]
+  pub fn contains(&self, name: &str) -> bool {
+    match self {
+      Self::Name(s) => s.as_str() == name,
+      Self::List(word_set) => word_set.inner.contains(name),
+    }
   }
 }
 impl Default for NameList {

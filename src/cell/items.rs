@@ -51,7 +51,7 @@ pub struct LeakagePower<C: Ctx> {
   pub power_level: Option<LibertyStr>,
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "crate::common::items::namelist_borrow",
+    check_fn = "NameList::as_ref",
     with_ref = false
   )]
   #[size = 64]
@@ -511,7 +511,7 @@ pub struct DynamicCurrent<C: Ctx> {
   pub when: Option<LogicBooleanExpression>,
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "crate::common::items::namelist_borrow",
+    check_fn = "NameList::as_ref",
     with_ref = false
   )]
   #[size = 64]
@@ -519,7 +519,7 @@ pub struct DynamicCurrent<C: Ctx> {
   pub related_inputs: NameList,
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "crate::common::items::namelist_borrow",
+    check_fn = "NameList::as_ref",
     with_ref = false
   )]
   #[size = 64]
