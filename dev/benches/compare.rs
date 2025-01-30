@@ -6,7 +6,7 @@ use std::{
 };
 
 fn main() {
-  dev.no_href();
+  dev::no_href();
   let regress_table = run_bench(
     gen_projs![
       (LibertyDbLatest, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),

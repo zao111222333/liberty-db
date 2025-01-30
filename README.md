@@ -84,6 +84,18 @@ cargo run --example 1_parse_fmt_file -- dev/tech/cases/ocv.lib
 cargo run --example 2_prune_lib -- dev/tech/cases/ocv.lib
 ```
 
+Or you can download the [releases/latest/examples.zip](https://github.com/zao111222333/liberty-db/releases/latest/download/examples_x86_64-unknown-linux-musl.zip), then
+
+``` shell
+cd ./examples_x86_64-unknown-linux-musl
+# example0
+./0_parse_fmt
+# example1
+./1_parse_fmt_file dev/tech/cases/ocv.lib
+# example2
+./2_prune_lib dev/tech/cases/ocv.lib
+```
+
 ## Benchmark
 Basic information as follow, see latest [benchmark summary](https://zao111222333.github.io/liberty-db/bench).
 
