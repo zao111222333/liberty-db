@@ -9,7 +9,10 @@ use itertools::Itertools as _;
 use serde_json::Value;
 use std::{fs::read_to_string, panic, path::Path, time::Duration};
 
-pub static mut HREF: bool = true;
+#[cfg(feature = "compare")]
+pub const COMPARE: bool = true;
+#[cfg(not(feature = "compare"))]
+pub const COMPARE: bool = false;
 
 pub enum TypedSupport {
   AllTyped,
@@ -124,10 +127,10 @@ pub trait Proj {
   fn info(&self) -> ProjInfo;
   fn info_html(&self) -> String {
     let info = self.info();
-    let name = if unsafe { HREF }{
-      format!("<a href=\"{}\">{}</a>",info.url, info.name)
-    }else{
+    let name = if COMPARE {
       format!("{}", info.name)
+    } else {
+      format!("<a href=\"{}\">{}</a>",info.url, info.name)
     };
     format!(
       "<tr><th style=\"text-align:left;padding-left:5px\">{name}</th><th>{}</th><th>{}</th>{}<th>{}</th><th>{}</th></tr>", 
@@ -144,10 +147,10 @@ pub trait Proj {
   }
   fn html(&self) -> String {
     let info = self.info();
-    if unsafe { HREF } {
-      format!("<th><a href=\"{}\">{}</a></th>", info.url, info.name)
-    }else{
+    if COMPARE {
       format!("<th>{}</th>", info.name)
+    } else {
+      format!("<th><a href=\"{}\">{}</a></th>", info.url, info.name)
     }
   }
   fn parse_bench(
@@ -198,14 +201,14 @@ impl BenchResult {
           .to_string()
       }
       Self::Ok { path, run_time, change: _ } => {
-        if unsafe { HREF } {
+        if COMPARE {
           format!(
-            "<td style=\"text-align:right;padding-right:10px;\"><a href=\"./{path}\" style=\"color:MediumSeaGreen;\">{}</a></td>",
+            "<td style=\"text-align:right;padding-right:10px;\"><a style=\"color:MediumSeaGreen;\">{}</a></td>",
             format_duration(run_time)
           )
         } else {
           format!(
-            "<td style=\"text-align:right;padding-right:10px;\"><a style=\"color:MediumSeaGreen;\">{}</a></td>",
+            "<td style=\"text-align:right;padding-right:10px;\"><a href=\"./{path}\" style=\"color:MediumSeaGreen;\">{}</a></td>",
             format_duration(run_time)
           )
         }
@@ -280,7 +283,16 @@ pub fn res_table(
   );
   let mut write_table = parse_table.clone();
   for (file_path, [(parse_path, parse_res), (write_path, write_res)]) in res_list {
-    if unsafe { HREF } {
+    if COMPARE {
+      parse_table += &format!(
+        "<tr>{}<td>{file_path}</td></tr>",
+        parse_res.iter().map(|res| res.html()).join("")
+      );
+      write_table += &format!(
+        "<tr>{}<td>{file_path}</td></tr>",
+        write_res.iter().map(|res| res.html()).join("")
+      );
+    } else {
       parse_table += &format!(
         "<tr>{}<td><a href=\"./{parse_path}/report/\">{file_path}</a></td></tr>",
         parse_res.iter().map(|res| res.html()).join("")
@@ -289,24 +301,11 @@ pub fn res_table(
         "<tr>{}<td><a href=\"./{write_path}/report/\">{file_path}</a></td></tr>",
         write_res.iter().map(|res| res.html()).join("")
       );
-    } else {
-      parse_table += &format!(
-        "<tr>{}<td>{file_path}</td></tr>",
-        parse_res.iter().map(|res| res.html()).join("")
-      );
-      write_table += &format!(
-        "<tr>{}<td>{file_path}</td></tr>",
-        write_res.iter().map(|res| res.html()).join("")
-      );
     }
   }
   parse_table += "</tbody></table>";
   write_table += "</tbody></table>";
   format!("<h3>Parse Performance Comparison</h3>{parse_table}<h3>Write Performance Comparison</h3>{write_table}")
-}
-
-pub fn no_href() {
-  unsafe { HREF = false };
 }
 
 pub fn run_bench(
@@ -321,8 +320,7 @@ pub fn run_bench(
   let res_list = bench_all(&mut criterion, projs.clone(), regression);
   criterion.final_summary();
 
-  let mut info_table =
-    if unsafe { HREF } { info_table(projs.clone()) } else { String::new() };
+  let mut info_table = if COMPARE { String::new() } else { info_table(projs.clone()) };
   let res_table = res_table(res_list, projs, regression);
   info_table += &res_table;
   info_table
