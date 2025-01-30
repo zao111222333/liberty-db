@@ -1,3 +1,4 @@
+#![expect(clippy::arbitrary_source_item_ordering)]
 pub trait Ctx: serde::Serialize + serde::de::DeserializeOwned + Default {
   type Library: core::fmt::Debug
     + Clone
