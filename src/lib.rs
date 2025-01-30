@@ -98,6 +98,7 @@
 )]
 #![allow(
     // Some explicitly allowed Clippy lints, must have clear reason to allow
+    clippy::arbitrary_source_item_ordering,
     clippy::allow_attributes_without_reason,
     clippy::default_numeric_fallback,
     clippy::pattern_type_mismatch, // TODO: 
