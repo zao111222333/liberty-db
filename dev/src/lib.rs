@@ -305,6 +305,10 @@ pub fn res_table(
   format!("<h3>Parse Performance Comparison</h3>{parse_table}<h3>Write Performance Comparison</h3>{write_table}")
 }
 
+pub fn no_href() {
+  unsafe { HREF = false };
+}
+
 pub fn run_bench(
   projs: impl Clone + Iterator<Item = impl Proj>,
   regression: bool,
