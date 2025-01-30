@@ -8,7 +8,7 @@ mod logic_impl;
 mod parser;
 use crate::{
   ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder},
-  cell::CellCtx,
+  cell::CellCtx as _,
 };
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 use parser::{as_sdf_str, BoolExprErr};
@@ -265,7 +265,7 @@ impl BddBooleanExpression {
         as_sdf_str(&expr)
       })
       .join(") || ( ");
-    SdfExpression::new(format!("( {s} )").into())
+    SdfExpression::new(format!("( {s} )"))
   }
 }
 

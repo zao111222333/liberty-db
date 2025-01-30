@@ -13,7 +13,7 @@ use crate::{
   common::{items::NameList, table::TableLookUp2D},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
-  Ctx, LibertyStr,
+  Ctx,
 };
 
 pub trait CellCtx {
@@ -72,7 +72,7 @@ pub struct Cell<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -108,13 +108,13 @@ pub struct Cell<C: Ctx> {
   /// CellId
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub single_bit_degenerate: Option<LibertyStr>,
+  pub single_bit_degenerate: Option<String>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub driver_waveform_rise: Option<LibertyStr>,
+  pub driver_waveform_rise: Option<String>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub driver_waveform_fall: Option<LibertyStr>,
+  pub driver_waveform_fall: Option<String>,
   /// The `always_on`  simple attribute models always-on cells or signal pins. Specify the attribute at the cell level to determine whether a cell is an always-on cell. Specify the attribute at the pin level to determine whether a pin is an always-on signal pin.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=100.73&end=100.75
@@ -148,7 +148,7 @@ pub struct Cell<C: Ctx> {
   pub clock_gating_integrated_cell: Option<ClockGatingIntegratedCell>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub cell_footprint: Option<LibertyStr>,
+  pub cell_footprint: Option<String>,
   #[size = 16]
   #[liberty(simple(type = Option))]
   pub cell_leakage_power: Option<f64>,
@@ -176,7 +176,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub fpga_isd: Option<LibertyStr>,
+  pub fpga_isd: Option<String>,
   /// Indicates that the `timing` arcs are interpreted according
   ///  to interface `timing` specifications semantics.
   /// If this attribute is missing or its value is set to false,
@@ -195,7 +195,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub io_type: Option<LibertyStr>,
+  pub io_type: Option<String>,
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub is_filler_cell: Option<bool>,
@@ -309,7 +309,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub retention_cell: Option<LibertyStr>,
+  pub retention_cell: Option<String>,
   /// The `switch_cell_type`  cell-level attribute specifies
   /// the type of the switch cell for direct inference.
   ///

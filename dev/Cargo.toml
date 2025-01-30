@@ -22,6 +22,7 @@ liberty-io = "0.0.4"
 libertyparse = "0.3.0"
 liberty2json = { path = "include/liberty2json" }
 liberty-db-latest = { package = "liberty-db", path = ".." }
+liberty-db-0p9p0  = { package = "liberty-db", version = "=0.9.0" }
 liberty-db-0p8p3  = { package = "liberty-db", version = "=0.8.3" }
 liberty-db-0p7p4  = { package = "liberty-db", version = "=0.7.4" }
 liberty-db-0p6p14  = { package = "liberty-db", version = "=0.6.14" }

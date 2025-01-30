@@ -13,9 +13,9 @@ pub use arcstr::{literal, ArcStr};
 #[derive(serde::Serialize, serde::Deserialize)]
 #[repr(transparent)]
 #[expect(clippy::unsafe_derive_deserialize)]
-pub struct LibertyStr(pub ArcStr);
+pub struct String(pub ArcStr);
 
-impl core::ops::Deref for LibertyStr {
+impl core::ops::Deref for String {
   type Target = ArcStr;
   #[inline]
   fn deref(&self) -> &ArcStr {
@@ -23,42 +23,42 @@ impl core::ops::Deref for LibertyStr {
   }
 }
 
-impl core::ops::DerefMut for LibertyStr {
+impl core::ops::DerefMut for String {
   #[inline]
   fn deref_mut(&mut self) -> &mut Self::Target {
     &mut self.0
   }
 }
 
-impl fmt::Debug for LibertyStr {
+impl fmt::Debug for String {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     <ArcStr as fmt::Debug>::fmt(&self.0, f)
   }
 }
 
-impl fmt::Display for LibertyStr {
+impl fmt::Display for String {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     <ArcStr as fmt::Display>::fmt(&self.0, f)
   }
 }
 
-impl AsRef<str> for LibertyStr {
+impl AsRef<str> for String {
   #[inline]
   fn as_ref(&self) -> &str {
     self
   }
 }
 
-impl AsRef<[u8]> for LibertyStr {
+impl AsRef<[u8]> for String {
   #[inline]
   fn as_ref(&self) -> &[u8] {
     self.as_bytes()
   }
 }
 
-impl core::str::FromStr for LibertyStr {
+impl core::str::FromStr for String {
   type Err = core::convert::Infallible;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -66,7 +66,7 @@ impl core::str::FromStr for LibertyStr {
   }
 }
 
-impl core::borrow::Borrow<str> for LibertyStr {
+impl core::borrow::Borrow<str> for String {
   #[inline]
   fn borrow(&self) -> &str {
     self
@@ -75,7 +75,7 @@ impl core::borrow::Borrow<str> for LibertyStr {
 
 macro_rules! impl_index {
     ($($IdxT:ty,)*) => {$(
-        impl core::ops::Index<$IdxT> for LibertyStr {
+        impl core::ops::Index<$IdxT> for String {
             type Output = str;
             #[inline]
             fn index(&self, i: $IdxT) -> &Self::Output {
@@ -114,122 +114,122 @@ macro_rules! impl_peq {
 }
 
 impl_peq! {
-    (LibertyStr, str),
-    (LibertyStr, &'a str),
-    (LibertyStr, String),
-    (LibertyStr, Cow<'a, str>),
-    (LibertyStr, Box<str>),
-    (LibertyStr, Arc<str>),
-    (LibertyStr, Rc<str>),
-    (LibertyStr, Arc<String>),
-    (LibertyStr, Rc<String>),
+    (String, str),
+    (String, &'a str),
+    (String, String),
+    (String, Cow<'a, str>),
+    (String, Box<str>),
+    (String, Arc<str>),
+    (String, Rc<str>),
+    (String, Arc<String>),
+    (String, Rc<String>),
 }
 
-impl From<ArcStr> for LibertyStr {
+impl From<ArcStr> for String {
   #[inline]
   fn from(s: ArcStr) -> Self {
     Self(s)
   }
 }
 
-impl From<LibertyStr> for ArcStr {
+impl From<String> for ArcStr {
   #[inline]
-  fn from(s: LibertyStr) -> Self {
+  fn from(s: String) -> Self {
     s.0
   }
 }
 
-impl From<&str> for LibertyStr {
+impl From<&str> for String {
   #[inline]
   fn from(s: &str) -> Self {
     Self(ArcStr::from(s))
   }
 }
 
-impl From<String> for LibertyStr {
+impl From<String> for String {
   #[inline]
   fn from(v: String) -> Self {
     Self(ArcStr::from(v))
   }
 }
 
-impl From<&mut str> for LibertyStr {
+impl From<&mut str> for String {
   #[inline]
   fn from(s: &mut str) -> Self {
     Self(ArcStr::from(s))
   }
 }
 
-impl From<Box<str>> for LibertyStr {
+impl From<Box<str>> for String {
   #[inline]
   fn from(s: Box<str>) -> Self {
     Self(ArcStr::from(s))
   }
 }
-impl From<LibertyStr> for Box<str> {
+impl From<String> for Box<str> {
   #[inline]
-  fn from(s: LibertyStr) -> Self {
+  fn from(s: String) -> Self {
     s.0.into()
   }
 }
-impl From<LibertyStr> for Rc<str> {
+impl From<String> for Rc<str> {
   #[inline]
-  fn from(s: LibertyStr) -> Self {
+  fn from(s: String) -> Self {
     s.0.into()
   }
 }
-impl From<LibertyStr> for Arc<str> {
+impl From<String> for Arc<str> {
   #[inline]
-  fn from(s: LibertyStr) -> Self {
+  fn from(s: String) -> Self {
     s.0.into()
   }
 }
-impl From<Rc<str>> for LibertyStr {
+impl From<Rc<str>> for String {
   #[inline]
   fn from(s: Rc<str>) -> Self {
     Self(ArcStr::from(s))
   }
 }
-impl From<Arc<str>> for LibertyStr {
+impl From<Arc<str>> for String {
   #[inline]
   fn from(s: Arc<str>) -> Self {
     Self(ArcStr::from(s))
   }
 }
-impl<'a> From<Cow<'a, str>> for LibertyStr {
+impl<'a> From<Cow<'a, str>> for String {
   #[inline]
   fn from(s: Cow<'a, str>) -> Self {
     Self(ArcStr::from(s))
   }
 }
-impl<'a> From<&'a LibertyStr> for Cow<'a, str> {
+impl<'a> From<&'a String> for Cow<'a, str> {
   #[inline]
-  fn from(s: &'a LibertyStr) -> Self {
+  fn from(s: &'a String) -> Self {
     Cow::Borrowed(s)
   }
 }
 
-impl From<LibertyStr> for Cow<'_, str> {
+impl From<String> for Cow<'_, str> {
   #[inline]
-  fn from(s: LibertyStr) -> Self {
+  fn from(s: String) -> Self {
     s.0.into()
   }
 }
 
-impl From<&String> for LibertyStr {
+impl From<&String> for String {
   #[inline]
   fn from(s: &String) -> Self {
     Self(ArcStr::from(s))
   }
 }
-impl From<&Self> for LibertyStr {
+impl From<&Self> for String {
   #[inline]
   fn from(s: &Self) -> Self {
     s.clone()
   }
 }
 
-impl LibertyStr {
+impl String {
   /// Construct a new empty string.
   #[inline]
   #[must_use]

@@ -106,7 +106,7 @@ cargo bench --bench dev
 
 ## TODO
 
-+ Compare `String` and `Arcstr`, if it is necessary to still use `Arcstr`?
++ use `nom_locate` & `nom 0.8.0`
 + CI:
   + only do comparsion after tag new version
   + fast regression self in build.yml

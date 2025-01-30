@@ -1,11 +1,9 @@
-use arcstr::literal;
-
 use crate::{
   ast::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
     ParseScope, SimpleAttri,
   },
-  Ctx, LibertyStr,
+  Ctx,
 };
 use core::fmt::{self, Write};
 
@@ -18,7 +16,7 @@ pub struct TableLookUpMultiSegment<C: Ctx> {
   #[liberty(name)]
   #[size = 8]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -60,7 +58,7 @@ pub struct DriverWaveform<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  pub name: Option<LibertyStr>,
+  pub name: Option<String>,
   /// The `driver_waveform_name`  string attribute differentiates the driver waveform table
   /// from other driver waveform tables when multiple tables are defined.
   /// The cell-specific, rise-specific, and fall-specific driver waveform usage modeling
@@ -77,7 +75,7 @@ pub struct DriverWaveform<C: Ctx> {
   #[size = 8]
   #[liberty(simple(type = Option))]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  pub driver_waveform_name: Option<LibertyStr>,
+  pub driver_waveform_name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -115,7 +113,7 @@ pub struct TableLookUp2D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -151,7 +149,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -165,7 +163,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   pub attributes: Attributes,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub base_curves_group: Option<LibertyStr>,
+  pub base_curves_group: Option<String>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
@@ -223,7 +221,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub index_3: Vec<LibertyStr>,
+  pub index_3: Vec<String>,
 }
 
 impl<C: Ctx> GroupFn for CompactLutTemplate<C> {}
@@ -279,7 +277,7 @@ pub struct Vector3D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -316,7 +314,7 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -357,7 +355,7 @@ pub struct Vector4D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -442,7 +440,7 @@ pub struct CompactCcsPower<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -456,10 +454,10 @@ pub struct CompactCcsPower<C: Ctx> {
   pub attributes: Attributes,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub base_curves_group: Option<LibertyStr>,
+  pub base_curves_group: Option<String>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub index_output: Option<LibertyStr>,
+  pub index_output: Option<String>,
   #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
@@ -471,7 +469,7 @@ pub struct CompactCcsPower<C: Ctx> {
   pub index_3: Vec<f64>,
   #[size = 24]
   #[liberty(complex)]
-  pub index_4: Vec<LibertyStr>,
+  pub index_4: Vec<String>,
   /// The values attribute is required in the `compact_ccs_power` group. The data within the
   /// quotation marks (" "), or line, represent the current waveform for one index combination.
   /// Each value is determined by the corresponding curve parameter. In the following line,
@@ -610,7 +608,7 @@ pub struct Vector3DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -638,7 +636,7 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -666,7 +664,7 @@ pub struct Vector4DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -699,7 +697,7 @@ pub struct TableLookUp3D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -736,7 +734,7 @@ pub struct TableLookUp1D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -773,7 +771,7 @@ pub struct CompactCcsTable<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -787,7 +785,7 @@ pub struct CompactCcsTable<C: Ctx> {
   pub attributes: Attributes,
   #[size = 8]
   #[liberty(simple)]
-  pub base_curves_group: LibertyStr,
+  pub base_curves_group: String,
   #[size = 40]
   #[liberty(complex)]
   pub values: Values,
@@ -803,7 +801,7 @@ pub struct TableLookUp<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<LibertyStr>,
+  name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -886,7 +884,7 @@ impl ComplexAttri for Values {
           if table_len_mismatch {
             Err((
               ComplexParseError::LengthDismatch,
-              ast::ComplexWrapper(vec![literal!("PARSER_ERROR").into()]),
+              ast::ComplexWrapper(vec![String::from("PARSER_ERROR")]),
             ))
           } else {
             Ok(Self { size1, size2, inner })
@@ -949,7 +947,7 @@ impl<V: Iterator<Item = f64>> DisplayValues<V> {
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = f64>> {
-  pub(crate) name: &'a Option<LibertyStr>,
+  pub(crate) name: &'a Option<String>,
   pub(crate) index_1: &'a Vec<f64>,
   pub(crate) index_2: &'a Vec<f64>,
   pub(crate) values: DisplayValues<V>,
@@ -991,7 +989,7 @@ pub struct TableTemple<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]

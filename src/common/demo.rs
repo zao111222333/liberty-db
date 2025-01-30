@@ -5,7 +5,7 @@ use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
   timing::{TimingTableLookUp, TimingType},
-  Ctx, LibertyStr,
+  Ctx,
 };
 use core::fmt::Write;
 
@@ -52,7 +52,7 @@ pub(crate) struct Pin<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  name: LibertyStr,
+  name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -79,11 +79,11 @@ pub(crate) struct FF<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  variable1: LibertyStr,
+  variable1: String,
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  variable2: LibertyStr,
+  variable2: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -96,7 +96,7 @@ pub(crate) struct FF<C: Ctx> {
   #[liberty(attributes)]
   attributes: Attributes,
   #[liberty(simple(type = Option))]
-  next_state: Option<LibertyStr>,
+  next_state: Option<String>,
 }
 impl<C: Ctx> GroupFn for FF<C> {}
 impl<C: Ctx> NamedGroup for FF<C> {
@@ -138,7 +138,7 @@ impl<C: Ctx> NamedGroup for FF<C> {
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub(crate) struct Cell<C: Ctx> {
   #[liberty(name)]
-  name: LibertyStr,
+  name: String,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,

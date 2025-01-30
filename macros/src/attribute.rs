@@ -181,13 +181,13 @@ pub(crate) fn parse_fields_type(
 /// #[liberty(attributes)]
 /// // GroupComments
 /// #[liberty(comments)]
-/// // Auto vector Id: Vec<LibertyStr>
+/// // Auto vector Id: Vec<String>
 /// #[liberty(id(title=0))]
-/// // Auto Id: Option<LibertyStr>
+/// // Auto Id: Option<String>
 /// #[liberty(id(title=0.5))]
-/// // Auto Id: LibertyStr
+/// // Auto Id: String
 /// #[liberty(id(title=1))]
-/// // Auto slice Id: [LibertyStr:2]
+/// // Auto slice Id: [String:2]
 /// #[liberty(id(title=2))]
 /// // GroupId
 /// #[liberty(id)]
@@ -517,7 +517,7 @@ fn parse_group_type(
 fn size_type_test() {
   use quote::ToTokens as _;
   // let attr: Attribute = parse_quote!(#[id]);
-  // let attr: Attribute = parse_quote!(#[id(borrow="&[LibertyStr]")] );
+  // let attr: Attribute = parse_quote!(#[id(borrow="&[String]")] );
   let attr: Vec<syn::Attribute> = syn::parse_quote!(
     #[liberty(group(type = Set))]
     #[liberty(default = vec![0.0])]);

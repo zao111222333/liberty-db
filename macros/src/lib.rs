@@ -9,9 +9,9 @@ mod group;
 /// #[liberty(undefined)]
 /// // GroupComments
 /// #[liberty(comments)]
-/// // Auto vector Id: Vec<LibertyStr>
+/// // Auto vector Id: Vec<String>
 /// #[liberty(id(title=0))]
-/// // Auto slice Id: [LibertyStr:2]
+/// // Auto slice Id: [String:2]
 /// #[liberty(id(title=2))]
 /// // GroupId
 /// #[liberty(id)]

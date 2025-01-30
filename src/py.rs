@@ -1,4 +1,3 @@
-use core::convert::Infallible;
 use pyo3::{
   exceptions::PyValueError,
   prelude::*,
@@ -8,7 +7,6 @@ use pyo3_stub_gen::{PyStubType, TypeInfo};
 
 use crate::{
   cell::PgType,
-  str::{ArcStr, LibertyStr},
   units::{
     CapacitiveLoadUnit, CurrentUnit, LeakagePowerUnit, PullingResistanceUnit, TimeUnit,
     VoltageUnit,
@@ -77,45 +75,6 @@ impl<'py> IntoPyObject<'py> for CapacitiveLoadUnit {
 impl PyStubType for CapacitiveLoadUnit {
   #[inline]
   fn type_output() -> TypeInfo {
-    <(f64, LibertyStr)>::type_output()
-  }
-}
-
-// Same to https://docs.rs/pyo3/0.23.3/src/pyo3/conversions/std/string.rs.html#188-201
-impl<'py> IntoPyObject<'py> for LibertyStr {
-  type Target = PyString;
-  type Output = Bound<'py, Self::Target>;
-  type Error = Infallible;
-
-  #[inline]
-  fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-    Ok(PyString::new(py, self.as_str()))
-  }
-}
-
-// Same to https://docs.rs/pyo3/0.23.3/src/pyo3/conversions/std/string.rs.html#211-225
-impl<'py> IntoPyObject<'py> for &LibertyStr {
-  type Target = PyString;
-  type Output = Bound<'py, Self::Target>;
-  type Error = Infallible;
-
-  #[inline]
-  fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-    Ok(PyString::new(py, self.as_str()))
-  }
-}
-
-// Same to https://docs.rs/pyo3/0.23.3/src/pyo3/conversions/std/string.rs.html#252-261
-impl<'py> FromPyObject<'py> for LibertyStr {
-  #[inline]
-  fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
-    ob.downcast::<PyString>()?.to_cow().map(|s| ArcStr::from(s).into())
-  }
-}
-
-impl PyStubType for LibertyStr {
-  #[inline]
-  fn type_output() -> TypeInfo {
-    PyString::type_output()
+    <(f64, String)>::type_output()
   }
 }
