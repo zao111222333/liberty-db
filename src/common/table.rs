@@ -620,7 +620,7 @@ pub struct Vector3DGrpup<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Vector3D<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Vector3D<C>>::deserialize_with")]
@@ -648,7 +648,7 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<ReferenceTimeVector3D<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<ReferenceTimeVector3D<C>>::deserialize_with")]
@@ -676,7 +676,7 @@ pub struct Vector4DGrpup<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Vector4D<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Vector4D<C>>::deserialize_with")]

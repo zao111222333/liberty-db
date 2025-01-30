@@ -533,7 +533,7 @@ pub struct DynamicCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=150.18&end=150.19
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<SwitchingGroup<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<SwitchingGroup<C>>::deserialize_with")]
@@ -703,7 +703,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=153.9&end=153.28
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<PgCurrent<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<PgCurrent<C>>::deserialize_with")]
@@ -802,7 +802,7 @@ pub struct PgCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=153.30+154.2&end=153.40+154.25
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CompactCcsPower<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CompactCcsPower<C>>::deserialize_with")]
@@ -947,7 +947,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.20&end=178.34
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<IntrinsicCapacitance<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<IntrinsicCapacitance<C>>::deserialize_with")]
@@ -986,7 +986,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=180.10&end=180.36
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<IntrinsicResistance<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<IntrinsicResistance<C>>::deserialize_with")]
@@ -1029,7 +1029,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=182.12&end=182.42
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<PgPinWithValue<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<PgPinWithValue<C>>::deserialize_with")]
@@ -1533,7 +1533,7 @@ pub struct LeakageCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=196.17&end=196.36
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<PgPinWithValue<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<PgPinWithValue<C>>::deserialize_with")]
@@ -1572,7 +1572,7 @@ pub struct LeakageCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=197.9&end=197.38
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<GateLeakage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<GateLeakage<C>>::deserialize_with")]

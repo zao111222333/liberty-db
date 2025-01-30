@@ -54,12 +54,11 @@ fn define() {
   }"#,
     r#"/* test */
 library (define) {
-| technology (cmos);
-| delay_model : table_lookup;
 | define (my_define_bool, library, boolean);
 | define (my_define_float, library, float);
 | define (my_define_integer, cell, integer);
 | define (my_define_str, library, string);
+| delay_model : table_lookup;
 | time_unit : 1ns;
 | voltage_unit : 1V;
 | slew_upper_threshold_pct_rise : 80.0;
@@ -127,6 +126,7 @@ fn comment() {
   library
     .comments_this_entry()
     .and_modify(|comment| comment.push_str("\ncomment2\ncomment3"));
+  library.technology = Some(Technology::Cmos);
   library.comments_technology_entry().or_insert("comment1".into());
   library
     .comments_technology_entry()
@@ -199,7 +199,6 @@ fn entry() {
     &library,
     r#"/* comment1 */
 library (undefined) {
-| technology (cmos);
 | delay_model : table_lookup;
 | time_unit : 1ns;
 | voltage_unit : 1V;

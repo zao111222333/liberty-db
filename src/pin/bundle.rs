@@ -50,7 +50,7 @@ pub struct Bundle<C: Ctx> {
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub nextstate_type: Option<NextstateType>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Timing<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Timing<C>>::deserialize_with")]

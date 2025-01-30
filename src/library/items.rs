@@ -1066,7 +1066,7 @@ pub struct WireLoad<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<FanoutLength>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FanoutLength>::deserialize_with")]
@@ -1320,7 +1320,7 @@ pub struct BaseCurves<C: Ctx> {
   #[size = 24]
   #[liberty(complex)]
   pub curve_x: Vec<f64>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<IdVector>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<IdVector>::deserialize_with")]

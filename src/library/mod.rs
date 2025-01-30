@@ -48,6 +48,28 @@ pub struct Library<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
+  /// Use this attribute to define new, temporary, or user-defined attributes
+  /// for use in symbol and technology libraries.
+  /// You can use either a space or a comma to separate the arguments.
+  /// The following example shows how to define a new string attribute called `bork`,
+  /// which is valid in a `pin`  group:
+  ///
+  /// Example
+  /// ``` liberty
+  /// define ("bork", "pin", "string") ;
+  /// ```
+  /// You give the new library attribute a value by using the simple attribute syntax:
+  /// ``` liberty
+  /// bork : "nimo" ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.5&end=36.21
+  /// ">Reference</a>
+  #[size = 88]
+  #[liberty(complex(type = Set))]
+  #[serde(serialize_with = "GroupSet::<Define>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Define>::deserialize_with")]
+  pub define: GroupSet<Define>,
   /// The `technology`  attribute statement specifies the technology
   /// family being used in the library.
   /// When you define the technology  attribute,
@@ -128,7 +150,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.3&end=72.4
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<OperatingConditions<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<OperatingConditions<C>>::deserialize_with")]
@@ -147,34 +169,12 @@ pub struct Library<C: Ctx> {
   #[size = 8]
   #[liberty(simple(type = Option))]
   pub default_threshold_voltage_group: Option<String>,
-  /// Use this attribute to define new, temporary, or user-defined attributes
-  /// for use in symbol and technology libraries.
-  /// You can use either a space or a comma to separate the arguments.
-  /// The following example shows how to define a new string attribute called `bork`,
-  /// which is valid in a `pin`  group:
-  ///
-  /// Example
-  /// ``` liberty
-  /// define ("bork", "pin", "string") ;
-  /// ```
-  /// You give the new library attribute a value by using the simple attribute syntax:
-  /// ``` liberty
-  /// bork : "nimo" ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.5&end=36.21
-  /// ">Reference</a>
-  #[size = 64]
-  #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Define>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Define>::deserialize_with")]
-  pub define: GroupSet<Define>,
   /// Use this special attribute to define new, temporary, or user-defined groups
   /// for use in technology libraries.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.24&end=37.25
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<DefineGroup>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<DefineGroup>::deserialize_with")]
@@ -184,7 +184,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.23&end=36.24
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<DefineCellArea>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<DefineCellArea>::deserialize_with")]
@@ -373,7 +373,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.15&end=39.16
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<VoltageMap>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<VoltageMap>::deserialize_with")]
@@ -383,7 +383,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=61.32&end=61.33
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<InputVoltage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<InputVoltage<C>>::deserialize_with")]
@@ -393,7 +393,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.22&end=75.23
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<OutputVoltage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<OutputVoltage<C>>::deserialize_with")]
@@ -537,7 +537,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=74.15&end=74.16
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableTemple<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableTemple<C>>::deserialize_with")]
@@ -546,7 +546,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=83.34&end=83.35
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableTemple<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableTemple<C>>::deserialize_with")]
@@ -556,7 +556,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=65.5&end=65.6
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableTemple<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableTemple<C>>::deserialize_with")]
@@ -585,7 +585,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.32+40.2&end=39.33+40.15
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<BaseCurves<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<BaseCurves<C>>::deserialize_with")]
@@ -594,7 +594,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=41.20&end=41.21
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CompactLutTemplate<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CompactLutTemplate<C>>::deserialize_with")]
@@ -609,7 +609,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=70.28&end=70.33
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<DriverWaveform<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<DriverWaveform<C>>::deserialize_with")]
@@ -618,7 +618,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.16&end=94.17
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<WireLoad<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<WireLoad<C>>::deserialize_with")]
@@ -627,7 +627,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.16&end=94.17
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<WireLoadSection<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<WireLoadSection<C>>::deserialize_with")]
@@ -653,7 +653,7 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=63.22+63.25&end=63.23+63.27
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FpgaIsd<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FpgaIsd<C>>::deserialize_with")]
@@ -680,12 +680,12 @@ pub struct Library<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.10&end=88.16
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Sensitization<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Sensitization<C>>::deserialize_with")]
   pub sensitization: GroupSet<Sensitization<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Cell<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Cell<C>>::deserialize_with")]

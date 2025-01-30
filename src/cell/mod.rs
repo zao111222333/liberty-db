@@ -402,32 +402,32 @@ pub struct Cell<C: Ctx> {
   #[size = 96]
   #[liberty(complex(type = Option))]
   pub pin_opposite: Option<PinOpposite>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<PgPin<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<PgPin<C>>::deserialize_with")]
   pub pg_pin: GroupSet<PgPin<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]
   pub ff: GroupSet<FF<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FFBank<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FFBank<C>>::deserialize_with")]
   pub ff_bank: GroupSet<FFBank<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Latch<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Latch<C>>::deserialize_with")]
   pub latch: GroupSet<Latch<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LatchBank<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LatchBank<C>>::deserialize_with")]
   pub latch_bank: GroupSet<LatchBank<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LeakagePower<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LeakagePower<C>>::deserialize_with")]
@@ -441,7 +441,7 @@ pub struct Cell<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=147.3&end=147.5
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<DynamicCurrent<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<DynamicCurrent<C>>::deserialize_with")]
@@ -502,7 +502,7 @@ pub struct Cell<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=176.24+177.2&end=176.49+177.25
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<IntrinsicParasitic<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<IntrinsicParasitic<C>>::deserialize_with")]
@@ -536,12 +536,12 @@ pub struct Cell<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=194.49+195.2&end=194.50+195.20
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LeakageCurrent<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LeakageCurrent<C>>::deserialize_with")]
   pub leakage_current: GroupSet<LeakageCurrent<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Pin<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Pin<C>>::deserialize_with")]
@@ -556,7 +556,7 @@ pub struct Cell<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
   /// ">Reference</a>
   pub test_cell: Vec<TestCell<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Bundle<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Bundle<C>>::deserialize_with")]
@@ -653,32 +653,32 @@ pub struct TestCell<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]
   pub ff: GroupSet<FF<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FFBank<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FFBank<C>>::deserialize_with")]
   pub ff_bank: GroupSet<FFBank<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Latch<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Latch<C>>::deserialize_with")]
   pub latch: GroupSet<Latch<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LatchBank<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LatchBank<C>>::deserialize_with")]
   pub latch_bank: GroupSet<LatchBank<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Pin<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Pin<C>>::deserialize_with")]
   pub pin: GroupSet<Pin<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Statetable<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Statetable<C>>::deserialize_with")]

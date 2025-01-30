@@ -333,12 +333,12 @@ pub struct ReceiverCapacitance<C: Ctx> {
     with_ref = false
   )]
   pub when: Option<LogicBooleanExpression>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]

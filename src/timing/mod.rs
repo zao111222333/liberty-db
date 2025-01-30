@@ -1502,7 +1502,7 @@ pub struct Timing<C: Ctx> {
   /// &end
   /// =204.9
   /// ">Reference-Instance</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CellDegradation<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CellDegradation<C>>::deserialize_with")]
@@ -1668,12 +1668,12 @@ pub struct Timing<C: Ctx> {
   #[size = 216]
   #[liberty(group)]
   pub propogated_noise_width_low: Option<TableLookUp<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]

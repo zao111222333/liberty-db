@@ -1129,7 +1129,7 @@ pub struct Pin<C: Ctx> {
   pub rise_capacitance_range: Option<(f64, f64)>,
   // NOTICE: Group Attributes in a pin Group
   // electromigration () { }
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<InternalPower<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<InternalPower<C>>::deserialize_with")]
@@ -1149,7 +1149,7 @@ pub struct Pin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=372.33&end=372.37
   /// ">Reference-Definition</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TLatch<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TLatch<C>>::deserialize_with")]
@@ -1175,7 +1175,7 @@ pub struct Pin<C: Ctx> {
   /// =203.29
   /// ">Reference-Instatnce-In-Pin</a>
   ///
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Timing<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Timing<C>>::deserialize_with")]
@@ -1197,7 +1197,7 @@ pub struct Pin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=316.5&end=316.31
   /// ">Reference-Definition</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<ReceiverCapacitance<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<ReceiverCapacitance<C>>::deserialize_with")]
@@ -1212,22 +1212,22 @@ pub struct Pin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=296.7&end=296.12
   /// ">Reference-Instance</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
   pub input_ccb: GroupSet<CCSNStage<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
   pub output_ccb: GroupSet<CCSNStage<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
   pub ccsn_first_stage: GroupSet<CCSNStage<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
