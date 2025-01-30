@@ -28,17 +28,20 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
-      - name: Show HEAD and BASE repo URLs
+      - name: Build commit URLs
+        id: buildurl
         run: |
-          echo "HEAD URL: ${{ github.event.pull_request.head.repo.clone_url }}"
-          echo "BASE URL: ${{ github.event.pull_request.base.repo.clone_url }}"
+          echo "HEAD_REPO_URL=${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+          echo "BASE_REPO_URL=${{ github.event.pull_request.base.repo.html_url }}/commit/${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+  
+      - name: Debug print
+        run: |
+          echo "HEAD commit URL: ${{ steps.buildurl.outputs.HEAD_REPO_URL }}"
+          echo "BASE commit URL: ${{ steps.buildurl.outputs.BASE_REPO_URL }}"
       - name: Run compare command
-        env:
-          BASE_URL: ${{ github.event.pull_request.base.repo.clone_url }}
-          INCOMING_URL: ${{ github.event.pull_request.head.repo.clone_url }}
         run: |
           cd pr_head
-          ./github/workflows/compare.sh "$BASE_URL" "$INCOMING_URL"
+          .github/workflows/compare.sh "${{ steps.buildurl.outputs.BASE_REPO_URL }}" "${{ steps.buildurl.outputs.HEAD_REPO_URL }}"
 
       - name: Show debug
         run: |
