@@ -610,7 +610,7 @@ crate::ast::impl_self_builder!(Formula);
 impl SimpleAttri for Formula {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    use nom::Parser;
+    use nom::Parser as _;
     #[inline]
     fn f(i: &str) -> nom::IResult<&str, Formula> {
       nom::combinator::map(ast::parser::formula, |s| Formula(String::from(s))).parse(i)

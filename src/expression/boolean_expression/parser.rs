@@ -13,7 +13,7 @@ use nom::{
   combinator::map,
   multi::many1,
   sequence::{delimited, pair},
-  IResult, Parser,
+  IResult, Parser as _,
 };
 
 /// only not(variable) and variable

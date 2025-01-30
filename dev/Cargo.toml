@@ -18,22 +18,35 @@ sysinfo.workspace = true
 chrono.workspace = true
 dev_utils.workspace = true
 
-liberty-io = "0.0.4"
-libertyparse = "0.3.0"
-liberty2json = { path = "include/liberty2json" }
 liberty-db-latest = { package = "liberty-db", path = ".." }
-liberty-db-0p9p0  = { package = "liberty-db", version = "=0.9.0" }
-liberty-db-0p8p3  = { package = "liberty-db", version = "=0.8.3" }
-liberty-db-0p7p4  = { package = "liberty-db", version = "=0.7.4" }
-liberty-db-0p6p14  = { package = "liberty-db", version = "=0.6.14" }
-liberty-db-0p5p9  = { package = "liberty-db", version = "=0.5.9" }
-liberty-db-0p4p13 = { package = "liberty-db", version = "=0.4.13" }
-liberty-db-0p3p1  = { package = "liberty-db", version = "=0.3.1" }
+liberty-db-0p9p0  = { package = "liberty-db", version = "=0.9.0", optional = true  }
+liberty-db-0p8p3  = { package = "liberty-db", version = "=0.8.3", optional = true  }
+liberty-db-0p7p4  = { package = "liberty-db", version = "=0.7.4", optional = true  }
+liberty-db-0p6p14  = { package = "liberty-db", version = "=0.6.14", optional = true  }
+liberty-db-0p5p9  = { package = "liberty-db", version = "=0.5.9", optional = true  }
+liberty-db-0p4p13 = { package = "liberty-db", version = "=0.4.13", optional = true  }
+liberty-db-0p3p1  = { package = "liberty-db", version = "=0.3.1", optional = true  }
+
+liberty-io = { version = "0.0.4", optional = true }
+libertyparse = { version = "0.3.0", optional = true }
+liberty2json = { path = "include/liberty2json", optional = true  }
 
 liberty-db-incoming = { package = "liberty-db", path = "..", optional = true }
 # liberty-db-incoming = { package = "liberty-db", path = "../../pr_head", optional = true }
 
 [features]
+bench = [
+    "liberty-db-0p9p0",
+    "liberty-db-0p8p3",
+    "liberty-db-0p7p4",
+    "liberty-db-0p6p14",
+    "liberty-db-0p5p9",
+    "liberty-db-0p4p13",
+    "liberty-db-0p3p1",
+    "liberty-io",
+    "libertyparse",
+    "liberty2json",
+]
 compare = ["liberty-db-incoming"]
 
 [[bench]]
@@ -44,3 +57,4 @@ required-features = ["compare"]
 [[bench]]
 name = "benchmark"
 harness = false
+required-features = ["bench"]

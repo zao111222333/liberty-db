@@ -28,7 +28,6 @@ fn main() {
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Pipeline Report</title>
 </head>
 <body><div class="body"><h2>Benchmark Summary</h2>
 <p>Platform: {cpu_info}</p>

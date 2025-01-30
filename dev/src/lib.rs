@@ -1,3 +1,7 @@
+#[cfg(feature = "bench")]
+pub mod _impl_bench;
+#[cfg(feature = "compare")]
+pub mod _impl_compare;
 pub mod projs;
 use criterion::{black_box, Criterion};
 use dev_utils::all_files;

@@ -1,12 +1,13 @@
-#[cfg(all(target_os = "linux", not(feature = "compare")))]
-use dev::projs::OpenTimerLibrary;
+// cargo bench --package dev --bench benchmark --features bench
+#[cfg(target_os = "linux")]
+use dev::_impl_bench::OpenTimerLibrary;
 use dev::{gen_projs, run_bench};
 use std::{
   fs::File,
   io::{BufWriter, Write},
 };
 fn main() {
-  #[cfg(all(target_os = "linux", not(feature = "compare")))]
+  #[cfg(target_os = "linux")]
   let projs = gen_projs![
     (LibertyDb, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
     // (Si2drLiberty, Si2drLibertyLibrary),

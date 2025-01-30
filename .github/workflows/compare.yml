@@ -31,17 +31,24 @@ jobs:
       - name: Build commit URLs
         id: buildurl
         run: |
-          echo "HEAD_REPO_URL=${{ github.event.pull_request.head.repo.html_url }}/tree/${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
-          echo "BASE_REPO_URL=${{ github.event.pull_request.base.repo.html_url }}/tree/${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+          echo "BASE_URL=${{ github.event.pull_request.base.repo.html_url }}/tree/${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+          echo "INCOMING_URL=${{ github.event.pull_request.head.repo.html_url }}/tree/${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
   
       - name: Debug print
         run: |
-          echo "HEAD commit URL: ${{ steps.buildurl.outputs.HEAD_REPO_URL }}"
-          echo "BASE commit URL: ${{ steps.buildurl.outputs.BASE_REPO_URL }}"
+          echo "BASE commit URL: ${{ steps.buildurl.outputs.BASE_URL }}"
+          echo "HEAD commit URL: ${{ steps.buildurl.outputs.INCOMING_URL }}"
       - name: Run compare command
         run: |
+          sed -i 's|^version = .*|version = "0.0.0-incoming"|' pr_head/Cargo.toml
           cd base_branch
-          .github/workflows/compare.sh "${{ steps.buildurl.outputs.BASE_REPO_URL }}" "${{ steps.buildurl.outputs.HEAD_REPO_URL }}"
+          sed -i 's|^liberty-db-incoming|## liberty-db-incoming|' dev/Cargo.toml
+          sed -i 's|^# liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
+          sed -i "s|BASE_URL|${{ steps.buildurl.outputs.BASE_URL }}|" dev/src/projs.rs
+          sed -i "s|INCOMING_URL|${{ steps.buildurl.outputs.INCOMING_URL }}|" dev/src/projs.rs
+          cargo bench --package dev --bench compare --features compare
+          sed -i 's|^liberty-db-incoming|# liberty-db-incoming|' dev/Cargo.toml
+          sed -i 's|^## liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
 
       - name: Show debug
         run: |
