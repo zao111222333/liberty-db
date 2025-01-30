@@ -31,8 +31,8 @@ jobs:
       - name: Build commit URLs
         id: buildurl
         run: |
-          echo "HEAD_REPO_URL=${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
-          echo "BASE_REPO_URL=${{ github.event.pull_request.base.repo.html_url }}/commit/${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+          echo "HEAD_REPO_URL=${{ github.event.pull_request.head.repo.html_url }}/tree/${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+          echo "BASE_REPO_URL=${{ github.event.pull_request.base.repo.html_url }}/tree/${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
   
       - name: Debug print
         run: |
