@@ -7,6 +7,7 @@ sed -i 's|^liberty-db-incoming|## liberty-db-incoming|' dev/Cargo.toml
 sed -i 's|^# liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
 sed -i "s|BASE_URL|${BASE_URL}|" dev/src/projs.rs
 sed -i "s|INCOMING_URL|${INCOMING_URL}|" dev/src/projs.rs
+sed -i 's|^version = .*|version = "0.0.0-incoming"|' ../pr_head/Cargo.toml
 cargo bench --package dev --bench compare --features compare
 sed -i 's|^liberty-db-incoming|# liberty-db-incoming|' dev/Cargo.toml
 sed -i 's|^## liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
