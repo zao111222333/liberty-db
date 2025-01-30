@@ -28,15 +28,22 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
-      - name: Run compare command
+      - name: Show HEAD and BASE repo URLs
         run: |
-          cd base_branch
-          ./github/workflows/compare.sh
+          echo "HEAD URL: ${{ github.event.pull_request.head.repo.clone_url }}"
+          echo "BASE URL: ${{ github.event.pull_request.base.repo.clone_url }}"
+      - name: Run compare command
+        env:
+          BASE_URL: ${{ github.event.pull_request.base.repo.clone_url }}
+          INCOMING_URL: ${{ github.event.pull_request.head.repo.clone_url }}
+        run: |
+          cd pr_head
+          ./github/workflows/compare.sh "$BASE_URL" "$INCOMING_URL"
 
       - name: Show debug
         run: |
-          ls -l base_branch
-          cat base_branch/target/criterion/index.html || true
+          ls -l pr_head
+          cat pr_head/target/criterion/index.html || true
 
       - name: Post report as PR comment
         uses: actions/github-script@v7

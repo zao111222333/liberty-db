@@ -9,7 +9,7 @@ fn main() {
   let regress_table = run_bench(
     gen_projs![
       (LibertyDbLatest, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
-      (LibertyDbBase, liberty_db_base::Library<liberty_db_base::DefaultCtx>),
+      (LibertyDbIncoming, liberty_db_incoming::Library<liberty_db_incoming::DefaultCtx>),
     ],
     true,
   );

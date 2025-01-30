@@ -30,11 +30,11 @@ liberty-db-0p5p9  = { package = "liberty-db", version = "=0.5.9" }
 liberty-db-0p4p13 = { package = "liberty-db", version = "=0.4.13" }
 liberty-db-0p3p1  = { package = "liberty-db", version = "=0.3.1" }
 
-## liberty-db-base = { package = "liberty-db", path = "..", optional = true }
-liberty-db-base = { package = "liberty-db", path = "../../pr_head", optional = true }
+## liberty-db-incoming = { package = "liberty-db", path = "..", optional = true }
+liberty-db-incoming = { package = "liberty-db", path = "../../pr_head", optional = true }
 
 [features]
-compare = ["liberty-db-base"]
+compare = ["liberty-db-incoming"]
 
 [[bench]]
 name = "compare"

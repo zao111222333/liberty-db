@@ -45,15 +45,15 @@ macro_rules! gen_projs {
 }
 
 #[cfg(feature = "compare")]
-impl ProjLibrary for liberty_db_base::Library<liberty_db_base::DefaultCtx> {
+impl ProjLibrary for liberty_db_incoming::Library<liberty_db_incoming::DefaultCtx> {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",
-    url: "BASE_URL",
+    url: "INCOMING_URL",
     lang: "rust",
-    version: "base",
+    version: "incoming",
     typed_support: TypedSupport::AllTyped,
     parsed_boolexpr: true,
-    other: "base version",
+    other: "incoming version",
   };
   fn parse(s: &str) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
@@ -68,12 +68,12 @@ impl ProjLibrary for liberty_db_base::Library<liberty_db_base::DefaultCtx> {
 impl ProjLibrary for liberty_db_latest::Library<liberty_db_latest::DefaultCtx> {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",
-    url: "INCOMING_URL",
+    url: "BASE_URL",
     lang: "rust",
-    version: "incoming",
+    version: "base",
     typed_support: TypedSupport::AllTyped,
     parsed_boolexpr: true,
-    other: "incoming version",
+    other: "current version",
   };
   fn parse(s: &str) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
