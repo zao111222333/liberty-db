@@ -1,4 +1,3 @@
-#![expect(unused_imports)]
 use crate::{ProjInfo, ProjLibrary, TypedSupport};
 use criterion::black_box;
 impl ProjLibrary for liberty_db_incoming::Library<liberty_db_incoming::DefaultCtx> {

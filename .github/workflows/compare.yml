@@ -44,8 +44,8 @@ jobs:
           cd base_branch
           sed -i 's|^liberty-db-incoming|## liberty-db-incoming|' dev/Cargo.toml
           sed -i 's|^# liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
-          sed -i "s|BASE_URL|${{ steps.buildurl.outputs.BASE_URL }}|" dev/src/projs.rs
-          sed -i "s|INCOMING_URL|${{ steps.buildurl.outputs.INCOMING_URL }}|" dev/src/projs.rs
+          sed -i "s|BASE_URL|${{ steps.buildurl.outputs.BASE_URL }}|" dev/src/_impl_compare.rs
+          sed -i "s|INCOMING_URL|${{ steps.buildurl.outputs.INCOMING_URL }}|" dev/src/_impl_compare.rs
           cargo bench --package dev --bench compare --features compare
           sed -i 's|^liberty-db-incoming|# liberty-db-incoming|' dev/Cargo.toml
           sed -i 's|^## liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
@@ -61,6 +61,7 @@ jobs:
           script: |
             const fs = require('fs');
             const reportBody = fs.readFileSync('base_branch/target/criterion/index.html', 'utf8');
+            const msg = String.raw`## Fast comparsion between [Incoming](${{ steps.buildurl.outputs.INCOMING_URL }}) and [Base](${{ steps.buildurl.outputs.BASE_URL }})`
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
