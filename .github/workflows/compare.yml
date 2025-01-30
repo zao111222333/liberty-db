@@ -40,13 +40,13 @@ jobs:
           echo "BASE commit URL: ${{ steps.buildurl.outputs.BASE_REPO_URL }}"
       - name: Run compare command
         run: |
-          cd pr_head
+          cd base_branch
           .github/workflows/compare.sh "${{ steps.buildurl.outputs.BASE_REPO_URL }}" "${{ steps.buildurl.outputs.HEAD_REPO_URL }}"
 
       - name: Show debug
         run: |
-          ls -l pr_head
-          cat pr_head/target/criterion/index.html || true
+          ls -l base_branch
+          cat base_branch/target/criterion/index.html || true
 
       - name: Post report as PR comment
         uses: actions/github-script@v7
