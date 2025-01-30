@@ -26,7 +26,7 @@ jobs:
           mv target/x86_64-unknown-linux-musl/release/examples/* examples/
           mkdir -p examples/dev/tech
           mv dev/tech/cases examples/dev/tech
-          zip -r examples_x86_64-unknown-linux-musl.zip examples
+          zip -r examples.zip examples
       - name: Upload to Release
         uses: actions/upload-release-asset@v1
         env:
@@ -34,5 +34,5 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: examples.zip
-          asset_name: examples.zip
+          asset_name: examples_x86_64-unknown-linux-musl.zip
           asset_content_type: application/zip
