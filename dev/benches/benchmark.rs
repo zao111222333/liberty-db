@@ -1,4 +1,4 @@
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", not(feature = "compare")))]
 use dev::projs::OpenTimerLibrary;
 use dev::{gen_projs, run_bench};
 use std::{
@@ -6,7 +6,7 @@ use std::{
   io::{BufWriter, Write},
 };
 fn main() {
-  #[cfg(target_os = "linux")]
+  #[cfg(all(target_os = "linux", not(feature = "compare")))]
   let projs = gen_projs![
     (LibertyDb, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
     // (Si2drLiberty, Si2drLibertyLibrary),

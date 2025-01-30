@@ -106,10 +106,10 @@ cargo bench --bench dev
 
 ## TODO
 
-+ use `nom_locate` & `nom 0.8.0`
++ use `nom_locate`
 + CI:
   + only do comparsion after tag new version
-  + fast regression self in build.yml
+  + ~~fast regression self in compare.yml~~
 + Other:
   + BDD use LibertyStr
   + Linked Group

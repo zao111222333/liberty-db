@@ -26,10 +26,20 @@ liberty-db-0p9p0  = { package = "liberty-db", version = "=0.9.0" }
 liberty-db-0p8p3  = { package = "liberty-db", version = "=0.8.3" }
 liberty-db-0p7p4  = { package = "liberty-db", version = "=0.7.4" }
 liberty-db-0p6p14  = { package = "liberty-db", version = "=0.6.14" }
-# liberty-db-0p6p1  = { package = "liberty-db", version = "=0.6.1" }
 liberty-db-0p5p9  = { package = "liberty-db", version = "=0.5.9" }
 liberty-db-0p4p13 = { package = "liberty-db", version = "=0.4.13" }
 liberty-db-0p3p1  = { package = "liberty-db", version = "=0.3.1" }
+
+## liberty-db-base = { package = "liberty-db", path = "..", optional = true }
+liberty-db-base = { package = "liberty-db", path = "../../pr_head", optional = true }
+
+[features]
+compare = ["liberty-db-base"]
+
+[[bench]]
+name = "compare"
+harness = false
+required-features = ["compare"]
 
 [[bench]]
 name = "benchmark"

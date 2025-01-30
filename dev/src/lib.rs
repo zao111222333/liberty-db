@@ -5,19 +5,19 @@ use itertools::Itertools as _;
 use serde_json::Value;
 use std::{fs::read_to_string, panic, path::Path, time::Duration};
 
-enum TypedSupport {
+pub enum TypedSupport {
   AllTyped,
   PartialTyped,
   AstOnly,
 }
 pub struct ProjInfo {
-  name: &'static str,
-  url: &'static str,
-  lang: &'static str,
-  version: &'static str,
-  typed_support: TypedSupport,
-  parsed_boolexpr: bool,
-  other: &'static str,
+  pub name: &'static str,
+  pub url: &'static str,
+  pub lang: &'static str,
+  pub version: &'static str,
+  pub typed_support: TypedSupport,
+  pub parsed_boolexpr: bool,
+  pub other: &'static str,
 }
 #[allow(clippy::result_unit_err)]
 pub trait ProjLibrary: Sized {
@@ -279,7 +279,7 @@ pub fn run_bench(
   regression: bool,
 ) -> String {
   let mut criterion = Criterion::default()
-    .sample_size(100)
+    .sample_size(50)
     .with_output_color(true)
     .warm_up_time(Duration::from_millis(100))
     .configure_from_args();
