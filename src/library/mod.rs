@@ -726,7 +726,7 @@ impl<C: Ctx> Library<C> {
       }
       Err(e) => return Err(ParserError::nom(0, e)),
     };
-    let (input2, key) = match parser::key::<nom::error::Error<&str>>(input1) {
+    let (input2, key) = match parser::key(input1) {
       Ok(res) => res,
       Err(e) => return Err(ParserError::nom(scope.line_num, e)),
     };

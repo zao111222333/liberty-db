@@ -12,8 +12,8 @@ use nom::{
   character::complete::{alpha1, alphanumeric0, char, digit1},
   combinator::map,
   multi::many1,
-  sequence::{delimited, pair, tuple},
-  IResult,
+  sequence::{delimited, pair},
+  IResult, Parser,
 };
 
 /// only not(variable) and variable
@@ -158,7 +158,8 @@ enum Token {
 
 #[inline]
 fn space(i: &str) -> IResult<&str, Token> {
-  map(take_while1(move |c: char| matches!(c, '\t' | '\r' | ' ')), |_| Token::Space)(i)
+  map(take_while1(move |c: char| matches!(c, '\t' | '\r' | ' ')), |_| Token::Space)
+    .parse(i)
 }
 
 fn open_b(i: &str) -> IResult<&str, Token> {
@@ -168,7 +169,8 @@ fn open_b(i: &str) -> IResult<&str, Token> {
       Token::Tokens(space_and(v))
     }),
     char(')'),
-  )(i)
+  )
+  .parse(i)
 }
 /// filter all non-and space
 /// A' !B
@@ -208,27 +210,30 @@ fn single_op(i: &str) -> IResult<&str, Token> {
     map(alt((char('\''), char('’'))), |_| Token::SingleOp(SingleOp::BackNot)),
     map(char('0'), |_| Token::SingleOp(SingleOp::Zero)),
     map(char('1'), |_| Token::SingleOp(SingleOp::One)),
-  ))(i)
+  ))
+  .parse(i)
 }
 fn binary_op(i: &str) -> IResult<&str, Token> {
   alt((
     map(alt((char('+'), char('|'))), |_| Token::BinaryOp(BinaryOp::Or)),
     map(alt((char('&'), char('*'))), |_| Token::BinaryOp(BinaryOp::And)),
     map(char('^'), |_| Token::BinaryOp(BinaryOp::Xor)),
-  ))(i)
+  ))
+  .parse(i)
 }
 fn node(i: &str) -> IResult<&str, Token> {
   alt((
     map(pair(alpha1, alphanumeric0), |(s1, s2)| {
       Token::Node(Expr::Variable(format!("{s1}{s2}")))
     }),
-    map(tuple((tag(r#"\""#), digit1, alphanumeric0, tag(r#"\""#))), |(_, s1, s2, _)| {
+    map((tag(r#"\""#), digit1, alphanumeric0, tag(r#"\""#)), |(_, s1, s2, _)| {
       Token::Node(Expr::Variable(format!("{s1}{s2}")))
     }),
-  ))(i)
+  ))
+  .parse(i)
 }
 fn token_vec(i: &str) -> IResult<&str, Vec<Token>> {
-  map(many1(alt((space, open_b, single_op, binary_op, node))), space_and)(i)
+  map(many1(alt((space, open_b, single_op, binary_op, node))), space_and).parse(i)
 }
 
 /// `BoolExprErr`
