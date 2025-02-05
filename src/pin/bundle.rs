@@ -4,7 +4,7 @@ use crate::{
   expression::LogicBooleanExpression,
   pin::{Direction, NextstateType},
   timing::Timing,
-  Ctx, LibertyStr,
+  Ctx,
 };
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
@@ -18,7 +18,7 @@ pub struct Bundle<C: Ctx> {
   /// Name of the pin
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "crate::common::items::namelist_borrow",
+    check_fn = "NameList::as_ref",
     with_ref = false
   )]
   #[size = 48]
@@ -37,7 +37,7 @@ pub struct Bundle<C: Ctx> {
   pub attributes: Attributes,
   #[size = 24]
   #[liberty(complex)]
-  pub members: Vec<LibertyStr>,
+  pub members: Vec<String>,
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub direction: Option<Direction>,
@@ -50,7 +50,7 @@ pub struct Bundle<C: Ctx> {
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub nextstate_type: Option<NextstateType>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Timing<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Timing<C>>::deserialize_with")]

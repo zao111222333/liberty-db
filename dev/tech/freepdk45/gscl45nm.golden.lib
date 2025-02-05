@@ -1,6 +1,5 @@
 
 liberty_db::library::Library (gscl45nm) {
-	technology (cmos);
 	delay_model : table_lookup;
 	nom_process : 1.0;
 	nom_temperature : 27.0;

@@ -19,7 +19,7 @@ use crate::{
     },
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
-  Ctx, LibertyStr,
+  Ctx,
 };
 pub use items::*;
 
@@ -53,7 +53,7 @@ pub use items::*;
 pub struct Timing<C: Ctx> {
   #[size = 24]
   #[liberty(name)]
-  pub name: Vec<LibertyStr>,
+  pub name: Vec<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -228,7 +228,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub fpga_domain_style: Option<LibertyStr>,
+  pub fpga_domain_style: Option<String>,
   /// Use pairs of `interdependence_id` attributes to identify interdependent pairs
   /// of `setup` and `hold` constraint tables. Interdependence data is supported
   /// in conditional constraint checking, the `interdependence_id` attribute increases
@@ -569,7 +569,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Instance</a>
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "crate::common::items::namelist_borrow",
+    check_fn = "NameList::as_ref",
     with_ref = false
   )]
   #[size = 64]
@@ -1502,7 +1502,7 @@ pub struct Timing<C: Ctx> {
   /// &end
   /// =204.9
   /// ">Reference-Instance</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CellDegradation<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CellDegradation<C>>::deserialize_with")]
@@ -1668,12 +1668,12 @@ pub struct Timing<C: Ctx> {
   #[size = 216]
   #[liberty(group)]
   pub propogated_noise_width_low: Option<TableLookUp<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]

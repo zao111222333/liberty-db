@@ -20,7 +20,7 @@ fn cpp_files(search_paths: &[PathBuf]) -> Vec<String> {
     })
     .collect()
 }
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", feature = "bench"))]
 fn main() {
   let binding = env::var("OUT_DIR").unwrap();
   let out_dir = Path::new(&binding);
@@ -75,5 +75,5 @@ fn main() {
   println!("cargo:rustc-link-lib=dylib=projs");
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(any(not(target_os = "linux"), not(feature = "bench")))]
 fn main() {}

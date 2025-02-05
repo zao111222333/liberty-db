@@ -98,6 +98,7 @@
 )]
 #![allow(
     // Some explicitly allowed Clippy lints, must have clear reason to allow
+    clippy::arbitrary_source_item_ordering,
     clippy::allow_attributes_without_reason,
     clippy::default_numeric_fallback,
     clippy::pattern_type_mismatch, // TODO: 
@@ -177,7 +178,6 @@
     clippy::or_fun_call,
   )
 )]
-extern crate alloc;
 pub use biodivine_lib_bdd;
 pub use strum::IntoEnumIterator;
 /// `bus` group structure.
@@ -194,14 +194,16 @@ pub mod internal_power;
 /// `Library` group structure, top level of liberty format.
 pub mod library;
 pub use library::Library;
-pub mod str;
-pub use str::LibertyStr;
+// pub mod str;
+// pub use str::LibertyStr;
 /// `pin` group structure.
 pub mod pin;
 pub use pin::Pin;
 /// `timing` group structure.
 pub mod timing;
 pub use timing::Timing;
+#[cfg(feature = "py")]
+extern crate alloc;
 #[cfg(feature = "py")]
 mod py;
 pub mod units;

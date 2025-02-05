@@ -1,7 +1,4 @@
-use crate::{
-  ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri},
-  LibertyStr,
-};
+use crate::ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri};
 use core::fmt::{self, Write};
 
 /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
@@ -30,7 +27,7 @@ use core::fmt::{self, Write};
 #[derive(Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SdfExpression {
-  inner: LibertyStr,
+  inner: String,
 }
 impl fmt::Display for SdfExpression {
   #[inline]
@@ -42,7 +39,7 @@ impl core::str::FromStr for SdfExpression {
   type Err = core::convert::Infallible;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self { inner: LibertyStr::from_str(s)? })
+    Ok(Self { inner: String::from_str(s)? })
   }
 }
 crate::ast::impl_self_builder!(SdfExpression);
@@ -65,7 +62,7 @@ impl SimpleAttri for SdfExpression {
 impl SdfExpression {
   #[must_use]
   #[inline]
-  pub const fn new(s: LibertyStr) -> Self {
+  pub const fn new(s: String) -> Self {
     Self { inner: s }
   }
 }

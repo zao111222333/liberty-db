@@ -1,6 +1,5 @@
 
 liberty_db::library::Library (timing_type) {
-	technology (cmos);
 	delay_model : table_lookup;
 	time_unit : 1ns;
 	voltage_unit : 1V;

@@ -4,7 +4,7 @@ use crate::{
     Indentation, ParseScope, SimpleAttri,
   },
   expression::logic::Edge,
-  Ctx, LibertyStr,
+  Ctx,
 };
 use core::{
   fmt::{self, Write},
@@ -65,7 +65,7 @@ pub struct TLatch<C: Ctx> {
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]

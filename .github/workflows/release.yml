@@ -1,0 +1,40 @@
+name: release
+
+on:
+  release:
+    types: [published]
+permissions:
+  contents: write
+env:
+  CARGO_TERM_COLOR: always
+  RUST_VERSION: "1.84.0"
+jobs:
+  build:
+    name: Build x86_64-unknown-linux-musl
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+      - name: Install toolchain
+        run: rustup target add x86_64-unknown-linux-musl
+      - name: Build
+        run: cargo build --release --target x86_64-unknown-linux-musl --examples
+      - name: Prepare files
+        run: |
+          mv target/x86_64-unknown-linux-musl/release/examples/0_parse_fmt examples/0_parse_fmt
+          mv target/x86_64-unknown-linux-musl/release/examples/1_parse_fmt_file examples/1_parse_fmt_file
+          mv target/x86_64-unknown-linux-musl/release/examples/2_prune_lib examples/2_prune_lib
+          mkdir -p examples/dev/tech
+          mv dev/tech/cases examples/dev/tech
+          zip -r examples.zip examples
+      - name: Upload to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: examples.zip
+          asset_name: examples_x86_64-unknown-linux-musl.zip
+          asset_content_type: application/zip

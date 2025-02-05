@@ -6,7 +6,10 @@ mod latch_ff;
 pub mod logic;
 mod logic_impl;
 mod parser;
-use crate::ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder};
+use crate::{
+  ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder},
+  cell::CellCtx as _,
+};
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 use parser::{as_sdf_str, BoolExprErr};
 
@@ -262,7 +265,7 @@ impl BddBooleanExpression {
         as_sdf_str(&expr)
       })
       .join(") || ( ");
-    SdfExpression::new(format!("( {s} )").into())
+    SdfExpression::new(format!("( {s} )"))
   }
 }
 
@@ -344,6 +347,29 @@ impl fmt::Display for PowerGroundBooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     parser::_fmt(&self.0.expr, f)
+  }
+}
+
+impl<C: crate::Ctx> crate::Cell<C> {
+  #[inline]
+  pub fn parse_logic_booleanexpr(
+    &self,
+    s: &str,
+  ) -> Result<LogicBooleanExpression, BoolExprErr> {
+    println!("{s}");
+    println!("{}", self.extra_ctx.logic_variables());
+    let expr = BooleanExpression::from_str(s)?.expr;
+    let bdd = self.extra_ctx.logic_variables().eval_expression(&expr);
+    Ok(LogicBooleanExpression(BddBooleanExpression { expr, bdd }))
+  }
+  #[inline]
+  pub fn parse_pg_booleanexpr(
+    &self,
+    s: &str,
+  ) -> Result<PowerGroundBooleanExpression, BoolExprErr> {
+    let expr = BooleanExpression::from_str(s)?.expr;
+    let bdd = self.extra_ctx.pg_variables().eval_expression(&expr);
+    Ok(PowerGroundBooleanExpression(BddBooleanExpression { expr, bdd }))
   }
 }
 

@@ -13,7 +13,7 @@ use crate::{
     table::{DisplayTableLookUp, DisplayValues, TableLookUp},
   },
   expression::logic,
-  Ctx, LibertyStr,
+  Ctx,
 };
 
 use itertools::izip;
@@ -184,7 +184,7 @@ impl SimpleAttri for TimingSenseType {
 /// ">Reference-Instance</a>
 ///
 // #[derive(Debug, Clone, Copy, Default)]
-pub type Mode = [LibertyStr; 2];
+pub type Mode = [String; 2];
 
 /// The `cell_degradation`  group describes a cell performance degradation
 /// design rule for compiling a design.
@@ -205,7 +205,7 @@ pub struct CellDegradation<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -238,7 +238,7 @@ impl<C: Ctx> GroupFn for CellDegradation<C> {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TimingTableLookUp<C: Ctx> {
   pub extra_ctx: C::Table,
-  pub name: Option<LibertyStr>,
+  pub name: Option<String>,
   pub comments: String,
   pub index_1: Vec<f64>,
   pub index_2: Vec<f64>,

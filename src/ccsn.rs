@@ -12,7 +12,7 @@ use crate::{
   },
   expression::LogicBooleanExpression,
   timing::items::Mode,
-  Ctx, LibertyStr,
+  Ctx,
 };
 use core::fmt::{self, Write};
 use num_traits::Zero as _;
@@ -51,8 +51,8 @@ pub struct CCSNStage<C: Ctx> {
   /// group name
   #[liberty(name)]
   #[size = 24]
-  #[id(borrow = "&[LibertyStr]", with_ref = false)]
-  pub name: Vec<LibertyStr>,
+  #[id(borrow = "&[String]", with_ref = false)]
+  pub name: Vec<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -125,7 +125,7 @@ pub struct CCSNStage<C: Ctx> {
   #[size = 8]
   #[liberty(simple(type = Option))]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  pub related_ccb_node: Option<LibertyStr>,
+  pub related_ccb_node: Option<String>,
   /// Use the `stage_type`  attribute to specify the stage type of the channel-connecting block output voltage.
   ///
   /// The valid values are `pull_up`,in which the output voltage of the channel-connecting block is always pulled up (rising);
@@ -313,7 +313,7 @@ pub struct ReceiverCapacitance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  pub name: Option<LibertyStr>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -333,12 +333,12 @@ pub struct ReceiverCapacitance<C: Ctx> {
     with_ref = false
   )]
   pub when: Option<LogicBooleanExpression>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
@@ -370,9 +370,9 @@ impl<C: Ctx> GroupFn for ReceiverCapacitance<C> {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PropagatingCcb {
   /// `input_ccb_name`
-  pub input_ccb_name: LibertyStr,
+  pub input_ccb_name: String,
   /// `output_ccb_name`
-  pub output_ccb_name: Option<LibertyStr>,
+  pub output_ccb_name: Option<String>,
 }
 crate::ast::impl_self_builder!(PropagatingCcb);
 impl ComplexAttri for PropagatingCcb {
@@ -382,10 +382,10 @@ impl ComplexAttri for PropagatingCcb {
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let input_ccb_name = match iter.next() {
-      Some(&s) => LibertyStr::from(s),
+      Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let output_ccb_name = iter.next().map(|&s| LibertyStr::from(s));
+    let output_ccb_name = iter.next().map(|&s| String::from(s));
     if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }

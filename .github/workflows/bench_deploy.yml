@@ -20,7 +20,7 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_VERSION: "1.82.0"
+  RUST_VERSION: "1.84.0"
   CACHE_KEY_BENCH: bench-report
 jobs:
   regression:
@@ -44,7 +44,7 @@ jobs:
         with:
           path: target/criterion
           key: ${{ env.CACHE_KEY_BENCH }}
-      - run: cargo bench --package dev
+      - run: cargo bench --package dev --bench benchmark --features bench
       - name: Clear last bench results
         continue-on-error: true # Don't fail if the cache doesn't exist
         env:

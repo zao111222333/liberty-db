@@ -2,39 +2,41 @@
 //!
 //! All parser utilis.
 //!
-use crate::{ast::GroupWrapper, LibertyStr};
+use crate::ast::GroupWrapper;
 use nom::{
   branch::alt,
   bytes::complete::{escaped, is_not, tag, take, take_until, take_while},
   character::complete::{char, digit1, one_of},
   combinator::{map, map_opt, opt},
-  error::{ContextError, Error, ErrorKind, FromExternalError, ParseError},
+  error::{Error, ErrorKind},
   multi::{many0, separated_list0},
-  sequence::{delimited, pair, preceded, terminated, tuple},
-  IResult, InputTakeAtPosition as _,
+  sequence::{delimited, pair, preceded, terminated},
+  IResult, Input as _, Parser as _,
 };
 use std::collections::HashMap;
 
 use super::ComplexWrapper;
 
 #[inline]
-fn comment_single(i: &str) -> IResult<&str, usize, Error<&str>> {
+fn comment_single(i: &str) -> IResult<&str, usize> {
   map(
-    tuple((
+    (
       alt((tag("*"), tag("//"))),
       take_while(move |c: char| c != '\n'),
       take(1_usize),
       space,
-    )),
+    ),
     |_| 1,
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
-fn comment_multi(i: &str) -> IResult<&str, usize, Error<&str>> {
-  map(tuple((tag("/*"), take_until("*/"), take(2_usize), space)), |(_, s, _, _)| {
+fn comment_multi(i: &str) -> IResult<&str, usize> {
+  map((tag("/*"), take_until("*/"), take(2_usize), space), |(_, s, _, _)| {
     s.chars().filter(|&x| x == '\n').count()
-  })(i)
+  })
+  .parse(i)
 }
 
 #[cfg(test)]
@@ -66,23 +68,25 @@ mod test_comment {
 }
 
 #[inline]
-fn space(i: &str) -> IResult<&str, (), Error<&str>> {
-  map(take_while(move |c: char| matches!(c, '\t' | '\r' | ' ')), |_| ())(i)
+fn space(i: &str) -> IResult<&str, ()> {
+  map(take_while(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse(i)
 }
 #[inline]
-fn space_newline(i: &str) -> IResult<&str, usize, Error<&str>> {
-  map(take_while(move |c: char| matches!(c, '\t' | '\n' | '\r' | ' ')), |s: &str| {
+fn space_newline(i: &str) -> IResult<&str, usize> {
+  map(take_while(|c| matches!(c, '\t' | '\n' | '\r' | ' ')), |s: &str| {
     s.chars().filter(|&x| x == '\n').count()
-  })(i)
+  })
+  .parse(i)
 }
 
 /// must have new line!
 #[inline]
-pub(crate) fn comment_space_newline_many1(i: &str) -> IResult<&str, usize, Error<&str>> {
+pub(crate) fn comment_space_newline_many1(i: &str) -> IResult<&str, usize> {
   match map(
     pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
-  )(i)
+  )
+  .parse(i)
   {
     Ok((s, n)) => {
       if n == 0 {
@@ -96,15 +100,16 @@ pub(crate) fn comment_space_newline_many1(i: &str) -> IResult<&str, usize, Error
 }
 
 #[inline]
-pub(crate) fn comment_space_newline(i: &str) -> IResult<&str, usize, Error<&str>> {
+pub(crate) fn comment_space_newline(i: &str) -> IResult<&str, usize> {
   map(
     pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
-fn comment_space_newline_slash(i: &str) -> IResult<&str, usize, Error<&str>> {
+fn comment_space_newline_slash(i: &str) -> IResult<&str, usize> {
   map(
     pair(
       space,
@@ -124,7 +129,8 @@ fn comment_space_newline_slash(i: &str) -> IResult<&str, usize, Error<&str>> {
       )),
     ),
     |(_, n)| n.unwrap_or(0),
-  )(i)
+  )
+  .parse(i)
 }
 
 #[cfg(test)]
@@ -171,10 +177,10 @@ pub(crate) fn undefine<'a>(
   i: &'a str,
   group_name: &str,
   scope: &mut super::ParseScope,
-) -> IResult<&'a str, super::UndefinedAttriValue, Error<&'a str>> {
+) -> IResult<&'a str, super::UndefinedAttriValue> {
   let line_num_back: usize = scope.line_num;
   if let Ok((input, res)) = simple(i, &mut scope.line_num) {
-    return Ok((input, super::UndefinedAttriValue::Simple(LibertyStr::from(res))));
+    return Ok((input, super::UndefinedAttriValue::Simple(String::from(res))));
   }
   scope.line_num = line_num_back;
   if let Ok((input, vec)) = complex(i, &mut scope.line_num) {
@@ -187,7 +193,7 @@ pub(crate) fn undefine<'a>(
   match title(i, &mut scope.line_num) {
     Ok((mut input, title)) => {
       let mut res = GroupWrapper {
-        title: title.into_iter().map(LibertyStr::from).collect(),
+        title: title.into_iter().map(String::from).collect(),
         attri_map: HashMap::with_hasher(foldhash::fast::FixedState::default()),
       };
       loop {
@@ -219,15 +225,13 @@ pub(crate) fn undefine<'a>(
 }
 
 #[inline]
-fn unquote<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
-where
-  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
-{
+fn unquote(i: &str) -> IResult<&str, &str> {
   delimited(
     char('"'),
     escaped(opt(alt((tag(r#"\""#), is_not(r#"\""#)))), '\\', one_of(r#"\"rnt"#)),
     char('"'),
-  )(i)
+  )
+  .parse(i)
 }
 
 #[cfg(test)]
@@ -235,20 +239,16 @@ mod test_unquote {
   use super::*;
   #[test]
   fn test1() {
-    use nom::error::VerboseError;
-    println!("{:?}", unquote::<VerboseError<&str>>("\"iwww\" "));
-    println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
-    println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));
-    println!("{:?}", key::<VerboseError<&str>>("iw_w2w';"));
-    println!("{:?}", formula::<VerboseError<&str>>("0.3 * VDD ;"));
+    println!("{:?}", unquote("\"iwww\" "));
+    println!("{:?}", key("iw_ww "));
+    println!("{:?}", key("iw_w2w "));
+    println!("{:?}", key("iw_w2w';"));
+    println!("{:?}", formula("0.3 * VDD ;"));
   }
 }
 
 #[inline]
-pub(crate) fn key<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
-where
-  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
-{
+pub(crate) fn key(i: &str) -> IResult<&str, &str> {
   i.split_at_position1(|item| !(item.is_alphanumeric() || item == '_'), ErrorKind::Alpha)
 }
 #[inline]
@@ -257,10 +257,7 @@ pub(super) fn char_in_word(c: char) -> bool {
 }
 
 #[inline]
-pub(crate) fn word<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
-where
-  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
-{
+pub(crate) fn word(i: &str) -> IResult<&str, &str> {
   i.split_at_position1(|item| !char_in_word(item), ErrorKind::Alpha)
 }
 
@@ -270,10 +267,7 @@ pub(super) fn char_in_formula(c: char) -> bool {
 }
 
 #[inline]
-pub(crate) fn formula<'a, E>(i: &'a str) -> IResult<&'a str, &'a str, E>
-where
-  E: ParseError<&'a str> + ContextError<&'a str> + FromExternalError<&'a str, E>,
-{
+pub(crate) fn formula(i: &str) -> IResult<&str, &str> {
   i.split_at_position1(|item| !char_in_formula(item), ErrorKind::Alpha)
 }
 
@@ -281,9 +275,9 @@ where
 pub(crate) fn simple_multi<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, &'a str, Error<&'a str>> {
+) -> IResult<&'a str, &'a str> {
   map(
-    tuple((
+    (
       space,
       char(':'),
       space,
@@ -293,48 +287,47 @@ pub(crate) fn simple_multi<'a>(
       space,
       char(';'),
       comment_space_newline,
-    )),
+    ),
     |(_, _, _, _, s, _, _, _, n)| {
       *line_num += n + s.chars().filter(|&x| x == '\n').count();
       s
     },
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
 pub(crate) fn simple_custom<'a, T>(
   i: &'a str,
   line_num: &mut usize,
-  func: fn(&'a str) -> IResult<&'a str, T, Error<&'a str>>,
+  func: fn(&'a str) -> IResult<&'a str, T>,
 ) -> super::SimpleParseRes<'a, T> {
   map(
-    tuple((
+    (
       space,
       char(':'),
       space,
       alt((
         map(alt((func, delimited(char('"'), func, char('"')))), Ok),
-        map(alt((word, unquote)), |s| Err(LibertyStr::from(s))),
+        map(alt((word, unquote)), |s| Err(String::from(s))),
       )),
       alt((
         preceded(terminated(space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
-    )),
+    ),
     |(_, _, _, s, n)| {
       *line_num += n;
       s
     },
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
-pub(crate) fn simple<'a>(
-  i: &'a str,
-  line_num: &mut usize,
-) -> IResult<&'a str, &'a str, Error<&'a str>> {
+pub(crate) fn simple<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, &'a str> {
   map(
-    tuple((
+    (
       space,
       char(':'),
       space,
@@ -343,15 +336,16 @@ pub(crate) fn simple<'a>(
         preceded(terminated(space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
-    )),
+    ),
     |(_, _, _, s, n)| {
       *line_num += n;
       s
     },
-  )(i)
+  )
+  .parse(i)
 }
 #[inline]
-pub(crate) fn float_one(i: &str) -> IResult<&str, f64, Error<&str>> {
+pub(crate) fn float_one(i: &str) -> IResult<&str, f64> {
   #[expect(clippy::string_slice)]
   match fast_float2::parse_partial(i) {
     Ok((f, pos)) => Ok((&i[pos..], f)),
@@ -359,7 +353,7 @@ pub(crate) fn float_one(i: &str) -> IResult<&str, f64, Error<&str>> {
   }
 }
 #[inline]
-fn float_vec(i: &str) -> IResult<&str, Vec<f64>, Error<&str>> {
+fn float_vec(i: &str) -> IResult<&str, Vec<f64>> {
   delimited(
     pair(char('"'), space),
     terminated(
@@ -367,22 +361,23 @@ fn float_vec(i: &str) -> IResult<&str, Vec<f64>, Error<&str>> {
       pair(opt(char(',')), space),
     ),
     char('"'),
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
-fn int_usize(i: &str) -> IResult<&str, usize, Error<&str>> {
+fn int_usize(i: &str) -> IResult<&str, usize> {
   #[expect(clippy::unwrap_used)]
-  map(digit1, |s: &str| s.parse().unwrap())(i)
+  map(digit1, |s: &str| s.parse().unwrap()).parse(i)
 }
 
 #[inline]
 pub(crate) fn complex_id_vector<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, (usize, Vec<f64>), Error<&'a str>> {
+) -> IResult<&'a str, (usize, Vec<f64>)> {
   map(
-    tuple((
+    (
       space,
       char('('),
       comment_space_newline_slash,
@@ -397,22 +392,23 @@ pub(crate) fn complex_id_vector<'a>(
         preceded(pair(space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
-    )),
+    ),
     |(_, _, n0, id, _, _, n1, vec, n2, _, n3)| {
       *line_num += n0 + n1 + n2 + n3;
       (id, vec)
     },
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
-pub(crate) fn complex_multi_line<'a, T, F: nom::Parser<&'a str, T, Error<&'a str>>>(
+pub(crate) fn complex_multi_line<'a, T>(
   i: &'a str,
   line_num: &mut usize,
-  f: F,
-) -> IResult<&'a str, Vec<(usize, T)>, Error<&'a str>> {
+  f: fn(i: &str) -> IResult<&str, T>,
+) -> IResult<&'a str, Vec<(usize, T)>> {
   map(
-    tuple((
+    (
       space,
       char('('),
       comment_space_newline_slash,
@@ -424,21 +420,22 @@ pub(crate) fn complex_multi_line<'a, T, F: nom::Parser<&'a str, T, Error<&'a str
         preceded(pair(space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
-    )),
+    ),
     |(_, _, n0, vec, _, n1, _, n2)| {
       *line_num += n0 + n1 + n2;
       vec
     },
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
 pub(crate) fn complex_float_vec<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<f64>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<f64>> {
   map(
-    tuple((
+    (
       space,
       char('('),
       comment_space_newline_slash,
@@ -449,12 +446,13 @@ pub(crate) fn complex_float_vec<'a>(
         preceded(pair(space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
-    )),
+    ),
     |(_, _, n0, vec, n1, _, n2)| {
       *line_num += n0 + n1 + n2;
       vec
     },
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
@@ -462,7 +460,7 @@ pub(crate) fn complex_float_vec<'a>(
 pub(crate) fn complex_values<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<(usize, Vec<f64>)>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<(usize, Vec<f64>)>> {
   complex_multi_line(i, line_num, float_vec)
 }
 
@@ -470,25 +468,25 @@ pub(crate) fn complex_values<'a>(
 pub(crate) fn complex_ccs_power_values<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<(usize, crate::common::table::CcsPowerValue)>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<(usize, crate::common::table::CcsPowerValue)>> {
   #[inline]
   fn complex_ccs_power_value(
     i: &str,
-  ) -> IResult<&str, crate::common::table::CcsPowerValue, Error<&str>> {
+  ) -> IResult<&str, crate::common::table::CcsPowerValue> {
     delimited(
       pair(char('"'), space),
       map(
-        tuple((
+        (
           terminated(float_one, delimited(space, char(','), space)),
           terminated(float_one, delimited(space, char(','), space)),
           separated_list0(
             delimited(space, char(','), space),
             map(
-              tuple((
+              (
                 terminated(int_usize, delimited(space, char(','), space)),
                 terminated(float_one, delimited(space, char(','), space)),
                 float_one,
-              )),
+              ),
               |(bc_id, point_time, point_current)| crate::common::table::CcsPowerPoint {
                 bc_id,
                 point_time,
@@ -497,7 +495,7 @@ pub(crate) fn complex_ccs_power_values<'a>(
             ),
           ),
           pair(opt(char(',')), space),
-        )),
+        ),
         |(init_time, init_current, points, _)| crate::common::table::CcsPowerValue {
           init_time,
           init_current,
@@ -505,7 +503,8 @@ pub(crate) fn complex_ccs_power_values<'a>(
         },
       ),
       char('"'),
-    )(i)
+    )
+    .parse(i)
   }
 
   complex_multi_line(i, line_num, complex_ccs_power_value)
@@ -515,9 +514,9 @@ pub(crate) fn complex_ccs_power_values<'a>(
 pub(crate) fn complex<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<(usize, &'a str)>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<(usize, &'a str)>> {
   map(
-    tuple((
+    (
       space,
       char('('),
       comment_space_newline_slash,
@@ -532,12 +531,13 @@ pub(crate) fn complex<'a>(
         preceded(pair(space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
-    )),
+    ),
     |(_, _, n0, vec, _, n1, _, n2)| {
       *line_num += n0 + n1 + n2;
       vec
     },
-  )(i)
+  )
+  .parse(i)
 }
 
 #[cfg(test)]
@@ -589,15 +589,14 @@ mod test_key {
 
   #[test]
   fn test1() {
-    use nom::error::VerboseError;
     println!("{:?}", comment_space_newline("\n\r\t\n : b ; "));
     println!("{:?}", simple(" : b; }", &mut 1));
     println!("{:?}", simple(" : iwww ; ", &mut 1));
     println!("{:?}", simple(" : 0.3 * VDD ;", &mut 1));
-    println!("{:?}", key::<VerboseError<&str>>("iwww "));
-    println!("{:?}", key::<VerboseError<&str>>("iw_ww "));
-    println!("{:?}", key::<VerboseError<&str>>("iw_w2w "));
-    println!("{:?}", key::<VerboseError<&str>>("iw_w2w';"));
+    println!("{:?}", key("iwww "));
+    println!("{:?}", key("iw_ww "));
+    println!("{:?}", key("iw_w2w "));
+    println!("{:?}", key("iw_w2w';"));
   }
 }
 
@@ -605,9 +604,9 @@ mod test_key {
 pub(crate) fn title<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<&'a str>, Error<&'a str>> {
+) -> IResult<&'a str, Vec<&'a str>> {
   map(
-    tuple((
+    (
       space,
       char('('),
       separated_list0(char(','), delimited(space, alt((unquote, word)), space)),
@@ -615,17 +614,18 @@ pub(crate) fn title<'a>(
       space,
       char('{'),
       comment_space_newline,
-    )),
+    ),
     |(_, _, v, _, _, _, n)| {
       *line_num += n;
       v
     },
-  )(i)
+  )
+  .parse(i)
 }
 
 #[inline]
-pub(crate) fn end_group(i: &str) -> IResult<&str, (), Error<&str>> {
-  map(char('}'), |_| ())(i)
+pub(crate) fn end_group(i: &str) -> IResult<&str, ()> {
+  map(char('}'), |_| ()).parse(i)
 }
 
 #[cfg(test)]

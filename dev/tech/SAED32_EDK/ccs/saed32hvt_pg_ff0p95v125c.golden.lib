@@ -1,5 +1,8 @@
 
 liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
+	define (def_sim_opt, library, string);
+	define (driver_model, library, string);
+	define (simulator, library, string);
 	technology (cmos);
 	delay_model : table_lookup;
 	date : "[2012 JAN 31]";
@@ -9,9 +12,6 @@ liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
 	nom_voltage : 0.95;
 	default_operating_conditions : pg_ff0p95v125c;
 	default_threshold_voltage_group : saed32cell_hvt;
-	define (def_sim_opt, library, string);
-	define (driver_model, library, string);
-	define (simulator, library, string);
 	library_features (report_power_calculation);
 	default_leakage_power_density : 0.0;
 	default_cell_leakage_power : 0.0;

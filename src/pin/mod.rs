@@ -8,7 +8,7 @@ use crate::{
   expression::{logic, BooleanExpression, PowerGroundBooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
-  Ctx, LibertyStr,
+  Ctx,
 };
 mod bundle;
 mod items;
@@ -47,7 +47,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "crate::common::items::namelist_borrow",
+    check_fn = "NameList::as_ref",
     with_ref = false
   )]
   #[size = 48]
@@ -66,10 +66,10 @@ pub struct Pin<C: Ctx> {
   pub attributes: Attributes,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub driver_waveform_rise: Option<LibertyStr>,
+  pub driver_waveform_rise: Option<String>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub driver_waveform_fall: Option<LibertyStr>,
+  pub driver_waveform_fall: Option<String>,
   /// The `related_power_pin`  and `related_ground_pin`  attributes
   /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
   /// The `related_power_pin`  and `related_ground_pin` attributes are used
@@ -85,7 +85,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple)]
-  pub related_ground_pin: LibertyStr,
+  pub related_ground_pin: String,
   /// The `retention_pin` complex attribute identifies the retention pins of a retention cell. The
   /// attribute defines the following information:
   /// + pin class
@@ -128,7 +128,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 8]
   #[liberty(simple)]
-  pub related_power_pin: LibertyStr,
+  pub related_power_pin: String,
   // NOTICE: Simple Attributes in a pin Group
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -353,7 +353,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub complementary_pin: Option<LibertyStr>,
+  pub complementary_pin: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -551,7 +551,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub input_signal_level: Option<LibertyStr>,
+  pub input_signal_level: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -562,7 +562,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub input_voltage: Option<LibertyStr>,
+  pub input_voltage: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -573,7 +573,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub internal_node: Option<LibertyStr>, /* Required in statetable cells */
+  pub internal_node: Option<String>, /* Required in statetable cells */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -846,7 +846,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub output_signal_level: Option<LibertyStr>,
+  pub output_signal_level: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -879,7 +879,7 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub output_voltage: Option<LibertyStr>,
+  pub output_voltage: Option<String>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test
@@ -1129,7 +1129,7 @@ pub struct Pin<C: Ctx> {
   pub rise_capacitance_range: Option<(f64, f64)>,
   // NOTICE: Group Attributes in a pin Group
   // electromigration () { }
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<InternalPower<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<InternalPower<C>>::deserialize_with")]
@@ -1149,7 +1149,7 @@ pub struct Pin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=372.33&end=372.37
   /// ">Reference-Definition</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<TLatch<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TLatch<C>>::deserialize_with")]
@@ -1175,7 +1175,7 @@ pub struct Pin<C: Ctx> {
   /// =203.29
   /// ">Reference-Instatnce-In-Pin</a>
   ///
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Timing<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Timing<C>>::deserialize_with")]
@@ -1197,7 +1197,7 @@ pub struct Pin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=316.5&end=316.31
   /// ">Reference-Definition</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<ReceiverCapacitance<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<ReceiverCapacitance<C>>::deserialize_with")]
@@ -1212,22 +1212,22 @@ pub struct Pin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=296.7&end=296.12
   /// ">Reference-Instance</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
   pub input_ccb: GroupSet<CCSNStage<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
   pub output_ccb: GroupSet<CCSNStage<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]
   pub ccsn_first_stage: GroupSet<CCSNStage<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CCSNStage<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CCSNStage<C>>::deserialize_with")]

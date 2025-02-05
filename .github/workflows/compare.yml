@@ -1,0 +1,70 @@
+name: Compare Branches
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_VERSION: "1.84.0"
+
+jobs:
+  compare-and-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out PR (head)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          path: pr_head
+      - name: Check out Base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          repository: ${{ github.event.pull_request.base.repo.full_name }}
+          path: base_branch
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+      - name: Build commit URLs
+        id: buildurl
+        run: |
+          echo "BASE_URL=${{ github.event.pull_request.base.repo.html_url }}/tree/${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+          echo "INCOMING_URL=${{ github.event.pull_request.head.repo.html_url }}/tree/${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+  
+      - name: Debug print
+        run: |
+          echo "BASE commit URL: ${{ steps.buildurl.outputs.BASE_URL }}"
+          echo "HEAD commit URL: ${{ steps.buildurl.outputs.INCOMING_URL }}"
+      - name: Run compare command
+        run: |
+          sed -i 's|^version = .*|version = "0.0.0-incoming"|' pr_head/Cargo.toml
+          cd base_branch
+          sed -i 's|^liberty-db-incoming|## liberty-db-incoming|' dev/Cargo.toml
+          sed -i 's|^# liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
+          sed -i "s|BASE_URL|${{ steps.buildurl.outputs.BASE_URL }}|" dev/src/_impl_compare.rs
+          sed -i "s|INCOMING_URL|${{ steps.buildurl.outputs.INCOMING_URL }}|" dev/src/_impl_compare.rs
+          cargo bench --package dev --bench compare --features compare
+          sed -i 's|^liberty-db-incoming|# liberty-db-incoming|' dev/Cargo.toml
+          sed -i 's|^## liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
+
+      - name: Show debug
+        run: |
+          ls -l base_branch
+          cat base_branch/target/criterion/index.html || true
+
+      - name: Post report as PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportBody = fs.readFileSync('base_branch/target/criterion/index.html', 'utf8');
+            const msg = String.raw`## Fast comparsion between [Incoming](${{ steps.buildurl.outputs.INCOMING_URL }}) and [Base](${{ steps.buildurl.outputs.BASE_URL }})`
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: msg+reportBody
+            })

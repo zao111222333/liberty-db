@@ -1,5 +1,6 @@
+// cargo bench --package dev --bench benchmark --features bench
 #[cfg(target_os = "linux")]
-use dev::projs::OpenTimerLibrary;
+use dev::_impl_bench::OpenTimerLibrary;
 use dev::{gen_projs, run_bench};
 use std::{
   fs::File,
@@ -26,6 +27,7 @@ fn main() {
   let regress_table = run_bench(
     gen_projs![
       (LibertyDbLatest, liberty_db_latest::Library<liberty_db_latest::DefaultCtx>),
+      (LibertyDb0p9p, liberty_db_0p9p0::Library<liberty_db_0p9p0::DefaultCtx>),
       (LibertyDb0p8p, liberty_db_0p8p3::Library<liberty_db_0p8p3::DefaultCtx>),
       (LibertyDb0p7p, liberty_db_0p7p4::Library),
       (LibertyDb0p6p, liberty_db_0p6p14::Library),

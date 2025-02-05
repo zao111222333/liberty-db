@@ -13,7 +13,7 @@ use crate::{
   common::{items::NameList, table::TableLookUp2D},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
-  Ctx, LibertyStr,
+  Ctx,
 };
 
 pub trait CellCtx {
@@ -72,7 +72,7 @@ pub struct Cell<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -108,13 +108,13 @@ pub struct Cell<C: Ctx> {
   /// CellId
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub single_bit_degenerate: Option<LibertyStr>,
+  pub single_bit_degenerate: Option<String>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub driver_waveform_rise: Option<LibertyStr>,
+  pub driver_waveform_rise: Option<String>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub driver_waveform_fall: Option<LibertyStr>,
+  pub driver_waveform_fall: Option<String>,
   /// The `always_on`  simple attribute models always-on cells or signal pins. Specify the attribute at the cell level to determine whether a cell is an always-on cell. Specify the attribute at the pin level to determine whether a pin is an always-on signal pin.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=100.73&end=100.75
@@ -148,7 +148,7 @@ pub struct Cell<C: Ctx> {
   pub clock_gating_integrated_cell: Option<ClockGatingIntegratedCell>,
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub cell_footprint: Option<LibertyStr>,
+  pub cell_footprint: Option<String>,
   #[size = 16]
   #[liberty(simple(type = Option))]
   pub cell_leakage_power: Option<f64>,
@@ -176,7 +176,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub fpga_isd: Option<LibertyStr>,
+  pub fpga_isd: Option<String>,
   /// Indicates that the `timing` arcs are interpreted according
   ///  to interface `timing` specifications semantics.
   /// If this attribute is missing or its value is set to false,
@@ -195,7 +195,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub io_type: Option<LibertyStr>,
+  pub io_type: Option<String>,
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub is_filler_cell: Option<bool>,
@@ -309,7 +309,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub retention_cell: Option<LibertyStr>,
+  pub retention_cell: Option<String>,
   /// The `switch_cell_type`  cell-level attribute specifies
   /// the type of the switch cell for direct inference.
   ///
@@ -402,32 +402,32 @@ pub struct Cell<C: Ctx> {
   #[size = 96]
   #[liberty(complex(type = Option))]
   pub pin_opposite: Option<PinOpposite>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<PgPin<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<PgPin<C>>::deserialize_with")]
   pub pg_pin: GroupSet<PgPin<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]
   pub ff: GroupSet<FF<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FFBank<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FFBank<C>>::deserialize_with")]
   pub ff_bank: GroupSet<FFBank<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Latch<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Latch<C>>::deserialize_with")]
   pub latch: GroupSet<Latch<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LatchBank<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LatchBank<C>>::deserialize_with")]
   pub latch_bank: GroupSet<LatchBank<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LeakagePower<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LeakagePower<C>>::deserialize_with")]
@@ -441,7 +441,7 @@ pub struct Cell<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=147.3&end=147.5
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<DynamicCurrent<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<DynamicCurrent<C>>::deserialize_with")]
@@ -502,7 +502,7 @@ pub struct Cell<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=176.24+177.2&end=176.49+177.25
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<IntrinsicParasitic<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<IntrinsicParasitic<C>>::deserialize_with")]
@@ -536,12 +536,12 @@ pub struct Cell<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=194.49+195.2&end=194.50+195.20
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LeakageCurrent<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LeakageCurrent<C>>::deserialize_with")]
   pub leakage_current: GroupSet<LeakageCurrent<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Pin<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Pin<C>>::deserialize_with")]
@@ -556,7 +556,7 @@ pub struct Cell<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
   /// ">Reference</a>
   pub test_cell: Vec<TestCell<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Bundle<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Bundle<C>>::deserialize_with")]
@@ -653,32 +653,32 @@ pub struct TestCell<C: Ctx> {
   #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]
   pub ff: GroupSet<FF<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<FFBank<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FFBank<C>>::deserialize_with")]
   pub ff_bank: GroupSet<FFBank<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Latch<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Latch<C>>::deserialize_with")]
   pub latch: GroupSet<Latch<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<LatchBank<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<LatchBank<C>>::deserialize_with")]
   pub latch_bank: GroupSet<LatchBank<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Pin<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Pin<C>>::deserialize_with")]
   pub pin: GroupSet<Pin<C>>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Statetable<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Statetable<C>>::deserialize_with")]

@@ -13,7 +13,7 @@ use crate::{
     parse_f64,
   },
   expression::logic,
-  Ctx, LibertyStr,
+  Ctx,
 };
 use core::fmt::{self, Write};
 
@@ -41,7 +41,7 @@ pub struct Sensitization<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -65,7 +65,7 @@ pub struct Sensitization<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub pin_names: Vec<LibertyStr>,
+  pub pin_names: Vec<String>,
   /// # vector Complex Attribute
   ///
   /// Similar to the `pin_names` attribute,
@@ -304,7 +304,7 @@ pub struct VoltageMap {
   /// name
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
-  pub name: LibertyStr,
+  pub name: String,
   /// voltage
   pub voltage: f64,
 }
@@ -316,7 +316,7 @@ impl ComplexAttri for VoltageMap {
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let name = match iter.next() {
-      Some(&s) => LibertyStr::from(s),
+      Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let voltage = match iter.next() {
@@ -354,7 +354,7 @@ pub struct InputVoltage<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -413,7 +413,7 @@ pub struct OutputVoltage<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -504,7 +504,7 @@ pub struct OperatingConditions<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -522,7 +522,7 @@ pub struct OperatingConditions<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub calc_mode: Option<LibertyStr>,
+  pub calc_mode: Option<String>,
   /// Use this optional attribute to specify values for up to five user-defined variables.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.36&end=72.37
@@ -545,7 +545,7 @@ pub struct OperatingConditions<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple(type = Option))]
-  pub process_label: Option<LibertyStr>,
+  pub process_label: Option<String>,
   /// Use the `temperature`  attribute to specify the ambient temperature in which the design is to operate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.15&end=73.16
@@ -594,7 +594,7 @@ pub struct FpgaIsd<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -612,14 +612,14 @@ pub struct FpgaIsd<C: Ctx> {
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub drive: LibertyStr,
+  pub drive: String,
   /// The `io_type`  attribute is required and specifies the input or output voltage of the FPGA part or the FPGA cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.17&end=64.18
   /// ">Reference</a>
   #[size = 8]
   #[liberty(simple)]
-  pub io_type: LibertyStr,
+  pub io_type: String,
   /// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.27&end=64.28
@@ -692,6 +692,49 @@ impl SimpleAttri for TreeType {
   }
 }
 
+/// The `technology`  attribute statement specifies the technology
+/// family being used in the library.
+/// When you define the technology  attribute,
+/// it must be the first attribute you use and it must be placed at the top of the listing.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.3&end=39.5
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy)]
+#[derive(Hash, PartialEq, Eq)]
+#[derive(Ord, PartialOrd)]
+#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum Technology {
+  /// `cmos`
+  #[strum(serialize = "cmos")]
+  Cmos,
+}
+crate::ast::impl_self_builder!(Technology);
+impl ComplexAttri for Technology {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    iter: I,
+    _scope: &mut ParseScope,
+  ) -> Result<Self, ComplexParseError> {
+    let mut i = iter;
+    let v1: Self = match i.next() {
+      Some(&s) => s.parse()?,
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if i.next().is_some() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok(v1)
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{self}")
+  }
+}
+
 /// Use this attribute to define new, temporary, or user-defined attributes
 /// for use in symbol and technology libraries.
 ///
@@ -720,14 +763,14 @@ pub struct Define {
   /// ">Reference</a>
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
-  pub attribute_name: LibertyStr,
+  pub attribute_name: String,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.12&end=36.13
   /// ">Reference</a>
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
-  pub group_name: LibertyStr,
+  pub group_name: String,
   /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.14&end=36.15
@@ -768,18 +811,15 @@ impl ComplexAttri for Define {
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let attribute_name = match iter.next() {
-      Some(&s) => LibertyStr::from(s),
+      Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let group_name = match iter.next() {
-      Some(&s) => LibertyStr::from(s),
+      Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let attribute_type = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::UnsupportedWord),
-      },
+      Some(&s) => s.parse()?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if iter.next().is_some() {
@@ -816,14 +856,14 @@ pub struct DefineGroup {
   /// ">Reference</a>
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
-  pub group: LibertyStr,
+  pub group: String,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.35&end=37.36
   /// ">Reference</a>
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
-  pub parent_name: LibertyStr,
+  pub parent_name: String,
 }
 crate::ast::impl_self_builder!(DefineGroup);
 impl ComplexAttri for DefineGroup {
@@ -833,11 +873,11 @@ impl ComplexAttri for DefineGroup {
     scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let group = match iter.next() {
-      Some(&s) => LibertyStr::from(s),
+      Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let parent_name = match iter.next() {
-      Some(&s) => LibertyStr::from(s),
+      Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if iter.next().is_some() {
@@ -873,7 +913,7 @@ pub struct DefineCellArea {
   /// ">Reference</a>
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
-  pub area_name: LibertyStr,
+  pub area_name: String,
   /// The resource type can be
   /// + `pad_slots`
   /// + `pad_input_driver_sites`
@@ -926,7 +966,7 @@ impl ComplexAttri for DefineCellArea {
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let area_name = match iter.next() {
-      Some(&s) => LibertyStr::from(s),
+      Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let resource_type = match iter.next() {
@@ -964,7 +1004,7 @@ pub struct WireLoad<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1026,7 +1066,7 @@ pub struct WireLoad<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
   /// ">Reference</a>
-  #[size = 64]
+  #[size = 88]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<FanoutLength>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<FanoutLength>::deserialize_with")]
@@ -1147,7 +1187,7 @@ pub struct WireLoadSection<C: Ctx> {
   #[id(borrow = "&str", with_ref = false)]
   #[size = 8]
   #[liberty(name)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1165,7 +1205,7 @@ pub struct WireLoadSection<C: Ctx> {
   /// ">Reference</a>
   #[size = 24]
   #[liberty(complex)]
-  pub wire_load_from_area: (f64, f64, LibertyStr),
+  pub wire_load_from_area: (f64, f64, String),
 }
 impl<C: Ctx> GroupFn for WireLoadSection<C> {}
 
@@ -1245,7 +1285,7 @@ pub struct BaseCurves<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  pub name: LibertyStr,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1280,7 +1320,7 @@ pub struct BaseCurves<C: Ctx> {
   #[size = 24]
   #[liberty(complex)]
   pub curve_x: Vec<f64>,
-  #[size = 64]
+  #[size = 88]
   #[liberty(complex(type = Set))]
   #[serde(serialize_with = "GroupSet::<IdVector>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<IdVector>::deserialize_with")]

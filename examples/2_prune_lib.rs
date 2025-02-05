@@ -18,7 +18,7 @@ fn main() {
   let mut library =
     Library::<DefaultCtx>::parse_lib(read_to_string(input_lib).unwrap().as_str())
       .unwrap();
-  library.technology = "cmos".into();
+  library.technology = Some(liberty_db::library::Technology::Cmos);
   for operating_condition in library.operating_conditions.iter_mut() {
     operating_condition.voltage = 0.8;
   }

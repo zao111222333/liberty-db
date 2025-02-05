@@ -1,12 +1,9 @@
 //!
 //! implement basic types
 //!
-use crate::{
-  ast::{
-    self, is_word, join_fmt_no_quote, CodeFormatter, ComplexAttri, ComplexParseError,
-    ComplexParseRes, IdError, Indentation, NameAttri, ParseScope, SimpleAttri,
-  },
-  LibertyStr,
+use crate::ast::{
+  self, is_word, join_fmt_no_quote, CodeFormatter, ComplexAttri, ComplexParseError,
+  ComplexParseRes, IdError, Indentation, NameAttri, ParseScope, SimpleAttri,
 };
 use core::{
   fmt::{self, Write},
@@ -68,14 +65,14 @@ impl SimpleAttri for isize {
   }
 }
 
-impl NameAttri for Option<LibertyStr> {
+impl NameAttri for Option<String> {
   #[inline]
   fn parse(mut v: Vec<&str>) -> Result<Self, IdError> {
     let l = v.len();
     if l > 1 {
       Err(IdError::length_dismatch(1, l, v))
     } else {
-      Ok(v.pop().map(LibertyStr::from))
+      Ok(v.pop().map(String::from))
     }
   }
   #[inline]
@@ -93,7 +90,7 @@ impl NameAttri for Option<LibertyStr> {
   }
 }
 
-impl NameAttri for LibertyStr {
+impl NameAttri for String {
   #[inline]
   fn parse(mut v: Vec<&str>) -> Result<Self, IdError> {
     let l = v.len();
@@ -123,9 +120,7 @@ impl NameAttri for NameList {
       0 => Err(IdError::length_dismatch(1, 0, v)),
       #[expect(clippy::indexing_slicing)]
       1 => Ok(Self::Name(v[0].into())),
-      _ => Ok(Self::List(WordSet {
-        inner: v.into_iter().map(LibertyStr::from).collect(),
-      })),
+      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(String::from).collect() })),
     }
   }
   #[inline]
@@ -143,14 +138,12 @@ impl FromStr for NameList {
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     let mut v: Vec<_> = s
       .split(' ')
-      .filter_map(|_s| if _s.is_empty() { None } else { Some(LibertyStr::from(_s)) })
+      .filter_map(|_s| if _s.is_empty() { None } else { Some(String::from(_s)) })
       .collect();
     match v.len() {
       0 => Err(()),
       1 => Ok(Self::Name(v.pop().unwrap())),
-      _ => Ok(Self::List(WordSet {
-        inner: v.into_iter().map(LibertyStr::from).collect(),
-      })),
+      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(String::from).collect() })),
     }
   }
 }
@@ -214,10 +207,10 @@ impl fmt::Display for NameList {
   }
 }
 
-impl NameAttri for Vec<LibertyStr> {
+impl NameAttri for Vec<String> {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, IdError> {
-    Ok(v.into_iter().map(LibertyStr::from).collect())
+    Ok(v.into_iter().map(String::from).collect())
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -232,13 +225,13 @@ impl NameAttri for Vec<LibertyStr> {
     )
   }
 }
-impl<const N: usize> NameAttri for [LibertyStr; N] {
+impl<const N: usize> NameAttri for [String; N] {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Self, IdError> {
     let l = v.len();
     if l == N {
-      match TryInto::<[LibertyStr; N]>::try_into(
-        v.into_iter().map(LibertyStr::from).collect::<Vec<LibertyStr>>(),
+      match TryInto::<[String; N]>::try_into(
+        v.into_iter().map(String::from).collect::<Vec<String>>(),
       ) {
         Ok(name) => Ok(name),
         Err(e) => Err(IdError::Other(format!("try_into error: {e:?}"))),
@@ -260,8 +253,8 @@ impl<const N: usize> NameAttri for [LibertyStr; N] {
     )
   }
 }
-crate::ast::impl_self_builder!(LibertyStr);
-impl SimpleAttri for LibertyStr {
+crate::ast::impl_self_builder!(String);
+impl SimpleAttri for String {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str(i, scope)
@@ -282,22 +275,22 @@ impl SimpleAttri for LibertyStr {
     }
   }
 }
-impl<const N: usize> ast::ParsingBuilder for [LibertyStr; N] {
+impl<const N: usize> ast::ParsingBuilder for [String; N] {
   type Builder = Self;
   #[inline]
   fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope) -> Self {
     builder
   }
 }
-impl<const N: usize> ComplexAttri for [LibertyStr; N] {
+impl<const N: usize> ComplexAttri for [String; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    let v = iter.map(|&s| LibertyStr::from(s)).collect::<Vec<LibertyStr>>();
+    let v = iter.map(|&s| String::from(s)).collect::<Vec<String>>();
     if v.len() == N {
-      TryInto::<[LibertyStr; N]>::try_into(v).map_or(Err(ComplexParseError::Other), Ok)
+      TryInto::<[String; N]>::try_into(v).map_or(Err(ComplexParseError::Other), Ok)
     } else {
       Err(ComplexParseError::LengthDismatch)
     }
@@ -405,7 +398,7 @@ impl ComplexAttri for Vec<f64> {
     ast::join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
-impl ComplexAttri for LibertyStr {
+impl ComplexAttri for String {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -457,14 +450,14 @@ impl ComplexAttri for f64 {
     f.write_num(*self)
   }
 }
-crate::ast::impl_self_builder!(Vec<LibertyStr>);
-impl ComplexAttri for Vec<LibertyStr> {
+crate::ast::impl_self_builder!(Vec<String>);
+impl ComplexAttri for Vec<String> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
-    Ok(iter.map(|&s| LibertyStr::from(s)).collect())
+    Ok(iter.map(|&s| String::from(s)).collect())
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -507,8 +500,8 @@ impl ComplexAttri for Vec<usize> {
     join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_num(*i), ", ")
   }
 }
-crate::ast::impl_self_builder!((f64, f64, LibertyStr));
-impl ComplexAttri for (f64, f64, LibertyStr) {
+crate::ast::impl_self_builder!((f64, f64, String));
+impl ComplexAttri for (f64, f64, String) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -523,8 +516,8 @@ impl ComplexAttri for (f64, f64, LibertyStr) {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v3: LibertyStr = match i.next() {
-      Some(&s) => LibertyStr::from(s),
+    let v3: String = match i.next() {
+      Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
     if i.next().is_some() {
@@ -617,9 +610,10 @@ crate::ast::impl_self_builder!(Formula);
 impl SimpleAttri for Formula {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    use nom::Parser as _;
     #[inline]
-    fn f(i: &str) -> nom::IResult<&str, Formula, nom::error::Error<&str>> {
-      nom::combinator::map(ast::parser::formula, |s| Formula(LibertyStr::from(s)))(i)
+    fn f(i: &str) -> nom::IResult<&str, Formula> {
+      nom::combinator::map(ast::parser::formula, |s| Formula(String::from(s))).parse(i)
     }
     ast::parser::simple_custom(i, &mut scope.line_num, f)
   }

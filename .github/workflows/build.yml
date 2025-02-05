@@ -13,7 +13,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_VERSION: "1.82.0"
+  RUST_VERSION: "1.84.0"
   # A fixed version used for testing, so that the builds don't
   # spontaneously break after a few years.
   # Make sure to update this from time to time.
@@ -123,7 +123,7 @@ jobs:
           tool: cargo-tarpaulin
       - run: cargo tarpaulin --verbose --release --lib --examples --workspace --exclude liberty-macros --exclude-files dev/* --out xml html --output-dir target/codecov
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: target/codecov/cobertura.xml
           token: ${{ secrets.CODECOV_TOKEN }}

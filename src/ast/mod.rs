@@ -4,7 +4,7 @@
 
 mod fmt;
 pub mod parser;
-use crate::{common::f64_into_hash_ord_fn, library::AttributeType, LibertyStr};
+use crate::{common::f64_into_hash_ord_fn, library::AttributeType};
 use core::{
   cmp::Ordering,
   fmt::Write,
@@ -49,12 +49,12 @@ macro_rules! impl_self_builder {
 pub(crate) use impl_self_builder;
 
 /// Wrapper for simple attribute
-pub type SimpleWrapper = LibertyStr;
+pub type SimpleWrapper = String;
 /// Wrapper for complex attribute
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct ComplexWrapper(pub(crate) Vec<LibertyStr>);
+pub struct ComplexWrapper(pub(crate) Vec<String>);
 impl ComplexWrapper {
   #[expect(clippy::arithmetic_side_effects)]
   fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope) -> Self {
@@ -63,7 +63,7 @@ impl ComplexWrapper {
         .into_iter()
         .map(|(n, s)| {
           scope.line_num += n;
-          LibertyStr::from(s)
+          String::from(s)
         })
         .collect(),
     )
@@ -81,7 +81,7 @@ impl ComplexWrapper {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct GroupWrapper {
   /// title
-  pub title: Vec<LibertyStr>,
+  pub title: Vec<String>,
   /// `attri_map`
   pub attri_map: Attributes,
 }
@@ -98,7 +98,7 @@ impl PartialOrd for GroupWrapper {
   }
 }
 /// type for Undefined `Attributes`
-pub type Attributes = HashMap<LibertyStr, AttriValues, foldhash::fast::FixedState>;
+pub type Attributes = HashMap<String, AttriValues, foldhash::fast::FixedState>;
 /// `AttriValues` for `undefined_attribute/serialization`
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -121,13 +121,13 @@ pub(crate) enum UndefinedAttriValue {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SimpleDefined {
   /// Boolean `Simple`
-  Boolean(Vec<Result<bool, LibertyStr>>),
+  Boolean(Vec<Result<bool, String>>),
   /// string `Simple`
-  String(Vec<LibertyStr>),
+  String(Vec<String>),
   /// integer `Simple`
-  Integer(Vec<Result<isize, LibertyStr>>),
+  Integer(Vec<Result<isize, String>>),
   /// float `Simple`
-  Float(Vec<Result<f64, LibertyStr>>),
+  Float(Vec<Result<f64, String>>),
 }
 impl PartialEq for SimpleDefined {
   #[inline]
@@ -195,7 +195,7 @@ pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
   #[inline]
   fn fmt1<T: Write, I: Indentation, U: Format>(
     v: &Vec<U>,
-    key: &LibertyStr,
+    key: &String,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     v.iter().try_for_each(|u| Format::liberty(u, key, f))
@@ -203,8 +203,8 @@ pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
   #[expect(clippy::all)]
   #[inline]
   fn fmt2<T: Write, I: Indentation, U: SimpleAttri>(
-    v: &Vec<Result<U, LibertyStr>>,
-    key: &LibertyStr,
+    v: &Vec<Result<U, String>>,
+    key: &String,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     v.iter().try_for_each(|res_u| {
@@ -228,13 +228,13 @@ pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
 pub(crate) fn attributs_set_undefined_simple(
   attri_map: &mut Attributes,
   key: &str,
-  undefined: LibertyStr,
+  undefined: String,
 ) {
   if let Some(AttriValues::Simple(SimpleDefined::String(v))) = attri_map.get_mut(key) {
     v.push(undefined);
   } else {
     _ = attri_map.insert(
-      LibertyStr::from(key),
+      String::from(key),
       AttriValues::Simple(SimpleDefined::String(vec![undefined])),
     );
   }
@@ -248,7 +248,7 @@ pub(crate) fn attributs_set_undefined_complex(
   if let Some(AttriValues::Complex(v)) = attri_map.get_mut(key) {
     v.push(undefined);
   } else {
-    _ = attri_map.insert(LibertyStr::from(key), AttriValues::Complex(vec![undefined]));
+    _ = attri_map.insert(String::from(key), AttriValues::Complex(vec![undefined]));
   }
 }
 #[expect(clippy::too_many_lines)]
@@ -286,7 +286,7 @@ pub(crate) fn attributs_set_undefined_attri(
         }
       } else {
         _ = attri_map.insert(
-          LibertyStr::from(key),
+          String::from(key),
           match undefined {
             UndefinedAttriValue::Simple(u) => {
               AttriValues::Simple(SimpleDefined::String(vec![u]))
@@ -344,7 +344,7 @@ pub(crate) fn attributs_set_undefined_attri(
           }
         } else {
           _ = attri_map.insert(
-            LibertyStr::from(key),
+            String::from(key),
             match simple_type {
               AttributeType::Boolean => {
                 AttriValues::Simple(SimpleDefined::Boolean(vec![u
@@ -381,7 +381,7 @@ pub(crate) fn attributs_set_undefined_attri(
             );
           }
         } else {
-          _ = attri_map.insert(LibertyStr::from(key), AttriValues::Group(vec![u]));
+          _ = attri_map.insert(String::from(key), AttriValues::Group(vec![u]));
         }
       } else {
         log::error!("Line={}; Key={key}, `defined_group` got wrong type", scope.line_num);
@@ -471,7 +471,7 @@ pub(crate) fn define_id(hash_builder: &RandomState, group_name: &str, key: &str)
 // }
 
 pub(crate) type SimpleParseRes<'a, T> =
-  IResult<&'a str, Result<T, LibertyStr>, Error<&'a str>>;
+  IResult<&'a str, Result<T, String>, Error<&'a str>>;
 pub(crate) type ComplexParseRes<'a, T> =
   IResult<&'a str, Result<T, (ComplexParseError, ComplexWrapper)>, Error<&'a str>>;
 #[inline]
@@ -481,7 +481,7 @@ pub(crate) fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
 ) -> SimpleParseRes<'a, T> {
   let (input, s) = parser::simple(i, &mut scope.line_num)?;
   s.parse()
-    .map_or(Ok((input, Err(LibertyStr::from(s)))), |simple| Ok((input, Ok(simple))))
+    .map_or(Ok((input, Err(String::from(s)))), |simple| Ok((input, Ok(simple))))
 }
 
 /// Simple Attribute in Liberty
@@ -538,6 +538,13 @@ pub(crate) enum ComplexParseError {
   /// unsurpport word
   #[error("unsurpport word")]
   UnsupportedWord,
+}
+
+impl From<strum::ParseError> for ComplexParseError {
+  #[inline]
+  fn from(_: strum::ParseError) -> Self {
+    Self::UnsupportedWord
+  }
 }
 
 #[inline]
@@ -679,7 +686,7 @@ pub(crate) trait GroupAttri: Sized + ParsingBuilder {
 pub enum IdError {
   /// TitleLenMismatch(want,got,title)
   #[error("title length dismatch (want={want},got={got}), title={title:?}")]
-  LengthDismatch { want: usize, got: usize, title: Vec<LibertyStr> },
+  LengthDismatch { want: usize, got: usize, title: Vec<String> },
   /// replace same id
   #[error("replace same id")]
   RepeatIdx,
@@ -700,7 +707,7 @@ impl IdError {
     Self::LengthDismatch {
       want,
       got,
-      title: v.into_iter().map(LibertyStr::from).collect(),
+      title: v.into_iter().map(String::from).collect(),
     }
   }
 }
@@ -869,7 +876,7 @@ pub(crate) trait Format {
   }
 }
 #[inline]
-pub(crate) fn is_word(s: &LibertyStr) -> bool {
+pub(crate) fn is_word(s: &str) -> bool {
   !s.is_empty() && s.chars().all(parser::char_in_word)
 }
 
