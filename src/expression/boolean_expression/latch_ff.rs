@@ -457,7 +457,7 @@ impl<C: Ctx> NamedGroup for LatchFFBank_type<C> {
     }
     v.pop()
       .map_or(Err(IdError::Other("Unkown pop error".into())), |bits_str| {
-        match bits_str.parse::<usize>() {
+        match lexical_core::parse(bits_str.as_bytes()) {
           Ok(bits) => {
             v.pop()
               .map_or(Err(IdError::Other("Unkown pop error".into())), |variable2| {

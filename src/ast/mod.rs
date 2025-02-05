@@ -4,12 +4,14 @@
 
 mod fmt;
 pub mod parser;
-use crate::{common::f64_into_hash_ord_fn, library::AttributeType};
+use crate::{
+  common::{f64_into_hash_ord_fn, parse_f64},
+  library::AttributeType,
+};
 use core::{
   cmp::Ordering,
   fmt::Write,
   hash::{BuildHasher as _, Hash as _, Hasher as _},
-  num::ParseIntError,
   str::FromStr,
 };
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
@@ -323,7 +325,7 @@ pub(crate) fn attributs_set_undefined_attri(
             }
             AttributeType::Integer => {
               if let AttriValues::Simple(SimpleDefined::Integer(v)) = value {
-                v.push(u.parse().map_or(Err(u), Ok));
+                v.push(lexical_core::parse(u.as_bytes()).map_or(Err(u), Ok));
               } else {
                 log::error!(
                   "Line={}; Key={key}, the old attribute do NOT meet new one",
@@ -333,7 +335,7 @@ pub(crate) fn attributs_set_undefined_attri(
             }
             AttributeType::Float => {
               if let AttriValues::Simple(SimpleDefined::Float(v)) = value {
-                v.push(u.parse().map_or(Err(u), Ok));
+                v.push(parse_f64(&u).map_or(Err(u), Ok));
               } else {
                 log::error!(
                   "Line={}; Key={key}, the old attribute do NOT meet new one",
@@ -354,14 +356,12 @@ pub(crate) fn attributs_set_undefined_attri(
               AttributeType::String => {
                 AttriValues::Simple(SimpleDefined::String(vec![u]))
               }
-              AttributeType::Integer => {
-                AttriValues::Simple(SimpleDefined::Integer(vec![u
-                  .parse()
-                  .map_or(Err(u), Ok)]))
-              }
-              AttributeType::Float => AttriValues::Simple(SimpleDefined::Float(vec![u
-                .parse()
-                .map_or(Err(u), Ok)])),
+              AttributeType::Integer => AttriValues::Simple(SimpleDefined::Integer(
+                vec![lexical_core::parse(u.as_bytes()).map_or(Err(u), Ok)],
+              )),
+              AttributeType::Float => AttriValues::Simple(SimpleDefined::Float(vec![
+                parse_f64(&u).map_or(Err(u), Ok),
+              ])),
             },
           );
         }
@@ -528,7 +528,7 @@ pub(crate) enum ComplexParseError {
   // Float(#[from] ParseNotNanError<ParseFloatError>),
   /// `ParseIntError`
   #[error("{0}")]
-  Int(#[from] ParseIntError),
+  Int(#[from] lexical_core::Error),
   /// title length mismatch
   #[error("title length mismatch")]
   LengthDismatch,
@@ -695,7 +695,7 @@ pub enum IdError {
   RepeatAttri,
   /// Int Error
   #[error("{0}")]
-  Int(ParseIntError),
+  Int(#[from] lexical_core::Error),
   /// something else
   #[error("{0}")]
   Other(String),

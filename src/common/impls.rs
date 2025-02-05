@@ -40,7 +40,7 @@ crate::ast::impl_self_builder!(usize);
 impl SimpleAttri for usize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_custom(i, &mut scope.line_num, ast::parser::int_usize)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -54,7 +54,7 @@ crate::ast::impl_self_builder!(isize);
 impl SimpleAttri for isize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::parser::simple_custom(i, &mut scope.line_num, ast::parser::int_isize)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -484,7 +484,7 @@ impl ComplexAttri for Vec<usize> {
     _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     iter
-      .map(|&s| s.parse())
+      .map(|&s| lexical_core::parse(s.as_bytes()))
       .collect::<Result<Self, _>>()
       .map_err(ComplexParseError::Int)
   }
@@ -546,7 +546,7 @@ impl ComplexAttri for (i64, f64) {
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let v1 = match i.next() {
-      Some(s) => s.parse::<i64>()?,
+      Some(s) => lexical_core::parse(s.as_bytes())?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
     let v2 = match i.next() {
