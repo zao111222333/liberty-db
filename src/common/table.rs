@@ -564,11 +564,11 @@ impl ComplexAttri for Vec<CcsPowerValue> {
       point: &CcsPowerPoint,
       f: &mut ast::CodeFormatter<'_, T, I>,
     ) -> fmt::Result {
-      f.write_int(point.bc_id)?;
+      f.write_num(point.bc_id)?;
       f.write_str(", ")?;
-      f.write_float(point.point_time)?;
+      f.write_num(point.point_time)?;
       f.write_str(", ")?;
-      f.write_float(point.point_current)
+      f.write_num(point.point_current)
     }
     #[inline]
     fn fmt_value<T: Write, I: ast::Indentation>(
@@ -576,9 +576,9 @@ impl ComplexAttri for Vec<CcsPowerValue> {
       f: &mut ast::CodeFormatter<'_, T, I>,
     ) -> fmt::Result {
       write!(f, "\"")?;
-      f.write_float(value.init_time)?;
+      f.write_num(value.init_time)?;
       f.write_str(", ")?;
-      f.write_float(value.init_current)?;
+      f.write_num(value.init_current)?;
       if !value.points.is_empty() {
         f.write_str(", ")?;
         ast::join_fmt_no_quote(
@@ -910,11 +910,11 @@ impl ComplexAttri for Values {
     let indent = f.indentation();
     let mut iter = self.inner.chunks(self.size1);
     if let Some(v) = iter.next() {
-      ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(*float), ", ")?;
+      ast::join_fmt(v.iter(), f, |float, ff| ff.write_num(*float), ", ")?;
     }
     while let Some(v) = iter.next() {
       write!(f, ", \\\n{indent}")?;
-      ast::join_fmt(v.iter(), f, |float, ff| ff.write_float(*float), ", ")?;
+      ast::join_fmt(v.iter(), f, |float, ff| ff.write_num(*float), ", ")?;
     }
     Ok(())
   }
@@ -937,11 +937,11 @@ impl<V: Iterator<Item = f64>> DisplayValues<V> {
     let chunks = self.inner.chunks(self.size1);
     let mut iter = chunks.into_iter();
     if let Some(v) = iter.next() {
-      ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_float(float), ", ")?;
+      ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_num(float), ", ")?;
     }
     while let Some(v) = iter.next() {
       write!(f, ", \\\n{indent}")?;
-      ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_float(float), ", ")?;
+      ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_num(float), ", ")?;
     }
     Ok(())
   }

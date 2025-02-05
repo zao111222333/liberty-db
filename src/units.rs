@@ -320,7 +320,7 @@ impl ComplexAttri for CapacitiveLoadUnit {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(self.val)?;
+    f.write_num(self.val)?;
     if self.ff_pf {
       f.write_str(", ff")
     } else {

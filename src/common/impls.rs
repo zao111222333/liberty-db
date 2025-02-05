@@ -29,7 +29,7 @@ impl SimpleAttri for f64 {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(*self)
+    f.write_num(*self)
   }
 }
 crate::ast::impl_self_builder!(bool);
@@ -50,7 +50,7 @@ impl SimpleAttri for usize {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_int(*self)
+    f.write_num(*self)
   }
 }
 crate::ast::impl_self_builder!(isize);
@@ -64,7 +64,7 @@ impl SimpleAttri for isize {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_int(*self)
+    f.write_num(*self)
   }
 }
 
@@ -345,7 +345,7 @@ impl<const N: usize> ComplexAttri for [f64; N] {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(*float), ", ")
+    ast::join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
 crate::ast::impl_self_builder!(super::items::IdVector);
@@ -371,9 +371,9 @@ impl ComplexAttri for super::items::IdVector {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_int(self.id)?;
+    f.write_num(self.id)?;
     write!(f, ", \\\n{}", f.indentation())?;
-    ast::join_fmt(self.vec.iter(), f, |float, ff| ff.write_float(*float), ", ")
+    ast::join_fmt(self.vec.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
 crate::ast::impl_self_builder!(Vec<f64>);
@@ -402,7 +402,7 @@ impl ComplexAttri for Vec<f64> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    ast::join_fmt(self.iter(), f, |float, ff| ff.write_float(*float), ", ")
+    ast::join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
 impl ComplexAttri for LibertyStr {
@@ -454,7 +454,7 @@ impl ComplexAttri for f64 {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(*self)
+    f.write_num(*self)
   }
 }
 crate::ast::impl_self_builder!(Vec<LibertyStr>);
@@ -504,7 +504,7 @@ impl ComplexAttri for Vec<usize> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_int(*i), ", ")
+    join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_num(*i), ", ")
   }
 }
 crate::ast::impl_self_builder!((f64, f64, LibertyStr));
@@ -537,9 +537,9 @@ impl ComplexAttri for (f64, f64, LibertyStr) {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(self.0)?;
+    f.write_num(self.0)?;
     f.write_str(", ")?;
-    f.write_float(self.1)?;
+    f.write_num(self.1)?;
     f.write_str(", ")?;
     f.write_str(&self.2)
   }
@@ -570,9 +570,9 @@ impl ComplexAttri for (i64, f64) {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_int(self.0)?;
+    f.write_num(self.0)?;
     f.write_str(", ")?;
-    f.write_float(self.1)
+    f.write_num(self.1)
   }
 }
 crate::ast::impl_self_builder!((f64, f64));
@@ -601,9 +601,9 @@ impl ComplexAttri for (f64, f64) {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_float(self.0)?;
+    f.write_num(self.0)?;
     f.write_str(", ")?;
-    f.write_float(self.1)
+    f.write_num(self.1)
   }
 }
 
