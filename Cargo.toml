@@ -83,8 +83,8 @@ foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
 hashmatch = "0.1.1"
 pyo3 = "0.23.4"
-# pyo3-stub-gen = "0.7"
-pyo3-stub-gen = { path = "../pyo3-stub-gen/pyo3-stub-gen" }
+pyo3-stub-gen = "0.7"
+# pyo3-stub-gen = { path = "../pyo3-stub-gen/pyo3-stub-gen" }
 
 [dependencies]
 liberty-macros = { path = "macros" }
