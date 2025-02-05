@@ -524,7 +524,7 @@ pub(crate) trait SimpleAttri: Sized + core::fmt::Display + ParsingBuilder {
 pub(crate) enum ComplexParseError {
   /// `ParseFloatError`
   #[error("{0}")]
-  Float(#[from] fast_float2::Error),
+  Float(#[from] lexical_core::Error),
   // Float(#[from] ParseNotNanError<ParseFloatError>),
   /// `ParseIntError`
   #[error("{0}")]

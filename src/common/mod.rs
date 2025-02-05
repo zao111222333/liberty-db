@@ -11,8 +11,8 @@ pub mod traits;
 mod demo;
 mod impls;
 #[inline]
-pub(crate) fn parse_f64<S: AsRef<[u8]>>(s: S) -> Result<f64, fast_float2::Error> {
-  fast_float2::parse(s)
+pub(crate) fn parse_f64<S: AsRef<[u8]>>(s: S) -> Result<f64, lexical_core::Error> {
+  lexical_core::parse(s.as_ref())
 }
 #[inline]
 #[expect(clippy::trivially_copy_pass_by_ref)]

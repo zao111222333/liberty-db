@@ -347,7 +347,7 @@ pub(crate) fn simple<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, &
 #[inline]
 pub(crate) fn float_one(i: &str) -> IResult<&str, f64> {
   #[expect(clippy::string_slice)]
-  match fast_float2::parse_partial(i) {
+  match lexical_core::parse_partial(i.as_bytes()) {
     Ok((f, pos)) => Ok((&i[pos..], f)),
     Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Float))),
   }
