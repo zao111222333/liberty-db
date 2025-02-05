@@ -342,6 +342,25 @@ pub struct ReceiverCapacitance<C: Ctx> {
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment<C>>,
+  /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
+  /// switching input_ccb groups of the input pin that do not propagate the noise in the timing
+  /// arc or the receiver capacitance load.
+  /// You can also specify this attribute in the `receiver_capacitance` group of the input pin.
+  ///
+  /// Syntax
+  /// ``` text
+  /// active_input_ccb(input_ccb_name1[ , input_ccb_name2, ...]);
+  /// ```
+  /// Example
+  /// ``` text
+  /// active_input_ccb("A", "B");
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.2&end=339.6
+  /// ">Reference-Instance</a>
+  #[size = 24]
+  #[liberty(complex)]
+  pub active_input_ccb: Vec<String>,
   #[size = 336]
   #[liberty(group)]
   pub receiver_capacitance1_fall: Option<TableLookUp<C>>,

@@ -1379,6 +1379,43 @@ pub struct Timing<C: Ctx> {
   #[size = 32]
   #[liberty(simple(type = Option))]
   pub when_start: Option<BooleanExpression>,
+  /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
+  /// switching input_ccb groups of the input pin that do not propagate the noise in the timing
+  /// arc or the receiver capacitance load.
+  /// You can also specify this attribute in the `receiver_capacitance` group of the input pin.
+  ///
+  /// Syntax
+  /// ``` text
+  /// active_input_ccb(input_ccb_name1[ , input_ccb_name2, ...]);
+  /// ```
+  /// Example
+  /// ``` text
+  /// active_input_ccb("A", "B");
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.2&end=339.6
+  /// ">Reference-Instance</a>
+  #[size = 24]
+  #[liberty(complex)]
+  pub active_input_ccb: Vec<String>,
+  /// In referenced CCS noise modeling, the `active_output_ccb` attribute lists the `output_ccb`
+  /// groups in the timing arc that drive the output pin, but do not propagate the noise. You must
+  /// define both the `output_ccb` and `timing` groups in the same pin group.
+  ///
+  /// Syntax
+  /// ``` text
+  /// active_output_ccb(output_ccb_name);
+  /// ```
+  /// Example
+  /// ``` text
+  /// active_input_ccb("CCB_Q2");
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.12&end=339.18
+  /// ">Reference-Instance</a>
+  #[size = 24]
+  #[liberty(complex(type = Option))]
+  pub active_output_ccb: Option<String>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1392,7 +1429,7 @@ pub struct Timing<C: Ctx> {
   #[liberty(complex(type = Option))]
   pub fall_delay_intercept: Option<(i64, f64)>,
   #[size = 16]
-  #[liberty(complex(type=Option))]
+  #[liberty(complex(type = Option))]
   pub propagating_ccb: Option<PropagatingCcb>,
   // piecewise model only
   /// <a name ="reference_link" href="
@@ -1726,6 +1763,21 @@ mod test {
 
   use super::*;
 
+  #[test]
+  fn active_ccb() {
+    use crate::ast::GroupAttri;
+    _ = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
+      r#"(){
+        active_input_ccb(XOR4D4BWP30P140__nci_14_3_FRLR_RFLF:a4, XOR4D4BWP30P140__nci_15_1_FR_RF:a4);
+        active_output_ccb(XOR4D4BWP30P140__nco_0_0_FR_RF:z);
+      }"#,
+      r#"
+liberty_db::timing::Timing () {
+| active_input_ccb (XOR4D4BWP30P140__nci_14_3_FRLR_RFLF:a4, XOR4D4BWP30P140__nci_15_1_FR_RF:a4);
+| active_output_ccb (XOR4D4BWP30P140__nco_0_0_FR_RF:z);
+}"#,
+    )
+  }
   #[test]
   fn lvf() {
     use crate::ast::GroupAttri;

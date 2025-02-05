@@ -144,6 +144,54 @@ pub struct Library<C: Ctx> {
   #[size = 16]
   #[liberty(simple(type = Option))]
   pub nom_voltage: Option<f64>,
+  /// The `receiver_capacitance_rise_threshold_pct` attribute specifies the points that
+  /// separate the voltage rise segments in the multi-segment receiver capacitance model.
+  ///
+  /// Specify the points as percentage of the rail voltage between 0.0 and 100.0.
+  ///
+  /// Specify monotonically increasing values with the
+  /// `receiver_capacitance_rise_threshold_pct` attribute.
+  ///
+  /// Syntax
+  /// ``` text
+  /// receiver_capacitance_rise_threshold_pct ("float, float,...");
+  /// ```
+  /// Example
+  /// ``` text
+  /// receiver_capacitance_rise_threshold_pct ("0, 30, 50, 60, 70, 80, 100");
+  /// ```
+  /// In this example, six segments are defined and the first segment is from zero percent to 30
+  /// percent of the rail voltage.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=38.18&end=38.28
+  /// ">Reference</a>
+  #[size = 24]
+  #[liberty(complex)]
+  pub receiver_capacitance_rise_threshold_pct: Vec<f64>,
+  /// The `receiver_capacitance_fall_threshold_pct` attribute specifies the points that
+  /// separate the voltage fall segments in the multi-segment receiver capacitance model.
+  ///
+  /// Specify each point as a percentage of the rail voltage between 0.0 and 100.0.
+  ///
+  /// Specify monotonically decreasing values with the
+  /// `receiver_capacitance_fall_threshold_pct` attribute.
+  ///
+  /// Syntax
+  /// ``` text
+  /// receiver_capacitance_fall_threshold_pct ("float, float,...");
+  /// ```
+  /// Example
+  /// ``` text
+  /// receiver_capacitance_fall_threshold_pct ("100, 80, 70, 60, 50, 30, 0");
+  /// ```
+  /// In this example, six segments are defined and the first segment is from 100 percent to 80
+  /// percent of the rail voltage.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=38.6&end=38.16
+  /// ">Reference</a>
+  #[size = 24]
+  #[liberty(complex)]
+  pub receiver_capacitance_fall_threshold_pct: Vec<f64>,
   /// Use this group to define operating conditions;
   /// that is, `process`, `voltage`, and `temperature`.
   /// You define an `operating_conditions`  group at the library-level, as shown here:

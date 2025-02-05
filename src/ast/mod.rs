@@ -529,8 +529,8 @@ pub(crate) enum ComplexParseError {
   /// `ParseIntError`
   #[error("{0}")]
   Int(#[from] lexical_core::Error),
-  /// title length mismatch
-  #[error("title length mismatch")]
+  /// complex length mismatch
+  #[error("complex length mismatch")]
   LengthDismatch,
   /// other error
   #[error("other")]
