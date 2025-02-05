@@ -15,7 +15,6 @@ use crate::{
   Ctx,
 };
 use core::fmt::{self, Write};
-use num_traits::Zero as _;
 
 /// Use the `ccsn_first_stage` group to specify CCS noise for the first stage of the channel-
 /// connected block (CCB).
@@ -234,13 +233,13 @@ impl<C: Ctx> GroupFn for CCSNStage<C> {
   fn before_build(builder: &mut Self::Builder, _scope: &mut BuilderScope) {
     if let Some(miller_cap_fall) = builder.miller_cap_fall.as_mut() {
       if miller_cap_fall.is_sign_negative() {
-        miller_cap_fall.set_zero();
+        *miller_cap_fall = 0.0;
         log::warn!("miller_cap_fall is negative!");
       }
     }
     if let Some(miller_cap_rise) = builder.miller_cap_rise.as_mut() {
       if miller_cap_rise.is_sign_negative() {
-        miller_cap_rise.set_zero();
+        *miller_cap_rise = 0.0;
         log::warn!("miller_cap_rise is negative!");
       }
     }
