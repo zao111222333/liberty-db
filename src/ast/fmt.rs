@@ -79,9 +79,10 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
     }
   }
   #[inline]
+  #[expect(clippy::unwrap_used, clippy::unwrap_in_result)]
   pub(crate) fn write_num<N: lexical_core::ToLexical>(&mut self, n: N) -> fmt::Result {
     let bytes = lexical_core::write(n, &mut self.buffer);
-    let s = std::str::from_utf8(bytes).unwrap();
+    let s = core::str::from_utf8(bytes).unwrap();
     self.f.write_str(s)
   }
   /// Set the indentation level to a specific value

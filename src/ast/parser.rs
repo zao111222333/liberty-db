@@ -6,7 +6,7 @@ use crate::ast::GroupWrapper;
 use nom::{
   branch::alt,
   bytes::complete::{escaped, is_not, tag, take, take_until, take_while},
-  character::complete::{char, digit1, one_of},
+  character::complete::{char, one_of},
   combinator::{map, map_opt, opt},
   error::{Error, ErrorKind},
   multi::{many0, separated_list0},
@@ -366,9 +366,21 @@ fn float_vec(i: &str) -> IResult<&str, Vec<f64>> {
 }
 
 #[inline]
-fn int_usize(i: &str) -> IResult<&str, usize> {
-  #[expect(clippy::unwrap_used)]
-  map(digit1, |s: &str| s.parse().unwrap()).parse(i)
+pub(crate) fn int_isize(i: &str) -> IResult<&str, isize> {
+  #[expect(clippy::string_slice)]
+  match lexical_core::parse_partial(i.as_bytes()) {
+    Ok((n, pos)) => Ok((&i[pos..], n)),
+    Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Digit))),
+  }
+}
+
+#[inline]
+pub(crate) fn int_usize(i: &str) -> IResult<&str, usize> {
+  #[expect(clippy::string_slice)]
+  match lexical_core::parse_partial(i.as_bytes()) {
+    Ok((n, pos)) => Ok((&i[pos..], n)),
+    Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Digit))),
+  }
 }
 
 #[inline]
