@@ -62,6 +62,7 @@ nom = "8.0"
 derivative = "2.2"
 ryu = "1.0"
 itoa = "1.0"
+lexical-core = "1.0"
 biodivine-lib-bdd = { version = "0.5.23", features = ["serde"] }
 # biodivine-lib-bdd = { git = "https://github.com/zao111222333/biodivine-lib-bdd.git", features = ["serde"] }
 mut_set = "0.7.0"
@@ -82,8 +83,8 @@ foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
 hashmatch = "0.1.1"
 pyo3 = "0.23.4"
-pyo3-stub-gen = "0.7"
-# pyo3-stub-gen = { path = "../pyo3-stub-gen/pyo3-stub-gen" }
+# pyo3-stub-gen = "0.7"
+pyo3-stub-gen = { path = "../pyo3-stub-gen/pyo3-stub-gen" }
 
 [dependencies]
 liberty-macros = { path = "macros" }
@@ -92,15 +93,13 @@ foldhash.workspace = true
 log.workspace = true
 serde.workspace = true
 thiserror.workspace = true
+lexical-core.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
 itertools.workspace = true
 ordered-float.workspace = true
 fast-float2.workspace = true
 nom.workspace = true
-# derivative.workspace = true
-ryu.workspace = true
-itoa.workspace = true
 biodivine-lib-bdd.workspace = true
 mut_set.workspace = true
 duplicate.workspace = true

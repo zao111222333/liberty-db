@@ -54,8 +54,7 @@ impl Indentation for DefaultIndentation {
 pub struct CodeFormatter<'a, F, I> {
   f: &'a mut F,
   level: usize,
-  buff_f: ryu::Buffer,
-  buff_i: itoa::Buffer,
+  buffer: [u8; lexical_core::BUFFER_SIZE],
   __i: PhantomData<I>,
 }
 
@@ -75,19 +74,14 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
     Self {
       f,
       level: 0,
-      buff_f: ryu::Buffer::new(),
-      buff_i: itoa::Buffer::new(),
+      buffer: [b'0'; lexical_core::BUFFER_SIZE],
       __i: PhantomData,
     }
   }
   #[inline]
-  pub(crate) fn write_float<F: ryu::Float>(&mut self, float: F) -> fmt::Result {
-    let s = self.buff_f.format(float);
-    self.f.write_str(s)
-  }
-  #[inline]
-  pub(crate) fn write_int<Int: itoa::Integer>(&mut self, int: Int) -> fmt::Result {
-    let s = self.buff_i.format(int);
+  pub(crate) fn write_num<N: lexical_core::ToLexical>(&mut self, n: N) -> fmt::Result {
+    let bytes = lexical_core::write(n, &mut self.buffer);
+    let s = std::str::from_utf8(bytes).unwrap();
     self.f.write_str(s)
   }
   /// Set the indentation level to a specific value

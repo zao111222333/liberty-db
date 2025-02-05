@@ -1,6 +1,6 @@
 #![cfg(test)]
 use dev_utils::{all_files, text_diff};
-use liberty_db::{ast::Group, Library};
+use liberty_db::{ast::Group, DefaultCtx, Library};
 use std::{
   fs::read_to_string,
   path::{Path, PathBuf},
@@ -32,7 +32,8 @@ fn make_golden() {
     let golden_lib_path = golden_path(&test_lib_path);
     log::info!("{}", test_lib_path.display());
     let library =
-      Library::parse_lib(read_to_string(test_lib_path).unwrap().as_str()).unwrap();
+      Library::<DefaultCtx>::parse_lib(read_to_string(test_lib_path).unwrap().as_str())
+        .unwrap();
     let golden_lib = File::create(golden_lib_path).unwrap();
     let mut writer = BufWriter::new(golden_lib);
     _ = write!(writer, "{}", library.display());
@@ -42,8 +43,6 @@ fn make_golden() {
 #[cfg(test)]
 #[test]
 fn regression() {
-  use liberty_db::DefaultCtx;
-
   _ = simple_logger::SimpleLogger::new().init();
   for test_lib_path in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());

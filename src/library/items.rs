@@ -204,7 +204,7 @@ impl ComplexAttri for SensitizationVector {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_int(self.id)?;
+    f.write_num(self.id)?;
     f.write_str(", ")?;
     crate::ast::join_fmt(
       self.states.iter(),
@@ -334,7 +334,7 @@ impl ComplexAttri for VoltageMap {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     write!(f, "{}, ", self.name)?;
-    f.write_float(self.voltage)
+    f.write_num(self.voltage)
   }
 }
 
@@ -1156,18 +1156,18 @@ impl ComplexAttri for FanoutLength {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_int(self.fanout)?;
+    f.write_num(self.fanout)?;
     f.write_str(", ")?;
-    f.write_float(self.length)?;
+    f.write_num(self.length)?;
     if let (Some(average_capacitance), Some(standard_deviation), Some(number_of_nets)) =
       (self.average_capacitance, self.standard_deviation, self.number_of_nets)
     {
       f.write_str(", ")?;
-      f.write_float(average_capacitance)?;
+      f.write_num(average_capacitance)?;
       f.write_str(", ")?;
-      f.write_float(standard_deviation)?;
+      f.write_num(standard_deviation)?;
       f.write_str(", ")?;
-      f.write_int(number_of_nets)?;
+      f.write_num(number_of_nets)?;
     }
     Ok(())
   }
