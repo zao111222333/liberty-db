@@ -367,7 +367,7 @@ fn float_vec(i: &str) -> IResult<&str, Vec<f64>> {
 
 #[inline]
 pub(crate) fn int_isize(i: &str) -> IResult<&str, isize> {
-  #[expect(clippy::unwrap_used)]
+  #[expect(clippy::string_slice)]
   match lexical_core::parse_partial(i.as_bytes()) {
     Ok((n, pos)) => Ok((&i[pos..], n)),
     Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Digit))),
@@ -376,7 +376,7 @@ pub(crate) fn int_isize(i: &str) -> IResult<&str, isize> {
 
 #[inline]
 pub(crate) fn int_usize(i: &str) -> IResult<&str, usize> {
-  #[expect(clippy::unwrap_used)]
+  #[expect(clippy::string_slice)]
   match lexical_core::parse_partial(i.as_bytes()) {
     Ok((n, pos)) => Ok((&i[pos..], n)),
     Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Digit))),
