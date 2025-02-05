@@ -15,7 +15,8 @@ use crate::{
   common::{
     items::{NameList, SdfEdgeType, WordSet},
     table::{
-      CompactCcsTable, ReferenceTimeVector3DGrpup, TableLookUp, TableLookUpMultiSegment,
+      CompactCcsTable, OcvSigmaTable, ReferenceTimeVector3DGrpup, TableLookUp,
+      TableLookUp2D, TableLookUpMultiSegment,
     },
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
@@ -1545,10 +1546,10 @@ pub struct Timing<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<CellDegradation<C>>::deserialize_with")]
   pub cell_degradation: GroupSet<CellDegradation<C>>,
   #[liberty(supergroup(
-    cell_rise: Option<TableLookUp<C>>,
-    ocv_mean_shift_cell_rise: Option<TableLookUp<C>>,
-    ocv_std_dev_cell_rise: Option<TableLookUp<C>>,
-    ocv_skewness_cell_rise: Option<TableLookUp<C>>,
+    cell_rise: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_cell_rise: Option<TableLookUp2D<C>>,
+    ocv_std_dev_cell_rise: Option<TableLookUp2D<C>>,
+    ocv_skewness_cell_rise: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub cell_rise: Option<TimingTableLookUp<C>>,
@@ -1577,74 +1578,74 @@ pub struct Timing<C: Ctx> {
   /// =204.10
   /// ">Reference-Instance</a>
   #[liberty(supergroup(
-    cell_fall: Option<TableLookUp<C>>,
-    ocv_mean_shift_cell_fall: Option<TableLookUp<C>>,
-    ocv_std_dev_cell_fall: Option<TableLookUp<C>>,
-    ocv_skewness_cell_fall: Option<TableLookUp<C>>,
+    cell_fall: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_cell_fall: Option<TableLookUp2D<C>>,
+    ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
+    ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub cell_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    rise_transition: Option<TableLookUp<C>>,
-    ocv_mean_shift_rise_transition: Option<TableLookUp<C>>,
-    ocv_std_dev_rise_transition: Option<TableLookUp<C>>,
-    ocv_skewness_rise_transition: Option<TableLookUp<C>>,
+    rise_transition: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_rise_transition: Option<TableLookUp2D<C>>,
+    ocv_std_dev_rise_transition: Option<TableLookUp2D<C>>,
+    ocv_skewness_rise_transition: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub rise_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    fall_transition: Option<TableLookUp<C>>,
-    ocv_mean_shift_fall_transition: Option<TableLookUp<C>>,
-    ocv_std_dev_fall_transition: Option<TableLookUp<C>>,
-    ocv_skewness_fall_transition: Option<TableLookUp<C>>,
+    fall_transition: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_fall_transition: Option<TableLookUp2D<C>>,
+    ocv_std_dev_fall_transition: Option<TableLookUp2D<C>>,
+    ocv_skewness_fall_transition: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub fall_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    rise_constraint: Option<TableLookUp<C>>,
-    ocv_mean_shift_rise_constraint: Option<TableLookUp<C>>,
-    ocv_std_dev_rise_constraint: Option<TableLookUp<C>>,
-    ocv_skewness_rise_constraint: Option<TableLookUp<C>>,
+    rise_constraint: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_rise_constraint: Option<TableLookUp2D<C>>,
+    ocv_std_dev_rise_constraint: Option<TableLookUp2D<C>>,
+    ocv_skewness_rise_constraint: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub rise_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    fall_constraint: Option<TableLookUp<C>>,
-    ocv_mean_shift_fall_constraint: Option<TableLookUp<C>>,
-    ocv_std_dev_fall_constraint: Option<TableLookUp<C>>,
-    ocv_skewness_fall_constraint: Option<TableLookUp<C>>,
+    fall_constraint: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_fall_constraint: Option<TableLookUp2D<C>>,
+    ocv_std_dev_fall_constraint: Option<TableLookUp2D<C>>,
+    ocv_skewness_fall_constraint: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub fall_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retaining_rise: Option<TableLookUp<C>>,
-    ocv_mean_shift_retaining_rise: Option<TableLookUp<C>>,
-    ocv_std_dev_retaining_rise: Option<TableLookUp<C>>,
-    ocv_skewness_retaining_rise: Option<TableLookUp<C>>,
+    retaining_rise: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_retaining_rise: Option<TableLookUp2D<C>>,
+    ocv_std_dev_retaining_rise: Option<TableLookUp2D<C>>,
+    ocv_skewness_retaining_rise: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub retaining_rise: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retaining_fall: Option<TableLookUp<C>>,
-    ocv_mean_shift_retaining_fall: Option<TableLookUp<C>>,
-    ocv_std_dev_retaining_fall: Option<TableLookUp<C>>,
-    ocv_skewness_retaining_fall: Option<TableLookUp<C>>,
+    retaining_fall: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_retaining_fall: Option<TableLookUp2D<C>>,
+    ocv_std_dev_retaining_fall: Option<TableLookUp2D<C>>,
+    ocv_skewness_retaining_fall: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub retaining_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retain_rise_slew: Option<TableLookUp<C>>,
-    ocv_mean_shift_retain_rise_slew: Option<TableLookUp<C>>,
-    ocv_std_dev_retain_rise_slew: Option<TableLookUp<C>>,
-    ocv_skewness_retain_rise_slew: Option<TableLookUp<C>>,
+    retain_rise_slew: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_retain_rise_slew: Option<TableLookUp2D<C>>,
+    ocv_std_dev_retain_rise_slew: Option<TableLookUp2D<C>>,
+    ocv_skewness_retain_rise_slew: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub retain_rise_slew: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retain_fall_slew: Option<TableLookUp<C>>,
-    ocv_mean_shift_retain_fall_slew: Option<TableLookUp<C>>,
-    ocv_std_dev_retain_fall_slew: Option<TableLookUp<C>>,
-    ocv_skewness_retain_fall_slew: Option<TableLookUp<C>>,
+    retain_fall_slew: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_retain_fall_slew: Option<TableLookUp2D<C>>,
+    ocv_std_dev_retain_fall_slew: Option<TableLookUp2D<C>>,
+    ocv_skewness_retain_fall_slew: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub retain_fall_slew: Option<TimingTableLookUp<C>>,
@@ -1753,6 +1754,44 @@ pub struct Timing<C: Ctx> {
   #[size = 168]
   #[liberty(group)]
   pub compact_ccs_fall: Option<CompactCcsTable<C>>,
+  #[size = 169]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_cell_fall: GroupSet<OcvSigmaTable<C>>,
+  #[size = 169]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_cell_rise: GroupSet<OcvSigmaTable<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_fall_constraint: Option<TableLookUp2D<C>>,
+  #[size = 169]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_fall_transition: GroupSet<OcvSigmaTable<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_rise_constraint: Option<TableLookUp2D<C>>,
+  #[size = 169]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_rise_transition: GroupSet<OcvSigmaTable<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_retaining_fall: Option<TableLookUp2D<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_retaining_rise: Option<TableLookUp2D<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_retain_fall_slew: Option<TableLookUp2D<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_retain_rise_slew: Option<TableLookUp2D<C>>,
 }
 
 impl<C: Ctx> GroupFn for Timing<C> {}
@@ -2313,6 +2352,73 @@ liberty_db::timing::Timing () {
         cell_rise(delay_template_3x3){
           index_1("10, 20, 30");
           index_2("30, 50, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+        ocv_mean_shift_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "0, 0, 0", \
+            "0, 0, 0", \
+            "0, 0, 0", \
+          ) ;
+        }
+        ocv_std_dev_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+        ocv_skewness_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+      }
+    "#,
+    );
+    let table = timing.cell_rise.unwrap();
+    let assert_fn = |idx1: f64, idx2: f64, want: f64| {
+      assert_eq!(Some(want), table.lookup(&idx1, &idx2));
+    };
+    assert_fn(10.0, 30.0, 100.0);
+    assert_fn(30.0, 60.0, 900.0);
+    assert_fn(10.0, 42.0, 160.0);
+    assert_fn(14.0, 30.0, 220.0);
+    // 100 + (400-100)*0.4 = 220
+    // 200 + (500-200)*0.4 = 320
+    // 220 + (320-220)*0.6 = 280
+    assert_fn(14.0, 42.0, 280.0);
+    let assert_lvf_fn = |idx1: f64, idx2: f64, want: f64| {
+      assert_eq!(
+        Some(LVFValue { mean: want, std_dev: want, skewness: want }),
+        table.lookup_lvf(&idx1, &idx2)
+      );
+    };
+    assert_lvf_fn(10.0, 30.0, 100.0);
+    assert_lvf_fn(30.0, 60.0, 900.0);
+    assert_lvf_fn(10.0, 42.0, 160.0);
+    assert_lvf_fn(14.0, 30.0, 220.0);
+  }
+  #[test]
+  fn table_lookup_mismatch_lvf() {
+    use crate::ast::GroupAttri;
+    let timing = crate::ast::test_parse::<Timing<DefaultCtx>>(
+      r#"(){
+        cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 40, 60");
           values(  \
             "100, 200, 300", \
             "400, 500, 600", \

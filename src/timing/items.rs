@@ -10,7 +10,7 @@ use crate::{
   },
   common::{
     f64_into_hash_ord_fn,
-    table::{DisplayTableLookUp, DisplayValues, TableLookUp},
+    table::{DisplayTableLookUp, DisplayValues, TableLookUp2D},
   },
   expression::logic,
   Ctx,
@@ -245,6 +245,12 @@ pub struct TimingTableLookUp<C: Ctx> {
   pub size1: usize,
   pub size2: usize,
   pub values: Vec<f64>,
+  /// when `!lvf_values.is_empty() && lvf_index_1.is_empty()`
+  /// directly use `index_1`
+  pub lvf_index_1: Vec<f64>,
+  /// when `!lvf_values.is_empty() && lvf_index_2.is_empty()`
+  /// directly use `index_1`
+  pub lvf_index_2: Vec<f64>,
   pub lvf_values: Vec<LVFValue>,
 }
 #[expect(
@@ -444,30 +450,30 @@ impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
   /// `value`, `mean_shift`, `std_dev`, `skewness`
   type Builder = (
     // value
-    Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
+    Option<<TableLookUp2D<C> as ParsingBuilder>::Builder>,
     // mean_shift
-    Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
+    Option<<TableLookUp2D<C> as ParsingBuilder>::Builder>,
     // std_dev
-    Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
+    Option<<TableLookUp2D<C> as ParsingBuilder>::Builder>,
     // skewness
-    Option<<TableLookUp<C> as ParsingBuilder>::Builder>,
+    Option<<TableLookUp2D<C> as ParsingBuilder>::Builder>,
   );
   #[inline]
   #[expect(clippy::float_arithmetic)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope) -> Self {
     #[inline]
     fn eq_index<C: Ctx>(
-      lhs: &<TableLookUp<C> as ParsingBuilder>::Builder,
-      rhs: &<TableLookUp<C> as ParsingBuilder>::Builder,
+      lhs: &<TableLookUp2D<C> as ParsingBuilder>::Builder,
+      rhs: &<TableLookUp2D<C> as ParsingBuilder>::Builder,
     ) -> bool {
       lhs.index_1 == rhs.index_1 && lhs.index_2 == rhs.index_2
     }
     match builder {
       (Some(_value), Some(_mean_shift), Some(_std_dev), Some(_skewness)) => {
-        let (lvf_values, comments) = if eq_index(&_value, &_mean_shift)
-          && eq_index(&_mean_shift, &_std_dev)
-          && eq_index(&_std_dev, &_skewness)
-        {
+        let lvf_nomial_same_index = eq_index(&_value, &_mean_shift);
+        let valid_lvf_index =
+          eq_index(&_mean_shift, &_std_dev) && eq_index(&_std_dev, &_skewness);
+        let (lvf_values, comments) = if valid_lvf_index {
           (
             izip!(
               _value.values.inner.iter(),
@@ -494,6 +500,16 @@ impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
           size1: _value.values.size1,
           size2: _value.values.size2,
           values: _value.values.inner,
+          lvf_index_1: if lvf_nomial_same_index {
+            Vec::new()
+          } else {
+            _mean_shift.index_1
+          },
+          lvf_index_2: if lvf_nomial_same_index {
+            Vec::new()
+          } else {
+            _mean_shift.index_2
+          },
           lvf_values,
           extra_ctx: Default::default(),
         })
@@ -506,6 +522,8 @@ impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
         size1: _value.values.size1,
         size2: _value.values.size2,
         values: _value.values.inner,
+        lvf_index_1: Vec::new(),
+        lvf_index_2: Vec::new(),
         lvf_values: Vec::new(),
         extra_ctx: Default::default(),
       }),
