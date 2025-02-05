@@ -15,7 +15,8 @@ use crate::{
   common::{
     items::{NameList, SdfEdgeType, WordSet},
     table::{
-      CompactCcsTable, ReferenceTimeVector3DGrpup, TableLookUp, TableLookUpMultiSegment,
+      CompactCcsTable, OcvSigmaTable, ReferenceTimeVector3DGrpup, TableLookUp,
+      TableLookUp2D, TableLookUpMultiSegment,
     },
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
@@ -1379,6 +1380,43 @@ pub struct Timing<C: Ctx> {
   #[size = 32]
   #[liberty(simple(type = Option))]
   pub when_start: Option<BooleanExpression>,
+  /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
+  /// switching input_ccb groups of the input pin that do not propagate the noise in the timing
+  /// arc or the receiver capacitance load.
+  /// You can also specify this attribute in the `receiver_capacitance` group of the input pin.
+  ///
+  /// Syntax
+  /// ``` text
+  /// active_input_ccb(input_ccb_name1[ , input_ccb_name2, ...]);
+  /// ```
+  /// Example
+  /// ``` text
+  /// active_input_ccb("A", "B");
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.2&end=339.6
+  /// ">Reference-Instance</a>
+  #[size = 24]
+  #[liberty(complex)]
+  pub active_input_ccb: Vec<String>,
+  /// In referenced CCS noise modeling, the `active_output_ccb` attribute lists the `output_ccb`
+  /// groups in the timing arc that drive the output pin, but do not propagate the noise. You must
+  /// define both the `output_ccb` and `timing` groups in the same pin group.
+  ///
+  /// Syntax
+  /// ``` text
+  /// active_output_ccb(output_ccb_name);
+  /// ```
+  /// Example
+  /// ``` text
+  /// active_input_ccb("CCB_Q2");
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.12&end=339.18
+  /// ">Reference-Instance</a>
+  #[size = 24]
+  #[liberty(complex(type = Option))]
+  pub active_output_ccb: Option<String>,
   // piecewise model only
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
@@ -1392,7 +1430,7 @@ pub struct Timing<C: Ctx> {
   #[liberty(complex(type = Option))]
   pub fall_delay_intercept: Option<(i64, f64)>,
   #[size = 16]
-  #[liberty(complex(type=Option))]
+  #[liberty(complex(type = Option))]
   pub propagating_ccb: Option<PropagatingCcb>,
   // piecewise model only
   /// <a name ="reference_link" href="
@@ -1508,10 +1546,10 @@ pub struct Timing<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<CellDegradation<C>>::deserialize_with")]
   pub cell_degradation: GroupSet<CellDegradation<C>>,
   #[liberty(supergroup(
-    cell_rise: Option<TableLookUp<C>>,
-    ocv_mean_shift_cell_rise: Option<TableLookUp<C>>,
-    ocv_std_dev_cell_rise: Option<TableLookUp<C>>,
-    ocv_skewness_cell_rise: Option<TableLookUp<C>>,
+    cell_rise: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_cell_rise: Option<TableLookUp2D<C>>,
+    ocv_std_dev_cell_rise: Option<TableLookUp2D<C>>,
+    ocv_skewness_cell_rise: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub cell_rise: Option<TimingTableLookUp<C>>,
@@ -1540,74 +1578,74 @@ pub struct Timing<C: Ctx> {
   /// =204.10
   /// ">Reference-Instance</a>
   #[liberty(supergroup(
-    cell_fall: Option<TableLookUp<C>>,
-    ocv_mean_shift_cell_fall: Option<TableLookUp<C>>,
-    ocv_std_dev_cell_fall: Option<TableLookUp<C>>,
-    ocv_skewness_cell_fall: Option<TableLookUp<C>>,
+    cell_fall: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_cell_fall: Option<TableLookUp2D<C>>,
+    ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
+    ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub cell_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    rise_transition: Option<TableLookUp<C>>,
-    ocv_mean_shift_rise_transition: Option<TableLookUp<C>>,
-    ocv_std_dev_rise_transition: Option<TableLookUp<C>>,
-    ocv_skewness_rise_transition: Option<TableLookUp<C>>,
+    rise_transition: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_rise_transition: Option<TableLookUp2D<C>>,
+    ocv_std_dev_rise_transition: Option<TableLookUp2D<C>>,
+    ocv_skewness_rise_transition: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub rise_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    fall_transition: Option<TableLookUp<C>>,
-    ocv_mean_shift_fall_transition: Option<TableLookUp<C>>,
-    ocv_std_dev_fall_transition: Option<TableLookUp<C>>,
-    ocv_skewness_fall_transition: Option<TableLookUp<C>>,
+    fall_transition: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_fall_transition: Option<TableLookUp2D<C>>,
+    ocv_std_dev_fall_transition: Option<TableLookUp2D<C>>,
+    ocv_skewness_fall_transition: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub fall_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    rise_constraint: Option<TableLookUp<C>>,
-    ocv_mean_shift_rise_constraint: Option<TableLookUp<C>>,
-    ocv_std_dev_rise_constraint: Option<TableLookUp<C>>,
-    ocv_skewness_rise_constraint: Option<TableLookUp<C>>,
+    rise_constraint: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_rise_constraint: Option<TableLookUp2D<C>>,
+    ocv_std_dev_rise_constraint: Option<TableLookUp2D<C>>,
+    ocv_skewness_rise_constraint: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub rise_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    fall_constraint: Option<TableLookUp<C>>,
-    ocv_mean_shift_fall_constraint: Option<TableLookUp<C>>,
-    ocv_std_dev_fall_constraint: Option<TableLookUp<C>>,
-    ocv_skewness_fall_constraint: Option<TableLookUp<C>>,
+    fall_constraint: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_fall_constraint: Option<TableLookUp2D<C>>,
+    ocv_std_dev_fall_constraint: Option<TableLookUp2D<C>>,
+    ocv_skewness_fall_constraint: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub fall_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retaining_rise: Option<TableLookUp<C>>,
-    ocv_mean_shift_retaining_rise: Option<TableLookUp<C>>,
-    ocv_std_dev_retaining_rise: Option<TableLookUp<C>>,
-    ocv_skewness_retaining_rise: Option<TableLookUp<C>>,
+    retaining_rise: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_retaining_rise: Option<TableLookUp2D<C>>,
+    ocv_std_dev_retaining_rise: Option<TableLookUp2D<C>>,
+    ocv_skewness_retaining_rise: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub retaining_rise: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retaining_fall: Option<TableLookUp<C>>,
-    ocv_mean_shift_retaining_fall: Option<TableLookUp<C>>,
-    ocv_std_dev_retaining_fall: Option<TableLookUp<C>>,
-    ocv_skewness_retaining_fall: Option<TableLookUp<C>>,
+    retaining_fall: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_retaining_fall: Option<TableLookUp2D<C>>,
+    ocv_std_dev_retaining_fall: Option<TableLookUp2D<C>>,
+    ocv_skewness_retaining_fall: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub retaining_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retain_rise_slew: Option<TableLookUp<C>>,
-    ocv_mean_shift_retain_rise_slew: Option<TableLookUp<C>>,
-    ocv_std_dev_retain_rise_slew: Option<TableLookUp<C>>,
-    ocv_skewness_retain_rise_slew: Option<TableLookUp<C>>,
+    retain_rise_slew: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_retain_rise_slew: Option<TableLookUp2D<C>>,
+    ocv_std_dev_retain_rise_slew: Option<TableLookUp2D<C>>,
+    ocv_skewness_retain_rise_slew: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub retain_rise_slew: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
-    retain_fall_slew: Option<TableLookUp<C>>,
-    ocv_mean_shift_retain_fall_slew: Option<TableLookUp<C>>,
-    ocv_std_dev_retain_fall_slew: Option<TableLookUp<C>>,
-    ocv_skewness_retain_fall_slew: Option<TableLookUp<C>>,
+    retain_fall_slew: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_retain_fall_slew: Option<TableLookUp2D<C>>,
+    ocv_std_dev_retain_fall_slew: Option<TableLookUp2D<C>>,
+    ocv_skewness_retain_fall_slew: Option<TableLookUp2D<C>>,
   ))]
   #[size = 144]
   pub retain_fall_slew: Option<TimingTableLookUp<C>>,
@@ -1716,6 +1754,44 @@ pub struct Timing<C: Ctx> {
   #[size = 168]
   #[liberty(group)]
   pub compact_ccs_fall: Option<CompactCcsTable<C>>,
+  #[size = 169]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_cell_fall: GroupSet<OcvSigmaTable<C>>,
+  #[size = 169]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_cell_rise: GroupSet<OcvSigmaTable<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_fall_constraint: Option<TableLookUp2D<C>>,
+  #[size = 169]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_fall_transition: GroupSet<OcvSigmaTable<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_rise_constraint: Option<TableLookUp2D<C>>,
+  #[size = 169]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_rise_transition: GroupSet<OcvSigmaTable<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_retaining_fall: Option<TableLookUp2D<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_retaining_rise: Option<TableLookUp2D<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_retain_fall_slew: Option<TableLookUp2D<C>>,
+  #[size = 168]
+  #[liberty(group)]
+  pub ocv_sigma_retain_rise_slew: Option<TableLookUp2D<C>>,
 }
 
 impl<C: Ctx> GroupFn for Timing<C> {}
@@ -1726,6 +1802,21 @@ mod test {
 
   use super::*;
 
+  #[test]
+  fn active_ccb() {
+    use crate::ast::GroupAttri;
+    _ = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
+      r#"(){
+        active_input_ccb(XOR4D4BWP30P140__nci_14_3_FRLR_RFLF:a4, XOR4D4BWP30P140__nci_15_1_FR_RF:a4);
+        active_output_ccb(XOR4D4BWP30P140__nco_0_0_FR_RF:z);
+      }"#,
+      r#"
+liberty_db::timing::Timing () {
+| active_input_ccb (XOR4D4BWP30P140__nci_14_3_FRLR_RFLF:a4, XOR4D4BWP30P140__nci_15_1_FR_RF:a4);
+| active_output_ccb (XOR4D4BWP30P140__nco_0_0_FR_RF:z);
+}"#,
+    )
+  }
   #[test]
   fn lvf() {
     use crate::ast::GroupAttri;
@@ -2256,7 +2347,7 @@ liberty_db::timing::Timing () {
   #[test]
   fn table_lookup() {
     use crate::ast::GroupAttri;
-    let timing = crate::ast::test_parse::<Timing<DefaultCtx>>(
+    let timing = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
       r#"(){
         cell_rise(delay_template_3x3){
           index_1("10, 20, 30");
@@ -2296,6 +2387,135 @@ liberty_db::timing::Timing () {
         }
       }
     "#,
+      r#"
+liberty_db::timing::Timing () {
+| cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+| ocv_mean_shift_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("0.0, 0.0, 0.0", \
+| | | "0.0, 0.0, 0.0", \
+| | | "0.0, 0.0, 0.0");
+| }
+| ocv_std_dev_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+| ocv_skewness_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+}"#,
+    );
+    let table = timing.cell_rise.unwrap();
+    let assert_fn = |idx1: f64, idx2: f64, want: f64| {
+      assert_eq!(Some(want), table.lookup(&idx1, &idx2));
+    };
+    assert_fn(10.0, 30.0, 100.0);
+    assert_fn(30.0, 60.0, 900.0);
+    assert_fn(10.0, 42.0, 160.0);
+    assert_fn(14.0, 30.0, 220.0);
+    // 100 + (400-100)*0.4 = 220
+    // 200 + (500-200)*0.4 = 320
+    // 220 + (320-220)*0.6 = 280
+    assert_fn(14.0, 42.0, 280.0);
+    let assert_lvf_fn = |idx1: f64, idx2: f64, want: f64| {
+      assert_eq!(
+        Some(LVFValue { mean: want, std_dev: want, skewness: want }),
+        table.lookup_lvf(&idx1, &idx2)
+      );
+    };
+    assert_lvf_fn(10.0, 30.0, 100.0);
+    assert_lvf_fn(30.0, 60.0, 900.0);
+    assert_lvf_fn(10.0, 42.0, 160.0);
+    assert_lvf_fn(14.0, 30.0, 220.0);
+  }
+  #[test]
+  fn table_lookup_mismatch_lvf() {
+    use crate::ast::GroupAttri;
+    let timing = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
+      r#"(){
+        cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 40, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+        ocv_mean_shift_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "0, 0, 0", \
+            "0, 0, 0", \
+            "0, 0, 0", \
+          ) ;
+        }
+        ocv_std_dev_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+        ocv_skewness_cell_rise(delay_template_3x3){
+          index_1("10, 20, 30");
+          index_2("30, 50, 60");
+          values(  \
+            "100, 200, 300", \
+            "400, 500, 600", \
+            "700, 800, 900", \
+          ) ;
+        }
+      }
+    "#,
+      r#"
+liberty_db::timing::Timing () {
+| cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 40.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+| ocv_mean_shift_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("0.0, 0.0, 0.0", \
+| | | "0.0, 0.0, 0.0", \
+| | | "0.0, 0.0, 0.0");
+| }
+| ocv_std_dev_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+| ocv_skewness_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+}"#,
     );
     let table = timing.cell_rise.unwrap();
     let assert_fn = |idx1: f64, idx2: f64, want: f64| {

@@ -113,6 +113,48 @@ impl SimpleAttri for VariableType {
   }
 }
 
+/// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the
+/// `ocv_sigma_cell_rise`, `ocv_sigma_cell_fall`, `ocv_sigma_rise_transition`, and
+/// `ocv_sigma_fall_transition` group lookup tables. The values are `early`, `late`, and
+/// `early_and_late`. The default is `early_and_late`.
+///
+/// You can specify the `sigma_type` attribute in the `ocv_sigma_cell_rise` and
+/// `ocv_sigma_cell_fall` groups.
+///
+/// Syntax
+/// ``` text
+/// sigma_type: early | late | early_and_late;
+/// ```
+/// Example
+/// ``` text
+/// sigma_type: early;
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=357.15&end=357.24
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, PartialOrd, Ord, Hash)]
+#[derive(Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum SigmaType {
+  #[strum(serialize = "early")]
+  Early,
+  #[strum(serialize = "late")]
+  Late,
+  #[default]
+  #[strum(serialize = "early_and_late")]
+  EarlyAndLate,
+}
+crate::ast::impl_self_builder!(SigmaType);
+impl SimpleAttri for SigmaType {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from_str(i, scope)
+  }
+}
+
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
 /// ?field=test

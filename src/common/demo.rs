@@ -9,7 +9,7 @@ use crate::{
 };
 use core::fmt::Write;
 
-use super::table::TableLookUp;
+use super::table::TableLookUp2D;
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -33,10 +33,10 @@ pub(crate) struct Timing<C: Ctx> {
   #[liberty(simple(type = Option))]
   t2: Option<TimingType>,
   #[liberty(supergroup(
-    cell_fall: Option<TableLookUp<C>>,
-    ocv_mean_shift_cell_fall: Option<TableLookUp<C>>,
-    ocv_std_dev_cell_fall: Option<TableLookUp<C>>,
-    ocv_skewness_cell_fall: Option<TableLookUp<C>>,
+    cell_fall: Option<TableLookUp2D<C>>,
+    ocv_mean_shift_cell_fall: Option<TableLookUp2D<C>>,
+    ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
+    ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
   ))]
   pub cell_fall: Option<TimingTableLookUp<C>>,
 }

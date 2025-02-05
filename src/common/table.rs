@@ -1,3 +1,4 @@
+use super::items::SigmaType;
 use crate::{
   ast::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
@@ -723,6 +724,64 @@ pub struct TableLookUp3D<C: Ctx> {
   pub values: Values,
 }
 
+/// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the
+/// `ocv_sigma_cell_rise`, `ocv_sigma_cell_fall`, `ocv_sigma_rise_transition`, and
+/// `ocv_sigma_fall_transition` group lookup tables.
+#[mut_set::derive::item(sort)]
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct OcvSigmaTable<C: Ctx> {
+  #[size = 8]
+  #[liberty(name)]
+  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  name: Option<String>,
+  /// group comments
+  #[size = 32]
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[size = 0]
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::Table,
+  /// group undefined attributes
+  #[size = 40]
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  /// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the
+  /// `ocv_sigma_cell_rise`, `ocv_sigma_cell_fall`, `ocv_sigma_rise_transition`, and
+  /// `ocv_sigma_fall_transition` group lookup tables. The values are `early`, `late`, and
+  /// `early_and_late`. The default is `early_and_late`.
+  ///
+  /// You can specify the `sigma_type` attribute in the `ocv_sigma_cell_rise` and
+  /// `ocv_sigma_cell_fall` groups.
+  ///
+  /// Syntax
+  /// ``` text
+  /// sigma_type: early | late | early_and_late;
+  /// ```
+  /// Example
+  /// ``` text
+  /// sigma_type: early;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=357.15&end=357.24
+  /// ">Reference-Definition</a>
+  #[size = 1]
+  #[liberty(simple)]
+  #[id]
+  pub sigma_type: SigmaType,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_1: Vec<f64>,
+  #[size = 24]
+  #[liberty(complex)]
+  pub index_2: Vec<f64>,
+  #[size = 40]
+  #[liberty(complex)]
+  pub values: Values,
+}
+
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -834,6 +893,7 @@ impl<C: Ctx> GroupFn for TableLookUp<C> {}
 impl<C: Ctx> GroupFn for TableLookUpMultiSegment<C> {}
 impl<C: Ctx> GroupFn for TableLookUp2D<C> {}
 impl<C: Ctx> GroupFn for TableLookUp3D<C> {}
+impl<C: Ctx> GroupFn for OcvSigmaTable<C> {}
 impl<C: Ctx> GroupFn for DriverWaveform<C> {}
 impl<C: Ctx> GroupFn for Vector3D<C> {}
 impl<C: Ctx> GroupFn for Vector4D<C> {}
