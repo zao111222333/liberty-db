@@ -551,10 +551,11 @@ impl<C: Ctx> TimingTableLookUp<C> {
     }
     .fmt_self("", key, f)?;
     if !self.lvf_values.is_empty() {
+      let mismatch_index = !self.lvf_index_1.is_empty();
       DisplayTableLookUp {
         name: &self.name,
-        index_1: &self.index_1,
-        index_2: &self.index_2,
+        index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
+        index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
           size1: self.size1,
           inner: izip!(self.values.iter(), self.lvf_values.iter())
@@ -564,8 +565,8 @@ impl<C: Ctx> TimingTableLookUp<C> {
       .fmt_self("ocv_mean_shift_", key, f)?;
       DisplayTableLookUp {
         name: &self.name,
-        index_1: &self.index_1,
-        index_2: &self.index_2,
+        index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
+        index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
           size1: self.size1,
           inner: self.lvf_values.iter().map(|lvf| lvf.std_dev),
@@ -574,8 +575,8 @@ impl<C: Ctx> TimingTableLookUp<C> {
       .fmt_self("ocv_std_dev_", key, f)?;
       DisplayTableLookUp {
         name: &self.name,
-        index_1: &self.index_1,
-        index_2: &self.index_2,
+        index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
+        index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
           size1: self.size1,
           inner: self.lvf_values.iter().map(|lvf| lvf.skewness),

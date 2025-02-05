@@ -2347,7 +2347,7 @@ liberty_db::timing::Timing () {
   #[test]
   fn table_lookup() {
     use crate::ast::GroupAttri;
-    let timing = crate::ast::test_parse::<Timing<DefaultCtx>>(
+    let timing = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
       r#"(){
         cell_rise(delay_template_3x3){
           index_1("10, 20, 30");
@@ -2387,6 +2387,37 @@ liberty_db::timing::Timing () {
         }
       }
     "#,
+      r#"
+liberty_db::timing::Timing () {
+| cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+| ocv_mean_shift_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("0.0, 0.0, 0.0", \
+| | | "0.0, 0.0, 0.0", \
+| | | "0.0, 0.0, 0.0");
+| }
+| ocv_std_dev_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+| ocv_skewness_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+}"#,
     );
     let table = timing.cell_rise.unwrap();
     let assert_fn = |idx1: f64, idx2: f64, want: f64| {
@@ -2414,7 +2445,7 @@ liberty_db::timing::Timing () {
   #[test]
   fn table_lookup_mismatch_lvf() {
     use crate::ast::GroupAttri;
-    let timing = crate::ast::test_parse::<Timing<DefaultCtx>>(
+    let timing = crate::ast::test_parse_fmt::<Timing<DefaultCtx>>(
       r#"(){
         cell_rise(delay_template_3x3){
           index_1("10, 20, 30");
@@ -2454,6 +2485,37 @@ liberty_db::timing::Timing () {
         }
       }
     "#,
+      r#"
+liberty_db::timing::Timing () {
+| cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 40.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+| ocv_mean_shift_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("0.0, 0.0, 0.0", \
+| | | "0.0, 0.0, 0.0", \
+| | | "0.0, 0.0, 0.0");
+| }
+| ocv_std_dev_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+| ocv_skewness_cell_rise (delay_template_3x3) {
+| | index_1 ("10.0, 20.0, 30.0");
+| | index_2 ("30.0, 50.0, 60.0");
+| | values ("100.0, 200.0, 300.0", \
+| | | "400.0, 500.0, 600.0", \
+| | | "700.0, 800.0, 900.0");
+| }
+}"#,
     );
     let table = timing.cell_rise.unwrap();
     let assert_fn = |idx1: f64, idx2: f64, want: f64| {
