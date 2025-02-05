@@ -55,8 +55,6 @@ pub struct CodeFormatter<'a, F, I> {
   f: &'a mut F,
   level: usize,
   buffer: [u8; lexical_core::BUFFER_SIZE],
-  // buff_f: ryu::Buffer,
-  // buff_i: itoa::Buffer,
   __i: PhantomData<I>,
 }
 
@@ -77,14 +75,11 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
       f,
       level: 0,
       buffer: [b'0'; lexical_core::BUFFER_SIZE],
-      // buff_f: ryu::Buffer::new(),
-      // buff_i: itoa::Buffer::new(),
       __i: PhantomData,
     }
   }
   #[inline]
   pub(crate) fn write_num<N: lexical_core::ToLexical>(&mut self, n: N) -> fmt::Result {
-    // let s = self.buff_i.format(int);
     let bytes = lexical_core::write(n, &mut self.buffer);
     let s = std::str::from_utf8(bytes).unwrap();
     self.f.write_str(s)
