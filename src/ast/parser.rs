@@ -468,7 +468,6 @@ pub(crate) fn complex_float_vec<'a>(
 }
 
 #[inline]
-#[expect(clippy::type_complexity)]
 pub(crate) fn complex_values<'a>(
   i: &'a str,
   line_num: &mut usize,

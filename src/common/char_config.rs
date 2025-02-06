@@ -79,14 +79,9 @@ pub struct CharConfig<C: Ctx> {
   /// exclude_switching_on_rise_and_fall |
   /// include_switching ;
   /// ```
-  /// + `exclude_switching_on_rise`:
-  /// The switching energy is deducted only from the `rise_power` table values.
-  /// + `exclude_switching_on_rise_and_fall`:
-  /// The switching energy is deducted from both the `rise_power` and `fall_power`
-  /// table values.
-  /// + `include_switching`:
-  /// The switching energy is not deducted from the table values in the
-  /// `internal_power` group
+  /// + `exclude_switching_on_rise`: The switching energy is deducted only from the `rise_power` table values.
+  /// + `exclude_switching_on_rise_and_fall`: The switching energy is deducte d from both the `rise_power` and `fall_power`table values.
+  /// + `include_switching`: The switching energy is not deducted from the table values in the `internal_power` group
   ///
   /// ### Example
   /// ``` text
@@ -105,12 +100,8 @@ pub struct CharConfig<C: Ctx> {
   /// ``` text
   /// three_state_disable_measurement_method : voltage | current ;
   /// ```
-  /// + `voltage`:
-  /// This method measures the voltage waveform to the
-  /// gate input of the three-state stage.
-  /// + `current`:
-  /// This method measures the leakage current flowing
-  /// through the pullup and pulldown resistors of the threestate stage.
+  /// + `voltage`: This method measures the volta ge waveform to thegate input of the three-state stage.
+  /// + `current`: This method measures the leaka ge current flowingthrough the pullup and pulldown resistors of the threestate stage.
   ///
   /// ### Example
   /// ``` text
@@ -121,7 +112,7 @@ pub struct CharConfig<C: Ctx> {
   /// The `three_state_disable_current_threshold_abs` attribute specifies the
   /// absolute current threshold value to distinguish between the low- and high-impedance
   /// states of a three-state output pin. The unit of the absolute current threshold value is
-  /// specified in the current_unit attribute of the library group.
+  /// specified in the `current_unit` attribute of the library group.
   ///
   /// In the pin group, this attribute is valid only for an inout pin. If you define both the
   /// `three_state_disable_current_threshold_abs` and
@@ -409,8 +400,7 @@ pub struct CharConfig<C: Ctx> {
   /// The `input_stimulus_transition` attribute specifies the transition time for all the input-
   /// signal edges except the arc input pin's last transition, during generation of the input
   /// stimulus for simulation.
-  /// The time units of the `input_stimulus_transition` attribute are specified by the library-
-  /// level `time_unit` attribute.
+  /// The time units of the `input_stimulus_transition` attribute are specified by the library-level `time_unit` attribute.
   /// You must define this attribute.
   ///
   /// ### Syntax
@@ -430,7 +420,7 @@ pub struct CharConfig<C: Ctx> {
   pub input_stimulus_transition: GroupSet<CharModeValue>,
   /// The `input_stimulus_interval` attribute specifies the time-interval between the input-
   /// signal toggles to generate the input stimulus for a characterization cell. The time units of
-  /// this attribute are specified by the library-level time_unit attribute.
+  /// this attribute are specified by the library-level `time_unit` attribute.
   ///
   /// You must define the `input_stimulus_interval` attribute.
   ///
@@ -451,8 +441,8 @@ pub struct CharConfig<C: Ctx> {
   pub input_stimulus_interval: GroupSet<CharModeValue>,
   /// The `unrelated_output_net_capacitance` attribute specifies a load value for an output
   /// pin that is not a related output pin of the characterization model. The valid value is a
-  /// floating-point number, and is defined by the library-level capacitive_load_unit attribute.
-  /// If you do not specify this attribute for the nldm_delay and nlpm_output characterization
+  /// floating-point number, and is defined by the library-level `capacitive_load_unit` attribute.
+  /// If you do not specify this attribute for the `nldm_delay` and `nlpm_output` characterization
   /// models, the unrelated output pins use the load value of the related output pin. However,
   /// you must specify this attribute for any other characterization model.
   ///
@@ -475,13 +465,10 @@ pub struct CharConfig<C: Ctx> {
   /// default value for
   /// + The delay arc from state-dependent delay arcs
   /// + The constraint arc from state-dependent constraint arcs
-  /// + Pin-based minimum pulse-width constraints from simulated results with side pin
-  /// combinations
-  /// + Internal power arcs from multiple state-dependent internal_power groups
-  /// + The cell_leakage_power attribute from the state-dependent values in leakage power
-  /// models
-  /// + The input-pin capacitance from capacitance values for input-slew values used for
-  /// timing characterization
+  /// + Pin-based minimum pulse-width constraints from simulated results with side pin combinations
+  /// + Internal power arcs from multiple state-dependent `internal_power` groups
+  /// + The `cell_leakage_power` attribute from the state-dependent values in leakage power models
+  /// + The input-pin capacitance from capacitance values for input-slew values used for timing characterization
   ///
   /// ### Syntax
   /// ``` text
@@ -501,9 +488,9 @@ pub struct CharConfig<C: Ctx> {
   pub default_value_selection_method: GroupSet<CharModeMethod>,
   /// Use the `default_value_selection_method_rise` attribute when the selection method
   /// for rise is different from the selection method for fall.
-  /// You must define either the default_value_selection_method
+  /// You must define either the `default_value_selection_method`
   /// attribute, or the `default_value_selection_method_rise` and
-  /// default_value_selection_method_fall attributes.
+  /// `default_value_selection_method_fall` attributes.
   ///
   /// ### Syntax
   /// ``` text
@@ -519,7 +506,7 @@ pub struct CharConfig<C: Ctx> {
   /// Use the `default_value_selection_method_fall` attribute when the selection method
   /// for fall is different from the selection method for rise.
   /// You must define either the `default_value_selection_method`
-  /// attribute, or the default_value_selection_method_rise and
+  /// attribute, or the `default_value_selection_method_rise` and
   /// `default_value_selection_method_fall` attributes.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=55.5&end=55.14
@@ -543,7 +530,7 @@ pub struct CharConfig<C: Ctx> {
   /// The `merge_tolerance_rel` attribute specifies the relative tolerance to merge arc
   /// simulation results. Specify the relative tolerance value in percent, for example, 10.0 for 10
   /// percent.
-  /// If you specify both the merge_tolerance_abs and `merge_tolerance_rel` attributes, the
+  /// If you specify both the `merge_tolerance_abs` and `merge_tolerance_rel` attributes, the
   /// results are merged if either or both the tolerance conditions are satisfied. If you do not
   /// specify any of these attributes, data including identical data is not merged.
   /// <a name ="reference_link" href="
@@ -557,7 +544,7 @@ pub struct CharConfig<C: Ctx> {
   /// multiple sets of state-dependent data are merged, the attribute selects a particular set of
   /// the state-dependent data to represent the merged data.
   /// You must define the `merge_selection` attribute if you have defined the
-  /// merge_tolerance_abs or merge_tolerance_rel attribute.
+  /// `merge_tolerance_abs` or `merge_tolerance_rel` attribute.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=56.7&end=56.18
   /// ">Reference</a>
@@ -578,14 +565,9 @@ impl<C: Ctx> GroupFn for CharConfig<C> {}
 /// exclude_switching_on_rise_and_fall |
 /// include_switching ;
 /// ```
-/// + `exclude_switching_on_rise`:
-/// The switching energy is deducted only from the `rise_power` table values.
-/// + `exclude_switching_on_rise_and_fall`:
-/// The switching energy is deducted from both the `rise_power` and `fall_power`
-/// table values.
-/// + `include_switching`:
-/// The switching energy is not deducted from the table values in the
-/// `internal_power` group
+/// + `exclude_switching_on_rise`: The switching energy is deducted only from the `rise_power` table values.
+/// + `exclude_switching_on_rise_and_fall`: The switching energy is deducted from both the `rise_power` and `fall_power` table values.
+/// + `include_switching`: The switching energy is not deducted from the table values in the `internal_power` group
 ///
 /// ### Example
 /// ``` text
@@ -706,12 +688,8 @@ pub enum CharMode {
 /// ``` text
 /// three_state_disable_measurement_method : voltage | current ;
 /// ```
-/// + `voltage`:
-/// This method measures the voltage waveform to the
-/// gate input of the three-state stage.
-/// + `current`:
-/// This method measures the leakage current flowing
-/// through the pullup and pulldown resistors of the threestate stage.
+/// + `voltage`: This method measures the voltage waveform to the gate input of the three-state stage.
+/// + `current`: This method measures the leakage current flowing through the pullup and pulldown resistors of the threestate stage.
 ///
 /// ### Example
 /// ``` text
