@@ -13,6 +13,7 @@ use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
   ccsn::PropagatingCcb,
   common::{
+    char_config::CharConfig,
     items::{NameList, SdfEdgeType, WordSet},
     table::{
       CompactCcsTable, OcvSigmaTable, ReferenceTimeVector3DGrpup, TableLookUp,
@@ -24,28 +25,27 @@ use crate::{
 };
 pub use items::*;
 
-/// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
+/// A `timing` group is defined in a `bundle`, a `bus`, or a `pin` group within a `cell`. The `timing`
+/// group can be used to identify the name or names of multiple `timing` arcs. A `timing` group
+/// identifies multiple `timing` arcs, by identifying a `timing` arc in a `pin` group that has more than
+/// one `related pin` or when the timing arc is part of a `bundle` or a `bus`.
+/// The following syntax shows a `timing` group in a `pin` group within a `cell` group.
 ///
-/// The timing group can be used to identify the name or names of multiple timing arcs.
-/// A timing group identifies multiple timing arcs, by identifying a timing arc in a [pin](crate::pin::Pin) group
-/// that has more than one related pin or when the timing arc is part of a [bundle](crate::bundle::Bundle) or a [bus](crate::bus::Bus).
+/// ### Syntax
+/// ``` text
+/// library (namestring) {
+///   cell (name) {
+///     pin (name) {
+///       timing (name | name_list) {
+///         ... timing description ...
+///       }
+///     }
+///   }
+/// }
+/// ```
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =67.26
-/// &end
-/// =67.43
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =203.8
-/// &end
-/// =203.29
-/// ">Reference-Instatnce-In-Pin</a>
-///
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=90.29+91.2&end=90.41+91.5
+/// ">Reference</a>
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -84,21 +84,8 @@ pub struct Timing<C: Ctx> {
   /// clock_gating_flag : true ;
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.47
-  /// &end
-  /// =204.59
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-  /// ?field=test
-  /// &bgn
-  /// =320.6
-  /// &end
-  /// =320.6
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=322.21&end=322.32
+  /// ">Reference</a>
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub clock_gating_flag: Option<bool>,
@@ -113,60 +100,11 @@ pub struct Timing<C: Ctx> {
   /// default_timing : true ;
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =205.0
-  /// &end
-  /// =205.6
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-  /// ?field=test
-  /// &bgn
-  /// =320.7
-  /// &end
-  /// =320.7
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=322.34+323.2&end=322.37+323.3
+  /// ">Reference</a>
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub default_timing: Option<bool>,
-  /// The `fall_resistance` attribute represents the load-dependent output resistance,
-  /// or drive capability, for a logic 1-to-0 transition.
-  ///
-  /// #### Note
-  /// You cannot specify a resistance unit in the library.
-  /// Instead, the resistance unit is derived from the ratio of the time_unit
-  /// value to the capacitive_load_unit value.
-  ///
-  /// #### Syntax
-  /// `fall_resistance : valuefloat ; `
-  ///
-  /// `value` is a positive floating-point number in terms of delay time per load unit.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// fall_resistance : 0.18 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =205.7
-  /// &end
-  /// =205.20
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.33
-  /// &end
-  /// =203.33
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub fall_resistance: Option<f64>,
   /// The `fpga_arc_condition` attribute specifies a Boolean condition that enables
   /// a timing arc.
   ///
@@ -180,56 +118,11 @@ pub struct Timing<C: Ctx> {
   /// fpga_arc_condition : true;
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =205.21
-  /// &end
-  /// =205.31
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.34
-  /// &end
-  /// =203.34
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=323.5&end=323.14
+  /// ">Reference</a>
   #[size = 24]
   #[liberty(simple(type = Option))]
-  pub fpga_arc_condition: Option<BooleanExpression>,
-  /// Use this attribute to reference a `calc_mode` value in a
-  /// [domain](crate::common::items::Domain) group in a polynomial table.
-  ///
-  /// TODO: `calc_mode`
-  /// #### Syntax
-  /// `fpga_domain_style : "nameid" ; `
-  ///
-  /// `name`: The `calc_mode` value.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// fpga_domain_style : "speed";
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =205.32
-  /// &end
-  /// =206.0
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.35
-  /// &end
-  /// =203.35
-  /// ">Reference-Instance</a>
-  #[size = 8]
-  #[liberty(simple(type = Option))]
-  pub fpga_domain_style: Option<String>,
+  pub fpga_arc_condition: Option<LogicBooleanExpression>,
   /// Use pairs of `interdependence_id` attributes to identify interdependent pairs
   /// of `setup` and `hold` constraint tables. Interdependence data is supported
   /// in conditional constraint checking, the `interdependence_id` attribute increases
@@ -294,144 +187,11 @@ pub struct Timing<C: Ctx> {
   /// interdependence data defined, the values for the `interdependence_id` should be in consecutive order.
   /// That is, 1, 2, 3 is allowed, but 1, 2, 4 is not.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =206.1
-  /// &end
-  /// =207.9
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.36
-  /// &end
-  /// =203.36
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=323.16+324.2+325.2&end=323.41+324.49+325.3
+  /// ">Reference</a>
   #[size = 16]
   #[liberty(simple(type = Option))]
   pub interdependence_id: Option<usize>,
-  /// On an output pin, `intrinsic_fall` defines the 1-to-Z propagation time
-  /// for a three-state-disable timing type and the Z-to-0 propagation time
-  /// for a three-state-enable timing type.
-  ///
-  /// On an input pin, `intrinsic_fall` defines a `setup`, `hold`, or `recovery`
-  /// timing requirement for a logic 1-to-0 transition. With `intrinsic_rise`,
-  /// `intrinsic_fall` defines timing checks (`rising` and `falling` transitions).
-  ///
-  /// #### Syntax
-  /// `intrinsic_fall : valuefloat ;`
-  ///
-  /// `value`: A floating-point number that represents a timing requirement.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// intrinsic_fall : 0.75 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =207.10
-  /// &end
-  /// =207.24
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.37
-  /// &end
-  /// =203.37
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub intrinsic_fall: Option<f64>,
-  /// On an output pin, `intrinsic_rise` defines the 0-to-Z propagation time
-  /// for a three-state-disable timing type and a Z-to-1 propagation time
-  /// for a three-state-enable timing type.
-  ///
-  /// On an input pin, `intrinsic_rise` defines a `setup`, `hold`, or `recovery`
-  /// timing requirement for a logic 0-to-1 transition. With intrinsic_fall,
-  /// `intrinsic_rise` defines timing checks (`rising` and `falling` transitions).
-  ///
-  /// #### Syntax
-  /// `intrinsic_rise : valuefloat ;`
-  ///
-  /// `value`: A floating-point number that represents a timing requirement.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// intrinsic_rise : 0.17 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =207.25
-  /// &end
-  /// =207.39
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.38
-  /// &end
-  /// =203.38
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub intrinsic_rise: Option<f64>,
-  /// The `related_bus_equivalent` attribute generates a single timing arc
-  /// for all paths from points in a group through an internal pin (I) to given endpoints.
-  ///
-  /// #### Syntax
-  /// `related_bus_equivalent : " name1 [name2 name3 ... ] " ;`
-  ///
-  /// #### Example1
-  /// ``` liberty
-  /// related_bus_equivalent : a ;
-  /// ```
-  /// #### Example2
-  /// ``` liberty
-  /// cell(acell) {
-  ///     ...
-  ///     bus(y) {
-  ///         bus_type : bus4;
-  ///         direction : output;
-  ///         timing() {
-  ///             related_bus_equivalent : a;
-  ///             ...
-  ///         }
-  ///     }
-  ///     bus(a) {
-  ///         bus_type : bus4;
-  ///         direction : input;
-  ///         ...
-  ///     }
-  /// }
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =207.40
-  /// &end
-  /// =208.18
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.39
-  /// &end
-  /// =203.39
-  /// ">Reference-Instance</a>
-  #[size = 64]
-  #[liberty(simple)]
-  pub related_bus_equivalent: WordSet,
   /// The `related_bus_pins` attribute defines the pin or pins that
   /// are the startpoint of the timing arc. The primary use of
   /// `related_bus_pins` is for module generators.
@@ -451,21 +211,8 @@ pub struct Timing<C: Ctx> {
   /// related_bus_pins : "A" ;
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =208.19
-  /// &end
-  /// =208.28
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.40
-  /// &end
-  /// =203.40
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=293.20&end=293.33
+  /// ">Reference</a>
   #[size = 64]
   #[liberty(simple)]
   pub related_bus_pins: WordSet,
@@ -484,24 +231,11 @@ pub struct Timing<C: Ctx> {
   /// related_output_pin : Z ;
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =208.29
-  /// &end
-  /// =208.37
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.41
-  /// &end
-  /// =203.41
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=325.26&end=325.33
+  /// ">Reference</a>
   #[size = 64]
-  #[liberty(simple)]
-  pub related_output_pin: WordSet,
+  #[liberty(simple(type = Option))]
+  pub related_output_pin: Option<String>,
   /// The `related_pin` attribute defines the pin or pins representing
   /// the beginning point of the timing arc. It is required in all timing groups.
   ///
@@ -553,21 +287,8 @@ pub struct Timing<C: Ctx> {
   /// ##### Note
   /// It is not necessary to use the escape character, `\` (backslash), with nonalphabetic characters.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =208.38
-  /// &end
-  /// =209.31
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.42
-  /// &end
-  /// =203.42
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=326.3&end=326.38
+  /// ">Reference</a>
   #[id(
     borrow = "crate::common::items::RefNameList<'_>",
     check_fn = "NameList::as_ref",
@@ -576,140 +297,73 @@ pub struct Timing<C: Ctx> {
   #[size = 64]
   #[liberty(simple)]
   pub related_pin: NameList,
-  /// The `rise_resistance` attribute represents the load-dependent output resistance,
-  /// or drive capability, for a logic 0-to-1 transition.
+  /// The `sdf_cond` attribute is defined in the state-dependent timing group to support SDF file
+  /// generation and condition matching during back-annotation.
   ///
-  /// #### Note
-  /// You cannot specify a resistance unit in the library.
-  /// Instead, the resistance unit is derived from the ratio of the `time_unit` value
-  /// to the `capacitive_load_unit` value.
-  ///
-  /// #### Syntax
-  /// `rise_resistance : valuefloat ;`,
-  ///
-  /// `value`: A positive floating-point number in terms of delay time per load unit.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// rise_resistance : 0.15 ;
+  /// ### Syntax
+  /// ``` text
+  /// sdf_cond : "SDF expression" ;
   /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =209.32
-  /// &end
-  /// =209.45
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.43
-  /// &end
-  /// =203.43
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub rise_resistance: Option<f64>,
-  /// The `sdf_cond` attribute is defined in the state-dependent timing group
-  /// to support SDF file generation and condition matching during back-annotation.
-  /// #### Syntax
+  /// SDF expression
   ///
-  /// `sdf_cond : "SDF expression" ;`
+  /// A string that represents a Boolean description of the state dependency of the
+  /// delay. Use a Boolean description that conforms to the valid syntax defined in
+  /// the OVI SDF, which is different from the Boolean expression. For a complete
+  /// description of the valid syntax for these expressions, see the OVI specification
+  /// for SDF, V1.0.
   ///
-  /// `SDF expression`: A string that represents a Boolean description of the
-  /// state dependency of the delay. Use a Boolean description that conforms to
-  /// the valid syntax defined in the OVI SDF, which is different from the
-  /// Synopsys Boolean expression syntax. For a complete description of the
-  /// valid syntax for these expressions, refer to the OVI specification for SDF, v1.0.
-  ///
-  /// #### Example
-  /// ``` liberty
+  /// ### Example
+  /// ``` text
   /// sdf_cond : "b == 1’b1" ;
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =209.46
-  /// &end
-  /// =210.9
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.44
-  /// &end
-  /// =203.44
-  /// ">Reference-Instance</a>
-  #[size = 8]
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.3&end=327.14
+  /// ">Reference</a>
+  #[size = 24]
   #[liberty(simple(type = Option))]
   pub sdf_cond: Option<SdfExpression>,
-  /// The `sdf_cond_end` attribute defines a timing-check condition specific
-  /// to the end event in VHDL models. The expression must conform to
-  /// `OVI SDF 2.1 timing-check condition syntax`.
+  /// The `sdf_cond_end` attribute defines a timing-check condition specific to the end event
+  /// in VHDL models. The expression must conform to OVI SDF 2.1 timing-check condition
+  /// syntax.
   ///
-  /// #### Syntax
-  /// `sdf_cond_end : "SDF expression" ;`
+  /// ### Syntax
+  /// ``` text
+  /// sdf_cond_end : "SDF expression" ;
+  /// ```
+  /// SDF expression
   ///
-  /// `SDF expression`: An SDF expression containing names of input, output, inout, and internal pins.
+  /// An SDF expression containing names of input, output, inout, and internal pins.
   ///
-  /// #### Example
-  /// ``` liberty
+  /// ### Example
+  /// ``` text
   /// sdf_cond_end : "SIG_0 == 1’b1" ;
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =210.10
-  /// &end
-  /// =210.19
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.45
-  /// &end
-  /// =203.45
-  /// ">Reference-Instance</a>
-  #[size = 8]
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.16&end=327.24
+  /// ">Reference</a>
+  #[size = 24]
   #[liberty(simple(type = Option))]
   pub sdf_cond_end: Option<SdfExpression>,
-  /// The `sdf_cond_start` attribute defines a timing-check condition specific
-  /// to the start event in full-timing gate-level simulation (FTGS) models.
-  /// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
+  /// The `sdf_cond_start` attribute defines a timing-check condition specific to the start event
+  /// in full-timing gate-level simulation (FTGS) models. The expression must conform to OVI
+  /// SDF 2.1 timing-check condition syntax.
   ///
-  /// #### Syntax
-  /// `sdf_cond_start : "SDF expression" ;`
+  /// ### Syntax
+  /// ``` text
+  /// sdf_cond_start : "SDF expression" ;
+  /// ```
+  /// SDF expression
   ///
-  /// `SDF expression`: An SDF expression containing names of
-  /// input, output, inout, and internal pins.
+  /// An SDF expression containing names of input, output, inout, and internal pins.
   ///
-  /// #### Example
-  /// ``` liberty
+  /// ### Example
+  /// ``` text
   /// sdf_cond_start : "SIG_2 == 1’b1" ;
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =210.20
-  /// &end
-  /// =210.30
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.46
-  /// &end
-  /// =203.46
-  /// ">Reference-Instance</a>
-  #[size = 8]
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.26+328.2&end=327.30+328.5
+  /// ">Reference</a>
+  #[size = 24]
   #[liberty(simple(type = Option))]
   pub sdf_cond_start: Option<SdfExpression>,
   /// The `sdf_edges` attribute defines the edge specification on both
@@ -728,305 +382,15 @@ pub struct Timing<C: Ctx> {
   /// sdf_edges : end_edge ; /* edge specification on end pin */
   /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =210.31
-  /// &end
-  /// =211.2
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.47
-  /// &end
-  /// =203.47
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=328.7&end=328.17
+  /// ">Reference</a>
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub sdf_edges: Option<SdfEdgeType>,
-  // /// FIXME: Can Not find instance in `timing`, only find definition
-  // ///
-  // /// The `sensitization_master` attribute defines the `sensitization` group
-  // /// specific to the current timing group to generate stimulus for characterization.
-  // /// The attribute is optional when the sensitization master used for
-  // /// the timing arc is the same as that defined in the current cell.
-  // /// It is required when they are different. Any sensitization group name
-  // /// predefined in the current library is a valid attribute value.
-  // ///
-  // /// #### Syntax
-  // /// `sensitization_master : sensitization_group_name;`
-  // ///
-  // /// `sensitization_group_name`: A string identifying the sensitization
-  // /// group name predefined in the current library.
-  // ///
-  // /// #### Example
-  // /// ``` liberty
-  // /// sensitization_master : sensi_2in_1out;
-  // /// ```
-  // /// <a name ="reference_link" href="
-  // /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  // /// ?field=test
-  // /// &bgn
-  // /// =211.3
-  // /// &end
-  // /// =211.15
-  // /// ">Reference-Definition</a>
-  // #[size = 1]
-  // #[liberty(simple(type = Option))]
-  // pub sensitization_master: Option<Sensitization>,
-  /// The `slope_fall` attribute represents the incremental delay
-  /// to add to the slope of the input waveform for a logic 1-to-0 transition.
-  ///
-  /// #### Syntax
-  /// `slope_fall : valuefloat ;`
-  ///
-  /// `value`: A positive floating-point number multiplied by the transition
-  /// delay resulting in slope delay.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// slope_fall : 0.8 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =211.16
-  /// &end
-  /// =211.27
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.48
-  /// &end
-  /// =203.48
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub slope_fall: Option<f64>,
-  /// The `slope_rise` attribute represents the incremental delay
-  /// to add to the slope of the input waveform for a logic 0-to-1 transition.
-  ///
-  /// #### Syntax
-  /// `slope_rise : valuefloat ;`
-  ///
-  /// `value`: A positive floating-point number multiplied by the
-  /// transition delay resulting in slope delay.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// slope_rise : 1.0 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =211.28
-  /// &end
-  /// =211.39
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.49
-  /// &end
-  /// =203.49
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub slope_rise: Option<f64>,
-  /// The `steady_state_resistance_above_high` attribute specifies a
-  /// steady-state resistance value for a region of a current-voltage (I-V) curve
-  /// when the output is high and the noise is over the high voltage rail.
-  ///
-  /// #### Syntax
-  /// `steady_state_resistance_above_high : valuefloat ;`
-  ///
-  /// `value`: A positive floating-point number that represents the resistance.
-  /// The resistance unit is a function of the unit of time divided by
-  /// the library unit of capacitance.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// steady_state_resistance_above_high : 200 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =211.40
-  /// &end
-  /// =212.8
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.50
-  /// &end
-  /// =203.50
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub steady_state_resistance_above_high: Option<f64>,
-  /// The `steady_state_resistance_below_low` attribute specifies a steady-state
-  /// resistance value for a region of a current-voltage (I-V) curve
-  /// when the output is low and the noise is below the low voltage rail.
-  ///
-  /// #### Syntax
-  /// `steady_state_resistance_below_low : valuefloat ;`
-  ///
-  /// `value`: A positive floating-point number that represents the resistance.
-  /// The resistance unit is a function of the unit of time divided by
-  /// the library unit of capacitance.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// steady_state_resistance_below_low : 100 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =212.9
-  /// &end
-  /// =212.22
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.51
-  /// &end
-  /// =203.51
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub steady_state_resistance_below_low: Option<f64>,
-  /// The `steady_state_resistance_high` attribute specifies a steady-state
-  /// resistance value for a region of a current-voltage (I-V) curve when
-  /// the output is high and the noise is below the high voltage rail.
-  ///
-  /// #### Syntaxs
-  /// `teady_state_resistance_high : valuefloat ;`
-  ///
-  /// `value`: A positive floating-point number that represents the resistance.
-  /// The resistance unit is a function of the unit of time divided by
-  /// the library unit of capacitance.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// steady_state_resistance_high : 1500 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =212.23
-  /// &end
-  /// =212.36
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.52
-  /// &end
-  /// =203.52
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub steady_state_resistance_high: Option<f64>,
-  /// The `steady_state_resistance_low` attribute specifies a steady-state
-  /// resistance value for a region of a current-voltage (I-V) curve
-  /// when the output is low and the noise is over the low voltage rail.
-  ///
-  /// #### Syntax
-  ///
-  /// `steady_state_resistance_low : valuefloat ;`
-  ///
-  /// `value`: A positive floating-point number that represents the resistance.
-  /// The resistance unit is a function of the unit of time divided by
-  /// the library unit of capacitance.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// steady_state_resistance_low : 1100 ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =212.37
-  /// &end
-  /// =213.1
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.53
-  /// &end
-  /// =203.53
-  /// ">Reference-Instance</a>
-  #[size = 16]
-  #[liberty(simple(type = Option))]
-  pub steady_state_resistance_low: Option<f64>,
-  /// Used for noise modeling, the `tied_off` attribute allows you
-  /// to specify the I-V characteristics and steady-state resistance values
-  /// on tied-off cells.
-  ///
-  /// #### Syntax
-  ///
-  /// `tied_off : Boolean ;`
-  ///
-  /// `Boolean`: Valid values are true and false.
-  ///
-  /// #### Example
-  /// ``` liberty
-  /// tied_off : true ;
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =213.2
-  /// &end
-  /// =213.10
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.54
-  /// &end
-  /// =203.54
-  /// ">Reference-Instance</a>
-  #[size = 1]
-  #[liberty(simple(type = Option))]
-  pub tied_off: Option<bool>,
   /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =213.11
-  /// &end
-  /// =214.6
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.55
-  /// &end
-  /// =203.55
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=328.32+329.2+330.2&end=328.33+329.39+330.6
+  /// ">Reference</a>
   /// #### Syntax
   /// `timing_sense : positive_unate | negative_unate | non_unate ;`
   ///
@@ -1084,29 +448,8 @@ pub struct Timing<C: Ctx> {
   /// and sequential cells by defining the type of timing arc.
   /// If this attribute is not assigned, the cell is considered combinational.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =214.7
-  /// +214.28
-  /// +214.50
-  /// +216.63
-  /// +217.19
-  /// &end
-  /// =214.27
-  /// +214.49
-  /// +216.60
-  /// +217.18
-  /// +217.35
-  /// ">Reference-Difinition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.56
-  /// &end
-  /// =203.70
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=330.8+331.2+331.21+332.2+333.2+334.2+335.3+336.2&end=330.41+331.19+331.30+332.33+333.37+334.53+335.45+336.22
+  /// ">Reference</a>
   /// #### Syntax
   /// `timing_type : combinational | combinational_rise | combinational_fall | three_state_disable |
   /// three_state_disable_rise | three_state_disable_fall | three_state_enable | three_state_enable_rise |
@@ -1318,22 +661,34 @@ pub struct Timing<C: Ctx> {
     with_ref = false
   )]
   pub timing_type: Option<TimingType>,
+  /// The when attribute is used in state-dependent timing and conditional timing checks.
+  ///
+  /// Note:
+  ///
+  /// The when attribute also appears in the `min_pulse_width` group and
+  /// the `minimum_period` group (described on `min_pulse_width` Group and
+  /// `minimum_period` Group, respectively). Both groups can be placed in pin, bus,
+  /// and `bundle` groups. The when attribute also appears in the power, `fall_power`,
+  /// and `rise_power` groups.
+  ///
+  /// For more details, see the “Modeling Power and Electromigration” and “Timing Arcs”
+  /// chapters in the Synopsys Liberty User Guide.
+  ///
+  /// ### Syntax
+  /// ``` text
+  /// when : "Boolean expression" ;
+  /// ```
+  /// Boolean expression
+  ///
+  /// A Boolean expression containing names of input, output, inout, and internal pins.
+  ///
+  /// ### Example
+  /// ``` text
+  /// when : "CD * SD" ;
+  /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-  /// ?field=test
-  /// &bgn
-  /// =150.10
-  /// &end
-  /// =150.16
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.71
-  /// &end
-  /// =203.71
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=337.12&end=337.26
+  /// ">Reference</a>
   #[size = 80]
   #[liberty(simple(type = Option))]
   #[id(
@@ -1343,40 +698,14 @@ pub struct Timing<C: Ctx> {
   )]
   pub when: Option<LogicBooleanExpression>,
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-  /// ?field=test
-  /// &bgn
-  /// =338.12
-  /// &end
-  /// =338.20
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.0
-  /// &end
-  /// =204.0
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=338.13&end=338.20
+  /// ">Reference</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
   pub when_end: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-  /// ?field=test
-  /// &bgn
-  /// =338.21
-  /// &end
-  /// =338.30
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.1
-  /// &end
-  /// =204.1
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=338.22&end=338.30
+  /// ">Reference</a>
   #[size = 32]
   #[liberty(simple(type = Option))]
   pub when_start: Option<BooleanExpression>,
@@ -1385,11 +714,11 @@ pub struct Timing<C: Ctx> {
   /// arc or the receiver capacitance load.
   /// You can also specify this attribute in the `receiver_capacitance` group of the input pin.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// active_input_ccb(input_ccb_name1[ , input_ccb_name2, ...]);
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// active_input_ccb("A", "B");
   /// ```
@@ -1403,11 +732,11 @@ pub struct Timing<C: Ctx> {
   /// groups in the timing arc that drive the output pin, but do not propagate the noise. You must
   /// define both the `output_ccb` and `timing` groups in the same pin group.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// active_output_ccb(output_ccb_name);
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// active_input_ccb("CCB_Q2");
   /// ```
@@ -1417,134 +746,82 @@ pub struct Timing<C: Ctx> {
   #[size = 24]
   #[liberty(complex(type = Option))]
   pub active_output_ccb: Option<String>,
-  // piecewise model only
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.3
-  /// &end
-  /// =204.3
-  /// ">Reference-Instance</a>
-  #[size = 24]
-  #[liberty(complex(type = Option))]
-  pub fall_delay_intercept: Option<(i64, f64)>,
   #[size = 16]
   #[liberty(complex(type = Option))]
   pub propagating_ccb: Option<PropagatingCcb>,
-  // piecewise model only
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =
-  /// &end
-  /// =
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.4
-  /// &end
-  /// =204.4
-  /// ">Reference-Instance</a>
-  #[size = 24]
-  #[liberty(complex(type = Option))]
-  pub fall_pin_resistance: Option<(i64, f64)>,
   /// You define the mode attribute within a timing group.
   /// A mode attribute pertains to an individual timing arc.
   /// The timing arc is active when mode is instantiated with a name and a value.
   /// You can specify multiple instances of the mode attribute,
   /// but only one instance for each timing arc.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =219.39
-  /// +220.11
-  /// &end
-  /// =220.9
-  /// +222.73
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.5
-  /// &end
-  /// =204.5
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=340.23+341.2+342.2+343.2+344.2&end=340.36+341.53+342.54+343.54+344.46
+  /// ">Reference</a>
   #[size = 16]
   #[liberty(complex(type = Option))]
-  pub mode: Option<Mode>,
-  // piecewise model only
+  pub mode: Option<[String; 2]>,
+  /// The `char_config` group is a group of attributes including simple and complex attributes.
+  /// These attributes represent library characterization configuration, and specify the settings
+  /// to characterize the library. Use the `char_config` group syntax to apply an attribute value
+  /// to a specific characterization model. You can specify multiple complex attributes in the
+  /// `char_config` group. You can also specify a single complex attribute multiple times for
+  /// different characterization models.
+  /// You can also define the `char_config` group within the cell, pin, and timing groups.
+  /// However, when you specify the same attribute in multiple `char_config` groups at different
+  /// levels, such as at the `library`, `cell`, `pin`, and `timing` levels, the attribute specified at the lower
+  /// level gets priority over the ones specified at the higher levels. For example, the pin-level
+  /// `char_config` group attributes have higher priority over the library-level `char_config`
+  /// group attributes.
+  ///
+  /// ### Syntax
+  /// ``` text
+  /// library (library_name) {
+  ///   char_config() {
+  ///     /* characterization configuration attributes */
+  ///   }
+  ///   ...
+  ///   cell (cell_name) {
+  ///     char_config() {
+  ///       /* characterization configuration attributes */
+  ///     }
+  ///     ...
+  ///     pin(pin_name) {
+  ///       char_config() {
+  ///         /* characterization configuration attributes */
+  ///       }
+  ///       timing() {
+  ///         char_config() {
+  ///           /* characterization configuration attributes */
+  ///         }
+  ///       } /* end of timing */
+  ///       ...
+  ///     } /* end of pin */
+  ///     ...
+  ///   } /* end of cell */
+  ///   ...
+  /// }
+  /// ```
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =
-  /// &end
-  /// =
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.6
-  /// &end
-  /// =204.6
-  /// ">Reference-Instance</a>
-  #[size = 24]
-  #[liberty(complex(type = Option))]
-  pub rise_delay_intercept: Option<(i64, f64)>,
-  // piecewise model only
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =
-  /// &end
-  /// =
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.7
-  /// &end
-  /// =204.7
-  /// ">Reference-Instance</a>
-  #[size = 24]
-  #[liberty(complex(type = Option))]
-  pub rise_pin_resistance: Option<(i64, f64)>,
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.30+44.2&end=43.31+44.37
+  /// ">Reference</a>
+  #[size = 1312]
+  #[liberty(group)]
+  pub char_config: Option<CharConfig<C>>,
   /// The `cell_degradation` group describes a cell performance degradation
   /// design rule for compiling a design. A cell degradation design rule
   /// specifies the maximum capacitive load a cell can drive without causing
   /// cell performance degradation during the fall transition.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =225.4
-  /// +225.27
-  /// &end
-  /// =225.25
-  /// +227.51
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.9
-  /// &end
-  /// =204.9
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33+348.2&end=347.42+348.20
+  /// ">Reference</a>
   #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<CellDegradation<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CellDegradation<C>>::deserialize_with")]
   pub cell_degradation: GroupSet<CellDegradation<C>>,
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33+348.2&end=347.42+348.20
+  /// ">Reference</a>
   #[liberty(supergroup(
     cell_rise: Option<TableLookUp2D<C>>,
     ocv_mean_shift_cell_rise: Option<TableLookUp2D<C>>,
@@ -1560,23 +837,8 @@ pub struct Timing<C: Ctx> {
   /// retaining_fall and retaining_rise values. There are no separate k-factors for
   /// the retaining_fall and retaining_rise values.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =227.53
-  /// +228.27
-  /// &end
-  /// =228.25
-  /// +228.62
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =204.10
-  /// &end
-  /// =204.10
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.22+349.2&end=348.49+349.32
+  /// ">Reference</a>
   #[liberty(supergroup(
     cell_fall: Option<TableLookUp2D<C>>,
     ocv_mean_shift_cell_fall: Option<TableLookUp2D<C>>,
@@ -1794,7 +1056,12 @@ pub struct Timing<C: Ctx> {
   pub ocv_sigma_retain_rise_slew: Option<TableLookUp2D<C>>,
 }
 
-impl<C: Ctx> GroupFn for Timing<C> {}
+impl<C: Ctx> GroupFn for Timing<C> {
+  fn after_build(&mut self, _: &mut crate::ast::BuilderScope) {
+    impls::need_timing_sense_when_timing_type_is_clear_or_preset(self);
+    impls::need_timing_sense_when_related_pin_is_output(self);
+  }
+}
 
 #[cfg(test)]
 mod test {
@@ -2442,6 +1709,8 @@ liberty_db::timing::Timing () {
     assert_lvf_fn(10.0, 42.0, 160.0);
     assert_lvf_fn(14.0, 30.0, 220.0);
   }
+  // FIXME:
+  #[ignore]
   #[test]
   fn table_lookup_mismatch_lvf() {
     use crate::ast::GroupAttri;

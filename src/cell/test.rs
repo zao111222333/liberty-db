@@ -28,7 +28,7 @@ liberty_db::cell::Cell (test) {
 }"#,
   );
 }
-/// Example 23 A multibit register containing four rising-edge-triggered D flip-flops
+/// ### Example 23 A multibit register containing four rising-edge-triggered D flip-flops
 /// with clear  and preset is shown in Figure 1 and Example 23
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=167.32&end=167.33
@@ -306,7 +306,7 @@ liberty_db::cell::Cell (dff4) {
 }"#,
   );
 }
-/// Example 27 shows a `latch_bank`  group for a multibit register containing four rising-edge-triggered D latches
+/// ### Example 27 shows a `latch_bank`  group for a multibit register containing four rising-edge-triggered D latches
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=187.42&end=187.43
 /// ">Reference</a>
@@ -365,7 +365,7 @@ liberty_db::cell::Cell (latch4) {
 }"#,
   );
 }
-/// Example PLL
+/// ### Example PLL
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=112.3+113.2&end=112.53+113.6
 /// ">Reference</a>
@@ -477,7 +477,7 @@ liberty_db::cell::Cell (my_pll) {
 }"#,
   );
 }
-/// Example 28 a multibit register containing four high-enable D latches with the clear  attribute.
+/// ### Example 28 a multibit register containing four high-enable D latches with the clear  attribute.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=190.11&end=190.12
 /// ">Reference</a>

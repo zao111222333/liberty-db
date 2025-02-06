@@ -341,6 +341,38 @@ impl<const N: usize> ComplexAttri for [f64; N] {
     ast::join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
+crate::ast::impl_self_builder!((String, f64));
+impl ComplexAttri for (String, f64) {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    iter: I,
+    _scope: &mut ParseScope,
+  ) -> Result<Self, ComplexParseError> {
+    let mut i = iter;
+    let v1 = match i.next() {
+      Some(&s) => s.to_owned(),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let v2 = match i.next() {
+      Some(s) => parse_f64(s)?,
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if i.next().is_some() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok((v1, v2))
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    f.write_str(&self.0)?;
+    f.write_str(", ")?;
+    f.write_num(self.1)
+  }
+}
+
 crate::ast::impl_self_builder!(super::items::IdVector);
 impl ComplexAttri for super::items::IdVector {
   #[inline]

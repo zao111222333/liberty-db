@@ -21,21 +21,8 @@ use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
 ///
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =213.11
-/// &end
-/// =214.6
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =203.55
-/// &end
-/// =203.55
-/// ">Reference-Instance</a>
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=328.32+329.2+330.2&end=328.33+329.39+330.6
+/// ">Reference</a>
 ///
 /// #### Syntax
 /// `timing_sense : positive_unate | negative_unate | non_unate ;`
@@ -78,22 +65,6 @@ use strum_macros::{Display, EnumString};
 ///
 /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
 /// If `related_pin` is an output pin, you must define a `timing_sense` attribute for that pin.
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =213.11
-/// &end
-/// =214.6
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =203.55
-/// &end
-/// =203.55
-/// ">Reference-Instance</a>
 #[derive(
   Debug, Clone, Copy, PartialEq, Display, EnumString, Default, Hash, Eq, PartialOrd, Ord
 )]
@@ -102,24 +73,14 @@ pub enum TimingSenseType {
   /// Combines incoming `rise` delays with local `rise` delays
   /// and compares incoming `fall` delays with local `fall` delays.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =t.m0.x45.ha.y2b10.ffc.fs2.fc2.sc0.ls0.ws0
-  /// &end
-  /// =t.m0.x37.h4.y2b12.ff1.fs2.fc2.sc0.ls0.ws0
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=329.5&end=329.6
   /// ">Reference</a>
   #[strum(serialize = "positive_unate")]
   PositiveUnate,
   /// Combines incoming `rise` delays with local `fall` delays
   /// and compares incoming `fall` delays with local `rise` delays.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =t.m0.x45.ha.y2b13.ffc.fs2.fc2.sc0.ls0.ws0
-  /// &end
-  /// =t.m0.x37.h4.y2b15.ff1.fs2.fc2.sc0.ls0.ws0
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=329.8&end=329.9
   /// ">Reference</a>
   #[strum(serialize = "negative_unate")]
   NegativeUnate,
@@ -128,12 +89,7 @@ pub enum TimingSenseType {
   /// output value change cannot be determined from the direction
   /// of the change in the input value.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =t.m0.x45.ha.y2b16.ffc.fs2.fc2.sc0.ls0.ws0
-  /// &end
-  /// =t.m0.x37.h4.y2b19.ff1.fs2.fc2.sc0.ls0.ws0
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=329.11&end=329.13
   /// ">Reference</a>
   #[strum(serialize = "non_unate")]
   #[default]
@@ -158,33 +114,6 @@ impl SimpleAttri for TimingSenseType {
     ast::nom_parse_from_str(i, scope)
   }
 }
-/// You define the mode attribute within a timing group.
-///
-/// A mode attribute pertains to an individual timing arc.
-/// The timing arc is active when mode is instantiated with a name and a value.
-/// You can specify multiple instances of the mode attribute,
-/// but only one instance for each timing arc.
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =219.39
-/// +220.11
-/// &end
-/// =220.9
-/// +222.73
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =204.5
-/// &end
-/// =204.5
-/// ">Reference-Instance</a>
-///
-// #[derive(Debug, Clone, Copy, Default)]
-pub type Mode = [String; 2];
 
 /// The `cell_degradation`  group describes a cell performance degradation
 /// design rule for compiling a design.

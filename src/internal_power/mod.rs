@@ -1,11 +1,7 @@
 use crate::{
   ast::{Attributes, GroupComments, GroupFn},
-  common::{
-    items::{Domain, NameList},
-    table::TableLookUp,
-  },
+  common::{items::NameList, table::TableLookUp},
   expression::LogicBooleanExpression,
-  timing::items::Mode,
   Ctx,
 };
 
@@ -58,16 +54,27 @@ pub struct InternalPower<C: Ctx> {
   )]
   pub when: Option<LogicBooleanExpression>,
   // NOTICE: Complex Attribute
-  #[size = 16]
+  /// The `mode` attribute specifies the current mode of operation of the cell. Use this attribute in
+  /// the `internal_power` group to define the internal power in the specified mode.
+  ///
+  /// ### Syntax
+  /// ``` text
+  /// mode (mode_name, mode_value) ;
+  /// ```
+  /// ### Example
+  /// ``` text
+  /// mode (rw, read) ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=305.9&end=305.14
+  /// ">Reference-Definition</a>
+  #[size = 48]
   #[liberty(complex(type = Option))]
-  mode: Option<Mode>,
+  pub mode: Option<[String; 2]>,
   // NOTICE: Group Statements
-  #[size = 336]
-  #[liberty(group(type = Option))]
-  pub domain: Option<Domain<C>>,
-  // fall_power (template name) {}
-  // power (template name) {}
-  // rise_power (template name) {}
+  // #[size = 336]
+  // #[liberty(group(type = Option))]
+  // pub domain: Option<Domain<C>>,
   #[size = 336]
   #[liberty(group(type = Option))]
   pub rise_power: Option<TableLookUp<C>>,

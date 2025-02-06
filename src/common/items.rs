@@ -30,21 +30,8 @@ use strum_macros::{Display, EnumString};
 /// sdf_edges : end_edge ; /* edge specification on end pin */
 /// ```
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =210.31
-/// &end
-/// =211.2
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =203.47
-/// &end
-/// =203.47
-/// ">Reference-Instance</a>
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=328.7&end=328.17
+/// ">Reference</a>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[derive(Default, EnumString, Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -121,11 +108,11 @@ impl SimpleAttri for VariableType {
 /// You can specify the `sigma_type` attribute in the `ocv_sigma_cell_rise` and
 /// `ocv_sigma_cell_fall` groups.
 ///
-/// Syntax
+/// ### Syntax
 /// ``` text
 /// sigma_type: early | late | early_and_late;
 /// ```
-/// Example
+/// ### Example
 /// ``` text
 /// sigma_type: early;
 /// ```
@@ -155,58 +142,58 @@ impl SimpleAttri for SigmaType {
   }
 }
 
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =38.48
-/// &end
-/// =39.24
-/// ">Reference-Definition</a>
-#[mut_set::derive::item(sort)]
-#[derive(Debug, Clone)]
-#[derive(liberty_macros::Group)]
-#[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Domain<C: Ctx> {
-  #[size = 8]
-  #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
-  pub name: String,
-  /// group comments
-  #[size = 32]
-  #[liberty(comments)]
-  comments: GroupComments,
-  #[size = 0]
-  #[liberty(extra_ctx)]
-  pub extra_ctx: C::Other,
-  /// group undefined attributes
-  #[size = 40]
-  #[liberty(attributes)]
-  pub attributes: crate::ast::Attributes,
-  #[size = 8]
-  #[liberty(simple(type = Option))]
-  pub calc_mode: Option<String>,
-  #[size = 1]
-  #[liberty(simple(type = Option))]
-  pub variable_1: Option<VariableType>,
-  #[size = 1]
-  #[liberty(simple(type = Option))]
-  pub variable_2: Option<VariableType>,
-  #[size = 1]
-  #[liberty(simple(type = Option))]
-  pub variable_3: Option<VariableType>,
-  #[size = 24]
-  #[liberty(complex)]
-  pub index_1: Vec<f64>,
-  #[size = 24]
-  #[liberty(complex)]
-  pub index_2: Vec<f64>,
-  #[size = 24]
-  #[liberty(complex)]
-  pub index_3: Vec<f64>,
-}
-impl<C: Ctx> GroupFn for Domain<C> {}
+// /// <a name ="reference_link" href="
+// /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
+// /// ?field=test
+// /// &bgn
+// /// =38.48
+// /// &end
+// /// =39.24
+// /// ">Reference-Definition</a>
+// #[mut_set::derive::item(sort)]
+// #[derive(Debug, Clone)]
+// #[derive(liberty_macros::Group)]
+// #[derive(serde::Serialize, serde::Deserialize)]
+// #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+// pub struct Domain<C: Ctx> {
+//   #[size = 8]
+//   #[liberty(name)]
+//   #[id(borrow = "&str", with_ref = false)]
+//   pub name: String,
+//   /// group comments
+//   #[size = 32]
+//   #[liberty(comments)]
+//   comments: GroupComments,
+//   #[size = 0]
+//   #[liberty(extra_ctx)]
+//   pub extra_ctx: C::Other,
+//   /// group undefined attributes
+//   #[size = 40]
+//   #[liberty(attributes)]
+//   pub attributes: crate::ast::Attributes,
+//   #[size = 8]
+//   #[liberty(simple(type = Option))]
+//   pub calc_mode: Option<String>,
+//   #[size = 1]
+//   #[liberty(simple(type = Option))]
+//   pub variable_1: Option<VariableType>,
+//   #[size = 1]
+//   #[liberty(simple(type = Option))]
+//   pub variable_2: Option<VariableType>,
+//   #[size = 1]
+//   #[liberty(simple(type = Option))]
+//   pub variable_3: Option<VariableType>,
+//   #[size = 24]
+//   #[liberty(complex)]
+//   pub index_1: Vec<f64>,
+//   #[size = 24]
+//   #[liberty(complex)]
+//   pub index_2: Vec<f64>,
+//   #[size = 24]
+//   #[liberty(complex)]
+//   pub index_3: Vec<f64>,
+// }
+// impl<C: Ctx> GroupFn for Domain<C> {}
 /// sth. like "A B C" will save as set{A B C}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]

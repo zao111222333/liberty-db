@@ -9,7 +9,6 @@ use crate::{
   },
   expression::{logic, LogicBooleanExpression, PowerGroundBooleanExpression},
   pin::Direction,
-  timing::items::Mode,
   Ctx,
 };
 use core::{
@@ -68,9 +67,9 @@ pub struct LeakagePower<C: Ctx> {
   #[size = 8]
   #[liberty(simple)]
   pub value: f64,
-  #[size = 16]
+  #[size = 48]
   #[liberty(complex(type = Option))]
-  pub mode: Option<Mode>,
+  pub mode: Option<[String; 2]>,
 }
 impl<C: Ctx> GroupFn for LeakagePower<C> {}
 
@@ -575,13 +574,13 @@ pub struct SwitchingGroup<C: Ctx> {
   /// you can place the attribute in any order.
   /// The valid values are rise and fall. rise represents a rising pin and fall represents a
   /// falling pin.
-  /// Syntax
+  /// ### Syntax
   /// `input_switching_condition (enum(rise, fall));`
   ///
   /// `enum(rise, fall)`
   /// Enumerated type specifying the rise or fall condition.
   ///
-  /// Example
+  /// ### Example
   /// `input_switching_condition (rise);`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.5&end=151.15
@@ -601,13 +600,13 @@ pub struct SwitchingGroup<C: Ctx> {
   /// the `related_outputs` attribute.
   /// The valid values are rise and fall. rise represents a rising pin and fall represents a
   /// falling pin.
-  /// Syntax
+  /// ### Syntax
   /// `output_switching_condition (enum(rise, fall));`
   ///
   /// `enum(rise, fall)`
   /// Enumerated type specifying the rise or fall condition.
   ///
-  /// Example
+  /// ### Example
   /// `output_switching_condition (rise, fall);`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.17&end=151.29
@@ -626,7 +625,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// + The count must be an integer.
   /// + The count must be greater than 0 and less than the `max_input_switching_count`
   /// value.
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// switching_group() {
   /// min_input_switching_count : integer ;
@@ -634,7 +633,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// ...
   /// }
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// switching_group() {
   /// min_input_switching_count : 1 ;
@@ -655,7 +654,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// + The count must be greater than the `min_input_switching_count` value.
   /// + The count within a `dynamic_current` should cover the total number of input bits
   /// specified in `related_inputs`.
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// switching_group() {
   /// min_input_switching_count : integer ;
@@ -663,7 +662,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// ...
   /// }
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// switching_group() {
   /// min_input_switching_count : 1 ;
@@ -812,7 +811,7 @@ impl<C: Ctx> GroupFn for PgCurrent<C> {}
 
 /// The `intrinsic_parasitic` group specifies the state-dependent intrinsic capacitance and
 /// intrinsic resistance of a `cell`.
-/// Syntax
+/// ### Syntax
 /// ``` text
 /// library( library_name ) {
 ///   ......
@@ -900,10 +899,10 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
   /// be a valid PG pin.
   ///
-  /// Syntax
+  /// ### Syntax
   /// `reference_pg_pin : pg_pin_name ;`
   ///
-  /// Example
+  /// ### Example
   /// `reference_pg_pin : G1 ;`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.3&end=178.9
@@ -916,10 +915,10 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// However, specify only one instance for each `cell`.
   /// Define the mode attribute within an `intrinsic_parasitic` group.
   ///
-  /// Syntax
+  /// ### Syntax
   /// `mode (mode_name, mode_value) ;`
   ///
-  /// Example
+  /// ### Example
   /// `mode (rw, read) ;`
   ///
   /// <a name ="reference_link" href="
@@ -928,7 +927,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   #[liberty(complex(type = Option))]
   pub mode: Option<[String; 2]>,
   /// Use this group to specify the intrinsic capacitance of a `cell`.
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// intrinsic_parasitic () {
   ///   intrinsic_capacitance (pg_pin_name) {
@@ -955,7 +954,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// Use this group to specify the intrinsic resistance between a power pin and an output pin of
   /// a cell.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// intrinsic_parasitic () {
   ///   intrinsic_resistance (pg_pin_name) {
@@ -999,7 +998,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// + The total capacitance parasitics modeling in macro cells is not state dependent, which
   /// means that there is no state condition specified in `intrinsic_parasitic`.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// cell (cell_name) {
   ///   ...
@@ -1013,7 +1012,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// }
   /// ```
   ///
-  /// Example
+  /// ### Example
   /// ``` text
   /// cell (my_cell) {
   ///   ...
@@ -1038,7 +1037,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
 impl<C: Ctx> GroupFn for IntrinsicParasitic<C> {}
 
 /// Use this group to specify the intrinsic capacitance of a `cell`.
-/// Syntax
+/// ### Syntax
 /// ``` text
 /// intrinsic_parasitic () {
 ///   intrinsic_capacitance (pg_pin_name) {
@@ -1091,10 +1090,10 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   /// The `reference_pg_pin` attribute specifies the reference pin for the
   /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
   /// be a valid PG pin.
-  /// Syntax
+  /// ### Syntax
   /// `reference_pg_pin : pg_pin_name ;`
   ///
-  /// Example
+  /// ### Example
   /// `reference_pg_pin : G1 ;`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
@@ -1110,7 +1109,7 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   /// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
   /// `pg_voltage_difference`.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// lut_values ( template_name ) {
   /// index_1 ("float, ... float" );
@@ -1118,7 +1117,7 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   /// }
   /// ```
   ///
-  /// Example
+  /// ### Example
   /// ``` text
   /// lut_values ( test_voltage ) {
   /// index_1 ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
@@ -1137,7 +1136,7 @@ impl<C: Ctx> GroupFn for IntrinsicCapacitance<C> {}
 /// Use this group to specify the intrinsic resistance between a power pin and an output pin of
 /// a cell.
 ///
-/// Syntax
+/// ### Syntax
 /// ``` text
 /// intrinsic_parasitic () {
 ///   intrinsic_resistance (pg_pin_name) {
@@ -1200,14 +1199,14 @@ pub struct IntrinsicResistance<C: Ctx> {
   #[liberty(default = f64::INFINITY)]
   pub value: f64,
   /// Use this attribute to specify the output pin.
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// related_output : output_pin_name ;
   /// ``` text
   ///
   /// `output_pin_name`
   /// The name of the output pin.
-  /// Example
+  /// ### Example
   /// `related_output : "A & B" ;`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
@@ -1218,10 +1217,10 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// The `reference_pg_pin` attribute specifies the reference pin for the
   /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The reference pin must
   /// be a valid PG pin.
-  /// Syntax
+  /// ### Syntax
   /// `reference_pg_pin : pg_pin_name ;`
   ///
-  /// Example
+  /// ### Example
   /// `reference_pg_pin : G1 ;`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
@@ -1237,7 +1236,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
   /// `pg_voltage_difference`.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// lut_values ( template_name ) {
   /// index_1 ("float, ... float" );
@@ -1245,7 +1244,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// }
   /// ```
   ///
-  /// Example
+  /// ### Example
   /// ``` text
   /// lut_values ( test_voltage ) {
   /// index_1 ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
@@ -1269,7 +1268,7 @@ impl<C: Ctx> GroupFn for IntrinsicResistance<C> {}
 /// + The total capacitance parasitics modeling in macro cells is not state dependent, which
 /// means that there is no state condition specified in `intrinsic_parasitic`.
 ///
-/// Syntax
+/// ### Syntax
 /// ``` text
 /// cell (cell_name) {
 ///   ...
@@ -1283,7 +1282,7 @@ impl<C: Ctx> GroupFn for IntrinsicResistance<C> {}
 /// }
 /// ```
 ///
-/// Example
+/// ### Example
 /// ``` text
 /// cell (my_cell) {
 ///   ...
@@ -1340,10 +1339,10 @@ impl<C: Ctx> GroupFn for PgPinWithValue<C> {}
 /// static current during the measurement.
 /// + A missing `gate_leakage` group is allowed for certain pins.
 /// + Current conservation is applicable if it can be applied to higher error tolerance.
-/// Syntax
+/// ### Syntax
 /// `gate_leakage (input_pin_name)`
 ///
-/// Example
+/// ### Example
 /// ``` text
 /// cell (my_cell) {
 ///   ...
@@ -1420,7 +1419,7 @@ impl<C: Ctx> GroupFn for GateLeakage<C> {}
 /// A `leakage_current` group is defined within a cell group or a model group to specify
 /// leakage current values that are dependent on the state of the cell.
 ///
-/// Syntax
+/// ### Syntax
 /// ``` text
 /// library (name) {
 /// cell(cell_name) {
@@ -1492,10 +1491,10 @@ pub struct LeakageCurrent<C: Ctx> {
   /// However, specify only one instance for each `cell`.
   /// Define the mode attribute within an `intrinsic_parasitic` group.
   ///
-  /// Syntax
+  /// ### Syntax
   /// `mode (mode_name, mode_value) ;`
   ///
-  /// Example
+  /// ### Example
   /// `mode (rw, read) ;`
   ///
   /// <a name ="reference_link" href="
@@ -1505,7 +1504,7 @@ pub struct LeakageCurrent<C: Ctx> {
   pub mode: Option<[String; 2]>,
   /// Use this group to specify a power or ground pin where leakage current is to be measured.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// cell(cell_name) {
   ///   ...
@@ -1549,10 +1548,10 @@ pub struct LeakageCurrent<C: Ctx> {
   /// static current during the measurement.
   /// + A missing `gate_leakage` group is allowed for certain pins.
   /// + Current conservation is applicable if it can be applied to higher error tolerance.
-  /// Syntax
+  /// ### Syntax
   /// `gate_leakage (input_pin_name)`
   ///
-  /// Example
+  /// ### Example
   /// ``` text
   /// cell (my_cell) {
   ///   ...
@@ -1588,7 +1587,7 @@ impl<C: Ctx> GroupFn for LeakageCurrent<C> {}
 /// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
 /// `pg_voltage_difference`.
 ///
-/// Syntax
+/// ### Syntax
 /// ``` text
 /// lut_values ( template_name ) {
 /// index_1 ("float, ... float" );
@@ -1596,7 +1595,7 @@ impl<C: Ctx> GroupFn for LeakageCurrent<C> {}
 /// }
 /// ```
 ///
-/// Example
+/// ### Example
 /// ``` text
 /// lut_values ( test_voltage ) {
 /// index_1 ( "0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0" );
@@ -1704,7 +1703,7 @@ impl SimpleAttri for PgType {
 /// The `switch_cell_type`  cell-level attribute specifies
 /// the type of the switch cell for direct inference.
 ///
-/// Syntax:
+/// ### Syntax:
 /// ``` text
 /// switch_cell_type : coarse_grain | fine_grain;
 /// ``` text
@@ -1798,7 +1797,7 @@ impl SimpleAttri for LevelShifterType {
 /// You can use the `clock_gating_integrated_cell` attribute to enter specific
 /// values that determine which integrated cell functionality the clock-gating tool uses.
 ///
-/// Syntax:
+/// ### Syntax:
 /// ```text
 /// clock_gating_integrated_cell:generic|value_id;
 /// ``` text
@@ -1855,7 +1854,7 @@ impl SimpleAttri for ClockGatingIntegratedCell {
 
 /// Use the `pin_opposite` attribute to describe functionally opposite (logically inverse) groups
 /// of input or output pins.
-/// Syntax
+/// ### Syntax
 ///
 /// ``` text
 /// pin_opposite ("name_list1", "name_list2") ;

@@ -48,13 +48,13 @@ impl SimpleAttri for Edge {
 /// the `related_outputs` attribute.
 /// The valid values are rise and fall. rise represents a rising pin and fall represents a
 /// falling pin.
-/// Syntax
+/// ### Syntax
 /// `output_switching_condition (enum(rise, fall));`
 ///
 /// `enum(rise, fall)`
 /// Enumerated type specifying the rise or fall condition.
 ///
-/// Example
+/// ### Example
 /// `output_switching_condition (rise, fall);`
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.17&end=151.29

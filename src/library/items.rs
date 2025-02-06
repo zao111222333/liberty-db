@@ -739,7 +739,7 @@ impl ComplexAttri for Technology {
 /// The following example shows how to define a new string attribute called `bork`,
 /// which is valid in a `pin`  group:
 ///
-/// Example
+/// ### Example
 /// ``` liberty
 /// define ("bork", "pin", "string") ;
 /// ```

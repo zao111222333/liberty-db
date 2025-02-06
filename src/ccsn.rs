@@ -11,7 +11,6 @@ use crate::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
   },
   expression::LogicBooleanExpression,
-  timing::items::Mode,
   Ctx,
 };
 use core::fmt::{self, Write};
@@ -153,7 +152,7 @@ pub struct CCSNStage<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 16]
   #[liberty(complex(type = Option))]
-  pub mode: Option<Mode>,
+  pub mode: Option<[String; 2]>,
   /// Use the `dc_current`  group to specify the input and output voltage values
   /// of a two-dimensional current table for a channel-connecting block.
   ///
@@ -347,11 +346,11 @@ pub struct ReceiverCapacitance<C: Ctx> {
   /// arc or the receiver capacitance load.
   /// You can also specify this attribute in the `receiver_capacitance` group of the input pin.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// active_input_ccb(input_ccb_name1[ , input_ccb_name2, ...]);
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// active_input_ccb("A", "B");
   /// ```

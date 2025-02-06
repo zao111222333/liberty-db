@@ -998,7 +998,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
 
-  /// Example 19 is an ff  group for a single-stage D flip-flop with
+  /// ### Example 19 is an ff  group for a single-stage D flip-flop with
   /// rising-edge sampling, negative clear and preset, and output pins
   /// set to 0 when both clear and preset are active (low).
   /// <a name ="reference_link" href="
@@ -1040,7 +1040,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
 
-  /// Example 20 is an ff group for a single-stage, rising-edge-triggered
+  /// ### Example 20 is an ff group for a single-stage, rising-edge-triggered
   /// JK flip-flop with scan input, negative clear and preset, and
   /// output pins set to 0 when clear and preset are both active.
   /// <a name ="reference_link" href="
@@ -1082,7 +1082,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
 
-  /// Example 21 is an ff group for a D flip-flop with synchronous negative clear.
+  /// ### Example 21 is an ff group for a D flip-flop with synchronous negative clear.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=162.26&end=162.31
   /// ">Reference</a>
@@ -1114,7 +1114,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
 
-  /// Example 22 shows an ff  group for a master-slave D flip-flop with
+  /// ### Example 22 shows an ff  group for a master-slave D flip-flop with
   /// rising-edge sampling, falling-edge data transfer, negative clear and preset,
   /// and output values set high when clear and preset are both active
   /// <a name ="reference_link" href="
@@ -1157,7 +1157,7 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
-  /// Example 23 A multibit register containing four rising-edge-triggered D flip-flops
+  /// ### Example 23 A multibit register containing four rising-edge-triggered D flip-flops
   /// with clear  and preset is shown in Figure 1 and Example 23
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=167.32&end=167.33
@@ -1197,7 +1197,7 @@ liberty_db::expression::boolean_expression::latch_ff::FFBank (IQ, IQN, 4) {
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
-  /// Example 25 D Latch With Active-High Enable and Negative Clear
+  /// ### Example 25 D Latch With Active-High Enable and Negative Clear
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=186.19&end=186.24
   /// ">Reference</a>
@@ -1230,7 +1230,7 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
     assert_eq!(id_var1_expr_, id_var1_expr);
     assert_eq!(id_var2_expr_, id_var2_expr);
   }
-  /// Example 25 SR latch. The `enable`  and `data_in`  attributes are not required for an SR latch.
+  /// ### Example 25 SR latch. The `enable`  and `data_in`  attributes are not required for an SR latch.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=186.25&end=186.33
   /// ">Reference</a>

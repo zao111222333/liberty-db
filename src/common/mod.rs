@@ -4,6 +4,7 @@
 //!
 
 use ordered_float::NotNan;
+pub mod char_config;
 pub mod items;
 pub mod table;
 pub mod traits;

@@ -396,7 +396,7 @@ impl FromStr for TwoValue {
   }
 }
 
-/// Example
+/// ### Example
 /// ``` text
 /// retention_pin (save | restore | save_restore, enumerated_type) ;
 /// ```
@@ -429,11 +429,11 @@ pub enum PinClass {
 /// Defines the value of the retention pin when the cell works in normal mode. The valid
 /// values are 0 and 1.
 ///
-/// Syntax
+/// ### Syntax
 /// ``` text
 /// retention_pin (pin_class, disable_value) ;
 /// ```
-/// Example
+/// ### Example
 /// ``` text
 /// retention_pin (save | restore | save_restore, enumerated_type) ;
 /// ```
