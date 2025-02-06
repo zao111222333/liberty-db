@@ -1,28 +1,28 @@
 use crate::ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri};
 use core::fmt::{self, Write};
 
-/// The expression must conform to `OVI SDF 2.1 timing-check condition syntax`.
+/// The `sdf_cond` attribute is defined in the state-dependent timing group to support SDF file
+/// generation and condition matching during back-annotation.
 ///
-/// #### Example
-/// ``` liberty
-/// sdf_cond_end : "SIG_0 == 1’b1" ;
+/// ### Syntax
+/// ``` text
+/// sdf_cond : "SDF expression" ;
+/// ```
+/// SDF expression
+///
+/// A string that represents a Boolean description of the state dependency of the
+/// delay. Use a Boolean description that conforms to the valid syntax defined in
+/// the OVI SDF, which is different from the Boolean expression. For a complete
+/// description of the valid syntax for these expressions, see the OVI specification
+/// for SDF, V1.0.
+///
+/// ### Example
+/// ``` text
+/// sdf_cond : "b == 1’b1" ;
 /// ```
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =210.10
-/// &end
-/// =210.19
-/// ">Reference-Definition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-/// ?field=test
-/// &bgn
-/// =203.45
-/// &end
-/// =203.45
-/// ">Reference-Instance</a>
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.3&end=327.14
+/// ">Reference</a>
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[derive(Default)]
 #[derive(serde::Serialize, serde::Deserialize)]

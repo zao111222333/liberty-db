@@ -10,7 +10,10 @@ use crate::{
     ParseScope, ParsingBuilder,
   },
   cell::Cell,
-  common::table::{CompactLutTemplate, DriverWaveform, TableTemple},
+  common::{
+    char_config::CharConfig,
+    table::{CompactLutTemplate, DriverWaveform, TableTemple},
+  },
   units, Ctx,
 };
 use core::fmt::{self, Write as _};
@@ -54,7 +57,7 @@ pub struct Library<C: Ctx> {
   /// The following example shows how to define a new string attribute called `bork`,
   /// which is valid in a `pin`  group:
   ///
-  /// Example
+  /// ### Example
   /// ``` liberty
   /// define ("bork", "pin", "string") ;
   /// ```
@@ -152,11 +155,11 @@ pub struct Library<C: Ctx> {
   /// Specify monotonically increasing values with the
   /// `receiver_capacitance_rise_threshold_pct` attribute.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// receiver_capacitance_rise_threshold_pct ("float, float,...");
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// receiver_capacitance_rise_threshold_pct ("0, 30, 50, 60, 70, 80, 100");
   /// ```
@@ -176,11 +179,11 @@ pub struct Library<C: Ctx> {
   /// Specify monotonically decreasing values with the
   /// `receiver_capacitance_fall_threshold_pct` attribute.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// receiver_capacitance_fall_threshold_pct ("float, float,...");
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// receiver_capacitance_fall_threshold_pct ("100, 80, 70, 60, 50, 30, 0");
   /// ```
@@ -351,13 +354,13 @@ pub struct Library<C: Ctx> {
   /// The `em_temp_degradation_factor` attribute specifies the electromigration exponential
   /// degradation factor.
   ///
-  /// Syntax:
+  /// ### Syntax:
   /// `em_temp_degradation_factor : valuefloat ;`
   ///
   /// value:
   /// A floating-point number in centigrade units consistent with other temperature specifications throughout the library.
   ///
-  /// Example
+  /// ### Example
   /// `em_temp_degradation_factor : 40.0 ;`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=26.3&end=26.13
@@ -580,6 +583,53 @@ pub struct Library<C: Ctx> {
   #[size = 16]
   #[liberty(simple(type = Option))]
   pub soft_error_rate_confidence: Option<f64>,
+  /// The `char_config` group is a group of attributes including simple and complex attributes.
+  /// These attributes represent library characterization configuration, and specify the settings
+  /// to characterize the library. Use the `char_config` group syntax to apply an attribute value
+  /// to a specific characterization model. You can specify multiple complex attributes in the
+  /// `char_config` group. You can also specify a single complex attribute multiple times for
+  /// different characterization models.
+  /// You can also define the `char_config` group within the cell, pin, and timing groups.
+  /// However, when you specify the same attribute in multiple `char_config` groups at different
+  /// levels, such as at the `library`, `cell`, `pin`, and `timing` levels, the attribute specified at the lower
+  /// level gets priority over the ones specified at the higher levels. For example, the pin-level
+  /// `char_config` group attributes have higher priority over the library-level `char_config`
+  /// group attributes.
+  ///
+  /// ### Syntax
+  /// ``` text
+  /// library (library_name) {
+  ///   char_config() {
+  ///     /* characterization configuration attributes */
+  ///   }
+  ///   ...
+  ///   cell (cell_name) {
+  ///     char_config() {
+  ///       /* characterization configuration attributes */
+  ///     }
+  ///     ...
+  ///     pin(pin_name) {
+  ///       char_config() {
+  ///         /* characterization configuration attributes */
+  ///       }
+  ///       timing() {
+  ///         char_config() {
+  ///           /* characterization configuration attributes */
+  ///         }
+  ///       } /* end of timing */
+  ///       ...
+  ///     } /* end of pin */
+  ///     ...
+  ///   } /* end of cell */
+  ///   ...
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.30+44.2&end=43.31+44.37
+  /// ">Reference</a>
+  #[size = 1312]
+  #[liberty(group)]
+  pub char_config: Option<CharConfig<C>>,
   /// Use the `output_current_template`  group to describe a table template
   /// for composite current source (CCS) modeling.
   /// <a name ="reference_link" href="

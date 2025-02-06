@@ -10,7 +10,7 @@ pub use items::*;
 
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
-  common::{items::NameList, table::TableLookUp2D},
+  common::{char_config::CharConfig, items::NameList, table::TableLookUp2D},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
   Ctx,
@@ -136,7 +136,7 @@ pub struct Cell<C: Ctx> {
   /// You can use the `clock_gating_integrated_cell` attribute to enter specific
   /// values that determine which integrated cell functionality the clock-gating tool uses.
   ///
-  /// Syntax:
+  /// ### Syntax:
   /// ```text
   /// clock_gating_integrated_cell:generic|value_id;
   /// ```
@@ -300,7 +300,7 @@ pub struct Cell<C: Ctx> {
   pub level_shifter_type: Option<LevelShifterType>,
   /// The `retention_cell`  attribute identifies a retention cell. The `retention_cell_style` value is a random string
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// retention_cell : retention_cell_style ;
   /// ```
@@ -313,7 +313,7 @@ pub struct Cell<C: Ctx> {
   /// The `switch_cell_type`  cell-level attribute specifies
   /// the type of the switch cell for direct inference.
   ///
-  /// Syntax:
+  /// ### Syntax:
   /// ``` text
   /// switch_cell_type : coarse_grain | fine_grain;
   /// ```
@@ -323,6 +323,29 @@ pub struct Cell<C: Ctx> {
   #[size = 1]
   #[liberty(simple(type = Option))]
   pub switch_cell_type: Option<SwitchCellType>,
+  /// The `sensitization_master` attribute defines the sensitization group referenced by
+  /// the cell to generate stimuli for characterization. The attribute is required if the cell
+  /// contains sensitization information. Its string value should be any sensitization group name
+  /// predefined in the current library.
+  ///
+  /// ### Syntax
+  /// ``` text
+  /// sensitization_master : sensitization_group_name;
+  /// ```
+  /// sensitization_group_name
+  ///
+  /// A string identifying the sensitization group name predefined in the current library.
+  ///
+  /// ### Example
+  /// ``` text
+  /// sensitization_master : sensi_2in_1out;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=118.28+119.2&end=118.31+119.7
+  /// ">Reference</a>
+  #[size = 24]
+  #[liberty(simple(type = Option))]
+  pub sensitization_master: Option<String>,
   /// Use the `dc_current`  group to specify the input and output voltage values
   /// of a two-dimensional current table for a channel-connecting block.
   ///
@@ -375,7 +398,7 @@ pub struct Cell<C: Ctx> {
   pub output_voltage_range: Option<(f64, f64)>,
   /// Use the pin_opposite attribute to describe functionally opposite (logically inverse) groups
   /// of input or output pins.
-  /// Syntax
+  /// ### Syntax
   ///
   /// ``` text
   /// pin_opposite ("name_list1", "name_list2") ;
@@ -402,6 +425,53 @@ pub struct Cell<C: Ctx> {
   #[size = 96]
   #[liberty(complex(type = Option))]
   pub pin_opposite: Option<PinOpposite>,
+  /// The `char_config` group is a group of attributes including simple and complex attributes.
+  /// These attributes represent library characterization configuration, and specify the settings
+  /// to characterize the library. Use the `char_config` group syntax to apply an attribute value
+  /// to a specific characterization model. You can specify multiple complex attributes in the
+  /// `char_config` group. You can also specify a single complex attribute multiple times for
+  /// different characterization models.
+  /// You can also define the `char_config` group within the cell, pin, and timing groups.
+  /// However, when you specify the same attribute in multiple `char_config` groups at different
+  /// levels, such as at the `library`, `cell`, `pin`, and `timing` levels, the attribute specified at the lower
+  /// level gets priority over the ones specified at the higher levels. For example, the pin-level
+  /// `char_config` group attributes have higher priority over the library-level `char_config`
+  /// group attributes.
+  ///
+  /// ### Syntax
+  /// ``` text
+  /// library (library_name) {
+  ///   char_config() {
+  ///     /* characterization configuration attributes */
+  ///   }
+  ///   ...
+  ///   cell (cell_name) {
+  ///     char_config() {
+  ///       /* characterization configuration attributes */
+  ///     }
+  ///     ...
+  ///     pin(pin_name) {
+  ///       char_config() {
+  ///         /* characterization configuration attributes */
+  ///       }
+  ///       timing() {
+  ///         char_config() {
+  ///           /* characterization configuration attributes */
+  ///         }
+  ///       } /* end of timing */
+  ///       ...
+  ///     } /* end of pin */
+  ///     ...
+  ///   } /* end of cell */
+  ///   ...
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.30+44.2&end=43.31+44.37
+  /// ">Reference</a>
+  #[size = 1312]
+  #[liberty(group)]
+  pub char_config: Option<CharConfig<C>>,
   #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<PgPin<C>>::serialize_with")]
@@ -448,7 +518,7 @@ pub struct Cell<C: Ctx> {
   pub dynamic_current: GroupSet<DynamicCurrent<C>>,
   /// The `intrinsic_parasitic` group specifies the state-dependent intrinsic capacitance and
   /// intrinsic resistance of a `cell`.
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// library( library_name ) {
   ///   ......
@@ -510,7 +580,7 @@ pub struct Cell<C: Ctx> {
   /// A `leakage_current` group is defined within a cell group or a model group to specify
   /// leakage current values that are dependent on the state of the cell.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// library (name) {
   /// cell(cell_name) {

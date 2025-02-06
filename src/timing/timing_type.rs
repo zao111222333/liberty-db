@@ -657,21 +657,8 @@ impl fmt::Display for ArcNoChange {
 ///
 /// If this attribute is not assigned, the cell is considered combinational (Default).
 /// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-/// ?field=test
-/// &bgn
-/// =330.7
-/// &end
-/// =330.37
-/// ">Reference-Difinition</a>
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-/// ?field=test
-/// &bgn
-/// =320.20
-/// &end
-/// =320.34
-/// ">Reference-Instance</a>
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=330.8+331.2+331.21+332.2+333.2+334.2+335.3+336.2&end=330.41+331.19+331.30+332.33+333.37+334.53+335.45+336.22
+/// ">Reference</a>
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>

@@ -756,11 +756,11 @@ pub struct OcvSigmaTable<C: Ctx> {
   /// You can specify the `sigma_type` attribute in the `ocv_sigma_cell_rise` and
   /// `ocv_sigma_cell_fall` groups.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// sigma_type: early | late | early_and_late;
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// sigma_type: early;
   /// ```

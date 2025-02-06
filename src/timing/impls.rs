@@ -7,37 +7,34 @@
 
 //   use crate::{common::traits::Check, timing::Timing};
 
-//   // TODO:
-//   /// Timing arcs with a timing type of clear or preset require a `timing_sense` attribute.
-//   /// <a name ="reference_link" href="
-//   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-//   /// ?field=test
-//   /// &bgn
-//   /// =214.5
-//   /// &end
-//   /// =214.5
-//   /// ">Reference</a>
-//   const fn need_timing_sense_when_timing_type_is_clear_or_preset(timing: &Timing) {
-//     if timing.timing_sense.is_none() {}
-//   }
+use crate::Ctx;
 
-//   // TODO:
-//   /// If `related_pin` is an output pin, you must define a `timing_sense` attribute for that pin.
-//   /// <a name ="reference_link" href="
-//   /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-//   /// ?field=test
-//   /// &bgn
-//   /// =214.6
-//   /// &end
-//   /// =214.6
-//   /// ">Reference</a>
-//   const fn need_timing_sense_when_related_pin_is_output() {}
+use super::{Timing, TimingType};
 
-//   impl Check for Timing {
-//     #[inline]
-//     fn check(&self) {
-//       need_timing_sense_when_timing_type_is_clear_or_preset(self);
-//       need_timing_sense_when_related_pin_is_output();
-//     }
-//   }
-// }
+// TODO:
+/// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=330.5&end=330.6
+/// ">Reference</a>
+pub(super) fn need_timing_sense_when_timing_type_is_clear_or_preset<C: Ctx>(
+  timing: &Timing<C>,
+) {
+  if matches!(timing.timing_type, Some(TimingType::CLEAR | TimingType::PRESET))
+    && timing.timing_sense.is_none()
+  {
+    log::error!("Build Error: Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.");
+  }
+}
+
+/// If `related_pin` is an output pin, you must define a `timing_sense` attribute for that pin.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=330.6&end=330.7
+/// ">Reference</a>
+pub(super) const fn need_timing_sense_when_related_pin_is_output<C: Ctx>(
+  _timing: &Timing<C>,
+) {
+  // TODO
+  //   if timing.related_pin && timing.timing_sense.is_none() {
+  //     log::error!("Build Error: If `related_pin` is an output pin, you must define a `timing_sense` attribute for that pin.");
+  //   }
+}

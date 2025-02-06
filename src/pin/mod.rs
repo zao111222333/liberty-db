@@ -4,7 +4,10 @@
 use crate::{
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
   ccsn::{CCSNStage, ReceiverCapacitance},
-  common::items::{NameList, WordSet},
+  common::{
+    char_config::CharConfig,
+    items::{NameList, WordSet},
+  },
   expression::{logic, BooleanExpression, PowerGroundBooleanExpression},
   internal_power::InternalPower,
   timing::Timing,
@@ -99,11 +102,11 @@ pub struct Pin<C: Ctx> {
   /// Defines the value of the retention pin when the cell works in normal mode. The valid
   /// values are 0 and 1.
   ///
-  /// Syntax
+  /// ### Syntax
   /// ``` text
   /// retention_pin (pin_class, disable_value) ;
   /// ```
-  /// Example
+  /// ### Example
   /// ``` text
   /// retention_pin (save | restore | save_restore, enumerated_type) ;
   /// ```
@@ -1129,6 +1132,53 @@ pub struct Pin<C: Ctx> {
   pub rise_capacitance_range: Option<(f64, f64)>,
   // NOTICE: Group Attributes in a pin Group
   // electromigration () { }
+  /// The `char_config` group is a group of attributes including simple and complex attributes.
+  /// These attributes represent library characterization configuration, and specify the settings
+  /// to characterize the library. Use the `char_config` group syntax to apply an attribute value
+  /// to a specific characterization model. You can specify multiple complex attributes in the
+  /// `char_config` group. You can also specify a single complex attribute multiple times for
+  /// different characterization models.
+  /// You can also define the `char_config` group within the cell, pin, and timing groups.
+  /// However, when you specify the same attribute in multiple `char_config` groups at different
+  /// levels, such as at the `library`, `cell`, `pin`, and `timing` levels, the attribute specified at the lower
+  /// level gets priority over the ones specified at the higher levels. For example, the pin-level
+  /// `char_config` group attributes have higher priority over the library-level `char_config`
+  /// group attributes.
+  ///
+  /// ### Syntax
+  /// ``` text
+  /// library (library_name) {
+  ///   char_config() {
+  ///     /* characterization configuration attributes */
+  ///   }
+  ///   ...
+  ///   cell (cell_name) {
+  ///     char_config() {
+  ///       /* characterization configuration attributes */
+  ///     }
+  ///     ...
+  ///     pin(pin_name) {
+  ///       char_config() {
+  ///         /* characterization configuration attributes */
+  ///       }
+  ///       timing() {
+  ///         char_config() {
+  ///           /* characterization configuration attributes */
+  ///         }
+  ///       } /* end of timing */
+  ///       ...
+  ///     } /* end of pin */
+  ///     ...
+  ///   } /* end of cell */
+  ///   ...
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.30+44.2&end=43.31+44.37
+  /// ">Reference</a>
+  #[size = 1312]
+  #[liberty(group)]
+  pub char_config: Option<CharConfig<C>>,
   #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<InternalPower<C>>::serialize_with")]
@@ -1154,27 +1204,27 @@ pub struct Pin<C: Ctx> {
   #[serde(serialize_with = "GroupSet::<TLatch<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TLatch<C>>::deserialize_with")]
   pub tlatch: GroupSet<TLatch<C>>,
-  /// A timing group is defined in a [bundle](crate::bundle::Bundle), a [bus](crate::bus::Bus), or a [pin](crate::pin::Pin) group within a cell.
-  /// The timing group can be used to identify the name or names of multiple timing arcs.
-  /// A timing group identifies multiple timing arcs, by identifying a timing arc in a [pin](crate::pin::Pin) group
-  /// that has more than one related pin or when the timing arc is part of a [bundle](crate::bundle::Bundle) or a [bus](crate::bus::Bus).
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =67.26
-  /// &end
-  /// =67.43
-  /// ">Reference-Definition</a>
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-  /// ?field=test
-  /// &bgn
-  /// =203.8
-  /// &end
-  /// =203.29
-  /// ">Reference-Instatnce-In-Pin</a>
+  /// A `timing` group is defined in a `bundle`, a `bus`, or a `pin` group within a `cell`. The `timing`
+  /// group can be used to identify the name or names of multiple `timing` arcs. A `timing` group
+  /// identifies multiple `timing` arcs, by identifying a `timing` arc in a `pin` group that has more than
+  /// one `related pin` or when the timing arc is part of a `bundle` or a `bus`.
+  /// The following syntax shows a `timing` group in a `pin` group within a `cell` group.
   ///
+  /// ### Syntax
+  /// ``` text
+  /// library (namestring) {
+  ///   cell (name) {
+  ///     pin (name) {
+  ///       timing (name | name_list) {
+  ///         ... timing description ...
+  ///       }
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=90.29+91.2&end=90.41+91.5
+  /// ">Reference</a>
   #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Timing<C>>::serialize_with")]
