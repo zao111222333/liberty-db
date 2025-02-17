@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.9.3"
+version = "0.9.4"
 license = "MIT"
 edition = "2021"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -73,6 +73,7 @@ cfg-if = "1.0.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 sysinfo = "0.33"
 chrono = "0.4"
+anyhow = "1.0"
 # faster hash
 ahash = { version = "0.8", features = ["no-rng"]}
 # group name matching use faster but less DOS resistance foldhash
@@ -114,3 +115,4 @@ dev_utils.workspace = true
 simple_logger.workspace = true
 criterion.workspace = true
 bincode.workspace = true
+anyhow.workspace = true

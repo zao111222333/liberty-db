@@ -356,8 +356,6 @@ impl<C: crate::Ctx> crate::Cell<C> {
     &self,
     s: &str,
   ) -> Result<LogicBooleanExpression, BoolExprErr> {
-    println!("{s}");
-    println!("{}", self.extra_ctx.logic_variables());
     let expr = BooleanExpression::from_str(s)?.expr;
     let bdd = self.extra_ctx.logic_variables().eval_expression(&expr);
     Ok(LogicBooleanExpression(BddBooleanExpression { expr, bdd }))

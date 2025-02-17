@@ -82,6 +82,8 @@ cargo run --example 0_parse_fmt
 cargo run --example 1_parse_fmt_file -- dev/tech/cases/ocv.lib
 # example2
 cargo run --example 2_prune_lib -- dev/tech/cases/ocv.lib
+# example3
+cargo run --example 3_obtain_timing_lut
 ```
 
 Or you can download the [releases/latest/examples.zip](https://github.com/zao111222333/liberty-db/releases/latest/download/examples_x86_64-unknown-linux-musl.zip), then

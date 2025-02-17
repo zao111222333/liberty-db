@@ -1,6 +1,6 @@
 use liberty_db::{DefaultCtx, Group, Library};
 
-static TEMPLATE: &str = r#"
+const TEMPLATE: &str = r#"
 library(gscl45nm) {
   delay_model : table_lookup;
   in_place_swap_mode : match_footprint;
