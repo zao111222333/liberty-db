@@ -210,6 +210,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
   fn get_lvf_value(&self, ix: usize, iy: usize) -> LVFValue {
     self.lvf_values[ix * self.index_2.len() + iy]
   }
+  /// The linear interpolation & extrapolation
   #[must_use]
   #[inline]
   #[expect(clippy::float_arithmetic)]

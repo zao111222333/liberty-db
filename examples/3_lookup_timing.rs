@@ -1,5 +1,5 @@
 use anyhow::Context as _;
-use liberty_db::{DefaultCtx, Library};
+use liberty_db::{timing::TimingType, DefaultCtx, Library};
 
 const TEMPLATE: &str = include_str!("../dev/tech/tsmc22/tcbn22ullbwp30p140tt0p8v25c.lib");
 fn main() -> anyhow::Result<()> {
@@ -12,12 +12,13 @@ fn main() -> anyhow::Result<()> {
     .get(
       "CP".into(),
       None,
-      Some(&liberty_db::timing::TimingType::SETUP_RISING),
+      Some(&TimingType::SETUP_RISING),
       Some(&cell_dff.parse_logic_booleanexpr("CDN")?),
     )
     .context("Failed to get timing")?;
   let setup_table =
     timing.rise_constraint.as_ref().context("Failed to get setup_table")?;
-  dbg!(setup_table);
+  dbg!(setup_table.lookup(&0.1, &0.3));
+  // dbg!(setup_table);
   Ok(())
 }

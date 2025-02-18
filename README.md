@@ -83,7 +83,7 @@ cargo run --example 1_parse_fmt_file -- dev/tech/cases/ocv.lib
 # example2
 cargo run --example 2_prune_lib -- dev/tech/cases/ocv.lib
 # example3
-cargo run --example 3_obtain_timing_lut
+cargo run --example 3_lookup_timing
 ```
 
 Or you can download the [releases/latest/examples.zip](https://github.com/zao111222333/liberty-db/releases/latest/download/examples_x86_64-unknown-linux-musl.zip), then
@@ -115,43 +115,14 @@ cargo test --release
 Run benchmark, it will takes 40mins.
 
 ```shell
-cargo bench --bench dev
+cargo bench --package dev --bench benchmark --features bench
 ```
 
 ## TODO
 
-+ use `nom_locate`
-+ CI:
-  + only do comparsion after tag new version
-  + ~~fast regression self in compare.yml~~
-+ Other:
-  + BDD use LibertyStr
-  + Linked Group
-  + like IndexMap, only sort once and store
-  + bitcode support
-+ ~~Reconstruction:~~
-  + ~~parser to `GroupBuilder`, e.g., use `Vec` to store `GroupSet`, no comment attribute~~
-  + ~~build/link `GroupBuilder` to `Group`, providing parent's `scope`, e.g.~~
-    + ~~all `Pin` name set to build BDD~~
-    + ~~supper group like `timing::TimingTableLookUp`~~
-    + check all rules
-
-+ Parse:
-  + ~~Only `Vec<NotNan<f64>>` and `Value` complex attributes need quotes vector, use `fast_float2::parse_partial`~~
-  + ~~Fix error when `make_golden`~~
-    + ~~`intrinsic_parasitic` group~~
-    + ~~`leakage_current` group~~
-    + ~~`dynamic_current` group~~
-  + async
-  + stream input
-
-+ Finished
-  + ~~user `define`~~
-  + ~~remove `GroupWapper`, `ComplexWapper`, `SimpleWapper`. At leaset remove it in parser and formatter~~
-  + ~~fix missing newline at endding~~
-  + ~~recursive parse boolean expression~~
-  + ~~macros~~
-  + ~~format to `liberty`~~
-  + ~~support multi-line `\`~~
-  + ~~support comment~~
-  + ~~Use `MutSet` to store GroupMap~~
++ Parse: use `nom_locate`
++ Parse: check all rules
++ Parse: Linked Group
++ Parse: async
++ CI: only do comparsion after tag new version
++ MISC: bitcode support
