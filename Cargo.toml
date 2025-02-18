@@ -52,7 +52,7 @@ thiserror = "2.0"
 strum = "0.26"
 strum_macros = "0.26"
 itertools = "0.14"
-ordered-float = "4.6"
+ordered-float = "5.0"
 fast-float2 = "0.2"
 walkdir = "2"
 similar = { version = "2.7", features = ["inline"]}
