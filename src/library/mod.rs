@@ -783,6 +783,17 @@ pub struct Library<C: Ctx> {
   #[serde(serialize_with = "GroupSet::<Sensitization<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Sensitization<C>>::deserialize_with")]
   pub sensitization: GroupSet<Sensitization<C>>,
+  /// A model group can include all the attributes that are valid in a cell group, as well as the
+  /// two additional attributes described in this section. For information about the cell group
+  /// attributes, see Attributes and Values on page 99.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.23&end=225.29
+  /// ">Reference</a>
+  #[size = 88]
+  #[liberty(group(type = Set))]
+  #[serde(serialize_with = "GroupSet::<Cell<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<Cell<C>>::deserialize_with")]
+  pub model: GroupSet<Cell<C>>,
   #[size = 88]
   #[liberty(group(type = Set))]
   #[serde(serialize_with = "GroupSet::<Cell<C>>::serialize_with")]

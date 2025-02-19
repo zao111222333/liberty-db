@@ -1370,7 +1370,7 @@ pub enum ScalarVariable {
   /// The `normalized_voltage`  variable is specified under the
   /// `lu_table_template`  table to describe a collection of waveforms under
   /// various input slew values.
-  /// For a given input slew in `index_1`  (for example, `index_1`[0] = 1.0 ns),
+  /// For a given input slew in `index_1`  (for example, `index_1[0]` = 1.0 ns),
   /// the `index_2`  values are a set of points that represent how the voltage rises from 0 to VDD in a rise arc,
   /// or from VDD to 0 in a fall arc.
   /// <a name ="reference_link" href="

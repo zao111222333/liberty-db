@@ -62,7 +62,13 @@ impl Default for DefaultCellCtx {
     }
   }
 }
-/// cell
+/// cell group
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=98.23&end=98.32
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -87,6 +93,37 @@ pub struct Cell<C: Ctx> {
   #[size = 16]
   #[liberty(simple(type = Option))]
   pub area: Option<f64>,
+  /// **Only in `model`**
+  ///
+  /// The `cell_name` attribute specifies the name of the cell within a model group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.31&end=225.32
+  /// ">Reference</a>
+  #[size = 24]
+  #[liberty(simple(type = Option))]
+  pub cell_name: Option<String>,
+  /// **Only in `model`**
+  ///
+  /// The `short` attribute lists the shorted ports that are connected together by a metal or poly
+  /// trace. These ports are modeled within a model group.
+  ///
+  /// The most common example of a shorted port is a feedthrough, where an input port is
+  /// directly connected to an output port and there is no active logic between these two ports.
+  ///
+  /// ###### Syntax
+  /// ``` text
+  /// short ("name_liststring") ;
+  /// ```
+  /// ###### Example
+  /// ```
+  /// short(b, y);
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=226.3&end=226.13
+  /// ">Reference</a>
+  #[size = 24]
+  #[liberty(complex(type = Vec))]
+  pub short: Vec<Vec<String>>,
   /// The `dont_use`  attribute with a true value indicates
   /// that a cell should not be added to a design
   /// during optimization
@@ -706,6 +743,9 @@ impl<C: Ctx> GroupFn for Cell<C> {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=218.9&end=218.11
 /// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
 #[derive(Debug, Clone)]
 #[derive(mut_set::derive::Dummy)]
 #[derive(liberty_macros::Group)]

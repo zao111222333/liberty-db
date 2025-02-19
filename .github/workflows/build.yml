@@ -68,8 +68,8 @@ jobs:
     needs: check
     name: Clippy
     runs-on: ubuntu-latest
-    # env:
-      # RUSTFLAGS: "-D warnings -A clippy::todo"
+    env:
+      RUSTFLAGS: "-D warnings"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -77,12 +77,25 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           components: clippy
       - run: cargo clippy --all-features
+  doc:
+    needs: check
+    name: Document
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-D warnings"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          components: doc
+      - run: RUSTDOCFLAGS="--html-in-header docs/header.html" cargo doc --no-deps
   examples:
     needs: check
     name: Run Examples
     runs-on: ubuntu-latest
-    # env:
-      # RUSTFLAGS: "-D warnings -A clippy::todo"
+    env:
+      RUSTFLAGS: "-D warning"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

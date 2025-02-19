@@ -14,7 +14,7 @@ use core::fmt::Write;
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
 ///
-/// TODO: For information about the `test_cell` group, see [test_cell](crate::test_cell) Group
+/// TODO: For information about the `test_cell` group, see [test_cell](crate::cell::TestCell) Group
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=157.22&end=157.40
 /// ">Reference-Definition</a>
@@ -111,7 +111,7 @@ pub struct FF<C: Ctx> {
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
 ///
-/// TODO: For information about the `test_cell` group, see [test_cell](crate::test_cell) Group
+/// TODO: For information about the `test_cell` group, see [test_cell](crate::cell::TestCell) Group
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=157.22&end=157.40
 /// ">Reference-Definition</a>

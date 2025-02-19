@@ -1,7 +1,5 @@
 #![allow(clippy::unsafe_derive_deserialize, clippy::undocumented_unsafe_blocks)]
-//! <script>
-//! IFRAME('https://en.wikipedia.org/wiki/International_System_of_Units');
-//! </script>
+//! The unit system
 
 use crate::{
   ast::{

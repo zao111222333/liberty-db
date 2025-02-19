@@ -46,6 +46,9 @@ pub use items::*;
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=90.29+91.2&end=90.41+91.5
 /// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -127,7 +130,7 @@ pub struct Timing<C: Ctx> {
   /// of `setup` and `hold` constraint tables. Interdependence data is supported
   /// in conditional constraint checking, the `interdependence_id` attribute increases
   /// independently for each condition. Interdependence data can be specified in
-  /// [pin](crate::pin::Pin), [bus](crate::bus::Bus), and [bundle](crate::bundle::Bundle) groups.
+  /// [pin](crate::pin::Pin), [bus](crate::bus::Bus), and [bundle](crate::pin::Bundle) groups.
   ///
   /// #### Syntax
   /// `interdependence_id : "nameenum" ;`
@@ -201,7 +204,7 @@ pub struct Timing<C: Ctx> {
   /// #### Note
   /// When a `related_bus_pins` attribute is within a timing group,
   /// the timing group must be within a [bus](crate::bus::Bus) or
-  /// [bundle](crate::bundle::Bundle) group.
+  /// [bundle](crate::pin::Bundle) group.
   ///
   /// #### Syntax
   /// `related_bus_pins : " name1 [name2 name3 ... ] " ;`.

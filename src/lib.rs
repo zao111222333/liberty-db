@@ -114,6 +114,7 @@
     clippy::pub_with_shorthand,
     clippy::ignored_unit_patterns,
     clippy::mod_module_files,
+    clippy::todo,
     clippy::unreachable,
     clippy::missing_trait_methods,
     clippy::min_ident_chars,
@@ -136,7 +137,6 @@
     clippy::used_underscore_binding,
 )]
 #![warn(
-    clippy::todo,
     clippy::manual_map,
     clippy::shadow_reuse,
     clippy::option_if_let_else,

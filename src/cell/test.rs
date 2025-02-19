@@ -794,3 +794,64 @@ liberty_db::cell::Cell (DLT2) {
 }"#,
   );
 }
+
+/// ### Example 30 Using the short Attribute in a model Group
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=226.14&end=226.42
+/// ">Reference</a>
+#[test]
+fn example30() {
+  let cell = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
+    r#"(cellA) {
+    area : 0.4;
+    short(b, c, y);
+    short(c, y);
+    short(b, c);
+    pin(y) {
+        direction : output;
+        timing() {
+            related_pin : a;
+        }
+    }
+    pin(a) {
+        direction : input;
+        capacitance : 0.1;
+    }
+    pin(b) {
+        direction : input;
+        capacitance : 0.1;
+    }
+    pin(c) {
+        direction : input;
+        capacitance : 0.1;
+        clock : true;
+    }
+}"#,
+    r#"
+liberty_db::cell::Cell (cellA) {
+| area : 0.4;
+| short (b, c, y);
+| short (c, y);
+| short (b, c);
+| pin (a) {
+| | capacitance : 0.1;
+| | direction : input;
+| }
+| pin (b) {
+| | capacitance : 0.1;
+| | direction : input;
+| }
+| pin (c) {
+| | capacitance : 0.1;
+| | clock : true;
+| | direction : input;
+| }
+| pin (y) {
+| | direction : output;
+| | timing () {
+| | | related_pin : a;
+| | }
+| }
+}"#,
+  );
+}

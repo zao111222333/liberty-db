@@ -19,7 +19,7 @@ pub use bundle::*;
 // use crate::units;
 pub use items::*;
 /// You can define a `pin` group within a [`cell`](crate::cell::Cell),
-/// [`test_cell`](crate::test_cell), [`model`](crate::model),
+/// [`test_cell`](crate::cell::TestCell), [`model`](crate::cell::Cell),
 /// or [`bus`](crate::bus::Bus) group.
 ///
 /// <a name ="reference_link" href="
