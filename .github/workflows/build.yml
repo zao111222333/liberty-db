@@ -104,24 +104,10 @@ jobs:
       - run: cargo run --example 0_parse_fmt
       - run: cargo run --example 1_parse_fmt_file -- dev/tech/cases/ocv.lib
       - run: cargo run --example 2_prune_lib -- dev/tech/cases/ocv.lib
-  regression:
-    needs: [unit_test, clippy, examples]
-    name: Regression
-    runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: "-D warnings"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ env.RUST_VERSION }}
-          components: rustfmt
-      - name: Run Regression
-        # https://www.reddit.com/r/git/comments/1ecplap/how_to_get_the_head_commit_hash_of_a_pr_in_github/#:~:text=If%20you%20want%20to%20get,head.
-        run: echo "TODO ${{ github.event.pull_request.head.sha }}"
+      - run: cargo run --example 3_lookup_timing
   # Compute code coverage
   codecov:
-    needs: [unit_test, clippy, examples]
+    needs: [unit_test, clippy, examples, doc]
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:
