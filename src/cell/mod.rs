@@ -115,7 +115,7 @@ pub struct Cell<C: Ctx> {
   /// short ("name_liststring") ;
   /// ```
   /// ###### Example
-  /// ```
+  /// ``` text
   /// short(b, y);
   /// ```
   /// <a name ="reference_link" href="
