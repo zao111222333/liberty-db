@@ -96,6 +96,8 @@ cd ./examples_x86_64-unknown-linux-musl
 ./1_parse_fmt_file dev/tech/cases/ocv.lib
 # example2
 ./2_prune_lib dev/tech/cases/ocv.lib
+# example3
+./3_lookup_timing
 ```
 
 ## Benchmark

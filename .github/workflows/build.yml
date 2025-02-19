@@ -88,7 +88,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
-          components: doc
       - run: RUSTDOCFLAGS="--html-in-header docs/header.html" cargo doc --no-deps
   examples:
     needs: check
