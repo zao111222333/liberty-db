@@ -109,7 +109,7 @@ impl crate::ast::SimpleAttri for BooleanExpression {
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::parser::simple_custom(i, &mut scope.line_num, Self::parse)
+    crate::ast::parser::simple_custom(i, &mut scope.line_num, Self::parse, Self::unquote)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -125,7 +125,7 @@ impl crate::ast::SimpleAttri for LogicBooleanExpression {
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
-    crate::ast::parser::simple_custom(i, &mut scope.line_num, Self::Builder::parse)
+    Self::Builder::nom_parse(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -141,7 +141,7 @@ impl crate::ast::SimpleAttri for PowerGroundBooleanExpression {
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
-    crate::ast::parser::simple_custom(i, &mut scope.line_num, Self::Builder::parse)
+    Self::Builder::nom_parse(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(

@@ -8,9 +8,15 @@ use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt;
 use nom::{
   branch::alt,
-  bytes::complete::{tag, take_while1},
-  character::complete::{alpha1, alphanumeric0, char, digit1},
-  combinator::{map, map_res},
+  bytes::{
+    complete::{tag, take_while1},
+    escaped, is_not,
+  },
+  character::{
+    complete::{alpha1, alphanumeric0, char, digit1},
+    one_of,
+  },
+  combinator::{map, map_res, opt},
   multi::many1,
   sequence::{delimited, pair},
   IResult, Parser as _,
@@ -364,11 +370,21 @@ impl core::str::FromStr for super::BooleanExpression {
 }
 
 impl super::BooleanExpression {
+  #[inline]
   pub fn parse(i: &str) -> IResult<&str, Self> {
     map_res(token_vec, |tokens| match parse_formula(&tokens) {
       Ok(expr) => Ok(Self { expr: *expr }),
       Err(e) => Err(e),
     })
+    .parse(i)
+  }
+  #[inline]
+  pub(super) fn unquote(i: &str) -> IResult<&str, &str> {
+    delimited(
+      char('"'),
+      escaped(opt(alt((tag(r#"\""#), is_not(r#"\""#)))), '\\', one_of(r#"\"rnt"#)),
+      char('"'),
+    )
     .parse(i)
   }
 }

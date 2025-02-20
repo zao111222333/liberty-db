@@ -19,7 +19,12 @@ crate::ast::impl_self_builder!(f64);
 impl SimpleAttri for f64 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::parser::simple_custom(i, &mut scope.line_num, ast::parser::float_one)
+    ast::parser::simple_custom(
+      i,
+      &mut scope.line_num,
+      ast::parser::float_one,
+      ast::parser::unquote,
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -40,7 +45,12 @@ crate::ast::impl_self_builder!(usize);
 impl SimpleAttri for usize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::parser::simple_custom(i, &mut scope.line_num, ast::parser::int_usize)
+    ast::parser::simple_custom(
+      i,
+      &mut scope.line_num,
+      ast::parser::int_usize,
+      ast::parser::unquote,
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -54,7 +64,12 @@ crate::ast::impl_self_builder!(isize);
 impl SimpleAttri for isize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::parser::simple_custom(i, &mut scope.line_num, ast::parser::int_isize)
+    ast::parser::simple_custom(
+      i,
+      &mut scope.line_num,
+      ast::parser::int_isize,
+      ast::parser::unquote,
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -647,6 +662,6 @@ impl SimpleAttri for Formula {
     fn f(i: &str) -> nom::IResult<&str, Formula> {
       nom::combinator::map(ast::parser::formula, |s| Formula(String::from(s))).parse(i)
     }
-    ast::parser::simple_custom(i, &mut scope.line_num, f)
+    ast::parser::simple_custom(i, &mut scope.line_num, f, ast::parser::unquote)
   }
 }
