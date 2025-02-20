@@ -763,12 +763,43 @@ impl FromStr for TimingType {
 impl fmt::Display for TimingType {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::Combinational(t) => t.fmt(f),
-      Self::Sequential(t) => t.fmt(f),
-      Self::NonSequential(t) => t.fmt(f),
-      Self::NoChange(t) => t.fmt(f),
-    }
+    f.write_str(match self {
+      &Self::COMBINATIONAL => ArcCombinational::COMBINATIONAL,
+      &Self::COMBINATIONAL_RISE => ArcCombinational::COMBINATIONAL_RISE,
+      &Self::COMBINATIONAL_FALL => ArcCombinational::COMBINATIONAL_FALL,
+      &Self::THREE_STATE_DISABLE => ArcCombinational::THREE_STATE_DISABLE,
+      &Self::THREE_STATE_DISABLE_RISE => ArcCombinational::THREE_STATE_DISABLE_RISE,
+      &Self::THREE_STATE_DISABLE_FALL => ArcCombinational::THREE_STATE_DISABLE_FALL,
+      &Self::THREE_STATE_ENABLE => ArcCombinational::THREE_STATE_ENABLE,
+      &Self::THREE_STATE_ENABLE_RISE => ArcCombinational::THREE_STATE_ENABLE_RISE,
+      &Self::THREE_STATE_ENABLE_FALL => ArcCombinational::THREE_STATE_ENABLE_FALL,
+      &Self::RISING_EDGE => ArcSequential::RISING_EDGE,
+      &Self::FALLING_EDGE => ArcSequential::FALLING_EDGE,
+      &Self::PRESET => ArcSequential::PRESET,
+      &Self::CLEAR => ArcSequential::CLEAR,
+      &Self::HOLD_RISING => ArcSequential::HOLD_RISING,
+      &Self::HOLD_FALLING => ArcSequential::HOLD_FALLING,
+      &Self::SETUP_RISING => ArcSequential::SETUP_RISING,
+      &Self::SETUP_FALLING => ArcSequential::SETUP_FALLING,
+      &Self::RECOVERY_RISING => ArcSequential::RECOVERY_RISING,
+      &Self::RECOVERY_FALLING => ArcSequential::RECOVERY_FALLING,
+      &Self::SKEW_RISING => ArcSequential::SKEW_RISING,
+      &Self::SKEW_FALLING => ArcSequential::SKEW_FALLING,
+      &Self::REMOVAL_RISING => ArcSequential::REMOVAL_RISING,
+      &Self::REMOVAL_FALLING => ArcSequential::REMOVAL_FALLING,
+      &Self::MIN_PULSE_WIDTH => ArcSequential::MIN_PULSE_WIDTH,
+      &Self::MINIMUM_PERIOD => ArcSequential::MINIMUM_PERIOD,
+      &Self::MAX_CLOCK_TREE_PATH => ArcSequential::MAX_CLOCK_TREE_PATH,
+      &Self::MIN_CLOCK_TREE_PATH => ArcSequential::MIN_CLOCK_TREE_PATH,
+      &Self::NON_SEQ_SETUP_RISING => ArcNonSequential::NON_SEQ_SETUP_RISING,
+      &Self::NON_SEQ_SETUP_FALLING => ArcNonSequential::NON_SEQ_SETUP_FALLING,
+      &Self::NON_SEQ_HOLD_RISING => ArcNonSequential::NON_SEQ_HOLD_RISING,
+      &Self::NON_SEQ_HOLD_FALLING => ArcNonSequential::NON_SEQ_HOLD_FALLING,
+      &Self::NOCHANGE_HIGH_HIGH => ArcNoChange::NOCHANGE_HIGH_HIGH,
+      &Self::NOCHANGE_HIGH_LOW => ArcNoChange::NOCHANGE_HIGH_LOW,
+      &Self::NOCHANGE_LOW_HIGH => ArcNoChange::NOCHANGE_LOW_HIGH,
+      &Self::NOCHANGE_LOW_LOW => ArcNoChange::NOCHANGE_LOW_LOW,
+    })
   }
 }
 
