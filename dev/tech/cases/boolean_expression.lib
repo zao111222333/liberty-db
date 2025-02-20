@@ -1,0 +1,22 @@
+library(some){
+    cell(A){
+        ff(IQ,IQN) {
+            next_state : "(J K IQ') + (J K') + (J' K' IQ)";
+        }
+        pin(A) {
+            timing() {
+                when : "B' J K | IQ";
+            }
+            timing() {
+                when : "B' J K | IQ";
+            }
+        }
+        pin(B) {
+            timing() {
+                when : "A' J K | IQ";
+            }
+        }
+        pin(J) {}
+        pin(K) {}
+    }
+}

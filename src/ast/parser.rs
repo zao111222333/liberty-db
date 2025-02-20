@@ -5,8 +5,11 @@
 use crate::ast::GroupWrapper;
 use nom::{
   branch::alt,
-  bytes::complete::{escaped, is_not, tag, take, take_until, take_while},
-  character::complete::{char, one_of},
+  bytes::{
+    complete::{tag, take, take_until, take_while},
+    take_till,
+  },
+  character::complete::char,
   combinator::{map, map_opt, opt},
   error::{Error, ErrorKind},
   multi::{many0, separated_list0},
@@ -223,15 +226,9 @@ pub(crate) fn undefine<'a>(
     Err(e) => Err(e),
   }
 }
-
 #[inline]
-fn unquote(i: &str) -> IResult<&str, &str> {
-  delimited(
-    char('"'),
-    escaped(opt(alt((tag(r#"\""#), is_not(r#"\""#)))), '\\', one_of(r#"\"rnt"#)),
-    char('"'),
-  )
-  .parse(i)
+pub(crate) fn unquote(i: &str) -> IResult<&str, &str> {
+  delimited(char('"'), take_till(|c| c == '"'), take(1_usize)).parse(i)
 }
 
 #[cfg(test)]
@@ -295,12 +292,12 @@ pub(crate) fn simple_multi<'a>(
   )
   .parse(i)
 }
-
 #[inline]
 pub(crate) fn simple_custom<'a, T>(
   i: &'a str,
   line_num: &mut usize,
   func: fn(&'a str) -> IResult<&'a str, T>,
+  unquote: fn(&str) -> IResult<&str, &str>,
 ) -> super::SimpleParseRes<'a, T> {
   map(
     (
