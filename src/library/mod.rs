@@ -804,7 +804,7 @@ pub struct Library<C: Ctx> {
 impl<C: Ctx> GroupFn for Library<C> {}
 
 impl<C: Ctx> fmt::Display for Library<C> {
-  /// Format [Library] struct as `.lib` file, see more at [examples](https://github.com/zao111222333/liberty-db/tree/master/examples)
+  /// Format [Library] struct as `.lib` file, see more at [examples](https://github.com/zao111222333/liberty-db/tree/main/examples)
   /// ```
   /// use liberty_db::{Library, DefaultCtx};
   /// use std::{
