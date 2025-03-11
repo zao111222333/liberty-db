@@ -22,7 +22,7 @@ use core::{
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
+#[derive(strum::EnumString, strum::Display, strum::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimeUnit {
   /// 1ps, 1e-12
@@ -72,7 +72,7 @@ impl<C: Ctx> SimpleAttri<C> for TimeUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
+#[derive(strum::EnumString, strum::Display, strum::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VoltageUnit {
   /// 1mV, 1e-3
@@ -123,7 +123,7 @@ impl<C: Ctx> SimpleAttri<C> for VoltageUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
+#[derive(strum::EnumString, strum::Display, strum::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum CurrentUnit {
   /// 1uA, 1e-6
@@ -185,7 +185,7 @@ impl<C: Ctx> SimpleAttri<C> for CurrentUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
+#[derive(strum::EnumString, strum::Display, strum::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PullingResistanceUnit {
   /// 1ohm, 1
@@ -332,7 +332,7 @@ impl<C: Ctx> ComplexAttri<C> for CapacitiveLoadUnit {
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
 /// </script>
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[derive(strum_macros::EnumString, strum_macros::Display, strum_macros::AsRefStr)]
+#[derive(strum::EnumString, strum::Display, strum::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LeakagePowerUnit {
   /// 1pW, 1e-12

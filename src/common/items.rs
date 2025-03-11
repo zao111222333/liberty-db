@@ -12,7 +12,7 @@ use core::{
 };
 use itertools::Itertools as _;
 use std::collections::HashSet;
-use strum_macros::{Display, EnumString};
+use strum::{Display, EnumString};
 
 /// The `sdf_edges` attribute defines the edge specification on both
 /// the start pin and the end pin. The default is noedge.
@@ -64,82 +64,6 @@ pub struct IdVector {
   #[id]
   pub id: usize,
   pub vec: Vec<f64>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Display, EnumString)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub enum VariableType {
-  #[strum(serialize = "input_net_transition")]
-  InputNetTransition,
-  #[strum(serialize = "normalized_voltage")]
-  NormalizedVoltage,
-  #[strum(serialize = "total_output_net_capacitance")]
-  TotalOutputNetCapacitance,
-  #[strum(serialize = "related_out_total_output_net_capacitance")]
-  RelatedOutTotalOutputNetCapacitance,
-  #[strum(serialize = "constrained_pin_transition")]
-  ConstrainedPinTransition,
-  #[strum(serialize = "fanout_number")]
-  FanoutNumber,
-  #[strum(serialize = "fanout_pin_capacitance")]
-  FanoutPinCapacitance,
-  #[strum(serialize = "driver_slew")]
-  DriverSlew,
-  #[strum(serialize = "input_transition_time")]
-  InputTransitionTime,
-}
-crate::ast::impl_self_builder!(VariableType);
-impl<C: Ctx> SimpleAttri<C> for VariableType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
-
-/// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the
-/// `ocv_sigma_cell_rise`, `ocv_sigma_cell_fall`, `ocv_sigma_rise_transition`, and
-/// `ocv_sigma_fall_transition` group lookup tables. The values are `early`, `late`, and
-/// `early_and_late`. The default is `early_and_late`.
-///
-/// You can specify the `sigma_type` attribute in the `ocv_sigma_cell_rise` and
-/// `ocv_sigma_cell_fall` groups.
-///
-/// ### Syntax
-/// ``` text
-/// sigma_type: early | late | early_and_late;
-/// ```
-/// ### Example
-/// ``` text
-/// sigma_type: early;
-/// ```
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=357.15&end=357.24
-/// ">Reference-Definition</a>
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, PartialOrd, Ord, Hash)]
-#[derive(Display, EnumString)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub enum SigmaType {
-  #[strum(serialize = "early")]
-  Early,
-  #[strum(serialize = "late")]
-  Late,
-  #[default]
-  #[strum(serialize = "early_and_late")]
-  EarlyAndLate,
-}
-crate::ast::impl_self_builder!(SigmaType);
-impl<C: Ctx> SimpleAttri<C> for SigmaType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
 }
 
 // /// <a name ="reference_link" href="
@@ -369,4 +293,11 @@ impl Default for NameList {
   fn default() -> Self {
     Self::Name(String::new())
   }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum MaxMin {
+  Max,
+  Min,
 }

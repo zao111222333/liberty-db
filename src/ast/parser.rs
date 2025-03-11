@@ -476,11 +476,11 @@ pub(crate) fn complex_values<'a>(
 pub(crate) fn complex_ccs_power_values<'a>(
   i: &'a str,
   line_num: &mut usize,
-) -> IResult<&'a str, Vec<(usize, crate::common::table::CcsPowerValue)>> {
+) -> IResult<&'a str, Vec<(usize, crate::table::CcsPowerValue)>> {
   #[inline]
   fn complex_ccs_power_value(
     i: &str,
-  ) -> IResult<&str, crate::common::table::CcsPowerValue> {
+  ) -> IResult<&str, crate::table::CcsPowerValue> {
     delimited(
       pair(char('"'), space),
       map(
@@ -495,7 +495,7 @@ pub(crate) fn complex_ccs_power_values<'a>(
                 terminated(float_one, delimited(space, char(','), space)),
                 float_one,
               ),
-              |(bc_id, point_time, point_current)| crate::common::table::CcsPowerPoint {
+              |(bc_id, point_time, point_current)| crate::table::CcsPowerPoint {
                 bc_id,
                 point_time,
                 point_current,
@@ -504,7 +504,7 @@ pub(crate) fn complex_ccs_power_values<'a>(
           ),
           pair(opt(char(',')), space),
         ),
-        |(init_time, init_current, points, _)| crate::common::table::CcsPowerValue {
+        |(init_time, init_current, points, _)| crate::table::CcsPowerValue {
           init_time,
           init_current,
           points,

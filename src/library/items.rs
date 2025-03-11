@@ -465,7 +465,7 @@ impl<C: Ctx> GroupFn<C> for OutputVoltage<C> {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq, Default)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DelayModel {
   /// `table_lookup`
@@ -635,7 +635,7 @@ impl<C: Ctx> GroupFn<C> for FpgaIsd<C> {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum FPGASlew {
   /// `FAST`
@@ -665,7 +665,7 @@ impl<C: Ctx> SimpleAttri<C> for FPGASlew {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TreeType {
   /// `best_case_tree`
@@ -699,7 +699,7 @@ impl<C: Ctx> SimpleAttri<C> for TreeType {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Technology {
   /// `cmos`
@@ -783,7 +783,7 @@ pub struct Define {
 #[derive(Debug, Clone, Copy, Default)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum AttributeType {
   /// Boolean
@@ -938,7 +938,7 @@ pub struct DefineCellArea {
 #[derive(Debug, Clone, Copy, Default)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ResourceType {
   /// `pad_slots`
@@ -1230,7 +1230,7 @@ impl<C: Ctx> GroupFn<C> for WireLoadSection<C> {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd, Default)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum BaseCurveType {
   /// The `ccs_half_curve`  value allows you to model compact CCS power

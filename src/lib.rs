@@ -178,7 +178,7 @@
     clippy::or_fun_call,
   )
 )]
-#[cfg(any(feature = "table_template", feature = "py"))]
+#[cfg(any(feature = "lut_template", feature = "py"))]
 extern crate alloc;
 pub use biodivine_lib_bdd;
 pub use strum::IntoEnumIterator;
@@ -195,6 +195,8 @@ pub mod expression;
 pub mod internal_power;
 /// `Library` group structure, top level of liberty format.
 pub mod library;
+/// `table` group structure.
+pub mod table;
 pub use library::Library;
 // pub mod str;
 // pub use str::LibertyStr;
@@ -215,7 +217,6 @@ pub use ast::Group;
 pub mod ccsn;
 mod ctx;
 pub use ctx::{Ctx, DefaultCtx};
-mod types;
 
 #[test]
 fn demo() {

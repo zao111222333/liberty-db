@@ -1,8 +1,8 @@
-use crate::common::table::{
-  CompactTableCtx, DefaultCompactTableCtx, DefaultTableCtx, TableCtx,
-};
+use crate::table::{CompactTableCtx, DefaultCompactTableCtx, DefaultTableCtx, TableCtx};
 
-pub trait Ctx: serde::Serialize + serde::de::DeserializeOwned + Default + Clone {
+pub trait Ctx:
+  serde::Serialize + serde::de::DeserializeOwned + Default + Clone + core::fmt::Debug
+{
   type Library: core::fmt::Debug
     + Clone
     + Default

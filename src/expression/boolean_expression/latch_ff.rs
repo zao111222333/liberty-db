@@ -900,7 +900,7 @@ pub trait LatchFF: __LatchFF {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ClearPresetState {
   /// 0

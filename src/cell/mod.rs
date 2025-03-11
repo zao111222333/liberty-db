@@ -11,9 +11,10 @@ pub use items::*;
 use crate::{
   Ctx,
   ast::{Attributes, BuilderScope, GroupComments, GroupFn, GroupSet},
-  common::{char_config::CharConfig, items::NameList, table::TableLookUp2D},
+  common::{char_config::CharConfig, items::NameList},
   expression::{FF, FFBank, Latch, LatchBank},
   pin::{AntennaDiodeType, Bundle, Pin},
+  table::TableLookUp2D,
 };
 
 pub trait CellCtx {
@@ -50,7 +51,10 @@ impl CellCtx for DefaultCellCtx {
 impl Debug for DefaultCellCtx {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    f.debug_struct("DefaultCellCtx").finish()
+    f.debug_struct("DefaultCellCtx")
+      .field("logic_variables", &format_args!("{}", self.logic_variables))
+      .field("pg_variables", &format_args!("{}", self.pg_variables))
+      .finish()
   }
 }
 impl Default for DefaultCellCtx {

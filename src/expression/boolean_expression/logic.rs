@@ -8,7 +8,7 @@ use core::{cmp::Ordering, hash::Hash};
 #[derive(Ord, PartialOrd)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum::Display, strum::EnumString, strum::EnumIter)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Level {
   /// High
@@ -23,7 +23,7 @@ pub enum Level {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Edge {
   /// Fall
@@ -107,7 +107,7 @@ impl core::ops::Not for &Edge {
 
 /// `UnInit`
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum::Display, strum::EnumString, strum::EnumIter)]
 #[derive(PartialEq, Hash, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum UnInit {
@@ -138,7 +138,7 @@ impl Ord for UnInit {
 /// H L R F
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum::Display, strum::EnumString, strum::EnumIter)]
 pub enum Normal {
   /// R
   #[strum(serialize = "R")]
@@ -166,7 +166,7 @@ impl<C: Ctx> SimpleAttri<C> for Normal {
 /// H L R F
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum::Display, strum::EnumString, strum::EnumIter)]
 pub enum Static {
   /// X
   #[strum(serialize = "X")]
@@ -187,7 +187,7 @@ pub enum Static {
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum::Display, strum::EnumString, strum::EnumIter)]
 pub enum State {
   /// L
   #[strum(serialize = "L")]
@@ -390,7 +390,7 @@ impl State {
 
 // /// Operator1
 // #[derive(Debug, Clone, Copy, PartialEq)]
-// // #[derive(strum_macros::Display, strum_macros::EnumString)]
+// // #[derive(strum::Display, strum::EnumString)]
 // pub enum Operator1 {
 //   /// invert previous expression & invert following expression
 //   Not,
@@ -451,7 +451,7 @@ impl State {
 // /// =133.11
 // /// ">Reference</a>
 // #[derive(Debug, Clone, Copy, PartialEq)]
-// // #[derive(strum_macros::Display, strum_macros::EnumString)]
+// // #[derive(strum::Display, strum::EnumString)]
 // pub enum Operator2 {
 //   /// FIXME: only sapce `" "` between two expression means `AND`
 //   // #[strum(serialize = "*",serialize = " ",serialize = "&")]

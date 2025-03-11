@@ -3,22 +3,20 @@
 #![allow(clippy::multiple_inherent_impl)]
 use core::ops::{Add, Mul, Not as _, Sub};
 
-#[cfg(feature = "table_template")]
-use crate::common::table::TableCtx as _;
+#[cfg(feature = "lut_template")]
+use crate::table::TableCtx as _;
 use crate::{
   Ctx,
   ast::{
     self, BuilderScope, GroupComments, GroupFn, ParseScope, ParsingBuilder, SimpleAttri,
     fmt_comment_liberty,
   },
-  common::{
-    f64_into_hash_ord_fn,
-    table::{DisplayTableLookUp, DisplayValues, TableLookUp2D},
-  },
+  common::f64_into_hash_ord_fn,
   expression::logic,
+  table::{DisplayTableLookUp, DisplayValues, TableLookUp2D},
 };
 use itertools::izip;
-use strum_macros::{Display, EnumString};
+use strum::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
 ///
 /// <a name ="reference_link" href="
@@ -390,7 +388,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
   );
   #[inline]
-  #[cfg_attr(not(feature = "table_template"), expect(unused_mut, unused_variables))]
+  #[cfg_attr(not(feature = "lut_template"), expect(unused_mut, unused_variables))]
   #[expect(clippy::float_arithmetic)]
   fn build(builder: Self::Builder, scope: &mut BuilderScope<C>) -> Self {
     #[inline]
@@ -425,9 +423,9 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
           (Vec::new(), String::from("LVF LUTs' index mismatch"))
         };
         let mut extra_ctx = C::Table::default();
-        #[cfg(feature = "table_template")]
+        #[cfg(feature = "lut_template")]
         if let Some(template) = scope.lu_table_template.get(&_value.name) {
-          extra_ctx.set_lu_table_template(template);
+          extra_ctx.set_lut_template(template);
         }
         Some(TimingTableLookUp {
           extra_ctx,
@@ -453,9 +451,9 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
       }
       (Some(_value), None, None, None) => {
         let mut extra_ctx = C::Table::default();
-        #[cfg(feature = "table_template")]
+        #[cfg(feature = "lut_template")]
         if let Some(template) = scope.lu_table_template.get(&_value.name) {
-          extra_ctx.set_lu_table_template(template);
+          extra_ctx.set_lut_template(template);
         }
         Some(TimingTableLookUp {
           extra_ctx,

@@ -1,4 +1,3 @@
-use super::items::SigmaType;
 use crate::{
   Ctx,
   ast::{
@@ -6,15 +5,33 @@ use crate::{
     ParseScope, SimpleAttri,
   },
 };
-use core::fmt::{self, Write};
-
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 use alloc::sync::Arc;
-#[cfg(not(feature = "table_template"))]
+use core::fmt::{self, Write};
+#[cfg(not(feature = "lut_template"))]
 use core::marker::PhantomData;
+use strum::{Display, EnumString};
+
+pub trait TableCtx<C: Ctx> {
+  /// Comes from one of
+  /// + `lu_table_template`
+  /// + `power_lut_template`
+  /// + `output_current_template`
+  #[cfg(feature = "lut_template")]
+  fn lut_template(&self) -> &Option<Arc<TableTemple<C>>>;
+  #[cfg(feature = "lut_template")]
+  fn set_lut_template(&mut self, template: &Arc<TableTemple<C>>);
+}
+
+pub trait CompactTableCtx<C: Ctx> {
+  #[cfg(feature = "lut_template")]
+  fn compact_lut_template(&self) -> &Option<Arc<CompactLutTemplate<C>>>;
+  #[cfg(feature = "lut_template")]
+  fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>);
+}
 
 /// Flag of the lut's template
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 trait LUTFlag {
   /// use `lu_table_template`
   const TIMING_VOLT: bool;
@@ -29,91 +46,64 @@ trait LUTFlag {
   ) {
     if Self::TIMING_VOLT {
       if let Some(template) = scope.lu_table_template.get(name) {
-        extra_ctx.set_lu_table_template(template);
+        extra_ctx.set_lut_template(template);
         return;
       }
     }
     if Self::POWER {
       if let Some(template) = scope.power_lut_template.get(name) {
-        extra_ctx.set_lu_table_template(template);
+        extra_ctx.set_lut_template(template);
         return;
       }
     }
     if Self::CURRENT {
       if let Some(template) = scope.output_current_template.get(name) {
-        extra_ctx.set_lu_table_template(template);
+        extra_ctx.set_lut_template(template);
       }
     }
   }
 }
 
-pub trait TableCtx<C: Ctx> {
-  #[cfg(feature = "table_template")]
-  fn lu_table_template(&self) -> &Option<Arc<TableTemple<C>>>;
-  #[cfg(feature = "table_template")]
-  fn set_lu_table_template(&mut self, template: &Arc<TableTemple<C>>);
-}
-
-pub trait CompactTableCtx<C: Ctx> {
-  #[cfg(feature = "table_template")]
-  fn compact_lut_template(&self) -> &Option<Arc<CompactLutTemplate<C>>>;
-  #[cfg(feature = "table_template")]
-  fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>);
-}
-
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct DefaultTableCtx<C: Ctx> {
-  #[cfg(feature = "table_template")]
-  pub table_template: Option<Arc<TableTemple<C>>>,
-  #[cfg(not(feature = "table_template"))]
+  #[cfg(feature = "lut_template")]
+  pub lut_template: Option<Arc<TableTemple<C>>>,
+  #[cfg(not(feature = "lut_template"))]
   ___p: PhantomData<C::Other>,
 }
 impl<C: Ctx> TableCtx<C> for DefaultTableCtx<C> {
   #[inline]
-  #[cfg(feature = "table_template")]
-  fn lu_table_template(&self) -> &Option<Arc<TableTemple<C>>> {
-    &self.table_template
+  #[cfg(feature = "lut_template")]
+  fn lut_template(&self) -> &Option<Arc<TableTemple<C>>> {
+    &self.lut_template
   }
   #[inline]
-  #[cfg(feature = "table_template")]
-  fn set_lu_table_template(&mut self, template: &Arc<TableTemple<C>>) {
-    self.table_template = Some(Arc::clone(template));
+  #[cfg(feature = "lut_template")]
+  fn set_lut_template(&mut self, template: &Arc<TableTemple<C>>) {
+    self.lut_template = Some(Arc::clone(template));
   }
 }
-impl<C: Ctx> fmt::Debug for DefaultTableCtx<C> {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    f.debug_struct("DefaultCellCtx").finish()
-  }
-}
-
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct DefaultCompactTableCtx<C: Ctx> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   pub compact_lut_template: Option<Arc<CompactLutTemplate<C>>>,
-  #[cfg(not(feature = "table_template"))]
+  #[cfg(not(feature = "lut_template"))]
   ___p: PhantomData<C::Other>,
 }
 impl<C: Ctx> CompactTableCtx<C> for DefaultCompactTableCtx<C> {
   #[inline]
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn compact_lut_template(&self) -> &Option<Arc<CompactLutTemplate<C>>> {
     &self.compact_lut_template
   }
   #[inline]
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>) {
     self.compact_lut_template = template.cloned();
-  }
-}
-impl<C: Ctx> fmt::Debug for DefaultCompactTableCtx<C> {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    f.debug_struct("DefaultCompactTableCtx").finish()
   }
 }
 
@@ -335,7 +325,7 @@ pub struct CompactLutTemplate<C: Ctx> {
 }
 
 impl<C: Ctx> GroupFn<C> for CompactLutTemplate<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     self
       .extra_ctx
@@ -349,7 +339,7 @@ impl<C: Ctx> GroupFn<C> for CompactLutTemplate<C> {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
 /// ">Reference</a>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(strum_macros::Display, strum_macros::EnumString)]
+#[derive(strum::Display, strum::EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VariableTypeCompactLutTemplateIndex12 {
   #[strum(serialize = "input_net_transition")]
@@ -371,7 +361,7 @@ impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex12 {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.30&end=42.31
 /// ">Reference</a>
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(strum_macros::Display, strum_macros::EnumString)]
+#[derive(strum::Display, strum::EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VariableTypeCompactLutTemplateIndex3 {
   #[strum(serialize = "curve_parameters")]
@@ -800,7 +790,7 @@ pub struct Vector4DGrpup<C: Ctx> {
 }
 impl<C: Ctx> GroupFn<C> for Vector4DGrpup<C> {}
 impl<C: Ctx> GroupFn<C> for Vector3DGrpup<C> {}
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 impl<C: Ctx> LUTFlag for Vector3D<C> {
   /// `output_voltage_fall`
   /// `output_voltage_rise`
@@ -809,12 +799,12 @@ impl<C: Ctx> LUTFlag for Vector3D<C> {
   const CURRENT: bool = false;
 }
 impl<C: Ctx> GroupFn<C> for Vector3D<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
   }
 }
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 impl<C: Ctx> LUTFlag for Vector4D<C> {
   /// `propagated_noise_low`
   /// `propagated_noise_high`
@@ -823,12 +813,12 @@ impl<C: Ctx> LUTFlag for Vector4D<C> {
   const CURRENT: bool = false;
 }
 impl<C: Ctx> GroupFn<C> for Vector4D<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
   }
 }
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 impl<C: Ctx> LUTFlag for ReferenceTimeVector3D<C> {
   const TIMING_VOLT: bool = false;
   const POWER: bool = false;
@@ -837,14 +827,14 @@ impl<C: Ctx> LUTFlag for ReferenceTimeVector3D<C> {
   const CURRENT: bool = true;
 }
 impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3D<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
   }
 }
 impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3DGrpup<C> {}
 impl<C: Ctx> GroupFn<C> for CompactCcsPower<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     self
       .extra_ctx
@@ -1016,7 +1006,7 @@ pub struct CompactCcsTable<C: Ctx> {
   pub values: Values,
 }
 impl<C: Ctx> GroupFn<C> for CompactCcsTable<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     self
       .extra_ctx
@@ -1061,19 +1051,19 @@ pub struct TableLookUp<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 impl<C: Ctx> LUTFlag for TableLookUp<C> {
   const TIMING_VOLT: bool = true;
   const POWER: bool = true;
   const CURRENT: bool = true;
 }
 impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
   }
 }
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 impl<C: Ctx> LUTFlag for TableLookUpMultiSegment<C> {
   /// `receiver_capacitance_fall`
   /// `receiver_capacitance_rise`
@@ -1082,31 +1072,31 @@ impl<C: Ctx> LUTFlag for TableLookUpMultiSegment<C> {
   const CURRENT: bool = false;
 }
 impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
   }
 }
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 impl<C: Ctx> LUTFlag for TableLookUp2D<C> {
   const TIMING_VOLT: bool = true;
   const POWER: bool = false;
   const CURRENT: bool = false;
 }
 impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
   }
 }
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 impl<C: Ctx> LUTFlag for OcvSigmaTable<C> {
   const TIMING_VOLT: bool = true;
   const POWER: bool = false;
   const CURRENT: bool = false;
 }
 impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
   }
@@ -1478,7 +1468,7 @@ impl fmt::Display for Variable {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum TimeVariable {
   /// `input_transition_time`
@@ -1516,7 +1506,7 @@ pub enum TimeVariable {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum VoltageVariable {
   /// `input_voltage`
@@ -1533,7 +1523,7 @@ pub enum VoltageVariable {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum CapacitanceVariable {
   /// `total_output_net_capacitance`
@@ -1562,7 +1552,7 @@ pub enum CapacitanceVariable {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LengthVariable {
   /// `output_net_length`
@@ -1576,7 +1566,7 @@ pub enum LengthVariable {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum ScalarVariable {
   /// `fanout_number`
@@ -1593,6 +1583,45 @@ pub enum ScalarVariable {
   /// ">Reference-Definition</a>
   #[strum(serialize = "normalized_voltage")]
   NormalizedVoltage,
+}
+
+/// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the
+/// `ocv_sigma_cell_rise`, `ocv_sigma_cell_fall`, `ocv_sigma_rise_transition`, and
+/// `ocv_sigma_fall_transition` group lookup tables. The values are `early`, `late`, and
+/// `early_and_late`. The default is `early_and_late`.
+///
+/// You can specify the `sigma_type` attribute in the `ocv_sigma_cell_rise` and
+/// `ocv_sigma_cell_fall` groups.
+///
+/// ### Syntax
+/// ``` text
+/// sigma_type: early | late | early_and_late;
+/// ```
+/// ### Example
+/// ``` text
+/// sigma_type: early;
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=357.15&end=357.24
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, PartialOrd, Ord, Hash)]
+#[derive(Display, EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum SigmaType {
+  #[strum(serialize = "early")]
+  Early,
+  #[strum(serialize = "late")]
+  Late,
+  #[default]
+  #[strum(serialize = "early_and_late")]
+  EarlyAndLate,
+}
+ast::impl_self_builder!(SigmaType);
+impl<C: Ctx> SimpleAttri<C> for SigmaType {
+  #[inline]
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+    ast::nom_parse_from_str::<C, _>(i, scope)
+  }
 }
 
 #[cfg(test)]
@@ -1614,7 +1643,7 @@ mod test {
     }
     "#,
       r#"
-liberty_db::common::table::TableLookUp (CCS_RCV_TEMPLATE_0) {
+liberty_db::table::TableLookUp (CCS_RCV_TEMPLATE_0) {
 | index_1 ("0.0186051, 0.0372112, 0.0744591");
 | index_2 ("0.1, 0.25, 0.5");
 | values ("0.54283814, 0.54289214, 0.54298464", \
@@ -1638,7 +1667,7 @@ liberty_db::common::table::TableLookUp (CCS_RCV_TEMPLATE_0) {
       }
     "#,
       r#"
-liberty_db::common::table::CompactCcsTable (c_ccs_pwr_template_6) {
+liberty_db::table::CompactCcsTable (c_ccs_pwr_template_6) {
 | values ("-0.0119931, -101.1912245", \
 | | "-0.0119953, -101.1912245", \
 | | "-0.0119957, -101.1912245", \
@@ -1660,7 +1689,7 @@ liberty_db::common::table::CompactCcsTable (c_ccs_pwr_template_6) {
       }
     "#,
       r#"
-liberty_db::common::table::CompactCcsPower (c_ccs_pwr_template_3) {
+liberty_db::table::CompactCcsPower (c_ccs_pwr_template_3) {
 | values ("0.0358012, 0.0206745, 2505, 0.0480925, 1.1701594, 2506, 1.4011397, 0.0724034", \
 | | "-0.0481277, 0.0206745, 13, -0.0477729, 0.0, 13, -0.026014, -1.267817, 1198, 71.4506979, 0.0698575", \
 | | "-0.6273036, 0.0206745, 3, -0.1100034, 3.4377912, 294, 3.8867416, 0.0715863");
@@ -1670,8 +1699,10 @@ liberty_db::common::table::CompactCcsPower (c_ccs_pwr_template_3) {
   }
   // https://github.com/zao111222333/liberty-db/issues/28
   #[test]
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   fn table_template() {
+    use super::TableCtx;
+
     let library = test_parse::<crate::Library<DefaultCtx>>(
       r#" (ccsn) {
         lu_table_template (receiver_cap_power_template_8x8) {
@@ -1695,7 +1726,7 @@ liberty_db::common::table::CompactCcsPower (c_ccs_pwr_template_3) {
     "#,
     );
     let cell = library.cell.get("AO21D1BWP30P140").unwrap();
-    let when = cell.parse_logic_booleanexpr("A2*B").unwrap();
+    let when = cell.parse_logic_boolexpr("A2*B").unwrap();
     let receiver_capacitance = cell
       .pin
       .get("A1".into())
@@ -1708,12 +1739,12 @@ liberty_db::common::table::CompactCcsPower (c_ccs_pwr_template_3) {
       .as_ref()
       .unwrap()
       .extra_ctx
-      .table_template
+      .lut_template()
       .as_ref()
       .unwrap();
     dev_utils::text_diff(
       r#"
-liberty_db::common::table::TableTemple (receiver_cap_power_template_8x8) {
+liberty_db::table::TableTemple (receiver_cap_power_template_8x8) {
 | variable_1 : input_net_transition;
 | index_1 ("0.0018, 0.0086, 0.0223, 0.0497, 0.1045, 0.2141, 0.4332, 0.8715");
 }"#,

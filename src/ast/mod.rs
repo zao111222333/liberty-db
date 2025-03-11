@@ -4,14 +4,14 @@
 
 mod fmt;
 pub mod parser;
-#[cfg(feature = "table_template")]
-use crate::common::table::{CompactLutTemplate, TableTemple};
+#[cfg(feature = "lut_template")]
+use crate::table::{CompactLutTemplate, TableTemple};
 use crate::{
   Ctx, DefaultCtx,
   common::{f64_into_hash_ord_fn, parse_f64},
   library::AttributeType,
 };
-#[cfg(feature = "table_template")]
+#[cfg(feature = "lut_template")]
 use alloc::sync::Arc;
 use core::{
   cmp::Ordering,
@@ -37,15 +37,15 @@ pub type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 #[derive(Default)]
 pub(crate) struct BuilderScope<C: Ctx> {
   pub(crate) cell_extra_ctx: crate::cell::DefaultCellCtx,
-  #[cfg(not(feature = "table_template"))]
+  #[cfg(not(feature = "lut_template"))]
   ___p: PhantomData<C>,
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   pub(crate) lu_table_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   pub(crate) power_lut_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   pub(crate) output_current_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
-  #[cfg(feature = "table_template")]
+  #[cfg(feature = "lut_template")]
   pub(crate) compact_lut_template:
     HashMap<String, Arc<CompactLutTemplate<C>>, RandomState>,
 }
