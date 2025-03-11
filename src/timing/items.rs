@@ -108,10 +108,10 @@ impl TimingSenseType {
   }
 }
 crate::ast::impl_self_builder!(TimingSenseType);
-impl SimpleAttri for TimingSenseType {
+impl<C: Ctx> SimpleAttri<C> for TimingSenseType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -161,7 +161,7 @@ pub struct CellDegradation<C: Ctx> {
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
-impl<C: Ctx> GroupFn for CellDegradation<C> {}
+impl<C: Ctx> GroupFn<C> for CellDegradation<C> {}
 
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -376,25 +376,25 @@ impl Mul<f64> for LVFValue {
   }
 }
 
-impl<C: Ctx> ParsingBuilder for Option<TimingTableLookUp<C>> {
+impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
   /// `value`, `mean_shift`, `std_dev`, `skewness`
   type Builder = (
     // value
-    Option<<TableLookUp2D<C> as ParsingBuilder>::Builder>,
+    Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
     // mean_shift
-    Option<<TableLookUp2D<C> as ParsingBuilder>::Builder>,
+    Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
     // std_dev
-    Option<<TableLookUp2D<C> as ParsingBuilder>::Builder>,
+    Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
     // skewness
-    Option<<TableLookUp2D<C> as ParsingBuilder>::Builder>,
+    Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
   );
   #[inline]
   #[expect(clippy::float_arithmetic)]
-  fn build(builder: Self::Builder, _scope: &mut BuilderScope) -> Self {
+  fn build(builder: Self::Builder, _scope: &mut BuilderScope<C>) -> Self {
     #[inline]
     fn eq_index<C: Ctx>(
-      lhs: &<TableLookUp2D<C> as ParsingBuilder>::Builder,
-      rhs: &<TableLookUp2D<C> as ParsingBuilder>::Builder,
+      lhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
+      rhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
     ) -> bool {
       lhs.index_1 == rhs.index_1 && lhs.index_2 == rhs.index_2
     }
@@ -479,7 +479,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
         inner: self.values.iter().copied(),
       },
     }
-    .fmt_self("", key, f)?;
+    .fmt_self::<_, _, C>("", key, f)?;
     if !self.lvf_values.is_empty() {
       let mismatch_index = !self.lvf_index_1.is_empty();
       DisplayTableLookUp {
@@ -492,7 +492,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
             .map(|(value, lvf)| lvf.mean - value),
         },
       }
-      .fmt_self("ocv_mean_shift_", key, f)?;
+      .fmt_self::<_, _, C>("ocv_mean_shift_", key, f)?;
       DisplayTableLookUp {
         name: &self.name,
         index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
@@ -502,7 +502,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
           inner: self.lvf_values.iter().map(|lvf| lvf.std_dev),
         },
       }
-      .fmt_self("ocv_std_dev_", key, f)?;
+      .fmt_self::<_, _, C>("ocv_std_dev_", key, f)?;
       DisplayTableLookUp {
         name: &self.name,
         index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
@@ -512,7 +512,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
           inner: self.lvf_values.iter().map(|lvf| lvf.skewness),
         },
       }
-      .fmt_self("ocv_skewness_", key, f)?;
+      .fmt_self::<_, _, C>("ocv_skewness_", key, f)?;
     }
     Ok(())
   }

@@ -40,7 +40,7 @@ pub(crate) struct Timing<C: Ctx> {
   ))]
   pub cell_fall: Option<TimingTableLookUp<C>>,
 }
-impl<C: Ctx> GroupFn for Timing<C> {}
+impl<C: Ctx> GroupFn<C> for Timing<C> {}
 
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
@@ -68,7 +68,7 @@ pub(crate) struct Pin<C: Ctx> {
   #[liberty(group(type = Vec))]
   timing: Vec<Timing<C>>,
 }
-impl<C: Ctx> GroupFn for Pin<C> {}
+impl<C: Ctx> GroupFn<C> for Pin<C> {}
 
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
@@ -98,8 +98,8 @@ pub(crate) struct FF<C: Ctx> {
   #[liberty(simple(type = Option))]
   next_state: Option<String>,
 }
-impl<C: Ctx> GroupFn for FF<C> {}
-impl<C: Ctx> NamedGroup for FF<C> {
+impl<C: Ctx> GroupFn<C> for FF<C> {}
+impl<C: Ctx> NamedGroup<C> for FF<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -160,7 +160,7 @@ pub(crate) struct Cell<C: Ctx> {
   #[liberty(group(type = Option))]
   statetable: Option<Statetable<C>>,
 }
-impl<C: Ctx> GroupFn for Cell<C> {}
+impl<C: Ctx> GroupFn<C> for Cell<C> {}
 
 #[cfg(test)]
 mod test {

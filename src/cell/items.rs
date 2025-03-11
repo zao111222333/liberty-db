@@ -71,7 +71,7 @@ pub struct LeakagePower<C: Ctx> {
   #[liberty(complex(type = Option))]
   pub mode: Option<[String; 2]>,
 }
-impl<C: Ctx> GroupFn for LeakagePower<C> {}
+impl<C: Ctx> GroupFn<C> for LeakagePower<C> {}
 
 #[cfg(test)]
 mod test_sort {
@@ -182,9 +182,9 @@ pub struct Statetable<C: Ctx> {
   #[liberty(simple)]
   pub table: Table,
 }
-impl<C: Ctx> GroupFn for Statetable<C> {}
+impl<C: Ctx> GroupFn<C> for Statetable<C> {}
 
-impl<C: Ctx> NamedGroup for Statetable<C> {
+impl<C: Ctx> NamedGroup<C> for Statetable<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -270,7 +270,7 @@ impl FromStr for Table {
   }
 }
 crate::ast::impl_self_builder!(Table);
-impl SimpleAttri for Table {
+impl<C: Ctx> SimpleAttri<C> for Table {
   #[inline]
   fn is_set(&self) -> bool {
     !self.v.is_empty()
@@ -468,7 +468,7 @@ pub struct PgPin<C: Ctx> {
   #[liberty(simple(type = Option))]
   pub switch_function: Option<LogicBooleanExpression>,
 }
-impl<C: Ctx> GroupFn for PgPin<C> {}
+impl<C: Ctx> GroupFn<C> for PgPin<C> {}
 
 /// Use the `dynamic_current` group to specify a current waveform vector when the power
 /// and ground current is dependent on the logical condition of a cell. A `dynamic_current`
@@ -538,7 +538,7 @@ pub struct DynamicCurrent<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<SwitchingGroup<C>>::deserialize_with")]
   pub switching_group: GroupSet<SwitchingGroup<C>>,
 }
-impl<C: Ctx> GroupFn for DynamicCurrent<C> {}
+impl<C: Ctx> GroupFn<C> for DynamicCurrent<C> {}
 
 /// Use the switching_group group to specify a current waveform vector when the power
 /// and ground current is dependent on pin switching conditions.
@@ -708,7 +708,7 @@ pub struct SwitchingGroup<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<PgCurrent<C>>::deserialize_with")]
   pub pg_current: GroupSet<PgCurrent<C>>,
 }
-impl<C: Ctx> GroupFn for SwitchingGroup<C> {}
+impl<C: Ctx> GroupFn<C> for SwitchingGroup<C> {}
 
 /// Use the `pg_current` group to specify current waveform data in a vector group. If all
 /// vectors under the group are dense, data in this group is represented as a dense table. If
@@ -807,7 +807,7 @@ pub struct PgCurrent<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<CompactCcsPower<C>>::deserialize_with")]
   pub compact_ccs_power: GroupSet<CompactCcsPower<C>>,
 }
-impl<C: Ctx> GroupFn for PgCurrent<C> {}
+impl<C: Ctx> GroupFn<C> for PgCurrent<C> {}
 
 /// The `intrinsic_parasitic` group specifies the state-dependent intrinsic capacitance and
 /// intrinsic resistance of a `cell`.
@@ -1034,7 +1034,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<PgPinWithValue<C>>::deserialize_with")]
   pub total_capacitance: GroupSet<PgPinWithValue<C>>,
 }
-impl<C: Ctx> GroupFn for IntrinsicParasitic<C> {}
+impl<C: Ctx> GroupFn<C> for IntrinsicParasitic<C> {}
 
 /// Use this group to specify the intrinsic capacitance of a `cell`.
 /// ### Syntax
@@ -1131,7 +1131,7 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   #[liberty(group(type = Option))]
   pub lut_values: Option<LutValues<C>>,
 }
-impl<C: Ctx> GroupFn for IntrinsicCapacitance<C> {}
+impl<C: Ctx> GroupFn<C> for IntrinsicCapacitance<C> {}
 
 /// Use this group to specify the intrinsic resistance between a power pin and an output pin of
 /// a cell.
@@ -1258,7 +1258,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   #[liberty(group(type = Option))]
   pub lut_values: Option<LutValues<C>>,
 }
-impl<C: Ctx> GroupFn for IntrinsicResistance<C> {}
+impl<C: Ctx> GroupFn<C> for IntrinsicResistance<C> {}
 
 /// The `total_capacitance` group specifies the macro cell’s total capacitance on a power
 /// or ground net within the `intrinsic_parasitic` group. The following applies to the
@@ -1326,7 +1326,7 @@ pub struct PgPinWithValue<C: Ctx> {
   #[liberty(simple)]
   pub value: f64,
 }
-impl<C: Ctx> GroupFn for PgPinWithValue<C> {}
+impl<C: Ctx> GroupFn<C> for PgPinWithValue<C> {}
 
 /// The `gate_leakage` group specifies the cell’s gate leakage current on input or inout pins
 /// within the `leakage_current` group in a cell. The following applies to `gate_leakage`
@@ -1414,7 +1414,7 @@ pub struct GateLeakage<C: Ctx> {
   #[liberty(simple(type = Option))]
   pub input_high_value: Option<f64>,
 }
-impl<C: Ctx> GroupFn for GateLeakage<C> {}
+impl<C: Ctx> GroupFn<C> for GateLeakage<C> {}
 
 /// A `leakage_current` group is defined within a cell group or a model group to specify
 /// leakage current values that are dependent on the state of the cell.
@@ -1577,7 +1577,7 @@ pub struct LeakageCurrent<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<GateLeakage<C>>::deserialize_with")]
   pub gate_leakage: GroupSet<GateLeakage<C>>,
 }
-impl<C: Ctx> GroupFn for LeakageCurrent<C> {}
+impl<C: Ctx> GroupFn<C> for LeakageCurrent<C> {}
 
 /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
 /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
@@ -1628,7 +1628,7 @@ pub struct LutValues<C: Ctx> {
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
-impl<C: Ctx> GroupFn for LutValues<C> {}
+impl<C: Ctx> GroupFn<C> for LutValues<C> {}
 
 /// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
 /// The `pg_type`  attribute also supports back-bias modeling.
@@ -1693,10 +1693,10 @@ pub enum PgType {
   DeepPwell,
 }
 crate::ast::impl_self_builder!(PgType);
-impl SimpleAttri for PgType {
+impl<C: Ctx> SimpleAttri<C> for PgType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -1724,10 +1724,10 @@ pub enum SwitchCellType {
   FineGrain,
 }
 crate::ast::impl_self_builder!(SwitchCellType);
-impl SimpleAttri for SwitchCellType {
+impl<C: Ctx> SimpleAttri<C> for SwitchCellType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -1751,10 +1751,10 @@ pub enum FpgaCellType {
   FallingEdgeClockCell,
 }
 crate::ast::impl_self_builder!(FpgaCellType);
-impl SimpleAttri for FpgaCellType {
+impl<C: Ctx> SimpleAttri<C> for FpgaCellType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 /// The `level_shifter_type`  attribute specifies the
@@ -1787,10 +1787,10 @@ pub enum LevelShifterType {
   HL_LH,
 }
 crate::ast::impl_self_builder!(LevelShifterType);
-impl SimpleAttri for LevelShifterType {
+impl<C: Ctx> SimpleAttri<C> for LevelShifterType {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -1845,10 +1845,10 @@ impl fmt::Display for ClockGatingIntegratedCell {
   }
 }
 crate::ast::impl_self_builder!(ClockGatingIntegratedCell);
-impl SimpleAttri for ClockGatingIntegratedCell {
+impl<C: Ctx> SimpleAttri<C> for ClockGatingIntegratedCell {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -1887,7 +1887,7 @@ pub struct PinOpposite {
   pub name_list2: WordSet,
 }
 crate::ast::impl_self_builder!(PinOpposite);
-impl ComplexAttri for PinOpposite {
+impl<C: Ctx> ComplexAttri<C> for PinOpposite {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,

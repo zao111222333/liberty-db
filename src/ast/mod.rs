@@ -5,8 +5,9 @@
 mod fmt;
 pub mod parser;
 use crate::{
-  common::{f64_into_hash_ord_fn, parse_f64},
+  common::{f64_into_hash_ord_fn, parse_f64, table::TableTemple},
   library::AttributeType,
+  Ctx, DefaultCtx,
 };
 use core::{
   cmp::Ordering,
@@ -17,7 +18,7 @@ use core::{
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
 use itertools::{izip, Itertools as _};
 use nom::{error::Error, IResult};
-use std::collections::HashMap;
+use std::{collections::HashMap, marker::PhantomData, sync::Arc};
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
 #[cfg(not(feature = "fast_hash"))]
@@ -29,20 +30,22 @@ pub type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Default)]
-pub(crate) struct BuilderScope {
+pub(crate) struct BuilderScope<C: Ctx> {
   pub(crate) cell_extra_ctx: crate::cell::DefaultCellCtx,
+  pub(crate) lu_table_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
 }
-pub(crate) trait ParsingBuilder: Sized {
+
+pub(crate) trait ParsingBuilder<C: Ctx>: Sized {
   type Builder;
-  fn build(builder: Self::Builder, scope: &mut BuilderScope) -> Self;
+  fn build(builder: Self::Builder, scope: &mut BuilderScope<C>) -> Self;
 }
 
 macro_rules! impl_self_builder {
   ($t:ty) => {
-    impl $crate::ast::ParsingBuilder for $t {
+    impl<C: crate::Ctx> $crate::ast::ParsingBuilder<C> for $t {
       type Builder = Self;
       #[inline]
-      fn build(builder: Self::Builder, _scope: &mut crate::ast::BuilderScope) -> Self {
+      fn build(builder: Self::Builder, _scope: &mut crate::ast::BuilderScope<C>) -> Self {
         builder
       }
     }
@@ -204,7 +207,7 @@ pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
   }
   #[expect(clippy::all)]
   #[inline]
-  fn fmt2<T: Write, I: Indentation, U: SimpleAttri>(
+  fn fmt2<T: Write, I: Indentation, U: SimpleAttri<DefaultCtx>>(
     v: &Vec<Result<U, String>>,
     key: &String,
     f: &mut CodeFormatter<'_, T, I>,
@@ -212,7 +215,7 @@ pub(crate) fn attributs_fmt_liberty<T: Write, I: Indentation>(
     v.iter().try_for_each(|res_u| {
       match res_u {
         Ok(u) => SimpleAttri::fmt_liberty(u, key, f),
-        Err(u) => SimpleAttri::fmt_liberty(u, key, f),
+        Err(u) => SimpleAttri::<DefaultCtx>::fmt_liberty(u, key, f),
       }
       .and(write!(f, "{DEFINED_COMMENT}"))
     })
@@ -475,7 +478,7 @@ pub(crate) type SimpleParseRes<'a, T> =
 pub(crate) type ComplexParseRes<'a, T> =
   IResult<&'a str, Result<T, (ComplexParseError, ComplexWrapper)>, Error<&'a str>>;
 #[inline]
-pub(crate) fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
+pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
   i: &'a str,
   scope: &mut ParseScope,
 ) -> SimpleParseRes<'a, T> {
@@ -485,7 +488,9 @@ pub(crate) fn nom_parse_from_str<'a, T: SimpleAttri + FromStr>(
 }
 
 /// Simple Attribute in Liberty
-pub(crate) trait SimpleAttri: Sized + core::fmt::Display + ParsingBuilder {
+pub(crate) trait SimpleAttri<C: Ctx>:
+  Sized + core::fmt::Display + ParsingBuilder<C>
+{
   /// `nom_parse`, auto implement
   fn nom_parse<'a>(
     i: &'a str,
@@ -589,7 +594,7 @@ pub(crate) fn join_fmt_no_quote<
 }
 
 /// Complex Attribute in Liberty
-pub(crate) trait ComplexAttri: Sized + ParsingBuilder {
+pub(crate) trait ComplexAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   /// basic `parser`
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -645,27 +650,27 @@ pub(crate) trait ComplexAttri: Sized + ParsingBuilder {
   }
 }
 /// Group Functions
-pub(crate) trait GroupFn: ParsingBuilder {
+pub(crate) trait GroupFn<C: Ctx>: ParsingBuilder<C> {
   /// `before_build` call back
   #[inline]
   #[expect(unused_variables)]
-  fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope) {}
+  fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope<C>) {}
   /// `after_build` call back
   #[inline]
   #[expect(unused_variables)]
-  fn after_build(&mut self, scope: &mut BuilderScope) {}
+  fn after_build(&mut self, scope: &mut BuilderScope<C>) {}
 }
 /// Export Group APIs
 #[expect(private_bounds)]
-pub trait Group: Sized + GroupAttri {
+pub trait Group<C: Ctx>: Sized + GroupAttri<C> {
   /// `test_wrapper`
   #[inline]
-  fn display(&self) -> GroupDisplay<'_, Self> {
-    GroupDisplay { inner: self }
+  fn display(&self) -> GroupDisplay<'_, C, Self> {
+    GroupDisplay { inner: self, ___p: PhantomData }
   }
 }
 /// `GroupAttri`, internal Group APIs
-pub(crate) trait GroupAttri: Sized + ParsingBuilder {
+pub(crate) trait GroupAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   /// `nom_parse`, will be implemented by macros
   fn nom_parse<'a>(
     i: &'a str,
@@ -714,7 +719,7 @@ impl IdError {
 
 /// If more than one `#[liberty(name)]`,
 /// need to impl `NamedGroup` manually
-pub(crate) trait NamedGroup: GroupAttri {
+pub(crate) trait NamedGroup<C: Ctx>: GroupAttri<C> {
   /// parse name from `v: &[&str]` and then set self
   fn parse_set_name(builder: &mut Self::Builder, v: Vec<&str>) -> Result<(), IdError>;
   /// `fmt_liberty`
@@ -768,11 +773,12 @@ impl ParserError {
 
 /// `GroupDisplay`
 #[derive(Debug)]
-pub struct GroupDisplay<'a, G> {
+pub struct GroupDisplay<'a, C: Ctx, G: GroupAttri<C>> {
   pub inner: &'a G,
+  ___p: PhantomData<C>,
 }
 
-impl<G: GroupAttri> core::fmt::Display for GroupDisplay<'_, G> {
+impl<C: Ctx, G: GroupAttri<C>> core::fmt::Display for GroupDisplay<'_, C, G> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ff = DefaultCodeFormatter::new(f);
@@ -788,30 +794,35 @@ impl<G: GroupAttri> core::fmt::Display for GroupDisplay<'_, G> {
 
 #[cfg(test)]
 #[inline]
-pub(crate) fn test_parse<G: GroupAttri + Group>(input: &str) -> G {
+pub(crate) fn test_parse<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
+  input: &str,
+) -> G {
   let mut scope = ParseScope::default();
   let builder = match G::nom_parse(input, "", &mut scope) {
     Ok((_, Ok(g))) => g,
     Ok((_, Err(e))) => panic!("{e:#?}"),
     Err(e) => panic!("{e:#?}"),
   };
-  let mut builder_scope = BuilderScope::default();
-  let g = <G as ParsingBuilder>::build(builder, &mut builder_scope);
+  let mut builder_scope = BuilderScope::<DefaultCtx>::default();
+  let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
   println!("{}", g.display());
   g
 }
 
 #[cfg(test)]
 #[inline]
-pub(crate) fn test_parse_fmt<G: GroupAttri + Group>(input: &str, fmt_want: &str) -> G {
+pub(crate) fn test_parse_fmt<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
+  input: &str,
+  fmt_want: &str,
+) -> G {
   let mut scope = ParseScope::default();
   let builder = match G::nom_parse(input, "", &mut scope) {
     Ok((_, Ok(g))) => g,
     Ok((_, Err(e))) => panic!("{e:#?}"),
     Err(e) => panic!("{e:#?}"),
   };
-  let mut builder_scope = BuilderScope::default();
-  let g = <G as ParsingBuilder>::build(builder, &mut builder_scope);
+  let mut builder_scope = BuilderScope::<DefaultCtx>::default();
+  let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
   let fmt_str = g.display().to_string();
   println!("{fmt_str}");
   dev_utils::text_diff(fmt_want, fmt_str.as_str());
@@ -820,7 +831,7 @@ pub(crate) fn test_parse_fmt<G: GroupAttri + Group>(input: &str, fmt_want: &str)
 
 #[cfg(test)]
 #[inline]
-pub(crate) fn test_parse_fmt_variables<G: GroupAttri + Group>(
+pub(crate) fn test_parse_fmt_variables<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
   variable: &[&str],
   input: &str,
   fmt_want: &str,
@@ -833,9 +844,9 @@ pub(crate) fn test_parse_fmt_variables<G: GroupAttri + Group>(
     Ok((_, Err(e))) => panic!("{e:#?}"),
     Err(e) => panic!("{e:#?}"),
   };
-  let mut builder_scope = BuilderScope::default();
+  let mut builder_scope = BuilderScope::<DefaultCtx>::default();
   builder_scope.cell_extra_ctx.logic_variables = BddVariableSet::new(variable);
-  let g = <G as ParsingBuilder>::build(builder, &mut builder_scope);
+  let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
   let fmt_str = g.display().to_string();
   println!("{fmt_str}");
   dev_utils::text_diff(fmt_want, fmt_str.as_str());
@@ -931,7 +942,8 @@ impl Format for SimpleWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    SimpleAttri::fmt_liberty(self, key, f).and(write!(f, "{DEFINED_COMMENT}"))
+    SimpleAttri::<DefaultCtx>::fmt_liberty(self, key, f)
+      .and(write!(f, "{DEFINED_COMMENT}"))
   }
 }
 
@@ -942,7 +954,8 @@ impl Format for ComplexWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    ComplexAttri::fmt_liberty(&self.0, key, f).and(write!(f, "{DEFINED_COMMENT}"))
+    ComplexAttri::<DefaultCtx>::fmt_liberty(&self.0, key, f)
+      .and(write!(f, "{DEFINED_COMMENT}"))
   }
 }
 

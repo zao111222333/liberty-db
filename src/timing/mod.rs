@@ -1059,8 +1059,8 @@ pub struct Timing<C: Ctx> {
   pub ocv_sigma_retain_rise_slew: Option<TableLookUp2D<C>>,
 }
 
-impl<C: Ctx> GroupFn for Timing<C> {
-  fn after_build(&mut self, _: &mut crate::ast::BuilderScope) {
+impl<C: Ctx> GroupFn<C> for Timing<C> {
+  fn after_build(&mut self, _: &mut crate::ast::BuilderScope<C>) {
     impls::need_timing_sense_when_timing_type_is_clear_or_preset(self);
     impls::need_timing_sense_when_related_pin_is_output(self);
   }

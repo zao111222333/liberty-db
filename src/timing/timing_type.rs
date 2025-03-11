@@ -7,6 +7,7 @@ use crate::{
   ast::{ParseScope, SimpleAttri},
   expression::logic,
   types::MaxMin,
+  Ctx,
 };
 
 /// # Combinational Timing Arcs
@@ -705,13 +706,13 @@ pub enum TimingType {
   NoChange(ArcNoChange),
 }
 crate::ast::impl_self_builder!(TimingType);
-impl SimpleAttri for TimingType {
+impl<C: Ctx> SimpleAttri<C> for TimingType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 

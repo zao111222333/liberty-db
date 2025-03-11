@@ -8,6 +8,39 @@ use crate::{
 };
 use core::fmt::{self, Write};
 
+use std::sync::Arc;
+pub trait TableCtx<C: Ctx> {
+  fn lu_table_template(&self) -> &Option<Arc<TableTemple<C>>>;
+  fn set_lu_table_template(&mut self, template: Option<&Arc<TableTemple<C>>>);
+}
+
+#[derive(Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct DefaultTableCtx<C: Ctx> {
+  pub lu_table_template: Option<Arc<TableTemple<C>>>,
+}
+impl<C: Ctx> TableCtx<C> for DefaultTableCtx<C> {
+  fn lu_table_template(&self) -> &Option<Arc<TableTemple<C>>> {
+    &self.lu_table_template
+  }
+  fn set_lu_table_template(&mut self, template: Option<&Arc<TableTemple<C>>>) {
+    self.lu_table_template = template.cloned();
+  }
+}
+impl<C: Ctx> fmt::Debug for DefaultTableCtx<C> {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    f.debug_struct("DefaultCellCtx").finish()
+  }
+}
+impl<C: Ctx> Default for DefaultTableCtx<C> {
+  #[inline]
+  fn default() -> Self {
+    Self { lu_table_template: None }
+  }
+}
+
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -225,7 +258,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   pub index_3: Vec<String>,
 }
 
-impl<C: Ctx> GroupFn for CompactLutTemplate<C> {}
+impl<C: Ctx> GroupFn<C> for CompactLutTemplate<C> {}
 
 /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
 ///
@@ -242,10 +275,10 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
   TotalOutputNetCapacitance,
 }
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
-impl SimpleAttri for VariableTypeCompactLutTemplateIndex12 {
+impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex12 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -262,10 +295,10 @@ pub enum VariableTypeCompactLutTemplateIndex3 {
   CurveParameters,
 }
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex3);
-impl SimpleAttri for VariableTypeCompactLutTemplateIndex3 {
+impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex3 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -523,7 +556,7 @@ pub struct CcsPowerPoint {
   pub point_current: f64,
 }
 crate::ast::impl_self_builder!(Vec<CcsPowerValue>);
-impl ComplexAttri for Vec<CcsPowerValue> {
+impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
@@ -684,11 +717,11 @@ pub struct Vector4DGrpup<C: Ctx> {
   pub vector: GroupSet<Vector4D<C>>,
 }
 
-impl<C: Ctx> GroupFn for Vector3DGrpup<C> {}
-impl<C: Ctx> GroupFn for Vector4DGrpup<C> {}
-impl<C: Ctx> GroupFn for ReferenceTimeVector3D<C> {}
-impl<C: Ctx> GroupFn for ReferenceTimeVector3DGrpup<C> {}
-impl<C: Ctx> GroupFn for CompactCcsPower<C> {}
+impl<C: Ctx> GroupFn<C> for Vector3DGrpup<C> {}
+impl<C: Ctx> GroupFn<C> for Vector4DGrpup<C> {}
+impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3D<C> {}
+impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3DGrpup<C> {}
+impl<C: Ctx> GroupFn<C> for CompactCcsPower<C> {}
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -812,7 +845,7 @@ pub struct TableLookUp1D<C: Ctx> {
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
-impl<C: Ctx> GroupFn for TableLookUp1D<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUp1D<C> {}
 
 /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
 ///
@@ -849,7 +882,7 @@ pub struct CompactCcsTable<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-impl<C: Ctx> GroupFn for CompactCcsTable<C> {}
+impl<C: Ctx> GroupFn<C> for CompactCcsTable<C> {}
 
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
@@ -889,14 +922,14 @@ pub struct TableLookUp<C: Ctx> {
   pub values: Values,
 }
 
-impl<C: Ctx> GroupFn for TableLookUp<C> {}
-impl<C: Ctx> GroupFn for TableLookUpMultiSegment<C> {}
-impl<C: Ctx> GroupFn for TableLookUp2D<C> {}
-impl<C: Ctx> GroupFn for TableLookUp3D<C> {}
-impl<C: Ctx> GroupFn for OcvSigmaTable<C> {}
-impl<C: Ctx> GroupFn for DriverWaveform<C> {}
-impl<C: Ctx> GroupFn for Vector3D<C> {}
-impl<C: Ctx> GroupFn for Vector4D<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUp<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUp3D<C> {}
+impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {}
+impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {}
+impl<C: Ctx> GroupFn<C> for Vector3D<C> {}
+impl<C: Ctx> GroupFn<C> for Vector4D<C> {}
 
 #[derive(Debug, Default, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -906,7 +939,7 @@ pub struct Values {
   pub inner: Vec<f64>,
 }
 crate::ast::impl_self_builder!(Values);
-impl ComplexAttri for Values {
+impl<C: Ctx> ComplexAttri<C> for Values {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
@@ -1015,7 +1048,7 @@ pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = f64>> {
 
 impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
   #[inline]
-  pub(crate) fn fmt_self<T: Write, I: ast::Indentation>(
+  pub(crate) fn fmt_self<T: Write, I: ast::Indentation, C: Ctx>(
     self,
     key1: &str,
     key2: &str,
@@ -1027,8 +1060,8 @@ impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
     ast::NameAttri::fmt_self(self.name, f)?;
     f.write_fmt(format_args!(") {{"))?;
     f.indent(1);
-    ComplexAttri::fmt_liberty(self.index_1, "index_1", f)?;
-    ComplexAttri::fmt_liberty(self.index_2, "index_2", f)?;
+    ComplexAttri::<C>::fmt_liberty(self.index_1, "index_1", f)?;
+    ComplexAttri::<C>::fmt_liberty(self.index_2, "index_2", f)?;
     let indent1 = f.indentation();
     write!(f, "\n{indent1}values (")?;
     f.indent(1);
@@ -1086,7 +1119,7 @@ pub struct TableTemple<C: Ctx> {
   #[liberty(complex(type = Option))]
   pub index_4: Option<Vec<f64>>,
 }
-impl<C: Ctx> GroupFn for TableTemple<C> {}
+impl<C: Ctx> GroupFn<C> for TableTemple<C> {}
 
 /// In Timing Delay Tables:
 ///
@@ -1190,10 +1223,10 @@ pub enum Variable {
   Scalar(ScalarVariable),
 }
 crate::ast::impl_self_builder!(Variable);
-impl SimpleAttri for Variable {
+impl<C: Ctx> SimpleAttri<C> for Variable {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 

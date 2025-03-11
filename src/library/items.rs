@@ -164,7 +164,7 @@ pub struct SensitizationVector {
   states: Vec<logic::Static>,
 }
 crate::ast::impl_self_builder!(SensitizationVector);
-impl ComplexAttri for SensitizationVector {
+impl<C:Ctx> ComplexAttri<C> for SensitizationVector {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -286,7 +286,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
     assert!(sense1.attributes.len() == 1);
   }
 }
-impl<C: Ctx> GroupFn for Sensitization<C> {}
+impl<C: Ctx> GroupFn<C> for Sensitization<C> {}
 
 /// Use the `voltage_map`  attribute to associate a voltage name
 /// with relative voltage values referenced by the cell-level `pg_pin`  groups.
@@ -306,7 +306,7 @@ pub struct VoltageMap {
   pub voltage: f64,
 }
 crate::ast::impl_self_builder!(VoltageMap);
-impl ComplexAttri for VoltageMap {
+impl<C:Ctx> ComplexAttri<C> for VoltageMap {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -392,7 +392,7 @@ pub struct InputVoltage<C: Ctx> {
   #[liberty(simple)]
   pub vimax: Formula,
 }
-impl<C: Ctx> GroupFn for InputVoltage<C> {}
+impl<C: Ctx> GroupFn<C> for InputVoltage<C> {}
 
 /// You define an `output_voltage` group in the `library` group to designate a set of output
 /// voltage level ranges to drive output cells.
@@ -451,7 +451,7 @@ pub struct OutputVoltage<C: Ctx> {
   #[liberty(simple)]
   pub vomax: Formula,
 }
-impl<C: Ctx> GroupFn for OutputVoltage<C> {}
+impl<C: Ctx> GroupFn<C> for OutputVoltage<C> {}
 
 /// Use the `delay_model`  attribute to specify which delay model
 /// to use in the delay calculations.
@@ -474,13 +474,13 @@ pub enum DelayModel {
   TableLookup,
 }
 crate::ast::impl_self_builder!(DelayModel);
-impl SimpleAttri for DelayModel {
+impl<C:Ctx> SimpleAttri<C> for DelayModel {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -570,7 +570,7 @@ pub struct OperatingConditions<C: Ctx> {
   #[liberty(default = 5.0)]
   pub voltage: f64,
 }
-impl<C: Ctx> GroupFn for OperatingConditions<C> {}
+impl<C: Ctx> GroupFn<C> for OperatingConditions<C> {}
 
 /// You can define one or more `fpga_isd`  groups at the library level
 /// to specify the drive current, I/O voltages, and slew rates for FPGA parts and cells
@@ -625,7 +625,7 @@ pub struct FpgaIsd<C: Ctx> {
   #[liberty(simple(type = Option))]
   pub slew: Option<FPGASlew>,
 }
-impl<C: Ctx> GroupFn for FpgaIsd<C> {}
+impl<C: Ctx> GroupFn<C> for FpgaIsd<C> {}
 
 /// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
 ///
@@ -646,13 +646,13 @@ pub enum FPGASlew {
   SLOW,
 }
 crate::ast::impl_self_builder!(FPGASlew);
-impl SimpleAttri for FPGASlew {
+impl<C:Ctx> SimpleAttri<C> for FPGASlew {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -679,13 +679,13 @@ pub enum TreeType {
   WorstCaseTree,
 }
 crate::ast::impl_self_builder!(TreeType);
-impl SimpleAttri for TreeType {
+impl<C:Ctx> SimpleAttri<C> for TreeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -707,7 +707,7 @@ pub enum Technology {
   Cmos,
 }
 crate::ast::impl_self_builder!(Technology);
-impl ComplexAttri for Technology {
+impl<C:Ctx> ComplexAttri<C> for Technology {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -801,7 +801,7 @@ pub enum AttributeType {
   Float,
 }
 crate::ast::impl_self_builder!(Define);
-impl ComplexAttri for Define {
+impl<C:Ctx> ComplexAttri<C> for Define {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -863,7 +863,7 @@ pub struct DefineGroup {
   pub parent_name: String,
 }
 crate::ast::impl_self_builder!(DefineGroup);
-impl ComplexAttri for DefineGroup {
+impl<C:Ctx> ComplexAttri<C> for DefineGroup {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -956,7 +956,7 @@ pub enum ResourceType {
   PadDriverSites,
 }
 crate::ast::impl_self_builder!(DefineCellArea);
-impl ComplexAttri for DefineCellArea {
+impl<C:Ctx> ComplexAttri<C> for DefineCellArea {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -1069,7 +1069,7 @@ pub struct WireLoad<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<FanoutLength>::deserialize_with")]
   pub fanout_length: GroupSet<FanoutLength>,
 }
-impl<C: Ctx> GroupFn for WireLoad<C> {}
+impl<C: Ctx> GroupFn<C> for WireLoad<C> {}
 
 /// Use this attribute to define values for fanout and length
 /// when you create the wire load manually.
@@ -1116,7 +1116,7 @@ pub struct FanoutLength {
   pub number_of_nets: Option<u32>,
 }
 crate::ast::impl_self_builder!(FanoutLength);
-impl ComplexAttri for FanoutLength {
+impl<C:Ctx> ComplexAttri<C> for FanoutLength {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -1207,7 +1207,7 @@ pub struct WireLoadSection<C: Ctx> {
   #[liberty(complex)]
   pub wire_load_from_area: (f64, f64, String),
 }
-impl<C: Ctx> GroupFn for WireLoadSection<C> {}
+impl<C: Ctx> GroupFn<C> for WireLoadSection<C> {}
 
 /// The `base_curve_type` attribute specifies the type of base curve.
 ///
@@ -1242,13 +1242,13 @@ pub enum BaseCurveType {
   CcsTimingHalfCurve,
 }
 crate::ast::impl_self_builder!(BaseCurveType);
-impl SimpleAttri for BaseCurveType {
+impl<C:Ctx> SimpleAttri<C> for BaseCurveType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -1327,7 +1327,7 @@ pub struct BaseCurves<C: Ctx> {
   pub curve_y: GroupSet<IdVector>,
 }
 
-impl<C: Ctx> GroupFn for BaseCurves<C> {}
+impl<C: Ctx> GroupFn<C> for BaseCurves<C> {}
 
 #[cfg(test)]
 mod test {

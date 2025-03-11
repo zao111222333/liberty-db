@@ -47,13 +47,13 @@ pub enum SdfEdgeType {
   BothEdges,
 }
 crate::ast::impl_self_builder!(SdfEdgeType);
-impl SimpleAttri for SdfEdgeType {
+impl<C: Ctx> SimpleAttri<C> for SdfEdgeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -90,13 +90,13 @@ pub enum VariableType {
   InputTransitionTime,
 }
 crate::ast::impl_self_builder!(VariableType);
-impl SimpleAttri for VariableType {
+impl<C: Ctx> SimpleAttri<C> for VariableType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -132,13 +132,13 @@ pub enum SigmaType {
   EarlyAndLate,
 }
 crate::ast::impl_self_builder!(SigmaType);
-impl SimpleAttri for SigmaType {
+impl<C: Ctx> SimpleAttri<C> for SigmaType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -193,7 +193,7 @@ impl SimpleAttri for SigmaType {
 //   #[liberty(complex)]
 //   pub index_3: Vec<f64>,
 // }
-// impl<C: Ctx> GroupFn for Domain<C> {}
+// impl<C: Ctx> GroupFn<C> for Domain<C> {}
 /// sth. like "A B C" will save as set{A B C}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -240,13 +240,13 @@ impl PartialOrd for WordSet {
   }
 }
 crate::ast::impl_self_builder!(WordSet);
-impl SimpleAttri for WordSet {
+impl<C: Ctx> SimpleAttri<C> for WordSet {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -309,7 +309,7 @@ pub struct DummyGroup<C: Ctx> {
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
 }
-impl<C: Ctx> GroupFn for DummyGroup<C> {}
+impl<C: Ctx> GroupFn<C> for DummyGroup<C> {}
 
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]

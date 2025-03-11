@@ -46,7 +46,7 @@ __test_runtime_assert = []
 [workspace.dependencies]
 log = { version = "0.4", features = ["std", "serde"] }
 simple_logger = "5.0"
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 thiserror = "2.0"
 strum = "0.27"

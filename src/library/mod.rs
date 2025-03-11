@@ -801,7 +801,7 @@ pub struct Library<C: Ctx> {
   pub cell: GroupSet<Cell<C>>,
 }
 
-impl<C: Ctx> GroupFn for Library<C> {}
+impl<C: Ctx> GroupFn<C> for Library<C> {}
 
 impl<C: Ctx> fmt::Display for Library<C> {
   /// Format [Library] struct as `.lib` file, see more at [examples](https://github.com/zao111222333/liberty-db/tree/main/examples)
@@ -840,7 +840,7 @@ impl<C: Ctx> Library<C> {
       Err(e) => return Err(ParserError::nom(scope.line_num, e)),
     };
     if key == Self::KEY {
-      match <Self as GroupAttri>::nom_parse(input2, Self::KEY, &mut scope) {
+      match <Self as GroupAttri<C>>::nom_parse(input2, Self::KEY, &mut scope) {
         Err(e) => Err(ParserError::nom(scope.line_num, e)),
         Ok((_, Err(e))) => Err(ParserError::IdError(scope.line_num, e)),
         Ok((_, Ok(builder))) => {

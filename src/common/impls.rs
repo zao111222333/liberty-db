@@ -1,9 +1,12 @@
 //!
 //! implement basic types
 //!
-use crate::ast::{
-  self, is_word, join_fmt_no_quote, CodeFormatter, ComplexAttri, ComplexParseError,
-  ComplexParseRes, IdError, Indentation, NameAttri, ParseScope, SimpleAttri,
+use crate::{
+  ast::{
+    self, is_word, join_fmt_no_quote, CodeFormatter, ComplexAttri, ComplexParseError,
+    ComplexParseRes, IdError, Indentation, NameAttri, ParseScope, SimpleAttri,
+  },
+  Ctx,
 };
 use core::{
   fmt::{self, Write},
@@ -16,7 +19,7 @@ use super::{
   parse_f64,
 };
 crate::ast::impl_self_builder!(f64);
-impl SimpleAttri for f64 {
+impl<C: Ctx> SimpleAttri<C> for f64 {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_custom(
@@ -35,14 +38,14 @@ impl SimpleAttri for f64 {
   }
 }
 crate::ast::impl_self_builder!(bool);
-impl SimpleAttri for bool {
+impl<C: Ctx> SimpleAttri<C> for bool {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 crate::ast::impl_self_builder!(usize);
-impl SimpleAttri for usize {
+impl<C: Ctx> SimpleAttri<C> for usize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_custom(
@@ -61,7 +64,7 @@ impl SimpleAttri for usize {
   }
 }
 crate::ast::impl_self_builder!(isize);
-impl SimpleAttri for isize {
+impl<C: Ctx> SimpleAttri<C> for isize {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_custom(
@@ -163,19 +166,19 @@ impl FromStr for NameList {
   }
 }
 crate::ast::impl_self_builder!(NameList);
-impl SimpleAttri for NameList {
+impl<C: Ctx> SimpleAttri<C> for NameList {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> ast::SimpleParseRes<'a, Self::Builder> {
-    ast::nom_parse_from_str(i, scope)
+    ast::nom_parse_from_str::<C, _>(i, scope)
   }
   #[inline]
   fn is_set(&self) -> bool {
     match self {
       Self::Name(s) => !s.is_empty(),
-      Self::List(word_set) => word_set.is_set(),
+      Self::List(word_set) => <_ as SimpleAttri<C>>::is_set(word_set),
     }
   }
   #[inline]
@@ -269,10 +272,10 @@ impl<const N: usize> NameAttri for [String; N] {
   }
 }
 crate::ast::impl_self_builder!(String);
-impl SimpleAttri for String {
+impl<C: Ctx> SimpleAttri<C> for String {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str(i, scope)
+    ast::nom_parse_from_str::<C, _>(i, scope)
   }
   #[inline]
   fn is_set(&self) -> bool {
@@ -290,14 +293,14 @@ impl SimpleAttri for String {
     }
   }
 }
-impl<const N: usize> ast::ParsingBuilder for [String; N] {
+impl<const N: usize, C: Ctx> ast::ParsingBuilder<C> for [String; N] {
   type Builder = Self;
   #[inline]
-  fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope) -> Self {
+  fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope<C>) -> Self {
     builder
   }
 }
-impl<const N: usize> ComplexAttri for [String; N] {
+impl<const N: usize, C: Ctx> ComplexAttri<C> for [String; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -323,15 +326,15 @@ impl<const N: usize> ComplexAttri for [String; N] {
   }
 }
 
-impl<const N: usize> ast::ParsingBuilder for [f64; N] {
+impl<const N: usize, C: Ctx> ast::ParsingBuilder<C> for [f64; N] {
   type Builder = Self;
   #[inline]
-  fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope) -> Self {
+  fn build(builder: Self::Builder, _scope: &mut ast::BuilderScope<C>) -> Self {
     builder
   }
 }
 
-impl<const N: usize> ComplexAttri for [f64; N] {
+impl<const N: usize, C: Ctx> ComplexAttri<C> for [f64; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -357,7 +360,7 @@ impl<const N: usize> ComplexAttri for [f64; N] {
   }
 }
 crate::ast::impl_self_builder!((String, f64));
-impl ComplexAttri for (String, f64) {
+impl<C: Ctx> ComplexAttri<C> for (String, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -389,7 +392,7 @@ impl ComplexAttri for (String, f64) {
 }
 
 crate::ast::impl_self_builder!(super::items::IdVector);
-impl ComplexAttri for super::items::IdVector {
+impl<C: Ctx> ComplexAttri<C> for super::items::IdVector {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
@@ -417,7 +420,7 @@ impl ComplexAttri for super::items::IdVector {
   }
 }
 crate::ast::impl_self_builder!(Vec<f64>);
-impl ComplexAttri for Vec<f64> {
+impl<C: Ctx> ComplexAttri<C> for Vec<f64> {
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
     _scope: &mut ParseScope,
@@ -445,7 +448,7 @@ impl ComplexAttri for Vec<f64> {
     ast::join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
-impl ComplexAttri for String {
+impl<C: Ctx> ComplexAttri<C> for String {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -473,7 +476,7 @@ impl ComplexAttri for String {
     }
   }
 }
-impl ComplexAttri for f64 {
+impl<C: Ctx> ComplexAttri<C> for f64 {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -498,7 +501,7 @@ impl ComplexAttri for f64 {
   }
 }
 crate::ast::impl_self_builder!(Vec<String>);
-impl ComplexAttri for Vec<String> {
+impl<C: Ctx> ComplexAttri<C> for Vec<String> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -524,7 +527,7 @@ impl ComplexAttri for Vec<String> {
   }
 }
 crate::ast::impl_self_builder!(Vec<usize>);
-impl ComplexAttri for Vec<usize> {
+impl<C: Ctx> ComplexAttri<C> for Vec<usize> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -548,7 +551,7 @@ impl ComplexAttri for Vec<usize> {
   }
 }
 crate::ast::impl_self_builder!((f64, f64, String));
-impl ComplexAttri for (f64, f64, String) {
+impl<C: Ctx> ComplexAttri<C> for (f64, f64, String) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -585,7 +588,7 @@ impl ComplexAttri for (f64, f64, String) {
   }
 }
 crate::ast::impl_self_builder!((i64, f64));
-impl ComplexAttri for (i64, f64) {
+impl<C: Ctx> ComplexAttri<C> for (i64, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -616,7 +619,7 @@ impl ComplexAttri for (i64, f64) {
   }
 }
 crate::ast::impl_self_builder!((f64, f64));
-impl ComplexAttri for (f64, f64) {
+impl<C: Ctx> ComplexAttri<C> for (f64, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -654,7 +657,7 @@ impl fmt::Display for Formula {
   }
 }
 crate::ast::impl_self_builder!(Formula);
-impl SimpleAttri for Formula {
+impl<C: Ctx> SimpleAttri<C> for Formula {
   #[inline]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     use nom::Parser as _;

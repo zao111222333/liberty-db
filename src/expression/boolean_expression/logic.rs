@@ -1,4 +1,7 @@
-use crate::ast::{ComplexAttri, ComplexParseError, ParseScope, SimpleAttri};
+use crate::{
+  ast::{ComplexAttri, ComplexParseError, ParseScope, SimpleAttri},
+  Ctx,
+};
 use core::{cmp::Ordering, hash::Hash};
 
 /// Level
@@ -31,13 +34,13 @@ pub enum Edge {
   R,
 }
 crate::ast::impl_self_builder!(Edge);
-impl SimpleAttri for Edge {
+impl<C: Ctx> SimpleAttri<C> for Edge {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -59,7 +62,7 @@ impl SimpleAttri for Edge {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.17&end=151.29
 /// ">Reference</a>
-impl ComplexAttri for Edge {
+impl<C: Ctx> ComplexAttri<C> for Edge {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -151,13 +154,13 @@ pub enum Normal {
   L,
 }
 crate::ast::impl_self_builder!(Normal);
-impl SimpleAttri for Normal {
+impl<C: Ctx> SimpleAttri<C> for Normal {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 /// H L R F
