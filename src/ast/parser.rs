@@ -478,9 +478,7 @@ pub(crate) fn complex_ccs_power_values<'a>(
   line_num: &mut usize,
 ) -> IResult<&'a str, Vec<(usize, crate::table::CcsPowerValue)>> {
   #[inline]
-  fn complex_ccs_power_value(
-    i: &str,
-  ) -> IResult<&str, crate::table::CcsPowerValue> {
+  fn complex_ccs_power_value(i: &str) -> IResult<&str, crate::table::CcsPowerValue> {
     delimited(
       pair(char('"'), space),
       map(
