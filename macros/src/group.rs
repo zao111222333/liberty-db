@@ -438,7 +438,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
   let st = match &ast.data {
     Data::Struct(s) => s,
     _ => {
-      return Err(syn::Error::new(Span::call_site(), "This macro only supports struct."))
+      return Err(syn::Error::new(Span::call_site(), "This macro only supports struct."));
     }
   };
   let builder_ident = Ident::new(&format!("{}Builder", ident), Span::call_site());
@@ -760,7 +760,7 @@ fn extract_generic_param<'a>(ty: &'a Type, container: &str) -> syn::Result<&'a T
     if let Some(last_segment) = type_path.path.segments.last() {
       if last_segment.ident == container {
         if let PathArguments::AngleBracketed(ref args) = last_segment.arguments {
-          if let Some(GenericArgument::Type(ref inner_type)) = args.args.first() {
+          if let Some(GenericArgument::Type(inner_type)) = args.args.first() {
             return Ok(inner_type);
           }
         }

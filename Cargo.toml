@@ -6,7 +6,7 @@ members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 [workspace.package]
 version = "0.9.6"
 license = "MIT"
-edition = "2021"
+edition = "2024"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
 keywords = ["eda", "liberty", "database", "parser"]
 readme = "README.md"
