@@ -67,7 +67,6 @@ mut_set = "0.7.0"
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
 num-traits = "0.2"
-cfg-if = "1.0.0"
 criterion = { version = "0.5", features = ["html_reports"] }
 sysinfo = "0.33"
 chrono = "0.4"
@@ -101,11 +100,9 @@ nom.workspace = true
 biodivine-lib-bdd.workspace = true
 mut_set.workspace = true
 duplicate.workspace = true
-cfg-if.workspace = true
 hashmatch.workspace = true
 pyo3 = { workspace = true, optional = true }
 pyo3-stub-gen = { workspace = true, optional = true }
-
 
 [dev-dependencies]
 dev_utils.workspace = true

@@ -19,35 +19,32 @@ pub trait Indentation {
 #[derive(Debug, Clone, Copy)]
 pub struct DefaultIndentation;
 impl Indentation for DefaultIndentation {
-  cfg_if::cfg_if! {
-    if #[cfg(test)]{
-      const LUT: &'static [&'static str] =  &[
-        "",
-        "| ",
-        "| | ",
-        "| | | ",
-        "| | | | ",
-        "| | | | | ",
-        "| | | | | | ",
-        "| | | | | | | ",
-        "| | | | | | | | ",
-        "| | | | | | | | | ",
-      ];
-    }else{
-      const LUT: &'static [&'static str] = &[
-        "",
-        "\t",
-        "\t\t",
-        "\t\t\t",
-        "\t\t\t\t",
-        "\t\t\t\t\t",
-        "\t\t\t\t\t\t",
-        "\t\t\t\t\t\t\t",
-        "\t\t\t\t\t\t\t\t",
-        "\t\t\t\t\t\t\t\t\t",
-      ];
-    }
-  }
+  #[cfg(test)]
+  const LUT: &'static [&'static str] = &[
+    "",
+    "| ",
+    "| | ",
+    "| | | ",
+    "| | | | ",
+    "| | | | | ",
+    "| | | | | | ",
+    "| | | | | | | ",
+    "| | | | | | | | ",
+    "| | | | | | | | | ",
+  ];
+  #[cfg(not(test))]
+  const LUT: &'static [&'static str] = &[
+    "",
+    "\t",
+    "\t\t",
+    "\t\t\t",
+    "\t\t\t\t",
+    "\t\t\t\t\t",
+    "\t\t\t\t\t\t",
+    "\t\t\t\t\t\t\t",
+    "\t\t\t\t\t\t\t\t",
+    "\t\t\t\t\t\t\t\t\t",
+  ];
 }
 /// `CodeFormatter` with indent
 #[expect(missing_debug_implementations)]

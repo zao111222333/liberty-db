@@ -526,12 +526,13 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     });
     #[expect(clippy::needless_bool)]
     let hashmatch = if field_name_arrti_type_old_pos.len() >= 40 {
-      cfg_if::cfg_if! {
-        if #[cfg(feature = "hashmatch")] {
-          true
-        }else{
-          false
-        }
+      #[cfg(feature = "hashmatch")]
+      {
+        true
+      }
+      #[cfg(not(feature = "hashmatch"))]
+      {
+        false
       }
     } else {
       false

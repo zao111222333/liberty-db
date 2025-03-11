@@ -1,8 +1,7 @@
 [package]
 name = "dev"
-edition = "2021"
 publish = false
-resolver = "2"
+edition.workspace = true
 
 [dependencies]
 itertools.workspace = true
