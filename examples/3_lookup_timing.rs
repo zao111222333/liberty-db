@@ -1,5 +1,5 @@
 use anyhow::Context as _;
-use liberty_db::{timing::TimingType, DefaultCtx, Library};
+use liberty_db::{DefaultCtx, Library, timing::TimingType};
 
 const TEMPLATE: &str = include_str!("../dev/tech/tsmc22/tcbn22ullbwp30p140tt0p8v25c.lib");
 fn main() -> anyhow::Result<()> {

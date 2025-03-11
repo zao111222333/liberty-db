@@ -2,11 +2,11 @@
 //! implement basic types
 //!
 use crate::{
-  ast::{
-    self, is_word, join_fmt_no_quote, CodeFormatter, ComplexAttri, ComplexParseError,
-    ComplexParseRes, IdError, Indentation, NameAttri, ParseScope, SimpleAttri,
-  },
   Ctx,
+  ast::{
+    self, CodeFormatter, ComplexAttri, ComplexParseError, ComplexParseRes, IdError,
+    Indentation, NameAttri, ParseScope, SimpleAttri, is_word, join_fmt_no_quote,
+  },
 };
 use core::{
   fmt::{self, Write},
@@ -99,11 +99,7 @@ impl NameAttri for Option<String> {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     self.as_ref().map_or(Ok(()), |s| {
-      if is_word(s) {
-        write!(f, "{s}")
-      } else {
-        write!(f, "\"{s}\"")
-      }
+      if is_word(s) { write!(f, "{s}") } else { write!(f, "\"{s}\"") }
     })
   }
 }
@@ -123,11 +119,7 @@ impl NameAttri for String {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    if is_word(self) {
-      write!(f, "{self}")
-    } else {
-      write!(f, "\"{self}\"")
-    }
+    if is_word(self) { write!(f, "{self}") } else { write!(f, "\"{self}\"") }
   }
 }
 
@@ -286,11 +278,7 @@ impl<C: Ctx> SimpleAttri<C> for String {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    if is_word(self) {
-      write!(f, "{self}")
-    } else {
-      write!(f, "\"{self}\"")
-    }
+    if is_word(self) { write!(f, "{self}") } else { write!(f, "\"{self}\"") }
   }
 }
 impl<const N: usize, C: Ctx> ast::ParsingBuilder<C> for [String; N] {
@@ -469,11 +457,7 @@ impl<C: Ctx> ComplexAttri<C> for String {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    if is_word(self) {
-      write!(f, "{self}")
-    } else {
-      write!(f, "\"{self}\"")
-    }
+    if is_word(self) { write!(f, "{self}") } else { write!(f, "\"{self}\"") }
   }
 }
 impl<C: Ctx> ComplexAttri<C> for f64 {

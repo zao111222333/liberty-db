@@ -1,10 +1,10 @@
 use crate::{
+  Ctx,
   ast::{
     Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
     Indentation, ParseScope, SimpleAttri,
   },
   expression::logic::Edge,
-  Ctx,
 };
 use core::{
   fmt::{self, Write},

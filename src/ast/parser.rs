@@ -4,6 +4,7 @@
 //!
 use crate::ast::GroupWrapper;
 use nom::{
+  IResult, Input as _, Parser as _,
   branch::alt,
   bytes::{
     complete::{tag, take, take_until, take_while},
@@ -14,7 +15,6 @@ use nom::{
   error::{Error, ErrorKind},
   multi::{many0, separated_list0},
   sequence::{delimited, pair, preceded, terminated},
-  IResult, Input as _, Parser as _,
 };
 use std::collections::HashMap;
 
@@ -586,7 +586,13 @@ mod test_key {
       )
     );
     assert_eq!(
-      Ok(("}", vec![(0, "init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current")])),
+      Ok((
+        "}",
+        vec![(
+          0,
+          "init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current"
+        )]
+      )),
       complex(
         r#" ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current") ;
         }"#,

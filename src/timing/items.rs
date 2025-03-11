@@ -6,16 +6,16 @@ use core::ops::{Add, Mul, Not as _, Sub};
 #[cfg(feature = "table_template")]
 use crate::common::table::TableCtx as _;
 use crate::{
+  Ctx,
   ast::{
-    self, fmt_comment_liberty, BuilderScope, GroupComments, GroupFn, ParseScope,
-    ParsingBuilder, SimpleAttri,
+    self, BuilderScope, GroupComments, GroupFn, ParseScope, ParsingBuilder, SimpleAttri,
+    fmt_comment_liberty,
   },
   common::{
     f64_into_hash_ord_fn,
     table::{DisplayTableLookUp, DisplayValues, TableLookUp2D},
   },
   expression::logic,
-  Ctx,
 };
 use itertools::izip;
 use strum_macros::{Display, EnumString};

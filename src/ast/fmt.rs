@@ -114,7 +114,7 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::{common::items::DummyGroup, DefaultCtx};
+  use crate::{DefaultCtx, common::items::DummyGroup};
   #[test]
   fn more_than_10_indent() {
     crate::ast::test_parse_fmt::<DummyGroup<DefaultCtx>>(

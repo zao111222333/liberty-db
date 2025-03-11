@@ -1,10 +1,10 @@
 use super::items::SigmaType;
 use crate::{
+  Ctx,
   ast::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
     ParseScope, SimpleAttri,
   },
-  Ctx,
 };
 use core::fmt::{self, Write};
 
@@ -1598,8 +1598,8 @@ pub enum ScalarVariable {
 #[cfg(test)]
 mod test {
   use crate::{
-    ast::{test_parse, test_parse_fmt},
     DefaultCtx, Group,
+    ast::{test_parse, test_parse_fmt},
   };
 
   #[test]

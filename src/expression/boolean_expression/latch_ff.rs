@@ -6,8 +6,8 @@ use super::{
   BooleanExpression, BooleanExpressionLike as _, LogicBooleanExpression, UNKNOWN,
 };
 use crate::{
-  ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
   Ctx,
+  ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
 };
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt::Write;
@@ -933,8 +933,8 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for ClearPresetState {
 #[cfg(test)]
 mod test {
   use crate::{
-    expression::{BddBooleanExpression, FFBank, Latch, LatchBank, LatchFF as _, FF},
     DefaultCtx,
+    expression::{BddBooleanExpression, FF, FFBank, Latch, LatchBank, LatchFF as _},
   };
   #[test]
   fn special_boolean_expression() {

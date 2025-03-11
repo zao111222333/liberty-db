@@ -5,6 +5,7 @@
 mod items;
 mod test;
 use crate::{
+  Ctx,
   ast::{
     Attributes, BuilderScope, DefaultIndentation, GroupComments, GroupFn, GroupSet,
     ParseScope, ParsingBuilder,
@@ -14,7 +15,7 @@ use crate::{
     char_config::CharConfig,
     table::{CompactLutTemplate, DriverWaveform, TableTemple},
   },
-  units, Ctx,
+  units,
 };
 use core::fmt::{self, Write as _};
 pub use items::*;
@@ -818,7 +819,7 @@ impl<C: Ctx> fmt::Display for Library<C> {
     self.fmt_lib::<DefaultIndentation>(f)
   }
 }
-use crate::ast::{parser, GroupAttri, ParserError};
+use crate::ast::{GroupAttri, ParserError, parser};
 impl<C: Ctx> Library<C> {
   const KEY: &'static str = "library";
   /// Parse `.lib` file as a [Library] struct.

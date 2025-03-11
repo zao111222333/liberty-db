@@ -2,10 +2,10 @@
 //! cargo expand common::demo
 //! cargo expand common::demo --no-default-features
 use crate::{
+  Ctx,
   ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
   timing::{TimingTableLookUp, TimingType},
-  Ctx,
 };
 use core::fmt::Write;
 
@@ -165,8 +165,8 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {}
 #[cfg(test)]
 mod test {
   use crate::{
-    ast::{DefaultIndentation, Group as _},
     DefaultCtx,
+    ast::{DefaultIndentation, Group as _},
   };
 
   use super::*;

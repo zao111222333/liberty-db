@@ -1,7 +1,7 @@
 #![cfg(test)]
 use crate::{
-  ast::{AttriValues, SimpleDefined},
   DefaultCtx,
+  ast::{AttriValues, SimpleDefined},
 };
 
 use super::*;

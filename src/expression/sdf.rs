@@ -1,6 +1,6 @@
 use crate::{
-  ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri},
   Ctx,
+  ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri},
 };
 use core::fmt::{self, Write};
 

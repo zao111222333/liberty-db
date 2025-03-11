@@ -4,10 +4,10 @@
 use core::{fmt, str::FromStr};
 
 use crate::{
+  Ctx,
   ast::{ParseScope, SimpleAttri},
   expression::logic,
   types::MaxMin,
-  Ctx,
 };
 
 /// # Combinational Timing Arcs

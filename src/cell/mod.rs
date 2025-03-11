@@ -9,11 +9,11 @@ use core::{fmt::Debug, mem};
 pub use items::*;
 
 use crate::{
+  Ctx,
   ast::{Attributes, BuilderScope, GroupComments, GroupFn, GroupSet},
   common::{char_config::CharConfig, items::NameList, table::TableLookUp2D},
-  expression::{FFBank, Latch, LatchBank, FF},
+  expression::{FF, FFBank, Latch, LatchBank},
   pin::{AntennaDiodeType, Bundle, Pin},
-  Ctx,
 };
 
 pub trait CellCtx {

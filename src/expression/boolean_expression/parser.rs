@@ -7,6 +7,7 @@
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt;
 use nom::{
+  IResult, Parser as _,
   branch::alt,
   bytes::{
     complete::{tag, take_while1},
@@ -19,7 +20,6 @@ use nom::{
   combinator::{map, map_res, opt},
   multi::many1,
   sequence::{delimited, pair},
-  IResult, Parser as _,
 };
 
 /// only not(variable) and variable

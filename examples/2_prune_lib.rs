@@ -1,7 +1,7 @@
-use liberty_db::{cell::CellCtx, DefaultCtx, Library};
+use liberty_db::{DefaultCtx, Library, cell::CellCtx};
 use std::{
   env,
-  fs::{read_to_string, File},
+  fs::{File, read_to_string},
   io::{BufWriter, Write},
   path::Path,
 };

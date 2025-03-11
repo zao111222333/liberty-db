@@ -7,15 +7,15 @@ pub mod logic;
 mod logic_impl;
 mod parser;
 use crate::{
+  Ctx, DefaultCtx,
   ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder},
   cell::CellCtx as _,
-  Ctx, DefaultCtx,
 };
-pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
-use parser::{as_sdf_str, BoolExprErr};
+pub use latch_ff::{FF, FFBank, Latch, LatchBank, LatchFF};
+use parser::{BoolExprErr, as_sdf_str};
 
 pub use biodivine_lib_bdd::{
-  boolean_expression::BooleanExpression as Expr, Bdd, BddVariableSet,
+  Bdd, BddVariableSet, boolean_expression::BooleanExpression as Expr,
 };
 use core::{
   borrow::Borrow,

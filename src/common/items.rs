@@ -1,8 +1,8 @@
 use crate::{
-  ast::{
-    join_fmt, CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri,
-  },
   Ctx,
+  ast::{
+    CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri, join_fmt,
+  },
 };
 use core::{
   cmp::Ordering,

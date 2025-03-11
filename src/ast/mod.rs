@@ -7,9 +7,9 @@ pub mod parser;
 #[cfg(feature = "table_template")]
 use crate::common::table::{CompactLutTemplate, TableTemple};
 use crate::{
+  Ctx, DefaultCtx,
   common::{f64_into_hash_ord_fn, parse_f64},
   library::AttributeType,
-  Ctx, DefaultCtx,
 };
 #[cfg(feature = "table_template")]
 use alloc::sync::Arc;
@@ -21,8 +21,8 @@ use core::{
   str::FromStr,
 };
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
-use itertools::{izip, Itertools as _};
-use nom::{error::Error, IResult};
+use itertools::{Itertools as _, izip};
+use nom::{IResult, error::Error};
 use std::collections::HashMap;
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
@@ -367,16 +367,18 @@ pub(crate) fn attributs_set_undefined_attri(
             String::from(key),
             match simple_type {
               AttributeType::Boolean => {
-                AttriValues::Simple(SimpleDefined::Boolean(vec![u
-                  .parse()
-                  .map_or(Err(u), Ok)]))
+                AttriValues::Simple(SimpleDefined::Boolean(vec![
+                  u.parse().map_or(Err(u), Ok),
+                ]))
               }
               AttributeType::String => {
                 AttriValues::Simple(SimpleDefined::String(vec![u]))
               }
-              AttributeType::Integer => AttriValues::Simple(SimpleDefined::Integer(
-                vec![lexical_core::parse(u.as_bytes()).map_or(Err(u), Ok)],
-              )),
+              AttributeType::Integer => {
+                AttriValues::Simple(SimpleDefined::Integer(vec![
+                  lexical_core::parse(u.as_bytes()).map_or(Err(u), Ok),
+                ]))
+              }
               AttributeType::Float => AttriValues::Simple(SimpleDefined::Float(vec![
                 parse_f64(&u).map_or(Err(u), Ok),
               ])),

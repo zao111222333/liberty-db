@@ -1,15 +1,15 @@
 use crate::{
+  Ctx,
   ast::{
-    join_fmt, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    GroupSet, Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes,
+    CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
+    Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes, join_fmt,
   },
   common::{
     items::{NameList, WordSet},
     table::CompactCcsPower,
   },
-  expression::{logic, LogicBooleanExpression, PowerGroundBooleanExpression},
+  expression::{LogicBooleanExpression, PowerGroundBooleanExpression, logic},
   pin::Direction,
-  Ctx,
 };
 use core::{
   fmt::{self, Write},
@@ -259,11 +259,7 @@ impl FromStr for Table {
           let _l = line
             .trim_start()
             .trim_end_matches(|c: char| c == ',' || c.is_ascii_whitespace());
-          if _l.is_empty() {
-            None
-          } else {
-            Some(String::from(_l))
-          }
+          if _l.is_empty() { None } else { Some(String::from(_l)) }
         })
         .collect(),
     })

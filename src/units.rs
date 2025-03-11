@@ -2,11 +2,11 @@
 //! The unit system
 
 use crate::{
+  Ctx,
   ast::{
     CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope, SimpleAttri,
   },
   common::{f64_into_hash_ord_fn, parse_f64},
-  Ctx,
 };
 use core::{
   cmp::Ordering,
@@ -283,11 +283,7 @@ impl CapacitiveLoadUnit {
   #[must_use]
   #[expect(clippy::float_arithmetic)]
   pub fn value(&self) -> f64 {
-    if self.ff_pf {
-      self.val * 1e-15
-    } else {
-      self.val * 1e-12
-    }
+    if self.ff_pf { self.val * 1e-15 } else { self.val * 1e-12 }
   }
 }
 crate::ast::impl_self_builder!(CapacitiveLoadUnit);
@@ -320,11 +316,7 @@ impl<C: Ctx> ComplexAttri<C> for CapacitiveLoadUnit {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     f.write_num(self.val)?;
-    if self.ff_pf {
-      f.write_str(", ff")
-    } else {
-      f.write_str(", pf")
-    }
+    if self.ff_pf { f.write_str(", ff") } else { f.write_str(", pf") }
   }
 }
 

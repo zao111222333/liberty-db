@@ -2,7 +2,7 @@ use core::fmt::Debug;
 use std::collections::HashMap;
 
 use proc_macro2::Ident;
-use syn::{parse::ParseStream, spanned::Spanned, Expr, Token, Type};
+use syn::{Expr, Token, Type, parse::ParseStream, spanned::Spanned};
 
 #[derive(Debug, Clone, Copy)]
 enum InternalType {
@@ -225,11 +225,11 @@ fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Field
                 return Ok(Some(FieldType::Internal(InternalType::Name)));
               }
               "attributes" => {
-                return Ok(Some(FieldType::Internal(InternalType::AttributeList)))
+                return Ok(Some(FieldType::Internal(InternalType::AttributeList)));
               }
               "comments" => return Ok(Some(FieldType::Internal(InternalType::Comment))),
               "extra_ctx" => {
-                return Ok(Some(FieldType::Internal(InternalType::ExtraCtx)))
+                return Ok(Some(FieldType::Internal(InternalType::ExtraCtx)));
               }
               "simple" => {
                 let simple_type = parse_simple_type(tokens)?;
@@ -255,7 +255,7 @@ fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Field
                 return Err(syn::Error::new(
                   proc_macro2::Span::call_site(),
                   format!("Unsupported token {}.", token_id.to_string().as_str()),
-                ))
+                ));
               }
             }
           } else {
@@ -280,7 +280,7 @@ fn parse_field_pos(field_attrs: &[syn::Attribute]) -> syn::Result<Option<usize>>
     if attr.path().is_ident("old_pos") {
       match &attr.meta {
         syn::Meta::List(_) | syn::Meta::Path(_) => {
-          return Err(syn::Error::new(attr.meta.span(), "expected #[old_pos = 123 ]"))
+          return Err(syn::Error::new(attr.meta.span(), "expected #[old_pos = 123 ]"));
         }
         syn::Meta::NameValue(s) => {
           if let syn::Expr::Lit(expr_lit) = &s.value {
@@ -354,7 +354,7 @@ fn parse_simple_type(
                 return Err(syn::Error::new(
                   proc_macro2::Span::call_site(),
                   format!("simple_type not support {}.", arg_value.to_string().as_str()),
-                ))
+                ));
               }
             }
           } else {
@@ -368,7 +368,7 @@ fn parse_simple_type(
           return Err(syn::Error::new(
             proc_macro2::Span::call_site(),
             format!("simple_type not support {} group.", arg_id.to_string().as_str()),
-          ))
+          ));
         }
       }
     }
@@ -408,7 +408,7 @@ fn parse_complex_type(
                 return Err(syn::Error::new(
                   proc_macro2::Span::call_site(),
                   format!("complex_type not support {}.", arg_value.to_string().as_str()),
-                ))
+                ));
               }
             }
           } else {
@@ -422,7 +422,7 @@ fn parse_complex_type(
           return Err(syn::Error::new(
             proc_macro2::Span::call_site(),
             format!("simple_type not support {} group.", arg_id.to_string().as_str()),
-          ))
+          ));
         }
       }
     }
@@ -491,7 +491,7 @@ fn parse_group_type(
                 return Err(syn::Error::new(
                   proc_macro2::Span::call_site(),
                   format!("group_type not support {}.", arg_value.to_string().as_str()),
-                ))
+                ));
               }
             }
           } else {
@@ -505,7 +505,7 @@ fn parse_group_type(
           return Err(syn::Error::new(
             proc_macro2::Span::call_site(),
             format!("group_type not support {} group.", arg_id.to_string().as_str()),
-          ))
+          ));
         }
       }
     }
@@ -529,7 +529,7 @@ fn size_type_test() {
 
 #[test]
 fn main() {
-  use syn::{parse_str, Data};
+  use syn::{Data, parse_str};
   let input = r#"
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]

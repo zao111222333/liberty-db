@@ -22,7 +22,9 @@ pub(super) fn need_timing_sense_when_timing_type_is_clear_or_preset<C: Ctx>(
   if matches!(timing.timing_type, Some(TimingType::CLEAR | TimingType::PRESET))
     && timing.timing_sense.is_none()
   {
-    log::error!("Build Error: Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.");
+    log::error!(
+      "Build Error: Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute."
+    );
   }
 }
 

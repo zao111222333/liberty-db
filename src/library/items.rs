@@ -4,6 +4,7 @@
 // use std::ops::DerefMut;
 
 use crate::{
+  Ctx,
   ast::{
     Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
     GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
@@ -13,7 +14,6 @@ use crate::{
     parse_f64,
   },
   expression::logic,
-  Ctx,
 };
 use core::fmt::{self, Write};
 

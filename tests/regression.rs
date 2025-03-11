@@ -1,6 +1,6 @@
 #![cfg(test)]
 use dev_utils::{all_files, text_diff};
-use liberty_db::{ast::Group, DefaultCtx, Library};
+use liberty_db::{DefaultCtx, Library, ast::Group};
 use std::{
   fs::read_to_string,
   path::{Path, PathBuf},

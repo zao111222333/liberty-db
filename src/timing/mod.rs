@@ -10,6 +10,7 @@ pub use timing_type::*;
 pub mod impls;
 pub mod items;
 use crate::{
+  Ctx,
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
   ccsn::PropagatingCcb,
   common::{
@@ -21,7 +22,6 @@ use crate::{
     },
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
-  Ctx,
 };
 pub use items::*;
 

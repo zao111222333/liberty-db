@@ -1,6 +1,6 @@
 use crate::{
-  ast::{ComplexAttri, ComplexParseError, ParseScope, SimpleAttri},
   Ctx,
+  ast::{ComplexAttri, ComplexParseError, ParseScope, SimpleAttri},
 };
 use core::{cmp::Ordering, hash::Hash};
 
