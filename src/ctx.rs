@@ -1,4 +1,8 @@
-pub trait Ctx: serde::Serialize + serde::de::DeserializeOwned + Default {
+use crate::common::table::{
+  CompactTableCtx, DefaultCompactTableCtx, DefaultTableCtx, TableCtx,
+};
+
+pub trait Ctx: serde::Serialize + serde::de::DeserializeOwned + Default + Clone {
   type Library: core::fmt::Debug
     + Clone
     + Default
@@ -30,7 +34,14 @@ pub trait Ctx: serde::Serialize + serde::de::DeserializeOwned + Default {
     + Default
     + serde::Serialize
     + serde::de::DeserializeOwned;
-  type Table: core::fmt::Debug
+  type Table: TableCtx<Self>
+    + core::fmt::Debug
+    + Clone
+    + Default
+    + serde::Serialize
+    + serde::de::DeserializeOwned;
+  type CompactTable: CompactTableCtx<Self>
+    + core::fmt::Debug
     + Clone
     + Default
     + serde::Serialize
@@ -55,6 +66,7 @@ impl Ctx for DefaultCtx {
   type Pin = ();
   type Timing = ();
   type InternalPower = ();
-  type Table = ();
+  type Table = DefaultTableCtx<Self>;
+  type CompactTable = DefaultCompactTableCtx<Self>;
   type Other = ();
 }

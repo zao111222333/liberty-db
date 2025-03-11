@@ -16,6 +16,7 @@ use crate::{
   },
   units, Ctx,
 };
+use alloc::sync::Arc;
 use core::fmt::{self, Write as _};
 pub use items::*;
 
@@ -801,8 +802,6 @@ pub struct Library<C: Ctx> {
   pub cell: GroupSet<Cell<C>>,
 }
 
-impl<C: Ctx> GroupFn<C> for Library<C> {}
-
 impl<C: Ctx> fmt::Display for Library<C> {
   /// Format [Library] struct as `.lib` file, see more at [examples](https://github.com/zao111222333/liberty-db/tree/main/examples)
   /// ```
@@ -887,5 +886,49 @@ impl<C: Ctx> Library<C> {
   #[inline]
   pub fn fmt_db(&self, _f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
     todo!()
+  }
+}
+
+impl<C: Ctx> GroupFn<C> for Library<C> {
+  fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope<C>) {
+    let mut empty_scope = BuilderScope::<C>::default();
+    scope.lu_table_template = builder
+      .lu_table_template
+      .iter()
+      .map(|_lut| {
+        let lut =
+          <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
+        (lut.name.clone(), Arc::new(lut))
+      })
+      .collect();
+    scope.power_lut_template = builder
+      .power_lut_template
+      .iter()
+      .map(|_lut| {
+        let lut =
+          <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
+        (lut.name.clone(), Arc::new(lut))
+      })
+      .collect();
+    scope.output_current_template = builder
+      .output_current_template
+      .iter()
+      .map(|_lut| {
+        let lut =
+          <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
+        (lut.name.clone(), Arc::new(lut))
+      })
+      .collect();
+    scope.compact_lut_template = builder
+      .compact_lut_template
+      .iter()
+      .map(|_lut| {
+        let lut = <CompactLutTemplate<C> as ParsingBuilder<C>>::build(
+          _lut.clone(),
+          &mut empty_scope,
+        );
+        (lut.name.clone(), Arc::new(lut))
+      })
+      .collect();
   }
 }

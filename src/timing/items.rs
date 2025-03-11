@@ -10,7 +10,7 @@ use crate::{
   },
   common::{
     f64_into_hash_ord_fn,
-    table::{DisplayTableLookUp, DisplayValues, TableLookUp2D},
+    table::{DisplayTableLookUp, DisplayValues, TableCtx as _, TableLookUp2D},
   },
   expression::logic,
   Ctx,
@@ -167,7 +167,7 @@ impl<C: Ctx> GroupFn<C> for CellDegradation<C> {}
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TimingTableLookUp<C: Ctx> {
   pub extra_ctx: C::Table,
-  pub name: Option<String>,
+  pub name: String,
   pub comments: String,
   pub index_1: Vec<f64>,
   pub index_2: Vec<f64>,
@@ -390,7 +390,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
   );
   #[inline]
   #[expect(clippy::float_arithmetic)]
-  fn build(builder: Self::Builder, _scope: &mut BuilderScope<C>) -> Self {
+  fn build(builder: Self::Builder, scope: &mut BuilderScope<C>) -> Self {
     #[inline]
     fn eq_index<C: Ctx>(
       lhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
@@ -422,7 +422,15 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
           log::error!("LVF LUTs' index mismatch");
           (Vec::new(), String::from("LVF LUTs' index mismatch"))
         };
+
         Some(TimingTableLookUp {
+          extra_ctx: {
+            let mut extra_ctx = C::Table::default();
+            if let Some(template) = scope.lu_table_template.get(&_value.name) {
+              extra_ctx.set_lu_table_template(template);
+            }
+            extra_ctx
+          },
           name: _value.name,
           comments,
           index_1: _value.index_1,
@@ -441,10 +449,16 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
             _mean_shift.index_2
           },
           lvf_values,
-          extra_ctx: Default::default(),
         })
       }
       (Some(_value), None, None, None) => Some(TimingTableLookUp {
+        extra_ctx: {
+          let mut extra_ctx = C::Table::default();
+          if let Some(template) = scope.lu_table_template.get(&_value.name) {
+            extra_ctx.set_lu_table_template(template);
+          }
+          extra_ctx
+        },
         name: _value.name,
         comments: String::new(),
         index_1: _value.index_1,
@@ -455,7 +469,6 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
         lvf_index_1: Vec::new(),
         lvf_index_2: Vec::new(),
         lvf_values: Vec::new(),
-        extra_ctx: Default::default(),
       }),
       _ => None,
     }

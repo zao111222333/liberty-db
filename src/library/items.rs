@@ -164,7 +164,7 @@ pub struct SensitizationVector {
   states: Vec<logic::Static>,
 }
 crate::ast::impl_self_builder!(SensitizationVector);
-impl<C:Ctx> ComplexAttri<C> for SensitizationVector {
+impl<C: Ctx> ComplexAttri<C> for SensitizationVector {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -306,7 +306,7 @@ pub struct VoltageMap {
   pub voltage: f64,
 }
 crate::ast::impl_self_builder!(VoltageMap);
-impl<C:Ctx> ComplexAttri<C> for VoltageMap {
+impl<C: Ctx> ComplexAttri<C> for VoltageMap {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -474,7 +474,7 @@ pub enum DelayModel {
   TableLookup,
 }
 crate::ast::impl_self_builder!(DelayModel);
-impl<C:Ctx> SimpleAttri<C> for DelayModel {
+impl<C: Ctx> SimpleAttri<C> for DelayModel {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -646,7 +646,7 @@ pub enum FPGASlew {
   SLOW,
 }
 crate::ast::impl_self_builder!(FPGASlew);
-impl<C:Ctx> SimpleAttri<C> for FPGASlew {
+impl<C: Ctx> SimpleAttri<C> for FPGASlew {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -679,7 +679,7 @@ pub enum TreeType {
   WorstCaseTree,
 }
 crate::ast::impl_self_builder!(TreeType);
-impl<C:Ctx> SimpleAttri<C> for TreeType {
+impl<C: Ctx> SimpleAttri<C> for TreeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -707,7 +707,7 @@ pub enum Technology {
   Cmos,
 }
 crate::ast::impl_self_builder!(Technology);
-impl<C:Ctx> ComplexAttri<C> for Technology {
+impl<C: Ctx> ComplexAttri<C> for Technology {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -801,7 +801,7 @@ pub enum AttributeType {
   Float,
 }
 crate::ast::impl_self_builder!(Define);
-impl<C:Ctx> ComplexAttri<C> for Define {
+impl<C: Ctx> ComplexAttri<C> for Define {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -863,7 +863,7 @@ pub struct DefineGroup {
   pub parent_name: String,
 }
 crate::ast::impl_self_builder!(DefineGroup);
-impl<C:Ctx> ComplexAttri<C> for DefineGroup {
+impl<C: Ctx> ComplexAttri<C> for DefineGroup {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -956,7 +956,7 @@ pub enum ResourceType {
   PadDriverSites,
 }
 crate::ast::impl_self_builder!(DefineCellArea);
-impl<C:Ctx> ComplexAttri<C> for DefineCellArea {
+impl<C: Ctx> ComplexAttri<C> for DefineCellArea {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -1116,7 +1116,7 @@ pub struct FanoutLength {
   pub number_of_nets: Option<u32>,
 }
 crate::ast::impl_self_builder!(FanoutLength);
-impl<C:Ctx> ComplexAttri<C> for FanoutLength {
+impl<C: Ctx> ComplexAttri<C> for FanoutLength {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -1242,7 +1242,7 @@ pub enum BaseCurveType {
   CcsTimingHalfCurve,
 }
 crate::ast::impl_self_builder!(BaseCurveType);
-impl<C:Ctx> SimpleAttri<C> for BaseCurveType {
+impl<C: Ctx> SimpleAttri<C> for BaseCurveType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,

@@ -34,7 +34,7 @@ pub enum AntennaDiodeType {
   PowerAndGround,
 }
 crate::ast::impl_self_builder!(AntennaDiodeType);
-impl<C:Ctx> SimpleAttri<C> for AntennaDiodeType {
+impl<C: Ctx> SimpleAttri<C> for AntennaDiodeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -109,7 +109,7 @@ pub enum Direction {
   Internal,
 }
 crate::ast::impl_self_builder!(Direction);
-impl<C:Ctx> SimpleAttri<C> for Direction {
+impl<C: Ctx> SimpleAttri<C> for Direction {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -130,7 +130,7 @@ pub enum DontFault {
   Sao1,
 }
 crate::ast::impl_self_builder!(DontFault);
-impl<C:Ctx> SimpleAttri<C> for DontFault {
+impl<C: Ctx> SimpleAttri<C> for DontFault {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -160,7 +160,7 @@ pub enum DriverType {
   Resistive1,
 }
 crate::ast::impl_self_builder!(DriverType);
-impl<C:Ctx> SimpleAttri<C> for DriverType {
+impl<C: Ctx> SimpleAttri<C> for DriverType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -186,7 +186,7 @@ pub enum NextstateType {
   ScanEnable,
 }
 crate::ast::impl_self_builder!(NextstateType);
-impl<C:Ctx> SimpleAttri<C> for NextstateType {
+impl<C: Ctx> SimpleAttri<C> for NextstateType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -211,7 +211,7 @@ pub enum PinFuncType {
   ActiveFalling,
 }
 crate::ast::impl_self_builder!(PinFuncType);
-impl<C:Ctx> SimpleAttri<C> for PinFuncType {
+impl<C: Ctx> SimpleAttri<C> for PinFuncType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -231,7 +231,7 @@ pub enum RestoreEdgeType {
   Trailing,
 }
 crate::ast::impl_self_builder!(RestoreEdgeType);
-impl<C:Ctx> SimpleAttri<C> for RestoreEdgeType {
+impl<C: Ctx> SimpleAttri<C> for RestoreEdgeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -266,7 +266,7 @@ pub enum SignalType {
   TestClock,
 }
 crate::ast::impl_self_builder!(SignalType);
-impl<C:Ctx> SimpleAttri<C> for SignalType {
+impl<C: Ctx> SimpleAttri<C> for SignalType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -290,7 +290,7 @@ pub enum SlewControl {
   None,
 }
 crate::ast::impl_self_builder!(SlewControl);
-impl<C:Ctx> SimpleAttri<C> for SlewControl {
+impl<C: Ctx> SimpleAttri<C> for SlewControl {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -325,7 +325,7 @@ pub enum OneZero {
   Zero,
 }
 crate::ast::impl_self_builder!(OneZero);
-impl<C:Ctx> SimpleAttri<C> for OneZero {
+impl<C: Ctx> SimpleAttri<C> for OneZero {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -360,7 +360,7 @@ enum OneValue {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TwoValue(OneValue, OneValue);
 crate::ast::impl_self_builder!(TwoValue);
-impl<C:Ctx> SimpleAttri<C> for TwoValue {
+impl<C: Ctx> SimpleAttri<C> for TwoValue {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -449,7 +449,7 @@ pub struct RetentionPin {
   pub disable_value: OneZero,
 }
 crate::ast::impl_self_builder!(RetentionPin);
-impl<C:Ctx> ComplexAttri<C> for RetentionPin {
+impl<C: Ctx> ComplexAttri<C> for RetentionPin {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
