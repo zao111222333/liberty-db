@@ -178,6 +178,7 @@
     clippy::or_fun_call,
   )
 )]
+extern crate alloc;
 pub use biodivine_lib_bdd;
 pub use strum::IntoEnumIterator;
 /// `bus` group structure.

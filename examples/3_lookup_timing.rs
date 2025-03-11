@@ -1,5 +1,5 @@
 use anyhow::Context as _;
-use liberty_db::{timing::TimingType, DefaultCtx, Library};
+use liberty_db::{timing::TimingType, DefaultCtx, Group, Library};
 
 const TEMPLATE: &str = include_str!("../dev/tech/tsmc22/tcbn22ullbwp30p140tt0p8v25c.lib");
 fn main() -> anyhow::Result<()> {
@@ -18,7 +18,14 @@ fn main() -> anyhow::Result<()> {
     .context("Failed to get timing")?;
   let setup_table =
     timing.rise_constraint.as_ref().context("Failed to get setup_table")?;
+  // table lookup
   dbg!(setup_table.lookup(&0.1, &0.3));
-  // dbg!(setup_table);
+  // table_template
+  let table_template = setup_table
+    .extra_ctx
+    .table_template
+    .as_ref()
+    .context("Failed to get table_template")?;
+  println!("table_template {}", table_template.display().to_string());
   Ok(())
 }

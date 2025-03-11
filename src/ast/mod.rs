@@ -5,20 +5,25 @@
 mod fmt;
 pub mod parser;
 use crate::{
-  common::{f64_into_hash_ord_fn, parse_f64, table::TableTemple},
+  common::{
+    f64_into_hash_ord_fn, parse_f64,
+    table::{CompactLutTemplate, TableTemple},
+  },
   library::AttributeType,
   Ctx, DefaultCtx,
 };
+use alloc::sync::Arc;
 use core::{
   cmp::Ordering,
   fmt::Write,
   hash::{BuildHasher as _, Hash as _, Hasher as _},
+  marker::PhantomData,
   str::FromStr,
 };
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
 use itertools::{izip, Itertools as _};
 use nom::{error::Error, IResult};
-use std::{collections::HashMap, marker::PhantomData, sync::Arc};
+use std::collections::HashMap;
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
 #[cfg(not(feature = "fast_hash"))]
@@ -33,6 +38,10 @@ pub type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
 pub(crate) struct BuilderScope<C: Ctx> {
   pub(crate) cell_extra_ctx: crate::cell::DefaultCellCtx,
   pub(crate) lu_table_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
+  pub(crate) power_lut_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
+  pub(crate) output_current_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
+  pub(crate) compact_lut_template:
+    HashMap<String, Arc<CompactLutTemplate<C>>, RandomState>,
 }
 
 pub(crate) trait ParsingBuilder<C: Ctx>: Sized {
@@ -773,7 +782,7 @@ impl ParserError {
 
 /// `GroupDisplay`
 #[derive(Debug)]
-pub struct GroupDisplay<'a, C: Ctx, G: GroupAttri<C>> {
+pub struct GroupDisplay<'a, C: Ctx, G> {
   pub inner: &'a G,
   ___p: PhantomData<C>,
 }
@@ -784,7 +793,6 @@ impl<C: Ctx, G: GroupAttri<C>> core::fmt::Display for GroupDisplay<'_, C, G> {
     let mut ff = DefaultCodeFormatter::new(f);
     self.inner.fmt_liberty(
       core::any::type_name::<G>()
-        .to_owned()
         .replace("<liberty_db::ctx::DefaultCtx>", "")
         .as_str(),
       &mut ff,

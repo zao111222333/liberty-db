@@ -161,7 +161,7 @@ impl FromStr for NameList {
     match v.len() {
       0 => Err(()),
       1 => Ok(Self::Name(v.pop().unwrap())),
-      _ => Ok(Self::List(WordSet { inner: v.into_iter().map(String::from).collect() })),
+      _ => Ok(Self::List(WordSet { inner: v.into_iter().collect() })),
     }
   }
 }
