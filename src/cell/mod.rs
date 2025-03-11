@@ -9,7 +9,7 @@ use core::{fmt::Debug, mem};
 pub use items::*;
 
 use crate::{
-  ast::{Attributes, GroupComments, GroupFn, GroupSet},
+  ast::{Attributes, BuilderScope, GroupComments, GroupFn, GroupSet},
   common::{char_config::CharConfig, items::NameList, table::TableLookUp2D},
   expression::{FFBank, Latch, LatchBank, FF},
   pin::{AntennaDiodeType, Bundle, Pin},
@@ -669,9 +669,9 @@ pub struct Cell<C: Ctx> {
   #[serde(deserialize_with = "GroupSet::<Bundle<C>>::deserialize_with")]
   pub bundle: GroupSet<Bundle<C>>,
 }
-impl<C: Ctx> GroupFn for Cell<C> {
+impl<C: Ctx> GroupFn<C> for Cell<C> {
   #[inline]
-  fn before_build(builder: &mut Self::Builder, scope: &mut crate::ast::BuilderScope) {
+  fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope<C>) {
     // update variable
     let mut logic_variables: Vec<&str> = Vec::new();
     for pin in &builder.pin {
@@ -723,7 +723,7 @@ impl<C: Ctx> GroupFn for Cell<C> {
     scope.cell_extra_ctx.pg_variables =
       biodivine_lib_bdd::BddVariableSet::new(&pg_variable);
   }
-  fn after_build(&mut self, scope: &mut crate::ast::BuilderScope) {
+  fn after_build(&mut self, scope: &mut BuilderScope<C>) {
     self.extra_ctx.set_logic_variables(mem::replace(
       &mut scope.cell_extra_ctx.logic_variables,
       biodivine_lib_bdd::BddVariableSet::new(&[]),
@@ -795,4 +795,4 @@ pub struct TestCell<C: Ctx> {
   pub statetable: GroupSet<Statetable<C>>,
 }
 
-impl<C: Ctx> GroupFn for TestCell<C> {}
+impl<C: Ctx> GroupFn<C> for TestCell<C> {}

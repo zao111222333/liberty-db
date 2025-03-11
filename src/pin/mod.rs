@@ -1284,7 +1284,7 @@ pub struct Pin<C: Ctx> {
   pub ccsn_last_stage: GroupSet<CCSNStage<C>>,
 }
 
-impl<C: Ctx> GroupFn for Pin<C> {}
+impl<C: Ctx> GroupFn<C> for Pin<C> {}
 
 #[cfg(test)]
 mod test {

@@ -1,4 +1,7 @@
-use crate::ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri};
+use crate::{
+  ast::{CodeFormatter, Indentation, ParseScope, SimpleAttri},
+  Ctx,
+};
 use core::fmt::{self, Write};
 
 /// The `sdf_cond` attribute is defined in the state-dependent timing group to support SDF file
@@ -43,13 +46,13 @@ impl core::str::FromStr for SdfExpression {
   }
 }
 crate::ast::impl_self_builder!(SdfExpression);
-impl SimpleAttri for SdfExpression {
+impl<C: Ctx> SimpleAttri<C> for SdfExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(

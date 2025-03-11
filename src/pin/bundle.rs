@@ -57,4 +57,4 @@ pub struct Bundle<C: Ctx> {
   pub timing: GroupSet<Timing<C>>,
 }
 
-impl<C: Ctx> GroupFn for Bundle<C> {}
+impl<C: Ctx> GroupFn<C> for Bundle<C> {}

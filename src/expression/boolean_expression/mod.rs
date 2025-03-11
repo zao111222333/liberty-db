@@ -9,6 +9,7 @@ mod parser;
 use crate::{
   ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder},
   cell::CellCtx as _,
+  Ctx, DefaultCtx,
 };
 pub use latch_ff::{FFBank, Latch, LatchBank, LatchFF, FF};
 use parser::{as_sdf_str, BoolExprErr};
@@ -103,7 +104,7 @@ impl From<BooleanExpression> for Expr {
 }
 
 crate::ast::impl_self_builder!(BooleanExpression);
-impl crate::ast::SimpleAttri for BooleanExpression {
+impl<C: Ctx> crate::ast::SimpleAttri<C> for BooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -119,13 +120,13 @@ impl crate::ast::SimpleAttri for BooleanExpression {
     f.write_fmt(format_args!("\"{self}\""))
   }
 }
-impl crate::ast::SimpleAttri for LogicBooleanExpression {
+impl<C: Ctx> crate::ast::SimpleAttri<C> for LogicBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
-    Self::Builder::nom_parse(i, scope)
+    <Self::Builder as crate::ast::SimpleAttri<DefaultCtx>>::nom_parse(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -135,13 +136,13 @@ impl crate::ast::SimpleAttri for LogicBooleanExpression {
     f.write_fmt(format_args!("\"{self}\""))
   }
 }
-impl crate::ast::SimpleAttri for PowerGroundBooleanExpression {
+impl<C: Ctx> crate::ast::SimpleAttri<C> for PowerGroundBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
-    Self::Builder::nom_parse(i, scope)
+    <Self::Builder as crate::ast::SimpleAttri<DefaultCtx>>::nom_parse(i, scope)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -291,19 +292,19 @@ impl core::hash::Hash for BddBooleanExpression {
   }
 }
 
-impl ParsingBuilder for LogicBooleanExpression {
+impl<C: Ctx> ParsingBuilder<C> for LogicBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
-  fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope) -> Self {
+  fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
     let bdd = scope.cell_extra_ctx.logic_variables.eval_expression(&builder.expr);
     Self(BddBooleanExpression { expr: builder.expr, bdd })
   }
 }
 
-impl ParsingBuilder for PowerGroundBooleanExpression {
+impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
-  fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope) -> Self {
+  fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
     let bdd = scope.cell_extra_ctx.pg_variables.eval_expression(&builder.expr);
     Self(BddBooleanExpression { expr: builder.expr, bdd })
   }
@@ -350,7 +351,7 @@ impl fmt::Display for PowerGroundBooleanExpression {
   }
 }
 
-impl<C: crate::Ctx> crate::Cell<C> {
+impl<C: Ctx> crate::Cell<C> {
   #[inline]
   pub fn parse_logic_booleanexpr(
     &self,

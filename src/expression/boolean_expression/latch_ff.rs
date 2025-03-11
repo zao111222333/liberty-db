@@ -411,7 +411,7 @@ pub struct LatchBank<C: Ctx> {
   [Latch];
   [FF];
 )]
-impl<C: Ctx> NamedGroup for LatchFF_type<C> {
+impl<C: Ctx> NamedGroup<C> for LatchFF_type<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -445,7 +445,7 @@ impl<C: Ctx> NamedGroup for LatchFF_type<C> {
   [LatchBank];
   [FFBank];
 )]
-impl<C: Ctx> NamedGroup for LatchFFBank_type<C> {
+impl<C: Ctx> NamedGroup<C> for LatchFFBank_type<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -612,7 +612,7 @@ impl<C: Ctx> LatchFF for AllTypes<C> {}
   [LatchBank];
   [Latch];
 )]
-impl<C: Ctx> GroupFn for AllTypes<C> {}
+impl<C: Ctx> GroupFn<C> for AllTypes<C> {}
 /// trait for `FF` and `FFBank`
 #[expect(private_bounds)]
 pub trait LatchFF: __LatchFF {
@@ -920,13 +920,13 @@ pub enum ClearPresetState {
   X,
 }
 crate::ast::impl_self_builder!(ClearPresetState);
-impl crate::ast::SimpleAttri for ClearPresetState {
+impl<C: Ctx> crate::ast::SimpleAttri<C> for ClearPresetState {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 

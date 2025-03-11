@@ -227,9 +227,9 @@ pub struct CCSNStage<C: Ctx> {
   pub propagated_noise_high: Option<Vector4DGrpup<C>>,
 }
 
-impl<C: Ctx> GroupFn for CCSNStage<C> {
+impl<C: Ctx> GroupFn<C> for CCSNStage<C> {
   #[inline]
-  fn before_build(builder: &mut Self::Builder, _scope: &mut BuilderScope) {
+  fn before_build(builder: &mut Self::Builder, _scope: &mut BuilderScope<C>) {
     if let Some(miller_cap_fall) = builder.miller_cap_fall.as_mut() {
       if miller_cap_fall.is_sign_negative() {
         *miller_cap_fall = 0.0;
@@ -271,13 +271,13 @@ pub enum StageType {
   Both,
 }
 crate::ast::impl_self_builder!(StageType);
-impl SimpleAttri for StageType {
+impl<C: Ctx> SimpleAttri<C> for StageType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str(i, scope)
+    crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 
@@ -373,7 +373,7 @@ pub struct ReceiverCapacitance<C: Ctx> {
   #[liberty(group)]
   pub receiver_capacitance2_rise: Option<TableLookUp<C>>,
 }
-impl<C: Ctx> GroupFn for ReceiverCapacitance<C> {}
+impl<C: Ctx> GroupFn<C> for ReceiverCapacitance<C> {}
 
 /// The `propagating_ccb`  attribute lists all the channel-connected block noise groups that propagate
 /// the noise to the output pin in a particular timing arc.
@@ -392,7 +392,7 @@ pub struct PropagatingCcb {
   pub output_ccb_name: Option<String>,
 }
 crate::ast::impl_self_builder!(PropagatingCcb);
-impl ComplexAttri for PropagatingCcb {
+impl<C: Ctx> ComplexAttri<C> for PropagatingCcb {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,

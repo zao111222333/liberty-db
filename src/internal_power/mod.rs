@@ -86,4 +86,4 @@ pub struct InternalPower<C: Ctx> {
   pub power: Option<TableLookUp<C>>,
 }
 
-impl<C: Ctx> GroupFn for InternalPower<C> {}
+impl<C: Ctx> GroupFn<C> for InternalPower<C> {}
