@@ -17,7 +17,7 @@ pub struct TableLookUpMultiSegment<C: Ctx> {
   #[liberty(name)]
   #[size = 8]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -114,7 +114,7 @@ pub struct TableLookUp2D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -150,7 +150,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -278,7 +278,7 @@ pub struct Vector3D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -315,7 +315,7 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -356,7 +356,7 @@ pub struct Vector4D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -441,7 +441,7 @@ pub struct CompactCcsPower<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -609,7 +609,7 @@ pub struct Vector3DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -637,7 +637,7 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -665,7 +665,7 @@ pub struct Vector4DGrpup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -698,7 +698,7 @@ pub struct TableLookUp3D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -736,7 +736,7 @@ pub struct OcvSigmaTable<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -793,7 +793,7 @@ pub struct TableLookUp1D<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -830,7 +830,7 @@ pub struct CompactCcsTable<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -860,7 +860,7 @@ pub struct TableLookUp<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]

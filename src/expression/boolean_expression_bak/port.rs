@@ -7,7 +7,7 @@ use std::{collections::HashMap, fmt};
 #[derive(PartialOrd)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Port {
-  name: String,
+  pub name: String,
 }
 impl Port {
   #[inline]
