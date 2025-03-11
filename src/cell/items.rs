@@ -356,7 +356,7 @@ pub struct PgPin<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "&str", with_ref = false)]
-  name: String,
+  pub name: String,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -488,7 +488,7 @@ pub struct DynamicCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -557,7 +557,7 @@ pub struct SwitchingGroup<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -748,7 +748,7 @@ pub struct PgCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
   #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -876,7 +876,7 @@ impl<C: Ctx> GroupFn for PgCurrent<C> {}
 pub struct IntrinsicParasitic<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1067,7 +1067,7 @@ impl<C: Ctx> GroupFn for IntrinsicParasitic<C> {}
 pub struct IntrinsicCapacitance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1178,7 +1178,7 @@ impl<C: Ctx> GroupFn for IntrinsicCapacitance<C> {}
 pub struct IntrinsicResistance<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1456,7 +1456,7 @@ impl<C: Ctx> GroupFn for GateLeakage<C> {}
 pub struct LeakageCurrent<C: Ctx> {
   #[size = 8]
   #[liberty(name)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[size = 32]
   #[liberty(comments)]
@@ -1614,7 +1614,7 @@ impl<C: Ctx> GroupFn for LeakageCurrent<C> {}
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LutValues<C: Ctx> {
   #[liberty(name)]
-  name: Option<String>,
+  pub name: Option<String>,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
