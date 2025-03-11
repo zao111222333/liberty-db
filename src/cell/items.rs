@@ -4,12 +4,10 @@ use crate::{
     CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
     Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes, join_fmt,
   },
-  common::{
-    items::{NameList, WordSet},
-    table::CompactCcsPower,
-  },
+  common::items::{NameList, WordSet},
   expression::{LogicBooleanExpression, PowerGroundBooleanExpression, logic},
   pin::Direction,
+  table::CompactCcsPower,
 };
 use core::{
   fmt::{self, Write},
@@ -1648,12 +1646,7 @@ impl<C: Ctx> GroupFn<C> for LutValues<C> {}
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd, Default)]
-#[derive(
-  strum_macros::EnumString,
-  strum_macros::EnumIter,
-  strum_macros::Display,
-  strum_macros::AsRefStr
-)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display, strum::AsRefStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PgType {
   /// `primary_power`
@@ -1709,7 +1702,7 @@ impl<C: Ctx> SimpleAttri<C> for PgType {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum SwitchCellType {
   /// `coarse_grain`
@@ -1736,7 +1729,7 @@ impl<C: Ctx> SimpleAttri<C> for SwitchCellType {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum FpgaCellType {
   /// `rising_edge_clock_cell`
@@ -1769,7 +1762,7 @@ impl<C: Ctx> SimpleAttri<C> for FpgaCellType {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LevelShifterType {
   /// `LH`: Low to High

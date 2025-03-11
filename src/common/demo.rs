@@ -5,11 +5,10 @@ use crate::{
   Ctx,
   ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
   cell::Statetable,
+  table::TableLookUp2D,
   timing::{TimingTableLookUp, TimingType},
 };
 use core::fmt::Write;
-
-use super::table::TableLookUp2D;
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]

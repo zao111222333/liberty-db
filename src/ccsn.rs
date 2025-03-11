@@ -8,10 +8,10 @@ use crate::{
     Attributes, BuilderScope, CodeFormatter, ComplexAttri, ComplexParseError,
     GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
   },
-  common::table::{
+  expression::LogicBooleanExpression,
+  table::{
     TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
   },
-  expression::LogicBooleanExpression,
 };
 use core::fmt::{self, Write};
 
@@ -256,7 +256,7 @@ impl<C: Ctx> GroupFn<C> for CCSNStage<C> {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd, Default)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter, strum_macros::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum StageType {
   /// `pull_up`, in which the output voltage of the channel-connecting block is always pulled up (rising);

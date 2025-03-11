@@ -10,7 +10,7 @@ use core::{
   fmt::{self, Write},
   str::FromStr,
 };
-use strum_macros::{Display, EnumString};
+use strum::{Display, EnumString};
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

@@ -1,6 +1,6 @@
 use core::fmt::{self, Write};
 
-use strum_macros::{Display, EnumString};
+use strum::{Display, EnumString};
 
 use crate::{
   Ctx,

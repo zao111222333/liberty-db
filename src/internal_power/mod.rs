@@ -1,8 +1,9 @@
 use crate::{
   Ctx,
   ast::{Attributes, GroupComments, GroupFn},
-  common::{items::NameList, table::TableLookUp},
+  common::items::NameList,
   expression::LogicBooleanExpression,
+  table::TableLookUp,
 };
 
 #[mut_set::derive::item(sort)]

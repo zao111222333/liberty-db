@@ -352,8 +352,11 @@ impl fmt::Display for PowerGroundBooleanExpression {
 }
 
 impl<C: Ctx> crate::Cell<C> {
+  #[deprecated(since = "0.10.0", note = "use `parse_logic_boolexpr` instead")]
   #[inline]
-  pub fn parse_logic_booleanexpr(
+  pub const fn parse_logic_booleanexpr() {}
+  #[inline]
+  pub fn parse_logic_boolexpr(
     &self,
     s: &str,
   ) -> Result<LogicBooleanExpression, BoolExprErr> {
@@ -361,8 +364,11 @@ impl<C: Ctx> crate::Cell<C> {
     let bdd = self.extra_ctx.logic_variables().eval_expression(&expr);
     Ok(LogicBooleanExpression(BddBooleanExpression { expr, bdd }))
   }
+  #[deprecated(since = "0.10.0", note = "use `parse_pg_boolexpr` instead")]
   #[inline]
-  pub fn parse_pg_booleanexpr(
+  pub const fn parse_pg_booleanexpr() {}
+  #[inline]
+  pub fn parse_pg_boolexpr(
     &self,
     s: &str,
   ) -> Result<PowerGroundBooleanExpression, BoolExprErr> {

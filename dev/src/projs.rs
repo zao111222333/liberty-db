@@ -2,7 +2,7 @@
 macro_rules! gen_projs {
   ( $( ($name:tt,$type:ty) ),* $(,)? ) => {
     {
-      #[derive(Debug, strum_macros::EnumIter)]
+      #[derive(Debug, strum::EnumIter)]
       enum Projs {
         $( $name, )*
       }

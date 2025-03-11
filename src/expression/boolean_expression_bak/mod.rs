@@ -22,7 +22,7 @@ mod condition;
 pub use condition::ConditionExpression;
 
 mod tri_state;
-// use strum_macros::Display;
+// use strum::Display;
 use std::{
   collections::HashMap,
   fmt::{Debug, Display},

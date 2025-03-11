@@ -16,12 +16,12 @@ use crate::{
   common::{
     char_config::CharConfig,
     items::{NameList, SdfEdgeType, WordSet},
-    table::{
-      CompactCcsTable, OcvSigmaTable, ReferenceTimeVector3DGrpup, TableLookUp,
-      TableLookUp2D, TableLookUpMultiSegment,
-    },
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
+  table::{
+    CompactCcsTable, OcvSigmaTable, ReferenceTimeVector3DGrpup, TableLookUp,
+    TableLookUp2D, TableLookUpMultiSegment,
+  },
 };
 pub use items::*;
 

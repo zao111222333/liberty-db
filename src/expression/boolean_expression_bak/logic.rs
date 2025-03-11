@@ -105,7 +105,7 @@ impl ChangePattern {
 #[derive(Ord, PartialOrd)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
-#[derive(strum_macros::Display, strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum::Display, strum::EnumString, strum::EnumIter)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Level {
   /// High
@@ -145,7 +145,7 @@ impl LogicLike for Level {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum::EnumString, strum::EnumIter)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Edge {
   /// Fall
@@ -198,7 +198,7 @@ impl LogicLike for Edge {
 
 /// State
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[derive(strum_macros::Display)]
+#[derive(strum::Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum IllegalType {
   HighImpedanceInput,
@@ -224,7 +224,7 @@ impl IllegalType {
 
 /// UnInit
 #[derive(Debug, Clone, Copy)]
-#[derive(strum_macros::EnumString, strum_macros::EnumIter)]
+#[derive(strum::EnumString, strum::EnumIter)]
 #[derive(derivative::Derivative)]
 #[derivative(PartialEq, Hash, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -597,7 +597,7 @@ impl LogicLike for Vector {
 
 /// Operator1
 #[derive(Debug, Clone, Copy, PartialEq)]
-// #[derive(strum_macros::Display, strum_macros::EnumString)]
+// #[derive(strum::Display, strum::EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Operator1 {
   /// invert previous expression & invert following expression
@@ -659,7 +659,7 @@ impl Operator1 {
 /// =133.11
 /// ">Reference</a>
 #[derive(Debug, Clone, Copy, PartialEq)]
-// #[derive(strum_macros::Display, strum_macros::EnumString)]
+// #[derive(strum::Display, strum::EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Operator2 {
   /// FIXME: only sapce `" "` between two expression means `AND`

@@ -6,8 +6,8 @@ use core::{fmt, str::FromStr};
 use crate::{
   Ctx,
   ast::{ParseScope, SimpleAttri},
+  common::items::MaxMin,
   expression::logic,
-  types::MaxMin,
 };
 
 /// # Combinational Timing Arcs

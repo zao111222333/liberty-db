@@ -11,10 +11,8 @@ use crate::{
     ParseScope, ParsingBuilder,
   },
   cell::Cell,
-  common::{
-    char_config::CharConfig,
-    table::{CompactLutTemplate, DriverWaveform, TableTemple},
-  },
+  common::char_config::CharConfig,
+  table::{CompactLutTemplate, DriverWaveform, TableTemple},
   units,
 };
 use core::fmt::{self, Write as _};
@@ -890,9 +888,9 @@ impl<C: Ctx> Library<C> {
 }
 
 impl<C: Ctx> GroupFn<C> for Library<C> {
-  #[cfg_attr(not(feature = "table_template"), expect(unused_variables))]
+  #[cfg_attr(not(feature = "lut_template"), expect(unused_variables))]
   fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope<C>) {
-    #[cfg(feature = "table_template")]
+    #[cfg(feature = "lut_template")]
     {
       use alloc::sync::Arc;
       let mut empty_scope = BuilderScope::<C>::default();
