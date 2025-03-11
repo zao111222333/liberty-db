@@ -178,6 +178,7 @@
     clippy::or_fun_call,
   )
 )]
+#[cfg(any(feature = "table_template", feature = "py"))]
 extern crate alloc;
 pub use biodivine_lib_bdd;
 pub use strum::IntoEnumIterator;
@@ -203,8 +204,6 @@ pub use pin::Pin;
 /// `timing` group structure.
 pub mod timing;
 pub use timing::Timing;
-#[cfg(feature = "py")]
-extern crate alloc;
 #[cfg(feature = "py")]
 mod py;
 pub mod units;

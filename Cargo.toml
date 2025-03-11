@@ -36,11 +36,12 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html"]
 
 [features]
-default = ["fast_hash"]
+default = ["fast_hash", "table_template"]
 fast_hash = ["dep:ahash"]
 # use str's hash to do match, rather than directly match str
 hashmatch = ["liberty-macros/hashmatch"]
 py = ["dep:pyo3", "dep:pyo3-stub-gen"]
+table_template = []
 __test_runtime_assert = []
 
 [workspace.dependencies]
