@@ -1,6 +1,6 @@
 // https://github.com/mitsuhiko/similar/blob/main/examples/terminal-inline.rs
 pub fn text_diff(old: &str, new: &str) {
-  use console::{style, Style};
+  use console::{Style, style};
   use core::fmt;
   use similar::{ChangeTag, TextDiff};
   struct Line(Option<usize>);

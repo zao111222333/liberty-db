@@ -32,6 +32,7 @@ impl Indentation for DefaultIndentation {
     "| | | | | | | | ",
     "| | | | | | | | | ",
   ];
+  #[expect(clippy::cfg_not_test)]
   #[cfg(not(test))]
   const LUT: &'static [&'static str] = &[
     "",

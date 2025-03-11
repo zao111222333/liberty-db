@@ -3,7 +3,7 @@ pub mod _impl_bench;
 #[cfg(feature = "compare")]
 pub mod _impl_compare;
 pub mod projs;
-use criterion::{black_box, Criterion};
+use criterion::{Criterion, black_box};
 use dev_utils::all_files;
 use itertools::Itertools as _;
 use serde_json::Value;
@@ -264,7 +264,7 @@ pub fn bench_all(
 
 pub fn info_table(projs: impl Clone + Iterator<Item = impl Proj>) -> String {
   format!(
-    "<div class=\"info-table\"><table><thead><tr><th rowspan=\"2\" style=\"font-weight:bold;\">Project</th><th rowspan=\"2\" style=\"font-weight:bold;\">Lang</th><th rowspan=\"2\" style=\"font-weight:bold;\">Version</th><th colspan=\"3\" style=\"text-align:center;font-weight:bold;\">Type Support</th><th rowspan=\"2\" style=\"font-weight:bold;\">Boolean<br>Expression</th><th rowspan=\"2\" style=\"font-weight:bold;\">Comment</th></tr><tr><th>All</th><th>Partly</th><th>AST only</th></tr></thead><tbody>{}</tbody></table></div>", 
+    "<div class=\"info-table\"><table><thead><tr><th rowspan=\"2\" style=\"font-weight:bold;\">Project</th><th rowspan=\"2\" style=\"font-weight:bold;\">Lang</th><th rowspan=\"2\" style=\"font-weight:bold;\">Version</th><th colspan=\"3\" style=\"text-align:center;font-weight:bold;\">Type Support</th><th rowspan=\"2\" style=\"font-weight:bold;\">Boolean<br>Expression</th><th rowspan=\"2\" style=\"font-weight:bold;\">Comment</th></tr><tr><th>All</th><th>Partly</th><th>AST only</th></tr></thead><tbody>{}</tbody></table></div>",
     projs.map(|proj| proj.info_html()).join(""),
   )
 }
@@ -305,7 +305,9 @@ pub fn res_table(
   }
   parse_table += "</tbody></table>";
   write_table += "</tbody></table>";
-  format!("<h3>Parse Performance Comparison</h3>{parse_table}<h3>Write Performance Comparison</h3>{write_table}")
+  format!(
+    "<h3>Parse Performance Comparison</h3>{parse_table}<h3>Write Performance Comparison</h3>{write_table}"
+  )
 }
 
 pub fn run_bench(

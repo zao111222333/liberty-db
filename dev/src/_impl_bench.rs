@@ -2,7 +2,7 @@
 use crate::{ProjInfo, ProjLibrary, TypedSupport};
 use criterion::black_box;
 use std::{
-  ffi::{c_char, c_int, c_void, CString},
+  ffi::{CString, c_char, c_int, c_void},
   io::Cursor,
   str::FromStr,
 };
@@ -25,15 +25,34 @@ impl ProjLibrary for liberty_db_latest::Library<liberty_db_latest::DefaultCtx> {
   }
 }
 
-impl ProjLibrary for liberty_db_0p9p0::Library<liberty_db_0p9p0::DefaultCtx> {
+impl ProjLibrary for liberty_db_0p10p0::Library<liberty_db_0p10p0::DefaultCtx> {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",
-    url: "https://crates.io/crates/liberty-db/0.9.0",
+    url: "https://crates.io/crates/liberty-db/0.10.0",
     lang: "rust",
-    version: "0.9.0",
+    version: "0.10.0",
     typed_support: TypedSupport::AllTyped,
     parsed_boolexpr: true,
-    other: "published at 2025-01-01",
+    other: "published at 2025-03-11",
+  };
+  fn parse(s: &str) -> Result<Self, ()> {
+    Self::parse_lib(s).map_err(|_| ())
+  }
+  fn write(&self) -> Result<(), ()> {
+    _ = black_box(self.to_string());
+    Ok(())
+  }
+}
+
+impl ProjLibrary for liberty_db_0p9p6::Library<liberty_db_0p9p6::DefaultCtx> {
+  const INFO: ProjInfo = ProjInfo {
+    name: "liberty-db",
+    url: "https://crates.io/crates/liberty-db/0.9.6",
+    lang: "rust",
+    version: "0.9.6",
+    typed_support: TypedSupport::AllTyped,
+    parsed_boolexpr: true,
+    other: "published at 2025-03-11",
   };
   fn parse(s: &str) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
@@ -100,63 +119,6 @@ impl ProjLibrary for liberty_db_0p6p14::Library {
     Ok(())
   }
 }
-
-// impl ProjLibrary for liberty_db_0p6p2::Library {
-//   const INFO: ProjInfo = ProjInfo {
-//     name: "liberty-db",
-//     url: "https://crates.io/crates/liberty-db/0.6.2",
-//     lang: "rust",
-//     version: "0.6.2",
-//     typed_support: TypedSupport::AllTyped,
-//     parsed_boolexpr: true,
-//     other: "published at 2024-08-31",
-//   };
-//   fn parse(s: &str) -> Result<Self, ()> {
-//     Self::parse_lib(s).map_err(|_| ())
-//   }
-//   fn write(&self) -> Result<(), ()> {
-//     _ = black_box(self.to_string());
-//     Ok(())
-//   }
-// }
-
-// impl ProjLibrary for liberty_db_0p6p1::Library {
-//   const INFO: ProjInfo = ProjInfo {
-//     name: "liberty-db",
-//     url: "https://crates.io/crates/liberty-db/0.6.1",
-//     lang: "rust",
-//     version: "0.6.2",
-//     typed_support: TypedSupport::AllTyped,
-//     parsed_boolexpr: true,
-//     other: "published at 2024-08-30",
-//   };
-//   fn parse(s: &str) -> Result<Self, ()> {
-//     Self::parse_lib(s).map_err(|_| ())
-//   }
-//   fn write(&self) -> Result<(), ()> {
-//     _ = black_box(self.to_string());
-//     Ok(())
-//   }
-// }
-
-// impl ProjLibrary for liberty_db_0p6p0::Library {
-//   const INFO: ProjInfo = ProjInfo {
-//     name: "liberty-db",
-//     url: "https://crates.io/crates/liberty-db/0.6.0",
-//     lang: "rust",
-//     version: "0.6.0",
-//     typed_support: TypedSupport::AllTyped,
-//     parsed_boolexpr: true,
-//     other: "published at 2024-08-28",
-//   };
-//   fn parse(s: &str) -> Result<Self, ()> {
-//     Self::parse_lib(s).map_err(|_| ())
-//   }
-//   fn write(&self) -> Result<(), ()> {
-//     _ = black_box(self.to_string());
-//     Ok(())
-//   }
-// }
 
 impl ProjLibrary for liberty_db_0p5p9::Library {
   const INFO: ProjInfo = ProjInfo {
@@ -261,14 +223,14 @@ extern "C" {
 #[cfg(target_os = "linux")]
 impl ProjLibrary for OpenTimerLibrary {
   const INFO: ProjInfo = ProjInfo {
-      name: "OpenTimer",
-      url: "https://github.com/OpenTimer/OpenTimer/tree/a57d03b39886c1e2f113c1a893f5b3fad9199a52",
-      version: "2",
-      lang: "C++17",
-      typed_support: TypedSupport::PartialTyped,
-      parsed_boolexpr: true,
-      other: "STA tool's liberty component",
-    };
+    name: "OpenTimer",
+    url: "https://github.com/OpenTimer/OpenTimer/tree/a57d03b39886c1e2f113c1a893f5b3fad9199a52",
+    version: "2",
+    lang: "C++17",
+    typed_support: TypedSupport::PartialTyped,
+    parsed_boolexpr: true,
+    other: "STA tool's liberty component",
+  };
   fn parse(s: &str) -> Result<Self, ()> {
     let cstr = CString::new(s).unwrap();
     Ok(OpenTimerLibrary(unsafe { ot_parse_lib(cstr.as_ptr()) }))
@@ -320,14 +282,14 @@ impl ProjLibrary for Si2drLibertyLibrary {
 
 impl ProjLibrary for liberty2json::Liberty {
   const INFO: ProjInfo = ProjInfo {
-      name: "liberty2json",
-      url: "https://github.com/erihsu/liberty2json/tree/7d0a4f233f143fce9c2844208f4d48033622d93f",
-      lang: "rust",
-      version: "0.1.0",
-      typed_support: TypedSupport::AstOnly,
-      parsed_boolexpr: false,
-      other: "",
-    };
+    name: "liberty2json",
+    url: "https://github.com/erihsu/liberty2json/tree/7d0a4f233f143fce9c2844208f4d48033622d93f",
+    lang: "rust",
+    version: "0.1.0",
+    typed_support: TypedSupport::AstOnly,
+    parsed_boolexpr: false,
+    other: "",
+  };
   fn parse(s: &str) -> Result<Self, ()> {
     Self::from_str(s).map_err(|_| ())
   }

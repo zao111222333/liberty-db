@@ -1,0 +1,5 @@
+library(multi_pin){
+    cell(test){
+        pin (A, B) {}
+    }
+}
