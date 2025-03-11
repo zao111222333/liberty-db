@@ -16,7 +16,6 @@ use crate::{
   },
   units, Ctx,
 };
-use alloc::sync::Arc;
 use core::fmt::{self, Write as _};
 pub use items::*;
 
@@ -890,45 +889,50 @@ impl<C: Ctx> Library<C> {
 }
 
 impl<C: Ctx> GroupFn<C> for Library<C> {
+  #[cfg_attr(not(feature = "table_template"), expect(unused_variables))]
   fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope<C>) {
-    let mut empty_scope = BuilderScope::<C>::default();
-    scope.lu_table_template = builder
-      .lu_table_template
-      .iter()
-      .map(|_lut| {
-        let lut =
-          <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
-        (lut.name.clone(), Arc::new(lut))
-      })
-      .collect();
-    scope.power_lut_template = builder
-      .power_lut_template
-      .iter()
-      .map(|_lut| {
-        let lut =
-          <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
-        (lut.name.clone(), Arc::new(lut))
-      })
-      .collect();
-    scope.output_current_template = builder
-      .output_current_template
-      .iter()
-      .map(|_lut| {
-        let lut =
-          <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
-        (lut.name.clone(), Arc::new(lut))
-      })
-      .collect();
-    scope.compact_lut_template = builder
-      .compact_lut_template
-      .iter()
-      .map(|_lut| {
-        let lut = <CompactLutTemplate<C> as ParsingBuilder<C>>::build(
-          _lut.clone(),
-          &mut empty_scope,
-        );
-        (lut.name.clone(), Arc::new(lut))
-      })
-      .collect();
+    #[cfg(feature = "table_template")]
+    {
+      use alloc::sync::Arc;
+      let mut empty_scope = BuilderScope::<C>::default();
+      scope.lu_table_template = builder
+        .lu_table_template
+        .iter()
+        .map(|_lut| {
+          let lut =
+            <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
+          (lut.name.clone(), Arc::new(lut))
+        })
+        .collect();
+      scope.power_lut_template = builder
+        .power_lut_template
+        .iter()
+        .map(|_lut| {
+          let lut =
+            <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
+          (lut.name.clone(), Arc::new(lut))
+        })
+        .collect();
+      scope.output_current_template = builder
+        .output_current_template
+        .iter()
+        .map(|_lut| {
+          let lut =
+            <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
+          (lut.name.clone(), Arc::new(lut))
+        })
+        .collect();
+      scope.compact_lut_template = builder
+        .compact_lut_template
+        .iter()
+        .map(|_lut| {
+          let lut = <CompactLutTemplate<C> as ParsingBuilder<C>>::build(
+            _lut.clone(),
+            &mut empty_scope,
+          );
+          (lut.name.clone(), Arc::new(lut))
+        })
+        .collect();
+    }
   }
 }

@@ -1,5 +1,5 @@
 use anyhow::Context as _;
-use liberty_db::{timing::TimingType, DefaultCtx, Group, Library};
+use liberty_db::{timing::TimingType, DefaultCtx, Library};
 
 const TEMPLATE: &str = include_str!("../dev/tech/tsmc22/tcbn22ullbwp30p140tt0p8v25c.lib");
 fn main() -> anyhow::Result<()> {
@@ -21,11 +21,15 @@ fn main() -> anyhow::Result<()> {
   // table lookup
   dbg!(setup_table.lookup(&0.1, &0.3));
   // table_template
-  let table_template = setup_table
-    .extra_ctx
-    .table_template
-    .as_ref()
-    .context("Failed to get table_template")?;
-  println!("table_template {}", table_template.display().to_string());
+  #[cfg(feature = "table_template")]
+  {
+    use liberty_db::Group;
+    let table_template = setup_table
+      .extra_ctx
+      .table_template
+      .as_ref()
+      .context("Failed to get table_template")?;
+    println!("table_template {}", table_template.display().to_string());
+  }
   Ok(())
 }

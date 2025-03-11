@@ -3,6 +3,8 @@
 #![allow(clippy::multiple_inherent_impl)]
 use core::ops::{Add, Mul, Not as _, Sub};
 
+#[cfg(feature = "table_template")]
+use crate::common::table::TableCtx as _;
 use crate::{
   ast::{
     self, fmt_comment_liberty, BuilderScope, GroupComments, GroupFn, ParseScope,
@@ -10,12 +12,11 @@ use crate::{
   },
   common::{
     f64_into_hash_ord_fn,
-    table::{DisplayTableLookUp, DisplayValues, TableCtx as _, TableLookUp2D},
+    table::{DisplayTableLookUp, DisplayValues, TableLookUp2D},
   },
   expression::logic,
   Ctx,
 };
-
 use itertools::izip;
 use strum_macros::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
@@ -389,6 +390,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
   );
   #[inline]
+  #[cfg_attr(not(feature = "table_template"), expect(unused_mut, unused_variables))]
   #[expect(clippy::float_arithmetic)]
   fn build(builder: Self::Builder, scope: &mut BuilderScope<C>) -> Self {
     #[inline]
@@ -422,15 +424,13 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
           log::error!("LVF LUTs' index mismatch");
           (Vec::new(), String::from("LVF LUTs' index mismatch"))
         };
-
+        let mut extra_ctx = C::Table::default();
+        #[cfg(feature = "table_template")]
+        if let Some(template) = scope.lu_table_template.get(&_value.name) {
+          extra_ctx.set_lu_table_template(template);
+        }
         Some(TimingTableLookUp {
-          extra_ctx: {
-            let mut extra_ctx = C::Table::default();
-            if let Some(template) = scope.lu_table_template.get(&_value.name) {
-              extra_ctx.set_lu_table_template(template);
-            }
-            extra_ctx
-          },
+          extra_ctx,
           name: _value.name,
           comments,
           index_1: _value.index_1,
@@ -451,25 +451,26 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
           lvf_values,
         })
       }
-      (Some(_value), None, None, None) => Some(TimingTableLookUp {
-        extra_ctx: {
-          let mut extra_ctx = C::Table::default();
-          if let Some(template) = scope.lu_table_template.get(&_value.name) {
-            extra_ctx.set_lu_table_template(template);
-          }
-          extra_ctx
-        },
-        name: _value.name,
-        comments: String::new(),
-        index_1: _value.index_1,
-        index_2: _value.index_2,
-        size1: _value.values.size1,
-        size2: _value.values.size2,
-        values: _value.values.inner,
-        lvf_index_1: Vec::new(),
-        lvf_index_2: Vec::new(),
-        lvf_values: Vec::new(),
-      }),
+      (Some(_value), None, None, None) => {
+        let mut extra_ctx = C::Table::default();
+        #[cfg(feature = "table_template")]
+        if let Some(template) = scope.lu_table_template.get(&_value.name) {
+          extra_ctx.set_lu_table_template(template);
+        }
+        Some(TimingTableLookUp {
+          extra_ctx,
+          name: _value.name,
+          comments: String::new(),
+          index_1: _value.index_1,
+          index_2: _value.index_2,
+          size1: _value.values.size1,
+          size2: _value.values.size2,
+          values: _value.values.inner,
+          lvf_index_1: Vec::new(),
+          lvf_index_2: Vec::new(),
+          lvf_values: Vec::new(),
+        })
+      }
       _ => None,
     }
   }
