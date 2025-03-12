@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.10.0"
+version = "0.10.1"
 license = "MIT"
 edition = "2024"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -16,7 +16,7 @@ categories = ["development-tools"]
 
 [package]
 name = "liberty-db"
-description = "A fully defined liberty data structure, efficient parser & formatter"
+description = "A fully defined liberty (std. cells in VLSI) data structure, efficient parser & formatter"
 include = ["/src", "/examples", "/docs/header.html", "README.md"]
 version.workspace = true
 edition.workspace = true
