@@ -78,12 +78,15 @@ pub struct InternalPower<C: Ctx> {
   // pub domain: Option<Domain<C>>,
   #[size = 336]
   #[liberty(group(type = Option))]
+  #[liberty(after_build = crate::table::use_power_template!)]
   pub rise_power: Option<TableLookUp<C>>,
   #[size = 336]
   #[liberty(group(type = Option))]
+  #[liberty(after_build = crate::table::use_power_template!)]
   pub fall_power: Option<TableLookUp<C>>,
   #[size = 336]
   #[liberty(group(type = Option))]
+  #[liberty(after_build = crate::table::use_power_template!)]
   pub power: Option<TableLookUp<C>>,
 }
 

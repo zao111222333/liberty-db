@@ -400,6 +400,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 240]
   #[liberty(group(type = Option))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub dc_current: Option<TableLookUp2D<C>>,
   /// The `input_voltage_range`  attribute specifies the allowed
   /// voltage range of the level-shifter input pin and the voltage
@@ -677,16 +678,36 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {
   #[inline]
   fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope<C>) {
     // update variable
-    let mut logic_variables: Vec<&str> = Vec::new();
+    let ff_latch_nodes = builder
+      .ff
+      .iter()
+      .flat_map(|ff| [ff.variable1.as_str(), ff.variable2.as_str()])
+      .chain(
+        builder
+          .ff_bank
+          .iter()
+          .flat_map(|ff| [ff.variable1.as_str(), ff.variable2.as_str()]),
+      )
+      .chain(
+        builder
+          .latch
+          .iter()
+          .flat_map(|latch| [latch.variable1.as_str(), latch.variable2.as_str()]),
+      )
+      .chain(
+        builder
+          .latch_bank
+          .iter()
+          .flat_map(|latch| [latch.variable1.as_str(), latch.variable2.as_str()]),
+      );
+    let mut logic_variables: Vec<&str> = ff_latch_nodes.collect();
     for pin in &builder.pin {
       match &pin.name {
         NameList::Name(name) => {
           logic_variables.push(name);
         }
         NameList::List(word_set) => {
-          for name in &word_set.inner {
-            logic_variables.push(name);
-          }
+          logic_variables.extend(word_set.inner.iter().map(String::as_str));
         }
       }
     }
@@ -696,27 +717,9 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {
           logic_variables.push(name);
         }
         NameList::List(word_set) => {
-          for name in &word_set.inner {
-            logic_variables.push(name);
-          }
+          logic_variables.extend(word_set.inner.iter().map(String::as_str));
         }
       }
-    }
-    for ff in &builder.ff {
-      logic_variables.push(&ff.variable1);
-      logic_variables.push(&ff.variable2);
-    }
-    for latch in &builder.latch {
-      logic_variables.push(&latch.variable1);
-      logic_variables.push(&latch.variable2);
-    }
-    for ff in &builder.ff_bank {
-      logic_variables.push(&ff.variable1);
-      logic_variables.push(&ff.variable2);
-    }
-    for latch in &builder.latch_bank {
-      logic_variables.push(&latch.variable1);
-      logic_variables.push(&latch.variable2);
     }
     logic_variables.sort_unstable();
     scope.cell_extra_ctx.logic_variables =

@@ -14,7 +14,7 @@ use core::fmt::Write;
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-// #[derive(liberty_macros::Nothing)]
+#[derive(liberty_macros::Nothing)]
 pub(crate) struct Timing<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
@@ -37,6 +37,7 @@ pub(crate) struct Timing<C: Ctx> {
     ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   pub cell_fall: Option<TimingTableLookUp<C>>,
 }
 impl<C: Ctx> GroupFn<C> for Timing<C> {}

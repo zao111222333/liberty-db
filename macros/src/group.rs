@@ -3,10 +3,13 @@ use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn::{Data, DeriveInput, Expr, Fields, GenericArgument, PathArguments, Type};
 
+#[expect(clippy::too_many_arguments)]
 fn group_field_fn(
   field_name: &Ident,
   field_type: &Type,
   default: Option<&Expr>,
+  before_build: Option<&MyPath>,
+  after_build: Option<&MyPath>,
   arrti_type: &AttriType,
   attributes_name: &Ident,
   comments_name: &Ident,
@@ -57,6 +60,33 @@ fn group_field_fn(
         )
       }
     };
+  let build_fn = |ty: &Type| match (before_build, after_build) {
+    (None, None) => quote! { crate::ast::ParsingBuilder::<C>::build(t, scope) },
+    (None, Some(after)) => {
+      let __t = if after.is_macro { quote!(_t) } else { quote!(&mut _t) };
+      quote! { {
+        let mut _t: #ty = crate::ast::ParsingBuilder::<C>::build(t, scope);
+        #after(#__t, scope);
+        _t
+      } }
+    }
+    (Some(before), None) => quote! { {
+      let mut t = t;
+      #before(&mut t, scope);
+      crate::ast::ParsingBuilder::<C>::build(t, scope)
+      _t
+    } },
+    (Some(before), Some(after)) => {
+      let __t = if after.is_macro { quote!(_t) } else { quote!(&mut _t) };
+      quote! { {
+        let mut t = t;
+        #before(&mut t, scope);
+        let mut _t: #ty = crate::ast::ParsingBuilder::<C>::build(t, scope);
+        #after(#__t, scope);
+        _t
+      } }
+    }
+  };
   let parser_arm: proc_macro2::TokenStream;
   let builder_field: proc_macro2::TokenStream;
   let build_arm: proc_macro2::TokenStream;
@@ -88,10 +118,11 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: Option<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
       };
+      let build = build_fn(ty);
       build_arm = quote! {
         #field_name: builder
           .#field_name
-          .map(|t| crate::ast::ParsingBuilder::<C>::build(t, scope)),
+          .map(|t| #build),
       };
     }
     AttriType::Simple(SimpleType::Default) => {
@@ -118,9 +149,12 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: <#field_type as crate::ast::ParsingBuilder<C>>::Builder,
       };
+      let build = build_fn(field_type);
       build_arm = quote! {
-        #field_name: builder
-          .#field_name,
+        #field_name: {
+          let t = builder.#field_name;
+          #build
+        },
       };
     }
     AttriType::Complex(ComplexType::Default) => {
@@ -145,9 +179,12 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: <#field_type as crate::ast::ParsingBuilder<C>>::Builder,
       };
+      let build = build_fn(field_type);
       build_arm = quote! {
-        #field_name: builder
-          .#field_name,
+        #field_name: {
+          let t = builder.#field_name;
+          #build
+        },
       };
     }
     AttriType::Complex(ComplexType::Option) => {
@@ -175,10 +212,11 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: Option<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
       };
+      let build = build_fn(ty);
       build_arm = quote! {
         #field_name: builder
           .#field_name
-          .map(|t| crate::ast::ParsingBuilder::<C>::build(t, scope)),
+          .map(|t| #build),
       };
     }
     AttriType::Complex(ComplexType::Vec) => {
@@ -211,11 +249,12 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: Vec<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
       };
+      let build = build_fn(ty);
       build_arm = quote! {
         #field_name: builder
           .#field_name
           .into_iter()
-          .map(|t| crate::ast::ParsingBuilder::<C>::build(t, scope))
+          .map(|t| #build)
           .collect(),
       };
     }
@@ -249,12 +288,13 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: Vec<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
       };
+      let build = build_fn(ty);
       build_arm = quote! {
         #field_name: {
           let mut map: crate::ast::GroupSet<#ty> = builder
             .#field_name
             .into_iter()
-            .map(|t| crate::ast::ParsingBuilder::<C>::build(t, scope))
+            .map(|t| #build)
             .collect();
           map.sort();
           map
@@ -291,11 +331,12 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: Vec<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
       };
+      let build = build_fn(ty);
       build_arm = quote! {
         #field_name: builder
           .#field_name
           .into_iter()
-          .map(|t| crate::ast::ParsingBuilder::<C>::build(t, scope))
+          .map(|t| #build)
           .collect(),
       };
     }
@@ -329,12 +370,13 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: Vec<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
       };
+      let build = build_fn(ty);
       build_arm = quote! {
         #field_name: {
           let mut map: crate::ast::GroupSet<#ty> = builder
             .#field_name
             .into_iter()
-            .map(|t| crate::ast::ParsingBuilder::<C>::build(t, scope))
+            .map(|t| #build)
             .collect();
           map.sort();
           map
@@ -375,10 +417,11 @@ fn group_field_fn(
       builder_field = quote! {
         pub(crate) #field_name: Option<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
       };
+      let build = build_fn(ty);
       build_arm = quote! {
         #field_name: builder
           .#field_name
-          .map(|t| crate::ast::ParsingBuilder::<C>::build(t, scope)),
+          .map(|t| #build),
       };
     }
     AttriType::SuperGroup(sub_groups) => {
@@ -422,10 +465,12 @@ fn group_field_fn(
       }
       parser_arm = quote! { #(#_parser_arm)* };
       builder_field = quote! { #(#_builder_field)* };
+      let build = build_fn(field_type);
       build_arm = quote! {
-        #field_name: crate::ast::ParsingBuilder::<C>::build((
-          #(#_build_arm)*
-        ), scope),
+        #field_name: {
+          let t = ( #(#_build_arm)* );
+          #build
+        },
       };
       builder_init = quote! { #(#_builder_init)* };
     }
@@ -447,6 +492,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     let (
       attri_type_map,
       default_map,
+      before_build_map,
+      after_build_map,
       name_vec,
       attributes_name,
       comments_name,
@@ -543,6 +590,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           field_name,
           field_type,
           default_map.get(field_name),
+          before_build_map.get(field_name),
+          after_build_map.get(field_name),
           arrti_type,
           attributes_name,
           comments_name,
