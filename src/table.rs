@@ -20,7 +20,7 @@ pub trait TableCtx<C: Ctx> {
   #[cfg(feature = "lut_template")]
   fn lut_template(&self) -> &Option<Arc<TableTemple<C>>>;
   #[cfg(feature = "lut_template")]
-  fn set_lut_template(&mut self, template: &Arc<TableTemple<C>>);
+  fn set_lut_template(&mut self, template: Option<&Arc<TableTemple<C>>>);
 }
 
 pub trait CompactTableCtx<C: Ctx> {
@@ -30,39 +30,49 @@ pub trait CompactTableCtx<C: Ctx> {
   fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>);
 }
 
-/// Flag of the lut's template
-#[cfg(feature = "lut_template")]
-trait LUTFlag {
-  /// use `lu_table_template`
-  const TIMING_VOLT: bool;
-  /// use `output_current_template`
-  const POWER: bool;
-  /// use `output_current_template`
-  const CURRENT: bool;
-  fn after_build<C: Ctx>(
-    name: &str,
-    extra_ctx: &mut C::Table,
-    scope: &mut ast::BuilderScope<C>,
-  ) {
-    if Self::TIMING_VOLT {
-      if let Some(template) = scope.lu_table_template.get(name) {
-        extra_ctx.set_lut_template(template);
-        return;
-      }
-    }
-    if Self::POWER {
-      if let Some(template) = scope.power_lut_template.get(name) {
-        extra_ctx.set_lut_template(template);
-        return;
-      }
-    }
-    if Self::CURRENT {
-      if let Some(template) = scope.output_current_template.get(name) {
-        extra_ctx.set_lut_template(template);
-      }
-    }
-  }
+macro_rules! use_common_template {
+  ($table:tt, $scope:tt) => {
+    #[cfg(feature = "lut_template")]
+    crate::table::TableCtx::set_lut_template(
+      &mut $table.extra_ctx,
+      $scope.lu_table_template.get(&$table.name),
+    )
+  };
 }
+pub(crate) use use_common_template;
+
+macro_rules! use_power_template {
+  ($table:tt, $scope:tt) => {
+    #[cfg(feature = "lut_template")]
+    crate::table::TableCtx::set_lut_template(
+      &mut $table.extra_ctx,
+      $scope.power_lut_template.get(&$table.name),
+    )
+  };
+}
+pub(crate) use use_power_template;
+
+macro_rules! use_current_template {
+  ($table:tt, $scope:tt) => {
+    #[cfg(feature = "lut_template")]
+    crate::table::TableCtx::set_lut_template(
+      &mut $table.extra_ctx,
+      $scope.output_current_template.get(&$table.name),
+    )
+  };
+}
+pub(crate) use use_current_template;
+
+macro_rules! use_compact_template {
+  ($table:tt, $scope:tt) => {
+    #[cfg(feature = "lut_template")]
+    crate::table::CompactTableCtx::set_compact_lut_template(
+      &mut $table.extra_ctx,
+      $scope.compact_lut_template.get(&$table.name),
+    )
+  };
+}
+pub(crate) use use_compact_template;
 
 #[derive(Clone, Default, Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -81,8 +91,8 @@ impl<C: Ctx> TableCtx<C> for DefaultTableCtx<C> {
   }
   #[inline]
   #[cfg(feature = "lut_template")]
-  fn set_lut_template(&mut self, template: &Arc<TableTemple<C>>) {
-    self.lut_template = Some(Arc::clone(template));
+  fn set_lut_template(&mut self, template: Option<&Arc<TableTemple<C>>>) {
+    self.lut_template = template.cloned();
   }
 }
 #[derive(Clone, Default, Debug)]
@@ -728,6 +738,7 @@ pub struct Vector3DGrpup<C: Ctx> {
   pub attributes: Attributes,
   #[size = 88]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = use_common_template!)]
   #[serde(serialize_with = "GroupSet::<Vector3D<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Vector3D<C>>::deserialize_with")]
   pub vector: GroupSet<Vector3D<C>>,
@@ -756,6 +767,7 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   pub attributes: Attributes,
   #[size = 88]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = use_current_template!)]
   #[serde(serialize_with = "GroupSet::<ReferenceTimeVector3D<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<ReferenceTimeVector3D<C>>::deserialize_with")]
   pub vector: GroupSet<ReferenceTimeVector3D<C>>,
@@ -784,63 +796,18 @@ pub struct Vector4DGrpup<C: Ctx> {
   pub attributes: Attributes,
   #[size = 88]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = use_common_template!)]
   #[serde(serialize_with = "GroupSet::<Vector4D<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<Vector4D<C>>::deserialize_with")]
   pub vector: GroupSet<Vector4D<C>>,
 }
 impl<C: Ctx> GroupFn<C> for Vector4DGrpup<C> {}
 impl<C: Ctx> GroupFn<C> for Vector3DGrpup<C> {}
-#[cfg(feature = "lut_template")]
-impl<C: Ctx> LUTFlag for Vector3D<C> {
-  /// `output_voltage_fall`
-  /// `output_voltage_rise`
-  const TIMING_VOLT: bool = true;
-  const POWER: bool = false;
-  const CURRENT: bool = false;
-}
-impl<C: Ctx> GroupFn<C> for Vector3D<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
-  }
-}
-#[cfg(feature = "lut_template")]
-impl<C: Ctx> LUTFlag for Vector4D<C> {
-  /// `propagated_noise_low`
-  /// `propagated_noise_high`
-  const TIMING_VOLT: bool = true;
-  const POWER: bool = false;
-  const CURRENT: bool = false;
-}
-impl<C: Ctx> GroupFn<C> for Vector4D<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
-  }
-}
-#[cfg(feature = "lut_template")]
-impl<C: Ctx> LUTFlag for ReferenceTimeVector3D<C> {
-  const TIMING_VOLT: bool = false;
-  const POWER: bool = false;
-  /// `output_current_rise`
-  /// `output_current_fall`
-  const CURRENT: bool = true;
-}
-impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3D<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
-  }
-}
+impl<C: Ctx> GroupFn<C> for Vector3D<C> {}
+impl<C: Ctx> GroupFn<C> for Vector4D<C> {}
+impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3D<C> {}
 impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3DGrpup<C> {}
-impl<C: Ctx> GroupFn<C> for CompactCcsPower<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    self
-      .extra_ctx
-      .set_compact_lut_template(scope.compact_lut_template.get(&self.name));
-  }
-}
+impl<C: Ctx> GroupFn<C> for CompactCcsPower<C> {}
 // #[mut_set::derive::item(sort)]
 // #[derive(Debug, Clone)]
 // #[derive(liberty_macros::Group)]
@@ -1005,14 +972,7 @@ pub struct CompactCcsTable<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-impl<C: Ctx> GroupFn<C> for CompactCcsTable<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    self
-      .extra_ctx
-      .set_compact_lut_template(scope.compact_lut_template.get(&self.name));
-  }
-}
+impl<C: Ctx> GroupFn<C> for CompactCcsTable<C> {}
 
 #[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
@@ -1051,56 +1011,10 @@ pub struct TableLookUp<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-#[cfg(feature = "lut_template")]
-impl<C: Ctx> LUTFlag for TableLookUp<C> {
-  const TIMING_VOLT: bool = true;
-  const POWER: bool = true;
-  const CURRENT: bool = true;
-}
-impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
-  }
-}
-#[cfg(feature = "lut_template")]
-impl<C: Ctx> LUTFlag for TableLookUpMultiSegment<C> {
-  /// `receiver_capacitance_fall`
-  /// `receiver_capacitance_rise`
-  const TIMING_VOLT: bool = true;
-  const POWER: bool = false;
-  const CURRENT: bool = false;
-}
-impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
-  }
-}
-#[cfg(feature = "lut_template")]
-impl<C: Ctx> LUTFlag for TableLookUp2D<C> {
-  const TIMING_VOLT: bool = true;
-  const POWER: bool = false;
-  const CURRENT: bool = false;
-}
-impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
-  }
-}
-#[cfg(feature = "lut_template")]
-impl<C: Ctx> LUTFlag for OcvSigmaTable<C> {
-  const TIMING_VOLT: bool = true;
-  const POWER: bool = false;
-  const CURRENT: bool = false;
-}
-impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
-  #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-    <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
-  }
-}
+impl<C: Ctx> GroupFn<C> for TableLookUp<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {}
+impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {}
 impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {}
 
 #[derive(Debug, Default, Clone)]

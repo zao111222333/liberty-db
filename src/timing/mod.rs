@@ -831,6 +831,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_cell_rise: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_rise: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub cell_rise: Option<TimingTableLookUp<C>>,
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
@@ -848,6 +849,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub cell_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -856,6 +858,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_rise_transition: Option<TableLookUp2D<C>>,
     ocv_skewness_rise_transition: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub rise_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -864,6 +867,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_fall_transition: Option<TableLookUp2D<C>>,
     ocv_skewness_fall_transition: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub fall_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -872,6 +876,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_rise_constraint: Option<TableLookUp2D<C>>,
     ocv_skewness_rise_constraint: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub rise_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -880,6 +885,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_fall_constraint: Option<TableLookUp2D<C>>,
     ocv_skewness_fall_constraint: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub fall_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -888,6 +894,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_retaining_rise: Option<TableLookUp2D<C>>,
     ocv_skewness_retaining_rise: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub retaining_rise: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -896,6 +903,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_retaining_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_retaining_fall: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub retaining_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -904,6 +912,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_retain_rise_slew: Option<TableLookUp2D<C>>,
     ocv_skewness_retain_rise_slew: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub retain_rise_slew: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -912,22 +921,28 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_retain_fall_slew: Option<TableLookUp2D<C>>,
     ocv_skewness_retain_fall_slew: Option<TableLookUp2D<C>>,
   ))]
+  #[liberty(after_build = TimingTableLookUp::after_build)]
   #[size = 144]
   pub retain_fall_slew: Option<TimingTableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub fall_propagation: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub noise_immunity_above_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub noise_immunity_below_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub noise_immunity_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub noise_immunity_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
@@ -937,73 +952,95 @@ pub struct Timing<C: Ctx> {
   pub output_current_rise: Option<ReferenceTimeVector3DGrpup<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_height_above_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_height_below_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_height_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_height_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_peak_time_ratio_above_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_peak_time_ratio_below_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_peak_time_ratio_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_peak_time_ratio_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_width_above_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_width_below_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_width_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_width_low: Option<TableLookUp<C>>,
   #[size = 88]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
   #[size = 88]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance1_fall: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance1_rise: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance2_fall: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance2_rise: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub rise_propagation: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub steady_state_current_high: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub steady_state_current_low: Option<TableLookUp<C>>,
   #[size = 216]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub steady_state_current_tristate: Option<TableLookUp<C>>,
   /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
   /// <a name ="reference_link" href="
@@ -1011,6 +1048,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 128]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_compact_template!)]
   pub compact_ccs_rise: Option<CompactCcsTable<C>>,
   /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
   /// <a name ="reference_link" href="
@@ -1018,45 +1056,68 @@ pub struct Timing<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 168]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_compact_template!)]
   pub compact_ccs_fall: Option<CompactCcsTable<C>>,
   #[size = 169]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_cell_fall: GroupSet<OcvSigmaTable<C>>,
   #[size = 169]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_cell_rise: GroupSet<OcvSigmaTable<C>>,
   #[size = 168]
-  #[liberty(group)]
-  pub ocv_sigma_fall_constraint: Option<TableLookUp2D<C>>,
+  #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_fall_constraint: GroupSet<OcvSigmaTable<C>>,
   #[size = 169]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_fall_transition: GroupSet<OcvSigmaTable<C>>,
   #[size = 168]
-  #[liberty(group)]
-  pub ocv_sigma_rise_constraint: Option<TableLookUp2D<C>>,
+  #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_rise_constraint: GroupSet<OcvSigmaTable<C>>,
   #[size = 169]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_rise_transition: GroupSet<OcvSigmaTable<C>>,
   #[size = 168]
-  #[liberty(group)]
-  pub ocv_sigma_retaining_fall: Option<TableLookUp2D<C>>,
+  #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_retaining_fall: GroupSet<OcvSigmaTable<C>>,
   #[size = 168]
-  #[liberty(group)]
-  pub ocv_sigma_retaining_rise: Option<TableLookUp2D<C>>,
+  #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_retaining_rise: GroupSet<OcvSigmaTable<C>>,
   #[size = 168]
-  #[liberty(group)]
-  pub ocv_sigma_retain_fall_slew: Option<TableLookUp2D<C>>,
+  #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_retain_fall_slew: GroupSet<OcvSigmaTable<C>>,
   #[size = 168]
-  #[liberty(group)]
-  pub ocv_sigma_retain_rise_slew: Option<TableLookUp2D<C>>,
+  #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
+  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
+  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
+  pub ocv_sigma_retain_rise_slew: GroupSet<OcvSigmaTable<C>>,
 }
 
 impl<C: Ctx> GroupFn<C> for Timing<C> {

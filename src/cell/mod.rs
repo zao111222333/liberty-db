@@ -400,6 +400,7 @@ pub struct Cell<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 240]
   #[liberty(group(type = Option))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub dc_current: Option<TableLookUp2D<C>>,
   /// The `input_voltage_range`  attribute specifies the allowed
   /// voltage range of the level-shifter input pin and the voltage

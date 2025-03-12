@@ -797,6 +797,7 @@ pub struct PgCurrent<C: Ctx> {
   /// ">Reference</a>
   #[size = 88]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_compact_template!)]
   #[serde(serialize_with = "GroupSet::<CompactCcsPower<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<CompactCcsPower<C>>::deserialize_with")]
   pub compact_ccs_power: GroupSet<CompactCcsPower<C>>,

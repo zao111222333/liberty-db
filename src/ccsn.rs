@@ -166,6 +166,7 @@ pub struct CCSNStage<C: Ctx> {
   /// ">Reference-Definition</a>
   #[size = 240]
   #[liberty(group(type = Option))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub dc_current: Option<TableLookUp2D<C>>,
   /// Use the `output_voltage_fall`  group to specify vector groups that describe
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
@@ -333,11 +334,13 @@ pub struct ReceiverCapacitance<C: Ctx> {
   pub when: Option<LogicBooleanExpression>,
   #[size = 88]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
   #[size = 88]
   #[liberty(group(type = Set))]
+  #[liberty(after_build = crate::table::use_common_template!)]
   #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
   #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment<C>>,
@@ -362,15 +365,19 @@ pub struct ReceiverCapacitance<C: Ctx> {
   pub active_input_ccb: Vec<String>,
   #[size = 336]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance1_fall: Option<TableLookUp<C>>,
   #[size = 336]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance1_rise: Option<TableLookUp<C>>,
   #[size = 336]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance2_fall: Option<TableLookUp<C>>,
   #[size = 336]
   #[liberty(group)]
+  #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance2_rise: Option<TableLookUp<C>>,
 }
 impl<C: Ctx> GroupFn<C> for ReceiverCapacitance<C> {}

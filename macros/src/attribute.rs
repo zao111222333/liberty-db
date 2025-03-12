@@ -2,7 +2,12 @@ use core::fmt::Debug;
 use std::collections::HashMap;
 
 use proc_macro2::Ident;
-use syn::{Expr, Token, Type, parse::ParseStream, spanned::Spanned};
+use quote::{ToTokens, quote};
+use syn::{
+  Expr, Path, Token, Type,
+  parse::{Parse, ParseStream},
+  spanned::Spanned,
+};
 
 #[derive(Debug, Clone, Copy)]
 enum InternalType {
@@ -68,6 +73,10 @@ pub(crate) fn parse_fields_type(
   HashMap<&Ident, (AttriType, Option<usize>)>,
   // default map
   HashMap<&Ident, Expr>,
+  // before_build_map
+  HashMap<&Ident, MyPath>,
+  // after_build_map
+  HashMap<&Ident, MyPath>,
   // Name
   Vec<&syn::Field>,
   // attributes name
@@ -85,12 +94,23 @@ pub(crate) fn parse_fields_type(
   let mut _extra_ctx = None;
   let mut attri_type_map = HashMap::new();
   let mut default_map = HashMap::new();
+  let mut before_build_map = HashMap::new();
+  let mut after_build_map = HashMap::new();
   for field in fields {
     if let (Some(field_name), field_attrs) = (&field.ident, &field.attrs) {
       let pos = parse_field_pos(field_attrs)?;
       let attr = parse_field_attrs(field_attrs)?;
       if let Some(default) = parse_field_default(field_attrs)? {
         _ = default_map.insert(field_name, default);
+      }
+      match parse_field_build(field_attrs)? {
+        (None, None) => {}
+        (None, Some(after)) => _ = after_build_map.insert(field_name, after),
+        (Some(before), None) => _ = before_build_map.insert(field_name, before),
+        (Some(before), Some(after)) => {
+          _ = before_build_map.insert(field_name, before);
+          _ = after_build_map.insert(field_name, after);
+        }
       }
       let attr = match attr {
         Some(t) => t,
@@ -167,6 +187,8 @@ pub(crate) fn parse_fields_type(
     ) => Ok((
       attri_type_map,
       default_map,
+      before_build_map,
+      after_build_map,
       _name_vec,
       attributes_name,
       comments_name,
@@ -322,6 +344,37 @@ fn parse_field_default(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Exp
     }
   }
   Ok(None)
+}
+fn parse_field_build(
+  field_attrs: &[syn::Attribute],
+) -> syn::Result<(Option<MyPath>, Option<MyPath>)> {
+  let mut before_build_expr = None;
+  let mut after_build_expr = None;
+  for attr in field_attrs {
+    if attr.path().is_ident("liberty") {
+      attr.parse_args_with(|input: ParseStream| {
+        if input.is_empty() {
+          return Ok(());
+        }
+        let key: Ident = input.parse()?;
+        if key == "before_build" {
+          let _eq: Token![=] = input.parse()?;
+          let expr: MyPath = input.parse()?;
+          before_build_expr = Some(expr);
+        }
+        if key == "after_build" {
+          let _eq: Token![=] = input.parse()?;
+          let expr: MyPath = input.parse()?;
+          after_build_expr = Some(expr);
+        }
+        while !input.is_empty() {
+          _ = input.parse::<proc_macro2::TokenStream>()?;
+        }
+        Ok(())
+      })?;
+    }
+  }
+  Ok((before_build_expr, after_build_expr))
 }
 
 fn parse_simple_type(
@@ -525,6 +578,52 @@ fn size_type_test() {
   println!("{}", s.to_token_stream());
   // let t: proc_macro2::TokenStream = syn::parse_str(&s).unwrap();
   // println!("{t:?}");
+}
+#[test]
+fn build_test() {
+  use quote::ToTokens as _;
+  // let attr: Attribute = parse_quote!(#[id]);
+  // let attr: Attribute = parse_quote!(#[id(borrow="&[String]")] );
+  let aaa: MyPath = syn::parse_quote!(vec!);
+  println!("{:?}", aaa);
+  let aaa: MyPath = syn::parse_quote!(vec);
+  println!("{:?}", aaa);
+  // let attr: Vec<syn::Attribute> = syn::parse_quote!(
+  //   #[liberty(group(type = Set))]
+  //   #[liberty(before_build = vec!)]
+  //   #[liberty(after_build = vec![1.0])]
+  // );
+  // let (before, after) = parse_field_build(&attr).unwrap();
+  // println!("{}", before.unwrap().0.to_token_stream());
+  // println!("{}", after.unwrap().0.to_token_stream());
+  // let t: proc_macro2::TokenStream = syn::parse_str(&s).unwrap();
+  // println!("{t:?}");
+}
+
+#[derive(Debug)]
+pub(crate) struct MyPath {
+  path: Path,
+  pub is_macro: bool,
+}
+impl ToTokens for MyPath {
+  fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+    tokens.extend(self.path.to_token_stream());
+    if self.is_macro {
+      tokens.extend(quote! {!});
+    }
+  }
+}
+
+impl Parse for MyPath {
+  fn parse(input: ParseStream) -> syn::Result<Self> {
+    let path = input.parse::<Path>()?;
+    let is_macro = input.peek(Token![!]);
+    if is_macro {
+      // 消费掉 "!" 令牌
+      input.parse::<Token![!]>()?;
+    }
+    Ok(MyPath { path, is_macro })
+  }
 }
 
 #[test]
