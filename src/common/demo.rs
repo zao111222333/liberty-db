@@ -37,7 +37,7 @@ pub(crate) struct Timing<C: Ctx> {
     ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub cell_fall: Option<TimingTableLookUp<C>>,
 }
 impl<C: Ctx> GroupFn<C> for Timing<C> {}

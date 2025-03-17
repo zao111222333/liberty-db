@@ -831,7 +831,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_cell_rise: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_rise: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub cell_rise: Option<TimingTableLookUp<C>>,
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
@@ -849,7 +849,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub cell_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -858,7 +858,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_rise_transition: Option<TableLookUp2D<C>>,
     ocv_skewness_rise_transition: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub rise_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -867,7 +867,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_fall_transition: Option<TableLookUp2D<C>>,
     ocv_skewness_fall_transition: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub fall_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -876,7 +876,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_rise_constraint: Option<TableLookUp2D<C>>,
     ocv_skewness_rise_constraint: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub rise_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -885,7 +885,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_fall_constraint: Option<TableLookUp2D<C>>,
     ocv_skewness_fall_constraint: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub fall_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -894,7 +894,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_retaining_rise: Option<TableLookUp2D<C>>,
     ocv_skewness_retaining_rise: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub retaining_rise: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -903,7 +903,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_retaining_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_retaining_fall: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub retaining_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -912,7 +912,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_retain_rise_slew: Option<TableLookUp2D<C>>,
     ocv_skewness_retain_rise_slew: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub retain_rise_slew: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
@@ -921,7 +921,7 @@ pub struct Timing<C: Ctx> {
     ocv_std_dev_retain_fall_slew: Option<TableLookUp2D<C>>,
     ocv_skewness_retain_fall_slew: Option<TableLookUp2D<C>>,
   ))]
-  #[liberty(after_build = TimingTableLookUp::after_build)]
+  #[liberty(after_build = TimingTableLookUp::use_common_template)]
   #[size = 144]
   pub retain_fall_slew: Option<TimingTableLookUp<C>>,
   #[size = 216]
