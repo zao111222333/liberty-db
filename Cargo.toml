@@ -79,10 +79,10 @@ ahash = { version = "0.8", features = ["no-rng"]}
 foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
 hashmatch = "0.1.1"
-pyo3 = "0.23.4"
+pyo3 = "0.24.0"
 pyo3-stub-gen = "0.7"
 # pyo3-stub-gen = { path = "../pyo3-stub-gen/pyo3-stub-gen" }
-bincode = "1.3.3"
+bincode = "2.0.1"
 
 [dependencies]
 liberty-macros = { path = "macros" }
