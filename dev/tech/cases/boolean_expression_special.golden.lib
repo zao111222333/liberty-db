@@ -15,11 +15,15 @@ liberty_db::library::Library (some) {
 	cell (A) {
 		ff (IQ, IQN) {
 			clocked_on : "\"1A\"+\"1B\"";
-			next_state : "J*K*!IQ+J*!K+!J*!K*IQ";
+			next_state : "J*K*!IQ+J*!K+!J*!K*IQ+A_N+\"1_X\"";
 		}
 		pin (1A) {
 		}
 		pin (1B) {
+		}
+		pin (1_X) {
+		}
+		pin (A_N) {
 		}
 		pin (J) {
 		}
