@@ -166,7 +166,7 @@ enum Token {
 #[inline]
 fn space(i: &str) -> IResult<&str, Token> {
   map(take_while1(move |c: char| matches!(c, '\t' | '\r' | ' ')), |_| Token::Space)
-    .parse(i)
+    .parse_complete(i)
 }
 
 fn open_b(i: &str) -> IResult<&str, Token> {
@@ -177,7 +177,7 @@ fn open_b(i: &str) -> IResult<&str, Token> {
     }),
     char(')'),
   )
-  .parse(i)
+  .parse_complete(i)
 }
 /// filter all non-and space
 /// A' !B
@@ -218,7 +218,7 @@ fn single_op(i: &str) -> IResult<&str, Token> {
     map(char('0'), |_| Token::SingleOp(SingleOp::Zero)),
     map(char('1'), |_| Token::SingleOp(SingleOp::One)),
   ))
-  .parse(i)
+  .parse_complete(i)
 }
 fn binary_op(i: &str) -> IResult<&str, Token> {
   alt((
@@ -226,7 +226,7 @@ fn binary_op(i: &str) -> IResult<&str, Token> {
     map(alt((char('&'), char('*'))), |_| Token::BinaryOp(BinaryOp::And)),
     map(char('^'), |_| Token::BinaryOp(BinaryOp::Xor)),
   ))
-  .parse(i)
+  .parse_complete(i)
 }
 
 /// Matches alphanumeric characters and underscores
@@ -253,11 +253,12 @@ fn node(i: &str) -> IResult<&str, Token> {
       Token::Node(Expr::Variable(s1.to_owned()))
     }),
   ))
-  .parse(i)
+  .parse_complete(i)
 }
 
 fn token_vec(i: &str) -> IResult<&str, Vec<Token>> {
-  map(many1(alt((space, open_b, single_op, binary_op, node))), space_and).parse(i)
+  map(many1(alt((space, open_b, single_op, binary_op, node))), space_and)
+    .parse_complete(i)
 }
 
 /// `BoolExprErr`
@@ -394,7 +395,7 @@ impl super::BooleanExpression {
       Ok(expr) => Ok(Self { expr: *expr }),
       Err(e) => Err(e),
     })
-    .parse(i)
+    .parse_complete(i)
   }
   #[inline]
   pub(super) fn unquote(i: &str) -> IResult<&str, &str> {
@@ -403,6 +404,6 @@ impl super::BooleanExpression {
       escaped(opt(alt((tag(r#"\""#), is_not(r#"\""#)))), '\\', one_of(r#"\"rnt"#)),
       char('"'),
     )
-    .parse(i)
+    .parse_complete(i)
   }
 }
