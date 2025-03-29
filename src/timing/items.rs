@@ -186,8 +186,12 @@ pub struct TimingTableLookUp<C: Ctx> {
 impl<C: Ctx> TimingTableLookUp<C> {
   #[inline]
   #[expect(clippy::needless_pass_by_ref_mut)]
-  pub(crate) fn after_build(table: &mut Option<Self>, scope: &mut BuilderScope<C>) {
+  pub(crate) fn use_common_template(
+    table: &mut Option<Self>,
+    scope: &mut BuilderScope<C>,
+  ) {
     if let Some(t) = table {
+      #[cfg(feature = "lut_template")]
       crate::table::TableCtx::set_lut_template(
         &mut t.extra_ctx,
         scope.lu_table_template.get(&t.name),

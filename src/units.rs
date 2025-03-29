@@ -260,6 +260,14 @@ impl PartialEq for CapacitiveLoadUnit {
   }
 }
 
+impl fmt::Display for CapacitiveLoadUnit {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    f.write_fmt(format_args!("{}", self.val))?;
+    if self.ff_pf { f.write_str(" ff") } else { f.write_str(" pf") }
+  }
+}
+
 impl Eq for CapacitiveLoadUnit {}
 
 impl PartialOrd for CapacitiveLoadUnit {
