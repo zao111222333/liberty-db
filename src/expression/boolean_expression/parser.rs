@@ -12,7 +12,7 @@ use nom::{IResult, Parser as _, branch::alt, bytes::{
 }, character::{
   complete::{alpha1, char},
   one_of,
-}, combinator::{map, map_res, opt}, multi::many1, sequence::{delimited, pair}, Input};
+}, combinator::{map, map_res, opt}, multi::many1, sequence::{delimited, pair}, Input as _};
 use nom::error::ErrorKind;
 
 /// only not(variable) and variable
@@ -237,7 +237,7 @@ fn node(i: &str) -> IResult<&str, Token> {
       Token::Node(Expr::Variable(format!("{s1}{s2}")))
     }),
     map((tag(r#"\""#), pin_name_char1, tag(r#"\""#)), |(_, s1, _)| {
-      Token::Node(Expr::Variable(s1.to_string()))
+      Token::Node(Expr::Variable(s1.to_owned()))
     }),
   ))
       .parse(i)
