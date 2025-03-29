@@ -31,7 +31,7 @@ fn comment_single(i: &str) -> IResult<&str, usize> {
     ),
     |_| 1,
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[inline]
@@ -39,7 +39,7 @@ fn comment_multi(i: &str) -> IResult<&str, usize> {
   map((tag("/*"), take_until("*/"), take(2_usize), space), |(_, s, _, _)| {
     s.chars().filter(|&x| x == '\n').count()
   })
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[cfg(test)]
@@ -72,14 +72,14 @@ mod test_comment {
 
 #[inline]
 fn space(i: &str) -> IResult<&str, ()> {
-  map(take_while(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse(i)
+  map(take_while(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse_complete(i)
 }
 #[inline]
 fn space_newline(i: &str) -> IResult<&str, usize> {
   map(take_while(|c| matches!(c, '\t' | '\n' | '\r' | ' ')), |s: &str| {
     s.chars().filter(|&x| x == '\n').count()
   })
-  .parse(i)
+  .parse_complete(i)
 }
 
 /// must have new line!
@@ -89,7 +89,7 @@ pub(crate) fn comment_space_newline_many1(i: &str) -> IResult<&str, usize> {
     pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
   )
-  .parse(i)
+  .parse_complete(i)
   {
     Ok((s, n)) => {
       if n == 0 {
@@ -108,7 +108,7 @@ pub(crate) fn comment_space_newline(i: &str) -> IResult<&str, usize> {
     pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[inline]
@@ -133,7 +133,7 @@ fn comment_space_newline_slash(i: &str) -> IResult<&str, usize> {
     ),
     |(_, n)| n.unwrap_or(0),
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[cfg(test)]
@@ -228,7 +228,7 @@ pub(crate) fn undefine<'a>(
 }
 #[inline]
 pub(crate) fn unquote(i: &str) -> IResult<&str, &str> {
-  delimited(char('"'), take_till(|c| c == '"'), take(1_usize)).parse(i)
+  delimited(char('"'), take_till(|c| c == '"'), take(1_usize)).parse_complete(i)
 }
 
 #[cfg(test)]
@@ -290,7 +290,7 @@ pub(crate) fn simple_multi<'a>(
       s
     },
   )
-  .parse(i)
+  .parse_complete(i)
 }
 #[inline]
 pub(crate) fn simple_custom<'a, T>(
@@ -318,7 +318,7 @@ pub(crate) fn simple_custom<'a, T>(
       s
     },
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[inline]
@@ -339,7 +339,7 @@ pub(crate) fn simple<'a>(i: &'a str, line_num: &mut usize) -> IResult<&'a str, &
       s
     },
   )
-  .parse(i)
+  .parse_complete(i)
 }
 #[inline]
 pub(crate) fn float_one(i: &str) -> IResult<&str, f64> {
@@ -359,7 +359,7 @@ fn float_vec(i: &str) -> IResult<&str, Vec<f64>> {
     ),
     char('"'),
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[inline]
@@ -407,7 +407,7 @@ pub(crate) fn complex_id_vector<'a>(
       (id, vec)
     },
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[inline]
@@ -435,7 +435,7 @@ pub(crate) fn complex_multi_line<'a, T>(
       vec
     },
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[inline]
@@ -461,7 +461,7 @@ pub(crate) fn complex_float_vec<'a>(
       vec
     },
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[inline]
@@ -510,7 +510,7 @@ pub(crate) fn complex_ccs_power_values<'a>(
       ),
       char('"'),
     )
-    .parse(i)
+    .parse_complete(i)
   }
 
   complex_multi_line(i, line_num, complex_ccs_power_value)
@@ -543,7 +543,7 @@ pub(crate) fn complex<'a>(
       vec
     },
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[cfg(test)]
@@ -632,12 +632,12 @@ pub(crate) fn title<'a>(
       v
     },
   )
-  .parse(i)
+  .parse_complete(i)
 }
 
 #[inline]
 pub(crate) fn end_group(i: &str) -> IResult<&str, ()> {
-  map(char('}'), |_| ()).parse(i)
+  map(char('}'), |_| ()).parse_complete(i)
 }
 
 #[cfg(test)]
