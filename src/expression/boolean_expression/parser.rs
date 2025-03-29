@@ -6,14 +6,22 @@
 )]
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt;
-use nom::{IResult, Parser as _, branch::alt, bytes::{
-  complete::{tag, take_while1},
-  escaped, is_not,
-}, character::{
-  complete::{alpha1, char},
-  one_of,
-}, combinator::{map, map_res, opt}, multi::many1, sequence::{delimited, pair}, Input as _};
-use nom::error::ErrorKind;
+use nom::{
+  IResult, Input as _, Parser as _,
+  branch::alt,
+  bytes::{
+    complete::{tag, take_while1},
+    escaped, is_not,
+  },
+  character::{
+    complete::{alpha1, char},
+    one_of,
+  },
+  combinator::{map, map_res, opt},
+  error::ErrorKind,
+  multi::many1,
+  sequence::{delimited, pair},
+};
 
 /// only not(variable) and variable
 #[inline]
@@ -223,12 +231,17 @@ fn binary_op(i: &str) -> IResult<&str, Token> {
 
 /// Matches alphanumeric characters and underscores
 fn pin_name_char(i: &str) -> IResult<&str, &str> {
-  i.split_at_position_complete(move |c: char| !matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_'))
+  i.split_at_position_complete(
+    move |c: char| !matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_'),
+  )
 }
 
 /// Matches alphanumeric characters and underscores (at least 1 needed)
 fn pin_name_char1(i: &str) -> IResult<&str, &str> {
-  i.split_at_position1_complete(move |c: char| !matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_'), ErrorKind::Many1)
+  i.split_at_position1_complete(
+    move |c: char| !matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_'),
+    ErrorKind::Many1,
+  )
 }
 
 fn node(i: &str) -> IResult<&str, Token> {
@@ -240,7 +253,7 @@ fn node(i: &str) -> IResult<&str, Token> {
       Token::Node(Expr::Variable(s1.to_owned()))
     }),
   ))
-      .parse(i)
+  .parse(i)
 }
 
 fn token_vec(i: &str) -> IResult<&str, Vec<Token>> {
