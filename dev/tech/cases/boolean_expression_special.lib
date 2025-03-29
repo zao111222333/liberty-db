@@ -1,11 +1,13 @@
 library(some){
     cell(A){
         ff(IQ,IQN) {
-            next_state : "(J K IQ') + (J K') + (J' K' IQ)";
+            next_state : "(J K IQ') + (J K') + (J' K' IQ) + A_N + \"1_X\"";
             clocked_on : "\"1A\" + \"1B\"";
         }
         pin(1A){}
         pin(1B){}
+        pin(1_X){}
+        pin(A_N){}
         pin(J){}
         pin(K){}
     }

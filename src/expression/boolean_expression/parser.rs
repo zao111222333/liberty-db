@@ -7,17 +7,18 @@
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt;
 use nom::{
-  IResult, Parser as _,
+  IResult, Input as _, Parser as _,
   branch::alt,
   bytes::{
     complete::{tag, take_while1},
     escaped, is_not,
   },
   character::{
-    complete::{alpha1, alphanumeric0, char, digit1},
+    complete::{alpha1, char},
     one_of,
   },
   combinator::{map, map_res, opt},
+  error::ErrorKind,
   multi::many1,
   sequence::{delimited, pair},
 };
@@ -227,17 +228,34 @@ fn binary_op(i: &str) -> IResult<&str, Token> {
   ))
   .parse(i)
 }
+
+/// Matches alphanumeric characters and underscores
+fn pin_name_char(i: &str) -> IResult<&str, &str> {
+  i.split_at_position_complete(
+    move |c: char| !matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_'),
+  )
+}
+
+/// Matches alphanumeric characters and underscores (at least 1 needed)
+fn pin_name_char1(i: &str) -> IResult<&str, &str> {
+  i.split_at_position1_complete(
+    move |c: char| !matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_'),
+    ErrorKind::Many1,
+  )
+}
+
 fn node(i: &str) -> IResult<&str, Token> {
   alt((
-    map(pair(alpha1, alphanumeric0), |(s1, s2)| {
+    map(pair(alpha1, pin_name_char), |(s1, s2)| {
       Token::Node(Expr::Variable(format!("{s1}{s2}")))
     }),
-    map((tag(r#"\""#), digit1, alphanumeric0, tag(r#"\""#)), |(_, s1, s2, _)| {
-      Token::Node(Expr::Variable(format!("{s1}{s2}")))
+    map((tag(r#"\""#), pin_name_char1, tag(r#"\""#)), |(_, s1, _)| {
+      Token::Node(Expr::Variable(s1.to_owned()))
     }),
   ))
   .parse(i)
 }
+
 fn token_vec(i: &str) -> IResult<&str, Vec<Token>> {
   map(many1(alt((space, open_b, single_op, binary_op, node))), space_and).parse(i)
 }

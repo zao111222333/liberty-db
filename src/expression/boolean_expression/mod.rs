@@ -431,6 +431,7 @@ mod test {
       (true, "A^B+C"),
       (true, "(A+B)*(C+D)"),
       (true, r#"\"1A\" + \"1B\""#),
+      (true, r#"A_1 + \"1B_2\""#),
       (true, "(A+B)*(C)"),
       (true, "!(A+((C+A^!!!B))')"),
       (true, "!(A&B)"),
