@@ -92,10 +92,8 @@ pub(super) fn _fmt(expr: &Expr, f: &mut fmt::Formatter<'_>) -> fmt::Result {
           _fmt(e1, f)?;
           write!(f, ")")?;
         }
-        _ => {
-          _fmt(e1, f)?;
-        }
-      };
+        _ => _fmt(e1, f)?,
+      }
       write!(f, "*")?;
       match **e2 {
         Expr::Or(_, _) => {
@@ -113,10 +111,8 @@ pub(super) fn _fmt(expr: &Expr, f: &mut fmt::Formatter<'_>) -> fmt::Result {
           _fmt(e1, f)?;
           write!(f, ")")?;
         }
-        _ => {
-          _fmt(e1, f)?;
-        }
-      };
+        _ => _fmt(e1, f)?,
+      }
       write!(f, "^")?;
       match **e2 {
         Expr::Or(_, _) | Expr::And(_, _) => {

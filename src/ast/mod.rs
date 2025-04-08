@@ -23,7 +23,7 @@ use core::{
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
 use itertools::{Itertools as _, izip};
 use nom::{IResult, error::Error};
-use std::collections::HashMap;
+use std::{collections::HashMap, path::Path};
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
 #[cfg(not(feature = "fast_hash"))]
@@ -77,12 +77,12 @@ pub type SimpleWrapper = String;
 pub struct ComplexWrapper(pub(crate) Vec<String>);
 impl ComplexWrapper {
   #[expect(clippy::arithmetic_side_effects)]
-  fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope) -> Self {
+  fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope<'_>) -> Self {
     Self(
       vec
         .into_iter()
         .map(|(n, s)| {
-          scope.line_num += n;
+          scope.loc.line_num += n;
           String::from(s)
         })
         .collect(),
@@ -277,12 +277,12 @@ pub(crate) fn attributs_set_undefined_attri(
   attri_map: &mut Attributes,
   key: &str,
   group_name: &str,
-  scope: &ParseScope,
+  scope: &ParseScope<'_>,
   undefined: UndefinedAttriValue,
 ) {
   match scope.define_map.get(&define_id(&scope.hasher, group_name, key)) {
     None => {
-      log::warn!("Line={}; undefined {}", scope.line_num, key);
+      log::warn!("{} undefined {}", scope.loc, key);
       if let Some(value) = attri_map.get_mut(key) {
         match (value, undefined) {
           (
@@ -299,8 +299,8 @@ pub(crate) fn attributs_set_undefined_attri(
           }
           (_, _) => {
             log::error!(
-              "Line={}; Key={key}, the old undefined attribute do NOT meet new one",
-              scope.line_num
+              "{} Key={key}, the old undefined attribute do NOT meet new one",
+              scope.loc
             );
           }
         }
@@ -326,8 +326,8 @@ pub(crate) fn attributs_set_undefined_attri(
                 v.push(u.parse().map_or(Err(u), Ok));
               } else {
                 log::error!(
-                  "Line={}; Key={key}, the old attribute do NOT meet new one",
-                  scope.line_num
+                  "{} Key={key}, the old attribute do NOT meet new one",
+                  scope.loc
                 );
               }
             }
@@ -336,8 +336,8 @@ pub(crate) fn attributs_set_undefined_attri(
                 v.push(u);
               } else {
                 log::error!(
-                  "Line={}; Key={key}, the old attribute do NOT meet new one",
-                  scope.line_num
+                  "{} Key={key}, the old attribute do NOT meet new one",
+                  scope.loc
                 );
               }
             }
@@ -346,8 +346,8 @@ pub(crate) fn attributs_set_undefined_attri(
                 v.push(lexical_core::parse(u.as_bytes()).map_or(Err(u), Ok));
               } else {
                 log::error!(
-                  "Line={}; Key={key}, the old attribute do NOT meet new one",
-                  scope.line_num
+                  "{} Key={key}, the old attribute do NOT meet new one",
+                  scope.loc
                 );
               }
             }
@@ -356,8 +356,8 @@ pub(crate) fn attributs_set_undefined_attri(
                 v.push(parse_f64(&u).map_or(Err(u), Ok));
               } else {
                 log::error!(
-                  "Line={}; Key={key}, the old attribute do NOT meet new one",
-                  scope.line_num
+                  "{} Key={key}, the old attribute do NOT meet new one",
+                  scope.loc
                 );
               }
             }
@@ -386,7 +386,7 @@ pub(crate) fn attributs_set_undefined_attri(
           );
         }
       } else {
-        log::error!("Line={}; Key={key}, `defined` got wrong type", scope.line_num);
+        log::error!("{} Key={key}, `defined` got wrong type", scope.loc);
       }
     }
     Some(DefinedType::Group) => {
@@ -395,16 +395,13 @@ pub(crate) fn attributs_set_undefined_attri(
           if let AttriValues::Group(v) = value {
             v.push(u);
           } else {
-            log::error!(
-              "Line={}; Key={key}, the old attribute do NOT meet new one",
-              scope.line_num
-            );
+            log::error!("{} Key={key}, the old attribute do NOT meet new one", scope.loc);
           }
         } else {
           _ = attri_map.insert(String::from(key), AttriValues::Group(vec![u]));
         }
       } else {
-        log::error!("Line={}; Key={key}, `defined_group` got wrong type", scope.line_num);
+        log::error!("{} Key={key}, `defined_group` got wrong type", scope.loc);
       }
     }
   }
@@ -443,10 +440,26 @@ pub enum DefinedType {
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Debug, Default)]
-pub(crate) struct ParseScope {
-  pub(crate) line_num: usize,
+pub(crate) struct ParseScope<'a> {
+  pub(crate) loc: ParseLoc<'a>,
   pub(crate) define_map: HashMap<u64, DefinedType, mut_set::NoHashBuildHasher>,
   pub(crate) hasher: RandomState,
+}
+
+#[derive(Debug, Default)]
+pub struct ParseLoc<'a> {
+  pub filename: Option<&'a Path>,
+  pub line_num: usize,
+}
+
+impl core::fmt::Display for ParseLoc<'_> {
+  #[inline]
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    if let Some(p) = self.filename {
+      write!(f, "File {p:?}, ")?;
+    }
+    write!(f, "line {}.", self.line_num)
+  }
 }
 
 #[inline]
@@ -497,9 +510,9 @@ pub(crate) type ComplexParseRes<'a, T> =
 #[inline]
 pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
   i: &'a str,
-  scope: &mut ParseScope,
+  scope: &mut ParseScope<'_>,
 ) -> SimpleParseRes<'a, T> {
-  let (input, s) = parser::simple(i, &mut scope.line_num)?;
+  let (input, s) = parser::simple(i, &mut scope.loc.line_num)?;
   s.parse()
     .map_or(Ok((input, Err(String::from(s)))), |simple| Ok((input, Ok(simple))))
 }
@@ -511,7 +524,7 @@ pub(crate) trait SimpleAttri<C: Ctx>:
   /// `nom_parse`, auto implement
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> SimpleParseRes<'a, Self::Builder>;
   #[inline]
   fn is_set(&self) -> bool {
@@ -615,16 +628,16 @@ pub(crate) trait ComplexAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   /// basic `parser`
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> Result<Self::Builder, ComplexParseError>;
   /// `nom_parse`, auto implement
   #[expect(clippy::arithmetic_side_effects)]
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> ComplexParseRes<'a, Self::Builder> {
-    let (input, vec) = parser::complex(i, &mut scope.line_num)?;
+    let (input, vec) = parser::complex(i, &mut scope.loc.line_num)?;
     let mut line_num = 0;
     let res = Self::parse(
       vec.iter().map(|(n, s)| {
@@ -633,7 +646,7 @@ pub(crate) trait ComplexAttri<C: Ctx>: Sized + ParsingBuilder<C> {
       }),
       scope,
     );
-    scope.line_num += line_num;
+    scope.loc.line_num += line_num;
     match res {
       Ok(s) => Ok((input, Ok(s))),
       Err(e) => Ok((input, Err((e, ComplexWrapper::collect(vec, scope))))),
@@ -692,7 +705,7 @@ pub(crate) trait GroupAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   fn nom_parse<'a>(
     i: &'a str,
     group_name: &str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> IResult<&'a str, Result<Self::Builder, IdError>, Error<&'a str>>;
   /// `fmt_liberty`
   fn fmt_liberty<T: Write, I: Indentation>(
@@ -759,23 +772,29 @@ pub trait NameAttri: Sized {
 
 /// Error for parser
 #[derive(Debug, thiserror::Error)]
-pub enum ParserError {
+pub enum ParserError<'a> {
   /// TitleLenMismatch(want,got,title)
-  #[error("Line#{0}, {1}")]
-  IdError(usize, IdError),
+  #[error("{0} {1}")]
+  IdError(ParseLoc<'a>, IdError),
   /// replace same id
-  #[error("Line#{0}, {1}")]
-  NomError(usize, String),
+  #[error("{0} {1}")]
+  NomError(ParseLoc<'a>, String),
+  #[error("File {0:?}. {1}")]
+  IO(&'a Path, std::io::Error),
   /// something else
-  #[error("Line#{0}, {1}")]
-  Other(usize, String),
+  #[error("{0} {1}")]
+  Other(ParseLoc<'a>, String),
 }
 
-impl ParserError {
+impl<'a> ParserError<'a> {
   #[inline]
-  pub(crate) fn nom(line: usize, e: nom::Err<Error<&str>>) -> Self {
+  pub(crate) fn nom(
+    filename: Option<&'a Path>,
+    line_num: usize,
+    e: nom::Err<Error<&str>>,
+  ) -> Self {
     Self::NomError(
-      line,
+      ParseLoc { filename, line_num },
       match e {
         nom::Err::Incomplete(_) => e.to_string(),
         nom::Err::Failure(_e) | nom::Err::Error(_e) => format!(
@@ -816,8 +835,8 @@ pub(crate) fn test_parse<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
   let mut scope = ParseScope::default();
   let builder = match G::nom_parse(input, "", &mut scope) {
     Ok((_, Ok(g))) => g,
-    Ok((_, Err(e))) => panic!("{e:#?}"),
-    Err(e) => panic!("{e:#?}"),
+    Ok((_, Err(e))) => panic!("{e}"),
+    Err(e) => panic!("{e}"),
   };
   let mut builder_scope = BuilderScope::<DefaultCtx>::default();
   let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
@@ -834,8 +853,8 @@ pub(crate) fn test_parse_fmt<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
   let mut scope = ParseScope::default();
   let builder = match G::nom_parse(input, "", &mut scope) {
     Ok((_, Ok(g))) => g,
-    Ok((_, Err(e))) => panic!("{e:#?}"),
-    Err(e) => panic!("{e:#?}"),
+    Ok((_, Err(e))) => panic!("{e}"),
+    Err(e) => panic!("{e}"),
   };
   let mut builder_scope = BuilderScope::<DefaultCtx>::default();
   let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
@@ -857,8 +876,8 @@ pub(crate) fn test_parse_fmt_variables<G: GroupAttri<DefaultCtx> + Group<Default
   let mut scope = ParseScope::default();
   let builder = match G::nom_parse(input, "", &mut scope) {
     Ok((_, Ok(g))) => g,
-    Ok((_, Err(e))) => panic!("{e:#?}"),
-    Err(e) => panic!("{e:#?}"),
+    Ok((_, Err(e))) => panic!("{e}"),
+    Err(e) => panic!("{e}"),
   };
   let mut builder_scope = BuilderScope::<DefaultCtx>::default();
   builder_scope.cell_extra_ctx.logic_variables = BddVariableSet::new(variable);

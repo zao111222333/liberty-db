@@ -270,8 +270,9 @@ impl<C: Ctx> SimpleAttri<C> for Table {
     !self.v.is_empty()
   }
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    let (input, simple_multi) = crate::ast::parser::simple_multi(i, &mut scope.line_num)?;
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
+    let (input, simple_multi) =
+      crate::ast::parser::simple_multi(i, &mut scope.loc.line_num)?;
     simple_multi
       .parse()
       .map_or(Ok((input, Err(String::from(simple_multi)))), |s| Ok((input, Ok(s))))
@@ -1685,7 +1686,7 @@ pub enum PgType {
 crate::ast::impl_self_builder!(PgType);
 impl<C: Ctx> SimpleAttri<C> for PgType {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -1716,7 +1717,7 @@ pub enum SwitchCellType {
 crate::ast::impl_self_builder!(SwitchCellType);
 impl<C: Ctx> SimpleAttri<C> for SwitchCellType {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -1743,7 +1744,7 @@ pub enum FpgaCellType {
 crate::ast::impl_self_builder!(FpgaCellType);
 impl<C: Ctx> SimpleAttri<C> for FpgaCellType {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -1779,7 +1780,7 @@ pub enum LevelShifterType {
 crate::ast::impl_self_builder!(LevelShifterType);
 impl<C: Ctx> SimpleAttri<C> for LevelShifterType {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -1837,7 +1838,7 @@ impl fmt::Display for ClockGatingIntegratedCell {
 crate::ast::impl_self_builder!(ClockGatingIntegratedCell);
 impl<C: Ctx> SimpleAttri<C> for ClockGatingIntegratedCell {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -1881,7 +1882,7 @@ impl<C: Ctx> ComplexAttri<C> for PinOpposite {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let name_list1: WordSet = match iter.next() {
       Some(&s) => match s.parse() {

@@ -68,7 +68,7 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
   /// Wrap the formatter `f`, use `indentation` as base string indentation and return a new
   /// formatter that implements `fmt::Write` that can be used with the macro `write!()`
   #[inline]
-  pub fn new(f: &'a mut T) -> Self {
+  pub const fn new(f: &'a mut T) -> Self {
     Self {
       f,
       level: 0,
@@ -85,19 +85,19 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
   }
   /// Set the indentation level to a specific value
   #[inline]
-  pub fn set_level(&mut self, level: usize) {
+  pub const fn set_level(&mut self, level: usize) {
     self.level = level;
   }
 
   /// Increase the indentation level by `inc`
   #[inline]
-  pub fn indent(&mut self, inc: usize) {
+  pub const fn indent(&mut self, inc: usize) {
     self.level = self.level.saturating_add(inc);
   }
 
   /// Decrease the indentation level by `inc`
   #[inline]
-  pub fn dedent(&mut self, inc: usize) {
+  pub const fn dedent(&mut self, inc: usize) {
     self.level = self.level.saturating_sub(inc);
   }
 

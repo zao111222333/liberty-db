@@ -56,7 +56,7 @@ library(gscl45nm) {
 }"#;
 fn main() {
   simple_logger::SimpleLogger::new().init().unwrap();
-  match Library::<DefaultCtx>::parse_lib(TEMPLATE) {
+  match Library::<DefaultCtx>::parse_lib(TEMPLATE, None) {
     Ok(ref mut library) => {
       library.comments_this_entry().or_insert("line1\nline2".into());
       library.comments_this_entry().and_modify(|s| s.push_str("line3"));
@@ -76,6 +76,6 @@ fn main() {
         println!("{}", sdffrs_x2.display());
       }
     }
-    Err(e) => panic!("{e:#?}"),
+    Err(e) => panic!("{e}"),
   }
 }

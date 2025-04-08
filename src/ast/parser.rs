@@ -179,21 +179,21 @@ mod test_space {
 pub(crate) fn undefine<'a>(
   i: &'a str,
   group_name: &str,
-  scope: &mut super::ParseScope,
+  scope: &mut super::ParseScope<'_>,
 ) -> IResult<&'a str, super::UndefinedAttriValue> {
-  let line_num_back: usize = scope.line_num;
-  if let Ok((input, res)) = simple(i, &mut scope.line_num) {
+  let line_num_back: usize = scope.loc.line_num;
+  if let Ok((input, res)) = simple(i, &mut scope.loc.line_num) {
     return Ok((input, super::UndefinedAttriValue::Simple(String::from(res))));
   }
-  scope.line_num = line_num_back;
-  if let Ok((input, vec)) = complex(i, &mut scope.line_num) {
+  scope.loc.line_num = line_num_back;
+  if let Ok((input, vec)) = complex(i, &mut scope.loc.line_num) {
     return Ok((
       input,
       super::UndefinedAttriValue::Complex(ComplexWrapper::collect(vec, scope)),
     ));
   }
-  scope.line_num = line_num_back;
-  match title(i, &mut scope.line_num) {
+  scope.loc.line_num = line_num_back;
+  match title(i, &mut scope.loc.line_num) {
     Ok((mut input, title)) => {
       let mut res = GroupWrapper {
         title: title.into_iter().map(String::from).collect(),
@@ -205,7 +205,7 @@ pub(crate) fn undefine<'a>(
             (input, _) = end_group(input)?;
             let (new_input, n) = comment_space_newline(input)?;
             input = new_input;
-            scope.line_num += n;
+            scope.loc.line_num += n;
             return Ok((input, super::UndefinedAttriValue::Group(res)));
           }
           Err(e) => return Err(e),

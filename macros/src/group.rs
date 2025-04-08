@@ -109,7 +109,7 @@ fn group_field_fn(
               res.#field_name = Some(simple);
             },
             Err(undefined) => {
-              log::error!("Line={}; Key={}; Value={:?}",scope.line_num,key,undefined);
+              log::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
               crate::ast::attributs_set_undefined_simple(&mut res.#attributes_name, key, undefined);
             },
           }
@@ -140,7 +140,7 @@ fn group_field_fn(
               res.#field_name = simple;
             },
             Err(undefined) => {
-              log::error!("Line={}; Key={}; Value={:?}",scope.line_num,key,undefined);
+              log::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
               crate::ast::attributs_set_undefined_simple(&mut res.#attributes_name, key, undefined);
             },
           }
@@ -170,7 +170,7 @@ fn group_field_fn(
           match complex_res {
             Ok(complex) => res.#field_name = complex,
             Err((e,undefined)) => {
-              log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
+              log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
               crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
             },
           }
@@ -203,7 +203,7 @@ fn group_field_fn(
           match complex_res {
             Ok(complex) => res.#field_name = Some(complex),
             Err((e,undefined)) => {
-              log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
+              log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
               crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
             },
           }
@@ -237,13 +237,13 @@ fn group_field_fn(
               res.#field_name.push(complex);
             },
             Err((e,undefined)) => {
-              log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
+              log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
               crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
             },
           }
           let n: usize;
           (input,n) = crate::ast::parser::comment_space_newline(input)?;
-          scope.line_num += n;
+          scope.loc.line_num += n;
         },
       );
       builder_field = quote! {
@@ -276,13 +276,13 @@ fn group_field_fn(
               res.#field_name.push(complex);
             },
             Err((e,undefined)) => {
-              log::error!("Line={}; Key={}; Value={:?}; Err={}",scope.line_num,key,undefined,e);
+              log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
               crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
             },
           }
           let n: usize;
           (input,n) = crate::ast::parser::comment_space_newline(input)?;
-          scope.line_num += n;
+          scope.loc.line_num += n;
         },
       );
       builder_field = quote! {
@@ -320,12 +320,12 @@ fn group_field_fn(
               res.#field_name.push(group);
             },
             Err(e) => {
-              log::error!("Line={}, error={}",scope.line_num,e);
+              log::error!("{} error={}",scope.loc,e);
             },
           }
           let n: usize;
           (input,n) = crate::ast::parser::comment_space_newline(input)?;
-          scope.line_num += n;
+          scope.loc.line_num += n;
         },
       );
       builder_field = quote! {
@@ -359,12 +359,12 @@ fn group_field_fn(
               res.#field_name.push(group);
             },
             Err(e) => {
-              log::error!("Line={}, error={}",scope.line_num,e);
+              log::error!("{} error={}",scope.loc,e);
             },
           }
           let n: usize;
           (input,n) = crate::ast::parser::comment_space_newline(input)?;
-          scope.line_num += n;
+          scope.loc.line_num += n;
         },
       );
       builder_field = quote! {
@@ -401,17 +401,17 @@ fn group_field_fn(
             Ok(group) => {
               if let Some(old) = res.#field_name{
                 let e = crate::ast::IdError::RepeatAttri;
-                log::error!("Line={}, error={}",scope.line_num,e);
+                log::error!("{} error={}",scope.loc,e);
               }
               res.#field_name = Some(group);
             },
             Err(e) => {
-              log::error!("Line={}, error={}",scope.line_num,e);
+              log::error!("{} error={}",scope.loc,e);
             },
           }
           let n: usize;
           (input,n) = crate::ast::parser::comment_space_newline(input)?;
-          scope.line_num += n;
+          scope.loc.line_num += n;
         },
       );
       builder_field = quote! {
@@ -445,17 +445,17 @@ fn group_field_fn(
             Ok(group) => {
               if let Some(old) = res.#sub_name{
                 let e = crate::ast::IdError::RepeatAttri;
-                log::error!("Line={}, error={}",scope.line_num,e);
+                log::error!("{} error={}",scope.loc,e);
               }
               res.#sub_name = Some(group);
             },
             Err(e) => {
-              log::error!("Line={}, error={}",scope.line_num,e);
+              log::error!("{} error={}",scope.loc,e);
             },
           }
           let n: usize;
           (input,n) = crate::ast::parser::comment_space_newline(input)?;
-          scope.line_num += n;
+          scope.loc.line_num += n;
         }));
         _builder_field.push(quote! {
           pub(crate) #sub_name: Option<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
@@ -741,9 +741,9 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         fn nom_parse<'a>(
           i: &'a str,
           group_name: &str,
-          scope: &mut crate::ast::ParseScope,
+          scope: &mut crate::ast::ParseScope<'_>,
         ) -> nom::IResult<&'a str, Result<Self::Builder, crate::ast::IdError>, nom::error::Error<&'a str>> {
-          let (mut input,title) = crate::ast::parser::title(i, &mut scope.line_num)?;
+          let (mut input,title) = crate::ast::parser::title(i, &mut scope.loc.line_num)?;
           let mut res = #builder_ident{#builder_inits};
           loop {
             match crate::ast::parser::key(input) {
