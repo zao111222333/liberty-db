@@ -593,7 +593,10 @@ pub enum InternalPowerCalculation {
 ast::impl_self_builder!(InternalPowerCalculation);
 impl<C: Ctx> SimpleAttri<C> for InternalPowerCalculation {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope<'_>,
+  ) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -709,7 +712,10 @@ pub enum ThreeStateDisableMeasurementMethod {
 ast::impl_self_builder!(ThreeStateDisableMeasurementMethod);
 impl<C: Ctx> SimpleAttri<C> for ThreeStateDisableMeasurementMethod {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope<'_>,
+  ) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
