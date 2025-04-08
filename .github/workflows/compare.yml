@@ -1,7 +1,7 @@
 name: Compare Branches
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
 
 env:
@@ -49,11 +49,6 @@ jobs:
           cargo bench --package dev --bench compare --features compare
           sed -i 's|^liberty-db-incoming|# liberty-db-incoming|' dev/Cargo.toml
           sed -i 's|^## liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
-
-      - name: Show debug
-        run: |
-          ls -l base_branch
-          cat base_branch/target/criterion/index.html || true
 
       - name: Post report as PR comment
         uses: actions/github-script@v7
