@@ -108,9 +108,14 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for BooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::parser::simple_custom(i, &mut scope.line_num, Self::parse, Self::unquote)
+    crate::ast::parser::simple_custom(
+      i,
+      &mut scope.loc.line_num,
+      Self::parse,
+      Self::unquote,
+    )
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -124,7 +129,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for LogicBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
     <Self::Builder as crate::ast::SimpleAttri<DefaultCtx>>::nom_parse(i, scope)
   }
@@ -140,7 +145,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for PowerGroundBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
     <Self::Builder as crate::ast::SimpleAttri<DefaultCtx>>::nom_parse(i, scope)
   }

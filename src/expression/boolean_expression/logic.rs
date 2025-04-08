@@ -38,7 +38,7 @@ impl<C: Ctx> SimpleAttri<C> for Edge {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -66,7 +66,7 @@ impl<C: Ctx> ComplexAttri<C> for Edge {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let res = match iter.next() {
       Some(&s) => match s {
@@ -158,7 +158,7 @@ impl<C: Ctx> SimpleAttri<C> for Normal {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }

@@ -4,7 +4,7 @@ use liberty_db::{DefaultCtx, Library, table::TableCtx as _, timing::TimingType};
 const TEMPLATE: &str = include_str!("../dev/tech/tsmc22/tcbn22ullbwp30p140tt0p8v25c.lib");
 fn main() -> anyhow::Result<()> {
   simple_logger::SimpleLogger::new().init().unwrap();
-  let library = Library::<DefaultCtx>::parse_lib(TEMPLATE)?;
+  let library = Library::<DefaultCtx>::parse_lib(TEMPLATE, None)?;
   let cell_dff = library.cell.get("DFCNQD1BWP30P140").context("Failed to get cell")?;
   dbg!(&cell_dff.extra_ctx);
   let pin_d = cell_dff.pin.get("D".into()).context("Failed to get pin D")?;

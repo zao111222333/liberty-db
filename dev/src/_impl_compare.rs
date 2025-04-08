@@ -11,7 +11,7 @@ impl ProjLibrary for liberty_db_incoming::Library<liberty_db_incoming::DefaultCt
     other: "incoming version",
   };
   fn parse(s: &str) -> Result<Self, ()> {
-    Self::parse_lib(s).map_err(|_| ())
+    Self::parse_lib(s, None).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
     _ = black_box(self.to_string());
@@ -30,7 +30,7 @@ impl ProjLibrary for liberty_db_latest::Library<liberty_db_latest::DefaultCtx> {
     other: "current version",
   };
   fn parse(s: &str) -> Result<Self, ()> {
-    Self::parse_lib(s).map_err(|_| ())
+    Self::parse_lib(s, None).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
     _ = black_box(self.to_string());

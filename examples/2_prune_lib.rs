@@ -1,23 +1,28 @@
 use liberty_db::{DefaultCtx, Library, cell::CellCtx};
 use std::{
   env,
-  fs::{File, read_to_string},
+  fs::File,
   io::{BufWriter, Write},
   path::Path,
+  process::ExitCode,
 };
 
 // cargo run /path/to/xxx.lib
 // Use the first arg as input file name,
 // parse it, do some process, and then write it into example1_xxx.lib
-fn main() {
+fn main() -> ExitCode {
   simple_logger::SimpleLogger::new().init().unwrap();
   let args: Vec<String> = env::args().collect();
 
   let input_lib = Path::new(&args[1]);
   log::info!("Parsing [file] {} ...", input_lib.display());
-  let mut library =
-    Library::<DefaultCtx>::parse_lib(read_to_string(input_lib).unwrap().as_str())
-      .unwrap();
+  let mut library = match Library::<DefaultCtx>::parse_lib_file(input_lib) {
+    Ok(l) => l,
+    Err(e) => {
+      log::error!("{e}");
+      return ExitCode::FAILURE;
+    }
+  };
   library.technology = Some(liberty_db::library::Technology::Cmos);
   for operating_condition in library.operating_conditions.iter_mut() {
     operating_condition.voltage = 0.8;
@@ -79,4 +84,5 @@ fn main() {
   let out_file = File::create(out_file_name).unwrap();
   let mut writer = BufWriter::new(out_file);
   write!(&mut writer, "{}", library).unwrap();
+  ExitCode::SUCCESS
 }

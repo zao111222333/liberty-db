@@ -168,7 +168,7 @@ impl<C: Ctx> ComplexAttri<C> for SensitizationVector {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let id: usize = match iter.next() {
       Some(&s) => lexical_core::parse(s.as_bytes())?,
@@ -310,7 +310,7 @@ impl<C: Ctx> ComplexAttri<C> for VoltageMap {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let name = match iter.next() {
       Some(&s) => String::from(s),
@@ -478,7 +478,7 @@ impl<C: Ctx> SimpleAttri<C> for DelayModel {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -650,7 +650,7 @@ impl<C: Ctx> SimpleAttri<C> for FPGASlew {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -683,7 +683,7 @@ impl<C: Ctx> SimpleAttri<C> for TreeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -711,7 +711,7 @@ impl<C: Ctx> ComplexAttri<C> for Technology {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let v1: Self = match i.next() {
@@ -805,7 +805,7 @@ impl<C: Ctx> ComplexAttri<C> for Define {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let attribute_name = match iter.next() {
       Some(&s) => String::from(s),
@@ -867,7 +867,7 @@ impl<C: Ctx> ComplexAttri<C> for DefineGroup {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let group = match iter.next() {
       Some(&s) => String::from(s),
@@ -960,7 +960,7 @@ impl<C: Ctx> ComplexAttri<C> for DefineCellArea {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let area_name = match iter.next() {
       Some(&s) => String::from(s),
@@ -1120,7 +1120,7 @@ impl<C: Ctx> ComplexAttri<C> for FanoutLength {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let fanout = match iter.next() {
       Some(&s) => lexical_core::parse(s.as_bytes())?,
@@ -1246,7 +1246,7 @@ impl<C: Ctx> SimpleAttri<C> for BaseCurveType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }

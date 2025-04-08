@@ -581,7 +581,7 @@ fn size_type_test() {
 }
 #[test]
 fn build_test() {
-  use quote::ToTokens as _;
+  // use quote::ToTokens as _;
   // let attr: Attribute = parse_quote!(#[id]);
   // let attr: Attribute = parse_quote!(#[id(borrow="&[String]")] );
   let aaa: MyPath = syn::parse_quote!(vec!);

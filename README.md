@@ -23,7 +23,7 @@ This library is implemented in [Rust](https://doc.rust-lang.org/book/ch01-00-get
 
 ```toml
 [dependencies]
-liberty_db = "0.10"
+liberty_db = "0.11"
 ```
 
 One basic demo here:
@@ -56,7 +56,7 @@ library(demo) {
   }
 }"#;
 fn main(){
-  let mut library = Library::<DefaultCtx>::parse_lib(TEMPLATE).unwrap();
+  let mut library = Library::<DefaultCtx>::parse_lib(TEMPLATE, None).unwrap();
   // modify library
   library.cell.get_mut("DFF").map(|cell_dff| {
     cell_dff
@@ -126,5 +126,4 @@ cargo bench --package dev --bench benchmark --features bench
 + Parse: check all rules
 + Parse: Linked Group
 + Parse: async
-+ CI: only do comparsion after tag new version
 + MISC: bitcode support

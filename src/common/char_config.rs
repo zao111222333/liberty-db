@@ -593,7 +593,7 @@ pub enum InternalPowerCalculation {
 ast::impl_self_builder!(InternalPowerCalculation);
 impl<C: Ctx> SimpleAttri<C> for InternalPowerCalculation {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -709,7 +709,7 @@ pub enum ThreeStateDisableMeasurementMethod {
 ast::impl_self_builder!(ThreeStateDisableMeasurementMethod);
 impl<C: Ctx> SimpleAttri<C> for ThreeStateDisableMeasurementMethod {
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -779,7 +779,7 @@ impl<C: Ctx> ComplexAttri<C> for CharModeMethod {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let char_mode = match i.next() {
@@ -819,7 +819,7 @@ impl<C: Ctx> ComplexAttri<C> for CharModeValue {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let char_mode = match i.next() {

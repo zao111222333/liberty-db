@@ -7,7 +7,7 @@ use crate::{
 use super::*;
 
 fn parse_cmp(text: &str, want: &str) -> Library<DefaultCtx> {
-  match Library::parse_lib(text) {
+  match Library::parse_lib(text, None) {
     Ok(mut library) => {
       library.comments_this_entry().or_insert("test".into());
       let s = library.to_string();
@@ -15,7 +15,7 @@ fn parse_cmp(text: &str, want: &str) -> Library<DefaultCtx> {
       dev_utils::text_diff(&s, want);
       library
     }
-    Err(e) => panic!("{e:#?}"),
+    Err(e) => panic!("{e}"),
   }
 }
 
@@ -261,6 +261,13 @@ library (undefined) {
 }
 "#;
   fmt_cmp(&library, want);
-  let serialized = bincode::serialize(&library).unwrap();
-  fmt_cmp(&bincode::deserialize(&serialized).unwrap(), want);
+  let config = bincode::config::standard()
+    // pick one of:
+    // .with_big_endian()
+    .with_little_endian()
+    // pick one of:
+    // .with_variable_int_encoding()
+    .with_fixed_int_encoding();
+  let serialized = bincode::serde::encode_to_vec(library, config).unwrap();
+  fmt_cmp(&bincode::serde::decode_from_slice(&serialized, config).unwrap().0, want);
 }

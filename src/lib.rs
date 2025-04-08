@@ -28,7 +28,7 @@
 //!     pin (Q) {}
 //!   }
 //! }"#;
-//! let mut library = Library::<DefaultCtx>::parse_lib(TEMPLATE).unwrap();
+//! let mut library = Library::<DefaultCtx>::parse_lib(TEMPLATE, None).unwrap();
 //! // modify library
 //! library.cell.get_mut("DFF").map(|cell_dff| {
 //!   cell_dff
@@ -246,7 +246,7 @@ library(demo) {
     pin (Q) {}
   }
 }"#;
-  let mut library = Library::<DefaultCtx>::parse_lib(TEMPLATE).unwrap();
+  let mut library = Library::<DefaultCtx>::parse_lib(TEMPLATE, None).unwrap();
   // modify library
   library.cell.get_mut("DFF").map(|cell_dff| {
     cell_dff
