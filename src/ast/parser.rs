@@ -4,14 +4,14 @@
 //!
 use crate::ast::GroupWrapper;
 use nom::{
-  IResult, Input as _, Parser as _,
+  IResult, Parser as _,
   branch::alt,
   bytes::{
-    complete::{tag, take, take_until, take_while},
+    complete::{tag, take, take_until, take_while, take_while1},
     take_till,
   },
-  character::complete::char,
-  combinator::{map, map_opt, opt},
+  character::complete::{alpha1, char},
+  combinator::{map, map_opt, opt, recognize},
   error::{Error, ErrorKind},
   multi::{many0, separated_list0},
   sequence::{delimited, pair, preceded, terminated},
@@ -244,28 +244,36 @@ mod test_unquote {
   }
 }
 
+/// Matches alphanumeric characters and underscores
+#[inline]
+pub(crate) const fn char_in_key(c: char) -> bool {
+  matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_')
+}
+
 #[inline]
 pub(crate) fn key(i: &str) -> IResult<&str, &str> {
-  i.split_at_position1(|item| !(item.is_alphanumeric() || item == '_'), ErrorKind::Alpha)
+  recognize((alpha1, take_while(char_in_key))).parse_complete(i)
 }
+
 #[inline]
-pub(super) fn char_in_word(c: char) -> bool {
-  c.is_alphanumeric() || "/_.+-:".contains(c)
+pub(crate) const fn char_in_word(c: char) -> bool {
+  matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '/' | '.' | ':' | '+' | '-' )
 }
 
 #[inline]
 pub(crate) fn word(i: &str) -> IResult<&str, &str> {
-  i.split_at_position1(|item| !char_in_word(item), ErrorKind::Alpha)
+  take_while1(char_in_word)(i)
 }
 
+// TODO
 #[inline]
-pub(super) fn char_in_formula(c: char) -> bool {
-  c.is_ascii_alphanumeric() || " /_.+-*^:".contains(c)
+pub(crate) const fn char_in_formula(c: char) -> bool {
+  matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_'|'/'|'.'|':'|'+'|'-'|'*'|' ')
 }
 
 #[inline]
 pub(crate) fn formula(i: &str) -> IResult<&str, &str> {
-  i.split_at_position1(|item| !char_in_formula(item), ErrorKind::Alpha)
+  take_while1(char_in_formula)(i)
 }
 
 #[inline]

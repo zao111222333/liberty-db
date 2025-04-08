@@ -68,7 +68,7 @@ mut_set = "0.7.0"
 duplicate = "2.0.0"
 num-traits = "0.2"
 criterion = { version = "0.5", features = ["html_reports"] }
-sysinfo = "0.34"
+sysinfo = "0.33"
 chrono = "0.4"
 anyhow = "1.0"
 # faster hash
