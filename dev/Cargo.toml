@@ -17,7 +17,7 @@ chrono.workspace = true
 dev_utils.workspace = true
 
 liberty-db-latest = { package = "liberty-db", path = ".." }
-liberty-db-0p10p0  = { package = "liberty-db", version = "=0.10.2", optional = true  }
+liberty-db-0p10p2  = { package = "liberty-db", version = "=0.10.2", optional = true  }
 liberty-db-0p9p6  = { package = "liberty-db", version = "=0.9.6", optional = true  }
 liberty-db-0p8p3  = { package = "liberty-db", version = "=0.8.3", optional = true  }
 liberty-db-0p7p4  = { package = "liberty-db", version = "=0.7.4", optional = true  }
@@ -35,7 +35,7 @@ liberty-db-incoming = { package = "liberty-db", version = "=0.1.0", optional = t
 
 [features]
 bench = [
-    "liberty-db-0p10p0",
+    "liberty-db-0p10p2",
     "liberty-db-0p9p6",
     "liberty-db-0p8p3",
     "liberty-db-0p7p4",
