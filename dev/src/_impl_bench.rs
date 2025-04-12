@@ -25,15 +25,15 @@ impl ProjLibrary for liberty_db_latest::Library<liberty_db_latest::DefaultCtx> {
   }
 }
 
-impl ProjLibrary for liberty_db_0p10p0::Library<liberty_db_0p10p0::DefaultCtx> {
+impl ProjLibrary for liberty_db_0p10p2::Library<liberty_db_0p10p2::DefaultCtx> {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",
-    url: "https://crates.io/crates/liberty-db/0.10.0",
+    url: "https://crates.io/crates/liberty-db/0.10.2",
     lang: "rust",
-    version: "0.10.0",
+    version: "0.10.2",
     typed_support: TypedSupport::AllTyped,
     parsed_boolexpr: true,
-    other: "published at 2025-03-11",
+    other: "published at 2025-03-30",
   };
   fn parse(s: &str) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
