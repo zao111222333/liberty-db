@@ -215,7 +215,7 @@ impl ProjLibrary for libertyparse::Liberty {
 #[cfg(target_os = "linux")]
 pub struct OpenTimerLibrary(*mut c_void);
 #[cfg(target_os = "linux")]
-extern "C" {
+unsafe extern "C" {
   fn ot_parse_lib(s: *const c_char) -> *mut c_void;
   fn ot_write_lib(ptr: *mut c_void, debug: c_int);
   fn ot_drop_lib(ptr: *mut c_void);
@@ -250,7 +250,7 @@ impl ProjLibrary for OpenTimerLibrary {
 #[cfg(target_os = "linux")]
 pub struct Si2drLibertyLibrary(*mut c_void);
 #[cfg(target_os = "linux")]
-extern "C" {
+unsafe extern "C" {
   fn si2dr_liberty_parse_lib(s: *const c_char) -> *mut c_void;
   fn si2dr_liberty_write_lib(ptr: *mut c_void, debug: c_int);
   fn si2dr_liberty_drop_lib(ptr: *mut c_void);
