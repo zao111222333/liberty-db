@@ -27,6 +27,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ env.RUST_VERSION }}
+      - name: Check semver
+        uses: obi1kenobi/cargo-semver-checks-action@v2
       - name: cargo login
         run: cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
       - name: cargo publich
