@@ -415,8 +415,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=53.5&end=53.14
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeValue>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeValue>::deserialize_with")]
   pub input_stimulus_transition: GroupSet<CharModeValue>,
   /// The `input_stimulus_interval` attribute specifies the time-interval between the input-
   /// signal toggles to generate the input stimulus for a characterization cell. The time units of
@@ -436,8 +434,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=53.16&end=53.23
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeValue>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeValue>::deserialize_with")]
   pub input_stimulus_interval: GroupSet<CharModeValue>,
   /// The `unrelated_output_net_capacitance` attribute specifies a load value for an output
   /// pin that is not a related output pin of the characterization model. The valid value is a
@@ -458,8 +454,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=53.25+54.2&end=53.30+54.5
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeValue>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeValue>::deserialize_with")]
   pub unrelated_output_net_capacitance: GroupSet<CharModeValue>,
   /// The `default_value_selection_method` attribute defines the method of selecting a
   /// default value for
@@ -483,8 +477,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=54.7&end=54.27
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeMethod>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeMethod>::deserialize_with")]
   pub default_value_selection_method: GroupSet<CharModeMethod>,
   /// Use the `default_value_selection_method_rise` attribute when the selection method
   /// for rise is different from the selection method for fall.
@@ -500,8 +492,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=54.29+55.2&end=54.36+55.3
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeMethod>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeMethod>::deserialize_with")]
   pub default_value_selection_method_rise: GroupSet<CharModeMethod>,
   /// Use the `default_value_selection_method_fall` attribute when the selection method
   /// for fall is different from the selection method for rise.
@@ -512,8 +502,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=55.5&end=55.14
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeMethod>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeMethod>::deserialize_with")]
   pub default_value_selection_method_fall: GroupSet<CharModeMethod>,
   /// The `merge_tolerance_abs` attribute specifies the absolute tolerance to merge arc
   /// simulation results. Specify the absolute tolerance value in the corresponding library unit.
@@ -524,8 +512,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=55.16&end=55.24
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeValue>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeValue>::deserialize_with")]
   pub merge_tolerance_abs: GroupSet<CharModeValue>,
   /// The `merge_tolerance_rel` attribute specifies the relative tolerance to merge arc
   /// simulation results. Specify the relative tolerance value in percent, for example, 10.0 for 10
@@ -537,8 +523,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=55.26+56.2&end=55.31+56.5
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeValue>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeValue>::deserialize_with")]
   pub merge_tolerance_rel: GroupSet<CharModeValue>,
   /// The `merge_selection` attribute specifies the method to select the merged data. When
   /// multiple sets of state-dependent data are merged, the attribute selects a particular set of
@@ -549,8 +533,6 @@ pub struct CharConfig<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=56.7&end=56.18
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CharModeMethod>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CharModeMethod>::deserialize_with")]
   pub merge_selection: GroupSet<CharModeMethod>,
 }
 impl<C: Ctx> GroupFn<C> for CharConfig<C> {}
@@ -773,7 +755,7 @@ pub enum SelectionMethod {
 }
 
 #[derive(Debug, Clone, Default, Copy)]
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CharModeMethod {
   #[id]
@@ -813,7 +795,7 @@ impl<C: Ctx> ComplexAttri<C> for CharModeMethod {
 }
 
 #[derive(Debug, Clone, Default, Copy)]
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CharModeValue {
   #[id]

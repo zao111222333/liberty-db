@@ -117,57 +117,46 @@ impl<C: Ctx> CompactTableCtx<C> for DefaultCompactTableCtx<C> {
   }
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUpMultiSegment<C: Ctx> {
   #[liberty(name)]
-  #[size = 8]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Table,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[id]
-  #[size = 8]
   #[liberty(simple)]
   segment: usize,
-  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<f64>,
-  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct DriverWaveform<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// The `driver_waveform_name`  string attribute differentiates the driver waveform table
   /// from other driver waveform tables when multiple tables are defined.
@@ -182,66 +171,50 @@ pub struct DriverWaveform<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=71.24&end=71.31
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple(type = Option))]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   pub driver_waveform_name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<f64>,
-  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp2D<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Table,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<f64>,
-  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
@@ -253,32 +226,26 @@ pub struct TableLookUp2D<C: Ctx> {
 /// ">Reference</a>
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CompactLutTemplate<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::CompactTable,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 8]
   #[liberty(simple(type = Option))]
   pub base_curves_group: Option<String>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
   /// ">Reference</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub variable_1: Option<VariableTypeCompactLutTemplateIndex12>,
   /// The `index_1`  and `index_2`  attributes are required.
@@ -289,14 +256,12 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.7&end=43.10
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
   /// ">Reference</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub variable_2: Option<VariableTypeCompactLutTemplateIndex12>,
   /// The `index_1`  and `index_2`  attributes are required.
@@ -307,7 +272,6 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.7&end=43.10
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<f64>,
   /// The string values in `index_3`  are determined by the `base_curve_type` value
@@ -315,7 +279,6 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// `base_curve_type`  value, the following six string values (parameters)
   /// should be defined: `init_current`, `peak_current`, `peak_voltage`, `peak_time`, `left_id`, `right_id`;
   /// their order is not fixed.
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub variable_3: Option<VariableTypeCompactLutTemplateIndex3>,
   /// The string values in `index_3`  are determined by the `base_curve_type` value
@@ -329,7 +292,6 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.18+43.22&end=43.21+43.23
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<String>,
 }
@@ -391,121 +353,95 @@ impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex3 {
   }
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector3D<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Table,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
-  #[size = 8]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(complex)]
   pub index_1: f64,
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
-  #[size = 8]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(complex)]
   pub index_2: f64,
-  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct ReferenceTimeVector3D<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Table,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
-  #[size = 8]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(simple)]
   pub reference_time: f64,
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
-  #[size = 8]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(complex)]
   pub index_1: f64,
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
-  #[size = 8]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(complex)]
   pub index_2: f64,
-  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector4D<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Table,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
-  #[size = 8]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(complex)]
   pub index_1: f64,
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
-  #[size = 8]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(complex)]
   pub index_2: f64,
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
-  #[size = 8]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(complex)]
   pub index_3: f64,
-  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
@@ -554,43 +490,33 @@ pub struct Vector4D<C: Ctx> {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct CompactCcsPower<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::CompactTable,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 8]
   #[liberty(simple(type = Option))]
   pub base_curves_group: Option<String>,
-  #[size = 8]
   #[liberty(simple(type = Option))]
   pub index_output: Option<String>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<String>,
   /// The values attribute is required in the `compact_ccs_power` group. The data within the
@@ -624,7 +550,6 @@ pub struct CompactCcsPower<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=154.27+155.2&end=154.43+155.12
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<CcsPowerValue>,
 }
@@ -724,90 +649,69 @@ impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
     Ok(())
   }
 }
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector3DGrpup<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 88]
   #[liberty(group(type = Set))]
   #[liberty(after_build = use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<Vector3D<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Vector3D<C>>::deserialize_with")]
   pub vector: GroupSet<Vector3D<C>>,
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 88]
   #[liberty(group(type = Set))]
   #[liberty(after_build = use_current_template!)]
-  #[serde(serialize_with = "GroupSet::<ReferenceTimeVector3D<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<ReferenceTimeVector3D<C>>::deserialize_with")]
   pub vector: GroupSet<ReferenceTimeVector3D<C>>,
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Vector4DGrpup<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 88]
   #[liberty(group(type = Set))]
   #[liberty(after_build = use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<Vector4D<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Vector4D<C>>::deserialize_with")]
   pub vector: GroupSet<Vector4D<C>>,
 }
 impl<C: Ctx> GroupFn<C> for Vector4DGrpup<C> {}
@@ -817,63 +721,25 @@ impl<C: Ctx> GroupFn<C> for Vector4D<C> {}
 impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3D<C> {}
 impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3DGrpup<C> {}
 impl<C: Ctx> GroupFn<C> for CompactCcsPower<C> {}
-// #[mut_set::derive::item(sort)]
-// #[derive(Debug, Clone)]
-// #[derive(liberty_macros::Group)]
-// #[derive(serde::Serialize, serde::Deserialize)]
-// #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-// pub struct TableLookUp3D<C: Ctx> {
-//   #[size = 8]
-//   #[liberty(name)]
-//   #[id(borrow = "&str", with_ref = false)]
-//   pub name: String,
-//   /// group comments
-//   #[size = 32]
-//   #[liberty(comments)]
-//   comments: GroupComments,
-//   #[size = 0]
-//   #[liberty(extra_ctx)]
-//   pub extra_ctx: C::Table,
-//   /// group undefined attributes
-//   #[size = 40]
-//   #[liberty(attributes)]
-//   pub attributes: Attributes,
-//   #[size = 24]
-//   #[liberty(complex)]
-//   pub index_1: Vec<f64>,
-//   #[size = 24]
-//   #[liberty(complex)]
-//   pub index_2: Vec<f64>,
-//   #[size = 24]
-//   #[liberty(complex)]
-//   pub index_3: Vec<f64>,
-//   #[size = 40]
-//   #[liberty(complex)]
-//   pub values: Values,
-// }
 
 /// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the
 /// `ocv_sigma_cell_rise`, `ocv_sigma_cell_fall`, `ocv_sigma_rise_transition`, and
 /// `ocv_sigma_fall_transition` group lookup tables.
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct OcvSigmaTable<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Table,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the
@@ -895,128 +761,71 @@ pub struct OcvSigmaTable<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=357.15&end=357.24
   /// ">Reference-Definition</a>
-  #[size = 1]
   #[liberty(simple)]
   #[id]
   pub sigma_type: SigmaType,
-  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<f64>,
-  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
-
-// #[mut_set::derive::item(sort)]
-// #[derive(Debug, Clone)]
-// #[derive(liberty_macros::Group)]
-// #[derive(serde::Serialize, serde::Deserialize)]
-// #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-// pub struct TableLookUp1D<C: Ctx> {
-//   //
-//   // unit: (),
-//   #[size = 8]
-//   #[liberty(name)]
-//   #[id(borrow = "&str", with_ref = false)]
-//   pub name: String,
-//   /// group comments
-//   #[size = 32]
-//   #[liberty(comments)]
-//   comments: GroupComments,
-//   #[size = 0]
-//   #[liberty(extra_ctx)]
-//   pub extra_ctx: C::Table,
-//   /// group undefined attributes
-//   #[size = 40]
-//   #[liberty(attributes)]
-//   pub attributes: Attributes,
-//   #[size = 24]
-//   #[liberty(complex)]
-//   pub index_1: Vec<f64>,
-//   #[size = 24]
-//   #[liberty(complex)]
-//   pub values: Vec<f64>,
-// }
-// impl<C: Ctx> GroupFn<C> for TableLookUp1D<C> {
-//   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
-//     <Self as LUTFlag>::after_build(&self.name, &mut self.extra_ctx, scope);
-//   }
-// }
 
 /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
 ///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
 /// ">Reference-Definition</a>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::CompactTable: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct CompactCcsTable<C: Ctx> {
-  //
-  // unit: (),
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::CompactTable,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 8]
   #[liberty(simple)]
   pub base_curves_group: String,
-  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
 impl<C: Ctx> GroupFn<C> for CompactCcsTable<C> {}
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableLookUp<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Table,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_2: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_3: Vec<f64>,
-  #[size = 24]
   #[liberty(complex)]
   pub index_4: Vec<f64>,
-  #[size = 40]
   #[liberty(complex)]
   pub values: Values,
 }
@@ -1171,49 +980,37 @@ impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
   }
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TableTemple<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[size = 2]
   #[liberty(simple(type = Option))]
   pub variable_1: Option<Variable>,
-  #[size = 2]
   #[liberty(simple(type = Option))]
   pub variable_2: Option<Variable>,
-  #[size = 2]
   #[liberty(simple(type = Option))]
   pub variable_3: Option<Variable>,
-  #[size = 2]
   #[liberty(simple(type = Option))]
   pub variable_4: Option<Variable>,
-  #[size = 24]
   #[liberty(complex(type = Option))]
   pub index_1: Option<Vec<f64>>,
-  #[size = 24]
   #[liberty(complex(type = Option))]
   pub index_2: Option<Vec<f64>>,
-  #[size = 24]
   #[liberty(complex(type = Option))]
   pub index_3: Option<Vec<f64>>,
-  #[size = 24]
   #[liberty(complex(type = Option))]
   pub index_4: Option<Vec<f64>>,
 }
@@ -1634,6 +1431,7 @@ liberty_db::table::CompactCcsPower (c_ccs_pwr_template_3) {
   #[cfg(feature = "lut_template")]
   fn table_template() {
     use super::TableCtx;
+    use crate::{ccsn::ReceiverCapacitanceId, pin::PinId};
 
     let library = test_parse::<crate::Library<DefaultCtx>>(
       r#" (ccsn) {
@@ -1661,10 +1459,10 @@ liberty_db::table::CompactCcsPower (c_ccs_pwr_template_3) {
     let when = cell.parse_logic_boolexpr("A2*B").unwrap();
     let receiver_capacitance = cell
       .pin
-      .get("A1".into())
+      .get(&PinId::from("A1"))
       .unwrap()
       .receiver_capacitance
-      .get(None, Some(&when))
+      .get(&ReceiverCapacitanceId::new(None, Some(when)))
       .unwrap();
     let table_template = receiver_capacitance
       .receiver_capacitance1_fall

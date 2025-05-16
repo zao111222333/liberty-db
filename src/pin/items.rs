@@ -55,33 +55,27 @@ impl<C: Ctx> SimpleAttri<C> for AntennaDiodeType {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TLatch<C: Ctx> {
   /// Name of the pin
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Valid values are rising and falling.
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub edge_type: Option<Edge>,
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub tdisable: Option<bool>,
 }

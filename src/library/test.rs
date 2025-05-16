@@ -173,72 +173,76 @@ library (undefined) {
   );
 }
 
-#[test]
-fn entry() {
-  let mut library = Library::default();
-  library.comments_this_entry().or_insert("comment1".into());
-  library
-    .cell
-    .entry("CELL1".into())
-    .and_modify(|cell| cell.area = Some(1.0))
-    .or_insert_with(|cell| cell.area = Some(0.0));
-  library
-    .cell
-    .entry("CELL2".into())
-    .and_modify(|cell| cell.area = Some(1.0))
-    .or_insert_with(|cell| cell.area = Some(0.0));
-  library
-    .cell
-    .entry("CELL2".into())
-    .and_modify(|cell| cell.area = Some(1.0))
-    .or_insert_with(|cell| cell.area = Some(0.0));
-  fmt_cmp(
-    &library,
-    r#"/* comment1 */
-library (undefined) {
-| delay_model : table_lookup;
-| time_unit : 1ns;
-| voltage_unit : 1V;
-| slew_upper_threshold_pct_rise : 80.0;
-| slew_lower_threshold_pct_rise : 20.0;
-| slew_derate_from_library : 1.0;
-| slew_lower_threshold_pct_fall : 20.0;
-| slew_upper_threshold_pct_fall : 80.0;
-| input_threshold_pct_fall : 50.0;
-| input_threshold_pct_rise : 50.0;
-| output_threshold_pct_rise : 50.0;
-| output_threshold_pct_fall : 50.0;
-| cell (CELL1) {
-| | area : 0.0;
-| }
-| cell (CELL2) {
-| | area : 1.0;
-| }
-}
-"#,
-  );
-}
+// #[test]
+// fn entry() {
+//   let mut library = Library::default();
+//   library.comments_this_entry().or_insert("comment1".into());
+//   library
+//     .cell
+//     .entry("CELL1".into())
+//     .and_modify(|cell| cell.area = Some(1.0))
+//     .or_insert_with(|cell| cell.area = Some(0.0));
+//   library
+//     .cell
+//     .entry("CELL2".into())
+//     .and_modify(|cell| cell.area = Some(1.0))
+//     .or_insert_with(|cell| cell.area = Some(0.0));
+//   library
+//     .cell
+//     .entry("CELL2".into())
+//     .and_modify(|cell| cell.area = Some(1.0))
+//     .or_insert_with(|cell| cell.area = Some(0.0));
+//   fmt_cmp(
+//     &library,
+//     r#"/* comment1 */
+// library (undefined) {
+// | delay_model : table_lookup;
+// | time_unit : 1ns;
+// | voltage_unit : 1V;
+// | slew_upper_threshold_pct_rise : 80.0;
+// | slew_lower_threshold_pct_rise : 20.0;
+// | slew_derate_from_library : 1.0;
+// | slew_lower_threshold_pct_fall : 20.0;
+// | slew_upper_threshold_pct_fall : 80.0;
+// | input_threshold_pct_fall : 50.0;
+// | input_threshold_pct_rise : 50.0;
+// | output_threshold_pct_rise : 50.0;
+// | output_threshold_pct_fall : 50.0;
+// | cell (CELL1) {
+// | | area : 0.0;
+// | }
+// | cell (CELL2) {
+// | | area : 1.0;
+// | }
+// }
+// "#,
+//   );
+// }
 
 #[test]
 fn serde() {
-  let mut library = Library::default();
-  library.comments_this_entry().or_insert("comment1".into());
-  library
-    .cell
-    .entry("CELL1".into())
-    .and_modify(|cell| cell.area = Some(1.0))
-    .or_insert_with(|cell| cell.area = Some(0.0));
-  library
-    .cell
-    .entry("CELL2".into())
-    .and_modify(|cell| cell.area = Some(1.0))
-    .or_insert_with(|cell| cell.area = Some(0.0));
-  library
-    .cell
-    .entry("CELL2".into())
-    .and_modify(|cell| cell.area = Some(1.0))
-    .or_insert_with(|cell| cell.area = Some(0.0));
-  let want = r#"/* comment1 */
+  let text = r#"library (undefined) {
+  delay_model : table_lookup;
+  time_unit : 1ns;
+  voltage_unit : 1V;
+  slew_upper_threshold_pct_rise : 80.0;
+  slew_lower_threshold_pct_rise : 20.0;
+  slew_derate_from_library : 1.0;
+  slew_lower_threshold_pct_fall : 20.0;
+  slew_upper_threshold_pct_fall : 80.0;
+  input_threshold_pct_fall : 50.0;
+  input_threshold_pct_rise : 50.0;
+  output_threshold_pct_rise : 50.0;
+  output_threshold_pct_fall : 50.0;
+  cell (CELL1) {
+    area : 0.0;
+  }
+  cell (CELL2) {
+    area : 1.0;
+  }
+}
+"#;
+  let want = r#"/* test */
 library (undefined) {
 | delay_model : table_lookup;
 | time_unit : 1ns;
@@ -260,7 +264,8 @@ library (undefined) {
 | }
 }
 "#;
-  fmt_cmp(&library, want);
+  let library = parse_cmp(text, want);
+  // let library = Library::<DefaultCtx>::parse_lib(text, None).unwrap();
   let config = bincode::config::standard()
     // pick one of:
     // .with_big_endian()

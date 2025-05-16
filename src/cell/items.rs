@@ -21,51 +21,34 @@ use core::{
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LeakagePower<C: Ctx> {
-  #[id(borrow = "&[String]", with_ref = false)]
-  #[size = 24]
+  #[id]
   #[liberty(name)]
   pub name: Vec<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  #[size = 8]
+  #[id]
   #[liberty(simple(type = Option))]
   pub power_level: Option<String>,
-  #[id(
-    borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "NameList::as_ref",
-    with_ref = false
-  )]
-  #[size = 64]
+  #[id]
   #[liberty(simple)]
   pub related_pg_pin: NameList,
-  #[id(
-    borrow = "Option<&LogicBooleanExpression>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
-  #[size = 80]
+  #[id]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
-  #[size = 8]
   #[liberty(simple)]
   pub value: f64,
-  #[size = 48]
   #[liberty(complex(type = Option))]
   pub mode: Option<[String; 2]>,
 }
@@ -151,32 +134,26 @@ mod test_sort {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Statetable<C: Ctx> {
-  #[id(borrow = "&[String]", with_ref = false)]
-  #[size = 24]
+  #[id]
   #[liberty(name)]
   pub input_nodes: Vec<String>,
-  #[id(borrow = "&[String]", with_ref = false)]
-  #[size = 24]
+  #[id]
   #[liberty(name)]
   pub internal_nodes: Vec<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[size = 24]
   #[liberty(simple)]
   pub table: Table,
 }
@@ -342,25 +319,21 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct PgPin<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   /// <a name ="reference_link" href="
@@ -371,7 +344,6 @@ pub struct PgPin<C: Ctx> {
   /// &end
   /// =228.22
   /// ">Reference-Instance</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub direction: Option<Direction>,
   /// Use the `voltage_name`  attribute to specify an associated voltage.
@@ -381,7 +353,6 @@ pub struct PgPin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
-  #[size = 8]
   #[liberty(simple)]
   pub voltage_name: String,
   /// Use the optional `pg_type`  attribute to specify the type of power and ground pin.
@@ -403,25 +374,21 @@ pub struct PgPin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=210.8&end=210.13
   /// ">Reference-Definition</a>
-  #[size = 1]
   #[liberty(simple)]
   pub pg_type: PgType,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
-  #[size = 8]
   #[liberty(simple)]
   pub user_pg_type: String,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
-  #[size = 8]
   #[liberty(simple)]
   pub physical_connection: String,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
-  #[size = 8]
   #[liberty(simple)]
   pub related_bias_pin: String,
   /// The `std_cell_main_rail`  Boolean attribute is defined in a `primary_power`
@@ -431,7 +398,6 @@ pub struct PgPin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=278.29&end=278.31
   /// ">Reference-Definition</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub std_cell_main_rail: Option<bool>,
   /// The `pg_function`  attribute models the logical function
@@ -444,7 +410,6 @@ pub struct PgPin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=266.21&end=266.26
   /// ">Reference-Definition</a>
-  #[size = 80]
   #[liberty(simple(type = Option))]
   pub pg_function: Option<PowerGroundBooleanExpression>,
   /// The `switch_function`  string attribute identifies the condition
@@ -459,7 +424,6 @@ pub struct PgPin<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=279.5&end=279.13
   /// ">Reference-Definition</a>
-  #[size = 80]
   #[liberty(simple(type = Option))]
   pub switch_function: Option<LogicBooleanExpression>,
 }
@@ -474,52 +438,32 @@ impl<C: Ctx> GroupFn<C> for PgPin<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct DynamicCurrent<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id(
-    borrow = "Option<&LogicBooleanExpression>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
-  #[size = 80]
+  #[id]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
-  #[id(
-    borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "NameList::as_ref",
-    with_ref = false
-  )]
-  #[size = 64]
+  #[id]
   #[liberty(simple)]
   pub related_inputs: NameList,
-  #[id(
-    borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "NameList::as_ref",
-    with_ref = false
-  )]
-  #[size = 64]
+  #[id]
   #[liberty(simple)]
   pub related_outputs: NameList,
-  #[size = 24]
   #[liberty(complex(type = Option))]
   pub typical_capacitances: Option<Vec<f64>>,
   /// Use the switching_group group to specify a current waveform vector when the power
@@ -527,10 +471,7 @@ pub struct DynamicCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=150.18&end=150.19
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<SwitchingGroup<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<SwitchingGroup<C>>::deserialize_with")]
   pub switching_group: GroupSet<SwitchingGroup<C>>,
 }
 impl<C: Ctx> GroupFn<C> for DynamicCurrent<C> {}
@@ -543,25 +484,21 @@ impl<C: Ctx> GroupFn<C> for DynamicCurrent<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct SwitchingGroup<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   /// The `input_switching_condition` attribute specifies the sense of the toggling input. If
@@ -580,12 +517,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.5&end=151.15
   /// ">Reference</a>
-  #[id(
-    borrow = "Option<&logic::Edge>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
-  #[size = 1]
+  #[id]
   #[liberty(complex(type = Option))]
   pub input_switching_condition: Option<logic::Edge>,
   /// Use the `output_switching_condition` attribute to specify the sense of the toggling
@@ -606,12 +538,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.17&end=151.29
   /// ">Reference</a>
-  #[id(
-    borrow = "Option<&logic::Edge>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
-  #[size = 1]
+  #[id]
   #[liberty(complex(type = Option))]
   pub output_switching_condition: Option<logic::Edge>,
   /// The `min_input_switching_count` attribute specifies the minimum number of
@@ -639,7 +566,6 @@ pub struct SwitchingGroup<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=152.3&end=152.22
   /// ">Reference</a>
-  #[size = 16]
   #[liberty(simple(type = Option))]
   pub min_input_switching_count: Option<usize>,
   /// The `max_input_switching_count` attribute specifies the maximum number of
@@ -668,7 +594,6 @@ pub struct SwitchingGroup<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=152.24+153.2&end=152.38+153.7
   /// ">Reference</a>
-  #[size = 16]
   #[liberty(simple(type = Option))]
   pub max_input_switching_count: Option<usize>,
   /// Use the `pg_current` group to specify current waveform data in a vector group. If all
@@ -697,10 +622,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=153.9&end=153.28
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<PgCurrent<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<PgCurrent<C>>::deserialize_with")]
   pub pg_current: GroupSet<PgCurrent<C>>,
 }
 impl<C: Ctx> GroupFn<C> for SwitchingGroup<C> {}
@@ -734,25 +656,21 @@ impl<C: Ctx> GroupFn<C> for SwitchingGroup<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct PgCurrent<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   /// The `compact_ccs_power` group contains a detailed description for compact CCS
@@ -796,11 +714,8 @@ pub struct PgCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=153.30+154.2&end=153.40+154.25
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_compact_template!)]
-  #[serde(serialize_with = "GroupSet::<CompactCcsPower<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CompactCcsPower<C>>::deserialize_with")]
   pub compact_ccs_power: GroupSet<CompactCcsPower<C>>,
 }
 impl<C: Ctx> GroupFn<C> for PgCurrent<C> {}
@@ -864,31 +779,23 @@ impl<C: Ctx> GroupFn<C> for PgCurrent<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct IntrinsicParasitic<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id(
-    borrow = "Option<&LogicBooleanExpression>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
+  #[id]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
   /// The `reference_pg_pin` attribute specifies the reference pin for the
@@ -903,7 +810,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.3&end=178.9
   /// ">Reference</a>
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   #[liberty(simple(type = Option))]
   pub reference_pg_pin: Option<String>,
   /// The `mode` attribute pertains to an individual `cell`. The cell is active when the `mode` attribute
@@ -942,10 +849,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=178.20&end=178.34
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<IntrinsicCapacitance<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<IntrinsicCapacitance<C>>::deserialize_with")]
   pub intrinsic_capacitance: GroupSet<IntrinsicCapacitance<C>>,
   /// Use this group to specify the intrinsic resistance between a power pin and an output pin of
   /// a cell.
@@ -981,10 +885,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=180.10&end=180.36
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<IntrinsicResistance<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<IntrinsicResistance<C>>::deserialize_with")]
   pub intrinsic_resistance: GroupSet<IntrinsicResistance<C>>,
   /// The `total_capacitance` group specifies the macro cell’s total capacitance on a power
   /// or ground net within the `intrinsic_parasitic` group. The following applies to the
@@ -1024,10 +925,7 @@ pub struct IntrinsicParasitic<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=182.12&end=182.42
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<PgPinWithValue<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<PgPinWithValue<C>>::deserialize_with")]
   pub total_capacitance: GroupSet<PgPinWithValue<C>>,
 }
 impl<C: Ctx> GroupFn<C> for IntrinsicParasitic<C> {}
@@ -1055,24 +953,20 @@ impl<C: Ctx> GroupFn<C> for IntrinsicParasitic<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct IntrinsicCapacitance<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   /// The `value` attribute specifies the value of the intrinsic capacitance.
@@ -1080,7 +974,7 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.8&end=179.9
   /// ">Reference</a>
-  #[id(into_hash_ord_fn = "crate::common::f64_into_hash_ord_fn")]
+  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(simple)]
   pub value: f64,
   /// The `reference_pg_pin` attribute specifies the reference pin for the
@@ -1094,7 +988,7 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
   /// ">Reference</a>
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   #[liberty(simple(type = Option))]
   pub reference_pg_pin: Option<String>,
   /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
@@ -1123,7 +1017,6 @@ pub struct IntrinsicCapacitance<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.23+180.2&end=179.34+180.8
   /// ">Reference</a>
-  #[size = 128]
   #[liberty(group(type = Option))]
   pub lut_values: Option<LutValues<C>>,
 }
@@ -1166,24 +1059,20 @@ impl<C: Ctx> GroupFn<C> for IntrinsicCapacitance<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct IntrinsicResistance<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   /// Specifies the value of the intrinsic resistance. If this attribute is not defined, the value of
@@ -1207,7 +1096,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
   /// ">Reference</a>
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   #[liberty(simple(type = Option))]
   pub related_output: Option<String>,
   /// The `reference_pg_pin` attribute specifies the reference pin for the
@@ -1221,7 +1110,7 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.15&end=179.21
   /// ">Reference</a>
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   #[liberty(simple(type = Option))]
   pub reference_pg_pin: Option<String>,
   /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
@@ -1250,7 +1139,6 @@ pub struct IntrinsicResistance<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=179.23+180.2&end=179.34+180.8
   /// ">Reference</a>
-  #[size = 128]
   #[liberty(group(type = Option))]
   pub lut_values: Option<LutValues<C>>,
 }
@@ -1297,28 +1185,23 @@ impl<C: Ctx> GroupFn<C> for IntrinsicResistance<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct PgPinWithValue<C: Ctx> {
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  #[size = 8]
+  #[id]
   #[liberty(name)]
   pg_pin_name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[size = 8]
   #[liberty(simple)]
   pub value: f64,
 }
@@ -1361,25 +1244,21 @@ impl<C: Ctx> GroupFn<C> for PgPinWithValue<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct GateLeakage<C: Ctx> {
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
-  #[size = 8]
+  #[id]
   #[liberty(name)]
   input_pin_name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
   /// The `input_low_value` attribute specifies gate leakage current on an input or inout pin
@@ -1393,7 +1272,6 @@ pub struct GateLeakage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=198.3&end=198.22
   /// ">Reference</a>
-  #[size = 16]
   #[liberty(simple(type = Option))]
   pub input_low_value: Option<f64>,
   /// The `input_high_value` attribute specifies gate leakage current on an input or inout pin
@@ -1406,7 +1284,6 @@ pub struct GateLeakage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=198.24&end=198.38
   /// ">Reference</a>
-  #[size = 16]
   #[liberty(simple(type = Option))]
   pub input_high_value: Option<f64>,
 }
@@ -1444,32 +1321,23 @@ impl<C: Ctx> GroupFn<C> for GateLeakage<C> {}
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct LeakageCurrent<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
   pub name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
-  #[id(
-    borrow = "Option<&LogicBooleanExpression>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
-  #[size = 80]
+  #[id]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
   /// When a cell has a single power and ground pin, omit the `pg_current` group and specify
@@ -1479,7 +1347,6 @@ pub struct LeakageCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=195.34+196.2&end=195.35+196.9
   /// ">Reference</a>
-  #[size = 16]
   #[liberty(simple(type = Option))]
   pub value: Option<f64>,
   /// The `mode` attribute pertains to an individual `cell`. The cell is active when the `mode` attribute
@@ -1528,10 +1395,7 @@ pub struct LeakageCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=196.17&end=196.36
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<PgPinWithValue<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<PgPinWithValue<C>>::deserialize_with")]
   pub pg_current: GroupSet<PgPinWithValue<C>>,
   /// The `gate_leakage` group specifies the cell’s gate leakage current on input or inout pins
   /// within the `leakage_current` group in a cell. The following applies to `gate_leakage`
@@ -1567,10 +1431,7 @@ pub struct LeakageCurrent<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=197.9&end=197.38
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<GateLeakage<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<GateLeakage<C>>::deserialize_with")]
   pub gate_leakage: GroupSet<GateLeakage<C>>,
 }
 impl<C: Ctx> GroupFn<C> for LeakageCurrent<C> {}

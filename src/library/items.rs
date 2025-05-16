@@ -31,26 +31,22 @@ use core::fmt::{self, Write};
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.10&end=88.16
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Sensitization<C: Ctx> {
   /// name
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   #[liberty(name)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `pin_names` attribute specified at the library level defines
@@ -63,7 +59,6 @@ pub struct Sensitization<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=88.28&end=88.32
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex)]
   pub pin_names: Vec<String>,
   /// # vector Complex Attribute
@@ -109,7 +104,6 @@ pub struct Sensitization<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=89.5&end=89.29
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex(type = Vec))]
   pub vector: Vec<SensitizationVector>,
 }
@@ -294,13 +288,12 @@ impl<C: Ctx> GroupFn<C> for Sensitization<C> {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.15&end=39.16
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct VoltageMap {
   /// name
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   pub name: String,
   /// voltage
   pub voltage: f64,
@@ -341,54 +334,46 @@ impl<C: Ctx> ComplexAttri<C> for VoltageMap {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=61.32&end=61.33
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct InputVoltage<C: Ctx> {
   /// name
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   #[liberty(name)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The maximum input voltage for which the input to the core is guaranteed to be a logic 0
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.7&end=62.8
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub vil: Formula,
   /// The minimum input voltage for which the input to the core is guaranteed to be a logic 1
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.10&end=62.11
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub vih: Formula,
   /// The minimum acceptable input voltage.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.13&end=62.13
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub vimin: Formula,
   /// The maximum acceptable input voltage.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=62.15&end=62.16
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub vimax: Formula,
 }
@@ -400,54 +385,46 @@ impl<C: Ctx> GroupFn<C> for InputVoltage<C> {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.22&end=75.23
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct OutputVoltage<C: Ctx> {
   /// name
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   #[liberty(name)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The maximum output voltage generated to represent a logic 0.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=75.45&end=75.46
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub vol: Formula,
   /// The minimum output voltage generated to represent a logic 1.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.3&end=76.4
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub voh: Formula,
   /// The minimum output voltage the pad can generate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.5&end=76.6
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub vomin: Formula,
   /// The maximum output voltage the pad can generate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=76.7&end=76.8
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub vomax: Formula,
 }
@@ -491,40 +468,34 @@ impl<C: Ctx> SimpleAttri<C> for DelayModel {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.3&end=72.4
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct OperatingConditions<C: Ctx> {
   /// name
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   #[liberty(name)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// An optional attribute, you can use calc_mode  to specify an associated process mode.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.28&end=72.28
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple(type = Option))]
   pub calc_mode: Option<String>,
   /// Use this optional attribute to specify values for up to five user-defined variables.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.36&end=72.37
   /// ">Reference</a>
-  #[size = 16]
   #[liberty(simple(type = Option))]
   pub parameteri: Option<f64>,
   /// Use the `process`  attribute to specify a scaling factor to account for variations in the outcome of the actual semiconductor manufacturing steps.
@@ -533,21 +504,18 @@ pub struct OperatingConditions<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.44+73.7&end=72.45+73.8
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub process: f64,
   /// Use the process_label  attribute to specify the name of the current process.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.9&end=73.10
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple(type = Option))]
   pub process_label: Option<String>,
   /// Use the `temperature`  attribute to specify the ambient temperature in which the design is to operate.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.15&end=73.16
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub temperature: f64,
   /// Use the `tree_type`  attribute to specify the environment interconnect model.
@@ -556,7 +524,6 @@ pub struct OperatingConditions<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.24+73.30&end=73.25+73.31
   /// ">Reference</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub tree_type: Option<TreeType>,
   /// Use the `voltage`  attribute to specify the operating voltage of the design; typically 5 volts for a CMOS library.
@@ -565,7 +532,6 @@ pub struct OperatingConditions<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.32+74.3&end=73.33+74.4
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   #[liberty(default = 5.0)]
   pub voltage: f64,
@@ -581,47 +547,40 @@ impl<C: Ctx> GroupFn<C> for OperatingConditions<C> {}
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=63.22+63.25&end=63.23+63.27
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct FpgaIsd<C: Ctx> {
   /// name
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `drive`  attribute is optional and specifies the output current of the FPGA part or the FPGA cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.7&end=64.8
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub drive: String,
   /// The `io_type`  attribute is required and specifies the input or output voltage of the FPGA part or the FPGA cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.17&end=64.18
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub io_type: String,
   /// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.27&end=64.28
   /// ">Reference</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub slew: Option<FPGASlew>,
 }
@@ -750,7 +709,7 @@ impl<C: Ctx> ComplexAttri<C> for Technology {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.5&end=36.21
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Define {
@@ -758,21 +717,18 @@ pub struct Define {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.10&end=36.11
   /// ">Reference</a>
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   pub attribute_name: String,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.12&end=36.13
   /// ">Reference</a>
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   pub group_name: String,
   /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.14&end=36.15
   /// ">Reference</a>
-  #[size = 1]
   pub attribute_type: AttributeType,
 }
 /// The type of the attribute that you are creating; valid values are Boolean, string, integer, or float
@@ -843,7 +799,7 @@ impl<C: Ctx> ComplexAttri<C> for Define {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.24&end=37.25
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefineGroup {
@@ -851,15 +807,13 @@ pub struct DefineGroup {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.33&end=37.34
   /// ">Reference</a>
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   pub group: String,
   /// The name of the group statement in which the attribute is to be used.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=37.35&end=37.36
   /// ">Reference</a>
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   pub parent_name: String,
 }
 crate::ast::impl_self_builder!(DefineGroup);
@@ -899,7 +853,7 @@ impl<C: Ctx> ComplexAttri<C> for DefineGroup {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.23&end=36.24
 /// ">Reference</a>
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefineCellArea {
@@ -908,8 +862,7 @@ pub struct DefineCellArea {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=36.28&end=36.29
   /// ">Reference</a>
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   pub area_name: String,
   /// The resource type can be
   /// + `pad_slots`
@@ -994,44 +947,37 @@ impl<C: Ctx> ComplexAttri<C> for DefineCellArea {
 /// ">Reference</a>
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WireLoad<C: Ctx> {
   /// name
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   #[liberty(name)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub area: f64,
   /// Use this attribute to specify capacitance per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=95.5&end=95.6
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub capacitance: f64,
   /// Use this attribute to specify wire resistance per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=95.15&end=95.16
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub resistance: f64,
   /// Use this attribute to characterize linear fanout length behavior
@@ -1040,7 +986,6 @@ pub struct WireLoad<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=95.25&end=95.26
   /// ">Reference</a>
-  #[size = 8]
   #[liberty(simple)]
   pub slope: f64,
   /// Use this attribute to define values for fanout and length
@@ -1063,10 +1008,7 @@ pub struct WireLoad<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<FanoutLength>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<FanoutLength>::deserialize_with")]
   pub fanout_length: GroupSet<FanoutLength>,
 }
 impl<C: Ctx> GroupFn<C> for WireLoad<C> {}
@@ -1093,7 +1035,7 @@ impl<C: Ctx> GroupFn<C> for WireLoad<C> {}
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
 /// ">Reference</a>
 #[derive(Debug, Clone, Default, Copy)]
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct FanoutLength {
   /// An integer representing the total number of pins, minus one, on the net driven by the given output
@@ -1180,30 +1122,25 @@ impl<C: Ctx> ComplexAttri<C> for FanoutLength {
 /// ">Reference</a>
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WireLoadSection<C: Ctx> {
   /// name
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   #[liberty(name)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Use this attribute to specify area per unit length of interconnect wire.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=94.31&end=94.32
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex)]
   pub wire_load_from_area: (f64, f64, String),
 }
@@ -1278,23 +1215,19 @@ impl<C: Ctx> SimpleAttri<C> for BaseCurveType {
 /// ">Reference</a>
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct BaseCurves<C: Ctx> {
   /// name
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The `base_curve_type` attribute specifies the type of base curve.
@@ -1314,16 +1247,11 @@ pub struct BaseCurves<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=40.21+40.26&end=40.25+40.29
   /// ">Reference</a>
-  #[size = 1]
   #[liberty(simple)]
   pub base_curve_type: BaseCurveType,
-  #[size = 24]
   #[liberty(complex)]
   pub curve_x: Vec<f64>,
-  #[size = 88]
   #[liberty(complex(type = Set))]
-  #[serde(serialize_with = "GroupSet::<IdVector>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<IdVector>::deserialize_with")]
   pub curve_y: GroupSet<IdVector>,
 }
 

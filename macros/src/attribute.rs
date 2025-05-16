@@ -6,7 +6,6 @@ use quote::{ToTokens, quote};
 use syn::{
   Expr, Path, Token, Type,
   parse::{Parse, ParseStream},
-  spanned::Spanned,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -70,7 +69,7 @@ pub(crate) fn parse_fields_type(
   fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
 ) -> syn::Result<(
   // attri map
-  HashMap<&Ident, (AttriType, Option<usize>)>,
+  HashMap<&Ident, AttriType>,
   // default map
   HashMap<&Ident, Expr>,
   // before_build_map
@@ -98,7 +97,6 @@ pub(crate) fn parse_fields_type(
   let mut after_build_map = HashMap::new();
   for field in fields {
     if let (Some(field_name), field_attrs) = (&field.ident, &field.attrs) {
-      let pos = parse_field_pos(field_attrs)?;
       let attr = parse_field_attrs(field_attrs)?;
       if let Some(default) = parse_field_default(field_attrs)? {
         _ = default_map.insert(field_name, default);
@@ -156,7 +154,7 @@ pub(crate) fn parse_fields_type(
           }
         }
         FieldType::Attri(attri_type) => {
-          _ = attri_type_map.insert(field_name, (attri_type, pos));
+          _ = attri_type_map.insert(field_name, attri_type);
         }
       }
     } else {
@@ -293,26 +291,6 @@ fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Field
           ));
         }
       }
-    }
-  }
-  Ok(None)
-}
-fn parse_field_pos(field_attrs: &[syn::Attribute]) -> syn::Result<Option<usize>> {
-  for attr in field_attrs {
-    if attr.path().is_ident("old_pos") {
-      match &attr.meta {
-        syn::Meta::List(_) | syn::Meta::Path(_) => {
-          return Err(syn::Error::new(attr.meta.span(), "expected #[old_pos = 123 ]"));
-        }
-        syn::Meta::NameValue(s) => {
-          if let syn::Expr::Lit(expr_lit) = &s.value {
-            if let syn::Lit::Int(lit_int) = &expr_lit.lit {
-              return Ok(Some(lit_int.base10_parse::<usize>()?));
-            }
-          }
-          return Err(syn::Error::new(attr.meta.span(), "Expected integer literal"));
-        }
-      };
     }
   }
   Ok(None)

@@ -57,7 +57,7 @@ impl<C: Ctx> SimpleAttri<C> for SdfEdgeType {
   }
 }
 
-#[mut_set::derive::item(sort)]
+#[mut_set::derive::item]
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct IdVector {
@@ -74,7 +74,7 @@ pub struct IdVector {
 // /// &end
 // /// =39.24
 // /// ">Reference-Definition</a>
-// #[mut_set::derive::item(sort)]
+// #[mut_set::derive::item]
 // #[derive(Debug, Clone)]
 // #[derive(liberty_macros::Group)]
 // #[derive(serde::Serialize, serde::Deserialize)]
@@ -82,7 +82,7 @@ pub struct IdVector {
 // pub struct Domain<C: Ctx> {
 //   #[size = 8]
 //   #[liberty(name)]
-//   #[id(borrow = "&str", with_ref = false)]
+//   #[id]
 //   pub name: String,
 //   /// group comments
 //   #[size = 32]
@@ -211,25 +211,21 @@ impl FromStr for WordSet {
   }
 }
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct DummyGroup<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "Option<&str>", check_fn = "mut_set::borrow_option!", with_ref = false)]
+  #[id]
   name: Option<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
 }
@@ -259,26 +255,19 @@ pub enum NameList {
   Name(String),
   List(WordSet),
 }
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum RefNameList<'a> {
-  Name(&'a str),
-  List(&'a WordSet),
-}
-impl<'a> From<&'a str> for RefNameList<'a> {
+impl From<String> for NameList {
   #[inline]
-  fn from(value: &'a str) -> Self {
+  fn from(value: String) -> Self {
     Self::Name(value)
   }
 }
-impl NameList {
+impl From<&str> for NameList {
   #[inline]
-  #[must_use]
-  pub fn as_ref(&self) -> RefNameList<'_> {
-    match self {
-      Self::Name(s) => RefNameList::Name(s.as_str()),
-      Self::List(word_set) => RefNameList::List(word_set),
-    }
+  fn from(value: &str) -> Self {
+    Self::Name(value.into())
   }
+}
+impl NameList {
   #[inline]
   #[must_use]
   pub fn contains(&self, name: &str) -> bool {

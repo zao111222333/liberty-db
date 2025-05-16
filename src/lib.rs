@@ -2,7 +2,7 @@
 //!
 //! Demo:
 //! ``` rust
-//! use liberty_db::{DefaultCtx, Library};
+//! use liberty_db::{DefaultCtx, Library, MutSetExt, PinId};
 //! use std::{
 //!   fs::File,
 //!   io::{BufWriter, Write},
@@ -33,7 +33,7 @@
 //! library.cell.get_mut("DFF").map(|cell_dff| {
 //!   cell_dff
 //!     .pin
-//!     .get_mut("CK".into())
+//!     .get_mut(&PinId::from("CK"))
 //!     .map(|pin_ck| pin_ck.clock = Some(true))
 //! });
 //! // print library
@@ -193,6 +193,7 @@ pub mod common;
 pub mod expression;
 /// `internal_power` group structure.
 pub mod internal_power;
+pub use internal_power::{InternalPower, InternalPowerId};
 /// `Library` group structure, top level of liberty format.
 pub mod library;
 /// `table` group structure.
@@ -202,13 +203,14 @@ pub use library::Library;
 // pub use str::LibertyStr;
 /// `pin` group structure.
 pub mod pin;
-pub use pin::Pin;
+pub use pin::{Pin, PinId};
 /// `timing` group structure.
 pub mod timing;
-pub use timing::Timing;
+pub use timing::{Timing, TimingId};
 #[cfg(feature = "py")]
 mod py;
 pub mod units;
+pub use mut_set::MutSetExt;
 
 pub mod ast;
 pub use ast::Group;
@@ -220,7 +222,7 @@ pub use ctx::{Ctx, DefaultCtx};
 
 #[test]
 fn demo() {
-  use crate::{DefaultCtx, Library};
+  use crate::{DefaultCtx, Library, MutSetExt, PinId};
   use std::{
     fs::File,
     io::{BufWriter, Write as _},
@@ -251,7 +253,7 @@ library(demo) {
   library.cell.get_mut("DFF").map(|cell_dff| {
     cell_dff
       .pin
-      .get_mut("CK".into())
+      .get_mut(&PinId::from("CK"))
       .map(|pin_ck| pin_ck.clock = Some(true))
   });
   // print library

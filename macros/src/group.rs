@@ -551,12 +551,11 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     });
     let mut write_simple_complex = quote! {};
     let mut write_group = quote! {};
-    let mut field_name_arrti_type_old_pos = Vec::new();
+    let mut field_name_arrti_type = Vec::new();
     for field in fields.into_iter() {
       if let Some(field_name) = &field.ident {
-        if let Some((arrti_type, old_pos)) = attri_type_map.get(field_name) {
-          field_name_arrti_type_old_pos
-            .push((field_name, arrti_type, old_pos, &field.ty));
+        if let Some(arrti_type) = attri_type_map.get(field_name) {
+          field_name_arrti_type.push((field_name, arrti_type, &field.ty));
         }
       } else {
         return Err(syn::Error::new(
@@ -565,14 +564,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         ));
       }
     }
-    field_name_arrti_type_old_pos.sort_by(|(_, _, a, _), (_, _, b, _)| match (a, b) {
-      (None, None) => std::cmp::Ordering::Equal,
-      (None, Some(_)) => std::cmp::Ordering::Greater,
-      (Some(_), None) => std::cmp::Ordering::Less,
-      (Some(a), Some(b)) => a.cmp(b),
-    });
     #[expect(clippy::needless_bool)]
-    let hashmatch = if field_name_arrti_type_old_pos.len() >= 40 {
+    let hashmatch = if field_name_arrti_type.len() >= 40 {
       #[cfg(feature = "hashmatch")]
       {
         true
@@ -584,7 +577,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     } else {
       false
     };
-    for (field_name, arrti_type, _, field_type) in field_name_arrti_type_old_pos {
+    for (field_name, arrti_type, field_type) in field_name_arrti_type {
       let (comment_fn, write_field, builder_init, parser_arm, builder_field, build_arm) =
         group_field_fn(
           field_name,
