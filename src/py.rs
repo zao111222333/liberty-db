@@ -37,7 +37,7 @@ macro_rules! impl_py_enum {
     impl PyStubType for $t {
       #[inline]
       fn type_output() -> TypeInfo {
-        use strum::IntoEnumIterator;
+        use strum::IntoEnumIterator as _;
         TypeInfo {
           name: format!(
             "typing.Literal{:?}",
