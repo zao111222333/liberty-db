@@ -6,53 +6,35 @@ use crate::{
   table::TableLookUp,
 };
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::InternalPower: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct InternalPower<C: Ctx> {
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::InternalPower,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   // NOTICE: Simple Attributes
   // equal_or_opposite_output
   // falling_together_group
   // power_level
-  #[id(
-    borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "NameList::as_ref",
-    with_ref = false
-  )]
-  #[size = 64]
+  #[id]
   #[liberty(simple)]
   pub related_pin: NameList,
-  #[id(
-    borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "NameList::as_ref",
-    with_ref = false
-  )]
-  #[size = 64]
+  #[id]
   #[liberty(simple)]
   pub related_pg_pin: NameList,
   // rising_together_group
   // switching_interval
   // switching_together_group
-  #[size = 80]
   #[liberty(simple(type = Option))]
-  #[id(
-    borrow = "Option<&LogicBooleanExpression>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
+  #[id]
   pub when: Option<LogicBooleanExpression>,
   // NOTICE: Complex Attribute
   /// The `mode` attribute specifies the current mode of operation of the cell. Use this attribute in
@@ -69,22 +51,18 @@ pub struct InternalPower<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=305.9&end=305.14
   /// ">Reference-Definition</a>
-  #[size = 48]
   #[liberty(complex(type = Option))]
   pub mode: Option<[String; 2]>,
   // NOTICE: Group Statements
   // #[size = 336]
   // #[liberty(group(type = Option))]
   // pub domain: Option<Domain<C>>,
-  #[size = 336]
   #[liberty(group(type = Option))]
   #[liberty(after_build = crate::table::use_power_template!)]
   pub rise_power: Option<TableLookUp<C>>,
-  #[size = 336]
   #[liberty(group(type = Option))]
   #[liberty(after_build = crate::table::use_power_template!)]
   pub fall_power: Option<TableLookUp<C>>,
-  #[size = 336]
   #[liberty(group(type = Option))]
   #[liberty(after_build = crate::table::use_power_template!)]
   pub power: Option<TableLookUp<C>>,

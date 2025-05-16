@@ -49,24 +49,20 @@ pub use items::*;
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Timing: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Timing<C: Ctx> {
-  #[size = 24]
   #[liberty(name)]
   pub name: Vec<String>,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Timing,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Use this attribute to indicate that a constraint arc is for
@@ -89,7 +85,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=322.21&end=322.32
   /// ">Reference</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub clock_gating_flag: Option<bool>,
   /// The `default_timing` attribute allows you to specify one timing arc as the default
@@ -105,7 +100,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=322.34+323.2&end=322.37+323.3
   /// ">Reference</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub default_timing: Option<bool>,
   /// The `fpga_arc_condition` attribute specifies a Boolean condition that enables
@@ -123,7 +117,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=323.5&end=323.14
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(simple(type = Option))]
   pub fpga_arc_condition: Option<LogicBooleanExpression>,
   /// Use pairs of `interdependence_id` attributes to identify interdependent pairs
@@ -192,7 +185,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=323.16+324.2+325.2&end=323.41+324.49+325.3
   /// ">Reference</a>
-  #[size = 16]
   #[liberty(simple(type = Option))]
   pub interdependence_id: Option<usize>,
   /// The `related_bus_pins` attribute defines the pin or pins that
@@ -216,7 +208,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=293.20&end=293.33
   /// ">Reference</a>
-  #[size = 64]
   #[liberty(simple)]
   pub related_bus_pins: WordSet,
   /// The `related_output_pin` attribute specifies the output or inout pin used
@@ -236,7 +227,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=325.26&end=325.33
   /// ">Reference</a>
-  #[size = 64]
   #[liberty(simple(type = Option))]
   pub related_output_pin: Option<String>,
   /// The `related_pin` attribute defines the pin or pins representing
@@ -292,12 +282,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=326.3&end=326.38
   /// ">Reference</a>
-  #[id(
-    borrow = "crate::common::items::RefNameList<'_>",
-    check_fn = "NameList::as_ref",
-    with_ref = false
-  )]
-  #[size = 64]
+  #[id]
   #[liberty(simple)]
   pub related_pin: NameList,
   /// The `sdf_cond` attribute is defined in the state-dependent timing group to support SDF file
@@ -322,7 +307,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.3&end=327.14
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(simple(type = Option))]
   pub sdf_cond: Option<SdfExpression>,
   /// The `sdf_cond_end` attribute defines a timing-check condition specific to the end event
@@ -344,7 +328,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.16&end=327.24
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(simple(type = Option))]
   pub sdf_cond_end: Option<SdfExpression>,
   /// The `sdf_cond_start` attribute defines a timing-check condition specific to the start event
@@ -366,7 +349,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.26+328.2&end=327.30+328.5
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(simple(type = Option))]
   pub sdf_cond_start: Option<SdfExpression>,
   /// The `sdf_edges` attribute defines the edge specification on both
@@ -387,7 +369,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=328.7&end=328.17
   /// ">Reference</a>
-  #[size = 1]
   #[liberty(simple(type = Option))]
   pub sdf_edges: Option<SdfEdgeType>,
   /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
@@ -439,13 +420,8 @@ pub struct Timing<C: Ctx> {
   ///
   /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
   /// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
-  #[size = 11]
   #[liberty(simple(type = Option))]
-  #[id(
-    borrow = "Option<&TimingSenseType>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
+  #[id]
   pub timing_sense: Option<TimingSenseType>,
   /// The `timing_type` attribute distinguishes between combinational
   /// and sequential cells by defining the type of timing arc.
@@ -656,13 +632,8 @@ pub struct Timing<C: Ctx> {
   /// the constrained pin and a positive pulse on the related pin.
   /// + `nochange_low_low` (negative/negative): Indicates a negative pulse on
   /// the constrained pin and a negative pulse on the related pin.
-  #[size = 3]
   #[liberty(simple(type = Option))]
-  #[id(
-    borrow = "Option<&TimingType>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
+  #[id]
   pub timing_type: Option<TimingType>,
   /// The when attribute is used in state-dependent timing and conditional timing checks.
   ///
@@ -692,24 +663,17 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=337.12&end=337.26
   /// ">Reference</a>
-  #[size = 80]
   #[liberty(simple(type = Option))]
-  #[id(
-    borrow = "Option<&LogicBooleanExpression>",
-    check_fn = "mut_set::borrow_option!",
-    with_ref = false
-  )]
+  #[id]
   pub when: Option<LogicBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=338.13&end=338.20
   /// ">Reference</a>
-  #[size = 32]
   #[liberty(simple(type = Option))]
   pub when_end: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=338.22&end=338.30
   /// ">Reference</a>
-  #[size = 32]
   #[liberty(simple(type = Option))]
   pub when_start: Option<BooleanExpression>,
   /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
@@ -728,7 +692,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.2&end=339.6
   /// ">Reference-Instance</a>
-  #[size = 24]
   #[liberty(complex)]
   pub active_input_ccb: Vec<String>,
   /// In referenced CCS noise modeling, the `active_output_ccb` attribute lists the `output_ccb`
@@ -746,10 +709,8 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.12&end=339.18
   /// ">Reference-Instance</a>
-  #[size = 24]
   #[liberty(complex(type = Option))]
   pub active_output_ccb: Option<String>,
-  #[size = 16]
   #[liberty(complex(type = Option))]
   pub propagating_ccb: Option<PropagatingCcb>,
   /// You define the mode attribute within a timing group.
@@ -760,7 +721,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=340.23+341.2+342.2+343.2+344.2&end=340.36+341.53+342.54+343.54+344.46
   /// ">Reference</a>
-  #[size = 16]
   #[liberty(complex(type = Option))]
   pub mode: Option<[String; 2]>,
   /// The `char_config` group is a group of attributes including simple and complex attributes.
@@ -807,7 +767,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=43.30+44.2&end=43.31+44.37
   /// ">Reference</a>
-  #[size = 1312]
   #[liberty(group)]
   pub char_config: Option<CharConfig<C>>,
   /// The `cell_degradation` group describes a cell performance degradation
@@ -817,10 +776,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33+348.2&end=347.42+348.20
   /// ">Reference</a>
-  #[size = 88]
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<CellDegradation<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<CellDegradation<C>>::deserialize_with")]
   pub cell_degradation: GroupSet<CellDegradation<C>>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33+348.2&end=347.42+348.20
@@ -832,7 +788,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_cell_rise: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub cell_rise: Option<TimingTableLookUp<C>>,
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
   ///
@@ -850,7 +805,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub cell_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
     rise_transition: Option<TableLookUp2D<C>>,
@@ -859,7 +813,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_rise_transition: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub rise_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
     fall_transition: Option<TableLookUp2D<C>>,
@@ -868,7 +821,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_fall_transition: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub fall_transition: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
     rise_constraint: Option<TableLookUp2D<C>>,
@@ -877,7 +829,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_rise_constraint: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub rise_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
     fall_constraint: Option<TableLookUp2D<C>>,
@@ -886,7 +837,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_fall_constraint: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub fall_constraint: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
     retaining_rise: Option<TableLookUp2D<C>>,
@@ -895,7 +845,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_retaining_rise: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub retaining_rise: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
     retaining_fall: Option<TableLookUp2D<C>>,
@@ -904,7 +853,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_retaining_fall: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub retaining_fall: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
     retain_rise_slew: Option<TableLookUp2D<C>>,
@@ -913,7 +861,6 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_retain_rise_slew: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub retain_rise_slew: Option<TimingTableLookUp<C>>,
   #[liberty(supergroup(
     retain_fall_slew: Option<TableLookUp2D<C>>,
@@ -922,123 +869,89 @@ pub struct Timing<C: Ctx> {
     ocv_skewness_retain_fall_slew: Option<TableLookUp2D<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
-  #[size = 144]
   pub retain_fall_slew: Option<TimingTableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub fall_propagation: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub noise_immunity_above_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub noise_immunity_below_low: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub noise_immunity_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub noise_immunity_low: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   pub output_current_fall: Option<ReferenceTimeVector3DGrpup<C>>,
-  #[size = 216]
   #[liberty(group)]
   pub output_current_rise: Option<ReferenceTimeVector3DGrpup<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_height_above_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_height_below_low: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_height_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_height_low: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_peak_time_ratio_above_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_peak_time_ratio_below_low: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_peak_time_ratio_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_peak_time_ratio_low: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_width_above_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_width_below_low: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_width_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub propogated_noise_width_low: Option<TableLookUp<C>>,
-  #[size = 88]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
-  #[size = 88]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<TableLookUpMultiSegment<C>>::deserialize_with")]
   pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance1_fall: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance1_rise: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance2_fall: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub receiver_capacitance2_rise: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub rise_propagation: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub steady_state_current_high: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub steady_state_current_low: Option<TableLookUp<C>>,
-  #[size = 216]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_common_template!)]
   pub steady_state_current_tristate: Option<TableLookUp<C>>,
@@ -1046,7 +959,6 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
   /// ">Reference-Definition</a>
-  #[size = 128]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_compact_template!)]
   pub compact_ccs_rise: Option<CompactCcsTable<C>>,
@@ -1054,69 +966,38 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
   /// ">Reference-Definition</a>
-  #[size = 168]
   #[liberty(group)]
   #[liberty(after_build = crate::table::use_compact_template!)]
   pub compact_ccs_fall: Option<CompactCcsTable<C>>,
-  #[size = 169]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_cell_fall: GroupSet<OcvSigmaTable<C>>,
-  #[size = 169]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_cell_rise: GroupSet<OcvSigmaTable<C>>,
-  #[size = 168]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_fall_constraint: GroupSet<OcvSigmaTable<C>>,
-  #[size = 169]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_fall_transition: GroupSet<OcvSigmaTable<C>>,
-  #[size = 168]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_rise_constraint: GroupSet<OcvSigmaTable<C>>,
-  #[size = 169]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_rise_transition: GroupSet<OcvSigmaTable<C>>,
-  #[size = 168]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_retaining_fall: GroupSet<OcvSigmaTable<C>>,
-  #[size = 168]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_retaining_rise: GroupSet<OcvSigmaTable<C>>,
-  #[size = 168]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_retain_fall_slew: GroupSet<OcvSigmaTable<C>>,
-  #[size = 168]
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_common_template!)]
-  #[serde(serialize_with = "GroupSet::<OcvSigmaTable<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<OcvSigmaTable<C>>::deserialize_with")]
   pub ocv_sigma_retain_rise_slew: GroupSet<OcvSigmaTable<C>>,
 }
 

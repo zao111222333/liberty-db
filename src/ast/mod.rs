@@ -31,7 +31,7 @@ pub(crate) type RandomState = std::hash::RandomState;
 #[cfg(feature = "fast_hash")]
 pub(crate) type RandomState = ahash::RandomState;
 
-pub type GroupSet<T> = <T as mut_set::Item>::MutSet<RandomState>;
+pub type GroupSet<T> = indexmap::IndexSet<T, RandomState>;
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Default)]

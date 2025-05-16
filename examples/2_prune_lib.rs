@@ -1,4 +1,5 @@
 use liberty_db::{DefaultCtx, Library, cell::CellCtx};
+use mut_set::MutSetExt as _;
 use std::{
   env,
   fs::File,

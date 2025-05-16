@@ -33,7 +33,7 @@ liberty_db = "0.11"
 One basic demo here:
 
 ```rust
-use liberty_db::{DefaultCtx, Library};
+use liberty_db::{DefaultCtx, Library, MutSetExt, PinId};
 use std::{
   fs::File,
   io::{BufWriter, Write},
@@ -65,7 +65,7 @@ fn main(){
   library.cell.get_mut("DFF").map(|cell_dff| {
     cell_dff
       .pin
-      .get_mut("CK".into())
+      .get_mut(&PinId::from("CK"))
       .map(|pin_ck| pin_ck.clock = Some(true))
   });
   // print library

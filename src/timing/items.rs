@@ -123,40 +123,34 @@ impl<C: Ctx> SimpleAttri<C> for TimingSenseType {
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33&end=347.35
 /// ">Reference</a>
 ///
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct CellDegradation<C: Ctx> {
   /// name
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   pub name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   pub attributes: ast::Attributes,
   /// /* lookup table */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex)]
   pub index_1: Vec<f64>,
   /// /* lookup table */
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.6&end=348.7
   /// ">Reference</a>
-  #[size = 24]
   #[liberty(complex)]
   pub values: Vec<f64>,
 }

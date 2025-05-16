@@ -42,57 +42,47 @@ pub(crate) struct Timing<C: Ctx> {
 }
 impl<C: Ctx> GroupFn<C> for Timing<C> {}
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 // #[derive(liberty_macros::Nothing)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub(crate) struct Pin<C: Ctx> {
-  #[size = 8]
   #[liberty(name)]
-  #[id(borrow = "&str", with_ref = false)]
+  #[id(borrow = str)]
   name: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   attributes: Attributes,
-  #[size = 24]
   #[liberty(group(type = Vec))]
   timing: Vec<Timing<C>>,
 }
 impl<C: Ctx> GroupFn<C> for Pin<C> {}
 
-#[mut_set::derive::item(sort)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
 pub(crate) struct FF<C: Ctx> {
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   #[liberty(name)]
   variable1: String,
-  #[id(borrow = "&str", with_ref = false)]
-  #[size = 8]
+  #[id(borrow = str)]
   #[liberty(name)]
   variable2: String,
   /// group comments
-  #[size = 32]
   #[liberty(comments)]
   comments: GroupComments,
-  #[size = 0]
   #[liberty(extra_ctx)]
   pub extra_ctx: C::Other,
   /// group undefined attributes
-  #[size = 40]
   #[liberty(attributes)]
   attributes: Attributes,
   #[liberty(simple(type = Option))]
@@ -150,12 +140,8 @@ pub(crate) struct Cell<C: Ctx> {
   #[liberty(simple(type = Option))]
   area: Option<f64>,
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<FF<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<FF<C>>::deserialize_with")]
   ff: GroupSet<FF<C>>,
   #[liberty(group(type = Set))]
-  #[serde(serialize_with = "GroupSet::<Pin<C>>::serialize_with")]
-  #[serde(deserialize_with = "GroupSet::<Pin<C>>::deserialize_with")]
   pin: GroupSet<Pin<C>>,
   #[liberty(group(type = Option))]
   statetable: Option<Statetable<C>>,

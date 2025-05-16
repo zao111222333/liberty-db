@@ -18,7 +18,6 @@ macro_rules! impl_py_enum {
   ($t:tt) => {
     impl<'py> FromPyObject<'py> for $t {
       #[inline]
-      // #[expect(clippy::option_if_let_else)]
       fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
         match ob.extract::<alloc::borrow::Cow<'_, str>>()?.parse() {
           Ok(t) => Ok(t),
@@ -38,7 +37,14 @@ macro_rules! impl_py_enum {
     impl PyStubType for $t {
       #[inline]
       fn type_output() -> TypeInfo {
-        PyString::type_output()
+        use strum::IntoEnumIterator as _;
+        TypeInfo {
+          name: format!(
+            "typing.Literal{:?}",
+            Self::iter().into_iter().map(|t| t.to_string()).collect::<Vec<_>>()
+          ),
+          import: ["typing".into()].into_iter().collect(),
+        }
       }
     }
   };
@@ -75,6 +81,9 @@ impl<'py> IntoPyObject<'py> for CapacitiveLoadUnit {
 impl PyStubType for CapacitiveLoadUnit {
   #[inline]
   fn type_output() -> TypeInfo {
-    <(f64, String)>::type_output()
+    TypeInfo::with_module(
+      "tuple[builtins.float, typing.Literal[\"ff\", \"pf\"]]",
+      "typing".into(),
+    )
   }
 }
