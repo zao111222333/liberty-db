@@ -121,6 +121,7 @@ jobs:
           tool: cargo-tarpaulin
       - run: cargo tarpaulin --verbose --release --lib --examples --workspace --exclude liberty-macros --exclude-files dev/* --out xml html --output-dir target/codecov
       - name: Upload to codecov.io
+        if: github.ref == 'refs/heads/main'
         uses: codecov/codecov-action@v5
         with:
           files: target/codecov/cobertura.xml
