@@ -266,16 +266,6 @@ impl<C: Ctx> SimpleAttri<C> for Table {
       |i, ff| write!(ff, "{i}"),
       format!(" ,\\\n{indent}         ").as_str(),
     )
-    // let mut iter = self.v.iter();
-    // if let Some(first) = iter.next() {
-    //   write!(f, "\"{first}")?;
-    //   while let Some(next) = iter.next() {
-    //     write!(f, " ,\\\n{indent}         {next}")?;
-    //   }
-    //   write!(f, "\"")
-    // } else {
-    //   Ok(())
-    // }
   }
 }
 

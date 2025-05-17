@@ -560,7 +560,6 @@ pub(crate) enum ComplexParseError {
   /// `ParseFloatError`
   #[error("{0}")]
   Float(#[from] fast_float2::Error),
-  // Float(#[from] ParseNotNanError<ParseFloatError>),
   /// `ParseIntError`
   #[error("{0}")]
   Int(#[from] lexical_core::Error),
