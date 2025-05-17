@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.12.0"
+version = "0.12.1"
 license = "MIT"
 edition = "2024"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -36,10 +36,7 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html"]
 
 [features]
-default = ["fast_hash", "lut_template"]
-fast_hash = ["dep:ahash"]
-# use str's hash to do match, rather than directly match str
-hashmatch = ["liberty-macros/hashmatch"]
+default = ["lut_template"]
 py = ["dep:pyo3", "dep:pyo3-stub-gen"]
 lut_template = []
 __test_runtime_assert = []
@@ -71,11 +68,6 @@ criterion = { version = "0.5", features = ["html_reports"] }
 sysinfo = "0.34"
 chrono = "0.4"
 anyhow = "1.0"
-# faster hash
-ahash = { version = "0.8", features = ["no-rng"]}
-# group name matching use faster but less DOS resistance foldhash
-# but that's okay since the matching is static and any error will
-# be find during compiling with `#[deny(unreachable_patterns)]`
 foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
 hashmatch = "0.1.1"
@@ -87,7 +79,6 @@ indexmap = { version = "2.9", features = ["serde"] }
 
 [dependencies]
 liberty-macros = { path = "macros" }
-ahash = { workspace = true, optional = true }
 foldhash.workspace = true
 log.workspace = true
 serde.workspace = true

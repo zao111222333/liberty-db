@@ -13,7 +13,6 @@ fn group_field_fn(
   arrti_type: &AttriType,
   attributes_name: &Ident,
   comments_name: &Ident,
-  hashmatch: bool,
 ) -> syn::Result<(
   proc_macro2::TokenStream,
   proc_macro2::TokenStream,
@@ -46,19 +45,11 @@ fn group_field_fn(
   };
   let wrapper_parser_arm =
     |_s_field_name: &String, parser_arm: proc_macro2::TokenStream| {
-      if hashmatch {
-        quote!(
-          hashmatch::hash_arm!(#_s_field_name) => {
-            #parser_arm
-          },
-        )
-      } else {
-        quote!(
-          #_s_field_name => {
-            #parser_arm
-          },
-        )
-      }
+      quote!(
+        #_s_field_name => {
+          #parser_arm
+        },
+      )
     };
   let build_fn = |ty: &Type| match (before_build, after_build) {
     (None, None) => quote! { crate::ast::ParsingBuilder::<C>::build(t, scope) },
@@ -564,19 +555,6 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         ));
       }
     }
-    #[expect(clippy::needless_bool)]
-    let hashmatch = if field_name_arrti_type.len() >= 40 {
-      #[cfg(feature = "hashmatch")]
-      {
-        true
-      }
-      #[cfg(not(feature = "hashmatch"))]
-      {
-        false
-      }
-    } else {
-      false
-    };
     for (field_name, arrti_type, field_type) in field_name_arrti_type {
       let (comment_fn, write_field, builder_init, parser_arm, builder_field, build_arm) =
         group_field_fn(
@@ -588,7 +566,6 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           arrti_type,
           attributes_name,
           comments_name,
-          hashmatch,
         )?;
       comment_fns = quote! {
         #comment_fns
@@ -677,7 +654,6 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
       _ => quote!(),
     };
-    let key_id = if hashmatch { quote!(hashmatch::hash_str(key)) } else { quote!(key) };
 
     let impl_group = quote! {
       #[doc(hidden)]
@@ -748,7 +724,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
               Ok((_input,key)) => {
                 input = _input;
                 #[deny(unreachable_patterns)]
-                match #key_id {
+                match key {
                   #parser_arms
                   _ => {
                     let (new_input,undefined) = crate::ast::parser::undefine(input, key, scope)?;

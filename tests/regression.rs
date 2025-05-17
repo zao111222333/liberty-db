@@ -18,10 +18,9 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
 }
 
 /// when we need to re-golden
-/// cargo test --no-default-features --test regression -- make_golden --exact --show-output
-#[cfg(all(not(feature = "fast_hash"), not(feature = "hashmatch"),))]
-#[allow(dead_code)]
+/// cargo test --package liberty-db --test regression -- make_golden --exact --show-output --ignored
 #[test]
+#[ignore]
 fn make_golden() {
   use std::{
     fs::File,
@@ -42,7 +41,6 @@ fn make_golden() {
   }
 }
 
-#[cfg(test)]
 #[test]
 fn regression() {
   _ = simple_logger::SimpleLogger::new().init();
