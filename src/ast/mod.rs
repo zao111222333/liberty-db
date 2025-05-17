@@ -26,10 +26,7 @@ use nom::{IResult, error::Error};
 use std::{collections::HashMap, path::Path};
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
-#[cfg(not(feature = "fast_hash"))]
-pub(crate) type RandomState = std::hash::RandomState;
-#[cfg(feature = "fast_hash")]
-pub(crate) type RandomState = ahash::RandomState;
+pub(crate) type RandomState = foldhash::quality::RandomState;
 
 pub type GroupSet<T> = indexmap::IndexSet<T, RandomState>;
 
@@ -280,7 +277,7 @@ pub(crate) fn attributs_set_undefined_attri(
   scope: &ParseScope<'_>,
   undefined: UndefinedAttriValue,
 ) {
-  match scope.define_map.get(&define_id(&scope.hasher, group_name, key)) {
+  match scope.define_map.get(&define_id(scope.hasher, group_name, key)) {
     None => {
       log::warn!("{} undefined {}", scope.loc, key);
       if let Some(value) = attri_map.get_mut(key) {
@@ -464,7 +461,7 @@ impl core::fmt::Display for ParseLoc<'_> {
 
 #[inline]
 #[must_use]
-pub(crate) fn define_id(hash_builder: &RandomState, group_name: &str, key: &str) -> u64 {
+pub(crate) fn define_id(hash_builder: RandomState, group_name: &str, key: &str) -> u64 {
   let mut hasher = hash_builder.build_hasher();
   group_name.hash(&mut hasher);
   key.hash(&mut hasher);
@@ -560,7 +557,6 @@ pub(crate) enum ComplexParseError {
   /// `ParseFloatError`
   #[error("{0}")]
   Float(#[from] fast_float2::Error),
-  // Float(#[from] ParseNotNanError<ParseFloatError>),
   /// `ParseIntError`
   #[error("{0}")]
   Int(#[from] lexical_core::Error),

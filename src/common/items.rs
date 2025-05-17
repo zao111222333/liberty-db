@@ -66,58 +66,6 @@ pub struct IdVector {
   pub vec: Vec<f64>,
 }
 
-// /// <a name ="reference_link" href="
-// /// https://zao111222333.github.io/liberty-db/2007.03/_user_guide.html
-// /// ?field=test
-// /// &bgn
-// /// =38.48
-// /// &end
-// /// =39.24
-// /// ">Reference-Definition</a>
-// #[mut_set::derive::item]
-// #[derive(Debug, Clone)]
-// #[derive(liberty_macros::Group)]
-// #[derive(serde::Serialize, serde::Deserialize)]
-// #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-// pub struct Domain<C: Ctx> {
-//   #[size = 8]
-//   #[liberty(name)]
-//   #[id]
-//   pub name: String,
-//   /// group comments
-//   #[size = 32]
-//   #[liberty(comments)]
-//   comments: GroupComments,
-//   #[size = 0]
-//   #[liberty(extra_ctx)]
-//   pub extra_ctx: C::Other,
-//   /// group undefined attributes
-//   #[size = 40]
-//   #[liberty(attributes)]
-//   pub attributes: crate::ast::Attributes,
-//   #[size = 8]
-//   #[liberty(simple(type = Option))]
-//   pub calc_mode: Option<String>,
-//   #[size = 1]
-//   #[liberty(simple(type = Option))]
-//   pub variable_1: Option<VariableType>,
-//   #[size = 1]
-//   #[liberty(simple(type = Option))]
-//   pub variable_2: Option<VariableType>,
-//   #[size = 1]
-//   #[liberty(simple(type = Option))]
-//   pub variable_3: Option<VariableType>,
-//   #[size = 24]
-//   #[liberty(complex)]
-//   pub index_1: Vec<f64>,
-//   #[size = 24]
-//   #[liberty(complex)]
-//   pub index_2: Vec<f64>,
-//   #[size = 24]
-//   #[liberty(complex)]
-//   pub index_3: Vec<f64>,
-// }
-// impl<C: Ctx> GroupFn<C> for Domain<C> {}
 /// sth. like "A B C" will save as set{A B C}
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -234,7 +182,6 @@ impl<C: Ctx> GroupFn<C> for DummyGroup<C> {}
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Formula(pub String);
-// type Aaa = mexprp::Expression<f64>;
 
 // /// Recursive type for boolean expression tree.
 // #[derive(serde::Serialize, serde::Deserialize)]

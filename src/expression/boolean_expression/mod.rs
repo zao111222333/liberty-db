@@ -35,7 +35,7 @@ static UNKNOWN: LazyLock<Box<Expr>> =
 pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
   #[inline]
   fn get_nodes(&self) -> HashSet<&str, crate::ast::RandomState> {
-    let mut node_set = HashSet::with_hasher(crate::ast::RandomState::new());
+    let mut node_set = HashSet::with_hasher(crate::ast::RandomState::default());
     _get_nodes(self.borrow(), &mut node_set);
     node_set
   }

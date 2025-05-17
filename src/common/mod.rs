@@ -6,7 +6,6 @@
 use ordered_float::NotNan;
 pub mod char_config;
 pub mod items;
-pub mod traits;
 
 mod demo;
 mod impls;

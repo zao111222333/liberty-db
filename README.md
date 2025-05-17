@@ -125,9 +125,8 @@ cargo bench --package dev --bench benchmark --features bench
 ```
 
 ## TODO
-
-+ Parse: use `nom_locate`
 + Parse: check all rules
 + Parse: Linked Group
++ Parse: Formula
 + Parse: async
 + MISC: bitcode support
