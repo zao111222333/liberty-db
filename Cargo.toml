@@ -63,7 +63,7 @@ ryu = "1.0"
 itoa = "1.0"
 lexical-core = "1.0"
 biodivine-lib-bdd = { version = "0.5.23", features = ["serde"] }
-mut_set = "0.8.1"
+mut_set = "0.8.2"
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
 num-traits = "0.2"

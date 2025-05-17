@@ -48,7 +48,7 @@ use core::fmt::{self, Write};
 pub struct CCSNStage<C: Ctx> {
   /// group name
   #[liberty(name)]
-  #[id]
+  #[id(borrow = [String])]
   pub name: Vec<String>,
   /// group comments
   #[liberty(comments)]
