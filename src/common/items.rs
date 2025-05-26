@@ -179,10 +179,6 @@ pub struct DummyGroup<C: Ctx> {
 }
 impl<C: Ctx> GroupFn<C> for DummyGroup<C> {}
 
-#[derive(Debug, Clone, Default)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct Formula(pub String);
-
 // /// Recursive type for boolean expression tree.
 // #[derive(serde::Serialize, serde::Deserialize)]
 // #[derive(Clone, Debug, Eq, PartialEq)]

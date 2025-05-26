@@ -15,7 +15,7 @@ use core::{
 use itertools::Itertools as _;
 
 use super::{
-  items::{Formula, NameList, WordSet},
+  items::{NameList, WordSet},
   parse_f64,
 };
 crate::ast::impl_self_builder!(f64);
@@ -646,27 +646,5 @@ impl<C: Ctx> ComplexAttri<C> for (f64, f64) {
     f.write_num(self.0)?;
     f.write_str(", ")?;
     f.write_num(self.1)
-  }
-}
-
-impl fmt::Display for Formula {
-  #[inline]
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    self.0.fmt(f)
-  }
-}
-crate::ast::impl_self_builder!(Formula);
-impl<C: Ctx> SimpleAttri<C> for Formula {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
-    use nom::Parser as _;
-    #[inline]
-    fn f(i: &str) -> nom::IResult<&str, Formula> {
-      nom::combinator::map(ast::parser::formula, |s| Formula(String::from(s))).parse(i)
-    }
-    ast::parser::simple_custom(i, &mut scope.loc.line_num, f, ast::parser::unquote)
   }
 }

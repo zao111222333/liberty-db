@@ -19,3 +19,9 @@ pub(crate) const fn f64_into_hash_ord_fn(val: &f64) -> NotNan<f64> {
   // SAFETY: convert float to hash & ord
   unsafe { NotNan::new_unchecked(*val) }
 }
+#[inline]
+#[cfg(test)]
+pub(crate) const fn f64_eq(a: f64, b: f64) -> bool {
+  const EPSILON: f64 = 1e-10;
+  (a - b).abs() < EPSILON
+}

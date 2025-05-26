@@ -15,10 +15,6 @@ categories.workspace = true
 [lib]
 proc-macro = true
 
-[features]
-default = []
-hashmatch = []
-
 [dependencies]
 foldhash.workspace = true
 proc-macro2 = "1.0"

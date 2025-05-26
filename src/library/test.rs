@@ -2,6 +2,7 @@
 use crate::{
   DefaultCtx,
   ast::{AttriValues, SimpleDefined},
+  common::f64_eq,
 };
 
 use super::*;
@@ -275,4 +276,57 @@ library (undefined) {
     .with_fixed_int_encoding();
   let serialized = bincode::serde::encode_to_vec(library, config).unwrap();
   fmt_cmp(&bincode::serde::decode_from_slice(&serialized, config).unwrap().0, want);
+}
+
+#[test]
+fn formula() {
+  let text = r#"library (test) {
+    voltage_map(VDD, 0.8);
+    voltage_map(TVDD, 0.8);
+    voltage_map(VDDDST, 0.8);
+    voltage_map(VDDGR, 0.8);
+    voltage_map(VDDSRC, 0.8);
+    voltage_map(VSS, 0);
+    input_voltage(cmos) {
+      vil : 0.3 * VDD + VSS;
+      vih : 0.7 * VDD + VSS;
+      vimin : -0.5 + VSS;
+      vimax : VDD + 0.5 + VSS;
+    }
+  }
+  
+"#;
+  let want = r#"/* test */
+library (test) {
+| delay_model : table_lookup;
+| time_unit : 1ns;
+| voltage_unit : 1V;
+| voltage_map (TVDD, 0.8);
+| voltage_map (VDD, 0.8);
+| voltage_map (VDDDST, 0.8);
+| voltage_map (VDDGR, 0.8);
+| voltage_map (VDDSRC, 0.8);
+| voltage_map (VSS, 0.0);
+| slew_upper_threshold_pct_rise : 80.0;
+| slew_lower_threshold_pct_rise : 20.0;
+| slew_derate_from_library : 1.0;
+| slew_lower_threshold_pct_fall : 20.0;
+| slew_upper_threshold_pct_fall : 80.0;
+| input_threshold_pct_fall : 50.0;
+| input_threshold_pct_rise : 50.0;
+| output_threshold_pct_rise : 50.0;
+| output_threshold_pct_fall : 50.0;
+| input_voltage (cmos) {
+| | vil : 0.3 * VDD + VSS;
+| | vih : 0.7 * VDD + VSS;
+| | vimin : -0.5 + VSS;
+| | vimax : VDD + 0.5 + VSS;
+| }
+}
+"#;
+  let library = parse_cmp(text, want);
+  let cmos_input_voltage = library.input_voltage.get("cmos").unwrap();
+  assert!(f64_eq(cmos_input_voltage.vil.value.unwrap(), 0.24));
+  assert!(f64_eq(cmos_input_voltage.vimin.value.unwrap(), -0.5));
+  assert!(f64_eq(cmos_input_voltage.vimax.value.unwrap(), 1.3));
 }

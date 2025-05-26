@@ -373,6 +373,7 @@ pub struct Library<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=39.15&end=39.16
   /// ">Reference</a>
   #[liberty(complex(type = Set))]
+  #[liberty(after_build = VoltageMap::add2scope)]
   pub voltage_map: GroupSet<VoltageMap>,
   /// An `input_voltage`  group is defined in the library  group to designate
   /// a set of input voltage ranges for your cells.
