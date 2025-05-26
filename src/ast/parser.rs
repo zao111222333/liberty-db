@@ -71,7 +71,7 @@ mod test_comment {
 }
 
 #[inline]
-fn space(i: &str) -> IResult<&str, ()> {
+pub(crate) fn space(i: &str) -> IResult<&str, ()> {
   map(take_while(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse_complete(i)
 }
 #[inline]
@@ -240,7 +240,6 @@ mod test_unquote {
     println!("{:?}", key("iw_ww "));
     println!("{:?}", key("iw_w2w "));
     println!("{:?}", key("iw_w2w';"));
-    println!("{:?}", formula("0.3 * VDD ;"));
   }
 }
 
@@ -263,17 +262,6 @@ pub(crate) const fn char_in_word(c: char) -> bool {
 #[inline]
 pub(crate) fn word(i: &str) -> IResult<&str, &str> {
   take_while1(char_in_word)(i)
-}
-
-// TODO
-#[inline]
-pub(crate) const fn char_in_formula(c: char) -> bool {
-  matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_'|'/'|'.'|':'|'+'|'-'|'*'|' ')
-}
-
-#[inline]
-pub(crate) fn formula(i: &str) -> IResult<&str, &str> {
-  take_while1(char_in_formula)(i)
 }
 
 #[inline]

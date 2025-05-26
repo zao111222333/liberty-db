@@ -6,14 +6,11 @@
 use crate::{
   Ctx,
   ast::{
-    Attributes, CodeFormatter, ComplexAttri, ComplexParseError, DefinedType,
-    GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
+    Attributes, BuilderScope, CodeFormatter, ComplexAttri, ComplexParseError,
+    DefinedType, GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
   },
-  common::{
-    items::{Formula, IdVector},
-    parse_f64,
-  },
-  expression::logic,
+  common::{items::IdVector, parse_f64},
+  expression::{Formula, logic},
 };
 use core::fmt::{self, Write};
 
@@ -297,6 +294,11 @@ pub struct VoltageMap {
   pub name: String,
   /// voltage
   pub voltage: f64,
+}
+impl VoltageMap {
+  pub(super) fn add2scope<C: Ctx>(&self, scope: &mut BuilderScope<C>) {
+    _ = scope.voltage_map.insert(self.name.clone(), self.voltage);
+  }
 }
 crate::ast::impl_self_builder!(VoltageMap);
 impl<C: Ctx> ComplexAttri<C> for VoltageMap {
@@ -1272,10 +1274,10 @@ mod test {
       }"#,
       r#"
 liberty_db::library::items::InputVoltage (cmos_schmitt) {
-| vil : 0.3 * VDD ;
-| vih : 0.7 * VDD ;
-| vimin : -0.5 ;
-| vimax : VDD + 0.5 ;
+| vil : 0.3 * VDD;
+| vih : 0.7 * VDD;
+| vimin : -0.5;
+| vimax : VDD + 0.5;
 }"#,
     );
   }

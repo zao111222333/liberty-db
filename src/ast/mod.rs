@@ -45,6 +45,7 @@ pub(crate) struct BuilderScope<C: Ctx> {
   #[cfg(feature = "lut_template")]
   pub(crate) compact_lut_template:
     HashMap<String, Arc<CompactLutTemplate<C>>, RandomState>,
+  pub(crate) voltage_map: HashMap<String, f64, RandomState>,
 }
 
 pub(crate) trait ParsingBuilder<C: Ctx>: Sized {

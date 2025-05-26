@@ -50,76 +50,76 @@ liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
 		voltage : 0.8;
 	}
 	input_voltage (cmos) {
-		vil : 0.3 * VDD ;
-		vih : 0.7 * VDD ;
-		vimin : -0.5 ;
-		vimax : VDD + 0.5 ;
+		vil : 0.3 * VDD;
+		vih : 0.7 * VDD;
+		vimin : -0.5;
+		vimax : VDD + 0.5;
 	}
 	input_voltage (cmos_schmitt) {
-		vil : 0.3 * VDD ;
-		vih : 0.7 * VDD ;
-		vimin : -0.5 ;
-		vimax : VDD + 0.5 ;
+		vil : 0.3 * VDD;
+		vih : 0.7 * VDD;
+		vimin : -0.5;
+		vimax : VDD + 0.5;
 	}
 	input_voltage (pci) {
-		vil : 0.8 ;
-		vih : 2.0 ;
-		vimin : -0.5 ;
-		vimax : VDD + 0.5 ;
+		vil : 0.8;
+		vih : 2;
+		vimin : -0.5;
+		vimax : VDD + 0.5;
 	}
 	input_voltage (schmitt) {
-		vil : 0.3 * VDD ;
-		vih : 0.7 * VDD ;
-		vimin : -0.5 ;
-		vimax : VDD + 0.5 ;
+		vil : 0.3 * VDD;
+		vih : 0.7 * VDD;
+		vimin : -0.5;
+		vimax : VDD + 0.5;
 	}
 	input_voltage (ttl) {
-		vil : 0.8 ;
-		vih : 2.0 ;
-		vimin : -0.5 ;
-		vimax : VDD + 0.5 ;
+		vil : 0.8;
+		vih : 2;
+		vimin : -0.5;
+		vimax : VDD + 0.5;
 	}
 	input_voltage (ttl_schmitt) {
-		vil : 0.8 ;
-		vih : 2.0 ;
-		vimin : -0.5 ;
-		vimax : VDD + 0.5 ;
+		vil : 0.8;
+		vih : 2;
+		vimin : -0.5;
+		vimax : VDD + 0.5;
 	}
 	output_voltage (cmos) {
-		vol : 0.3 * VDD ;
-		voh : 0.7 * VDD ;
-		vomin : -0.5 ;
-		vomax : VDD + 0.5 ;
+		vol : 0.3 * VDD;
+		voh : 0.7 * VDD;
+		vomin : -0.5;
+		vomax : VDD + 0.5;
 	}
 	output_voltage (cmos_schmitt) {
-		vol : 0.3 * VDD ;
-		voh : 0.7 * VDD ;
-		vomin : -0.5 ;
-		vomax : VDD + 0.5 ;
+		vol : 0.3 * VDD;
+		voh : 0.7 * VDD;
+		vomin : -0.5;
+		vomax : VDD + 0.5;
 	}
 	output_voltage (pci) {
-		vol : 0.8 ;
-		voh : 2.0 ;
-		vomin : -0.5 ;
-		vomax : VDD + 0.5 ;
+		vol : 0.8;
+		voh : 2;
+		vomin : -0.5;
+		vomax : VDD + 0.5;
 	}
 	output_voltage (schmitt) {
-		vol : 0.3 * VDD ;
-		voh : 0.7 * VDD ;
-		vomin : -0.5 ;
-		vomax : VDD + 0.5 ;
+		vol : 0.3 * VDD;
+		voh : 0.7 * VDD;
+		vomin : -0.5;
+		vomax : VDD + 0.5;
 	}
 	output_voltage (ttl) {
-		vol : 0.8 ;
-		voh : 2.0 ;
-		vomin : -0.5 ;
-		vomax : VDD + 0.5 ;
+		vol : 0.8;
+		voh : 2;
+		vomin : -0.5;
+		vomax : VDD + 0.5;
 	}
 	output_voltage (ttl_schmitt) {
-		vol : 0.8 ;
-		voh : 2.0 ;
-		vomin : -0.5 ;
-		vomax : VDD + 0.5 ;
+		vol : 0.8;
+		voh : 2;
+		vomin : -0.5;
+		vomax : VDD + 0.5;
 	}
 	power_lut_template (passive_power_template_7x1) {
 		variable_1 : input_transition_time;

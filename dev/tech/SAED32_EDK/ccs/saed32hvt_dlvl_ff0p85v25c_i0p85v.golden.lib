@@ -53,10 +53,10 @@ liberty_db::library::Library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 		voltage : 0.85;
 	}
 	output_voltage (DC_0) {
-		vol : 0.042500;
-		voh : 0.807500;
-		vomin : 0.000000;
-		vomax : 0.850000;
+		vol : 0.0425;
+		voh : 0.8075;
+		vomin : 0;
+		vomax : 0.85;
 	}
 	lu_table_template (CCS_RCV_TEMPLATE_0) {
 		variable_1 : input_net_transition;

@@ -127,6 +127,5 @@ cargo bench --package dev --bench benchmark --features bench
 ## TODO
 + Parse: check all rules
 + Parse: Linked Group
-+ Parse: Formula
 + Parse: async
 + MISC: bitcode support
