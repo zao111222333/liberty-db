@@ -64,7 +64,7 @@ mut_set = "0.8.2"
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
 num-traits = "0.2"
-criterion = { version = "0.5", features = ["html_reports"] }
+criterion = { version = "0.6", features = ["html_reports"] }
 sysinfo = "0.35"
 chrono = "0.4"
 anyhow = "1.0"
