@@ -210,13 +210,13 @@ impl<C: Ctx> GroupFn<C> for CCSNStage<C> {
     if let Some(miller_cap_fall) = builder.miller_cap_fall.as_mut() {
       if miller_cap_fall.is_sign_negative() {
         *miller_cap_fall = 0.0;
-        log::warn!("miller_cap_fall is negative!");
+        crate::warn!("miller_cap_fall is negative!");
       }
     }
     if let Some(miller_cap_rise) = builder.miller_cap_rise.as_mut() {
       if miller_cap_rise.is_sign_negative() {
         *miller_cap_rise = 0.0;
-        log::warn!("miller_cap_rise is negative!");
+        crate::warn!("miller_cap_rise is negative!");
       }
     }
   }

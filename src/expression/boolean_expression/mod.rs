@@ -310,7 +310,7 @@ impl<C: Ctx> ParsingBuilder<C> for LogicBooleanExpression {
       .logic_variables
       .safe_eval_expression(&builder.expr);
     if bdd.is_none() {
-      log::error!("Failed to build BDD for [{}]", builder.expr);
+      crate::error!("Failed to build BDD for [{}]", builder.expr);
     }
     Self(BddBooleanExpression { expr: builder.expr, bdd })
   }
@@ -322,7 +322,7 @@ impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
     let bdd = scope.cell_extra_ctx.pg_variables.safe_eval_expression(&builder.expr);
     if bdd.is_none() {
-      log::error!("Failed to build BDD for [{}]", builder.expr);
+      crate::error!("Failed to build BDD for [{}]", builder.expr);
     }
     Self(BddBooleanExpression { expr: builder.expr, bdd })
   }
@@ -336,7 +336,7 @@ impl From<BooleanExpression> for BddBooleanExpression {
     let variables = BddVariableSet::new(&node_set);
     let bdd = variables.safe_eval_expression(&value.expr);
     if bdd.is_none() {
-      log::error!("Failed to build BDD for [{}]", value.expr);
+      crate::error!("Failed to build BDD for [{}]", value.expr);
     }
     Self { expr: value.expr, bdd }
   }
@@ -384,7 +384,7 @@ impl<C: Ctx> crate::Cell<C> {
     let expr = BooleanExpression::from_str(s)?.expr;
     let bdd = self.extra_ctx.logic_variables().safe_eval_expression(&expr);
     if bdd.is_none() {
-      log::error!("Failed to build BDD for [{expr}]");
+      crate::error!("Failed to build BDD for [{expr}]");
     }
     Ok(LogicBooleanExpression(BddBooleanExpression { expr, bdd }))
   }
@@ -399,7 +399,7 @@ impl<C: Ctx> crate::Cell<C> {
     let expr = BooleanExpression::from_str(s)?.expr;
     let bdd = self.extra_ctx.pg_variables().safe_eval_expression(&expr);
     if bdd.is_none() {
-      log::error!("Failed to build BDD for [{expr}]");
+      crate::error!("Failed to build BDD for [{expr}]");
     }
     Ok(PowerGroundBooleanExpression(BddBooleanExpression { expr, bdd }))
   }

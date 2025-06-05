@@ -12,7 +12,7 @@ use std::{
 // Use the first arg as input file name,
 // parse it, and then write it into example1_xxx.lib
 fn main() -> ExitCode {
-  simple_logger::SimpleLogger::new().init().unwrap();
+  dev_utils::init_logger();
   let args: Vec<String> = env::args().collect();
 
   let input_lib = Path::new(&args[1]);

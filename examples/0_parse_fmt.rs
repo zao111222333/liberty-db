@@ -55,7 +55,7 @@ library(gscl45nm) {
   }
 }"#;
 fn main() {
-  simple_logger::SimpleLogger::new().init().unwrap();
+  dev_utils::init_logger();
   match Library::<DefaultCtx>::parse_lib(TEMPLATE, None) {
     Ok(ref mut library) => {
       library.comments_this_entry().or_insert("line1\nline2".into());

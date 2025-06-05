@@ -286,7 +286,7 @@ pub(crate) fn attributs_set_undefined_attri(
 ) {
   match scope.define_map.get(&define_id(scope.hasher, group_name, key)) {
     None => {
-      log::warn!("{} undefined {}", scope.loc, key);
+      crate::warn!("{} undefined {}", scope.loc, key);
       if let Some(value) = attri_map.get_mut(key) {
         match (value, undefined) {
           (
@@ -302,7 +302,7 @@ pub(crate) fn attributs_set_undefined_attri(
             v.push(u);
           }
           (_, _) => {
-            log::error!(
+            crate::error!(
               "{} Key={key}, the old undefined attribute do NOT meet new one",
               scope.loc
             );
@@ -329,7 +329,7 @@ pub(crate) fn attributs_set_undefined_attri(
               if let AttriValues::Simple(SimpleDefined::Boolean(v)) = value {
                 v.push(u.parse().map_or(Err(u), Ok));
               } else {
-                log::error!(
+                crate::error!(
                   "{} Key={key}, the old attribute do NOT meet new one",
                   scope.loc
                 );
@@ -339,7 +339,7 @@ pub(crate) fn attributs_set_undefined_attri(
               if let AttriValues::Simple(SimpleDefined::String(v)) = value {
                 v.push(u);
               } else {
-                log::error!(
+                crate::error!(
                   "{} Key={key}, the old attribute do NOT meet new one",
                   scope.loc
                 );
@@ -349,7 +349,7 @@ pub(crate) fn attributs_set_undefined_attri(
               if let AttriValues::Simple(SimpleDefined::Integer(v)) = value {
                 v.push(lexical_core::parse(u.as_bytes()).map_or(Err(u), Ok));
               } else {
-                log::error!(
+                crate::error!(
                   "{} Key={key}, the old attribute do NOT meet new one",
                   scope.loc
                 );
@@ -359,7 +359,7 @@ pub(crate) fn attributs_set_undefined_attri(
               if let AttriValues::Simple(SimpleDefined::Float(v)) = value {
                 v.push(parse_f64(&u).map_or(Err(u), Ok));
               } else {
-                log::error!(
+                crate::error!(
                   "{} Key={key}, the old attribute do NOT meet new one",
                   scope.loc
                 );
@@ -390,7 +390,7 @@ pub(crate) fn attributs_set_undefined_attri(
           );
         }
       } else {
-        log::error!("{} Key={key}, `defined` got wrong type", scope.loc);
+        crate::error!("{} Key={key}, `defined` got wrong type", scope.loc);
       }
     }
     Some(DefinedType::Group) => {
@@ -399,13 +399,16 @@ pub(crate) fn attributs_set_undefined_attri(
           if let AttriValues::Group(v) = value {
             v.push(u);
           } else {
-            log::error!("{} Key={key}, the old attribute do NOT meet new one", scope.loc);
+            crate::error!(
+              "{} Key={key}, the old attribute do NOT meet new one",
+              scope.loc
+            );
           }
         } else {
           _ = attri_map.insert(String::from(key), AttriValues::Group(vec![u]));
         }
       } else {
-        log::error!("{} Key={key}, `defined_group` got wrong type", scope.loc);
+        crate::error!("{} Key={key}, `defined_group` got wrong type", scope.loc);
       }
     }
   }
@@ -744,7 +747,7 @@ pub(crate) trait GroupAttri<C: Ctx>:
         nom::error::ErrorKind::Eof,
       ))
     })?;
-    log::info!("include file: {}", filename.display());
+    crate::info!("include file: {}", filename.display());
     if !scope.include_files.insert(filename.clone()) {
       return Err(nom::Err::Error(Error::new(
         "include_file: loop include",
@@ -767,7 +770,7 @@ pub(crate) trait GroupAttri<C: Ctx>:
       }
     };
     _ = Self::nom_parse::<true>(builder, input1, group_name, scope).map_err(|e| {
-      log::error!("{e}");
+      crate::error!("{e}");
       nom::Err::Error(Error::new(
         "include_file: unable to parse file",
         nom::error::ErrorKind::Eof,

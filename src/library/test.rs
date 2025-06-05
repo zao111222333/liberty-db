@@ -326,7 +326,7 @@ library (test) {
 | }
 }
 "#;
-  SimpleLogger::new().init();
+  dev_utils::init_logger();
   let library = parse_cmp(text, want);
   let cmos_input_voltage = library.input_voltage.get("cmos").unwrap();
   assert!(f64_eq(cmos_input_voltage.vil.value.unwrap(), 0.24));

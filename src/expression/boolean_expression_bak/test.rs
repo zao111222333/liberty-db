@@ -4,18 +4,20 @@ use std::{collections::HashMap, hash::Hasher};
 
 use crate::{expression::*, units};
 // use test_log::test;
-// use log::info;
+// use crate::info;
 
 fn nand_ab() -> BooleanExpression {
   let port_a: BooleanExpression = Port::new("A").into();
   let port_b = Port::new("B").into();
   let exp_not_a_and_b: BooleanExpression = FunctionExpression::new(
-    vec![FunctionExpression::new(
-      vec![port_a, port_b],
-      vec![None, None],
-      vec![logic::Operator2::And],
-    )
-    .into()],
+    vec![
+      FunctionExpression::new(
+        vec![port_a, port_b],
+        vec![None, None],
+        vec![logic::Operator2::And],
+      )
+      .into(),
+    ],
     vec![Some(logic::Operator1::Not)],
     vec![],
   )
@@ -42,12 +44,14 @@ fn and_ab() -> BooleanExpression {
   let port_a: BooleanExpression = Port::new("A").into();
   let port_b = Port::new("B").into();
   let exp_not_a_and_b: BooleanExpression = FunctionExpression::new(
-    vec![FunctionExpression::new(
-      vec![port_a, port_b],
-      vec![None, None],
-      vec![logic::Operator2::And],
-    )
-    .into()],
+    vec![
+      FunctionExpression::new(
+        vec![port_a, port_b],
+        vec![None, None],
+        vec![logic::Operator2::And],
+      )
+      .into(),
+    ],
     vec![None],
     vec![],
   )
@@ -58,12 +62,14 @@ fn and_ac() -> BooleanExpression {
   let port_a: BooleanExpression = Port::new("A").into();
   let port_c = Port::new("C").into();
   let exp_not_a_and_b: BooleanExpression = FunctionExpression::new(
-    vec![FunctionExpression::new(
-      vec![port_a, port_c],
-      vec![None, None],
-      vec![logic::Operator2::And],
-    )
-    .into()],
+    vec![
+      FunctionExpression::new(
+        vec![port_a, port_c],
+        vec![None, None],
+        vec![logic::Operator2::And],
+      )
+      .into(),
+    ],
     vec![None],
     vec![],
   )
@@ -74,12 +80,14 @@ fn and_ba() -> BooleanExpression {
   let port_a: BooleanExpression = Port::new("A").into();
   let port_b = Port::new("B").into();
   let exp_not_a_and_b: BooleanExpression = FunctionExpression::new(
-    vec![FunctionExpression::new(
-      vec![port_b, port_a],
-      vec![None, None],
-      vec![logic::Operator2::And],
-    )
-    .into()],
+    vec![
+      FunctionExpression::new(
+        vec![port_b, port_a],
+        vec![None, None],
+        vec![logic::Operator2::And],
+      )
+      .into(),
+    ],
     vec![None],
     vec![],
   )
@@ -90,12 +98,14 @@ fn and_aa() -> BooleanExpression {
   let port_a: BooleanExpression = Port::new("A").into();
   let port_b = Port::new("A").into();
   let exp_not_a_and_b: BooleanExpression = FunctionExpression::new(
-    vec![FunctionExpression::new(
-      vec![port_a, port_b],
-      vec![None, None],
-      vec![logic::Operator2::And],
-    )
-    .into()],
+    vec![
+      FunctionExpression::new(
+        vec![port_a, port_b],
+        vec![None, None],
+        vec![logic::Operator2::And],
+      )
+      .into(),
+    ],
     vec![None],
     vec![],
   )
@@ -176,7 +186,7 @@ fn logic_vecter_as_key() {
       units::second(0.1),
     )))));
     v_k1.push(logic::State::F);
-     _ = pin_map.insert(v_k1, v);
+    _ = pin_map.insert(v_k1, v);
   }
   {
     let mut v_k2: logic::Vector = vec![].into();
@@ -214,7 +224,7 @@ fn port_as_key() {
   println!("{:?}", port_a1.table());
   let mut map = HashMap::new();
   let v = 1;
-   _ = map.insert(port_a1, v);
+  _ = map.insert(port_a1, v);
   assert_eq!(Some(&v), map.get(&port_a2));
 }
 #[test]

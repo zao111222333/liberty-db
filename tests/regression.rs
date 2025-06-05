@@ -1,5 +1,13 @@
 #![cfg(test)]
-use dev_utils::{all_files, text_diff};
+
+#[expect(unused_imports)]
+#[cfg(not(feature = "tracing"))]
+use log::{debug, error, info, trace, warn};
+#[expect(unused_imports)]
+#[cfg(feature = "tracing")]
+use tracing::{debug, error, info, trace, warn};
+
+use dev_utils::{all_files, init_logger, text_diff};
 use liberty_db::{DefaultCtx, Library, ast::Group};
 use std::{
   fs::read_to_string,
@@ -26,11 +34,10 @@ fn make_golden() {
     fs::File,
     io::{BufWriter, Write},
   };
-  simple_logger::SimpleLogger::new().init().unwrap();
+  init_logger();
   for (is_good, test_lib_path) in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());
     let golden_lib_path = golden_path(&test_lib_path);
-    log::info!("{}", test_lib_path.display());
     let res = Library::<DefaultCtx>::parse_lib_file(&test_lib_path);
     if is_good {
       let library = res.unwrap();
@@ -45,7 +52,7 @@ fn make_golden() {
 
 #[test]
 fn regression() {
-  simple_logger::SimpleLogger::new().init().unwrap();
+  init_logger();
   for (is_good, test_lib_path) in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());
     let golden_lib_path = golden_path(&test_lib_path);

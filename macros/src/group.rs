@@ -101,7 +101,7 @@ fn group_field_fn(
               builder.#field_name = Some(simple);
             },
             Err(undefined) => {
-              log::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
+              crate::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
               crate::ast::attributs_set_undefined_simple(&mut builder.#attributes_name, key, undefined);
             },
           }
@@ -132,7 +132,7 @@ fn group_field_fn(
               builder.#field_name = simple;
             },
             Err(undefined) => {
-              log::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
+              crate::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
               crate::ast::attributs_set_undefined_simple(&mut builder.#attributes_name, key, undefined);
             },
           }
@@ -162,7 +162,7 @@ fn group_field_fn(
           match complex_res {
             Ok(complex) => builder.#field_name = complex,
             Err((e,undefined)) => {
-              log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
+              crate::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
               crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
             },
           }
@@ -195,7 +195,7 @@ fn group_field_fn(
           match complex_res {
             Ok(complex) => builder.#field_name = Some(complex),
             Err((e,undefined)) => {
-              log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
+              crate::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
               crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
             },
           }
@@ -229,7 +229,7 @@ fn group_field_fn(
               builder.#field_name.push(complex);
             },
             Err((e,undefined)) => {
-              log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
+              crate::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
               crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
             },
           }
@@ -268,7 +268,7 @@ fn group_field_fn(
               builder.#field_name.push(complex);
             },
             Err((e,undefined)) => {
-              log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
+              crate::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
               crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
             },
           }
@@ -313,7 +313,7 @@ fn group_field_fn(
               builder.#field_name.push(group_builder);
             },
             Err(e) => {
-              log::error!("{} error={}",scope.loc,e);
+              crate::error!("{} error={}",scope.loc,e);
             },
           }
           let n: usize;
@@ -353,7 +353,7 @@ fn group_field_fn(
               builder.#field_name.push(group_builder);
             },
             Err(e) => {
-              log::error!("{} error={}",scope.loc,e);
+              crate::error!("{} error={}",scope.loc,e);
             },
           }
           let n: usize;
@@ -396,12 +396,12 @@ fn group_field_fn(
             Ok(_) => {
               if let Some(old) = &builder.#field_name{
                 let e = crate::ast::IdError::RepeatAttri;
-                log::error!("{} error={}",scope.loc,e);
+                crate::error!("{} error={}",scope.loc,e);
               }
               builder.#field_name = Some(group_builder);
             },
             Err(e) => {
-              log::error!("{} error={}",scope.loc,e);
+              crate::error!("{} error={}",scope.loc,e);
             },
           }
           let n: usize;
@@ -441,12 +441,12 @@ fn group_field_fn(
               Ok(_) => {
                 if let Some(old) = &builder.#sub_name{
                   let e = crate::ast::IdError::RepeatAttri;
-                  log::error!("{} error={}",scope.loc,e);
+                  crate::error!("{} error={}",scope.loc,e);
                 }
                 builder.#sub_name = Some(group_builder);
               },
               Err(e) => {
-                log::error!("{} error={}",scope.loc,e);
+                crate::error!("{} error={}",scope.loc,e);
               },
             }
             let n: usize;

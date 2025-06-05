@@ -108,7 +108,7 @@ impl FormulaExpr {
         if let Some(f) = query_fn(k) {
           Some(f)
         } else {
-          log::error!("Eval formula [{top}]: Can NOT find voltage {k}");
+          crate::error!("Eval formula [{top}]: Can NOT find voltage {k}");
           None
         }
       }

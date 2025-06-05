@@ -920,7 +920,7 @@ impl<C: Ctx> ComplexAttri<C> for Values {
         Ok((
           _i,
           if table_len_mismatch {
-            log::error!("{} table of values is NOT aligned", scope.loc);
+            crate::error!("{} table of values is NOT aligned", scope.loc);
             Ok(Self { size1: inner.len(), size2: 1, inner })
           } else {
             Ok(Self { size1, size2, inner })

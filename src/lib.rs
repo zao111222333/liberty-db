@@ -179,6 +179,13 @@
     clippy::or_fun_call,
   )
 )]
+#[expect(unused_imports)]
+#[cfg(not(feature = "tracing"))]
+use log::{debug, error, info, trace, warn};
+#[expect(unused_imports)]
+#[cfg(feature = "tracing")]
+use tracing::{debug, error, info, trace, warn};
+
 #[cfg(any(feature = "lut_template", feature = "py"))]
 extern crate alloc;
 pub use biodivine_lib_bdd;

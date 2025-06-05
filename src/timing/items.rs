@@ -423,7 +423,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
             String::new(),
           )
         } else {
-          log::error!("LVF LUTs' index mismatch");
+          crate::error!("LVF LUTs' index mismatch");
           (Vec::new(), String::from("LVF LUTs' index mismatch"))
         };
         TimingTableLookUp {

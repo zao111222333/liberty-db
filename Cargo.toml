@@ -39,11 +39,14 @@ rustdoc-args = ["--cfg", "docsrs", "--html-in-header", "docs/header.html"]
 default = ["lut_template"]
 py = ["dep:pyo3", "dep:pyo3-stub-gen"]
 lut_template = []
+tracing = ["dep:tracing", "dev_utils/tracing"]
 __test_runtime_assert = []
 
 [workspace.dependencies]
 log = { version = "0.4", features = ["std", "serde"] }
 simple_logger = "5.0"
+tracing = "0.1.41"
+tracing-subscriber = { version="0.3.0", features=["chrono"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 thiserror = "2.0"
@@ -67,8 +70,8 @@ anyhow = "1.0"
 foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
 pyo3 = "0.25"
-pyo3-stub-gen = { version = "0.8", default-features = false }
-# pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
+# pyo3-stub-gen = { version = "0.8", default-features = false }
+pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
 bincode = { version= "2", features = ["serde"] }
 indexmap = { version = "2.9", features = ["serde"] }
 bitflags = { version = "2.9", features = ["serde"] }
@@ -77,6 +80,7 @@ bitflags = { version = "2.9", features = ["serde"] }
 liberty-macros = { path = "macros" }
 foldhash.workspace = true
 log.workspace = true
+tracing = { workspace = true, optional = true }
 serde.workspace = true
 thiserror.workspace = true
 lexical-core.workspace = true
@@ -95,6 +99,7 @@ bitflags.workspace = true
 
 [dev-dependencies]
 dev_utils.workspace = true
+tracing-subscriber.workspace = true
 simple_logger.workspace = true
 criterion.workspace = true
 bincode.workspace = true
