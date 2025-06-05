@@ -22,10 +22,7 @@ use super::{
 crate::ast::impl_self_builder!(f64);
 impl<C: Ctx> SimpleAttri<C> for f64 {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     let (new_i, expr_res) = ast::parser::simple_custom(
       i,
       &mut scope.loc.line_num,
@@ -50,20 +47,14 @@ impl<C: Ctx> SimpleAttri<C> for f64 {
 crate::ast::impl_self_builder!(bool);
 impl<C: Ctx> SimpleAttri<C> for bool {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
 crate::ast::impl_self_builder!(usize);
 impl<C: Ctx> SimpleAttri<C> for usize {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_custom(
       i,
       &mut scope.loc.line_num,
@@ -82,10 +73,7 @@ impl<C: Ctx> SimpleAttri<C> for usize {
 crate::ast::impl_self_builder!(isize);
 impl<C: Ctx> SimpleAttri<C> for isize {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_custom(
       i,
       &mut scope.loc.line_num,
@@ -285,10 +273,7 @@ impl<const N: usize> NameAttri for [String; N] {
 crate::ast::impl_self_builder!(String);
 impl<C: Ctx> SimpleAttri<C> for String {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
   #[inline]

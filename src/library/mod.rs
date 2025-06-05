@@ -16,7 +16,6 @@ use crate::{
   units,
 };
 use core::fmt::{self, Write as _};
-use indexmap::IndexSet;
 pub use items::*;
 use std::path::Path;
 
@@ -727,7 +726,6 @@ impl<C: Ctx> Library<C> {
       loc: ParseLoc {
         filename: filename.map(Path::to_path_buf),
         line_num: 0,
-        include_files: IndexSet::new(),
       },
       ..Default::default()
     };

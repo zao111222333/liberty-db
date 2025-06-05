@@ -1,3 +1,4 @@
+#![expect(clippy::map_err_ignore, clippy::arithmetic_side_effects)]
 //!
 //! `liberty` data structre ast
 //!
@@ -445,6 +446,7 @@ pub enum DefinedType {
 #[derive(Debug, Default)]
 pub(crate) struct ParseScope {
   pub(crate) loc: ParseLoc,
+  pub(crate) include_files: IndexSet<PathBuf>,
   pub(crate) define_map: HashMap<u64, DefinedType, mut_set::NoHashBuildHasher>,
   pub(crate) variables: HashMap<String, Formula, RandomState>,
   pub(crate) hasher: RandomState,
@@ -454,7 +456,6 @@ pub(crate) struct ParseScope {
 pub struct ParseLoc {
   pub filename: Option<PathBuf>,
   pub line_num: usize,
-  pub include_files: IndexSet<PathBuf>,
 }
 
 impl core::fmt::Display for ParseLoc {
@@ -721,23 +722,21 @@ pub(crate) trait GroupAttri<C: Ctx>:
     group_name: &str,
     scope: &mut ParseScope,
   ) -> IResult<&'a str, Result<(), IdError>, Error<&'a str>> {
-    let filename: &str;
-    (i, filename) = parser::complex_single(i, &mut scope.loc.line_num)?;
-    let filename = if Path::new(filename).is_absolute() {
-      PathBuf::from(filename)
-    } else {
-      if let Some(base_file) = &scope.loc.filename {
-        if let Some(root) = base_file.parent() {
-          root.join(filename)
-        } else {
-          return Err(nom::Err::Error(Error::new(
-            "include_file: unable to open file",
-            nom::error::ErrorKind::Eof,
-          )));
-        }
+    let (_i, filename_s) = parser::complex_single(i, &mut scope.loc.line_num)?;
+    i = _i;
+    let filename = if Path::new(filename_s).is_absolute() {
+      PathBuf::from(filename_s)
+    } else if let Some(base_file) = &scope.loc.filename {
+      if let Some(root) = base_file.parent() {
+        root.join(filename_s)
       } else {
-        PathBuf::from(filename)
+        return Err(nom::Err::Error(Error::new(
+          "include_file: unable to open file",
+          nom::error::ErrorKind::Eof,
+        )));
       }
+    } else {
+      PathBuf::from(filename_s)
     };
     let s = std::fs::read_to_string(&filename).map_err(|_| {
       nom::Err::Error(Error::new(
@@ -746,7 +745,7 @@ pub(crate) trait GroupAttri<C: Ctx>:
       ))
     })?;
     log::info!("include file: {}", filename.display());
-    if !scope.loc.include_files.insert(filename.clone()) {
+    if !scope.include_files.insert(filename.clone()) {
       return Err(nom::Err::Error(Error::new(
         "include_file: loop include",
         nom::error::ErrorKind::Eof,
@@ -774,7 +773,7 @@ pub(crate) trait GroupAttri<C: Ctx>:
         nom::error::ErrorKind::Eof,
       ))
     })?;
-    _ = scope.loc.include_files.pop();
+    _ = scope.include_files.pop();
     scope.loc.line_num = old_line_num;
     scope.loc.filename = old_filename;
     Ok((i, Ok(())))
@@ -858,7 +857,7 @@ pub enum ParserError {
   Other(ParseLoc, String),
 }
 
-impl<'a> ParserError {
+impl ParserError {
   #[inline]
   pub(crate) fn nom(loc: ParseLoc, e: nom::Err<Error<&str>>) -> Self {
     Self::NomError(

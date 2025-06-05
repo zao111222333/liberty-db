@@ -718,6 +718,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           f.dedent(1);
           write!(f, "\n{indent}}}")
         }
+        #[expect(unused_variables,clippy::collection_is_never_read)]
         fn nom_parse<'a, const IS_INCLUDED: bool>(
           builder: &mut Self::Builder,
           mut input: &'a str,
