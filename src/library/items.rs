@@ -449,7 +449,7 @@ impl<C: Ctx> GroupFn<C> for OutputVoltage<C> {}
 pub enum DelayModel {
   /// `table_lookup`
   #[default]
-  #[strum(serialize = "table_lookup")]
+  #[strum(serialize = "lookup_table", serialize = "table_lookup")]
   TableLookup,
 }
 crate::ast::impl_self_builder!(DelayModel);
