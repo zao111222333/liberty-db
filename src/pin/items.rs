@@ -38,7 +38,7 @@ impl<C: Ctx> SimpleAttri<C> for AntennaDiodeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -107,7 +107,7 @@ impl<C: Ctx> SimpleAttri<C> for Direction {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -128,7 +128,7 @@ impl<C: Ctx> SimpleAttri<C> for DontFault {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -176,7 +176,7 @@ impl<C: Ctx> SimpleAttri<C> for AllDriverType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -299,7 +299,7 @@ impl<C: Ctx> SimpleAttri<C> for NextstateType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -324,7 +324,7 @@ impl<C: Ctx> SimpleAttri<C> for PinFuncType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -344,7 +344,7 @@ impl<C: Ctx> SimpleAttri<C> for RestoreEdgeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -379,7 +379,7 @@ impl<C: Ctx> SimpleAttri<C> for SignalType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -403,7 +403,7 @@ impl<C: Ctx> SimpleAttri<C> for SlewControl {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -438,7 +438,7 @@ impl<C: Ctx> SimpleAttri<C> for OneZero {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -473,7 +473,7 @@ impl<C: Ctx> SimpleAttri<C> for TwoValue {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -583,7 +583,7 @@ impl<C: Ctx> ComplexAttri<C> for RetentionPin {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let pin_class: PinClass = match iter.next() {
       Some(&s) => match s.parse() {

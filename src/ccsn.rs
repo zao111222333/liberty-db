@@ -252,7 +252,7 @@ impl<C: Ctx> SimpleAttri<C> for StageType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -359,7 +359,7 @@ impl<C: Ctx> ComplexAttri<C> for PropagatingCcb {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let input_ccb_name = match iter.next() {
       Some(&s) => String::from(s),

@@ -322,10 +322,7 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
 impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex12 {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -345,10 +342,7 @@ pub enum VariableTypeCompactLutTemplateIndex3 {
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex3);
 impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex3 {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -574,16 +568,13 @@ impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     unreachable!()
   }
   #[inline]
   #[expect(clippy::arithmetic_side_effects)]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
     match ast::parser::complex_ccs_power_values(i, &mut scope.loc.line_num) {
       Ok((_i, vec)) => {
         let res = vec
@@ -897,16 +888,13 @@ impl<C: Ctx> ComplexAttri<C> for Values {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     unreachable!()
   }
   #[inline]
   #[expect(clippy::arithmetic_side_effects)]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
     match ast::parser::complex_values(i, &mut scope.loc.line_num) {
       Ok((_i, vec)) => {
         let mut size1 = 0;
@@ -1168,10 +1156,7 @@ pub enum Variable {
 crate::ast::impl_self_builder!(Variable);
 impl<C: Ctx> SimpleAttri<C> for Variable {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -1393,10 +1378,7 @@ pub enum SigmaType {
 ast::impl_self_builder!(SigmaType);
 impl<C: Ctx> SimpleAttri<C> for SigmaType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }

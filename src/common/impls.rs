@@ -24,7 +24,7 @@ impl<C: Ctx> SimpleAttri<C> for f64 {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> ast::SimpleParseRes<'a, Self> {
     let (new_i, expr_res) = ast::parser::simple_custom(
       i,
@@ -52,7 +52,7 @@ impl<C: Ctx> SimpleAttri<C> for bool {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -62,7 +62,7 @@ impl<C: Ctx> SimpleAttri<C> for usize {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_custom(
       i,
@@ -84,7 +84,7 @@ impl<C: Ctx> SimpleAttri<C> for isize {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> ast::SimpleParseRes<'a, Self> {
     ast::parser::simple_custom(
       i,
@@ -181,7 +181,7 @@ impl<C: Ctx> SimpleAttri<C> for NameList {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> ast::SimpleParseRes<'a, Self::Builder> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -287,7 +287,7 @@ impl<C: Ctx> SimpleAttri<C> for String {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -314,7 +314,7 @@ impl<const N: usize, C: Ctx> ComplexAttri<C> for [String; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let v = iter.map(|&s| String::from(s)).collect::<Vec<String>>();
     if v.len() == N {
@@ -348,7 +348,7 @@ impl<const N: usize, C: Ctx> ComplexAttri<C> for [f64; N] {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let v = iter.map(parse_f64).collect::<Result<Vec<f64>, _>>()?;
     if v.len() == N {
@@ -374,7 +374,7 @@ impl<C: Ctx> ComplexAttri<C> for (String, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let v1 = match i.next() {
@@ -406,12 +406,12 @@ impl<C: Ctx> ComplexAttri<C> for super::items::IdVector {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     unreachable!()
   }
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
     match ast::parser::complex_id_vector(i, &mut scope.loc.line_num) {
       Ok((_i, (id, vec))) => Ok((_i, Ok(Self { id, vec }))),
       Err(_) => {
@@ -433,12 +433,12 @@ crate::ast::impl_self_builder!(Vec<f64>);
 impl<C: Ctx> ComplexAttri<C> for Vec<f64> {
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     unreachable!()
   }
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ComplexParseRes<'a, Self> {
     match ast::parser::complex_float_vec(i, &mut scope.loc.line_num) {
       Ok((_i, v)) => Ok((_i, Ok(v))),
       Err(_) => {
@@ -462,7 +462,7 @@ impl<C: Ctx> ComplexAttri<C> for String {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let v1 = match i.next() {
@@ -486,7 +486,7 @@ impl<C: Ctx> ComplexAttri<C> for f64 {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let v1: Self = match i.next() {
@@ -511,7 +511,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<String> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     Ok(iter.map(|&s| String::from(s)).collect())
   }
@@ -537,7 +537,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<usize> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     iter
       .map(|&s| lexical_core::parse(s.as_bytes()))
@@ -561,7 +561,7 @@ impl<C: Ctx> ComplexAttri<C> for (f64, f64, String) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let v1 = match i.next() {
@@ -598,7 +598,7 @@ impl<C: Ctx> ComplexAttri<C> for (i64, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let v1 = match i.next() {
@@ -629,7 +629,7 @@ impl<C: Ctx> ComplexAttri<C> for (f64, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let v1 = match i.next() {

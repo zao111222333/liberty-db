@@ -333,3 +333,23 @@ library (test) {
   assert!(f64_eq(cmos_input_voltage.vimin.value.unwrap(), -0.5));
   assert!(f64_eq(cmos_input_voltage.vimax.value.unwrap(), 1.3));
 }
+
+#[test]
+fn included() {
+  let sense = crate::ast::test_parse_fmt_included::<Sensitization<DefaultCtx>>(
+    r#"pin_names ( IN1, IN2, OUT1 );
+      vector ( 1, "0 0 1" );
+      vector ( 2, "0 X 1" );
+      vector ( 3, "Z 0 1" );
+      vector ( 4, "1 1 0" );
+"#,
+    r#"
+liberty_db::library::items::Sensitization ("") {
+| pin_names (IN1, IN2, OUT1);
+| vector (1, "0 0 1");
+| vector (2, "0 X 1");
+| vector (3, "Z 0 1");
+| vector (4, "1 1 0");
+}"#,
+  );
+}

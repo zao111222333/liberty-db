@@ -22,14 +22,18 @@ use core::{
   str::FromStr,
 };
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
+use indexmap::IndexSet;
 use itertools::{Itertools as _, izip};
 use nom::{IResult, error::Error};
-use std::{collections::HashMap, path::Path};
+use std::{
+  collections::HashMap,
+  path::{Path, PathBuf},
+};
 const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
 pub(crate) type RandomState = foldhash::quality::RandomState;
 
-pub type GroupSet<T> = indexmap::IndexSet<T, RandomState>;
+pub type GroupSet<T> = IndexSet<T, RandomState>;
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Default)]
@@ -76,7 +80,7 @@ pub type SimpleWrapper = String;
 pub struct ComplexWrapper(pub(crate) Vec<String>);
 impl ComplexWrapper {
   #[expect(clippy::arithmetic_side_effects)]
-  fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope<'_>) -> Self {
+  fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope) -> Self {
     Self(
       vec
         .into_iter()
@@ -276,7 +280,7 @@ pub(crate) fn attributs_set_undefined_attri(
   attri_map: &mut Attributes,
   key: &str,
   group_name: &str,
-  scope: &ParseScope<'_>,
+  scope: &ParseScope,
   undefined: UndefinedAttriValue,
 ) {
   match scope.define_map.get(&define_id(scope.hasher, group_name, key)) {
@@ -439,23 +443,24 @@ pub enum DefinedType {
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Debug, Default)]
-pub(crate) struct ParseScope<'a> {
-  pub(crate) loc: ParseLoc<'a>,
+pub(crate) struct ParseScope {
+  pub(crate) loc: ParseLoc,
   pub(crate) define_map: HashMap<u64, DefinedType, mut_set::NoHashBuildHasher>,
   pub(crate) variables: HashMap<String, Formula, RandomState>,
   pub(crate) hasher: RandomState,
 }
 
 #[derive(Debug, Default)]
-pub struct ParseLoc<'a> {
-  pub filename: Option<&'a Path>,
+pub struct ParseLoc {
+  pub filename: Option<PathBuf>,
   pub line_num: usize,
+  pub include_files: IndexSet<PathBuf>,
 }
 
-impl core::fmt::Display for ParseLoc<'_> {
+impl core::fmt::Display for ParseLoc {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    if let Some(p) = self.filename {
+    if let Some(p) = &self.filename {
       write!(f, "File {p:?}, ")?;
     }
     write!(f, "line {}.", self.line_num)
@@ -510,7 +515,7 @@ pub(crate) type ComplexParseRes<'a, T> =
 #[inline]
 pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
   i: &'a str,
-  scope: &mut ParseScope<'_>,
+  scope: &mut ParseScope,
 ) -> SimpleParseRes<'a, T> {
   let (input, s) = parser::simple(i, &mut scope.loc.line_num)
     .or(parser::complex_single(i, &mut scope.loc.line_num))?;
@@ -525,7 +530,7 @@ pub(crate) trait SimpleAttri<C: Ctx>:
   /// `nom_parse`, auto implement
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> SimpleParseRes<'a, Self::Builder>;
   #[inline]
   fn is_set(&self) -> bool {
@@ -628,14 +633,14 @@ pub(crate) trait ComplexAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   /// basic `parser`
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> Result<Self::Builder, ComplexParseError>;
   /// `nom_parse`, auto implement
   #[expect(clippy::arithmetic_side_effects)]
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> ComplexParseRes<'a, Self::Builder> {
     let (input, vec) = parser::complex(i, &mut scope.loc.line_num)?;
     let mut line_num = 0;
@@ -704,12 +709,76 @@ pub(crate) trait GroupAttri<C: Ctx>:
   Sized + ParsingBuilder<C, Builder: Default>
 {
   /// `nom_parse`, will be implemented by macros
-  fn nom_parse<'a>(
+  fn nom_parse<'a, const IS_INCLUDED: bool>(
     builder: &mut Self::Builder,
     i: &'a str,
     group_name: &str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> IResult<&'a str, Result<(), IdError>, Error<&'a str>>;
+  fn include_file<'a>(
+    builder: &mut Self::Builder,
+    mut i: &'a str,
+    group_name: &str,
+    scope: &mut ParseScope,
+  ) -> IResult<&'a str, Result<(), IdError>, Error<&'a str>> {
+    let filename: &str;
+    (i, filename) = parser::complex_single(i, &mut scope.loc.line_num)?;
+    let filename = if Path::new(filename).is_absolute() {
+      PathBuf::from(filename)
+    } else {
+      if let Some(base_file) = &scope.loc.filename {
+        if let Some(root) = base_file.parent() {
+          root.join(filename)
+        } else {
+          return Err(nom::Err::Error(Error::new(
+            "include_file: unable to open file",
+            nom::error::ErrorKind::Eof,
+          )));
+        }
+      } else {
+        PathBuf::from(filename)
+      }
+    };
+    let s = std::fs::read_to_string(&filename).map_err(|_| {
+      nom::Err::Error(Error::new(
+        "include_file: unable to open file",
+        nom::error::ErrorKind::Eof,
+      ))
+    })?;
+    log::info!("include file: {}", filename.display());
+    if !scope.loc.include_files.insert(filename.clone()) {
+      return Err(nom::Err::Error(Error::new(
+        "include_file: loop include",
+        nom::error::ErrorKind::Eof,
+      )));
+    }
+    let old_line_num = scope.loc.line_num;
+    let old_filename = scope.loc.filename.take();
+    scope.loc.filename = Some(filename);
+    let input1 = match parser::comment_space_newline(&s) {
+      Ok((input1, n)) => {
+        scope.loc.line_num = 1 + n;
+        input1
+      }
+      Err(_) => {
+        return Err(nom::Err::Error(Error::new(
+          "include_file: unable to parse file",
+          nom::error::ErrorKind::Eof,
+        )));
+      }
+    };
+    _ = Self::nom_parse::<true>(builder, input1, group_name, scope).map_err(|e| {
+      log::error!("{e}");
+      nom::Err::Error(Error::new(
+        "include_file: unable to parse file",
+        nom::error::ErrorKind::Eof,
+      ))
+    })?;
+    _ = scope.loc.include_files.pop();
+    scope.loc.line_num = old_line_num;
+    scope.loc.filename = old_filename;
+    Ok((i, Ok(())))
+  }
   /// `fmt_liberty`
   fn fmt_liberty<T: Write, I: Indentation>(
     &self,
@@ -775,29 +844,25 @@ pub trait NameAttri: Sized {
 
 /// Error for parser
 #[derive(Debug, thiserror::Error)]
-pub enum ParserError<'a> {
+pub enum ParserError {
   /// TitleLenMismatch(want,got,title)
   #[error("{0} {1}")]
-  IdError(ParseLoc<'a>, IdError),
+  IdError(ParseLoc, IdError),
   /// replace same id
   #[error("{0} {1}")]
-  NomError(ParseLoc<'a>, String),
+  NomError(ParseLoc, String),
   #[error("File {0:?}. {1}")]
-  IO(&'a Path, std::io::Error),
+  IO(PathBuf, std::io::Error),
   /// something else
   #[error("{0} {1}")]
-  Other(ParseLoc<'a>, String),
+  Other(ParseLoc, String),
 }
 
-impl<'a> ParserError<'a> {
+impl<'a> ParserError {
   #[inline]
-  pub(crate) fn nom(
-    filename: Option<&'a Path>,
-    line_num: usize,
-    e: nom::Err<Error<&str>>,
-  ) -> Self {
+  pub(crate) fn nom(loc: ParseLoc, e: nom::Err<Error<&str>>) -> Self {
     Self::NomError(
-      ParseLoc { filename, line_num },
+      loc,
       match e {
         nom::Err::Incomplete(_) => e.to_string(),
         nom::Err::Failure(_e) | nom::Err::Error(_e) => format!(
@@ -837,7 +902,7 @@ pub(crate) fn test_parse<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
 ) -> G {
   let mut scope = ParseScope::default();
   let mut builder = G::Builder::default();
-  match G::nom_parse(&mut builder, input, "", &mut scope) {
+  match G::nom_parse::<false>(&mut builder, input, "", &mut scope) {
     Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
@@ -856,7 +921,28 @@ pub(crate) fn test_parse_fmt<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
 ) -> G {
   let mut scope = ParseScope::default();
   let mut builder = G::Builder::default();
-  match G::nom_parse(&mut builder, input, "", &mut scope) {
+  match G::nom_parse::<false>(&mut builder, input, "", &mut scope) {
+    Ok((_, Ok(_))) => {}
+    Ok((_, Err(e))) => panic!("{e}"),
+    Err(e) => panic!("{e}"),
+  };
+  let mut builder_scope = BuilderScope::<DefaultCtx>::default();
+  let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
+  let fmt_str = g.display().to_string();
+  println!("{fmt_str}");
+  dev_utils::text_diff(fmt_want, fmt_str.as_str());
+  g
+}
+
+#[cfg(test)]
+#[inline]
+pub(crate) fn test_parse_fmt_included<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
+  input: &str,
+  fmt_want: &str,
+) -> G {
+  let mut scope = ParseScope::default();
+  let mut builder = G::Builder::default();
+  match G::nom_parse::<true>(&mut builder, input, "", &mut scope) {
     Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
@@ -880,7 +966,7 @@ pub(crate) fn test_parse_fmt_variables<G: GroupAttri<DefaultCtx> + Group<Default
 
   let mut scope = ParseScope::default();
   let mut builder = G::Builder::default();
-  match G::nom_parse(&mut builder, input, "", &mut scope) {
+  match G::nom_parse::<false>(&mut builder, input, "", &mut scope) {
     Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),

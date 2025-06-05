@@ -305,7 +305,7 @@ fn group_field_fn(
         &s_field_name,
         quote! {
           let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
-          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse(&mut group_builder, input, key, scope)?;
+          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
           input = new_input;
           match group_res{
             Ok(_) => {
@@ -345,7 +345,7 @@ fn group_field_fn(
         &s_field_name,
         quote! {
           let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
-          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse(&mut group_builder, input, key, scope)?;
+          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
           input = new_input;
           match group_res{
             Ok(_) => {
@@ -389,7 +389,7 @@ fn group_field_fn(
         &s_field_name,
         quote! {
           let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
-          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse(&mut group_builder, input, key, scope)?;
+          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
           input = new_input;
           match group_res{
             Ok(_) => {
@@ -434,7 +434,7 @@ fn group_field_fn(
         _parser_arm.push(wrapper_parser_arm(
           &sub_name.to_string(),quote! {
             let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
-            let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse(&mut group_builder, input, key, scope)?;
+            let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
             input = new_input;
             match group_res {
               Ok(_) => {
@@ -718,18 +718,27 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           f.dedent(1);
           write!(f, "\n{indent}}}")
         }
-        fn nom_parse<'a>(
+        fn nom_parse<'a, const IS_INCLUDED: bool>(
           builder: &mut Self::Builder,
-          i: &'a str,
+          mut input: &'a str,
           group_name: &str,
-          scope: &mut crate::ast::ParseScope<'_>,
+          scope: &mut crate::ast::ParseScope,
         ) -> nom::IResult<&'a str, Result<(), crate::ast::IdError>, nom::error::Error<&'a str>> {
-          let (mut input,title) = crate::ast::parser::title(i, &mut scope.loc.line_num)?;
+          let title;
+          if IS_INCLUDED {
+            title = Default::default();
+          } else {
+            (input, title) = crate::ast::parser::title(input, &mut scope.loc.line_num)?;
+          }
           loop {
             match crate::ast::parser::key(input) {
               Err(nom::Err::Error(_)) => {
-                (input,_) = crate::ast::parser::end_group(input)?;
-                #change_id_return
+                if IS_INCLUDED {
+                  return Ok((input, Ok(())))
+                } else {
+                  (input,_) = crate::ast::parser::end_group(input)?;
+                  #change_id_return
+                }
               },
               Err(e) => return Err(e),
               Ok((_input,key)) => {
@@ -737,6 +746,9 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
                 #[deny(unreachable_patterns)]
                 match key {
                   #parser_arms
+                  "include_file" => {
+                    (input, _) = Self::include_file(builder, input, group_name, scope)?;
+                  },
                   _ => {
                     if let Ok((new_input,undefined)) = crate::ast::parser::undefine(input, key, scope) {
                       input = new_input;

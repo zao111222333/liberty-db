@@ -108,7 +108,7 @@ impl<C: Ctx> SimpleAttri<C> for TimingSenseType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }

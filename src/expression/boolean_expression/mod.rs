@@ -108,7 +108,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for BooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::parser::simple_custom(
       i,
@@ -129,7 +129,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for LogicBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
     <Self::Builder as crate::ast::SimpleAttri<DefaultCtx>>::nom_parse(i, scope)
   }
@@ -145,7 +145,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for PowerGroundBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self::Builder> {
     <Self::Builder as crate::ast::SimpleAttri<DefaultCtx>>::nom_parse(i, scope)
   }
