@@ -24,7 +24,7 @@ fn main() -> ExitCode {
       return ExitCode::FAILURE;
     }
   };
-  library.technology = Some(liberty_db::library::Technology::Cmos);
+  library.technology = Some(liberty_db::library::Technology::CMOS);
   for operating_condition in library.operating_conditions.iter_mut() {
     operating_condition.voltage = 0.8;
   }

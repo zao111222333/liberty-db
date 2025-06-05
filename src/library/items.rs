@@ -665,7 +665,10 @@ impl<C: Ctx> SimpleAttri<C> for TreeType {
 pub enum Technology {
   /// `cmos`
   #[strum(serialize = "cmos")]
-  Cmos,
+  CMOS,
+  /// `fpga`
+  #[strum(serialize = "fpga")]
+  FPGA,
 }
 crate::ast::impl_self_builder!(Technology);
 impl<C: Ctx> ComplexAttri<C> for Technology {

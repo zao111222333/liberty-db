@@ -127,7 +127,7 @@ fn comment() {
   library
     .comments_this_entry()
     .and_modify(|comment| comment.push_str("\ncomment2\ncomment3"));
-  library.technology = Some(Technology::Cmos);
+  library.technology = Some(Technology::CMOS);
   library.comments_technology_entry().or_insert("comment1".into());
   library
     .comments_technology_entry()
