@@ -290,7 +290,7 @@ pub(crate) fn key(i: &str) -> IResult<&str, &str> {
 
 #[inline]
 pub(crate) const fn char_in_word(c: char) -> bool {
-  matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '/' | '.' | ':' | '+' | '-' )
+  matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '/' | '.' | ':' | '+' | '-' | '[' | ']' )
 }
 
 #[inline]
