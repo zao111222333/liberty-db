@@ -120,7 +120,7 @@ library (inverter) {
   poly_template(my_propagated_noise) {
     variables ( input_noise_width, \
     input_noise_height, \
-    input_peak_time_ratio \
+    input_peak_time_ratio, \
     total_output_net_capacitance, \
     voltage, \
     voltage1, \
