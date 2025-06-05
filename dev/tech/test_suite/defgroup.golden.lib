@@ -1,0 +1,56 @@
+
+liberty_db::library::Library (test1) {
+	define (sec_acore_fall_power, sec_acore_internal_power, float);
+	define (sec_acore_rise_power, sec_acore_internal_power, float);
+	define (sec_acore_when, sec_acore_internal_power, string);
+	delay_model : table_lookup;
+	define_group (sec_acore_internal_power, pin);
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	cell (test1) {
+		pin (TST) {
+			capacitance : 0.1;
+			direction : input;
+			sec_acore_internal_power (TST) {  /* user defined attribute */
+				sec_acore_fall_power : 0.0; /* user defined attribute */
+				sec_acore_rise_power : 1000.0; /* user defined attribute */
+				sec_acore_when : "CNT' "; /* user defined attribute */
+			}
+			sec_acore_internal_power (TST) {  /* user defined attribute */
+				sec_acore_fall_power : 0.0; /* user defined attribute */
+				sec_acore_rise_power : 1000.0; /* user defined attribute */
+				sec_acore_when : "CNT  "; /* user defined attribute */
+			}
+		}
+		pin (TST2) {
+			capacitance : 0.1;
+			direction : input;
+			sec_acore_internal_power (TST) {  /* user defined attribute */
+				sec_acore_fall_power : 0.0; /* user defined attribute */
+				sec_acore_rise_power : 1000.0; /* user defined attribute */
+				sec_acore_when : "CNT' "; /* user defined attribute */
+			}
+			sec_acore_internal_power (TST1) {  /* user defined attribute */
+				sec_acore_fall_power : 0.0; /* user defined attribute */
+				sec_acore_rise_power : 1000.0; /* user defined attribute */
+				sec_acore_when : "CNT  "; /* user defined attribute */
+			}
+		}
+		pin (TST3) {
+			capacitance : 0.1;
+			direction : input;
+			sec_acore_internal_power () {  /* user defined attribute */
+				sec_acore_rise_power : 1000.0; /* user defined attribute */
+			}
+		}
+	}
+}

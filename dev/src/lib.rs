@@ -233,7 +233,10 @@ pub fn bench_all(
   };
   let mut res_list = Vec::new();
   let tag = if regression { "regression" } else { "comparsion" };
-  for path in all_files("tech") {
+  for (is_good, path) in all_files("tech") {
+    if !is_good {
+      continue;
+    }
     let file_path = path.display().to_string();
     let parse_res = {
       let group_name = format!("[{tag}-parse] {file_path} ");

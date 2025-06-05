@@ -1,0 +1,255 @@
+
+liberty_db::library::Library (example) {
+	technology (cmos);
+	delay_model : table_lookup;
+	simulation : false;
+	nom_process : 1.0;
+	nom_temperature : 85.0;
+	nom_voltage : 3.0;
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	type (thirtytwo) {  /* user defined attribute */
+		bit_width : 32; /* user defined attribute */
+	}
+	type (sixteen) {  /* user defined attribute */
+		bit_from : 15; /* user defined attribute */
+		bit_to : 0; /* user defined attribute */
+	}
+	input_voltage (iv1) {
+		vil : 0;
+		vih : 0;
+		vimin : 0;
+		vimax : 20;
+	}
+	output_voltage (vout1) {
+		vol : 0;
+		voh : 0;
+		vomin : 0;
+		vomax : 27;
+	}
+	lu_table_template (t111) {
+		variable_1 : total_output_net_capacitance;
+		variable_2 : input_net_transition;
+		index_1 ("-1.0, 2.0, 3.0, 4.0");
+		index_2 ("1.0, 2.0, -3.0, 4.0, 5.0");
+	}
+	lu_table_template (template_3d) {
+		variable_2 : total_output_net_capacitance;
+		variable_3 : input_net_transition;
+		index_1 ("0.0, 1.5");
+		index_2 ("0.0, 4.0");
+		index_3 ("0.1, 2.0, 3.0");
+		variable_1 : related_out_total_output_net_capacitance; /* user defined attribute */
+	}
+	cell (AN2) {
+		area : 2.0;
+		interface_timing : false;
+		memory (memx) {  /* user defined attribute */
+			address_width : 11; /* user defined attribute */
+		}
+		ff_bank (IQ, IQN, 2) {
+			clocked_on : "CP";
+			next_state : "CR*(DW*LD+IQ*!LD)";
+		}
+		ff_bank (QN01, QN02, 4) {
+			clear : "H06";
+			clocked_on : "H05";
+			next_state : "H0A";
+		}
+		ff_bank (QN03, QN04, 5) {
+			clear : "H06";
+			clocked_on : "H05";
+			next_state : "H0A";
+		}
+		ff_bank (x, y, 16) {
+			next_state : "D";
+		}
+		ff_bank (x4, y4, 32) {
+			next_state : "E";
+		}
+		pin (Z) {
+			direction : output;
+			function : "A^B";
+			timing () {
+				intrinsic_rise : 0.49;
+				intrinsic_fall : 0.77;
+				related_pin : A B;
+				timing_sense : positive_unate;
+				rise_resistance : 0.1443;
+				fall_resistance : 0.0523;
+				cell_rise (template_3d) {
+					values ("0.0, 0.23, 0.3", \
+						"0.11, 0.28, 0.4", \
+						"0.0, 0.24, 0.33", \
+						"0.1, 0.33, 0.41");
+				}
+				cell_fall (template_3d) {
+					values ("0.0, 0.23, 0.4", \
+						"0.11, 0.28, 0.43", \
+						"0.0, 0.24, 0.32", \
+						"0.1, 0.33, 0.42");
+				}
+				rise_transition (t111) {
+					index_1 ("0.5, 4.0, 8.0, 20.0");
+					index_2 ("0.01, 0.3, 0.9, 3.1, 6.0");
+					values ("0.0221, 0.0263, 0.0586, 0.0773, 0.1132", \
+						"0.1028, 0.1073, 0.1157, 0.1352, 0.1833", \
+						"0.2239, 0.225, 0.2283, 0.2589, 0.3017", \
+						"1.1595, 1.1593, 1.1601, 1.1685, 1.182");
+				}
+				fall_transition (scalar) {
+					values ("0.2");
+				}
+			}
+		}
+		pin (A, B) {
+			capacitance : 1.0;
+			direction : input;
+		}
+		bus (D) {
+			clock : true;
+			bus_type : sixteen; /* user defined attribute */
+		}
+		bus (E) {
+			bus_type : thirtytwo; /* user defined attribute */
+		}
+		bundle (CR) {
+			members (CR0, CR1);
+			direction : input;
+			capacitance : 1.0;
+			timing () {
+				intrinsic_rise : 0.2;
+				intrinsic_fall : 0.2;
+				related_pin : CP;
+				timing_type : hold_rising;
+			}
+			timing () {
+				intrinsic_rise : 1.6;
+				intrinsic_fall : 1.6;
+				related_pin : CP;
+				timing_type : setup_rising;
+			}
+		}
+		bundle (DW) {
+			members (D0, D1);
+			direction : input;
+			capacitance : 1.0;
+			timing () {
+				intrinsic_rise : 0.2;
+				intrinsic_fall : 0.2;
+				related_pin : CP;
+				timing_type : hold_rising;
+			}
+			timing () {
+				intrinsic_rise : 1.6;
+				intrinsic_fall : 1.6;
+				related_pin : CP;
+				timing_type : setup_rising;
+			}
+		}
+		bundle (H0A) {
+			members (H01, H02, H03, H04);
+			direction : input;
+			pin (H01) {  /* user defined attribute */
+				capacitance : 0.015785; /* user defined attribute */
+				timing () {  /* user defined attribute */
+					fall_constraint (scalar) {  /* user defined attribute */
+						values (0.720000); /* user defined attribute */
+					}
+					related_pin : H05; /* user defined attribute */
+					rise_constraint (scalar) {  /* user defined attribute */
+						values (0.720000); /* user defined attribute */
+					}
+					timing_type : setup_rising; /* user defined attribute */
+				}
+			}
+		}
+		bundle (LD) {
+			members (LD0, LD1);
+			direction : input;
+			capacitance : 1.0;
+			timing () {
+				intrinsic_rise : 0.2;
+				intrinsic_fall : 0.2;
+				related_pin : CP;
+				timing_type : hold_rising;
+			}
+			timing () {
+				intrinsic_rise : 1.6;
+				intrinsic_fall : 1.6;
+				related_pin : CP;
+				timing_type : setup_rising;
+			}
+		}
+		bundle (Q) {
+			members (Q0, Q1, Q3);
+			direction : output;
+			function : "IQ";
+			timing () {
+				intrinsic_rise : 1.09;
+				intrinsic_fall : 1.25;
+				related_pin : CP;
+				timing_type : rising_edge;
+				rise_resistance : 0.1458;
+				fall_resistance : 0.0589;
+			}
+		}
+		bundle (QN) {
+			members (QN0, QN1);
+			direction : output;
+			function : "IQN";
+			timing () {
+				intrinsic_rise : 1.47;
+				intrinsic_fall : 1.55;
+				related_pin : CP;
+				timing_type : rising_edge;
+				rise_resistance : 0.1523;
+				fall_resistance : 0.0589;
+			}
+		}
+	}
+	cell (OR2) {
+		area : 2.0;
+		pin (Z) {
+			direction : output;
+			function : "A+B";
+			timing () {
+				intrinsic_rise : 0.38;
+				intrinsic_fall : 0.85;
+				related_pin : A B;
+				rise_resistance : 0.1443;
+				fall_resistance : 0.0589;
+			}
+		}
+		pin (A, B) {
+			capacitance : 1.0;
+			direction : input;
+		}
+	}
+	cell (bank33) {
+		ff_bank (IQ, IQN, 4) {
+			clocked_on : "CK";
+			next_state : "SE+CK";
+		}
+		pin (CK) {
+			direction : input;
+		}
+		pin (SE) {
+			direction : input;
+		}
+		bundle (Q) {
+			members (Q0, Q1, Q2, Q3);
+			direction : output;
+			function : "IQ";
+		}
+	}
+}

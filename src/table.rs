@@ -322,10 +322,7 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
 impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex12 {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -345,10 +342,7 @@ pub enum VariableTypeCompactLutTemplateIndex3 {
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex3);
 impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex3 {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -574,16 +568,13 @@ impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     unreachable!()
   }
   #[inline]
   #[expect(clippy::arithmetic_side_effects)]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
     match ast::parser::complex_ccs_power_values(i, &mut scope.loc.line_num) {
       Ok((_i, vec)) => {
         let res = vec
@@ -829,11 +820,61 @@ pub struct TableLookUp<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-impl<C: Ctx> GroupFn<C> for TableLookUp<C> {}
-impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {}
-impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {}
-impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {}
-impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
+  #[expect(clippy::arithmetic_side_effects)]
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
+impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
+  #[expect(clippy::arithmetic_side_effects)]
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
+impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
+  #[expect(clippy::arithmetic_side_effects)]
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
+impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
+  #[expect(clippy::arithmetic_side_effects)]
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
+impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {
+  #[expect(clippy::arithmetic_side_effects)]
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
 
 #[derive(Debug, Default, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -847,22 +888,19 @@ impl<C: Ctx> ComplexAttri<C> for Values {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     unreachable!()
   }
   #[inline]
   #[expect(clippy::arithmetic_side_effects)]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
     match ast::parser::complex_values(i, &mut scope.loc.line_num) {
       Ok((_i, vec)) => {
         let mut size1 = 0;
         let mut size2 = 0;
         let mut table_len_mismatch = false;
-        let inner = vec
+        let inner: Vec<f64> = vec
           .into_iter()
           .flat_map(|(n, v)| {
             scope.loc.line_num += n;
@@ -882,10 +920,8 @@ impl<C: Ctx> ComplexAttri<C> for Values {
         Ok((
           _i,
           if table_len_mismatch {
-            Err((
-              ComplexParseError::LengthDismatch,
-              ast::ComplexWrapper(vec![String::from("PARSER_ERROR")]),
-            ))
+            log::error!("{} table of values is NOT aligned", scope.loc);
+            Ok(Self { size1: inner.len(), size2: 1, inner })
           } else {
             Ok(Self { size1, size2, inner })
           },
@@ -920,6 +956,7 @@ impl<C: Ctx> ComplexAttri<C> for Values {
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 pub(crate) struct DisplayValues<V: Iterator<Item = f64>> {
+  pub(crate) len: usize,
   pub(crate) size1: usize,
   pub(crate) inner: V,
 }
@@ -970,11 +1007,13 @@ impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
     ComplexAttri::<C>::fmt_liberty(self.index_1, "index_1", f)?;
     ComplexAttri::<C>::fmt_liberty(self.index_2, "index_2", f)?;
     let indent1 = f.indentation();
-    write!(f, "\n{indent1}values (")?;
-    f.indent(1);
-    self.values.fmt_self(f)?;
-    f.dedent(1);
-    write!(f, ");")?;
+    if self.values.len > 0 {
+      write!(f, "\n{indent1}values (")?;
+      f.indent(1);
+      self.values.fmt_self(f)?;
+      f.dedent(1);
+      write!(f, ");")?;
+    }
     f.dedent(1);
     f.write_fmt(format_args!("\n{indent}}}"))
   }
@@ -1120,10 +1159,7 @@ pub enum Variable {
 crate::ast::impl_self_builder!(Variable);
 impl<C: Ctx> SimpleAttri<C> for Variable {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -1345,10 +1381,7 @@ pub enum SigmaType {
 ast::impl_self_builder!(SigmaType);
 impl<C: Ctx> SimpleAttri<C> for SigmaType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -1356,10 +1389,70 @@ impl<C: Ctx> SimpleAttri<C> for SigmaType {
 #[cfg(test)]
 mod test {
   use crate::{
-    DefaultCtx, Group,
-    ast::{test_parse, test_parse_fmt},
+    DefaultCtx, Group as _,
+    ast::{ComplexAttri, test_parse, test_parse_fmt},
   };
-
+  #[test]
+  fn values_vector32() {
+    let mut scope = crate::ast::ParseScope::default();
+    let (_, res) = <super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"("5.4283814e-01, 5.4289214e-01, 5.4298464e-01", \
+    "6.2226570e-01, 6.2225652e-01, 6.2212002e-01,");"#,
+      &mut scope,
+    )
+    .unwrap();
+    let values = res.unwrap();
+    assert_eq!(values.size1, 3);
+    assert_eq!(values.size2, 2);
+  }
+  #[test]
+  fn values_vector31() {
+    let mut scope = crate::ast::ParseScope::default();
+    let (_, res) = <super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"("6.2226570e-01, 6.2225652e-01, 6.2212002e-01");"#,
+      &mut scope,
+    )
+    .unwrap();
+    let values = res.unwrap();
+    assert_eq!(values.size1, 3);
+    assert_eq!(values.size2, 1);
+  }
+  #[test]
+  fn values_vector31_badiface() {
+    let mut scope = crate::ast::ParseScope::default();
+    let (_, res) = <super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"("6.2226570e-01 6.2225652e-01 6.2212002e-01");"#,
+      &mut scope,
+    )
+    .unwrap();
+    let values = res.unwrap();
+    assert_eq!(values.size1, 3);
+    assert_eq!(values.size2, 1);
+  }
+  #[test]
+  fn values_scalar1() {
+    let mut scope = crate::ast::ParseScope::default();
+    let (_, res) = <super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"("6.2226570e-01");"#,
+      &mut scope,
+    )
+    .unwrap();
+    let values = res.unwrap();
+    assert_eq!(values.size1, 1);
+    assert_eq!(values.size2, 1);
+  }
+  #[test]
+  fn values_scalar2() {
+    let mut scope = crate::ast::ParseScope::default();
+    let (_, res) = <super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"(6.2226570e-01);"#,
+      &mut scope,
+    )
+    .unwrap();
+    let values = res.unwrap();
+    assert_eq!(values.size1, 1);
+    assert_eq!(values.size2, 1);
+  }
   #[test]
   fn table() {
     let table = test_parse_fmt::<super::TableLookUp<DefaultCtx>>(
@@ -1430,7 +1523,7 @@ liberty_db::table::CompactCcsPower (c_ccs_pwr_template_3) {
   #[test]
   #[cfg(feature = "lut_template")]
   fn table_template() {
-    use super::TableCtx;
+    use super::TableCtx as _;
     use crate::{ccsn::ReceiverCapacitanceId, pin::PinId};
 
     let library = test_parse::<crate::Library<DefaultCtx>>(

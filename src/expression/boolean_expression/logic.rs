@@ -12,10 +12,10 @@ use core::{cmp::Ordering, hash::Hash};
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Level {
   /// High
-  #[strum(serialize = "h", serialize = "1", serialize = "H")]
+  #[strum(serialize = "h", serialize = "1", to_string = "H")]
   H,
   /// Low
-  #[strum(serialize = "l", serialize = "0", serialize = "L")]
+  #[strum(serialize = "l", serialize = "0", to_string = "L")]
   L,
 }
 
@@ -38,7 +38,7 @@ impl<C: Ctx> SimpleAttri<C> for Edge {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -66,7 +66,7 @@ impl<C: Ctx> ComplexAttri<C> for Edge {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let res = match iter.next() {
       Some(&s) => match s {
@@ -112,10 +112,10 @@ impl core::ops::Not for &Edge {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum UnInit {
   /// `Unknown`
-  #[strum(serialize = "x", serialize = "X")]
+  #[strum(serialize = "x", to_string = "X")]
   X,
   /// `HighImpedance`
-  #[strum(serialize = "z", serialize = "Z")]
+  #[strum(serialize = "z", to_string = "Z")]
   Z,
 }
 
@@ -158,7 +158,7 @@ impl<C: Ctx> SimpleAttri<C> for Normal {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }

@@ -1,0 +1,27 @@
+
+liberty_db::library::Library (temp) {
+	delay_model : table_lookup;
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	type (bus4) {  /* user defined attribute */
+		bit_from : 0; /* user defined attribute */
+		bit_to : 3; /* user defined attribute */
+		bit_width : 4; /* user defined attribute */
+	}
+	cell (ex) {
+		bus (A) {
+			bus_type : bus4; /* user defined attribute */
+			pin (A[3]) {  /* user defined attribute */
+			}
+		}
+	}
+}

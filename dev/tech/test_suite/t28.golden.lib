@@ -1,0 +1,24 @@
+
+liberty_db::library::Library (t28) {
+	define (aaa, pin, integer);
+	delay_model : table_lookup;
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	cell (c1) {
+		pin (A) {
+			aaa : 1; /* user defined attribute */
+		}
+		pin (BB) {
+			aaa : 1.0000; /* user defined attribute */
+		}
+	}
+}

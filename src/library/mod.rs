@@ -35,10 +35,10 @@ use std::path::Path;
 #[serde(bound = "C::Library: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Library<C: Ctx> {
   /// library name
-  #[id(borrow = str)]
+  #[id(borrow = [String])]
   #[liberty(name)]
-  #[liberty(default = String::from("undefined"))]
-  pub name: String,
+  #[liberty(default = vec![String::from("undefined")])]
+  pub name: Vec<String>,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
@@ -712,21 +712,21 @@ impl<C: Ctx> Library<C> {
   const KEY: &'static str = "library";
   /// Parse `.lib` file as a [Library] struct.
   #[inline]
-  pub fn parse_lib_file(filename: &Path) -> Result<Self, ParserError<'_>> {
-    let s =
-      std::fs::read_to_string(filename).map_err(|e| ParserError::IO(filename, e))?;
+  pub fn parse_lib_file(filename: &Path) -> Result<Self, ParserError> {
+    let s = std::fs::read_to_string(filename)
+      .map_err(|e| ParserError::IO(filename.to_path_buf(), e))?;
     Self::parse_lib(&s, Some(filename))
   }
   /// Parse `.lib` string as a [Library] struct.
   /// Specify `filename` for better error information.
   #[expect(clippy::arithmetic_side_effects)]
   #[inline]
-  pub fn parse_lib<'a>(
-    s: &str,
-    filename: Option<&'a Path>,
-  ) -> Result<Self, ParserError<'a>> {
+  pub fn parse_lib(s: &str, filename: Option<&Path>) -> Result<Self, ParserError> {
     let mut scope = ParseScope {
-      loc: ParseLoc { filename, line_num: 0 },
+      loc: ParseLoc {
+        filename: filename.map(Path::to_path_buf),
+        line_num: 0,
+      },
       ..Default::default()
     };
     let input1 = match parser::comment_space_newline(s) {
@@ -734,17 +734,23 @@ impl<C: Ctx> Library<C> {
         scope.loc.line_num += n;
         input1
       }
-      Err(e) => return Err(ParserError::nom(filename, 0, e)),
+      Err(e) => return Err(ParserError::nom(scope.loc, e)),
     };
     let (input2, key) = match parser::key(input1) {
       Ok(res) => res,
-      Err(e) => return Err(ParserError::nom(filename, scope.loc.line_num, e)),
+      Err(e) => return Err(ParserError::nom(scope.loc, e)),
     };
     if key == Self::KEY {
-      match <Self as GroupAttri<C>>::nom_parse(input2, Self::KEY, &mut scope) {
-        Err(e) => Err(ParserError::nom(filename, scope.loc.line_num, e)),
+      let mut builder = LibraryBuilder::default();
+      match <Self as GroupAttri<C>>::nom_parse::<false>(
+        &mut builder,
+        input2,
+        Self::KEY,
+        &mut scope,
+      ) {
+        Err(e) => Err(ParserError::nom(scope.loc, e)),
         Ok((_, Err(e))) => Err(ParserError::IdError(scope.loc, e)),
-        Ok((_, Ok(builder))) => {
+        Ok((_, Ok(_))) => {
           let mut builder_scope = BuilderScope::default();
           Ok(ParsingBuilder::build(builder, &mut builder_scope))
         }
@@ -765,7 +771,7 @@ impl<C: Ctx> Library<C> {
   }
   /// TODO: Parse `.json` file as a [Library] struct.
   #[inline]
-  pub fn parse_json(_i: &str) -> Result<Self, ParserError<'_>> {
+  pub fn parse_json(_i: &str) -> Result<Self, ParserError> {
     todo!()
   }
   /// TODO: Format [Library] to .json
@@ -778,7 +784,7 @@ impl<C: Ctx> Library<C> {
   }
   /// TODO: Parse `.db` file as a [Library] struct.
   #[inline]
-  pub fn parse_db(_i: &str) -> Result<Self, ParserError<'_>> {
+  pub fn parse_db(_i: &str) -> Result<Self, ParserError> {
     todo!()
   }
   /// TODO: Format [Library] to .db

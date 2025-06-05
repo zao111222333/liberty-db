@@ -187,6 +187,10 @@ pub struct Timing<C: Ctx> {
   /// ">Reference</a>
   #[liberty(simple(type = Option))]
   pub interdependence_id: Option<usize>,
+  #[liberty(simple(type = Option))]
+  pub intrinsic_rise: Option<f64>,
+  #[liberty(simple(type = Option))]
+  pub intrinsic_fall: Option<f64>,
   /// The `related_bus_pins` attribute defines the pin or pins that
   /// are the startpoint of the timing arc. The primary use of
   /// `related_bus_pins` is for module generators.
@@ -778,6 +782,10 @@ pub struct Timing<C: Ctx> {
   /// ">Reference</a>
   #[liberty(group(type = Set))]
   pub cell_degradation: GroupSet<CellDegradation<C>>,
+  #[liberty(simple(type = Option))]
+  pub rise_resistance: Option<f64>,
+  #[liberty(simple(type = Option))]
+  pub fall_resistance: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33+348.2&end=347.42+348.20
   /// ">Reference</a>
@@ -1027,7 +1035,7 @@ liberty_db::timing::Timing () {
 | active_input_ccb (XOR4D4BWP30P140__nci_14_3_FRLR_RFLF:a4, XOR4D4BWP30P140__nci_15_1_FR_RF:a4);
 | active_output_ccb (XOR4D4BWP30P140__nco_0_0_FR_RF:z);
 }"#,
-    )
+    );
   }
   #[test]
   fn lvf() {

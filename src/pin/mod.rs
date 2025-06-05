@@ -372,7 +372,7 @@ pub struct Pin<C: Ctx> {
   /// =228.27
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub driver_type: Option<DriverType>,
+  pub driver_type: Option<AllDriverType>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

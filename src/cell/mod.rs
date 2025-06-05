@@ -2,11 +2,11 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 mod items;
+pub use items::*;
 #[cfg(test)]
 mod test;
+use alloc::collections::BTreeSet;
 use core::{fmt::Debug, mem};
-
-pub use items::*;
 
 use crate::{
   Ctx,
@@ -587,6 +587,9 @@ pub struct Cell<C: Ctx> {
   pub leakage_current: GroupSet<LeakageCurrent<C>>,
   #[liberty(group(type = Set))]
   pub pin: GroupSet<Pin<C>>,
+  // TODO:
+  #[liberty(group(type = Set))]
+  pub bus: GroupSet<Pin<C>>,
   #[liberty(group(type = Vec))]
   /// The `test_cell`  group is in a `cell` group or `model` group.
   /// It models only the nontest behavior of a scan cell, which
@@ -625,11 +628,11 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {
           .iter()
           .flat_map(|latch| [latch.variable1.as_str(), latch.variable2.as_str()]),
       );
-    let mut logic_variables: Vec<&str> = ff_latch_nodes.collect();
+    let mut logic_variables: BTreeSet<&str> = ff_latch_nodes.collect();
     for pin in &builder.pin {
       match &pin.name {
         NameList::Name(name) => {
-          logic_variables.push(name);
+          _ = logic_variables.insert(name);
         }
         NameList::List(word_set) => {
           logic_variables.extend(word_set.inner.iter().map(String::as_str));
@@ -639,16 +642,26 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {
     for pin in &builder.bundle {
       match &pin.name {
         NameList::Name(name) => {
-          logic_variables.push(name);
+          _ = logic_variables.insert(name);
         }
         NameList::List(word_set) => {
           logic_variables.extend(word_set.inner.iter().map(String::as_str));
         }
       }
     }
-    logic_variables.sort_unstable();
-    scope.cell_extra_ctx.logic_variables =
-      biodivine_lib_bdd::BddVariableSet::new(&logic_variables);
+    for pin in &builder.bus {
+      match &pin.name {
+        NameList::Name(name) => {
+          _ = logic_variables.insert(name);
+        }
+        NameList::List(word_set) => {
+          logic_variables.extend(word_set.inner.iter().map(String::as_str));
+        }
+      }
+    }
+    scope.cell_extra_ctx.logic_variables = biodivine_lib_bdd::BddVariableSet::new(
+      &logic_variables.into_iter().collect::<Vec<_>>(),
+    );
     let mut pg_variable: Vec<&str> =
       builder.pg_pin.iter().map(|pg_pin| pg_pin.name.as_str()).collect();
     pg_variable.sort_unstable();

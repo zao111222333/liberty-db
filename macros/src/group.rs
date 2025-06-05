@@ -97,11 +97,11 @@ fn group_field_fn(
           input = new_input;
           match simple_res {
             Ok(simple) => {
-              res.#field_name = Some(simple);
+              builder.#field_name = Some(simple);
             },
             Err(undefined) => {
               log::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
-              crate::ast::attributs_set_undefined_simple(&mut res.#attributes_name, key, undefined);
+              crate::ast::attributs_set_undefined_simple(&mut builder.#attributes_name, key, undefined);
             },
           }
         },
@@ -128,11 +128,11 @@ fn group_field_fn(
           input = new_input;
           match simple_res {
             Ok(simple) => {
-              res.#field_name = simple;
+              builder.#field_name = simple;
             },
             Err(undefined) => {
               log::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
-              crate::ast::attributs_set_undefined_simple(&mut res.#attributes_name, key, undefined);
+              crate::ast::attributs_set_undefined_simple(&mut builder.#attributes_name, key, undefined);
             },
           }
         },
@@ -159,10 +159,10 @@ fn group_field_fn(
           let (new_input,complex_res) = <#field_type as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
           match complex_res {
-            Ok(complex) => res.#field_name = complex,
+            Ok(complex) => builder.#field_name = complex,
             Err((e,undefined)) => {
               log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
-              crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
+              crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
             },
           }
         },
@@ -192,10 +192,10 @@ fn group_field_fn(
           let (new_input,complex_res) = <#ty as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
           match complex_res {
-            Ok(complex) => res.#field_name = Some(complex),
+            Ok(complex) => builder.#field_name = Some(complex),
             Err((e,undefined)) => {
               log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
-              crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
+              crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
             },
           }
         },
@@ -225,11 +225,11 @@ fn group_field_fn(
           input = new_input;
           match complex_res{
             Ok(complex) => {
-              res.#field_name.push(complex);
+              builder.#field_name.push(complex);
             },
             Err((e,undefined)) => {
               log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
-              crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
+              crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
             },
           }
           let n: usize;
@@ -264,11 +264,11 @@ fn group_field_fn(
           input = new_input;
           match complex_res {
             Ok(complex) => {
-              res.#field_name.push(complex);
+              builder.#field_name.push(complex);
             },
             Err((e,undefined)) => {
               log::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
-              crate::ast::attributs_set_undefined_complex(&mut res.#attributes_name, key, undefined);
+              crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
             },
           }
           let n: usize;
@@ -304,11 +304,12 @@ fn group_field_fn(
       parser_arm = wrapper_parser_arm(
         &s_field_name,
         quote! {
-          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse(input, key, scope)?;
+          let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
+          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
           input = new_input;
           match group_res{
-            Ok(group) => {
-              res.#field_name.push(group);
+            Ok(_) => {
+              builder.#field_name.push(group_builder);
             },
             Err(e) => {
               log::error!("{} error={}",scope.loc,e);
@@ -343,11 +344,12 @@ fn group_field_fn(
       parser_arm = wrapper_parser_arm(
         &s_field_name,
         quote! {
-          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse(input, key, scope)?;
+          let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
+          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
           input = new_input;
           match group_res{
-            Ok(group) => {
-              res.#field_name.push(group);
+            Ok(_) => {
+              builder.#field_name.push(group_builder);
             },
             Err(e) => {
               log::error!("{} error={}",scope.loc,e);
@@ -386,15 +388,16 @@ fn group_field_fn(
       parser_arm = wrapper_parser_arm(
         &s_field_name,
         quote! {
-          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse(input, key, scope)?;
+          let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
+          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
           input = new_input;
           match group_res{
-            Ok(group) => {
-              if let Some(old) = res.#field_name{
+            Ok(_) => {
+              if let Some(old) = &builder.#field_name{
                 let e = crate::ast::IdError::RepeatAttri;
                 log::error!("{} error={}",scope.loc,e);
               }
-              res.#field_name = Some(group);
+              builder.#field_name = Some(group_builder);
             },
             Err(e) => {
               log::error!("{} error={}",scope.loc,e);
@@ -430,24 +433,25 @@ fn group_field_fn(
         let ty = extract_generic_param(sub_type, "Option")?;
         _parser_arm.push(wrapper_parser_arm(
           &sub_name.to_string(),quote! {
-          let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse(input, key, scope)?;
-          input = new_input;
-          match group_res {
-            Ok(group) => {
-              if let Some(old) = res.#sub_name{
-                let e = crate::ast::IdError::RepeatAttri;
+            let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
+            let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
+            input = new_input;
+            match group_res {
+              Ok(_) => {
+                if let Some(old) = &builder.#sub_name{
+                  let e = crate::ast::IdError::RepeatAttri;
+                  log::error!("{} error={}",scope.loc,e);
+                }
+                builder.#sub_name = Some(group_builder);
+              },
+              Err(e) => {
                 log::error!("{} error={}",scope.loc,e);
-              }
-              res.#sub_name = Some(group);
-            },
-            Err(e) => {
-              log::error!("{} error={}",scope.loc,e);
-            },
-          }
-          let n: usize;
-          (input,n) = crate::ast::parser::comment_space_newline(input)?;
-          scope.loc.line_num += n;
-        }));
+              },
+            }
+            let n: usize;
+            (input,n) = crate::ast::parser::comment_space_newline(input)?;
+            scope.loc.line_num += n;
+          }));
         _builder_field.push(quote! {
           pub(crate) #sub_name: Option<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
         });
@@ -604,7 +608,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     }
     let (change_id_return, write_title) = if name_vec.is_empty() {
       (
-        quote! {return Ok((input, Ok(res)));},
+        quote! {return Ok((input, Ok(())));},
         quote! {
           write!(f,"\n{indent}{key} () {{")?;
         },
@@ -613,9 +617,9 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       (
         quote! {
           return Ok((input,
-            match <Self as crate::ast::NamedGroup<C>>::parse_set_name(&mut res, title){
+            match <Self as crate::ast::NamedGroup<C>>::parse_set_name(builder, title){
               Ok(_) => {
-                Ok(res)
+                Ok(())
               },
               Err(e) => {
                 Err(e)
@@ -671,7 +675,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         #comment_fns
       }
       #[expect(clippy::field_scoped_visibility_modifiers,clippy::redundant_pub_crate)]
-      #[derive(Clone)]
+      #[derive(Clone, Debug)]
       pub(crate) struct #builder_ident<C: crate::Ctx> {
         #builder_fields
       }
@@ -693,6 +697,13 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       }
       #[doc(hidden)]
       #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
+      impl<C: crate::Ctx> Default for #builder_ident<C> {
+        fn default() -> Self {
+          Self{#builder_inits}
+        }
+      }
+      #[doc(hidden)]
+      #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
       impl<C: crate::Ctx> crate::ast::GroupAttri<C> for #ident<C> {
         fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
           use core::fmt::Write;
@@ -707,18 +718,28 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           f.dedent(1);
           write!(f, "\n{indent}}}")
         }
-        fn nom_parse<'a>(
-          i: &'a str,
+        #[expect(unused_variables,clippy::collection_is_never_read)]
+        fn nom_parse<'a, const IS_INCLUDED: bool>(
+          builder: &mut Self::Builder,
+          mut input: &'a str,
           group_name: &str,
-          scope: &mut crate::ast::ParseScope<'_>,
-        ) -> nom::IResult<&'a str, Result<Self::Builder, crate::ast::IdError>, nom::error::Error<&'a str>> {
-          let (mut input,title) = crate::ast::parser::title(i, &mut scope.loc.line_num)?;
-          let mut res = #builder_ident{#builder_inits};
+          scope: &mut crate::ast::ParseScope,
+        ) -> nom::IResult<&'a str, Result<(), crate::ast::IdError>, nom::error::Error<&'a str>> {
+          let title;
+          if IS_INCLUDED {
+            title = Default::default();
+          } else {
+            (input, title) = crate::ast::parser::title(input, &mut scope.loc.line_num)?;
+          }
           loop {
             match crate::ast::parser::key(input) {
               Err(nom::Err::Error(_)) => {
-                (input,_) = crate::ast::parser::end_group(input)?;
-                #change_id_return
+                if IS_INCLUDED {
+                  return Ok((input, Ok(())))
+                } else {
+                  (input,_) = crate::ast::parser::end_group(input)?;
+                  #change_id_return
+                }
               },
               Err(e) => return Err(e),
               Ok((_input,key)) => {
@@ -726,16 +747,23 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
                 #[deny(unreachable_patterns)]
                 match key {
                   #parser_arms
+                  "include_file" => {
+                    (input, _) = Self::include_file(builder, input, group_name, scope)?;
+                  },
                   _ => {
-                    let (new_input,undefined) = crate::ast::parser::undefine(input, key, scope)?;
-                    input = new_input;
-                    crate::ast::attributs_set_undefined_attri(
-                      &mut res.#attributes_name,
-                      key,
-                      group_name,
-                      scope,
-                      undefined,
-                    );
+                    if let Ok((new_input,undefined)) = crate::ast::parser::undefine(input, key, scope) {
+                      input = new_input;
+                      crate::ast::attributs_set_undefined_attri(
+                        &mut builder.#attributes_name,
+                        key,
+                        group_name,
+                        scope,
+                        undefined,
+                      );
+                    } else {
+                      let (new_input,_) = crate::ast::parser::variable(input, key, scope)?;
+                      input = new_input;
+                    }
                   },
                 }
               }

@@ -2,7 +2,10 @@
 //!
 //! All parser utilis.
 //!
-use crate::ast::GroupWrapper;
+use crate::{
+  ast::GroupWrapper,
+  expression::{Formula, FormulaExpr},
+};
 use nom::{
   IResult, Parser as _,
   branch::alt,
@@ -75,6 +78,10 @@ pub(crate) fn space(i: &str) -> IResult<&str, ()> {
   map(take_while(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse_complete(i)
 }
 #[inline]
+pub(crate) fn space1(i: &str) -> IResult<&str, ()> {
+  map(take_while1(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse_complete(i)
+}
+#[inline]
 fn space_newline(i: &str) -> IResult<&str, usize> {
   map(take_while(|c| matches!(c, '\t' | '\n' | '\r' | ' ')), |s: &str| {
     s.chars().filter(|&x| x == '\n').count()
@@ -108,6 +115,14 @@ pub(crate) fn comment_space_newline(i: &str) -> IResult<&str, usize> {
     pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
   )
+  .parse_complete(i)
+}
+
+#[inline]
+fn slash_newline(i: &str) -> IResult<&str, usize> {
+  map_opt((char('\\'), space_newline), |(_, n_newline)| {
+    if n_newline == 0 { None } else { Some(n_newline) }
+  })
   .parse_complete(i)
 }
 
@@ -176,10 +191,29 @@ mod test_space {
   }
 }
 #[inline]
+pub(crate) fn variable<'a>(
+  i: &'a str,
+  name: &str,
+  scope: &mut super::ParseScope,
+) -> IResult<&'a str, ()> {
+  map(
+    (space, char('='), FormulaExpr::parse, space, char(';'), comment_space_newline),
+    |(_, _, expr, _, _, n)| {
+      scope.loc.line_num += n;
+      let formula = Formula {
+        value: expr.eval(&expr, |k: &str| scope.variables.get(k).and_then(|f| f.value)),
+        expr,
+      };
+      _ = scope.variables.insert(name.to_owned(), formula);
+    },
+  )
+  .parse_complete(i)
+}
+#[inline]
 pub(crate) fn undefine<'a>(
   i: &'a str,
   group_name: &str,
-  scope: &mut super::ParseScope<'_>,
+  scope: &mut super::ParseScope,
 ) -> IResult<&'a str, super::UndefinedAttriValue> {
   let line_num_back: usize = scope.loc.line_num;
   if let Ok((input, res)) = simple(i, &mut scope.loc.line_num) {
@@ -256,7 +290,7 @@ pub(crate) fn key(i: &str) -> IResult<&str, &str> {
 
 #[inline]
 pub(crate) const fn char_in_word(c: char) -> bool {
-  matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '/' | '.' | ':' | '+' | '-' )
+  matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '/' | '.' | ':' | '+' | '-' | '[' | ']' )
 }
 
 #[inline]
@@ -347,15 +381,25 @@ pub(crate) fn float_one(i: &str) -> IResult<&str, f64> {
 }
 #[inline]
 fn float_vec(i: &str) -> IResult<&str, Vec<f64>> {
-  delimited(
-    pair(char('"'), space),
-    terminated(
-      separated_list0(delimited(space, char(','), space), float_one),
-      pair(opt(char(',')), space),
-    ),
-    char('"'),
-  )
-  .parse_complete(i)
+  fn _float_vec(i: &str) -> IResult<&str, Vec<f64>> {
+    map(
+      (
+        space,
+        separated_list0(
+          alt((
+            delimited((space, char(',')), space, opt(slash_newline)),
+            terminated(space1, opt(slash_newline)),
+          )),
+          float_one,
+        ),
+        opt(char(',')),
+        space,
+      ),
+      |(_, list, _, _)| list,
+    )
+    .parse_complete(i)
+  }
+  alt((delimited(char('"'), _float_vec, char('"')), _float_vec)).parse_complete(i)
 }
 
 #[inline]
@@ -542,6 +586,32 @@ pub(crate) fn complex<'a>(
   .parse_complete(i)
 }
 
+#[inline]
+pub(crate) fn complex_single<'a>(
+  i: &'a str,
+  line_num: &mut usize,
+) -> IResult<&'a str, &'a str> {
+  map(
+    (
+      space,
+      char('('),
+      comment_space_newline_slash,
+      alt((word, unquote)),
+      comment_space_newline_slash,
+      char(')'),
+      alt((
+        preceded(pair(space, char(';')), comment_space_newline),
+        comment_space_newline_many1,
+      )),
+    ),
+    |(_, _, n0, s, n1, _, n2)| {
+      *line_num += n0 + n1 + n2;
+      s
+    },
+  )
+  .parse_complete(i)
+}
+
 #[cfg(test)]
 mod test_key {
   use super::*;
@@ -617,13 +687,18 @@ pub(crate) fn title<'a>(
     (
       space,
       char('('),
-      separated_list0(char(','), delimited(space, alt((unquote, word)), space)),
-      char(')'),
       space,
+      separated_list0(
+        alt((preceded((space, char(',')), space), space1)),
+        alt((unquote, word)),
+      ),
+      space,
+      char(')'),
+      comment_space_newline,
       char('{'),
       comment_space_newline,
     ),
-    |(_, _, v, _, _, _, n)| {
+    |(_, _, _, v, _, _, _, _, n)| {
       *line_num += n;
       v
     },
@@ -633,7 +708,7 @@ pub(crate) fn title<'a>(
 
 #[inline]
 pub(crate) fn end_group(i: &str) -> IResult<&str, ()> {
-  map(char('}'), |_| ()).parse_complete(i)
+  map((char('}'), space, opt(char(';'))), |_| ()).parse_complete(i)
 }
 
 #[cfg(test)]

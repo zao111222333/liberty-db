@@ -27,25 +27,36 @@ fn make_golden() {
     io::{BufWriter, Write},
   };
   simple_logger::SimpleLogger::new().init().unwrap();
-  for test_lib_path in all_files("dev/tech") {
+  for (is_good, test_lib_path) in all_files("dev/tech") {
+    println!("================\n{}", test_lib_path.display());
     let golden_lib_path = golden_path(&test_lib_path);
     log::info!("{}", test_lib_path.display());
-    let library = Library::<DefaultCtx>::parse_lib_file(&test_lib_path).unwrap();
-    let golden_lib = File::create(golden_lib_path).unwrap();
-    let mut writer = BufWriter::new(golden_lib);
-    _ = write!(writer, "{}", library.display());
+    let res = Library::<DefaultCtx>::parse_lib_file(&test_lib_path);
+    if is_good {
+      let library = res.unwrap();
+      let golden_lib = File::create(golden_lib_path).unwrap();
+      let mut writer = BufWriter::new(golden_lib);
+      _ = write!(writer, "{}", library.display());
+    } else {
+      assert!(res.is_err())
+    }
   }
 }
 
 #[test]
 fn regression() {
   simple_logger::SimpleLogger::new().init().unwrap();
-  for test_lib_path in all_files("dev/tech") {
+  for (is_good, test_lib_path) in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());
     let golden_lib_path = golden_path(&test_lib_path);
-    let library = Library::<DefaultCtx>::parse_lib_file(&test_lib_path).unwrap();
-    let golden = read_to_string(golden_lib_path).unwrap();
-    let new = library.display().to_string();
-    text_diff(golden.as_str(), new.as_str());
+    let res = Library::<DefaultCtx>::parse_lib_file(&test_lib_path);
+    if is_good {
+      let library = res.unwrap();
+      let golden = read_to_string(golden_lib_path).unwrap();
+      let new = library.display().to_string();
+      text_diff(golden.as_str(), new.as_str());
+    } else {
+      assert!(res.is_err())
+    }
   }
 }

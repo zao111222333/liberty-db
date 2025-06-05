@@ -1,7 +1,4 @@
-use core::{
-  fmt::{self, Write},
-  hash::BuildHasher,
-};
+use core::fmt::{self, Write};
 use nom::{
   IResult, Parser as _,
   branch::alt,
@@ -10,7 +7,6 @@ use nom::{
   multi::many1,
   sequence::{delimited, preceded},
 };
-use std::collections::HashMap;
 
 use crate::{
   Ctx,
@@ -40,6 +36,7 @@ pub struct Formula {
 }
 
 impl Default for FormulaExpr {
+  #[inline]
   fn default() -> Self {
     Self::Num(0.0)
   }
@@ -50,7 +47,7 @@ impl<C: Ctx> crate::ast::ParsingBuilder<C> for Formula {
   #[inline]
   #[expect(clippy::renamed_function_params)]
   fn build(expr: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
-    let value = expr.eval(&scope.voltage_map);
+    let value = expr.eval(&expr, |k: &str| scope.voltage_map.get(k).copied());
     Self { expr, value }
   }
 }
@@ -58,7 +55,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for Formula {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, FormulaExpr> {
     crate::ast::parser::simple_custom(
       i,
@@ -81,22 +78,40 @@ impl FormulaExpr {
   pub fn parse(i: &str) -> IResult<&str, Self> {
     map_res(tokens, |tokens| parse_formula(&tokens)).parse_complete(i)
   }
-  #[expect(clippy::float_arithmetic)]
-  pub fn eval<S: BuildHasher>(&self, map: &HashMap<String, f64, S>) -> Option<f64> {
+  #[inline]
+  #[expect(clippy::float_arithmetic, clippy::option_if_let_else)]
+  pub fn eval<F: Fn(&str) -> Option<f64> + Copy>(
+    &self,
+    top: &Self,
+    query_fn: F, // map: &HashMap<String, f64, S>,
+  ) -> Option<f64> {
     match self {
-      Self::Add(e1, e2) => e1.eval(map).and_then(|f1| e2.eval(map).map(|f2| f1 + f2)),
-      Self::Sub(e1, e2) => e1.eval(map).and_then(|f1| e2.eval(map).map(|f2| f1 - f2)),
-      Self::Mul(e1, e2) => e1.eval(map).and_then(|f1| e2.eval(map).map(|f2| f1 * f2)),
-      Self::Div(e1, e2) => e1.eval(map).and_then(|f1| e2.eval(map).map(|f2| f1 / f2)),
-      Self::Neg(e) => e.eval(map).map(|f| -f),
+      Self::Add(e1, e2) => {
+        let f1 = e1.eval(top, query_fn)?;
+        e2.eval(top, query_fn).map(|f2| f1 + f2)
+      }
+      Self::Sub(e1, e2) => {
+        let f1 = e1.eval(top, query_fn)?;
+        e2.eval(top, query_fn).map(|f2| f1 - f2)
+      }
+      Self::Mul(e1, e2) => {
+        let f1 = e1.eval(top, query_fn)?;
+        e2.eval(top, query_fn).map(|f2| f1 * f2)
+      }
+      Self::Div(e1, e2) => {
+        let f1 = e1.eval(top, query_fn)?;
+        e2.eval(top, query_fn).map(|f2| f1 / f2)
+      }
+      Self::Neg(e) => e.eval(top, query_fn).map(|f| -f),
       Self::Num(f) => Some(*f),
-      Self::Var(k) => map.get(k).map_or(
-        {
-          log::error!("Can NOT find voltage {k} in eval formula");
+      Self::Var(k) => {
+        if let Some(f) = query_fn(k) {
+          Some(f)
+        } else {
+          log::error!("Eval formula [{top}]: Can NOT find voltage {k}");
           None
-        },
-        |f| Some(*f),
-      ),
+        }
+      }
     }
   }
   /// precedence
@@ -354,15 +369,15 @@ mod test {
   use super::*;
   #[test]
   fn tokenize() {
-    dbg!(tokens("-0.5 ;"));
-    dbg!(tokens("VDD + 0.5 ;"));
-    let (_, t) = dbg!(tokens("0.3*(-A1+0.1) + 0.5 ;")).unwrap();
-    let expr = dbg!(parse_formula(&t)).unwrap();
+    tokens("-0.5 ;");
+    tokens("VDD + 0.5 ;");
+    let (_, t) = tokens("0.3*(-A1+0.1) + 0.5 ;").unwrap();
+    let expr = parse_formula(&t).unwrap();
     println!("{expr}");
-    let (_, t) = dbg!(tokens("-+A ;")).unwrap();
-    dbg!(parse_formula(&t));
-    let (_, t) = dbg!(tokens("A+ ;")).unwrap();
-    dbg!(parse_formula(&t));
+    let (_, t) = tokens("-+A ;").unwrap();
+    parse_formula(&t);
+    let (_, t) = tokens("A+ ;").unwrap();
+    parse_formula(&t);
   }
   #[test]
   fn parse_fmt_self_check() {

@@ -1,0 +1,171 @@
+
+liberty_db::library::Library (inverter) {
+	delay_model : table_lookup;
+	nom_voltage : 1.6;
+	default_fanout_load : 1.0;
+	default_inout_pin_cap : 1.0;
+	default_input_pin_cap : 1.0;
+	default_output_pin_cap : 0.0;
+	time_unit : 1ns;
+	capacitive_load_unit (1.0, pf);
+	voltage_unit : 1V;
+	current_unit : 1mA;
+	pulling_resistance_unit : 1kohm;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	iv_lut_template (my_current_low) {  /* user defined attribute */
+		index_1 ("-1, -0.1, 0, 0.1 0.8, 1.6, 2"); /* user defined attribute */
+		variable_1 : iv_output_voltage; /* user defined attribute */
+	}
+	iv_lut_template (my_current_high) {  /* user defined attribute */
+		index_1 ("-1, 0, 0.3, 0.5, 0.8, 1.5, 1.6, 1.7, 2"); /* user defined attribute */
+		variable_1 : iv_output_voltage; /* user defined attribute */
+	}
+	noise_lut_template (my_noise_reject) {  /* user defined attribute */
+		index_1 ("0, 0.1, 0.3, 1, 2"); /* user defined attribute */
+		index_2 ("0, 0.1, 0.3, 1, 2"); /* user defined attribute */
+		variable_1 : input_noise_width; /* user defined attribute */
+		variable_2 : total_output_net_capacitance; /* user defined attribute */
+	}
+	noise_lut_template (my_noise_reject_outside_rail) {  /* user defined attribute */
+		index_1 ("0, 0.1, 2"); /* user defined attribute */
+		index_2 ("0, 0.1, 2"); /* user defined attribute */
+		variable_1 : input_noise_width; /* user defined attribute */
+		variable_2 : total_output_net_capacitance; /* user defined attribute */
+	}
+	propagation_lut_template (my_propagated_noise) {  /* user defined attribute */
+		index_1 ("0.01, 0.2, 2"); /* user defined attribute */
+		index_2 ("0.2, 0.8"); /* user defined attribute */
+		index_3 ("0, 2"); /* user defined attribute */
+		variable_1 : input_noise_width; /* user defined attribute */
+		variable_2 : input_noise_height; /* user defined attribute */
+		variable_3 : total_output_net_capacitance; /* user defined attribute */
+	}
+	input_voltage (MY_CMOS_IN) {
+		vil : 0.3;
+		vih : 1.1;
+		vimin : -0.3;
+		vimax : VDD + 0.3;
+	}
+	output_voltage (MY_CMOS_OUT) {
+		vol : 0.1;
+		voh : 1.4;
+		vomin : -0.3;
+		vomax : VDD + 0.3;
+	}
+	cell (INV) {
+		area : 1.0;
+		pin (A) {
+			capacitance : 1.0;
+			direction : input;
+			fanout_load : 1.0;
+			input_voltage : MY_CMOS_IN;
+			hyperbolic_noise_above_high () {  /* user defined attribute */
+				area_coefficient : 0.3; /* user defined attribute */
+				height_coefficient : 0.1; /* user defined attribute */
+				width_coefficient : 0.01; /* user defined attribute */
+			}
+			hyperbolic_noise_below_low () {  /* user defined attribute */
+				area_coefficient : 0.3; /* user defined attribute */
+				height_coefficient : 0.1; /* user defined attribute */
+				width_coefficient : 0.01; /* user defined attribute */
+			}
+			hyperbolic_noise_high () {  /* user defined attribute */
+				area_coefficient : 0.9; /* user defined attribute */
+				height_coefficient : 0.3; /* user defined attribute */
+				width_coefficient : 0.1; /* user defined attribute */
+			}
+			hyperbolic_noise_low () {  /* user defined attribute */
+				area_coefficient : 1.1; /* user defined attribute */
+				height_coefficient : 0.4; /* user defined attribute */
+				width_coefficient : 0.1; /* user defined attribute */
+			}
+		}
+		pin (Y) {
+			direction : output;
+			function : "!A";
+			max_fanout : 10.0;
+			output_voltage : MY_CMOS_OUT;
+			timing () {
+				related_pin : A;
+				propagated_noise_height_above_high (my_propagated_noise) {  /* user defined attribute */
+					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
+				}
+				propagated_noise_height_below_low (my_propagated_noise) {  /* user defined attribute */
+					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
+				}
+				propagated_noise_height_high (my_propagated_noise) {  /* user defined attribute */
+					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
+				}
+				propagated_noise_height_low (my_propagated_noise) {  /* user defined attribute */
+					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
+				}
+				propagated_noise_width_above_high (my_propagated_noise) {  /* user defined attribute */
+					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
+				}
+				propagated_noise_width_below_low (my_propagated_noise) {  /* user defined attribute */
+					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
+				}
+				propagated_noise_width_high (my_propagated_noise) {  /* user defined attribute */
+					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
+				}
+				propagated_noise_width_low (my_propagated_noise) {  /* user defined attribute */
+					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
+				}
+				steady_state_resistance_above_high : 200; /* user defined attribute */
+				steady_state_resistance_below_low : 100; /* user defined attribute */
+				steady_state_resistance_high : 1500; /* user defined attribute */
+				steady_state_resistance_low : 1100; /* user defined attribute */
+				cell_rise (scalar) {
+					values ("0.0");
+				}
+				cell_fall (scalar) {
+					values ("0.0");
+				}
+				rise_transition (scalar) {
+					values ("0.0");
+				}
+				fall_transition (scalar) {
+					values ("0.0");
+				}
+				noise_immunity_above_high (my_noise_reject_outside_rail) {
+					values ("1.0, 0.8, 0.5", \
+						"1.0, 0.8, 0.5", \
+						"1.0, 0.8, 0.5");
+				}
+				noise_immunity_below_low (my_noise_reject_outside_rail) {
+					values ("1.0, 0.8, 0.5", \
+						"1.0, 0.8, 0.5", \
+						"1.0, 0.8, 0.5");
+				}
+				noise_immunity_high (my_noise_reject) {
+					values ("1.3, 0.8, 0.7, 0.6, 0.55", \
+						"1.5, 0.9, 0.8, 0.65, 0.6", \
+						"1.5, 0.9, 0.8, 0.65, 0.6", \
+						"1.5, 0.9, 0.8, 0.65, 0.6", \
+						"1.5, 0.9, 0.8, 0.65, 0.6");
+				}
+				noise_immunity_low (my_noise_reject) {
+					values ("1.5, 0.9, 0.8, 0.65, 0.6", \
+						"1.5, 0.9, 0.8, 0.65, 0.6", \
+						"1.5, 0.9, 0.8, 0.65, 0.6", \
+						"1.5, 0.9, 0.8, 0.65, 0.6", \
+						"1.5, 0.9, 0.8, 0.65, 0.6");
+				}
+				steady_state_current_high (my_current_high) {
+					values ("2.0, 1.8, 1.7, 1.4, 1.0, 0.5, 0.0, -0.1, -0.8");
+				}
+				steady_state_current_low (my_current_low) {
+					values ("0.1, 0.05, 0.0, -0.1, -0.25, -1.0, -1.8");
+				}
+			}
+		}
+	}
+}

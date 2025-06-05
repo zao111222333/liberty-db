@@ -106,10 +106,7 @@ impl TimingSenseType {
 crate::ast::impl_self_builder!(TimingSenseType);
 impl<C: Ctx> SimpleAttri<C> for TimingSenseType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope<'_>,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -396,7 +393,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
   );
   #[inline]
-  #[expect(clippy::float_arithmetic)]
+  #[expect(clippy::float_arithmetic, clippy::arithmetic_side_effects)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope<C>) -> Self {
     #[inline]
     fn eq_index<C: Ctx>(
@@ -405,7 +402,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     ) -> bool {
       lhs.index_1 == rhs.index_1 && lhs.index_2 == rhs.index_2
     }
-    match builder {
+    let mut out: TimingTableLookUp<C> = match builder {
       (Some(_value), Some(_mean_shift), Some(_std_dev), Some(_skewness)) => {
         let lvf_nomial_same_index = eq_index(&_value, &_mean_shift);
         let valid_lvf_index =
@@ -429,7 +426,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
           log::error!("LVF LUTs' index mismatch");
           (Vec::new(), String::from("LVF LUTs' index mismatch"))
         };
-        Some(TimingTableLookUp {
+        TimingTableLookUp {
           extra_ctx: C::Table::default(),
           name: _value.name,
           comments,
@@ -449,9 +446,9 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
             _mean_shift.index_2
           },
           lvf_values,
-        })
+        }
       }
-      (Some(_value), None, None, None) => Some(TimingTableLookUp {
+      (Some(_value), None, None, None) => TimingTableLookUp {
         extra_ctx: C::Table::default(),
         name: _value.name,
         comments: String::new(),
@@ -463,9 +460,14 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
         lvf_index_1: Vec::new(),
         lvf_index_2: Vec::new(),
         lvf_values: Vec::new(),
-      }),
-      _ => None,
+      },
+      _ => return None,
+    };
+    if out.size2 == 1 && out.values.len() == out.index_1.len() * out.index_2.len() {
+      out.size1 = out.index_1.len();
+      out.size2 = out.index_2.len();
     }
+    Some(out)
   }
 }
 impl<C: Ctx> TimingTableLookUp<C> {
@@ -482,6 +484,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
       index_1: &self.index_1,
       index_2: &self.index_2,
       values: DisplayValues {
+        len: self.values.len(),
         size1: self.size1,
         inner: self.values.iter().copied(),
       },
@@ -494,6 +497,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
         index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
         index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
+          len: self.values.len(),
           size1: self.size1,
           inner: izip!(self.values.iter(), self.lvf_values.iter())
             .map(|(value, lvf)| lvf.mean - value),
@@ -505,6 +509,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
         index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
         index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
+          len: self.values.len(),
           size1: self.size1,
           inner: self.lvf_values.iter().map(|lvf| lvf.std_dev),
         },
@@ -515,6 +520,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
         index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
         index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
+          len: self.values.len(),
           size1: self.size1,
           inner: self.lvf_values.iter().map(|lvf| lvf.skewness),
         },

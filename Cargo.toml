@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.13.0"
+version = "0.14.0"
 license = "MIT"
 edition = "2024"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -76,6 +76,7 @@ pyo3-stub-gen = { version = "0.8", default-features = false }
 # pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
 bincode = { version= "2", features = ["serde"] }
 indexmap = { version = "2.9", features = ["serde"] }
+bitflags = { version = "2.9", features = ["serde"] }
 
 [dependencies]
 liberty-macros = { path = "macros" }
@@ -96,6 +97,7 @@ pyo3 = { workspace = true, optional = true }
 pyo3-stub-gen = { workspace = true, optional = true }
 indexmap.workspace = true
 mut_set.workspace = true
+bitflags.workspace = true
 
 [dev-dependencies]
 dev_utils.workspace = true

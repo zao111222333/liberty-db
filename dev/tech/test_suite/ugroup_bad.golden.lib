@@ -1,0 +1,58 @@
+
+liberty_db::library::Library (pg_sample) {
+	define (coefficients, pg_state_data, string);
+	define (coefficients, pg_timing_data, string);
+	define (related_pin, pg_timing_data, string);
+	define (state, pg_state_data, string);
+	define (values, pg_cell_table, string);
+	delay_model : table_lookup;
+	define_group (pg_cell_table, cell);
+	define_group (pg_state_data, cell);
+	define_group (pg_timing_data, pin);
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	cell (ad2) {
+		pg_cell_table (ramps) {  /* user defined attribute */
+			values : "0.1, 3.313, 6.626"; /* user defined attribute */
+		}
+		pg_cell_table (loads) {  /* user defined attribute */
+			values : "0, 0.02499, 0.156188, 0.312375, 0.62475,1.2495,2.499"; /* user defined attribute */
+		}
+		pg_state_data (pg_state1) {  /* user defined attribute */
+			coefficients : " -1.388e-06, -1.20251e-06, -3.34395e-05, 2.75931e-07, \
+	    	-3.87367e-08, -3.79891e-08, -1.1437e-08, -7.70073e-08, \
+		    3.394e-09"; /* user defined attribute */
+			state : R1R; /* user defined attribute */
+		}
+		pin (A) {
+			pg_state_data (pg_state2) {  /* user defined attribute */
+				coefficients : " -1.388e-06, -1.20251e-06, -3.34395e-05, 2.75931e-07, \
+			    -3.87367e-08, -3.79891e-08, -1.1437e-08, -7.70073e-08, \
+			    3.394e-09"; /* user defined attribute */
+				state : R1R; /* user defined attribute */
+			}
+			pg_timing_data (fallSlewTab) {  /* user defined attribute */
+				coefficients : " 0.110163, 0.141989, 0.11636, 0.0972482, \
+			    0.0655029, 0.0673979, 0.161816, 0.147963, \
+			    0.115873, 0.093776, 0.096074, 0.01363"; /* user defined attribute */
+				related_pin : y; /* user defined attribute */
+			}
+			pg_timing_data (riseSlewTab) {  /* user defined attribute */
+				coefficients : " 0.162563, 0.144023, 0.137538, 0.0821456, \
+			    0.103689, 0.102928, 0.116279, 0.162594, \
+			    0.155714, 0.0783956, 0.162574, \
+			    0.042222"; /* user defined attribute */
+				related_pin1x : y; /* user defined attribute */
+			}
+		}
+	}
+}

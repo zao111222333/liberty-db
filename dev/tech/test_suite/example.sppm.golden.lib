@@ -1,0 +1,57 @@
+
+liberty_db::library::Library (sppm) {
+	delay_model : polynomial;
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	poly_template (delay_pt) {  /* user defined attribute */
+		variable_1_range (1, 5); /* user defined attribute */
+		variable_2_range (2.7, 3.6); /* user defined attribute */
+		variables (input_net_transition, voltage); /* user defined attribute */
+	}
+	power_model : polynomial; /* user defined attribute */
+	power_poly_template (power_pt) {  /* user defined attribute */
+		variable_1_range (1, 5); /* user defined attribute */
+		variable_2_range (2.7, 3.6); /* user defined attribute */
+		variables (input_net_transition, voltage); /* user defined attribute */
+	}
+	cell (IV) {
+		pin (A) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "!A";
+			internal_power () {
+				related_pin : A;
+				rise_power (power_pt) {
+					coefs ("2, 2, 2, 2"); /* user defined attribute */
+					orders ("1, 1"); /* user defined attribute */
+				}
+				fall_power (power_pt) {
+					coefs ("2, 2, 2, 2"); /* user defined attribute */
+					orders ("1, 1"); /* user defined attribute */
+				}
+			}
+			timing () {
+				related_pin : A;
+				cell_rise (delay_pt) {
+				}
+				cell_fall (delay_pt) {
+				}
+				rise_transition (delay_pt) {
+				}
+				fall_transition (delay_pt) {
+				}
+			}
+		}
+	}
+}

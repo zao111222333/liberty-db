@@ -4,7 +4,7 @@ use crate::{
     Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
     Indentation, ParseScope, SimpleAttri,
   },
-  expression::logic::Edge,
+  expression::logic::{Edge, Static},
 };
 use core::{
   fmt::{self, Write},
@@ -38,7 +38,7 @@ impl<C: Ctx> SimpleAttri<C> for AntennaDiodeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -97,7 +97,7 @@ pub enum Direction {
   Input,
   #[strum(serialize = "output")]
   Output,
-  #[strum(serialize = "inout")]
+  #[strum(serialize = "inoutput", to_string = "inout")]
   Inout,
   #[strum(serialize = "internal")]
   Internal,
@@ -107,7 +107,7 @@ impl<C: Ctx> SimpleAttri<C> for Direction {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -128,7 +128,7 @@ impl<C: Ctx> SimpleAttri<C> for DontFault {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -153,16 +153,131 @@ pub enum DriverType {
   #[strum(serialize = "resistive_1")]
   Resistive1,
 }
-crate::ast::impl_self_builder!(DriverType);
-impl<C: Ctx> SimpleAttri<C> for DriverType {
+
+bitflags::bitflags! {
+  /// Represents a set of flags.
+  #[derive(Debug, Clone, Copy, Eq, PartialEq)]
+  #[derive(serde::Serialize, serde::Deserialize)]
+  #[serde(transparent)]
+  pub struct AllDriverType: u8 {
+    const pull_up = 0b0000_0001;
+    const pull_down = 0b0000_0010;
+    const open_drain = 0b0000_0100;
+    const open_source = 0b0000_1000;
+    const bus_hold = 0b0000_1000;
+    const resistive = 0b0001_0000;
+    const resistive_0 = 0b0100_0000;
+    const resistive_1 = 0b1000_0000;
+  }
+}
+
+crate::ast::impl_self_builder!(AllDriverType);
+impl<C: Ctx> SimpleAttri<C> for AllDriverType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    if self.bits().is_power_of_two() {
+      write!(f, "{self}")
+    } else {
+      write!(f, "\"{self}\"")
+    }
+  }
 }
+impl FromStr for AllDriverType {
+  type Err = <DriverType as FromStr>::Err;
+  #[inline]
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    let mut out = Self::empty();
+    for t in s.split_ascii_whitespace() {
+      match t.parse()? {
+        DriverType::PullUp => out.insert(Self::pull_up),
+        DriverType::PullDown => out.insert(Self::pull_down),
+        DriverType::OpenDrain => out.insert(Self::open_drain),
+        DriverType::OpenSource => out.insert(Self::open_source),
+        DriverType::BusHold => out.insert(Self::bus_hold),
+        DriverType::Resistive => out.insert(Self::resistive),
+        DriverType::Resistive0 => out.insert(Self::resistive_0),
+        DriverType::Resistive1 => out.insert(Self::resistive_1),
+      }
+    }
+    Ok(out)
+  }
+}
+impl fmt::Display for AllDriverType {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let mut has_write = false;
+    if self.contains(Self::pull_up) {
+      has_write = true;
+      write!(f, "{}", DriverType::PullUp)?;
+    }
+    if self.contains(Self::pull_down) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::PullDown)?;
+    }
+    if self.contains(Self::open_drain) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::OpenDrain)?;
+    }
+    if self.contains(Self::open_source) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::OpenSource)?;
+    }
+    if self.contains(Self::bus_hold) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::BusHold)?;
+    }
+    if self.contains(Self::resistive) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::Resistive)?;
+    }
+    if self.contains(Self::resistive_0) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::Resistive0)?;
+    }
+    if self.contains(Self::resistive_1) {
+      if has_write {
+        write!(f, " ")?;
+      }
+      write!(f, "{}", DriverType::Resistive1)?;
+    }
+    Ok(())
+  }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum NextstateType {
@@ -184,7 +299,7 @@ impl<C: Ctx> SimpleAttri<C> for NextstateType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -209,7 +324,7 @@ impl<C: Ctx> SimpleAttri<C> for PinFuncType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -229,7 +344,7 @@ impl<C: Ctx> SimpleAttri<C> for RestoreEdgeType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -264,7 +379,7 @@ impl<C: Ctx> SimpleAttri<C> for SignalType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -288,7 +403,7 @@ impl<C: Ctx> SimpleAttri<C> for SlewControl {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -323,7 +438,7 @@ impl<C: Ctx> SimpleAttri<C> for OneZero {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -358,7 +473,7 @@ impl<C: Ctx> SimpleAttri<C> for TwoValue {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope<'_>,
+    scope: &mut ParseScope,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -397,18 +512,39 @@ impl FromStr for TwoValue {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=282.3&end=282.23
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PinClass {
   /// `save`
-  #[strum(serialize = "save")]
   Save,
   /// `restore`
-  #[strum(serialize = "restore")]
   Restore,
   /// `save_restore`
-  #[strum(serialize = "save_restore")]
   SaveRestore,
+  PinName(String),
+}
+impl FromStr for PinClass {
+  type Err = ();
+  #[inline]
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
+      "save" => Ok(Self::Save),
+      "restore" => Ok(Self::Restore),
+      "save_restore" => Ok(Self::SaveRestore),
+      _ => Ok(Self::PinName(s.to_owned())),
+    }
+  }
+}
+impl fmt::Display for PinClass {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::Save => write!(f, "save"),
+      Self::Restore => write!(f, "restore"),
+      Self::SaveRestore => write!(f, "save_restore"),
+      Self::PinName(pin) => write!(f, "{pin}"),
+    }
+  }
 }
 /// The `retention_pin` complex attribute identifies the retention pins of a retention cell. The
 /// attribute defines the following information:
@@ -434,20 +570,20 @@ pub enum PinClass {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=282.3&end=282.23
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct RetentionPin {
   /// `pin_class`
   pub pin_class: PinClass,
   /// `disable_value`
-  pub disable_value: OneZero,
+  pub disable_value: Static,
 }
 crate::ast::impl_self_builder!(RetentionPin);
 impl<C: Ctx> ComplexAttri<C> for RetentionPin {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope<'_>,
+    _scope: &mut ParseScope,
   ) -> Result<Self, ComplexParseError> {
     let pin_class: PinClass = match iter.next() {
       Some(&s) => match s.parse() {
@@ -456,10 +592,13 @@ impl<C: Ctx> ComplexAttri<C> for RetentionPin {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let disable_value: OneZero = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::Other),
+    let disable_value = match iter.next() {
+      Some(&s) => match s {
+        "1" => Static::H,
+        "0" => Static::L,
+        "X" | "x" => Static::X,
+        "Z" | "z" => Static::Z,
+        _ => return Err(ComplexParseError::UnsupportedWord),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
@@ -474,7 +613,17 @@ impl<C: Ctx> ComplexAttri<C> for RetentionPin {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    write!(f, "{}, {}", self.pin_class, self.disable_value)
+    write!(
+      f,
+      "{}, {}",
+      self.pin_class,
+      match self.disable_value {
+        Static::X => "x",
+        Static::Z => "z",
+        Static::H => "1",
+        Static::L => "0",
+      }
+    )
   }
 }
 
@@ -493,7 +642,7 @@ mod test {
   }
   #[test]
   fn retention_pin() {
-    let pin = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
+    let cell = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
       r#"(cell1){
         pin(A){
           retention_pin (save_restore, 1);
@@ -515,6 +664,36 @@ liberty_db::cell::Cell (cell1) {
 | }
 | pin (C) {
 | | retention_pin (save, 0);
+| }
+}"#,
+    );
+  }
+  #[test]
+  fn driver_type() {
+    let cell = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
+      r#"(cell1){
+        pin(A){
+          direction: inout;
+          driver_type : "pull_up pull_down open_drain open_source bus_hold";
+        }
+        pin(B){
+          driver_type : pull_up;
+        }
+        pin(C){
+          driver_type : "bus_hold";
+        }
+      }"#,
+      r#"
+liberty_db::cell::Cell (cell1) {
+| pin (A) {
+| | direction : inout;
+| | driver_type : "pull_up pull_down open_drain open_source bus_hold";
+| }
+| pin (B) {
+| | driver_type : pull_up;
+| }
+| pin (C) {
+| | driver_type : open_source bus_hold;
 | }
 }"#,
     );
