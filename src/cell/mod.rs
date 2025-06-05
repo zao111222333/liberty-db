@@ -5,7 +5,10 @@ mod items;
 #[cfg(test)]
 mod test;
 use core::{fmt::Debug, mem};
+use std::collections::BTreeSet;
 
+use foldhash::HashSet;
+use indexmap::IndexSet;
 pub use items::*;
 
 use crate::{
@@ -628,11 +631,11 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {
           .iter()
           .flat_map(|latch| [latch.variable1.as_str(), latch.variable2.as_str()]),
       );
-    let mut logic_variables: Vec<&str> = ff_latch_nodes.collect();
+    let mut logic_variables: BTreeSet<&str> = ff_latch_nodes.collect();
     for pin in &builder.pin {
       match &pin.name {
         NameList::Name(name) => {
-          logic_variables.push(name);
+          _ = logic_variables.insert(name);
         }
         NameList::List(word_set) => {
           logic_variables.extend(word_set.inner.iter().map(String::as_str));
@@ -642,7 +645,7 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {
     for pin in &builder.bundle {
       match &pin.name {
         NameList::Name(name) => {
-          logic_variables.push(name);
+          _ = logic_variables.insert(name);
         }
         NameList::List(word_set) => {
           logic_variables.extend(word_set.inner.iter().map(String::as_str));
@@ -652,16 +655,16 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {
     for pin in &builder.bus {
       match &pin.name {
         NameList::Name(name) => {
-          logic_variables.push(name);
+          _ = logic_variables.insert(name);
         }
         NameList::List(word_set) => {
           logic_variables.extend(word_set.inner.iter().map(String::as_str));
         }
       }
     }
-    logic_variables.sort_unstable();
-    scope.cell_extra_ctx.logic_variables =
-      biodivine_lib_bdd::BddVariableSet::new(&logic_variables);
+    scope.cell_extra_ctx.logic_variables = biodivine_lib_bdd::BddVariableSet::new(
+      &logic_variables.into_iter().collect::<Vec<_>>(),
+    );
     let mut pg_variable: Vec<&str> =
       builder.pg_pin.iter().map(|pg_pin| pg_pin.name.as_str()).collect();
     pg_variable.sort_unstable();
