@@ -54,7 +54,6 @@ pub struct InternalPower<C: Ctx> {
   #[liberty(complex(type = Option))]
   pub mode: Option<[String; 2]>,
   // NOTICE: Group Statements
-  // #[size = 336]
   // #[liberty(group(type = Option))]
   // pub domain: Option<Domain<C>>,
   #[liberty(group(type = Option))]
