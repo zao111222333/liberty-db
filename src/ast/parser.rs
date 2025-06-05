@@ -628,7 +628,7 @@ pub(crate) fn title<'a>(
       ),
       space,
       char(')'),
-      space,
+      comment_space_newline,
       char('{'),
       comment_space_newline,
     ),
