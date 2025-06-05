@@ -50,7 +50,7 @@ impl<C: Ctx> crate::ast::ParsingBuilder<C> for Formula {
   #[inline]
   #[expect(clippy::renamed_function_params)]
   fn build(expr: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
-    let value = expr.eval(&scope.voltage_map);
+    let value = expr.eval(&expr, &scope.voltage_map);
     Self { expr, value }
   }
 }
@@ -82,21 +82,33 @@ impl FormulaExpr {
     map_res(tokens, |tokens| parse_formula(&tokens)).parse_complete(i)
   }
   #[expect(clippy::float_arithmetic)]
-  pub fn eval<S: BuildHasher>(&self, map: &HashMap<String, f64, S>) -> Option<f64> {
+  pub fn eval<S: BuildHasher>(
+    &self,
+    top: &Self,
+    map: &HashMap<String, f64, S>,
+  ) -> Option<f64> {
     match self {
-      Self::Add(e1, e2) => e1.eval(map).and_then(|f1| e2.eval(map).map(|f2| f1 + f2)),
-      Self::Sub(e1, e2) => e1.eval(map).and_then(|f1| e2.eval(map).map(|f2| f1 - f2)),
-      Self::Mul(e1, e2) => e1.eval(map).and_then(|f1| e2.eval(map).map(|f2| f1 * f2)),
-      Self::Div(e1, e2) => e1.eval(map).and_then(|f1| e2.eval(map).map(|f2| f1 / f2)),
-      Self::Neg(e) => e.eval(map).map(|f| -f),
+      Self::Add(e1, e2) => {
+        e1.eval(top, map).and_then(|f1| e2.eval(top, map).map(|f2| f1 + f2))
+      }
+      Self::Sub(e1, e2) => {
+        e1.eval(top, map).and_then(|f1| e2.eval(top, map).map(|f2| f1 - f2))
+      }
+      Self::Mul(e1, e2) => {
+        e1.eval(top, map).and_then(|f1| e2.eval(top, map).map(|f2| f1 * f2))
+      }
+      Self::Div(e1, e2) => {
+        e1.eval(top, map).and_then(|f1| e2.eval(top, map).map(|f2| f1 / f2))
+      }
+      Self::Neg(e) => e.eval(top, map).map(|f| -f),
       Self::Num(f) => Some(*f),
-      Self::Var(k) => map.get(k).map_or(
-        {
-          log::error!("Can NOT find voltage {k} in eval formula");
+      Self::Var(k) => match map.get(k) {
+        Some(f) => Some(*f),
+        None => {
+          log::error!("Eval formula [{top}]: Can NOT find voltage {k}");
           None
-        },
-        |f| Some(*f),
-      ),
+        }
+      },
     }
   }
   /// precedence

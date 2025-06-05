@@ -1,4 +1,6 @@
 #![cfg(test)]
+use simple_logger::SimpleLogger;
+
 use crate::{
   DefaultCtx,
   ast::{AttriValues, SimpleDefined},
@@ -324,6 +326,7 @@ library (test) {
 | }
 }
 "#;
+  SimpleLogger::new().init();
   let library = parse_cmp(text, want);
   let cmos_input_voltage = library.input_voltage.get("cmos").unwrap();
   assert!(f64_eq(cmos_input_voltage.vil.value.unwrap(), 0.24));
