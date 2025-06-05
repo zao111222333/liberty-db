@@ -75,6 +75,10 @@ pub(crate) fn space(i: &str) -> IResult<&str, ()> {
   map(take_while(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse_complete(i)
 }
 #[inline]
+pub(crate) fn space1(i: &str) -> IResult<&str, ()> {
+  map(take_while1(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse_complete(i)
+}
+#[inline]
 fn space_newline(i: &str) -> IResult<&str, usize> {
   map(take_while(|c| matches!(c, '\t' | '\n' | '\r' | ' ')), |s: &str| {
     s.chars().filter(|&x| x == '\n').count()
@@ -617,13 +621,18 @@ pub(crate) fn title<'a>(
     (
       space,
       char('('),
-      separated_list0(char(','), delimited(space, alt((unquote, word)), space)),
+      space,
+      separated_list0(
+        alt((preceded((space, char(',')), space), space1)),
+        alt((unquote, word)),
+      ),
+      space,
       char(')'),
       space,
       char('{'),
       comment_space_newline,
     ),
-    |(_, _, v, _, _, _, n)| {
+    |(_, _, _, v, _, _, _, _, n)| {
       *line_num += n;
       v
     },

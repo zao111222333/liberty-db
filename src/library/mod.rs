@@ -35,10 +35,10 @@ use std::path::Path;
 #[serde(bound = "C::Library: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct Library<C: Ctx> {
   /// library name
-  #[id(borrow = str)]
+  #[id(borrow = [String])]
   #[liberty(name)]
-  #[liberty(default = String::from("undefined"))]
-  pub name: String,
+  #[liberty(default = vec![String::from("undefined")])]
+  pub name: Vec<String>,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
