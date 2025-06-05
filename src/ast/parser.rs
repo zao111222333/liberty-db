@@ -686,7 +686,7 @@ pub(crate) fn title<'a>(
 
 #[inline]
 pub(crate) fn end_group(i: &str) -> IResult<&str, ()> {
-  map(char('}'), |_| ()).parse_complete(i)
+  map((char('}'), space, opt(char(';'))), |_| ()).parse_complete(i)
 }
 
 #[cfg(test)]
