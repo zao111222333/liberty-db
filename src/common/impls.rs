@@ -5,7 +5,8 @@ use crate::{
   Ctx,
   ast::{
     self, CodeFormatter, ComplexAttri, ComplexParseError, ComplexParseRes, IdError,
-    Indentation, NameAttri, ParseScope, SimpleAttri, is_word, join_fmt_no_quote,
+    Indentation, NameAttri, ParseScope, SimpleAttri, is_word, join_fmt,
+    join_fmt_no_quote,
   },
   expression,
 };
@@ -193,12 +194,9 @@ impl<C: Ctx> SimpleAttri<C> for NameList {
           write!(f, "\"{s}\"")
         }
       }
-      Self::List(set) => join_fmt_no_quote(
-        set.inner.iter().sorted(),
-        f,
-        |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
-        " ",
-      ),
+      Self::List(set) => {
+        join_fmt(set.inner.iter().sorted(), f, |s, ff| write!(ff, "{s}"), " ")
+      }
     }
   }
 }
@@ -317,7 +315,7 @@ impl<const N: usize, C: Ctx> ComplexAttri<C> for [String; N] {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    ast::join_fmt(self.iter(), f, |s, ff| write!(ff, "{s}"), ", ")
+    join_fmt(self.iter(), f, |s, ff| write!(ff, "{s}"), ", ")
   }
 }
 
@@ -351,7 +349,7 @@ impl<const N: usize, C: Ctx> ComplexAttri<C> for [f64; N] {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    ast::join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
+    join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
 crate::ast::impl_self_builder!((String, f64));
@@ -411,7 +409,7 @@ impl<C: Ctx> ComplexAttri<C> for super::items::IdVector {
   ) -> fmt::Result {
     f.write_num(self.id)?;
     write!(f, ", \\\n{}", f.indentation())?;
-    ast::join_fmt(self.vec.iter(), f, |float, ff| ff.write_num(*float), ", ")
+    join_fmt(self.vec.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
 crate::ast::impl_self_builder!(Vec<f64>);
@@ -440,7 +438,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<f64> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    ast::join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
+    join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
   }
 }
 impl<C: Ctx> ComplexAttri<C> for String {
