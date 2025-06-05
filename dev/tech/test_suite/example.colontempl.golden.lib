@@ -1,0 +1,30 @@
+
+liberty_db::library::Library (em222e) {
+	delay_model : table_lookup;
+	nom_process : 1.0;
+	nom_temperature : 25.0;
+	nom_voltage : 2.5;
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	lu_table_template (em222e:timing_by_trans_and_cap_0) {
+		variable_1 : input_net_transition;
+		variable_2 : total_output_net_capacitance;
+		index_1 ("0.08, 0.6, 1.2, 3.0");
+		index_2 ("0.015, 0.046, 0.114, 0.531");
+	}
+	lu_table_template (em222e:timing_by_trans_and_cap_1) {
+		variable_1 : input_net_transition;
+		variable_2 : total_output_net_capacitance;
+		index_1 ("0.08, 0.6, 1.2, 3.0");
+		index_2 ("0.015, 0.053, 0.129, 0.683");
+	}
+}

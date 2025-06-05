@@ -1,0 +1,43 @@
+
+liberty_db::library::Library (example) {
+	technology (cmos);
+	delay_model : table_lookup;
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	power_lut_template (pwr_bcm_rf) {
+		variable_1 : input_transition_time;
+		index_1 ("0.15, 0.5, 0.7");
+	}
+	cell (AN2) {
+		area : 2.0;
+		pin (P) {
+			internal_power () {
+				values ("4.7, 4.9"); /* user defined attribute */
+			}
+		}
+		pin (A, B) {
+			capacitance : 1.0;
+			direction : input;
+			internal_power () {
+				rise_power (pwr_bcm_rf) {
+					values ("4.7, 4.9");
+				}
+				fall_power (pwr_bcm_rf) {
+					values ("4.7, 4.9");
+				}
+				power (pwr_bcm_rf) {
+					values ("4.7, 4.9");
+				}
+			}
+		}
+	}
+}
