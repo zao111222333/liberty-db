@@ -830,6 +830,7 @@ pub struct TableLookUp<C: Ctx> {
   pub values: Values,
 }
 impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
+  #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.size2 == 1
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
@@ -840,6 +841,7 @@ impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
   }
 }
 impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
+  #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.size2 == 1
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
@@ -850,6 +852,7 @@ impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
   }
 }
 impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
+  #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.size2 == 1
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
@@ -860,6 +863,7 @@ impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
   }
 }
 impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
+  #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.size2 == 1
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
@@ -870,6 +874,7 @@ impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
   }
 }
 impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {
+  #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.size2 == 1
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
@@ -1399,7 +1404,7 @@ impl<C: Ctx> SimpleAttri<C> for SigmaType {
 #[cfg(test)]
 mod test {
   use crate::{
-    DefaultCtx, Group,
+    DefaultCtx, Group as _,
     ast::{ComplexAttri, test_parse, test_parse_fmt},
   };
   #[test]
@@ -1533,7 +1538,7 @@ liberty_db::table::CompactCcsPower (c_ccs_pwr_template_3) {
   #[test]
   #[cfg(feature = "lut_template")]
   fn table_template() {
-    use super::TableCtx;
+    use super::TableCtx as _;
     use crate::{ccsn::ReceiverCapacitanceId, pin::PinId};
 
     let library = test_parse::<crate::Library<DefaultCtx>>(

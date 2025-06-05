@@ -160,14 +160,14 @@ bitflags::bitflags! {
   #[derive(serde::Serialize, serde::Deserialize)]
   #[serde(transparent)]
   pub struct AllDriverType: u8 {
-    const pull_up = 0b00000001;
-    const pull_down = 0b00000010;
-    const open_drain = 0b00000100;
-    const open_source = 0b00001000;
-    const bus_hold = 0b00001000;
-    const resistive = 0b00010000;
-    const resistive_0 = 0b01000000;
-    const resistive_1 = 0b10000000;
+    const pull_up = 0b0000_0001;
+    const pull_down = 0b0000_0010;
+    const open_drain = 0b0000_0100;
+    const open_source = 0b0000_1000;
+    const bus_hold = 0b0000_1000;
+    const resistive = 0b0001_0000;
+    const resistive_0 = 0b0100_0000;
+    const resistive_1 = 0b1000_0000;
   }
 }
 
@@ -185,7 +185,7 @@ impl<C: Ctx> SimpleAttri<C> for AllDriverType {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    if self.bits().count_ones() == 1 {
+    if self.bits().is_power_of_two() {
       write!(f, "{self}")
     } else {
       write!(f, "\"{self}\"")
@@ -194,6 +194,7 @@ impl<C: Ctx> SimpleAttri<C> for AllDriverType {
 }
 impl FromStr for AllDriverType {
   type Err = <DriverType as FromStr>::Err;
+  #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     let mut out = Self::empty();
     for t in s.split_ascii_whitespace() {
@@ -212,6 +213,7 @@ impl FromStr for AllDriverType {
   }
 }
 impl fmt::Display for AllDriverType {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let mut has_write = false;
     if self.contains(Self::pull_up) {
@@ -523,6 +525,7 @@ pub enum PinClass {
 }
 impl FromStr for PinClass {
   type Err = ();
+  #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     match s {
       "save" => Ok(Self::Save),
@@ -533,6 +536,7 @@ impl FromStr for PinClass {
   }
 }
 impl fmt::Display for PinClass {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Self::Save => write!(f, "save"),

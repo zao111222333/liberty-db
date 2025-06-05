@@ -81,7 +81,7 @@ impl FormulaExpr {
   pub fn parse(i: &str) -> IResult<&str, Self> {
     map_res(tokens, |tokens| parse_formula(&tokens)).parse_complete(i)
   }
-  #[expect(clippy::float_arithmetic)]
+  #[expect(clippy::float_arithmetic, clippy::option_if_let_else)]
   pub fn eval<S: BuildHasher>(
     &self,
     top: &Self,
@@ -89,26 +89,31 @@ impl FormulaExpr {
   ) -> Option<f64> {
     match self {
       Self::Add(e1, e2) => {
-        e1.eval(top, map).and_then(|f1| e2.eval(top, map).map(|f2| f1 + f2))
+        let f1 = e1.eval(top, map)?;
+        e2.eval(top, map).map(|f2| f1 + f2)
       }
       Self::Sub(e1, e2) => {
-        e1.eval(top, map).and_then(|f1| e2.eval(top, map).map(|f2| f1 - f2))
+        let f1 = e1.eval(top, map)?;
+        e2.eval(top, map).map(|f2| f1 - f2)
       }
       Self::Mul(e1, e2) => {
-        e1.eval(top, map).and_then(|f1| e2.eval(top, map).map(|f2| f1 * f2))
+        let f1 = e1.eval(top, map)?;
+        e2.eval(top, map).map(|f2| f1 * f2)
       }
       Self::Div(e1, e2) => {
-        e1.eval(top, map).and_then(|f1| e2.eval(top, map).map(|f2| f1 / f2))
+        let f1 = e1.eval(top, map)?;
+        e2.eval(top, map).map(|f2| f1 / f2)
       }
       Self::Neg(e) => e.eval(top, map).map(|f| -f),
       Self::Num(f) => Some(*f),
-      Self::Var(k) => match map.get(k) {
-        Some(f) => Some(*f),
-        None => {
+      Self::Var(k) => {
+        if let Some(f) = map.get(k) {
+          Some(*f)
+        } else {
           log::error!("Eval formula [{top}]: Can NOT find voltage {k}");
           None
         }
-      },
+      }
     }
   }
   /// precedence
@@ -366,15 +371,15 @@ mod test {
   use super::*;
   #[test]
   fn tokenize() {
-    dbg!(tokens("-0.5 ;"));
-    dbg!(tokens("VDD + 0.5 ;"));
-    let (_, t) = dbg!(tokens("0.3*(-A1+0.1) + 0.5 ;")).unwrap();
-    let expr = dbg!(parse_formula(&t)).unwrap();
+    tokens("-0.5 ;");
+    tokens("VDD + 0.5 ;");
+    let (_, t) = tokens("0.3*(-A1+0.1) + 0.5 ;").unwrap();
+    let expr = parse_formula(&t).unwrap();
     println!("{expr}");
-    let (_, t) = dbg!(tokens("-+A ;")).unwrap();
-    dbg!(parse_formula(&t));
-    let (_, t) = dbg!(tokens("A+ ;")).unwrap();
-    dbg!(parse_formula(&t));
+    let (_, t) = tokens("-+A ;").unwrap();
+    parse_formula(&t);
+    let (_, t) = tokens("A+ ;").unwrap();
+    parse_formula(&t);
   }
   #[test]
   fn parse_fmt_self_check() {

@@ -1035,7 +1035,7 @@ liberty_db::timing::Timing () {
 | active_input_ccb (XOR4D4BWP30P140__nci_14_3_FRLR_RFLF:a4, XOR4D4BWP30P140__nci_15_1_FR_RF:a4);
 | active_output_ccb (XOR4D4BWP30P140__nco_0_0_FR_RF:z);
 }"#,
-    )
+    );
   }
   #[test]
   fn lvf() {

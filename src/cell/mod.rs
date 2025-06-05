@@ -6,7 +6,7 @@ pub use items::*;
 #[cfg(test)]
 mod test;
 use core::{fmt::Debug, mem};
-use std::collections::BTreeSet;
+use alloc::collections::BTreeSet;
 
 use crate::{
   Ctx,

@@ -159,6 +159,7 @@
     unused_imports,
     unused_results,
     clippy::trivially_copy_pass_by_ref,
+    clippy::shadow_unrelated,
     clippy::default_numeric_fallback,
     clippy::unreadable_literal,
     clippy::type_complexity,
@@ -220,9 +221,10 @@ pub mod ccsn;
 mod ctx;
 pub use ctx::{Ctx, DefaultCtx};
 
+#[cfg(test)]
 #[test]
 fn demo() {
-  use crate::{DefaultCtx, Library, MutSetExt, PinId};
+  use crate::{DefaultCtx, Library, MutSetExt as _, PinId};
   use std::{
     fs::File,
     io::{BufWriter, Write as _},

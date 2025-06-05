@@ -396,7 +396,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
   );
   #[inline]
-  #[expect(clippy::float_arithmetic)]
+  #[expect(clippy::float_arithmetic, clippy::arithmetic_side_effects)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope<C>) -> Self {
     #[inline]
     fn eq_index<C: Ctx>(
