@@ -116,6 +116,14 @@ pub(crate) fn comment_space_newline(i: &str) -> IResult<&str, usize> {
 }
 
 #[inline]
+fn slash_newline(i: &str) -> IResult<&str, usize> {
+  map_opt((char('\\'), space_newline), |(_, n_newline)| {
+    if n_newline == 0 { None } else { Some(n_newline) }
+  })
+  .parse_complete(i)
+}
+
+#[inline]
 fn comment_space_newline_slash(i: &str) -> IResult<&str, usize> {
   map(
     pair(
@@ -355,7 +363,13 @@ fn float_vec(i: &str) -> IResult<&str, Vec<f64>> {
     map(
       (
         space,
-        separated_list0(alt((preceded((space, char(',')), space), space1)), float_one),
+        separated_list0(
+          alt((
+            delimited((space, char(',')), space, opt(slash_newline)),
+            terminated(space1, opt(slash_newline)),
+          )),
+          float_one,
+        ),
         opt(char(',')),
         space,
       ),
