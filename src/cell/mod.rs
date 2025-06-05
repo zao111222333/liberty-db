@@ -587,6 +587,9 @@ pub struct Cell<C: Ctx> {
   pub leakage_current: GroupSet<LeakageCurrent<C>>,
   #[liberty(group(type = Set))]
   pub pin: GroupSet<Pin<C>>,
+  // TODO:
+  #[liberty(group(type = Set))]
+  pub bus: GroupSet<Pin<C>>,
   #[liberty(group(type = Vec))]
   /// The `test_cell`  group is in a `cell` group or `model` group.
   /// It models only the nontest behavior of a scan cell, which
@@ -637,6 +640,16 @@ impl<C: Ctx> GroupFn<C> for Cell<C> {
       }
     }
     for pin in &builder.bundle {
+      match &pin.name {
+        NameList::Name(name) => {
+          logic_variables.push(name);
+        }
+        NameList::List(word_set) => {
+          logic_variables.extend(word_set.inner.iter().map(String::as_str));
+        }
+      }
+    }
+    for pin in &builder.bus {
       match &pin.name {
         NameList::Name(name) => {
           logic_variables.push(name);
