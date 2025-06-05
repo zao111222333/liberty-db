@@ -700,13 +700,16 @@ pub trait Group<C: Ctx>: Sized + GroupAttri<C> {
   }
 }
 /// `GroupAttri`, internal Group APIs
-pub(crate) trait GroupAttri<C: Ctx>: Sized + ParsingBuilder<C> {
+pub(crate) trait GroupAttri<C: Ctx>:
+  Sized + ParsingBuilder<C, Builder: Default>
+{
   /// `nom_parse`, will be implemented by macros
   fn nom_parse<'a>(
+    builder: &mut Self::Builder,
     i: &'a str,
     group_name: &str,
     scope: &mut ParseScope<'_>,
-  ) -> IResult<&'a str, Result<Self::Builder, IdError>, Error<&'a str>>;
+  ) -> IResult<&'a str, Result<(), IdError>, Error<&'a str>>;
   /// `fmt_liberty`
   fn fmt_liberty<T: Write, I: Indentation>(
     &self,
@@ -833,8 +836,9 @@ pub(crate) fn test_parse<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
   input: &str,
 ) -> G {
   let mut scope = ParseScope::default();
-  let builder = match G::nom_parse(input, "", &mut scope) {
-    Ok((_, Ok(g))) => g,
+  let mut builder = G::Builder::default();
+  match G::nom_parse(&mut builder, input, "", &mut scope) {
+    Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
   };
@@ -851,8 +855,9 @@ pub(crate) fn test_parse_fmt<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
   fmt_want: &str,
 ) -> G {
   let mut scope = ParseScope::default();
-  let builder = match G::nom_parse(input, "", &mut scope) {
-    Ok((_, Ok(g))) => g,
+  let mut builder = G::Builder::default();
+  match G::nom_parse(&mut builder, input, "", &mut scope) {
+    Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
   };
@@ -874,8 +879,9 @@ pub(crate) fn test_parse_fmt_variables<G: GroupAttri<DefaultCtx> + Group<Default
   use biodivine_lib_bdd::BddVariableSet;
 
   let mut scope = ParseScope::default();
-  let builder = match G::nom_parse(input, "", &mut scope) {
-    Ok((_, Ok(g))) => g,
+  let mut builder = G::Builder::default();
+  match G::nom_parse(&mut builder, input, "", &mut scope) {
+    Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
   };

@@ -741,10 +741,16 @@ impl<C: Ctx> Library<C> {
       Err(e) => return Err(ParserError::nom(filename, scope.loc.line_num, e)),
     };
     if key == Self::KEY {
-      match <Self as GroupAttri<C>>::nom_parse(input2, Self::KEY, &mut scope) {
+      let mut builder = LibraryBuilder::default();
+      match <Self as GroupAttri<C>>::nom_parse(
+        &mut builder,
+        input2,
+        Self::KEY,
+        &mut scope,
+      ) {
         Err(e) => Err(ParserError::nom(filename, scope.loc.line_num, e)),
         Ok((_, Err(e))) => Err(ParserError::IdError(scope.loc, e)),
-        Ok((_, Ok(builder))) => {
+        Ok((_, Ok(_))) => {
           let mut builder_scope = BuilderScope::default();
           Ok(ParsingBuilder::build(builder, &mut builder_scope))
         }
