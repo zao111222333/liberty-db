@@ -171,8 +171,8 @@ impl<C: Ctx> ComplexAttri<C> for SensitizationVector {
         .map(|t| match t {
           "1" => Ok(logic::Static::H),
           "0" => Ok(logic::Static::L),
-          "X" => Ok(logic::Static::X),
-          "Z" => Ok(logic::Static::Z),
+          "X" | "x" => Ok(logic::Static::X),
+          "Z" | "z" => Ok(logic::Static::Z),
           _ => Err(ComplexParseError::UnsupportedWord),
         })
         .collect::<Result<Vec<logic::Static>, _>>()

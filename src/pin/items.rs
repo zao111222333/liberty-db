@@ -4,7 +4,7 @@ use crate::{
     Attributes, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
     Indentation, ParseScope, SimpleAttri,
   },
-  expression::logic::Edge,
+  expression::logic::{Edge, Static},
 };
 use core::{
   fmt::{self, Write},
@@ -510,18 +510,37 @@ impl FromStr for TwoValue {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=282.3&end=282.23
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum PinClass {
   /// `save`
-  #[strum(serialize = "save")]
   Save,
   /// `restore`
-  #[strum(serialize = "restore")]
   Restore,
   /// `save_restore`
-  #[strum(serialize = "save_restore")]
   SaveRestore,
+  PinName(String),
+}
+impl FromStr for PinClass {
+  type Err = ();
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
+      "save" => Ok(Self::Save),
+      "restore" => Ok(Self::Restore),
+      "save_restore" => Ok(Self::SaveRestore),
+      _ => Ok(Self::PinName(s.to_owned())),
+    }
+  }
+}
+impl fmt::Display for PinClass {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::Save => write!(f, "save"),
+      Self::Restore => write!(f, "restore"),
+      Self::SaveRestore => write!(f, "save_restore"),
+      Self::PinName(pin) => write!(f, "{pin}"),
+    }
+  }
 }
 /// The `retention_pin` complex attribute identifies the retention pins of a retention cell. The
 /// attribute defines the following information:
@@ -547,13 +566,13 @@ pub enum PinClass {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=282.3&end=282.23
 /// ">Reference-Definition</a>
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct RetentionPin {
   /// `pin_class`
   pub pin_class: PinClass,
   /// `disable_value`
-  pub disable_value: OneZero,
+  pub disable_value: Static,
 }
 crate::ast::impl_self_builder!(RetentionPin);
 impl<C: Ctx> ComplexAttri<C> for RetentionPin {
@@ -569,10 +588,13 @@ impl<C: Ctx> ComplexAttri<C> for RetentionPin {
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let disable_value: OneZero = match iter.next() {
-      Some(&s) => match s.parse() {
-        Ok(f) => f,
-        Err(_) => return Err(ComplexParseError::Other),
+    let disable_value = match iter.next() {
+      Some(&s) => match s {
+        "1" => Static::H,
+        "0" => Static::L,
+        "X" | "x" => Static::X,
+        "Z" | "z" => Static::Z,
+        _ => return Err(ComplexParseError::UnsupportedWord),
       },
       None => return Err(ComplexParseError::LengthDismatch),
     };
@@ -587,7 +609,17 @@ impl<C: Ctx> ComplexAttri<C> for RetentionPin {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    write!(f, "{}, {}", self.pin_class, self.disable_value)
+    write!(
+      f,
+      "{}, {}",
+      self.pin_class,
+      match self.disable_value {
+        Static::X => "x",
+        Static::Z => "z",
+        Static::H => "1",
+        Static::L => "0",
+      }
+    )
   }
 }
 
