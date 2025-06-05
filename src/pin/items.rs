@@ -97,7 +97,7 @@ pub enum Direction {
   Input,
   #[strum(serialize = "output")]
   Output,
-  #[strum(serialize = "inout")]
+  #[strum(serialize = "inoutput", serialize = "inout")]
   Inout,
   #[strum(serialize = "internal")]
   Internal,
