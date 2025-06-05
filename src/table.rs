@@ -956,6 +956,7 @@ impl<C: Ctx> ComplexAttri<C> for Values {
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 pub(crate) struct DisplayValues<V: Iterator<Item = f64>> {
+  pub(crate) len: usize,
   pub(crate) size1: usize,
   pub(crate) inner: V,
 }
@@ -1006,11 +1007,13 @@ impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
     ComplexAttri::<C>::fmt_liberty(self.index_1, "index_1", f)?;
     ComplexAttri::<C>::fmt_liberty(self.index_2, "index_2", f)?;
     let indent1 = f.indentation();
-    write!(f, "\n{indent1}values (")?;
-    f.indent(1);
-    self.values.fmt_self(f)?;
-    f.dedent(1);
-    write!(f, ");")?;
+    if self.values.len > 0 {
+      write!(f, "\n{indent1}values (")?;
+      f.indent(1);
+      self.values.fmt_self(f)?;
+      f.dedent(1);
+      write!(f, ");")?;
+    }
     f.dedent(1);
     f.write_fmt(format_args!("\n{indent}}}"))
   }

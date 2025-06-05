@@ -106,10 +106,7 @@ impl TimingSenseType {
 crate::ast::impl_self_builder!(TimingSenseType);
 impl<C: Ctx> SimpleAttri<C> for TimingSenseType {
   #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> ast::SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }
 }
@@ -487,6 +484,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
       index_1: &self.index_1,
       index_2: &self.index_2,
       values: DisplayValues {
+        len: self.values.len(),
         size1: self.size1,
         inner: self.values.iter().copied(),
       },
@@ -499,6 +497,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
         index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
         index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
+          len: self.values.len(),
           size1: self.size1,
           inner: izip!(self.values.iter(), self.lvf_values.iter())
             .map(|(value, lvf)| lvf.mean - value),
@@ -510,6 +509,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
         index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
         index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
+          len: self.values.len(),
           size1: self.size1,
           inner: self.lvf_values.iter().map(|lvf| lvf.std_dev),
         },
@@ -520,6 +520,7 @@ impl<C: Ctx> TimingTableLookUp<C> {
         index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
         index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
         values: DisplayValues {
+          len: self.values.len(),
           size1: self.size1,
           inner: self.lvf_values.iter().map(|lvf| lvf.skewness),
         },
