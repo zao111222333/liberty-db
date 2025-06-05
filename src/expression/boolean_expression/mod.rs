@@ -220,7 +220,7 @@ pub struct BddBooleanExpression {
   pub expr: Expr,
   /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
   /// as `id`, to impl `hash` and `compare`
-  pub bdd: Bdd,
+  pub bdd: Option<Bdd>,
 }
 
 #[derive(Debug, Clone)]
@@ -263,14 +263,15 @@ impl BddBooleanExpression {
   #[must_use]
   #[inline]
   pub fn sdf(&self, cell_variables: &BddVariableSet) -> SdfExpression {
-    let s = self
-      .bdd
-      .sat_valuations()
-      .map(|valuation| {
-        let expr = Bdd::from(valuation).to_boolean_expression(cell_variables);
-        as_sdf_str(&expr)
-      })
-      .join(") || ( ");
+    let s = self.bdd.as_ref().map_or(String::new(), |bdd| {
+      bdd
+        .sat_valuations()
+        .map(|valuation| {
+          let expr = Bdd::from(valuation).to_boolean_expression(cell_variables);
+          as_sdf_str(&expr)
+        })
+        .join(") || ( ")
+    });
     SdfExpression::new(format!("( {s} )"))
   }
 }
@@ -280,7 +281,10 @@ impl Eq for BddBooleanExpression {}
 impl PartialOrd for BddBooleanExpression {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-    Some(Bdd::cmp_structural(&self.bdd, &other.bdd))
+    match (&self.bdd, &other.bdd) {
+      (Some(b1), Some(b2)) => Some(Bdd::cmp_structural(b1, b2)),
+      _ => None,
+    }
   }
 }
 impl Ord for BddBooleanExpression {
@@ -301,7 +305,13 @@ impl<C: Ctx> ParsingBuilder<C> for LogicBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
-    let bdd = scope.cell_extra_ctx.logic_variables.eval_expression(&builder.expr);
+    let bdd = scope
+      .cell_extra_ctx
+      .logic_variables
+      .safe_eval_expression(&builder.expr);
+    if bdd.is_none() {
+      log::error!("Failed to build BDD for [{}]", builder.expr);
+    }
     Self(BddBooleanExpression { expr: builder.expr, bdd })
   }
 }
@@ -310,7 +320,10 @@ impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
-    let bdd = scope.cell_extra_ctx.pg_variables.eval_expression(&builder.expr);
+    let bdd = scope.cell_extra_ctx.pg_variables.safe_eval_expression(&builder.expr);
+    if bdd.is_none() {
+      log::error!("Failed to build BDD for [{}]", builder.expr);
+    }
     Self(BddBooleanExpression { expr: builder.expr, bdd })
   }
 }
@@ -321,7 +334,10 @@ impl From<BooleanExpression> for BddBooleanExpression {
     let mut node_set: Vec<&str> = value.get_nodes().into_iter().collect();
     node_set.sort_unstable();
     let variables = BddVariableSet::new(&node_set);
-    let bdd = variables.eval_expression(&value.expr);
+    let bdd = variables.safe_eval_expression(&value.expr);
+    if bdd.is_none() {
+      log::error!("Failed to build BDD for [{}]", value.expr);
+    }
     Self { expr: value.expr, bdd }
   }
 }
@@ -366,7 +382,10 @@ impl<C: Ctx> crate::Cell<C> {
     s: &str,
   ) -> Result<LogicBooleanExpression, BoolExprErr> {
     let expr = BooleanExpression::from_str(s)?.expr;
-    let bdd = self.extra_ctx.logic_variables().eval_expression(&expr);
+    let bdd = self.extra_ctx.logic_variables().safe_eval_expression(&expr);
+    if bdd.is_none() {
+      log::error!("Failed to build BDD for [{expr}]");
+    }
     Ok(LogicBooleanExpression(BddBooleanExpression { expr, bdd }))
   }
   #[deprecated(since = "0.10.0", note = "use `parse_pg_boolexpr` instead")]
@@ -378,7 +397,10 @@ impl<C: Ctx> crate::Cell<C> {
     s: &str,
   ) -> Result<PowerGroundBooleanExpression, BoolExprErr> {
     let expr = BooleanExpression::from_str(s)?.expr;
-    let bdd = self.extra_ctx.pg_variables().eval_expression(&expr);
+    let bdd = self.extra_ctx.pg_variables().safe_eval_expression(&expr);
+    if bdd.is_none() {
+      log::error!("Failed to build BDD for [{expr}]");
+    }
     Ok(PowerGroundBooleanExpression(BddBooleanExpression { expr, bdd }))
   }
 }
