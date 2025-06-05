@@ -510,7 +510,8 @@ pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
   i: &'a str,
   scope: &mut ParseScope<'_>,
 ) -> SimpleParseRes<'a, T> {
-  let (input, s) = parser::simple(i, &mut scope.loc.line_num)?;
+  let (input, s) = parser::simple(i, &mut scope.loc.line_num)
+    .or(parser::complex_single(i, &mut scope.loc.line_num))?;
   s.parse()
     .map_or(Ok((input, Err(String::from(s)))), |simple| Ok((input, Ok(simple))))
 }

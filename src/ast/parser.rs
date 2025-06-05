@@ -550,6 +550,32 @@ pub(crate) fn complex<'a>(
   .parse_complete(i)
 }
 
+#[inline]
+pub(crate) fn complex_single<'a>(
+  i: &'a str,
+  line_num: &mut usize,
+) -> IResult<&'a str, &'a str> {
+  map(
+    (
+      space,
+      char('('),
+      comment_space_newline_slash,
+      alt((word, unquote)),
+      comment_space_newline_slash,
+      char(')'),
+      alt((
+        preceded(pair(space, char(';')), comment_space_newline),
+        comment_space_newline_many1,
+      )),
+    ),
+    |(_, _, n0, s, n1, _, n2)| {
+      *line_num += n0 + n1 + n2;
+      s
+    },
+  )
+  .parse_complete(i)
+}
+
 #[cfg(test)]
 mod test_key {
   use super::*;
