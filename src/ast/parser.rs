@@ -351,15 +351,19 @@ pub(crate) fn float_one(i: &str) -> IResult<&str, f64> {
 }
 #[inline]
 fn float_vec(i: &str) -> IResult<&str, Vec<f64>> {
-  delimited(
-    pair(char('"'), space),
-    terminated(
-      separated_list0(alt((preceded((space, char(',')), space), space1)), float_one),
-      pair(opt(char(',')), space),
-    ),
-    char('"'),
-  )
-  .parse_complete(i)
+  fn _float_vec(i: &str) -> IResult<&str, Vec<f64>> {
+    map(
+      (
+        space,
+        separated_list0(alt((preceded((space, char(',')), space), space1)), float_one),
+        opt(char(',')),
+        space,
+      ),
+      |(_, list, _, _)| list,
+    )
+    .parse_complete(i)
+  }
+  alt((delimited(char('"'), _float_vec, char('"')), _float_vec)).parse_complete(i)
 }
 
 #[inline]
