@@ -153,8 +153,26 @@ pub enum DriverType {
   #[strum(serialize = "resistive_1")]
   Resistive1,
 }
-crate::ast::impl_self_builder!(DriverType);
-impl<C: Ctx> SimpleAttri<C> for DriverType {
+
+bitflags::bitflags! {
+  /// Represents a set of flags.
+  #[derive(Debug, Clone, Copy, Eq, PartialEq)]
+  #[derive(serde::Serialize, serde::Deserialize)]
+  #[serde(transparent)]
+  pub struct AllDriverType: u8 {
+    const pull_up = 0b00000001;
+    const pull_down = 0b00000010;
+    const open_drain = 0b00000100;
+    const open_source = 0b00001000;
+    const bus_hold = 0b00001000;
+    const resistive = 0b00010000;
+    const resistive_0 = 0b01000000;
+    const resistive_1 = 0b10000000;
+  }
+}
+
+crate::ast::impl_self_builder!(AllDriverType);
+impl<C: Ctx> SimpleAttri<C> for AllDriverType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -162,7 +180,102 @@ impl<C: Ctx> SimpleAttri<C> for DriverType {
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    if self.bits().count_ones() == 1 {
+      write!(f, "{self}")
+    } else {
+      write!(f, "\"{self}\"")
+    }
+  }
 }
+impl FromStr for AllDriverType {
+  type Err = <DriverType as FromStr>::Err;
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    let mut out = Self::empty();
+    for t in s.split_ascii_whitespace() {
+      match t.parse()? {
+        DriverType::PullUp => out.insert(Self::pull_up),
+        DriverType::PullDown => out.insert(Self::pull_down),
+        DriverType::OpenDrain => out.insert(Self::open_drain),
+        DriverType::OpenSource => out.insert(Self::open_source),
+        DriverType::BusHold => out.insert(Self::bus_hold),
+        DriverType::Resistive => out.insert(Self::resistive),
+        DriverType::Resistive0 => out.insert(Self::resistive_0),
+        DriverType::Resistive1 => out.insert(Self::resistive_1),
+      }
+    }
+    Ok(out)
+  }
+}
+impl fmt::Display for AllDriverType {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let mut has_write = false;
+    if self.contains(Self::pull_up) {
+      has_write = true;
+      write!(f, "{}", DriverType::PullUp)?;
+    }
+    if self.contains(Self::pull_down) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::PullDown)?;
+    }
+    if self.contains(Self::open_drain) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::OpenDrain)?;
+    }
+    if self.contains(Self::open_source) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::OpenSource)?;
+    }
+    if self.contains(Self::bus_hold) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::BusHold)?;
+    }
+    if self.contains(Self::resistive) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::Resistive)?;
+    }
+    if self.contains(Self::resistive_0) {
+      if has_write {
+        write!(f, " ")?;
+      } else {
+        has_write = true;
+      }
+      write!(f, "{}", DriverType::Resistive0)?;
+    }
+    if self.contains(Self::resistive_1) {
+      if has_write {
+        write!(f, " ")?;
+      }
+      write!(f, "{}", DriverType::Resistive1)?;
+    }
+    Ok(())
+  }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum NextstateType {
@@ -493,7 +606,7 @@ mod test {
   }
   #[test]
   fn retention_pin() {
-    let pin = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
+    let cell = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
       r#"(cell1){
         pin(A){
           retention_pin (save_restore, 1);
@@ -515,6 +628,34 @@ liberty_db::cell::Cell (cell1) {
 | }
 | pin (C) {
 | | retention_pin (save, 0);
+| }
+}"#,
+    );
+  }
+  #[test]
+  fn driver_type() {
+    let cell = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
+      r#"(cell1){
+        pin(A){
+          driver_type : "pull_up pull_down open_drain open_source bus_hold";
+        }
+        pin(B){
+          driver_type : pull_up;
+        }
+        pin(C){
+          driver_type : "bus_hold";
+        }
+      }"#,
+      r#"
+liberty_db::cell::Cell (cell1) {
+| pin (A) {
+| | driver_type : "pull_up pull_down open_drain open_source bus_hold";
+| }
+| pin (B) {
+| | driver_type : pull_up;
+| }
+| pin (C) {
+| | driver_type : open_source bus_hold;
 | }
 }"#,
     );
