@@ -8,5 +8,5 @@ mod boolean_expression;
 mod formula;
 mod sdf;
 pub use boolean_expression::*;
-pub use formula::{ExprErr, Formula};
+pub use formula::{ExprErr, Formula, FormulaExpr};
 pub use sdf::SdfExpression;

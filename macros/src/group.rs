@@ -727,15 +727,19 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
                 match key {
                   #parser_arms
                   _ => {
-                    let (new_input,undefined) = crate::ast::parser::undefine(input, key, scope)?;
-                    input = new_input;
-                    crate::ast::attributs_set_undefined_attri(
-                      &mut res.#attributes_name,
-                      key,
-                      group_name,
-                      scope,
-                      undefined,
-                    );
+                    if let Ok((new_input,undefined)) = crate::ast::parser::undefine(input, key, scope) {
+                      input = new_input;
+                      crate::ast::attributs_set_undefined_attri(
+                        &mut res.#attributes_name,
+                        key,
+                        group_name,
+                        scope,
+                        undefined,
+                      );
+                    } else {
+                      let (new_input,_) = crate::ast::parser::variable(input, key, scope)?;
+                      input = new_input;
+                    }
                   },
                 }
               }

@@ -2,7 +2,10 @@
 //!
 //! All parser utilis.
 //!
-use crate::ast::GroupWrapper;
+use crate::{
+  ast::GroupWrapper,
+  expression::{Formula, FormulaExpr},
+};
 use nom::{
   IResult, Parser as _,
   branch::alt,
@@ -186,6 +189,25 @@ mod test_space {
       )
     );
   }
+}
+#[inline]
+pub(crate) fn variable<'a>(
+  i: &'a str,
+  name: &str,
+  scope: &mut super::ParseScope<'_>,
+) -> IResult<&'a str, ()> {
+  map(
+    (space, char('='), FormulaExpr::parse, space, char(';'), comment_space_newline),
+    |(_, _, expr, _, _, n)| {
+      scope.loc.line_num += n;
+      let formula = Formula {
+        value: expr.eval(&expr, |k: &str| scope.variables.get(k).and_then(|f| f.value)),
+        expr,
+      };
+      _ = scope.variables.insert(name.to_owned(), formula);
+    },
+  )
+  .parse_complete(i)
 }
 #[inline]
 pub(crate) fn undefine<'a>(

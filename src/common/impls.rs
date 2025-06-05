@@ -7,6 +7,7 @@ use crate::{
     self, CodeFormatter, ComplexAttri, ComplexParseError, ComplexParseRes, IdError,
     Indentation, NameAttri, ParseScope, SimpleAttri, is_word, join_fmt_no_quote,
   },
+  expression,
 };
 use core::{
   fmt::{self, Write},
@@ -25,12 +26,18 @@ impl<C: Ctx> SimpleAttri<C> for f64 {
     i: &'a str,
     scope: &mut ParseScope<'_>,
   ) -> ast::SimpleParseRes<'a, Self> {
-    ast::parser::simple_custom(
+    let (new_i, expr_res) = ast::parser::simple_custom(
       i,
       &mut scope.loc.line_num,
-      ast::parser::float_one,
+      expression::FormulaExpr::parse,
       ast::parser::unquote,
-    )
+    )?;
+    let value_res = expr_res.and_then(|expr| {
+      expr
+        .eval(&expr, |k: &str| scope.variables.get(k).and_then(|f| f.value))
+        .ok_or(expr.to_string())
+    });
+    Ok((new_i, value_res))
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(

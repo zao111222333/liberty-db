@@ -9,6 +9,7 @@ use crate::table::{CompactLutTemplate, TableTemple};
 use crate::{
   Ctx, DefaultCtx,
   common::{f64_into_hash_ord_fn, parse_f64},
+  expression::Formula,
   library::AttributeType,
 };
 #[cfg(feature = "lut_template")]
@@ -441,6 +442,7 @@ pub enum DefinedType {
 pub(crate) struct ParseScope<'a> {
   pub(crate) loc: ParseLoc<'a>,
   pub(crate) define_map: HashMap<u64, DefinedType, mut_set::NoHashBuildHasher>,
+  pub(crate) variables: HashMap<String, Formula, RandomState>,
   pub(crate) hasher: RandomState,
 }
 

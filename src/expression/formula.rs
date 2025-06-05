@@ -1,7 +1,4 @@
-use core::{
-  fmt::{self, Write},
-  hash::BuildHasher,
-};
+use core::fmt::{self, Write};
 use nom::{
   IResult, Parser as _,
   branch::alt,
@@ -10,7 +7,6 @@ use nom::{
   multi::many1,
   sequence::{delimited, preceded},
 };
-use std::collections::HashMap;
 
 use crate::{
   Ctx,
@@ -40,6 +36,7 @@ pub struct Formula {
 }
 
 impl Default for FormulaExpr {
+  #[inline]
   fn default() -> Self {
     Self::Num(0.0)
   }
@@ -50,7 +47,7 @@ impl<C: Ctx> crate::ast::ParsingBuilder<C> for Formula {
   #[inline]
   #[expect(clippy::renamed_function_params)]
   fn build(expr: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
-    let value = expr.eval(&expr, &scope.voltage_map);
+    let value = expr.eval(&expr, |k: &str| scope.voltage_map.get(k).copied());
     Self { expr, value }
   }
 }
@@ -81,34 +78,35 @@ impl FormulaExpr {
   pub fn parse(i: &str) -> IResult<&str, Self> {
     map_res(tokens, |tokens| parse_formula(&tokens)).parse_complete(i)
   }
+  #[inline]
   #[expect(clippy::float_arithmetic, clippy::option_if_let_else)]
-  pub fn eval<S: BuildHasher>(
+  pub fn eval<F: Fn(&str) -> Option<f64> + Copy>(
     &self,
     top: &Self,
-    map: &HashMap<String, f64, S>,
+    query_fn: F, // map: &HashMap<String, f64, S>,
   ) -> Option<f64> {
     match self {
       Self::Add(e1, e2) => {
-        let f1 = e1.eval(top, map)?;
-        e2.eval(top, map).map(|f2| f1 + f2)
+        let f1 = e1.eval(top, query_fn)?;
+        e2.eval(top, query_fn).map(|f2| f1 + f2)
       }
       Self::Sub(e1, e2) => {
-        let f1 = e1.eval(top, map)?;
-        e2.eval(top, map).map(|f2| f1 - f2)
+        let f1 = e1.eval(top, query_fn)?;
+        e2.eval(top, query_fn).map(|f2| f1 - f2)
       }
       Self::Mul(e1, e2) => {
-        let f1 = e1.eval(top, map)?;
-        e2.eval(top, map).map(|f2| f1 * f2)
+        let f1 = e1.eval(top, query_fn)?;
+        e2.eval(top, query_fn).map(|f2| f1 * f2)
       }
       Self::Div(e1, e2) => {
-        let f1 = e1.eval(top, map)?;
-        e2.eval(top, map).map(|f2| f1 / f2)
+        let f1 = e1.eval(top, query_fn)?;
+        e2.eval(top, query_fn).map(|f2| f1 / f2)
       }
-      Self::Neg(e) => e.eval(top, map).map(|f| -f),
+      Self::Neg(e) => e.eval(top, query_fn).map(|f| -f),
       Self::Num(f) => Some(*f),
       Self::Var(k) => {
-        if let Some(f) = map.get(k) {
-          Some(*f)
+        if let Some(f) = query_fn(k) {
+          Some(f)
         } else {
           log::error!("Eval formula [{top}]: Can NOT find voltage {k}");
           None

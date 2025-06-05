@@ -1,9 +1,10 @@
 library (test) {
   FANOUT = 5;  /* declaration */
+  FANOUT1 = 5+FANOUT;  /* declaration */
   cell (AND) {
     pin (Z) {
       direction : output;
-      max_fanout : FANOUT * 2;  /* usage, here max_fanout : 10 */
+      max_fanout : FANOUT1 * 2;  /* usage, here max_fanout : 20 */
     }
   }
 }
