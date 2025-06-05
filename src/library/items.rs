@@ -449,7 +449,7 @@ impl<C: Ctx> GroupFn<C> for OutputVoltage<C> {}
 pub enum DelayModel {
   /// `table_lookup`
   #[default]
-  #[strum(serialize = "lookup_table", serialize = "table_lookup")]
+  #[strum(serialize = "lookup_table", to_string = "table_lookup")]
   TableLookup,
   #[strum(serialize = "polynomial")]
   Polynomial,
@@ -751,7 +751,7 @@ pub struct Define {
 pub enum AttributeType {
   /// Boolean
   #[default]
-  #[strum(serialize = "Boolean", serialize = "boolean")]
+  #[strum(serialize = "Boolean", to_string = "boolean")]
   Boolean,
   /// string
   #[strum(serialize = "string")]

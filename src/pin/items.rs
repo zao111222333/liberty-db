@@ -97,7 +97,7 @@ pub enum Direction {
   Input,
   #[strum(serialize = "output")]
   Output,
-  #[strum(serialize = "inoutput", serialize = "inout")]
+  #[strum(serialize = "inoutput", to_string = "inout")]
   Inout,
   #[strum(serialize = "internal")]
   Internal,
@@ -673,6 +673,7 @@ liberty_db::cell::Cell (cell1) {
     let cell = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
       r#"(cell1){
         pin(A){
+          direction: inout;
           driver_type : "pull_up pull_down open_drain open_source bus_hold";
         }
         pin(B){
@@ -685,6 +686,7 @@ liberty_db::cell::Cell (cell1) {
       r#"
 liberty_db::cell::Cell (cell1) {
 | pin (A) {
+| | direction : inout;
 | | driver_type : "pull_up pull_down open_drain open_source bus_hold";
 | }
 | pin (B) {
