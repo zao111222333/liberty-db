@@ -70,8 +70,8 @@ anyhow = "1.0"
 foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
 pyo3 = "0.25"
-# pyo3-stub-gen = { version = "0.8", default-features = false }
-pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
+pyo3-stub-gen = { version = "0.8", default-features = false }
+# pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
 bincode = { version= "2", features = ["serde"] }
 indexmap = { version = "2.9", features = ["serde"] }
 bitflags = { version = "2.9", features = ["serde"] }
