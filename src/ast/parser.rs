@@ -354,7 +354,7 @@ fn float_vec(i: &str) -> IResult<&str, Vec<f64>> {
   delimited(
     pair(char('"'), space),
     terminated(
-      separated_list0(delimited(space, char(','), space), float_one),
+      separated_list0(alt((preceded((space, char(',')), space), space1)), float_one),
       pair(opt(char(',')), space),
     ),
     char('"'),

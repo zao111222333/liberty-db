@@ -1357,9 +1357,52 @@ impl<C: Ctx> SimpleAttri<C> for SigmaType {
 mod test {
   use crate::{
     DefaultCtx, Group,
-    ast::{test_parse, test_parse_fmt},
+    ast::{ComplexAttri, test_parse, test_parse_fmt},
   };
-
+  #[test]
+  fn vector32() {
+    let mut scope = crate::ast::ParseScope::default();
+    let (_, res) = <super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"("5.4283814e-01, 5.4289214e-01, 5.4298464e-01", \
+    "6.2226570e-01, 6.2225652e-01, 6.2212002e-01,");"#,
+      &mut scope,
+    )
+    .unwrap();
+    dbg!(&res);
+    let values = res.unwrap();
+    assert_eq!(values.size1, 3);
+    assert_eq!(values.size2, 2);
+    dbg!(<super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"("6.2226570e-01, 6.2225652e-01, 6.2212002e-01");"#,
+      &mut scope,
+    ));
+  }
+  #[test]
+  fn vector31() {
+    let mut scope = crate::ast::ParseScope::default();
+    let (_, res) = <super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"("6.2226570e-01, 6.2225652e-01, 6.2212002e-01");"#,
+      &mut scope,
+    )
+    .unwrap();
+    dbg!(&res);
+    let values = res.unwrap();
+    assert_eq!(values.size1, 3);
+    assert_eq!(values.size2, 1);
+  }
+  #[test]
+  fn vector31_badiface() {
+    let mut scope = crate::ast::ParseScope::default();
+    let (_, res) = <super::Values as ComplexAttri<DefaultCtx>>::nom_parse(
+      r#"("6.2226570e-01 6.2225652e-01 6.2212002e-01");"#,
+      &mut scope,
+    )
+    .unwrap();
+    dbg!(&res);
+    let values = res.unwrap();
+    assert_eq!(values.size1, 3);
+    assert_eq!(values.size2, 1);
+  }
   #[test]
   fn table() {
     let table = test_parse_fmt::<super::TableLookUp<DefaultCtx>>(
