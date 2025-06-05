@@ -451,6 +451,8 @@ pub enum DelayModel {
   #[default]
   #[strum(serialize = "lookup_table", serialize = "table_lookup")]
   TableLookup,
+  #[strum(serialize = "polynomial")]
+  Polynomial,
 }
 crate::ast::impl_self_builder!(DelayModel);
 impl<C: Ctx> SimpleAttri<C> for DelayModel {
