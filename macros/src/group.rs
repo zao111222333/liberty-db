@@ -671,7 +671,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         #comment_fns
       }
       #[expect(clippy::field_scoped_visibility_modifiers,clippy::redundant_pub_crate)]
-      #[derive(Clone)]
+      #[derive(Clone, Debug)]
       pub(crate) struct #builder_ident<C: crate::Ctx> {
         #builder_fields
       }

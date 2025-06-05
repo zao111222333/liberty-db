@@ -405,7 +405,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     ) -> bool {
       lhs.index_1 == rhs.index_1 && lhs.index_2 == rhs.index_2
     }
-    match builder {
+    let mut out: TimingTableLookUp<C> = match builder {
       (Some(_value), Some(_mean_shift), Some(_std_dev), Some(_skewness)) => {
         let lvf_nomial_same_index = eq_index(&_value, &_mean_shift);
         let valid_lvf_index =
@@ -429,7 +429,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
           log::error!("LVF LUTs' index mismatch");
           (Vec::new(), String::from("LVF LUTs' index mismatch"))
         };
-        Some(TimingTableLookUp {
+        TimingTableLookUp {
           extra_ctx: C::Table::default(),
           name: _value.name,
           comments,
@@ -449,9 +449,9 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
             _mean_shift.index_2
           },
           lvf_values,
-        })
+        }
       }
-      (Some(_value), None, None, None) => Some(TimingTableLookUp {
+      (Some(_value), None, None, None) => TimingTableLookUp {
         extra_ctx: C::Table::default(),
         name: _value.name,
         comments: String::new(),
@@ -463,9 +463,14 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
         lvf_index_1: Vec::new(),
         lvf_index_2: Vec::new(),
         lvf_values: Vec::new(),
-      }),
-      _ => None,
+      },
+      _ => return None,
+    };
+    if out.size2 == 1 && out.values.len() == out.index_1.len() * out.index_2.len() {
+      out.size1 = out.index_1.len();
+      out.size2 = out.index_2.len();
     }
+    Some(out)
   }
 }
 impl<C: Ctx> TimingTableLookUp<C> {

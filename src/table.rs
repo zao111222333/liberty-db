@@ -829,11 +829,56 @@ pub struct TableLookUp<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-impl<C: Ctx> GroupFn<C> for TableLookUp<C> {}
-impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {}
-impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {}
-impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {}
-impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {}
+impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
+impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
+impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
+impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
+impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {
+  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+    if builder.values.size2 == 1
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.size1 = builder.index_1.len();
+      builder.values.size2 = builder.index_2.len();
+    }
+  }
+}
 
 #[derive(Debug, Default, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -862,7 +907,7 @@ impl<C: Ctx> ComplexAttri<C> for Values {
         let mut size1 = 0;
         let mut size2 = 0;
         let mut table_len_mismatch = false;
-        let inner = vec
+        let inner: Vec<f64> = vec
           .into_iter()
           .flat_map(|(n, v)| {
             scope.loc.line_num += n;
@@ -882,10 +927,8 @@ impl<C: Ctx> ComplexAttri<C> for Values {
         Ok((
           _i,
           if table_len_mismatch {
-            Err((
-              ComplexParseError::LengthDismatch,
-              ast::ComplexWrapper(vec![String::from("PARSER_ERROR")]),
-            ))
+            log::error!("{} table of values is NOT aligned", scope.loc);
+            Ok(Self { size1: inner.len(), size2: 1, inner })
           } else {
             Ok(Self { size1, size2, inner })
           },
