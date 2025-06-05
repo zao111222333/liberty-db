@@ -70,7 +70,6 @@ chrono = "0.4"
 anyhow = "1.0"
 foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
-hashmatch = "0.1.1"
 pyo3 = "0.25"
 pyo3-stub-gen = { version = "0.8", default-features = false }
 # pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
@@ -92,7 +91,6 @@ fast-float2.workspace = true
 nom.workspace = true
 biodivine-lib-bdd.workspace = true
 duplicate.workspace = true
-hashmatch.workspace = true
 pyo3 = { workspace = true, optional = true }
 pyo3-stub-gen = { workspace = true, optional = true }
 indexmap.workspace = true

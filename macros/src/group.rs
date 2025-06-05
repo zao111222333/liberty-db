@@ -5,6 +5,7 @@ use syn::{Data, DeriveInput, Expr, Fields, GenericArgument, PathArguments, Type}
 
 #[expect(clippy::too_many_arguments)]
 fn group_field_fn(
+  field_idx: u64,
   field_name: &Ident,
   field_type: &Type,
   default: Option<&Expr>,
@@ -30,11 +31,11 @@ fn group_field_fn(
   let mut comment_fn = quote! {
     #[inline]
     pub fn #comment_fn_name(&self)-> Option<&String> {
-      self.#comments_name.0.get(&hashmatch::hash_arm!(#s_field_name))
+      self.#comments_name.0.get(&#field_idx)
     }
     #[inline]
     pub fn #comment_fn_entry<'a>(&'a mut self)-> std::collections::hash_map::Entry<'a, u64, String> {
-      self.#comments_name.0.entry(hashmatch::hash_arm!(#s_field_name))
+      self.#comments_name.0.entry(#field_idx)
     }
   };
   let write_field: proc_macro2::TokenStream;
@@ -495,15 +496,14 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       extra_ctx_name,
       _extra_ctx_type,
     ) = parse_fields_type(fields)?;
-    let this_str = "__this__";
     let mut comment_fns = quote! {
       #[inline]
       pub fn comments_this(&self)-> Option<&String> {
-        self.#comments_name.0.get(&hashmatch::hash_arm!(#this_str))
+        self.#comments_name.0.get(&0)
       }
       #[inline]
       pub fn comments_this_entry<'a>(&'a mut self)-> std::collections::hash_map::Entry<'a, u64, String> {
-        self.#comments_name.0.entry(hashmatch::hash_arm!(#this_str))
+        self.#comments_name.0.entry(0)
       }
     };
     let mut builder_fields = quote! {
@@ -559,9 +559,12 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         ));
       }
     }
-    for (field_name, arrti_type, field_type) in field_name_arrti_type {
+    for (idx, (field_name, arrti_type, field_type)) in
+      field_name_arrti_type.into_iter().enumerate()
+    {
       let (comment_fn, write_field, builder_init, parser_arm, builder_field, build_arm) =
         group_field_fn(
+          (idx + 1) as u64,
           field_name,
           field_type,
           default_map.get(field_name),
