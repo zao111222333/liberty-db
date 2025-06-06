@@ -17,12 +17,19 @@ liberty_db::library::Library (example) {
 	input_threshold_pct_rise : 50.0;
 	output_threshold_pct_rise : 50.0;
 	output_threshold_pct_fall : 50.0;
-	type (thirtytwo) {  /* user defined attribute */
-		bit_width : 32; /* user defined attribute */
+	type (sixteen) {
+		base_type : array;
+		bit_from : 15;
+		bit_to : 0;
+		bit_width : 1;
+		data_type : bit;
 	}
-	type (sixteen) {  /* user defined attribute */
-		bit_from : 15; /* user defined attribute */
-		bit_to : 0; /* user defined attribute */
+	type (thirtytwo) {
+		base_type : array;
+		bit_from : 0;
+		bit_to : 0;
+		bit_width : 32;
+		data_type : bit;
 	}
 	input_voltage (iv1) {
 		vil : 0;
@@ -116,11 +123,13 @@ liberty_db::library::Library (example) {
 			direction : input;
 		}
 		bus (D) {
+			bus_type : sixteen;
+			scan_pin_inverted : false;
 			clock : true;
-			bus_type : sixteen; /* user defined attribute */
 		}
 		bus (E) {
-			bus_type : thirtytwo; /* user defined attribute */
+			bus_type : thirtytwo;
+			scan_pin_inverted : false;
 		}
 		bundle (CR) {
 			members (CR0, CR1);
@@ -159,17 +168,17 @@ liberty_db::library::Library (example) {
 		bundle (H0A) {
 			members (H01, H02, H03, H04);
 			direction : input;
-			pin (H01) {  /* user defined attribute */
-				capacitance : 0.015785; /* user defined attribute */
-				timing () {  /* user defined attribute */
-					fall_constraint (scalar) {  /* user defined attribute */
-						values (0.720000); /* user defined attribute */
+			pin (H01) {
+				capacitance : 0.015785;
+				timing () {
+					related_pin : H05;
+					timing_type : setup_rising;
+					rise_constraint (scalar) {
+						values ("0.72");
 					}
-					related_pin : H05; /* user defined attribute */
-					rise_constraint (scalar) {  /* user defined attribute */
-						values (0.720000); /* user defined attribute */
+					fall_constraint (scalar) {
+						values ("0.72");
 					}
-					timing_type : setup_rising; /* user defined attribute */
 				}
 			}
 		}

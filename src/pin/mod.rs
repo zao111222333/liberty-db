@@ -20,9 +20,71 @@ mod items;
 pub use bundle::*;
 // use crate::units;
 pub use items::*;
+
+#[derive(liberty_macros::Duplicate)]
+#[duplicated(name = Bus)]
+#[duplicated(docs(
+/// A `bus` group, defined in a [`cell`](crate::cell::Cell) group or a [`model`](crate::cell::Model) group, defines the bused pins in the
+/// library. Before you can define a `bus` group you must first define a [`type`](crate::pin::BusType) group at the `library`
+/// level.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=136.4&end=136.9
+/// ">Reference</a>
+))]
+#[duplicated(additional_attrs(
+  /// The `bus_type` attribute is a required element of all bus groups. The attribute defines the
+  /// type of bus. It must be the first attribute declared in a bus group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub bus_type: SimpleBusType,
+  /// The optional `scan_start_pin` attribute specifies the scan output pin of a sequential
+  /// element of a multibit scan cell, where the internal scan chain begins. This attribute applies
+  /// only to output buses and bundles of multibit scan cells.
+  /// Only the following scan chains are supported:
+  /// + From the least significant bit (LSB) to the most significant bit (MSB) of the output bus
+  /// group; and
+  /// + From the MSB to the LSB of the output bus group.
+  ///
+  /// Therefore, for a multibit scan cell with internal scan chain, the value of the
+  /// `scan_start_pin` attribute can either be the LSB, or the MSB output pin.
+  /// Specifying the LSB scan output pin as the value of the `scan_start_pin` attribute indicates
+  /// that the scan signal shifts from the LSB sequential element to the MSB sequential element
+  /// of the multibit scan cell.
+  ///
+  /// Specifying the MSB scan output pin as the value of the `scan_start_pin` attribute
+  /// indicates that the scan signal shifts from the MSB sequential element to the LSB
+  /// sequential element of the multibit scan cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
+  /// ">Reference-Definition</a>
+  #[liberty(simple(type = Option))]
+  pub scan_start_pin: Option<String>,
+  /// The optional `scan_pin_inverted` attribute specifies that the scan signal is inverted (after
+  /// the first sequential element of the multibit scan cell). This attribute applies only to output
+  /// buses and bundles of multibit scan cells. The default is false.
+  ///
+  /// If you specify the `scan_pin_inverted` attribute value as true, you must specify the value
+  /// of the `signal_type` attribute as `test_scan_out_inverted`.
+  ///
+  /// If you specify the `scan_pin_inverted` attribute, you must specify the `scan_start_pin`
+  /// attribute in the same bus group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  #[liberty(default = false)]
+  pub scan_pin_inverted: bool,
+  /// You can define a `pin` group within a [`cell`](crate::cell::Cell),
+  /// [`test_cell`](crate::cell::TestCell), [`model`](crate::cell::Model),
+  /// or [`bus`](crate::pin::Bus) group.
+  #[liberty(group(type = Set))]
+  pub pin: GroupSet<Pin<C>>,
+))]
 /// You can define a `pin` group within a [`cell`](crate::cell::Cell),
-/// [`test_cell`](crate::cell::TestCell), [`model`](crate::cell::Cell),
-/// or [`bus`](crate::bus::Bus) group.
+/// [`test_cell`](crate::cell::TestCell), [`model`](crate::cell::Model),
+/// or [`bus`](crate::pin::Bus) group.
 ///
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -61,12 +123,6 @@ pub struct Pin<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type = Option))]
-  pub bus_type: Option<SimpleBusType>,
-  #[liberty(simple(type = Option))]
-  pub scan_start_pin: Option<String>,
-  #[liberty(simple(type = Option))]
-  pub scan_pin_inverted: Option<bool>,
   #[liberty(simple(type = Option))]
   pub driver_waveform_rise: Option<String>,
   #[liberty(simple(type = Option))]
@@ -1162,6 +1218,7 @@ pub struct Pin<C: Ctx> {
 }
 
 impl<C: Ctx> GroupFn<C> for Pin<C> {}
+impl<C: Ctx> GroupFn<C> for Bus<C> {}
 
 #[cfg(test)]
 mod test {

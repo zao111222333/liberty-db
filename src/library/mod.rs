@@ -10,7 +10,7 @@ use crate::{
     Attributes, BuilderScope, DefaultIndentation, GroupComments, GroupFn, GroupSet,
     ParseLoc, ParseScope, ParserError, ParsingBuilder,
   },
-  cell::Cell,
+  cell::{Cell, Model},
   common::char_config::CharConfig,
   pin::BusType,
   table::{CompactLutTemplate, DriverWaveform, TableTemple},
@@ -715,7 +715,7 @@ pub struct Library<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.23&end=225.29
   /// ">Reference</a>
   #[liberty(group(type = Set))]
-  pub model: GroupSet<Cell<C>>,
+  pub model: GroupSet<Model<C>>,
   #[liberty(group(type = Set))]
   pub cell: GroupSet<Cell<C>>,
 }

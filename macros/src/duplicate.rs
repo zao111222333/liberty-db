@@ -1,0 +1,155 @@
+use quote::quote;
+// use proc_macro::Ident;
+use syn::{
+  Attribute, Data, DeriveInput, Field, Fields, Ident, Token,
+  parse::{Parse, ParseStream},
+  punctuated::Punctuated,
+  spanned::Spanned,
+};
+#[derive(Debug)]
+struct Config {
+  name: Ident,
+  additional_attrs: Punctuated<Field, Token![,]>,
+  docs: Vec<Attribute>,
+}
+
+enum DuplicatedArg {
+  Name(Ident),
+  Docs(Vec<Attribute>),
+  NewAttrs(Punctuated<Field, Token![,]>),
+}
+
+impl Parse for DuplicatedArg {
+  fn parse(input: ParseStream) -> syn::Result<Self> {
+    let lookahead = input.lookahead1();
+    if lookahead.peek(Ident) {
+      let key: Ident = input.parse()?;
+      let key_str = key.to_string();
+      match key_str.as_str() {
+        "name" => {
+          input.parse::<Token![=]>()?;
+          let value: Ident = input.parse()?;
+          Ok(DuplicatedArg::Name(value))
+        }
+        "additional_attrs" => {
+          let content;
+          syn::parenthesized!(content in input);
+          let fields = Punctuated::parse_terminated_with(&content, Field::parse_named)?;
+          Ok(DuplicatedArg::NewAttrs(fields))
+        }
+        "docs" => {
+          let content;
+          syn::parenthesized!(content in input);
+          let docs = Attribute::parse_outer(&content)?;
+          // Punctuated::parse_terminated_with(&content, Attribute::parse_outer)?;
+          Ok(DuplicatedArg::Docs(docs))
+        }
+        _ => Err(syn::Error::new(
+          key.span().into(),
+          "Only support `name = ...` or `additional_attrs(...)`",
+        )),
+      }
+    } else {
+      Err(lookahead.error())
+    }
+  }
+}
+
+fn attrs_config(attrs: &[Attribute]) -> syn::Result<Config> {
+  let mut maybe_name: Option<Ident> = None;
+  let mut maybe_new_attrs: Option<Punctuated<Field, Token![,]>> = None;
+  let mut maybe_docs: Option<Vec<Attribute>> = None;
+
+  for attr in attrs {
+    if attr.path().is_ident("duplicated") {
+      if let syn::Meta::List(list) = &attr.meta {
+        let tokens: proc_macro2::token_stream::IntoIter = list.tokens.clone().into_iter();
+        let dup_arg: DuplicatedArg = syn::parse2(tokens.collect())?;
+
+        match dup_arg {
+          DuplicatedArg::Name(ident) => {
+            if maybe_name.is_some() {
+              return Err(syn::Error::new(ident.span(), "duplicated `name` attribute"));
+            }
+            maybe_name = Some(ident);
+          }
+          DuplicatedArg::NewAttrs(fields) => {
+            if maybe_new_attrs.is_some() {
+              return Err(syn::Error::new(
+                fields.span(),
+                "duplicated `additional_attrs` attribute",
+              ));
+            }
+            maybe_new_attrs = Some(fields);
+          }
+          DuplicatedArg::Docs(docs) => {
+            if maybe_new_attrs.is_some() {
+              return Err(syn::Error::new(docs[0].span(), "duplicated `docs` attribute"));
+            }
+            maybe_docs = Some(docs);
+          }
+        }
+      }
+    }
+  }
+  let name = maybe_name.ok_or_else(|| {
+    syn::Error::new(proc_macro2::Span::call_site(), "miss `name = ...`")
+  })?;
+  let additional_attrs = maybe_new_attrs.ok_or_else(|| {
+    syn::Error::new(proc_macro2::Span::call_site(), "miss `additional_attrs(...)`")
+  })?;
+  let docs = maybe_docs
+    .ok_or_else(|| syn::Error::new(proc_macro2::Span::call_site(), "miss `docs(...)`"))?;
+
+  Ok(Config { name, additional_attrs, docs })
+}
+
+pub(crate) fn inner(mut ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+  let mut config = attrs_config(&ast.attrs)?;
+  ast
+    .attrs
+    .retain(|attr| !attr.path().is_ident("duplicated") && !attr.path().is_ident("doc"));
+  ast.ident = config.name;
+  ast.attrs.extend(config.docs.into_iter());
+  let st = match &mut ast.data {
+    Data::Struct(s) => s,
+    _ => {
+      return Err(syn::Error::new(
+        proc_macro2::Span::call_site(),
+        "This macro only supports struct.",
+      ));
+    }
+  };
+  if let Fields::Named(named) = &mut st.fields {
+    config.additional_attrs.extend(named.named.clone().into_iter());
+    named.named = config.additional_attrs;
+    Ok(quote! {#ast})
+  } else {
+    Err(syn::Error::new(
+      proc_macro2::Span::call_site(),
+      "Can not find NamedField".to_string(),
+    ))
+  }
+}
+
+#[test]
+fn test_attrs_config() {
+  let input = r#"
+  #[duplicated(name = Bus)]
+  #[duplicated(docs(
+    /// comment1
+    /// comment2
+  ))]
+  #[duplicated(additional_attrs(
+  /// comment1
+  #[liberty(simple)]
+  pub foo1: T1,
+  /// comment2
+  pub foo2: T2,
+  ))]
+  pub(crate) struct Timing<C: Ctx> {
+  }"#;
+  let ast: syn::DeriveInput = syn::parse_str(input).unwrap();
+  let config = attrs_config(&ast.attrs).unwrap();
+  dbg!(config);
+}

@@ -1,8 +1,8 @@
 use crate::{Ctx, ast};
 use core::fmt;
 
-/// If your library contains bused pins, you must define type groups and define the structural
-/// constraints of each bus type in the library. The type group is defined at the library group
+/// If your library contains bused pins, you must define `type` groups and define the structural
+/// constraints of each bus type in the library. The `type` group is defined at the library group
 /// level, as shown here:
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=91.7+136.10&end=91.9+136.25
@@ -105,7 +105,12 @@ impl<C: Ctx> ast::GroupFn<C> for BusType<C> {
   }
 }
 
-#[derive(Debug, Clone)]
+/// The `bus_type` attribute is a required element of all bus groups. The attribute defines the
+/// type of bus. It must be the first attribute declared in a bus group.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
+/// ">Reference-Definition</a>
+#[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct SimpleBusType {
   pub name: String,
@@ -169,6 +174,9 @@ impl<C: Ctx> ast::SimpleAttri<C> for SimpleBusType {
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     ast::SimpleAttri::<C>::fmt_self(&self.name, f)
+  }
+  fn is_set(&self) -> bool {
+    !self.name.is_empty()
   }
 }
 

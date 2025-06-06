@@ -48,15 +48,16 @@ liberty_db::library::Library (example) {
 			direction : input;
 		}
 		bus (bun1) {
+			scan_pin_inverted : false;
 			direction : input;
-			pin (p1) {  /* user defined attribute */
-				direction : output; /* user defined attribute */
+			pin (p1) {
+				direction : output;
 			}
 		}
 		bundle (bun1) {
 			direction : input;
-			pin (p1) {  /* user defined attribute */
-				direction : output; /* user defined attribute */
+			pin (p1) {
+				direction : output;
 			}
 		}
 	}

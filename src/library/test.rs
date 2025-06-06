@@ -397,6 +397,7 @@ library (test) {
 | cell (AND) {
 | | bus (A) {
 | | | bus_type : BUS4;
+| | | scan_pin_inverted : false;
 | | }
 | }
 }
@@ -405,7 +406,7 @@ library (test) {
   let library = parse_cmp(text, want);
   let cell = library.cell.get("AND").unwrap();
   let bus = cell.bus.get(&NameList::from("A")).unwrap();
-  let bus_type = bus.bus_type.as_ref().unwrap();
+  let bus_type = &bus.bus_type;
   assert_eq!(bus_type.name, "BUS4");
   let bus_type_ctx = bus_type.ctx.as_ref().unwrap();
   assert_eq!(bus_type_ctx.bit_from, 0);

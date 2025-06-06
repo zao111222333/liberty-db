@@ -70,7 +70,9 @@ pub fn all_files(root: &str) -> impl Iterator<Item = (bool, std::path::PathBuf)>
 
 pub fn init_logger() {
   #[cfg(not(feature = "tracing"))]
-  simple_logger::SimpleLogger::new().init().unwrap();
+  {
+    _ = simple_logger::SimpleLogger::new().init();
+  }
   #[cfg(feature = "tracing")]
   {
     let subscriber = tracing_subscriber::FmtSubscriber::builder()

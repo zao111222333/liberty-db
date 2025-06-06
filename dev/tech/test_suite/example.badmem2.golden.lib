@@ -49,8 +49,8 @@ liberty_db::library::Library (example) {
 		}
 		bundle (bun1) {
 			members (X);
-			pin (Q) {  /* user defined attribute */
-				direction : output; /* user defined attribute */
+			pin (Q) {
+				direction : output;
 			}
 		}
 	}

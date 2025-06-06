@@ -6,6 +6,8 @@ use crate::{
   pin::{Direction, NextstateType},
   timing::Timing,
 };
+
+use super::Pin;
 /// <script>
 /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 /// </script>
@@ -39,6 +41,14 @@ pub struct Bundle<C: Ctx> {
   pub nextstate_type: Option<NextstateType>,
   #[liberty(group(type = Set))]
   pub timing: GroupSet<Timing<C>>,
+  /// You can define attribute values for specific pins or groups of pins in a pin group within a
+  /// bundle group. Values in a pin group override the default attribute values defined for the
+  /// bundle (described previously).
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=135.23&end=135.25
+  /// ">Reference</a>
+  #[liberty(group(type = Set))]
+  pub pin: GroupSet<Pin<C>>,
 }
 
 impl<C: Ctx> GroupFn<C> for Bundle<C> {}
