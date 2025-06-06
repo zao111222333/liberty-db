@@ -9,7 +9,7 @@ use syn::{
 };
 
 #[derive(Debug, Clone, Copy)]
-enum InternalType {
+pub(crate) enum InternalType {
   /// `name`
   Name,
   /// `attributes`
@@ -57,7 +57,7 @@ pub(crate) enum AttriType {
 }
 
 #[derive(Debug, Clone)]
-enum FieldType {
+pub(crate) enum FieldType {
   /// `Internal`
   Internal(InternalType),
   /// `Attri`
@@ -232,7 +232,9 @@ pub(crate) fn parse_fields_type(
 /// // Complex group attribute, Vec
 /// #[liberty(group(type=Vec))]
 /// ```
-fn parse_field_attrs(field_attrs: &[syn::Attribute]) -> syn::Result<Option<FieldType>> {
+pub(crate) fn parse_field_attrs(
+  field_attrs: &[syn::Attribute],
+) -> syn::Result<Option<FieldType>> {
   for attri in field_attrs.iter() {
     if let Some(seg_title) = attri.path().segments.first() {
       if "liberty" == &seg_title.ident.to_string() {

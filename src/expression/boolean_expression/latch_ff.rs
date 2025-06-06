@@ -3,7 +3,8 @@
 //! </script>
 
 use super::{
-  BooleanExpression, BooleanExpressionLike as _, LogicBooleanExpression, UNKNOWN,
+  BooleanExpression, BooleanExpressionLike as _, LogicBooleanExpression,
+  PowerGroundBooleanExpression, UNKNOWN,
 };
 use crate::{
   Ctx,
@@ -95,6 +96,8 @@ pub struct FF<C: Ctx> {
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<LogicBooleanExpression>,
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
@@ -183,6 +186,8 @@ pub struct FFBank<C: Ctx> {
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<LogicBooleanExpression>,
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
 /// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
@@ -267,6 +272,8 @@ pub struct Latch<C: Ctx> {
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<LogicBooleanExpression>,
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
 /// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
@@ -354,6 +361,8 @@ pub struct LatchBank<C: Ctx> {
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<LogicBooleanExpression>,
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
 #[duplicate::duplicate_item(

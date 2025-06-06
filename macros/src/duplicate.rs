@@ -8,17 +8,23 @@ use syn::{
   punctuated::Punctuated,
   spanned::Spanned,
 };
+
+use crate::attribute::{AttriType, FieldType, parse_field_attrs};
 #[derive(Debug)]
 struct Config {
   name: Ident,
   additional_attrs: Punctuated<Field, Token![,]>,
   docs: Vec<Attribute>,
+  exclude_simple: bool,
+  exclude_complex: bool,
+  exclude_group: bool,
 }
 
 #[derive(Debug)]
 enum DuplicatedArg {
   Name(Ident),
   Docs(Vec<Attribute>),
+  Exclude(Punctuated<Ident, Token![,]>),
   NewAttrs(Punctuated<Field, Token![,]>),
 }
 
@@ -39,6 +45,12 @@ impl Parse for DuplicatedArg {
           syn::parenthesized!(content in input);
           let fields = Punctuated::parse_terminated_with(&content, Field::parse_named)?;
           Ok(DuplicatedArg::NewAttrs(fields))
+        }
+        "exclude" => {
+          let content;
+          syn::parenthesized!(content in input);
+          let excludes = Punctuated::parse_terminated_with(&content, Ident::parse)?;
+          Ok(DuplicatedArg::Exclude(excludes))
         }
         "docs" => {
           let content;
@@ -82,6 +94,9 @@ fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
         let mut maybe_name: Option<Ident> = None;
         let mut maybe_new_attrs: Option<Punctuated<Field, Token![,]>> = None;
         let mut maybe_docs: Option<Vec<Attribute>> = None;
+        let mut exclude_simple = false;
+        let mut exclude_complex = false;
+        let mut exclude_group = false;
         for arg in args.args {
           match arg {
             DuplicatedArg::Name(ident) => {
@@ -108,6 +123,21 @@ fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
               }
               maybe_docs = Some(docs);
             }
+            DuplicatedArg::Exclude(excludes) => {
+              for exclude in excludes {
+                match exclude.to_string().as_str() {
+                  "simple" => exclude_simple = true,
+                  "complex" => exclude_complex = true,
+                  "group" => exclude_group = true,
+                  _ => {
+                    return Err(syn::Error::new(
+                      exclude.span(),
+                      format!("unsupport exclude {exclude}"),
+                    ));
+                  }
+                }
+              }
+            }
           }
         }
         let name = maybe_name.ok_or_else(|| {
@@ -119,7 +149,14 @@ fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
         let docs = maybe_docs.ok_or_else(|| {
           syn::Error::new(proc_macro2::Span::call_site(), "miss `docs(...)`")
         })?;
-        configs.push(Config { name, additional_attrs, docs });
+        configs.push(Config {
+          name,
+          additional_attrs,
+          docs,
+          exclude_simple,
+          exclude_complex,
+          exclude_group,
+        });
       }
     }
   }
@@ -147,7 +184,27 @@ pub(crate) fn inner(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
       }
     };
     if let Fields::Named(named) = &mut st.fields {
-      config.additional_attrs.extend(mem::take(&mut named.named));
+      for f in mem::take(&mut named.named) {
+        match parse_field_attrs(&f.attrs)? {
+          Some(FieldType::Attri(AttriType::Simple(_))) => {
+            if config.exclude_simple {
+              continue;
+            }
+          }
+          Some(FieldType::Attri(AttriType::Complex(_))) => {
+            if config.exclude_complex {
+              continue;
+            }
+          }
+          Some(FieldType::Attri(AttriType::Group(_))) => {
+            if config.exclude_group {
+              continue;
+            }
+          }
+          _ => {}
+        }
+        config.additional_attrs.push(f);
+      }
       named.named = config.additional_attrs;
       asts.push(ast);
     } else {
@@ -169,6 +226,7 @@ fn test_attrs_config() {
       /// comment1
       /// comment2
     ),
+    exclude(complex, group),
     additional_attrs(
       /// comment1
       #[liberty(simple)]
