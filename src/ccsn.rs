@@ -6,7 +6,7 @@ use crate::{
   Ctx,
   ast::{
     Attributes, BuilderScope, CodeFormatter, ComplexAttri, ComplexParseError,
-    GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
+    GroupComments, GroupFn, GroupSet, Indentation, ParseScope,
   },
   expression::LogicBooleanExpression,
   table::{
@@ -248,15 +248,7 @@ pub enum StageType {
   Both,
 }
 crate::ast::impl_self_builder!(StageType);
-impl<C: Ctx> SimpleAttri<C> for StageType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(StageType);
 
 /// Use the `receiver_capacitance`  group to specify capacitance values
 /// for composite current source (CCS) receiver modeling at the pin level.

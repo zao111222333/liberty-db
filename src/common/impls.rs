@@ -46,12 +46,8 @@ impl<C: Ctx> SimpleAttri<C> for f64 {
   }
 }
 crate::ast::impl_self_builder!(bool);
-impl<C: Ctx> SimpleAttri<C> for bool {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(bool);
+
 crate::ast::impl_self_builder!(usize);
 impl<C: Ctx> SimpleAttri<C> for usize {
   #[inline]

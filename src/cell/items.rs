@@ -1535,12 +1535,7 @@ pub enum PgType {
   DeepPwell,
 }
 crate::ast::impl_self_builder!(PgType);
-impl<C: Ctx> SimpleAttri<C> for PgType {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(PgType);
 
 /// The `switch_cell_type`  cell-level attribute specifies
 /// the type of the switch cell for direct inference.
@@ -1566,12 +1561,7 @@ pub enum SwitchCellType {
   FineGrain,
 }
 crate::ast::impl_self_builder!(SwitchCellType);
-impl<C: Ctx> SimpleAttri<C> for SwitchCellType {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(SwitchCellType);
 
 /// interprets a combination timing arc between the clock pin and the output pin as a rising edge arc or as a falling edge arc
 ///
@@ -1593,12 +1583,8 @@ pub enum FpgaCellType {
   FallingEdgeClockCell,
 }
 crate::ast::impl_self_builder!(FpgaCellType);
-impl<C: Ctx> SimpleAttri<C> for FpgaCellType {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(FpgaCellType);
+
 /// The `level_shifter_type`  attribute specifies the
 /// voltage conversion type that is supported.
 /// Valid values are:
@@ -1629,12 +1615,7 @@ pub enum LevelShifterType {
   HL_LH,
 }
 crate::ast::impl_self_builder!(LevelShifterType);
-impl<C: Ctx> SimpleAttri<C> for LevelShifterType {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(LevelShifterType);
 
 /// You can use the `clock_gating_integrated_cell` attribute to enter specific
 /// values that determine which integrated cell functionality the clock-gating tool uses.
@@ -1687,12 +1668,7 @@ impl fmt::Display for ClockGatingIntegratedCell {
   }
 }
 crate::ast::impl_self_builder!(ClockGatingIntegratedCell);
-impl<C: Ctx> SimpleAttri<C> for ClockGatingIntegratedCell {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(ClockGatingIntegratedCell);
 
 /// Use the `pin_opposite` attribute to describe functionally opposite (logically inverse) groups
 /// of input or output pins.

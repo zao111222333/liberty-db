@@ -47,15 +47,7 @@ pub enum SdfEdgeType {
   BothEdges,
 }
 crate::ast::impl_self_builder!(SdfEdgeType);
-impl<C: Ctx> SimpleAttri<C> for SdfEdgeType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(SdfEdgeType);
 
 #[mut_set::derive::item]
 #[derive(Debug, Clone, Default)]

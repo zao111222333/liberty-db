@@ -3,9 +3,7 @@
 
 use crate::{
   Ctx,
-  ast::{
-    CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope, SimpleAttri,
-  },
+  ast::{CodeFormatter, ComplexAttri, ComplexParseError, Indentation, ParseScope},
   common::{f64_into_hash_ord_fn, parse_f64},
 };
 use core::{
@@ -53,15 +51,7 @@ impl TimeUnit {
   }
 }
 crate::ast::impl_self_builder!(TimeUnit);
-impl<C: Ctx> SimpleAttri<C> for TimeUnit {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(TimeUnit);
 
 /// Valid values are 1mV, 10mV, 100mV, and 1V. The default is 1V.
 ///
@@ -103,15 +93,7 @@ impl VoltageUnit {
   }
 }
 crate::ast::impl_self_builder!(VoltageUnit);
-impl<C: Ctx> SimpleAttri<C> for VoltageUnit {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(VoltageUnit);
 
 /// The valid values are 1uA, 10uA, 100uA, 1mA, 10mA, 100mA, and 1A.
 ///
@@ -165,15 +147,7 @@ impl CurrentUnit {
   }
 }
 crate::ast::impl_self_builder!(CurrentUnit);
-impl<C: Ctx> SimpleAttri<C> for CurrentUnit {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(CurrentUnit);
 
 /// Valid unit values are 1ohm, 10ohm, 100ohm, and 1kohm.
 ///
@@ -215,15 +189,7 @@ impl PullingResistanceUnit {
   }
 }
 crate::ast::impl_self_builder!(PullingResistanceUnit);
-impl<C: Ctx> SimpleAttri<C> for PullingResistanceUnit {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(PullingResistanceUnit);
 
 /// This attribute specifies the unit for all capacitance
 /// values within the logic library, including
@@ -406,12 +372,4 @@ impl LeakagePowerUnit {
   }
 }
 crate::ast::impl_self_builder!(LeakagePowerUnit);
-impl<C: Ctx> SimpleAttri<C> for LeakagePowerUnit {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(LeakagePowerUnit);

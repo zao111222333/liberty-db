@@ -1,6 +1,6 @@
 use crate::{
   Ctx,
-  ast::{ComplexAttri, ComplexParseError, ParseScope, SimpleAttri},
+  ast::{ComplexAttri, ComplexParseError, ParseScope},
 };
 use core::{cmp::Ordering, hash::Hash};
 
@@ -34,15 +34,7 @@ pub enum Edge {
   R,
 }
 crate::ast::impl_self_builder!(Edge);
-impl<C: Ctx> SimpleAttri<C> for Edge {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(Edge);
 
 /// Use the `output_switching_condition` attribute to specify the sense of the toggling
 /// output. If there is more than one `switching_group` group specified within the
@@ -154,15 +146,8 @@ pub enum Normal {
   L,
 }
 crate::ast::impl_self_builder!(Normal);
-impl<C: Ctx> SimpleAttri<C> for Normal {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(Normal);
+
 /// H L R F
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]

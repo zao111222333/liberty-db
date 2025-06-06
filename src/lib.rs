@@ -190,8 +190,6 @@ use tracing::{debug, error, info, trace, warn};
 extern crate alloc;
 pub use biodivine_lib_bdd;
 pub use strum::IntoEnumIterator;
-/// `bus` group structure.
-pub mod bus;
 /// `cell` group structure.
 pub mod cell;
 pub use cell::Cell;

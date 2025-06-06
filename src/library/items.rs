@@ -7,7 +7,7 @@ use crate::{
   Ctx,
   ast::{
     Attributes, BuilderScope, CodeFormatter, ComplexAttri, ComplexParseError,
-    DefinedType, GroupComments, GroupFn, GroupSet, Indentation, ParseScope, SimpleAttri,
+    DefinedType, GroupComments, GroupFn, GroupSet, Indentation, ParseScope,
   },
   common::{items::IdVector, parse_f64},
   expression::{Formula, logic},
@@ -455,15 +455,7 @@ pub enum DelayModel {
   Polynomial,
 }
 crate::ast::impl_self_builder!(DelayModel);
-impl<C: Ctx> SimpleAttri<C> for DelayModel {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(DelayModel);
 
 /// Use this group to define operating conditions;
 ///
@@ -609,15 +601,7 @@ pub enum FPGASlew {
   SLOW,
 }
 crate::ast::impl_self_builder!(FPGASlew);
-impl<C: Ctx> SimpleAttri<C> for FPGASlew {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(FPGASlew);
 
 /// Use the `tree_type`  attribute to specify the environment interconnect model.
 ///
@@ -642,15 +626,7 @@ pub enum TreeType {
   WorstCaseTree,
 }
 crate::ast::impl_self_builder!(TreeType);
-impl<C: Ctx> SimpleAttri<C> for TreeType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(TreeType);
 
 /// The `technology`  attribute statement specifies the technology
 /// family being used in the library.
@@ -1186,15 +1162,7 @@ pub enum BaseCurveType {
   CcsTimingHalfCurve,
 }
 crate::ast::impl_self_builder!(BaseCurveType);
-impl<C: Ctx> SimpleAttri<C> for BaseCurveType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(BaseCurveType);
 
 /// The `base_curves`  group is a library-level group that contains
 /// the detailed description of normalized base curves.

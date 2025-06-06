@@ -14,6 +14,8 @@ use crate::{
   timing::Timing,
 };
 mod bundle;
+mod bus;
+pub use bus::{BusType, BusTypeCtx, SimpleBusType};
 mod items;
 pub use bundle::*;
 // use crate::units;
@@ -59,6 +61,12 @@ pub struct Pin<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
+  #[liberty(simple(type = Option))]
+  pub bus_type: Option<SimpleBusType>,
+  #[liberty(simple(type = Option))]
+  pub scan_start_pin: Option<String>,
+  #[liberty(simple(type = Option))]
+  pub scan_pin_inverted: Option<bool>,
   #[liberty(simple(type = Option))]
   pub driver_waveform_rise: Option<String>,
   #[liberty(simple(type = Option))]

@@ -34,15 +34,7 @@ pub enum AntennaDiodeType {
   PowerAndGround,
 }
 crate::ast::impl_self_builder!(AntennaDiodeType);
-impl<C: Ctx> SimpleAttri<C> for AntennaDiodeType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(AntennaDiodeType);
 
 /// In timing analysis, use a tlatch group to describe the relationship between the data pin
 /// and the enable pin on a transparent level-sensitive latch.
@@ -103,15 +95,7 @@ pub enum Direction {
   Internal,
 }
 crate::ast::impl_self_builder!(Direction);
-impl<C: Ctx> SimpleAttri<C> for Direction {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(Direction);
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -124,15 +108,8 @@ pub enum DontFault {
   Sao1,
 }
 crate::ast::impl_self_builder!(DontFault);
-impl<C: Ctx> SimpleAttri<C> for DontFault {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(DontFault);
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum DriverType {
@@ -295,15 +272,7 @@ pub enum NextstateType {
   ScanEnable,
 }
 crate::ast::impl_self_builder!(NextstateType);
-impl<C: Ctx> SimpleAttri<C> for NextstateType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(NextstateType);
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -320,15 +289,8 @@ pub enum PinFuncType {
   ActiveFalling,
 }
 crate::ast::impl_self_builder!(PinFuncType);
-impl<C: Ctx> SimpleAttri<C> for PinFuncType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(PinFuncType);
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum RestoreEdgeType {
@@ -340,15 +302,7 @@ pub enum RestoreEdgeType {
   Trailing,
 }
 crate::ast::impl_self_builder!(RestoreEdgeType);
-impl<C: Ctx> SimpleAttri<C> for RestoreEdgeType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(RestoreEdgeType);
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -375,15 +329,8 @@ pub enum SignalType {
   TestClock,
 }
 crate::ast::impl_self_builder!(SignalType);
-impl<C: Ctx> SimpleAttri<C> for SignalType {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(SignalType);
+
 #[derive(Default)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -399,15 +346,7 @@ pub enum SlewControl {
   None,
 }
 crate::ast::impl_self_builder!(SlewControl);
-impl<C: Ctx> SimpleAttri<C> for SlewControl {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(SlewControl);
 
 /// The `prefer_tied` attribute describes an input pin of a flip-flop or latch.
 ///
@@ -434,15 +373,8 @@ pub enum OneZero {
   Zero,
 }
 crate::ast::impl_self_builder!(OneZero);
-impl<C: Ctx> SimpleAttri<C> for OneZero {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(OneZero);
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 enum OneValue {
@@ -469,15 +401,8 @@ enum OneValue {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TwoValue(OneValue, OneValue);
 crate::ast::impl_self_builder!(TwoValue);
-impl<C: Ctx> SimpleAttri<C> for TwoValue {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(TwoValue);
+
 impl fmt::Display for TwoValue {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
