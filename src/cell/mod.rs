@@ -67,64 +67,66 @@ impl Default for DefaultCellCtx {
   }
 }
 #[derive(liberty_macros::Duplicate)]
-#[duplicated(name = Model)]
-#[duplicated(docs(
-/// A model group can include all the attributes that are valid in a cell group, as well as the
-/// two additional attributes described in this section. For information about the cell group
-/// attributes, see Attributes and Values on page 99.
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.23&end=225.29
-/// ">Reference</a>
-))]
-#[duplicated(additional_attrs(
-  /// The `cell_name`  attribute specifies the name of the `cell` within a `model`  group
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.31&end=225.31
-  /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
-  pub cell_name: Option<String>,
-  /// The short attribute lists the shorted ports that are connected together by a metal or poly
-  /// trace. These ports are modeled within a model group.
-  /// The most common example of a shorted port is a feedthrough, where an input port is
-  /// directly connected to an output port and there is no active logic between these two ports.
-  /// 
-  /// Example 30 Using the short Attribute in a model Group
-  /// ``` text
-  /// model(cellA) {
-  ///   area : 0.4;
-  ///   ...
-  ///   short(b, y);
-  ///   short(c, y);
-  ///   short(b, c);
-  ///   ...
-  ///   pin(y) {
-  ///     direction : output;
-  ///     timing() {
-  ///       related_pin : a;
-  ///       ...
-  ///     }
-  ///   }
-  ///   pin(a) {
-  ///     direction : input;
-  ///     capacitance : 0.1;
-  ///   }
-  ///   pin(b) {
-  ///     direction : input;
-  ///     capacitance : 0.1;
-  ///   }
-  ///   pin(c) {
-  ///     direction : input;
-  ///     capacitance : 0.1;
-  ///     clock : true;
-  ///   }
-  /// }
-  /// ```
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=226.3&end=226.42
-  /// ">Reference-Definition</a>
-  #[liberty(complex(type = Vec))]
-  pub short: Vec<Vec<String>>,
-))]
+#[duplicated(
+  name = Model,
+  docs(
+    /// A model group can include all the attributes that are valid in a cell group, as well as the
+    /// two additional attributes described in this section. For information about the cell group
+    /// attributes, see Attributes and Values on page 99.
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.23&end=225.29
+    /// ">Reference</a>
+  ),
+  additional_attrs(
+    /// The `cell_name`  attribute specifies the name of the `cell` within a `model`  group
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.31&end=225.31
+    /// ">Reference-Definition</a>
+    #[liberty(simple(type = Option))]
+    pub cell_name: Option<String>,
+    /// The short attribute lists the shorted ports that are connected together by a metal or poly
+    /// trace. These ports are modeled within a model group.
+    /// The most common example of a shorted port is a feedthrough, where an input port is
+    /// directly connected to an output port and there is no active logic between these two ports.
+    /// 
+    /// Example 30 Using the short Attribute in a model Group
+    /// ``` text
+    /// model(cellA) {
+    ///   area : 0.4;
+    ///   ...
+    ///   short(b, y);
+    ///   short(c, y);
+    ///   short(b, c);
+    ///   ...
+    ///   pin(y) {
+    ///     direction : output;
+    ///     timing() {
+    ///       related_pin : a;
+    ///       ...
+    ///     }
+    ///   }
+    ///   pin(a) {
+    ///     direction : input;
+    ///     capacitance : 0.1;
+    ///   }
+    ///   pin(b) {
+    ///     direction : input;
+    ///     capacitance : 0.1;
+    ///   }
+    ///   pin(c) {
+    ///     direction : input;
+    ///     capacitance : 0.1;
+    ///     clock : true;
+    ///   }
+    /// }
+    /// ```
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=226.3&end=226.42
+    /// ">Reference-Definition</a>
+    #[liberty(complex(type = Vec))]
+    pub short: Vec<Vec<String>>,
+  )
+)]
 /// cell group
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=98.23&end=98.32

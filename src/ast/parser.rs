@@ -17,7 +17,7 @@ use nom::{
   combinator::{map, map_opt, opt, recognize},
   error::{Error, ErrorKind},
   multi::{many0, separated_list0},
-  sequence::{delimited, pair, preceded, terminated},
+  sequence::{delimited, preceded, terminated},
 };
 use std::collections::HashMap;
 
@@ -93,7 +93,7 @@ fn space_newline(i: &str) -> IResult<&str, usize> {
 #[inline]
 pub(crate) fn comment_space_newline_many1(i: &str) -> IResult<&str, usize> {
   match map(
-    pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
+    (many0((space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
   )
   .parse_complete(i)
@@ -112,7 +112,7 @@ pub(crate) fn comment_space_newline_many1(i: &str) -> IResult<&str, usize> {
 #[inline]
 pub(crate) fn comment_space_newline(i: &str) -> IResult<&str, usize> {
   map(
-    pair(many0(pair(space_newline, alt((comment_single, comment_multi)))), space_newline),
+    (many0((space_newline, alt((comment_single, comment_multi)))), space_newline),
     |(v, n3)| v.iter().map(|(n1, n2)| n1 + n2).sum::<usize>() + n3,
   )
   .parse_complete(i)
@@ -129,19 +129,18 @@ fn slash_newline(i: &str) -> IResult<&str, usize> {
 #[inline]
 fn comment_space_newline_slash(i: &str) -> IResult<&str, usize> {
   map(
-    pair(
+    (
       space,
       opt(preceded(
-        preceded(char('\\'), space),
+        (char('\\'), space),
         alt((
-          map_opt(
-            pair(opt(comment_multi), space_newline),
-            |(n_comment, n_newline)| match (n_comment, n_newline) {
+          map_opt((opt(comment_multi), space_newline), |(n_comment, n_newline)| {
+            match (n_comment, n_newline) {
               (_, 0) => None,
               (None | Some(0), _) => Some(n_newline),
               (_, _) => None,
-            },
-          ),
+            }
+          }),
           comment_single,
         )),
       )),
@@ -430,20 +429,22 @@ pub(crate) fn complex_id_vector<'a>(
       space,
       char('('),
       comment_space_newline_slash,
+      space_newline,
       int_usize,
       space,
       char(','),
       comment_space_newline_slash,
       float_vec,
       comment_space_newline_slash,
+      space_newline,
       char(')'),
       alt((
-        preceded(pair(space, char(';')), comment_space_newline),
+        preceded((space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
     ),
-    |(_, _, n0, id, _, _, n1, vec, n2, _, n3)| {
-      *line_num += n0 + n1 + n2 + n3;
+    |(_, _, n0, n1, id, _, _, n2, vec, n3, n4, _, n5)| {
+      *line_num += n0 + n1 + n2 + n3 + n4 + n5;
       (id, vec)
     },
   )
@@ -461,17 +462,19 @@ pub(crate) fn complex_multi_line<'a, T>(
       space,
       char('('),
       comment_space_newline_slash,
-      separated_list0(char(','), pair(comment_space_newline_slash, terminated(f, space))),
+      space_newline,
+      separated_list0(char(','), (comment_space_newline_slash, terminated(f, space))),
       opt(char(',')),
       comment_space_newline_slash,
+      space_newline,
       char(')'),
       alt((
-        preceded(pair(space, char(';')), comment_space_newline),
+        preceded((space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
     ),
-    |(_, _, n0, vec, _, n1, _, n2)| {
-      *line_num += n0 + n1 + n2;
+    |(_, _, n0, n1, vec, _, n2, n3, _, n4)| {
+      *line_num += n0 + n1 + n2 + n3 + n4;
       vec
     },
   )
@@ -488,16 +491,18 @@ pub(crate) fn complex_float_vec<'a>(
       space,
       char('('),
       comment_space_newline_slash,
+      space_newline,
       float_vec,
       comment_space_newline_slash,
+      space_newline,
       char(')'),
       alt((
-        preceded(pair(space, char(';')), comment_space_newline),
+        preceded((space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
     ),
-    |(_, _, n0, vec, n1, _, n2)| {
-      *line_num += n0 + n1 + n2;
+    |(_, _, n0, n1, vec, n2, n3, _, n4)| {
+      *line_num += n0 + n1 + n2 + n3 + n4;
       vec
     },
   )
@@ -520,7 +525,7 @@ pub(crate) fn complex_ccs_power_values<'a>(
   #[inline]
   fn complex_ccs_power_value(i: &str) -> IResult<&str, crate::table::CcsPowerValue> {
     delimited(
-      pair(char('"'), space),
+      (char('"'), space),
       map(
         (
           terminated(float_one, delimited(space, char(','), space)),
@@ -540,7 +545,7 @@ pub(crate) fn complex_ccs_power_values<'a>(
               },
             ),
           ),
-          pair(opt(char(',')), space),
+          (opt(char(',')), space),
         ),
         |(init_time, init_current, points, _)| crate::table::CcsPowerValue {
           init_time,
@@ -566,20 +571,22 @@ pub(crate) fn complex<'a>(
       space,
       char('('),
       comment_space_newline_slash,
+      space_newline,
       separated_list0(
         char(','),
-        pair(comment_space_newline_slash, terminated(alt((word, unquote)), space)),
+        (comment_space_newline_slash, terminated(alt((word, unquote)), space)),
       ),
       opt(char(',')),
       comment_space_newline_slash,
+      space_newline,
       char(')'),
       alt((
-        preceded(pair(space, char(';')), comment_space_newline),
+        preceded((space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
     ),
-    |(_, _, n0, vec, _, n1, _, n2)| {
-      *line_num += n0 + n1 + n2;
+    |(_, _, n0, n1, vec, _, n2, n3, _, n4)| {
+      *line_num += n0 + n1 + n2 + n3 + n4;
       vec
     },
   )
@@ -596,16 +603,18 @@ pub(crate) fn complex_single<'a>(
       space,
       char('('),
       comment_space_newline_slash,
+      space_newline,
       alt((word, unquote)),
       comment_space_newline_slash,
+      space_newline,
       char(')'),
       alt((
-        preceded(pair(space, char(';')), comment_space_newline),
+        preceded((space, char(';')), comment_space_newline),
         comment_space_newline_many1,
       )),
     ),
-    |(_, _, n0, s, n1, _, n2)| {
-      *line_num += n0 + n1 + n2;
+    |(_, _, n0, n1, s, n2, n3, _, n4)| {
+      *line_num += n0 + n1 + n2 + n3 + n4;
       s
     },
   )
