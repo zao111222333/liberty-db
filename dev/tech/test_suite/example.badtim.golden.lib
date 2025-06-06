@@ -65,7 +65,7 @@ liberty_db::library::Library (example) {
 		}
 		bundle (bun1) {
 			members (X);
-			clock : true; /* user defined attribute */
+			clock : true;
 		}
 	}
 	cell (OR2) {

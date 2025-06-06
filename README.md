@@ -27,7 +27,7 @@ This library is implemented in [Rust](https://doc.rust-lang.org/book/ch01-00-get
 
 ```toml
 [dependencies]
-liberty_db = "0.11"
+liberty_db = "0.15"
 ```
 
 One basic demo here:

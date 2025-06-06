@@ -133,36 +133,36 @@ liberty_db::library::Library (example) {
 		}
 		bundle (CR) {
 			members (CR0, CR1);
-			direction : input;
 			capacitance : 1.0;
-			timing () {
-				intrinsic_rise : 0.2;
-				intrinsic_fall : 0.2;
-				related_pin : CP;
-				timing_type : hold_rising;
+			direction : input;
+			timing () {  /* user defined attribute */
+				intrinsic_fall : 1.6; /* user defined attribute */
+				intrinsic_rise : 1.6; /* user defined attribute */
+				related_pin : CP; /* user defined attribute */
+				timing_type : setup_rising; /* user defined attribute */
 			}
-			timing () {
-				intrinsic_rise : 1.6;
-				intrinsic_fall : 1.6;
-				related_pin : CP;
-				timing_type : setup_rising;
+			timing () {  /* user defined attribute */
+				intrinsic_fall : 0.2; /* user defined attribute */
+				intrinsic_rise : 0.2; /* user defined attribute */
+				related_pin : CP; /* user defined attribute */
+				timing_type : hold_rising; /* user defined attribute */
 			}
 		}
 		bundle (DW) {
 			members (D0, D1);
-			direction : input;
 			capacitance : 1.0;
-			timing () {
-				intrinsic_rise : 0.2;
-				intrinsic_fall : 0.2;
-				related_pin : CP;
-				timing_type : hold_rising;
+			direction : input;
+			timing () {  /* user defined attribute */
+				intrinsic_fall : 1.6; /* user defined attribute */
+				intrinsic_rise : 1.6; /* user defined attribute */
+				related_pin : CP; /* user defined attribute */
+				timing_type : setup_rising; /* user defined attribute */
 			}
-			timing () {
-				intrinsic_rise : 1.6;
-				intrinsic_fall : 1.6;
-				related_pin : CP;
-				timing_type : setup_rising;
+			timing () {  /* user defined attribute */
+				intrinsic_fall : 0.2; /* user defined attribute */
+				intrinsic_rise : 0.2; /* user defined attribute */
+				related_pin : CP; /* user defined attribute */
+				timing_type : hold_rising; /* user defined attribute */
 			}
 		}
 		bundle (H0A) {
@@ -184,45 +184,45 @@ liberty_db::library::Library (example) {
 		}
 		bundle (LD) {
 			members (LD0, LD1);
-			direction : input;
 			capacitance : 1.0;
-			timing () {
-				intrinsic_rise : 0.2;
-				intrinsic_fall : 0.2;
-				related_pin : CP;
-				timing_type : hold_rising;
+			direction : input;
+			timing () {  /* user defined attribute */
+				intrinsic_fall : 1.6; /* user defined attribute */
+				intrinsic_rise : 1.6; /* user defined attribute */
+				related_pin : CP; /* user defined attribute */
+				timing_type : setup_rising; /* user defined attribute */
 			}
-			timing () {
-				intrinsic_rise : 1.6;
-				intrinsic_fall : 1.6;
-				related_pin : CP;
-				timing_type : setup_rising;
+			timing () {  /* user defined attribute */
+				intrinsic_fall : 0.2; /* user defined attribute */
+				intrinsic_rise : 0.2; /* user defined attribute */
+				related_pin : CP; /* user defined attribute */
+				timing_type : hold_rising; /* user defined attribute */
 			}
 		}
 		bundle (Q) {
 			members (Q0, Q1, Q3);
 			direction : output;
 			function : "IQ";
-			timing () {
-				intrinsic_rise : 1.09;
-				intrinsic_fall : 1.25;
-				related_pin : CP;
-				timing_type : rising_edge;
-				rise_resistance : 0.1458;
-				fall_resistance : 0.0589;
+			timing () {  /* user defined attribute */
+				fall_resistance : 0.0589; /* user defined attribute */
+				intrinsic_fall : 1.25; /* user defined attribute */
+				intrinsic_rise : 1.09; /* user defined attribute */
+				related_pin : CP; /* user defined attribute */
+				rise_resistance : 0.1458; /* user defined attribute */
+				timing_type : rising_edge; /* user defined attribute */
 			}
 		}
 		bundle (QN) {
 			members (QN0, QN1);
 			direction : output;
 			function : "IQN";
-			timing () {
-				intrinsic_rise : 1.47;
-				intrinsic_fall : 1.55;
-				related_pin : CP;
-				timing_type : rising_edge;
-				rise_resistance : 0.1523;
-				fall_resistance : 0.0589;
+			timing () {  /* user defined attribute */
+				fall_resistance : 0.0589; /* user defined attribute */
+				intrinsic_fall : 1.55; /* user defined attribute */
+				intrinsic_rise : 1.47; /* user defined attribute */
+				related_pin : CP; /* user defined attribute */
+				rise_resistance : 0.1523; /* user defined attribute */
+				timing_type : rising_edge; /* user defined attribute */
 			}
 		}
 	}
