@@ -1739,3 +1739,96 @@ impl<C: Ctx> ComplexAttri<C> for PinOpposite {
     write!(f, "{}, {}", self.name_list1, self.name_list2)
   }
 }
+
+/// The `retention_condition` group includes attributes that specify the conditions for the
+/// retention cell to hold its state during the retention mode.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=215.18&end=215.23
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct RetentionCondition<C: Ctx> {
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::Other,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  /// The `power_down_function` attribute specifies the Boolean condition for the retention
+  /// cell to be powered down, that is, the primary power to the cell is shut down. When this
+  /// Boolean condition evaluates to true, it triggers the evaluation of the control input conditions
+  /// specified by the `required_condition` attribute.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=215.27&end=215.33
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
+  /// The `required_condition` attribute specifies the control input conditions during the
+  /// retention mode. These conditions are checked when the primary power to the retention
+  /// cell is shut down. If these conditions are not met, the cell is considered to be in an illegal
+  /// state.
+  ///
+  /// Note:
+  ///
+  /// Within the `retention_condition` group, the `power_down_function` attribute
+  /// by itself does not specify the retention mode of the cell. The conditions specified
+  /// by the `required_condition` attribute ensure that the retention control pin is in
+  /// the correct state when the primary power to the cell is shut down.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=216.4&end=216.17
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub required_condition: Option<LogicBooleanExpression>,
+}
+impl<C: Ctx> GroupFn<C> for RetentionCondition<C> {}
+
+/// The preset_condition group is a group of attributes for a condition check on the normal
+/// mode preset expression.
+///
+/// If preset is asserted during the restore operation, it needs to extend beyond the restore
+/// operation time period so that the flip-flop content can be successfully overwritten.
+/// Therefore, trailing-edge condition checks on preset pins might be needed.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=214.23&end=214.27
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct RresetCondition<C: Ctx> {
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::Other,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  /// The `input` attribute should be identical to the `preset` attribute in the `ff` group and defines
+  /// how the asynchronous preset control is asserted.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=215.5&end=215.7
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub input: Option<LogicBooleanExpression>,
+  /// The `required_condition` attribute specifies the condition that the input attribute is
+  /// required to be and is evaluated at the positive edge of the clocked_on attribute in the
+  /// `clock_condition` group. If the expression evaluates to false, the cell is in an illegal
+  /// state.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=215.10&end=215.13
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub required_condition: Option<LogicBooleanExpression>,
+}
+impl<C: Ctx> GroupFn<C> for RresetCondition<C> {}

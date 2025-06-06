@@ -586,6 +586,24 @@ pub struct Cell<C: Ctx> {
   /// ">Reference</a>
   #[liberty(group(type = Set))]
   pub intrinsic_parasitic: GroupSet<IntrinsicParasitic<C>>,
+  /// The preset_condition group is a group of attributes for a condition check on the normal
+  /// mode preset expression.
+  ///
+  /// If preset is asserted during the restore operation, it needs to extend beyond the restore
+  /// operation time period so that the flip-flop content can be successfully overwritten.
+  /// Therefore, trailing-edge condition checks on preset pins might be needed.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=214.23&end=214.27
+  /// ">Reference</a>
+  #[liberty(group(type = Vec))]
+  pub preset_condition: Vec<RresetCondition<C>>,
+  /// The `retention_condition` group includes attributes that specify the conditions for the
+  /// retention cell to hold its state during the retention mode.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=215.18&end=215.23
+  /// ">Reference</a>
+  #[liberty(group(type = Vec))]
+  pub retention_condition: Vec<RetentionCondition<C>>,
   /// A `leakage_current` group is defined within a cell group or a model group to specify
   /// leakage current values that are dependent on the state of the cell.
   ///
