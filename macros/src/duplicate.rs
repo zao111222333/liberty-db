@@ -78,7 +78,7 @@ struct Args {
 impl Parse for Args {
   fn parse(input: ParseStream) -> syn::Result<Self> {
     Ok(Self {
-      args: Punctuated::parse_terminated_with(&input, DuplicatedArg::parse)?,
+      args: Punctuated::parse_terminated_with(input, DuplicatedArg::parse)?,
     })
   }
 }

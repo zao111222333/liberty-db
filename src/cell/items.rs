@@ -1789,7 +1789,7 @@ pub struct RetentionCondition<C: Ctx> {
 }
 impl<C: Ctx> GroupFn<C> for RetentionCondition<C> {}
 
-/// The preset_condition group is a group of attributes for a condition check on the normal
+/// The `preset_condition` group is a group of attributes for a condition check on the normal
 /// mode preset expression.
 ///
 /// If preset is asserted during the restore operation, it needs to extend beyond the restore
@@ -1822,7 +1822,7 @@ pub struct RresetCondition<C: Ctx> {
   #[liberty(simple(type = Option))]
   pub input: Option<LogicBooleanExpression>,
   /// The `required_condition` attribute specifies the condition that the input attribute is
-  /// required to be and is evaluated at the positive edge of the clocked_on attribute in the
+  /// required to be and is evaluated at the positive edge of the `clocked_on` attribute in the
   /// `clock_condition` group. If the expression evaluates to false, the cell is in an illegal
   /// state.
   /// <a name ="reference_link" href="
