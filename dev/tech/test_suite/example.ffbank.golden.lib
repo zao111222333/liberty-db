@@ -13,12 +13,19 @@ liberty_db::library::Library (example) {
 	input_threshold_pct_rise : 50.0;
 	output_threshold_pct_rise : 50.0;
 	output_threshold_pct_fall : 50.0;
-	type (thirtytwo) {  /* user defined attribute */
-		bit_width : 32; /* user defined attribute */
+	type (sixteen) {
+		base_type : array;
+		bit_from : 15;
+		bit_to : 0;
+		bit_width : 1;
+		data_type : bit;
 	}
-	type (sixteen) {  /* user defined attribute */
-		bit_from : 15; /* user defined attribute */
-		bit_to : 0; /* user defined attribute */
+	type (thirtytwo) {
+		base_type : array;
+		bit_from : 0;
+		bit_to : 0;
+		bit_width : 32;
+		data_type : bit;
 	}
 	lu_table_template (t111) {
 		variable_1 : total_output_net_capacitance;
@@ -67,10 +74,12 @@ liberty_db::library::Library (example) {
 			direction : input;
 		}
 		bus (D) {
-			bus_type : sixteen; /* user defined attribute */
+			bus_type : sixteen;
+			scan_pin_inverted : false;
 		}
 		bus (E) {
-			bus_type : thirtytwo; /* user defined attribute */
+			bus_type : thirtytwo;
+			scan_pin_inverted : false;
 		}
 	}
 	cell (OR2) {

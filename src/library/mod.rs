@@ -10,8 +10,9 @@ use crate::{
     Attributes, BuilderScope, DefaultIndentation, GroupComments, GroupFn, GroupSet,
     ParseLoc, ParseScope, ParserError, ParsingBuilder,
   },
-  cell::Cell,
+  cell::{Cell, Model},
   common::char_config::CharConfig,
+  pin::BusType,
   table::{CompactLutTemplate, DriverWaveform, TableTemple},
   units,
 };
@@ -177,6 +178,35 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[liberty(complex)]
   pub receiver_capacitance_fall_threshold_pct: Vec<f64>,
+  /// If your library contains bused pins, you must define type groups and define the structural
+  /// constraints of each bus type in the library. The type group is defined at the library group
+  /// level, as shown here:
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=91.7+136.10&end=91.9+136.25
+  /// ">Reference</a>
+  /// <script>
+  /// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+  /// </script>
+  /// ``` text
+  /// Example 17 Bused Pins
+  /// library (ExamBus) {
+  ///   type (bus4) { /* bus name */
+  ///     bit_width : 4 ; /* number of bused pins */
+  ///     ...
+  ///     ...
+  ///   }
+  ///   cell (bused cell) {
+  ///     ...
+  ///     bus (A) {
+  ///       ...
+  ///       bus_type : bus4 ; /* bus name */
+  ///       ...
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  #[liberty(group(type = Set))]
+  pub r#type: GroupSet<BusType<C>>,
   /// Use this group to define operating conditions;
   /// that is, `process`, `voltage`, and `temperature`.
   /// You define an `operating_conditions`  group at the library-level, as shown here:
@@ -685,7 +715,7 @@ pub struct Library<C: Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.23&end=225.29
   /// ">Reference</a>
   #[liberty(group(type = Set))]
-  pub model: GroupSet<Cell<C>>,
+  pub model: GroupSet<Model<C>>,
   #[liberty(group(type = Set))]
   pub cell: GroupSet<Cell<C>>,
 }

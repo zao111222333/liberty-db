@@ -1,6 +1,5 @@
+use super::{Cell, Model};
 use crate::{DefaultCtx, Group};
-
-use super::Cell;
 /// In the following example, pins IP and OP are logically inverse.
 /// ``` text
 /// pin_opposite ("IP", "OP") ;
@@ -801,7 +800,7 @@ liberty_db::cell::Cell (DLT2) {
 /// ">Reference</a>
 #[test]
 fn example30() {
-  let cell = crate::ast::test_parse_fmt::<Cell<DefaultCtx>>(
+  let cell = crate::ast::test_parse_fmt::<Model<DefaultCtx>>(
     r#"(cellA) {
     area : 0.4;
     short(b, c, y);
@@ -828,11 +827,11 @@ fn example30() {
     }
 }"#,
     r#"
-liberty_db::cell::Cell (cellA) {
-| area : 0.4;
+liberty_db::cell::Model (cellA) {
 | short (b, c, y);
 | short (c, y);
 | short (b, c);
+| area : 0.4;
 | pin (a) {
 | | capacitance : 0.1;
 | | direction : input;

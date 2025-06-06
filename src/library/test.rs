@@ -4,7 +4,7 @@ use simple_logger::SimpleLogger;
 use crate::{
   DefaultCtx,
   ast::{AttriValues, SimpleDefined},
-  common::f64_eq,
+  common::{f64_eq, items::NameList},
 };
 
 use super::*;
@@ -352,4 +352,64 @@ liberty_db::library::items::Sensitization ("") {
 | vector (4, "1 1 0");
 }"#,
   );
+}
+
+#[test]
+fn bus_type() {
+  let text = r#"library (test) {
+  type (BUS4) {
+    base_type : array ;
+    bit_from : 0 ;
+    bit_to : 3 ;
+    bit_width : 4 ;
+    data_type : bit ;
+    downto : false ;
+  }
+  cell (AND) {
+    bus (A) {
+      bus_type : BUS4 ;
+    }
+  }
+}
+"#;
+  let want = r#"/* test */
+library (test) {
+| delay_model : table_lookup;
+| time_unit : 1ns;
+| voltage_unit : 1V;
+| slew_upper_threshold_pct_rise : 80.0;
+| slew_lower_threshold_pct_rise : 20.0;
+| slew_derate_from_library : 1.0;
+| slew_lower_threshold_pct_fall : 20.0;
+| slew_upper_threshold_pct_fall : 80.0;
+| input_threshold_pct_fall : 50.0;
+| input_threshold_pct_rise : 50.0;
+| output_threshold_pct_rise : 50.0;
+| output_threshold_pct_fall : 50.0;
+| type (BUS4) {
+| | base_type : array;
+| | bit_from : 0;
+| | bit_to : 3;
+| | bit_width : 4;
+| | data_type : bit;
+| | downto : false;
+| }
+| cell (AND) {
+| | bus (A) {
+| | | bus_type : BUS4;
+| | | scan_pin_inverted : false;
+| | }
+| }
+}
+"#;
+  dev_utils::init_logger();
+  let library = parse_cmp(text, want);
+  let cell = library.cell.get("AND").unwrap();
+  let bus = cell.bus.get(&NameList::from("A")).unwrap();
+  let bus_type = &bus.bus_type;
+  assert_eq!(bus_type.name, "BUS4");
+  let bus_type_ctx = bus_type.ctx.as_ref().unwrap();
+  assert_eq!(bus_type_ctx.bit_from, 0);
+  assert_eq!(bus_type_ctx.bit_to, 3);
+  assert_eq!(bus_type_ctx.bit_width, 4);
 }

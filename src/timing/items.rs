@@ -4,8 +4,7 @@
 use crate::{
   Ctx,
   ast::{
-    self, BuilderScope, GroupComments, GroupFn, ParseScope, ParsingBuilder, SimpleAttri,
-    fmt_comment_liberty,
+    self, BuilderScope, GroupComments, GroupFn, ParsingBuilder, fmt_comment_liberty,
   },
   common::f64_into_hash_ord_fn,
   expression::logic,
@@ -104,12 +103,7 @@ impl TimingSenseType {
   }
 }
 crate::ast::impl_self_builder!(TimingSenseType);
-impl<C: Ctx> SimpleAttri<C> for TimingSenseType {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(TimingSenseType);
 
 /// The `cell_degradation`  group describes a cell performance degradation
 /// design rule for compiling a design.

@@ -6,7 +6,7 @@ use crate::{
   Ctx,
   ast::{
     self, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    GroupSet, Indentation, ParseScope, SimpleAttri,
+    GroupSet, Indentation, ParseScope,
   },
 };
 
@@ -562,23 +562,18 @@ impl<C: Ctx> GroupFn<C> for CharConfig<C> {}
 #[derive(EnumString, Display)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum InternalPowerCalculation {
-  #[strum(serialize = "exclude_switching_rise", serialize = "exclude_switching_on_rise")]
+  #[strum(serialize = "exclude_switching_rise", to_string = "exclude_switching_on_rise")]
   ExcludeSwitchingOnRise,
   #[strum(
     serialize = "exclude_switching_rise_and_fall",
-    serialize = "exclude_switching_on_rise_and_fall"
+    to_string = "exclude_switching_on_rise_and_fall"
   )]
   ExcludeSwitchingOnRiseAndFall,
   #[strum(serialize = "include_switching")]
   IncludeSwitching,
 }
 ast::impl_self_builder!(InternalPowerCalculation);
-impl<C: Ctx> SimpleAttri<C> for InternalPowerCalculation {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+ast::impl_simple!(InternalPowerCalculation);
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=45.28+46.2&end=45.40+46.18
@@ -689,12 +684,7 @@ pub enum ThreeStateDisableMeasurementMethod {
 }
 
 ast::impl_self_builder!(ThreeStateDisableMeasurementMethod);
-impl<C: Ctx> SimpleAttri<C> for ThreeStateDisableMeasurementMethod {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+ast::impl_simple!(ThreeStateDisableMeasurementMethod);
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=46.21+47.2+48.2+49.2&end=46.35+47.44+48.54+49.18

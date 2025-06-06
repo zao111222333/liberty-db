@@ -12,6 +12,7 @@ use crate::{
   common::{f64_into_hash_ord_fn, parse_f64},
   expression::Formula,
   library::AttributeType,
+  pin::BusTypeCtx,
 };
 #[cfg(feature = "lut_template")]
 use alloc::sync::Arc;
@@ -52,6 +53,7 @@ pub(crate) struct BuilderScope<C: Ctx> {
   pub(crate) compact_lut_template:
     HashMap<String, Arc<CompactLutTemplate<C>>, RandomState>,
   pub(crate) voltage_map: HashMap<String, f64, RandomState>,
+  pub(crate) bus_type: HashMap<String, BusTypeCtx, RandomState>,
 }
 
 pub(crate) trait ParsingBuilder<C: Ctx>: Sized {
@@ -61,7 +63,7 @@ pub(crate) trait ParsingBuilder<C: Ctx>: Sized {
 
 macro_rules! impl_self_builder {
   ($t:ty) => {
-    impl<C: crate::Ctx> $crate::ast::ParsingBuilder<C> for $t {
+    impl<C: crate::Ctx> crate::ast::ParsingBuilder<C> for $t {
       type Builder = Self;
       #[inline]
       fn build(builder: Self::Builder, _scope: &mut crate::ast::BuilderScope<C>) -> Self {
@@ -70,7 +72,30 @@ macro_rules! impl_self_builder {
     }
   };
 }
+macro_rules! impl_simple {
+  ($t:ty) => {
+    impl<C: crate::Ctx> crate::ast::SimpleAttri<C> for $t {
+      #[inline]
+      fn nom_parse<'a>(
+        i: &'a str,
+        scope: &mut crate::ast::ParseScope,
+      ) -> crate::ast::SimpleParseRes<'a, Self> {
+        crate::ast::nom_parse_from_str::<C, _>(i, scope)
+      }
+      #[inline]
+      fn fmt_self<T: core::fmt::Write, I: crate::ast::Indentation>(
+        &self,
+        f: &mut crate::ast::CodeFormatter<'_, T, I>,
+      ) -> core::fmt::Result {
+        use core::fmt::Write as _;
+        write!(f, "{self}")
+      }
+    }
+  };
+}
+
 pub(crate) use impl_self_builder;
+pub(crate) use impl_simple;
 
 /// Wrapper for simple attribute
 pub type SimpleWrapper = String;
@@ -528,9 +553,7 @@ pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
 }
 
 /// Simple Attribute in Liberty
-pub(crate) trait SimpleAttri<C: Ctx>:
-  Sized + core::fmt::Display + ParsingBuilder<C>
-{
+pub(crate) trait SimpleAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   /// `nom_parse`, auto implement
   fn nom_parse<'a>(
     i: &'a str,
@@ -540,13 +563,10 @@ pub(crate) trait SimpleAttri<C: Ctx>:
   fn is_set(&self) -> bool {
     true
   }
-  #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
-  ) -> core::fmt::Result {
-    write!(f, "{self}")
-  }
+  ) -> core::fmt::Result;
   /// `fmt_liberty`
   #[inline]
   fn fmt_liberty<T: Write, I: Indentation>(

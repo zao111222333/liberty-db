@@ -3,11 +3,12 @@
 //! </script>
 
 use super::{
-  BooleanExpression, BooleanExpressionLike as _, LogicBooleanExpression, UNKNOWN,
+  BooleanExpression, BooleanExpressionLike as _, LogicBooleanExpression,
+  PowerGroundBooleanExpression, UNKNOWN,
 };
 use crate::{
   Ctx,
-  ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup, ParseScope},
+  ast::{Attributes, GroupComments, GroupFn, IdError, NamedGroup},
 };
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt::Write;
@@ -95,6 +96,8 @@ pub struct FF<C: Ctx> {
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<LogicBooleanExpression>,
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
 /// in a cell or test cell. The syntax for a cell is shown here.
@@ -183,6 +186,8 @@ pub struct FFBank<C: Ctx> {
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<LogicBooleanExpression>,
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
 /// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
@@ -267,6 +272,8 @@ pub struct Latch<C: Ctx> {
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<LogicBooleanExpression>,
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
 /// A `latch` group is defined within a `cell`, `model`, or `test_cell` group to describe a levelsensitive memory device.
@@ -354,6 +361,8 @@ pub struct LatchBank<C: Ctx> {
   /// The `preset` attribute gives the active value for the preset input.
   #[liberty(simple(type = Option))]
   pub preset: Option<LogicBooleanExpression>,
+  #[liberty(simple(type = Option))]
+  pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
 #[duplicate::duplicate_item(
@@ -870,15 +879,7 @@ pub enum ClearPresetState {
   X,
 }
 crate::ast::impl_self_builder!(ClearPresetState);
-impl<C: Ctx> crate::ast::SimpleAttri<C> for ClearPresetState {
-  #[inline]
-  fn nom_parse<'a>(
-    i: &'a str,
-    scope: &mut ParseScope,
-  ) -> crate::ast::SimpleParseRes<'a, Self> {
-    crate::ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(ClearPresetState);
 
 #[cfg(test)]
 mod test {

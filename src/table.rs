@@ -2,7 +2,7 @@ use crate::{
   Ctx,
   ast::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
-    ParseScope, SimpleAttri,
+    ParseScope,
   },
 };
 #[cfg(feature = "lut_template")]
@@ -320,12 +320,7 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
   TotalOutputNetCapacitance,
 }
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
-impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex12 {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(VariableTypeCompactLutTemplateIndex12);
 
 /// The only legal string value for the `variable_3`  attribute is `curve_parameters`.
 ///
@@ -340,12 +335,7 @@ pub enum VariableTypeCompactLutTemplateIndex3 {
   CurveParameters,
 }
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex3);
-impl<C: Ctx> SimpleAttri<C> for VariableTypeCompactLutTemplateIndex3 {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(VariableTypeCompactLutTemplateIndex3);
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -1157,12 +1147,7 @@ pub enum Variable {
   Scalar(ScalarVariable),
 }
 crate::ast::impl_self_builder!(Variable);
-impl<C: Ctx> SimpleAttri<C> for Variable {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+crate::ast::impl_simple!(Variable);
 
 impl core::str::FromStr for Variable {
   type Err = strum::ParseError;
@@ -1379,12 +1364,7 @@ pub enum SigmaType {
   EarlyAndLate,
 }
 ast::impl_self_builder!(SigmaType);
-impl<C: Ctx> SimpleAttri<C> for SigmaType {
-  #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::SimpleParseRes<'a, Self> {
-    ast::nom_parse_from_str::<C, _>(i, scope)
-  }
-}
+ast::impl_simple!(SigmaType);
 
 #[cfg(test)]
 mod test {

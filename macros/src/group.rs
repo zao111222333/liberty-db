@@ -23,6 +23,7 @@ fn group_field_fn(
   proc_macro2::TokenStream,
 )> {
   let s_field_name = field_name.to_string();
+  let s_field_name = s_field_name.strip_prefix("r#").unwrap_or(&s_field_name);
   let comment_fn_name =
     Ident::new(&format!("comments_{s_field_name}"), Span::call_site());
   let comment_this_fn = Ident::new("comments_this", Span::call_site());
@@ -44,14 +45,13 @@ fn group_field_fn(
   } else {
     quote! { #field_name: Default::default(), }
   };
-  let wrapper_parser_arm =
-    |_s_field_name: &String, parser_arm: proc_macro2::TokenStream| {
-      quote!(
-        #_s_field_name => {
-          #parser_arm
-        },
-      )
-    };
+  let wrapper_parser_arm = |_s_field_name: &str, parser_arm: proc_macro2::TokenStream| {
+    quote!(
+      #_s_field_name => {
+        #parser_arm
+      },
+    )
+  };
   let build_fn = |ty: &Type| match (before_build, after_build) {
     (None, None) => quote! { crate::ast::ParsingBuilder::<C>::build(t, scope) },
     (None, Some(after)) => {
@@ -92,7 +92,7 @@ fn group_field_fn(
         }
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let (new_input,simple_res) = <#ty as crate::ast::SimpleAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
@@ -123,7 +123,7 @@ fn group_field_fn(
         crate::ast::SimpleAttri::<C>::fmt_liberty(&self.#field_name, #s_field_name, f)?;
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let (new_input,simple_res) = <#field_type as crate::ast::SimpleAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
@@ -155,7 +155,7 @@ fn group_field_fn(
         crate::ast::ComplexAttri::<C>::fmt_liberty(&self.#field_name, #s_field_name, f)?;
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let (new_input,complex_res) = <#field_type as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
@@ -188,7 +188,7 @@ fn group_field_fn(
         }
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let (new_input,complex_res) = <#ty as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
@@ -220,7 +220,7 @@ fn group_field_fn(
         }
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let (new_input,complex_res) = <#ty as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
@@ -259,7 +259,7 @@ fn group_field_fn(
         }
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let (new_input,complex_res) = <#ty as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
@@ -303,7 +303,7 @@ fn group_field_fn(
         }
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
           let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
@@ -343,7 +343,7 @@ fn group_field_fn(
         }
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
           let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
@@ -387,7 +387,7 @@ fn group_field_fn(
         }
       };
       parser_arm = wrapper_parser_arm(
-        &s_field_name,
+        s_field_name,
         quote! {
           let mut group_builder = <#ty as crate::ast::ParsingBuilder<C>>::Builder::default();
           let (new_input,group_res) = <#ty as crate::ast::GroupAttri<C>>::nom_parse::<false>(&mut group_builder, input, key, scope)?;
