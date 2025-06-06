@@ -1,3 +1,5 @@
+use std::mem;
+
 use quote::quote;
 // use proc_macro::Ident;
 use syn::{
@@ -45,7 +47,7 @@ impl Parse for DuplicatedArg {
           Ok(DuplicatedArg::Docs(docs))
         }
         _ => Err(syn::Error::new(
-          key.span().into(),
+          key.span(),
           "Only support `name = ...` or `additional_attrs(...)`",
         )),
       }
@@ -110,7 +112,7 @@ pub(crate) fn inner(mut ast: DeriveInput) -> syn::Result<proc_macro2::TokenStrea
     .attrs
     .retain(|attr| !attr.path().is_ident("duplicated") && !attr.path().is_ident("doc"));
   ast.ident = config.name;
-  ast.attrs.extend(config.docs.into_iter());
+  ast.attrs.extend(config.docs);
   let st = match &mut ast.data {
     Data::Struct(s) => s,
     _ => {
@@ -121,7 +123,7 @@ pub(crate) fn inner(mut ast: DeriveInput) -> syn::Result<proc_macro2::TokenStrea
     }
   };
   if let Fields::Named(named) = &mut st.fields {
-    config.additional_attrs.extend(named.named.clone().into_iter());
+    config.additional_attrs.extend(mem::take(&mut named.named));
     named.named = config.additional_attrs;
     Ok(quote! {#ast})
   } else {
