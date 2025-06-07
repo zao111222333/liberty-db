@@ -26,6 +26,14 @@ liberty_db::library::Library (example) {
 			clear_preset_var1 : H;
 			preset : "wow";
 		}
+		pin (A) {
+			capacitance : 1.0;
+			direction : input;
+		}
+		pin (B) {
+			capacitance : 1.0;
+			direction : input;
+		}
 		pin (Z) {
 			direction : output;
 			function : "A^B";
@@ -48,10 +56,6 @@ liberty_db::library::Library (example) {
 				}
 			}
 		}
-		pin (A, B) {
-			capacitance : 1.0;
-			direction : input;
-		}
 		bundle (bun1) {
 			members (X);
 			clock : true;
@@ -59,6 +63,14 @@ liberty_db::library::Library (example) {
 	}
 	cell (OR2) {
 		area : 2.0;
+		pin (A) {
+			capacitance : 1.0;
+			direction : input;
+		}
+		pin (B) {
+			capacitance : 1.0;
+			direction : input;
+		}
 		pin (Z) {
 			direction : output;
 			function : "A+B";
@@ -69,10 +81,6 @@ liberty_db::library::Library (example) {
 				rise_resistance : 0.1443;
 				fall_resistance : 0.0589;
 			}
-		}
-		pin (A, B) {
-			capacitance : 1.0;
-			direction : input;
 		}
 	}
 }

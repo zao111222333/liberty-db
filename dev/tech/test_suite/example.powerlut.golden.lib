@@ -19,12 +19,7 @@ liberty_db::library::Library (example) {
 	}
 	cell (AN2) {
 		area : 2.0;
-		pin (P) {
-			internal_power () {
-				values ("4.7, 4.9"); /* user defined attribute */
-			}
-		}
-		pin (A, B) {
+		pin (A) {
 			capacitance : 1.0;
 			direction : input;
 			internal_power () {
@@ -37,6 +32,26 @@ liberty_db::library::Library (example) {
 				power (pwr_bcm_rf) {
 					values ("4.7, 4.9");
 				}
+			}
+		}
+		pin (B) {
+			capacitance : 1.0;
+			direction : input;
+			internal_power () {
+				rise_power (pwr_bcm_rf) {
+					values ("4.7, 4.9");
+				}
+				fall_power (pwr_bcm_rf) {
+					values ("4.7, 4.9");
+				}
+				power (pwr_bcm_rf) {
+					values ("4.7, 4.9");
+				}
+			}
+		}
+		pin (P) {
+			internal_power () {
+				values ("4.7, 4.9"); /* user defined attribute */
 			}
 		}
 	}

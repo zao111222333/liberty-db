@@ -83,6 +83,14 @@ liberty_db::library::Library (example) {
 		ff_bank (x4, y4, 32) {
 			next_state : "E";
 		}
+		pin (A) {
+			capacitance : 1.0;
+			direction : input;
+		}
+		pin (B) {
+			capacitance : 1.0;
+			direction : input;
+		}
 		pin (Z) {
 			direction : output;
 			function : "A^B";
@@ -118,10 +126,6 @@ liberty_db::library::Library (example) {
 				}
 			}
 		}
-		pin (A, B) {
-			capacitance : 1.0;
-			direction : input;
-		}
 		bus (D) {
 			bus_type : sixteen;
 			scan_pin_inverted : false;
@@ -135,34 +139,34 @@ liberty_db::library::Library (example) {
 			members (CR0, CR1);
 			capacitance : 1.0;
 			direction : input;
-			timing () {  /* user defined attribute */
-				intrinsic_fall : 1.6; /* user defined attribute */
-				intrinsic_rise : 1.6; /* user defined attribute */
-				related_pin : CP; /* user defined attribute */
-				timing_type : setup_rising; /* user defined attribute */
+			timing () {
+				intrinsic_rise : 0.2;
+				intrinsic_fall : 0.2;
+				related_pin : CP;
+				timing_type : hold_rising;
 			}
-			timing () {  /* user defined attribute */
-				intrinsic_fall : 0.2; /* user defined attribute */
-				intrinsic_rise : 0.2; /* user defined attribute */
-				related_pin : CP; /* user defined attribute */
-				timing_type : hold_rising; /* user defined attribute */
+			timing () {
+				intrinsic_rise : 1.6;
+				intrinsic_fall : 1.6;
+				related_pin : CP;
+				timing_type : setup_rising;
 			}
 		}
 		bundle (DW) {
 			members (D0, D1);
 			capacitance : 1.0;
 			direction : input;
-			timing () {  /* user defined attribute */
-				intrinsic_fall : 1.6; /* user defined attribute */
-				intrinsic_rise : 1.6; /* user defined attribute */
-				related_pin : CP; /* user defined attribute */
-				timing_type : setup_rising; /* user defined attribute */
+			timing () {
+				intrinsic_rise : 0.2;
+				intrinsic_fall : 0.2;
+				related_pin : CP;
+				timing_type : hold_rising;
 			}
-			timing () {  /* user defined attribute */
-				intrinsic_fall : 0.2; /* user defined attribute */
-				intrinsic_rise : 0.2; /* user defined attribute */
-				related_pin : CP; /* user defined attribute */
-				timing_type : hold_rising; /* user defined attribute */
+			timing () {
+				intrinsic_rise : 1.6;
+				intrinsic_fall : 1.6;
+				related_pin : CP;
+				timing_type : setup_rising;
 			}
 		}
 		bundle (H0A) {
@@ -186,48 +190,56 @@ liberty_db::library::Library (example) {
 			members (LD0, LD1);
 			capacitance : 1.0;
 			direction : input;
-			timing () {  /* user defined attribute */
-				intrinsic_fall : 1.6; /* user defined attribute */
-				intrinsic_rise : 1.6; /* user defined attribute */
-				related_pin : CP; /* user defined attribute */
-				timing_type : setup_rising; /* user defined attribute */
+			timing () {
+				intrinsic_rise : 0.2;
+				intrinsic_fall : 0.2;
+				related_pin : CP;
+				timing_type : hold_rising;
 			}
-			timing () {  /* user defined attribute */
-				intrinsic_fall : 0.2; /* user defined attribute */
-				intrinsic_rise : 0.2; /* user defined attribute */
-				related_pin : CP; /* user defined attribute */
-				timing_type : hold_rising; /* user defined attribute */
+			timing () {
+				intrinsic_rise : 1.6;
+				intrinsic_fall : 1.6;
+				related_pin : CP;
+				timing_type : setup_rising;
 			}
 		}
 		bundle (Q) {
 			members (Q0, Q1, Q3);
 			direction : output;
 			function : "IQ";
-			timing () {  /* user defined attribute */
-				fall_resistance : 0.0589; /* user defined attribute */
-				intrinsic_fall : 1.25; /* user defined attribute */
-				intrinsic_rise : 1.09; /* user defined attribute */
-				related_pin : CP; /* user defined attribute */
-				rise_resistance : 0.1458; /* user defined attribute */
-				timing_type : rising_edge; /* user defined attribute */
+			timing () {
+				intrinsic_rise : 1.09;
+				intrinsic_fall : 1.25;
+				related_pin : CP;
+				timing_type : rising_edge;
+				rise_resistance : 0.1458;
+				fall_resistance : 0.0589;
 			}
 		}
 		bundle (QN) {
 			members (QN0, QN1);
 			direction : output;
 			function : "IQN";
-			timing () {  /* user defined attribute */
-				fall_resistance : 0.0589; /* user defined attribute */
-				intrinsic_fall : 1.55; /* user defined attribute */
-				intrinsic_rise : 1.47; /* user defined attribute */
-				related_pin : CP; /* user defined attribute */
-				rise_resistance : 0.1523; /* user defined attribute */
-				timing_type : rising_edge; /* user defined attribute */
+			timing () {
+				intrinsic_rise : 1.47;
+				intrinsic_fall : 1.55;
+				related_pin : CP;
+				timing_type : rising_edge;
+				rise_resistance : 0.1523;
+				fall_resistance : 0.0589;
 			}
 		}
 	}
 	cell (OR2) {
 		area : 2.0;
+		pin (A) {
+			capacitance : 1.0;
+			direction : input;
+		}
+		pin (B) {
+			capacitance : 1.0;
+			direction : input;
+		}
 		pin (Z) {
 			direction : output;
 			function : "A+B";
@@ -238,10 +250,6 @@ liberty_db::library::Library (example) {
 				rise_resistance : 0.1443;
 				fall_resistance : 0.0589;
 			}
-		}
-		pin (A, B) {
-			capacitance : 1.0;
-			direction : input;
 		}
 	}
 	cell (bank33) {
