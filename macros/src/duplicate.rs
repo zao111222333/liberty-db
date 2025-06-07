@@ -1,12 +1,13 @@
 use std::mem;
 
+use foldhash::{HashSet, HashSetExt};
 use quote::quote;
-// use proc_macro::Ident;
 use syn::{
   Attribute, Data, DeriveInput, Field, Fields, Ident, Token,
   parse::{Parse, ParseStream},
   punctuated::Punctuated,
   spanned::Spanned,
+  token::Comma,
 };
 
 use crate::attribute::{AttriType, FieldType, parse_field_attrs};
@@ -15,6 +16,7 @@ struct Config {
   name: Ident,
   additional_attrs: Punctuated<Field, Token![,]>,
   docs: Vec<Attribute>,
+  not_exclude: HashSet<Ident>,
   exclude_simple: bool,
   exclude_complex: bool,
   exclude_group: bool,
@@ -25,6 +27,7 @@ enum DuplicatedArg {
   Name(Ident),
   Docs(Vec<Attribute>),
   Exclude(Punctuated<Ident, Token![,]>),
+  NotExclude(HashSet<Ident>),
   NewAttrs(Punctuated<Field, Token![,]>),
 }
 
@@ -43,14 +46,23 @@ impl Parse for DuplicatedArg {
         "additional_attrs" => {
           let content;
           syn::parenthesized!(content in input);
-          let fields = Punctuated::parse_terminated_with(&content, Field::parse_named)?;
+          let fields: Punctuated<Field, Comma> =
+            Punctuated::parse_terminated_with(&content, Field::parse_named)?;
           Ok(DuplicatedArg::NewAttrs(fields))
         }
         "exclude" => {
           let content;
           syn::parenthesized!(content in input);
-          let excludes = Punctuated::parse_terminated_with(&content, Ident::parse)?;
+          let excludes: Punctuated<Ident, Comma> =
+            Punctuated::parse_terminated_with(&content, Ident::parse)?;
           Ok(DuplicatedArg::Exclude(excludes))
+        }
+        "not_exclude" => {
+          let content;
+          syn::parenthesized!(content in input);
+          let not_excludes: Punctuated<Ident, Comma> =
+            Punctuated::parse_terminated_with(&content, Ident::parse)?;
+          Ok(DuplicatedArg::NotExclude(not_excludes.into_iter().collect()))
         }
         "docs" => {
           let content;
@@ -61,7 +73,7 @@ impl Parse for DuplicatedArg {
         }
         _ => Err(syn::Error::new(
           key.span(),
-          "Only support `name = ...` or `additional_attrs(...)`",
+          "Only support `name`, `additional_attrs`, `exclude`, `not_exclude`, or `docs`",
         )),
       }
     } else {
@@ -94,6 +106,7 @@ fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
         let mut maybe_name: Option<Ident> = None;
         let mut maybe_new_attrs: Option<Punctuated<Field, Token![,]>> = None;
         let mut maybe_docs: Option<Vec<Attribute>> = None;
+        let mut not_exclude = HashSet::new();
         let mut exclude_simple = false;
         let mut exclude_complex = false;
         let mut exclude_group = false;
@@ -138,6 +151,7 @@ fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
                 }
               }
             }
+            DuplicatedArg::NotExclude(_not_exclude) => not_exclude = _not_exclude,
           }
         }
         let name = maybe_name.ok_or_else(|| {
@@ -153,6 +167,7 @@ fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
           name,
           additional_attrs,
           docs,
+          not_exclude,
           exclude_simple,
           exclude_complex,
           exclude_group,
@@ -185,23 +200,25 @@ pub(crate) fn inner(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     };
     if let Fields::Named(named) = &mut st.fields {
       for f in mem::take(&mut named.named) {
-        match parse_field_attrs(&f.attrs)? {
-          Some(FieldType::Attri(AttriType::Simple(_))) => {
-            if config.exclude_simple {
-              continue;
+        if !config.not_exclude.contains(f.ident.as_ref().unwrap()) {
+          match parse_field_attrs(&f.attrs)? {
+            Some(FieldType::Attri(AttriType::Simple(_))) => {
+              if config.exclude_simple {
+                continue;
+              }
             }
-          }
-          Some(FieldType::Attri(AttriType::Complex(_))) => {
-            if config.exclude_complex {
-              continue;
+            Some(FieldType::Attri(AttriType::Complex(_))) => {
+              if config.exclude_complex {
+                continue;
+              }
             }
-          }
-          Some(FieldType::Attri(AttriType::Group(_))) => {
-            if config.exclude_group {
-              continue;
+            Some(FieldType::Attri(AttriType::Group(_))) => {
+              if config.exclude_group {
+                continue;
+              }
             }
+            _ => {}
           }
-          _ => {}
         }
         config.additional_attrs.push(f);
       }

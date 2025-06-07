@@ -288,7 +288,7 @@ fn group_field_fn(
             .into_iter()
             .map(|t| #build)
             .collect();
-          map.sort();
+          map.sort_unstable();
           map
         },
       };
@@ -372,7 +372,7 @@ fn group_field_fn(
             .into_iter()
             .map(|t| #build)
             .collect();
-          map.sort();
+          map.sort_unstable();
           map
         },
       };
@@ -519,20 +519,34 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       #attributes_name: builder.#attributes_name,
       #extra_ctx_name: Default::default(),
     };
-    for name_field in &name_vec {
+    for (flatten, name_field) in &name_vec {
       let i = name_field.ident.clone().unwrap();
       let t = &name_field.ty;
-      builder_fields = quote! {
-        #builder_fields
-        pub(crate) #i: #t,
+      builder_fields = if *flatten {
+        quote! {
+          #builder_fields
+          pub(crate) #i: Vec<#t>,
+        }
+      } else {
+        quote! {
+          #builder_fields
+          pub(crate) #i: #t,
+        }
       };
       builder_inits = quote! {
         #builder_inits
         #i: Default::default(),
       };
-      build_arms = quote! {
-        #build_arms
-        #i: builder.#i,
+      build_arms = if *flatten {
+        quote! {
+          #build_arms
+          #i: crate::ast::FlattenNameAttri::pretend_group(builder.#i),
+        }
+      } else {
+        quote! {
+          #build_arms
+          #i: builder.#i,
+        }
       };
     }
     let mut parser_arms = quote! {};
@@ -639,22 +653,43 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     };
     let named_group_impl = match name_vec.len() {
       1 => {
-        let t = &name_vec[0].ty;
-        let i = name_vec[0].ident.clone().expect("name has no ident!");
-        quote! {
-          #[doc(hidden)]
-          impl<C: crate::Ctx> crate::ast::NamedGroup<C> for #ident<C> {
-            #[inline]
-            fn parse_set_name(builder: &mut Self::Builder, v: Vec<&str>) -> Result<(), crate::ast::IdError> {
-              <#t as crate::ast::NameAttri>::parse(v).map(|name| {builder.#i = name;})
+        let flatten = name_vec[0].0;
+        let t = &name_vec[0].1.ty;
+        let i = name_vec[0].1.ident.as_ref().expect("name has no ident!");
+        if flatten {
+          quote! {
+            #[doc(hidden)]
+            impl<C: crate::Ctx> crate::ast::NamedGroup<C> for #ident<C> {
+              #[inline]
+              fn parse_set_name(builder: &mut Self::Builder, v: Vec<&str>) -> Result<(), crate::ast::IdError> {
+                <#t as crate::ast::FlattenNameAttri>::parse(v).map(|name| {builder.#i = name;})
+              }
+              #[inline]
+              fn fmt_name<T: core::fmt::Write, I: crate::ast::Indentation>(
+                &self,
+                f: &mut crate::ast::CodeFormatter<'_, T, I>,
+              ) -> core::fmt::Result
+              {
+                <#t as crate::ast::FlattenNameAttri>::fmt_self(&self.#i, f)
+              }
             }
-            #[inline]
-            fn fmt_name<T: core::fmt::Write, I: crate::ast::Indentation>(
-              &self,
-              f: &mut crate::ast::CodeFormatter<'_, T, I>,
-            ) -> core::fmt::Result
-            {
-              <#t as crate::ast::NameAttri>::fmt_self(&self.#i, f)
+          }
+        } else {
+          quote! {
+            #[doc(hidden)]
+            impl<C: crate::Ctx> crate::ast::NamedGroup<C> for #ident<C> {
+              #[inline]
+              fn parse_set_name(builder: &mut Self::Builder, v: Vec<&str>) -> Result<(), crate::ast::IdError> {
+                <#t as crate::ast::NameAttri>::parse(v).map(|name| {builder.#i = name;})
+              }
+              #[inline]
+              fn fmt_name<T: core::fmt::Write, I: crate::ast::Indentation>(
+                &self,
+                f: &mut crate::ast::CodeFormatter<'_, T, I>,
+              ) -> core::fmt::Result
+              {
+                <#t as crate::ast::NameAttri>::fmt_self(&self.#i, f)
+              }
             }
           }
         }
@@ -726,7 +761,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           builder: &mut Self::Builder,
           mut input: &'a str,
           group_name: &str,
-          scope: &mut crate::ast::ParseScope,
+          scope: &mut crate::ast::ParseScope<'_>,
         ) -> nom::IResult<&'a str, Result<(), crate::ast::IdError>, nom::error::Error<&'a str>> {
           let title;
           if IS_INCLUDED {

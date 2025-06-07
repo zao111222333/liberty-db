@@ -14,6 +14,7 @@ use crate::{
   library::AttributeType,
   pin::BusTypeCtx,
 };
+use alloc::borrow::Cow;
 #[cfg(feature = "lut_template")]
 use alloc::sync::Arc;
 use core::{
@@ -78,7 +79,7 @@ macro_rules! impl_simple {
       #[inline]
       fn nom_parse<'a>(
         i: &'a str,
-        scope: &mut crate::ast::ParseScope,
+        scope: &mut crate::ast::ParseScope<'_>,
       ) -> crate::ast::SimpleParseRes<'a, Self> {
         crate::ast::nom_parse_from_str::<C, _>(i, scope)
       }
@@ -106,7 +107,7 @@ pub type SimpleWrapper = String;
 pub struct ComplexWrapper(pub(crate) Vec<String>);
 impl ComplexWrapper {
   #[expect(clippy::arithmetic_side_effects)]
-  fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope) -> Self {
+  fn collect(vec: Vec<(usize, &str)>, scope: &mut ParseScope<'_>) -> Self {
     Self(
       vec
         .into_iter()
@@ -306,7 +307,7 @@ pub(crate) fn attributs_set_undefined_attri(
   attri_map: &mut Attributes,
   key: &str,
   group_name: &str,
-  scope: &ParseScope,
+  scope: &ParseScope<'_>,
   undefined: UndefinedAttriValue,
 ) {
   match scope.define_map.get(&define_id(scope.hasher, group_name, key)) {
@@ -472,8 +473,8 @@ pub enum DefinedType {
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Debug, Default)]
-pub(crate) struct ParseScope {
-  pub(crate) loc: ParseLoc,
+pub(crate) struct ParseScope<'a> {
+  pub(crate) loc: ParseLoc<'a>,
   pub(crate) include_files: IndexSet<PathBuf>,
   pub(crate) define_map: HashMap<u64, DefinedType, mut_set::NoHashBuildHasher>,
   pub(crate) variables: HashMap<String, Formula, RandomState>,
@@ -481,12 +482,12 @@ pub(crate) struct ParseScope {
 }
 
 #[derive(Debug, Default)]
-pub struct ParseLoc {
-  pub filename: Option<PathBuf>,
+pub struct ParseLoc<'a> {
+  pub filename: Option<Cow<'a, Path>>,
   pub line_num: usize,
 }
 
-impl core::fmt::Display for ParseLoc {
+impl core::fmt::Display for ParseLoc<'_> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     if let Some(p) = &self.filename {
@@ -544,7 +545,7 @@ pub(crate) type ComplexParseRes<'a, T> =
 #[inline]
 pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
   i: &'a str,
-  scope: &mut ParseScope,
+  scope: &mut ParseScope<'_>,
 ) -> SimpleParseRes<'a, T> {
   let (input, s) = parser::simple(i, &mut scope.loc.line_num)
     .or(parser::complex_single(i, &mut scope.loc.line_num))?;
@@ -557,7 +558,7 @@ pub(crate) trait SimpleAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   /// `nom_parse`, auto implement
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> SimpleParseRes<'a, Self::Builder>;
   #[inline]
   fn is_set(&self) -> bool {
@@ -657,14 +658,14 @@ pub(crate) trait ComplexAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   /// basic `parser`
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> Result<Self::Builder, ComplexParseError>;
   /// `nom_parse`, auto implement
   #[expect(clippy::arithmetic_side_effects)]
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> ComplexParseRes<'a, Self::Builder> {
     let (input, vec) = parser::complex(i, &mut scope.loc.line_num)?;
     let mut line_num = 0;
@@ -737,13 +738,13 @@ pub(crate) trait GroupAttri<C: Ctx>:
     builder: &mut Self::Builder,
     i: &'a str,
     group_name: &str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> IResult<&'a str, Result<(), IdError>, Error<&'a str>>;
   fn include_file<'a>(
     builder: &mut Self::Builder,
     mut i: &'a str,
     group_name: &str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> IResult<&'a str, Result<(), IdError>, Error<&'a str>> {
     let (_i, filename_s) = parser::complex_single(i, &mut scope.loc.line_num)?;
     i = _i;
@@ -776,7 +777,7 @@ pub(crate) trait GroupAttri<C: Ctx>:
     }
     let old_line_num = scope.loc.line_num;
     let old_filename = scope.loc.filename.take();
-    scope.loc.filename = Some(filename);
+    scope.loc.filename = Some(filename.into());
     let input1 = match parser::comment_space_newline(&s) {
       Ok((input1, n)) => {
         scope.loc.line_num = 1 + n;
@@ -854,7 +855,7 @@ pub(crate) trait NamedGroup<C: Ctx>: GroupAttri<C> {
 }
 
 /// `NameAttri`
-pub trait NameAttri: Sized {
+pub(crate) trait NameAttri: Sized {
   /// basic parser
   fn parse(v: Vec<&str>) -> Result<Self, IdError>;
   /// name `to_vec`
@@ -864,25 +865,36 @@ pub trait NameAttri: Sized {
   ) -> core::fmt::Result;
 }
 
+pub(crate) trait FlattenNameAttri: Sized {
+  /// basic parser
+  fn parse(v: Vec<&str>) -> Result<Vec<Self>, IdError>;
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result;
+  fn pretend_group(parsed: Vec<Self>) -> Self;
+  fn ungroup(&self) -> Option<impl Iterator<Item = Self>>;
+}
+
 /// Error for parser
 #[derive(Debug, thiserror::Error)]
-pub enum ParserError {
+pub enum ParserError<'a> {
   /// TitleLenMismatch(want,got,title)
   #[error("{0} {1}")]
-  IdError(ParseLoc, IdError),
+  IdError(ParseLoc<'a>, IdError),
   /// replace same id
   #[error("{0} {1}")]
-  NomError(ParseLoc, String),
+  NomError(ParseLoc<'a>, String),
   #[error("File {0:?}. {1}")]
   IO(PathBuf, std::io::Error),
   /// something else
   #[error("{0} {1}")]
-  Other(ParseLoc, String),
+  Other(ParseLoc<'a>, String),
 }
 
-impl ParserError {
+impl<'a> ParserError<'a> {
   #[inline]
-  pub(crate) fn nom(loc: ParseLoc, e: nom::Err<Error<&str>>) -> Self {
+  pub(crate) fn nom(loc: ParseLoc<'a>, e: nom::Err<Error<&str>>) -> Self {
     Self::NomError(
       loc,
       match e {

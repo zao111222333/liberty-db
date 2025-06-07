@@ -3,12 +3,12 @@
 //! </script>
 use crate::{
   Ctx,
-  ast::{Attributes, GroupComments, GroupFn, GroupSet},
-  ccsn::{CCSNStage, ReceiverCapacitance},
-  common::{
-    char_config::CharConfig,
-    items::{NameList, WordSet},
+  ast::{
+    Attributes, BuilderScope, FlattenNameAttri, GroupComments, GroupFn, GroupSet,
+    RandomState,
   },
+  ccsn::{CCSNStage, ReceiverCapacitance},
+  common::{char_config::CharConfig, items::WordSet},
   expression::{BooleanExpression, PowerGroundBooleanExpression, logic},
   internal_power::InternalPower,
   timing::Timing,
@@ -84,6 +84,7 @@ pub use items::*;
 #[duplicated(
   name = Bundle,
   exclude(complex, group),
+  not_exclude(timing),
   docs(
     /// A bundle group uses the members complex attribute (unique to bundles) to group together
     /// in multibit cells—such as quad latches and 4-bit registers—several pins that have similar
@@ -131,12 +132,14 @@ pub use items::*;
 pub struct Pin<C: Ctx> {
   /// Name of the pin
   /// `pin (name | name_list)`
+  ///
+  /// `name_list` cases will be flatten into multiple Pin
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=227.10&end=227.25
   /// ">Reference-Definition</a>
-  #[id]
-  #[liberty(name)]
-  pub name: NameList,
+  #[id(borrow = str)]
+  #[liberty(name(flatten))]
+  pub name: String,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
@@ -1240,8 +1243,29 @@ pub struct Pin<C: Ctx> {
 }
 
 impl<C: Ctx> GroupFn<C> for Pin<C> {}
-impl<C: Ctx> GroupFn<C> for Bus<C> {}
-impl<C: Ctx> GroupFn<C> for Bundle<C> {}
+#[duplicate::duplicate_item(
+  BusBundle;
+  [Bus];
+  [Bundle];
+)]
+impl<C: Ctx> GroupFn<C> for BusBundle<C> {
+  fn after_build(&mut self, _: &mut BuilderScope<C>) {
+    let mut pin =
+      GroupSet::with_capacity_and_hasher(self.pin.len(), RandomState::default());
+    for p in core::mem::take(&mut self.pin) {
+      if let Some(names) = FlattenNameAttri::ungroup(&p.name) {
+        pin.extend(names.map(|name| {
+          let mut _p = p.clone();
+          _p.name = name;
+          _p
+        }));
+      } else {
+        _ = pin.insert(p);
+      }
+    }
+    self.pin = pin;
+  }
+}
 
 #[cfg(test)]
 mod test {
@@ -1249,6 +1273,10 @@ mod test {
 
   #[test]
   fn pin_name_list() {
+    // let mut scope = Default::default();
+    // let builder = super::PinBuilder::<DefaultCtx>::default();
+    // let a = <super::Pin as crate::ast::ParsingBuilder>::build_iter(builder, &mut scope);
+    // a.flat_map(f)
     let cell = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
       r#"(test_cell){
         pin (A) {}
@@ -1258,7 +1286,13 @@ mod test {
 liberty_db::cell::Cell (test_cell) {
 | pin (A) {
 | }
-| pin (B, C, D, E) {
+| pin (B) {
+| }
+| pin (C) {
+| }
+| pin (D) {
+| }
+| pin (E) {
 | }
 }"#,
     );

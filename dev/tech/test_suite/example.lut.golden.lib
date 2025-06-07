@@ -41,6 +41,14 @@ liberty_db::library::Library (example) {
 		ff_bank (x4, y4, 32) {
 			next_state : "E";
 		}
+		pin (A) {
+			capacitance : 1.0;
+			direction : input;
+		}
+		pin (B) {
+			capacitance : 1.0;
+			direction : input;
+		}
 		pin (Z) {
 			direction : output;
 			function : "A^B";
@@ -63,10 +71,6 @@ liberty_db::library::Library (example) {
 				}
 			}
 		}
-		pin (A, B) {
-			capacitance : 1.0;
-			direction : input;
-		}
 		bus (D) {
 			bus_type : sixteen;
 			scan_pin_inverted : false;
@@ -78,6 +82,14 @@ liberty_db::library::Library (example) {
 	}
 	cell (OR2) {
 		area : 2.0;
+		pin (A) {
+			capacitance : 1.0;
+			direction : input;
+		}
+		pin (B) {
+			capacitance : 1.0;
+			direction : input;
+		}
 		pin (Z) {
 			direction : output;
 			function : "A+B";
@@ -88,10 +100,6 @@ liberty_db::library::Library (example) {
 				rise_resistance : 0.1443;
 				fall_resistance : 0.0589;
 			}
-		}
-		pin (A, B) {
-			capacitance : 1.0;
-			direction : input;
 		}
 	}
 }

@@ -751,7 +751,7 @@ impl<C: Ctx> ComplexAttri<C> for CharModeMethod {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let char_mode = match i.next() {
@@ -791,7 +791,7 @@ impl<C: Ctx> ComplexAttri<C> for CharModeValue {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let mut i = iter;
     let char_mode = match i.next() {

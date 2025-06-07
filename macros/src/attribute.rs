@@ -11,7 +11,7 @@ use syn::{
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum InternalType {
   /// `name`
-  Name,
+  Name { flatten: bool },
   /// `attributes`
   AttributeList,
   /// `comment`
@@ -76,8 +76,8 @@ pub(crate) fn parse_fields_type(
   HashMap<&Ident, MyPath>,
   // after_build_map
   HashMap<&Ident, MyPath>,
-  // Name
-  Vec<&syn::Field>,
+  // Name (flatten, field)
+  Vec<(bool, &syn::Field)>,
   // attributes name
   &Ident,
   // comment name
@@ -120,8 +120,8 @@ pub(crate) fn parse_fields_type(
         }
       };
       match attr {
-        FieldType::Internal(InternalType::Name) => {
-          _name_vec.push(field);
+        FieldType::Internal(InternalType::Name { flatten }) => {
+          _name_vec.push((flatten, field));
         }
         FieldType::Internal(InternalType::AttributeList) => {
           if let Some(name) = &_attributes_name {
@@ -244,7 +244,9 @@ pub(crate) fn parse_field_attrs(
           if let Some(proc_macro2::TokenTree::Ident(token_id)) = tokens.next() {
             match token_id.to_string().as_str() {
               "name" => {
-                return Ok(Some(FieldType::Internal(InternalType::Name)));
+                return Ok(Some(FieldType::Internal(InternalType::Name {
+                  flatten: parse_name_flatten(tokens)?,
+                })));
               }
               "attributes" => {
                 return Ok(Some(FieldType::Internal(InternalType::AttributeList)));
@@ -355,6 +357,27 @@ fn parse_field_build(
     }
   }
   Ok((before_build_expr, after_build_expr))
+}
+
+fn parse_name_flatten(
+  mut tokens: proc_macro2::token_stream::IntoIter,
+) -> syn::Result<bool> {
+  let mut flatten = false;
+  if let Some(proc_macro2::TokenTree::Group(g)) = tokens.next() {
+    let mut args = g.stream().into_iter();
+    while let Some(proc_macro2::TokenTree::Ident(arg_id)) = args.next() {
+      match arg_id.to_string().as_str() {
+        "flatten" => flatten = true,
+        _ => {
+          return Err(syn::Error::new(
+            proc_macro2::Span::call_site(),
+            format!("name not support {}.", arg_id.to_string().as_str()),
+          ));
+        }
+      }
+    }
+  }
+  Ok(flatten)
 }
 
 fn parse_simple_type(

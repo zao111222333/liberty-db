@@ -31,7 +31,7 @@ pub struct ProjInfo {
 #[allow(clippy::result_unit_err)]
 pub trait ProjLibrary: Sized {
   const INFO: ProjInfo;
-  fn parse(s: &str) -> Result<Self, ()>;
+  fn parse(s: &str, path: &Path) -> Result<Self, ()>;
   fn write(&self) -> Result<(), ()> {
     Err(())
   }
@@ -93,10 +93,14 @@ pub trait ProjLibrary: Sized {
   ) -> BenchResult {
     let library_string = read_to_string(file_path).unwrap();
     let s = library_string.as_str();
-    if let Ok(Ok(try_l)) = panic::catch_unwind(|| (Self::parse)(black_box(s))) {
+    if let Ok(Ok(try_l)) =
+      panic::catch_unwind(|| (Self::parse)(black_box(s), Path::new(file_path)))
+    {
       (Self::drop)(try_l);
       group.bench_function(Self::id(), |b| {
-        b.iter(|| (Self::parse)(black_box(s)).map(|l| (Self::drop)(l)))
+        b.iter(|| {
+          (Self::parse)(black_box(s), Path::new(file_path)).map(|l| (Self::drop)(l))
+        })
       });
       Self::collect_result(group_path)
     } else {
@@ -110,7 +114,9 @@ pub trait ProjLibrary: Sized {
   ) -> BenchResult {
     let library_string = read_to_string(file_path).unwrap();
     let s = library_string.as_str();
-    if let Ok(Ok(l)) = panic::catch_unwind(|| (Self::parse)(black_box(s))) {
+    if let Ok(Ok(l)) =
+      panic::catch_unwind(|| (Self::parse)(black_box(s), Path::new(file_path)))
+    {
       if (Self::write)(black_box(&l)).is_ok() {
         group.bench_function(Self::id(), |b| b.iter(|| (Self::write)(black_box(&l))));
         (Self::drop)(l);

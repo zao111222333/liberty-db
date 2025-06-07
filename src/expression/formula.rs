@@ -55,7 +55,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for Formula {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, FormulaExpr> {
     crate::ast::parser::simple_custom(
       i,

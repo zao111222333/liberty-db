@@ -4,7 +4,7 @@ use crate::{
     CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
     Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes, join_fmt,
   },
-  common::items::{NameList, WordSet},
+  common::items::WordSet,
   expression::{LogicBooleanExpression, PowerGroundBooleanExpression, logic},
   pin::Direction,
   table::CompactCcsPower,
@@ -43,7 +43,7 @@ pub struct LeakagePower<C: Ctx> {
   pub power_level: Option<String>,
   #[id]
   #[liberty(simple)]
-  pub related_pg_pin: NameList,
+  pub related_pg_pin: WordSet,
   #[id]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
@@ -247,7 +247,7 @@ impl<C: Ctx> SimpleAttri<C> for Table {
     !self.v.is_empty()
   }
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
     let (input, simple_multi) =
       crate::ast::parser::simple_multi(i, &mut scope.loc.line_num)?;
     simple_multi
@@ -450,10 +450,10 @@ pub struct DynamicCurrent<C: Ctx> {
   pub when: Option<LogicBooleanExpression>,
   #[id]
   #[liberty(simple)]
-  pub related_inputs: NameList,
+  pub related_inputs: WordSet,
   #[id]
   #[liberty(simple)]
-  pub related_outputs: NameList,
+  pub related_outputs: WordSet,
   #[liberty(complex(type = Option))]
   pub typical_capacitances: Option<Vec<f64>>,
   /// Use the switching_group group to specify a current waveform vector when the power
@@ -1709,7 +1709,7 @@ impl<C: Ctx> ComplexAttri<C> for PinOpposite {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let name_list1: WordSet = match iter.next() {
       Some(&s) => match s.parse() {
