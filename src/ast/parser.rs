@@ -193,7 +193,7 @@ mod test_space {
 pub(crate) fn variable<'a>(
   i: &'a str,
   name: &str,
-  scope: &mut super::ParseScope,
+  scope: &mut super::ParseScope<'_>,
 ) -> IResult<&'a str, ()> {
   map(
     (space, char('='), FormulaExpr::parse, space, char(';'), comment_space_newline),
@@ -212,7 +212,7 @@ pub(crate) fn variable<'a>(
 pub(crate) fn undefine<'a>(
   i: &'a str,
   group_name: &str,
-  scope: &mut super::ParseScope,
+  scope: &mut super::ParseScope<'_>,
 ) -> IResult<&'a str, super::UndefinedAttriValue> {
   let line_num_back: usize = scope.loc.line_num;
   if let Ok((input, res)) = simple(i, &mut scope.loc.line_num) {

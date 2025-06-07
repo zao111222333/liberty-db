@@ -165,7 +165,7 @@ impl<C: Ctx> ast::ParsingBuilder<C> for SimpleBusType {
 impl<C: Ctx> ast::SimpleAttri<C> for SimpleBusType {
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ast::ParseScope,
+    scope: &mut ast::ParseScope<'_>,
   ) -> ast::SimpleParseRes<'a, Self::Builder> {
     ast::nom_parse_from_str::<C, _>(i, scope)
   }

@@ -247,7 +247,7 @@ impl<C: Ctx> SimpleAttri<C> for Table {
     !self.v.is_empty()
   }
   #[inline]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> SimpleParseRes<'a, Self> {
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
     let (input, simple_multi) =
       crate::ast::parser::simple_multi(i, &mut scope.loc.line_num)?;
     simple_multi
@@ -1709,7 +1709,7 @@ impl<C: Ctx> ComplexAttri<C> for PinOpposite {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let name_list1: WordSet = match iter.next() {
       Some(&s) => match s.parse() {

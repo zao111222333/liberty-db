@@ -265,7 +265,7 @@ impl<C: Ctx> ComplexAttri<C> for CapacitiveLoadUnit {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let val = match iter.next() {
       Some(s) => parse_f64(s)?,

@@ -16,6 +16,7 @@ use crate::{
   table::{CompactLutTemplate, DriverWaveform, TableTemple},
   units,
 };
+use alloc::borrow::Cow;
 use core::fmt::{self, Write as _};
 pub use items::*;
 use std::path::Path;
@@ -742,7 +743,7 @@ impl<C: Ctx> Library<C> {
   const KEY: &'static str = "library";
   /// Parse `.lib` file as a [Library] struct.
   #[inline]
-  pub fn parse_lib_file(filename: &Path) -> Result<Self, ParserError> {
+  pub fn parse_lib_file(filename: &'_ Path) -> Result<Self, ParserError<'_>> {
     let s = std::fs::read_to_string(filename)
       .map_err(|e| ParserError::IO(filename.to_path_buf(), e))?;
     Self::parse_lib(&s, Some(filename))
@@ -751,12 +752,12 @@ impl<C: Ctx> Library<C> {
   /// Specify `filename` for better error information.
   #[expect(clippy::arithmetic_side_effects)]
   #[inline]
-  pub fn parse_lib(s: &str, filename: Option<&Path>) -> Result<Self, ParserError> {
+  pub fn parse_lib<'a>(
+    s: &str,
+    filename: Option<&'a Path>,
+  ) -> Result<Self, ParserError<'a>> {
     let mut scope = ParseScope {
-      loc: ParseLoc {
-        filename: filename.map(Path::to_path_buf),
-        line_num: 0,
-      },
+      loc: ParseLoc { filename: filename.map(Cow::Borrowed), line_num: 0 },
       ..Default::default()
     };
     let input1 = match parser::comment_space_newline(s) {
@@ -801,7 +802,7 @@ impl<C: Ctx> Library<C> {
   }
   /// TODO: Parse `.json` file as a [Library] struct.
   #[inline]
-  pub fn parse_json(_i: &str) -> Result<Self, ParserError> {
+  pub fn parse_json(_i: &str) -> Result<Self, ParserError<'_>> {
     todo!()
   }
   /// TODO: Format [Library] to .json
@@ -814,7 +815,7 @@ impl<C: Ctx> Library<C> {
   }
   /// TODO: Parse `.db` file as a [Library] struct.
   #[inline]
-  pub fn parse_db(_i: &str) -> Result<Self, ParserError> {
+  pub fn parse_db(_i: &str) -> Result<Self, ParserError<'_>> {
     todo!()
   }
   /// TODO: Format [Library] to .db

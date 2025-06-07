@@ -58,7 +58,7 @@ impl<C: Ctx> ComplexAttri<C> for Edge {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let res = match iter.next() {
       Some(&s) => match s {

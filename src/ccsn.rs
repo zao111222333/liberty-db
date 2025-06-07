@@ -351,7 +351,7 @@ impl<C: Ctx> ComplexAttri<C> for PropagatingCcb {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let input_ccb_name = match iter.next() {
       Some(&s) => String::from(s),

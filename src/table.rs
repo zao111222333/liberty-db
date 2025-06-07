@@ -558,13 +558,16 @@ impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     unreachable!()
   }
   #[inline]
   #[expect(clippy::arithmetic_side_effects)]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope<'_>,
+  ) -> ast::ComplexParseRes<'a, Self> {
     match ast::parser::complex_ccs_power_values(i, &mut scope.loc.line_num) {
       Ok((_i, vec)) => {
         let res = vec
@@ -878,13 +881,16 @@ impl<C: Ctx> ComplexAttri<C> for Values {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     unreachable!()
   }
   #[inline]
   #[expect(clippy::arithmetic_side_effects)]
-  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope) -> ast::ComplexParseRes<'a, Self> {
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope<'_>,
+  ) -> ast::ComplexParseRes<'a, Self> {
     match ast::parser::complex_values(i, &mut scope.loc.line_num) {
       Ok((_i, vec)) => {
         let mut size1 = 0;

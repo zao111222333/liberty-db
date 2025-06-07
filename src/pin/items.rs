@@ -153,7 +153,7 @@ impl<C: Ctx> SimpleAttri<C> for AllDriverType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
-    scope: &mut ParseScope,
+    scope: &mut ParseScope<'_>,
   ) -> crate::ast::SimpleParseRes<'a, Self> {
     crate::ast::nom_parse_from_str::<C, _>(i, scope)
   }
@@ -508,7 +508,7 @@ impl<C: Ctx> ComplexAttri<C> for RetentionPin {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
-    _scope: &mut ParseScope,
+    _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
     let pin_class: PinClass = match iter.next() {
       Some(&s) => match s.parse() {
