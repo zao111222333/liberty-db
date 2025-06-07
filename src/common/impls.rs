@@ -132,7 +132,7 @@ impl NameAttri for String {
 impl FlattenNameAttri for String {
   #[inline]
   fn parse(v: Vec<&str>) -> Result<Vec<Self>, IdError> {
-    Ok(v.into_iter().map(String::from).collect())
+    Ok(v.into_iter().map(Self::from).collect())
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -147,7 +147,7 @@ impl FlattenNameAttri for String {
   }
   #[inline]
   fn ungroup(&self) -> Option<impl Iterator<Item = Self>> {
-    if self.contains(';') { Some(self.split(';').map(String::from)) } else { None }
+    self.contains(';').then(|| self.split(';').map(Self::from))
   }
 }
 

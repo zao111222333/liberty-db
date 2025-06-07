@@ -3,7 +3,10 @@
 //! </script>
 use crate::{
   Ctx,
-  ast::{Attributes, GroupComments, GroupFn, GroupSet},
+  ast::{
+    Attributes, BuilderScope, FlattenNameAttri, GroupComments, GroupFn, GroupSet,
+    RandomState,
+  },
   ccsn::{CCSNStage, ReceiverCapacitance},
   common::{char_config::CharConfig, items::WordSet},
   expression::{BooleanExpression, PowerGroundBooleanExpression, logic},
@@ -1240,8 +1243,29 @@ pub struct Pin<C: Ctx> {
 }
 
 impl<C: Ctx> GroupFn<C> for Pin<C> {}
-impl<C: Ctx> GroupFn<C> for Bus<C> {}
-impl<C: Ctx> GroupFn<C> for Bundle<C> {}
+#[duplicate::duplicate_item(
+  BusBundle;
+  [Bus];
+  [Bundle];
+)]
+impl<C: Ctx> GroupFn<C> for BusBundle<C> {
+  fn after_build(&mut self, _: &mut BuilderScope<C>) {
+    let mut pin =
+      GroupSet::with_capacity_and_hasher(self.pin.len(), RandomState::default());
+    for p in core::mem::take(&mut self.pin) {
+      if let Some(names) = FlattenNameAttri::ungroup(&p.name) {
+        pin.extend(names.map(|name| {
+          let mut _p = p.clone();
+          _p.name = name;
+          _p
+        }));
+      } else {
+        _ = pin.insert(p);
+      }
+    }
+    self.pin = pin;
+  }
+}
 
 #[cfg(test)]
 mod test {

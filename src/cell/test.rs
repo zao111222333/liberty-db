@@ -216,8 +216,8 @@ liberty_db::cell::Cell (dff4) {
 | }
 | bundle (D) {
 | | members (D1, D2, D3, D4);
-| | direction : input;
 | | capacitance : 0.0;
+| | direction : input;
 | | nextstate_type : data;
 | | timing () {
 | | | related_pin : CLK;
@@ -657,8 +657,8 @@ liberty_db::cell::Cell (DLT2) {
 | }
 | bundle (CLR) {
 | | members (CLRA, CLRB, CLRC, CLRD);
-| | direction : input;
 | | capacitance : 0.0;
+| | direction : input;
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : recovery_falling;
@@ -672,8 +672,8 @@ liberty_db::cell::Cell (DLT2) {
 | }
 | bundle (D) {
 | | members (DA, DB, DC, DD);
-| | direction : input;
 | | capacitance : 0.0;
+| | direction : input;
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : hold_falling;
@@ -697,8 +697,8 @@ liberty_db::cell::Cell (DLT2) {
 | }
 | bundle (PRE) {
 | | members (PREA, PREB, PREC, PRED);
-| | direction : input;
 | | capacitance : 0.0;
+| | direction : input;
 | | timing () {
 | | | related_pin : EN;
 | | | timing_type : recovery_falling;

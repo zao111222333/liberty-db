@@ -744,13 +744,13 @@ impl<C: Ctx> GroupFn<C> for CellModel<C> {
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
-#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+#[serde(bound = "C::Cell: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct TestCell<C: Ctx> {
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
   #[liberty(extra_ctx)]
-  pub extra_ctx: C::Other,
+  pub extra_ctx: C::Cell,
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
@@ -768,4 +768,60 @@ pub struct TestCell<C: Ctx> {
   pub statetable: GroupSet<Statetable<C>>,
 }
 
-impl<C: Ctx> GroupFn<C> for TestCell<C> {}
+impl<C: Ctx> GroupFn<C> for TestCell<C> {
+  #[inline]
+  fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope<C>) {
+    // update variable
+    let ff_latch_nodes = builder
+      .ff
+      .iter()
+      .flat_map(|ff| [ff.variable1.as_str(), ff.variable2.as_str()])
+      .chain(
+        builder
+          .ff_bank
+          .iter()
+          .flat_map(|ff| [ff.variable1.as_str(), ff.variable2.as_str()]),
+      )
+      .chain(
+        builder
+          .latch
+          .iter()
+          .flat_map(|latch| [latch.variable1.as_str(), latch.variable2.as_str()]),
+      )
+      .chain(
+        builder
+          .latch_bank
+          .iter()
+          .flat_map(|latch| [latch.variable1.as_str(), latch.variable2.as_str()]),
+      )
+      .chain(builder.pin.iter().flat_map(|pin| pin.name.iter().map(String::as_str)));
+    let logic_variables: BTreeSet<&str> = ff_latch_nodes.collect();
+    scope.cell_extra_ctx.logic_variables = biodivine_lib_bdd::BddVariableSet::new(
+      &logic_variables.into_iter().collect::<Vec<_>>(),
+    );
+  }
+  fn after_build(&mut self, scope: &mut BuilderScope<C>) {
+    let mut pin =
+      GroupSet::with_capacity_and_hasher(self.pin.len(), RandomState::default());
+    for p in mem::take(&mut self.pin) {
+      if let Some(names) = FlattenNameAttri::ungroup(&p.name) {
+        pin.extend(names.map(|name| {
+          let mut _p = p.clone();
+          _p.name = name;
+          _p
+        }));
+      } else {
+        _ = pin.insert(p);
+      }
+    }
+    self.pin = pin;
+    self.extra_ctx.set_logic_variables(mem::replace(
+      &mut scope.cell_extra_ctx.logic_variables,
+      biodivine_lib_bdd::BddVariableSet::new(&[]),
+    ));
+    self.extra_ctx.set_pg_variables(mem::replace(
+      &mut scope.cell_extra_ctx.pg_variables,
+      biodivine_lib_bdd::BddVariableSet::new(&[]),
+    ));
+  }
+}

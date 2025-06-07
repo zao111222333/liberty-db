@@ -85,8 +85,6 @@ impl Ord for WordSet {
     self.inner.as_slice().cmp(other.inner.as_slice())
   }
 }
-
-#[expect(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for WordSet {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -117,13 +115,9 @@ impl<C: Ctx> SimpleAttri<C> for WordSet {
 impl hash::Hash for WordSet {
   #[inline]
   fn hash<H: hash::Hasher>(&self, state: &mut H) {
-    let mut sum = 0_u64;
     for item in &self.inner {
-      let mut hasher = std::hash::DefaultHasher::new();
-      item.hash(&mut hasher);
-      sum = sum.wrapping_add(hash::Hasher::finish(&hasher));
+      item.hash(state);
     }
-    state.write_u64(sum);
   }
 }
 
