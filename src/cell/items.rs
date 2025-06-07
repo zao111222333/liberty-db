@@ -4,7 +4,7 @@ use crate::{
     CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
     Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes, join_fmt,
   },
-  common::items::{NameList, WordSet},
+  common::items::WordSet,
   expression::{LogicBooleanExpression, PowerGroundBooleanExpression, logic},
   pin::Direction,
   table::CompactCcsPower,
@@ -43,7 +43,7 @@ pub struct LeakagePower<C: Ctx> {
   pub power_level: Option<String>,
   #[id]
   #[liberty(simple)]
-  pub related_pg_pin: NameList,
+  pub related_pg_pin: WordSet,
   #[id]
   #[liberty(simple(type = Option))]
   pub when: Option<LogicBooleanExpression>,
@@ -450,10 +450,10 @@ pub struct DynamicCurrent<C: Ctx> {
   pub when: Option<LogicBooleanExpression>,
   #[id]
   #[liberty(simple)]
-  pub related_inputs: NameList,
+  pub related_inputs: WordSet,
   #[id]
   #[liberty(simple)]
-  pub related_outputs: NameList,
+  pub related_outputs: WordSet,
   #[liberty(complex(type = Option))]
   pub typical_capacitances: Option<Vec<f64>>,
   /// Use the switching_group group to specify a current waveform vector when the power

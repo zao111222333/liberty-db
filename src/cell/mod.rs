@@ -10,8 +10,11 @@ use core::{fmt::Debug, mem};
 
 use crate::{
   Ctx,
-  ast::{Attributes, BuilderScope, GroupComments, GroupFn, GroupSet},
-  common::{char_config::CharConfig, items::NameList},
+  ast::{
+    Attributes, BuilderScope, FlattenNameAttri, GroupComments, GroupFn, GroupSet,
+    RandomState,
+  },
+  common::char_config::CharConfig,
   expression::{FF, FFBank, Latch, LatchBank},
   pin::{AntennaDiodeType, Bundle, Bus, Pin},
   table::TableLookUp2D,
@@ -682,38 +685,16 @@ impl<C: Ctx> GroupFn<C> for CellModel<C> {
           .latch_bank
           .iter()
           .flat_map(|latch| [latch.variable1.as_str(), latch.variable2.as_str()]),
-      );
-    let mut logic_variables: BTreeSet<&str> = ff_latch_nodes.collect();
-    for pin in &builder.pin {
-      match &pin.name {
-        NameList::Name(name) => {
-          _ = logic_variables.insert(name);
-        }
-        NameList::List(word_set) => {
-          logic_variables.extend(word_set.inner.iter().map(String::as_str));
-        }
-      }
-    }
-    for pin in &builder.bundle {
-      match &pin.name {
-        NameList::Name(name) => {
-          _ = logic_variables.insert(name);
-        }
-        NameList::List(word_set) => {
-          logic_variables.extend(word_set.inner.iter().map(String::as_str));
-        }
-      }
-    }
-    for pin in &builder.bus {
-      match &pin.name {
-        NameList::Name(name) => {
-          _ = logic_variables.insert(name);
-        }
-        NameList::List(word_set) => {
-          logic_variables.extend(word_set.inner.iter().map(String::as_str));
-        }
-      }
-    }
+      )
+      .chain(builder.pin.iter().flat_map(|pin| pin.name.iter().map(String::as_str)))
+      .chain(
+        builder
+          .bundle
+          .iter()
+          .flat_map(|pin| pin.name.iter().map(String::as_str)),
+      )
+      .chain(builder.bus.iter().flat_map(|pin| pin.name.iter().map(String::as_str)));
+    let logic_variables: BTreeSet<&str> = ff_latch_nodes.collect();
     scope.cell_extra_ctx.logic_variables = biodivine_lib_bdd::BddVariableSet::new(
       &logic_variables.into_iter().collect::<Vec<_>>(),
     );
@@ -724,6 +705,20 @@ impl<C: Ctx> GroupFn<C> for CellModel<C> {
       biodivine_lib_bdd::BddVariableSet::new(&pg_variable);
   }
   fn after_build(&mut self, scope: &mut BuilderScope<C>) {
+    let mut pin =
+      GroupSet::with_capacity_and_hasher(self.pin.len(), RandomState::default());
+    for p in mem::take(&mut self.pin) {
+      if let Some(names) = FlattenNameAttri::ungroup(&p.name) {
+        pin.extend(names.map(|name| {
+          let mut _p = p.clone();
+          _p.name = name;
+          _p
+        }));
+      } else {
+        _ = pin.insert(p);
+      }
+    }
+    self.pin = pin;
     self.extra_ctx.set_logic_variables(mem::replace(
       &mut scope.cell_extra_ctx.logic_variables,
       biodivine_lib_bdd::BddVariableSet::new(&[]),

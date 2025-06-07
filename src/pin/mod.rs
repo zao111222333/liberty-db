@@ -5,10 +5,7 @@ use crate::{
   Ctx,
   ast::{Attributes, GroupComments, GroupFn, GroupSet},
   ccsn::{CCSNStage, ReceiverCapacitance},
-  common::{
-    char_config::CharConfig,
-    items::{NameList, WordSet},
-  },
+  common::{char_config::CharConfig, items::WordSet},
   expression::{BooleanExpression, PowerGroundBooleanExpression, logic},
   internal_power::InternalPower,
   timing::Timing,
@@ -131,12 +128,14 @@ pub use items::*;
 pub struct Pin<C: Ctx> {
   /// Name of the pin
   /// `pin (name | name_list)`
+  ///
+  /// `name_list` cases will be flatten into multiple Pin
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=227.10&end=227.25
   /// ">Reference-Definition</a>
-  #[id]
-  #[liberty(name)]
-  pub name: NameList,
+  #[id(borrow = str)]
+  #[liberty(name(flatten))]
+  pub name: String,
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
@@ -1249,6 +1248,10 @@ mod test {
 
   #[test]
   fn pin_name_list() {
+    // let mut scope = Default::default();
+    // let builder = super::PinBuilder::<DefaultCtx>::default();
+    // let a = <super::Pin as crate::ast::ParsingBuilder>::build_iter(builder, &mut scope);
+    // a.flat_map(f)
     let cell = crate::ast::test_parse_fmt::<crate::Cell<DefaultCtx>>(
       r#"(test_cell){
         pin (A) {}

@@ -15,7 +15,7 @@ use crate::{
   ccsn::PropagatingCcb,
   common::{
     char_config::CharConfig,
-    items::{NameList, SdfEdgeType, WordSet},
+    items::{SdfEdgeType, WordSet},
   },
   expression::{BooleanExpression, LogicBooleanExpression, SdfExpression},
   table::{
@@ -288,7 +288,7 @@ pub struct Timing<C: Ctx> {
   /// ">Reference</a>
   #[id]
   #[liberty(simple)]
-  pub related_pin: NameList,
+  pub related_pin: WordSet,
   /// The `sdf_cond` attribute is defined in the state-dependent timing group to support SDF file
   /// generation and condition matching during back-annotation.
   ///

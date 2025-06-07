@@ -855,7 +855,7 @@ pub(crate) trait NamedGroup<C: Ctx>: GroupAttri<C> {
 }
 
 /// `NameAttri`
-pub trait NameAttri: Sized {
+pub(crate) trait NameAttri: Sized {
   /// basic parser
   fn parse(v: Vec<&str>) -> Result<Self, IdError>;
   /// name `to_vec`
@@ -863,6 +863,17 @@ pub trait NameAttri: Sized {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result;
+}
+
+pub(crate) trait FlattenNameAttri: Sized {
+  /// basic parser
+  fn parse(v: Vec<&str>) -> Result<Vec<Self>, IdError>;
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result;
+  fn pretend_group(parsed: Vec<Self>) -> Self;
+  fn ungroup(&self) -> Option<impl Iterator<Item = Self>>;
 }
 
 /// Error for parser

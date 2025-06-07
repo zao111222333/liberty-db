@@ -1,17 +1,19 @@
 use crate::{
   Ctx,
   ast::{
-    CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, SimpleAttri, join_fmt,
+    CodeFormatter, GroupComments, GroupFn, Indentation, ParseScope, RandomState,
+    SimpleAttri, join_fmt,
   },
 };
 use core::{
   cmp::Ordering,
+  convert::Infallible,
   fmt::{self, Write},
   hash,
   str::FromStr,
 };
+use indexmap::IndexSet;
 use itertools::Itertools as _;
-use std::collections::HashSet;
 use strum::{Display, EnumString};
 
 /// The `sdf_edges` attribute defines the edge specification on both
@@ -62,7 +64,7 @@ pub struct IdVector {
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct WordSet {
-  pub inner: HashSet<String, crate::ast::RandomState>,
+  pub inner: IndexSet<String, RandomState>,
 }
 impl fmt::Display for WordSet {
   #[expect(clippy::unwrap_in_result)]
@@ -80,11 +82,7 @@ impl fmt::Display for WordSet {
 impl Ord for WordSet {
   #[inline]
   fn cmp(&self, other: &Self) -> Ordering {
-    match self.inner.len().cmp(&other.inner.len()) {
-      Ordering::Less => Ordering::Less,
-      Ordering::Greater => Ordering::Greater,
-      Ordering::Equal => self.inner.iter().sorted().cmp(other.inner.iter().sorted()),
-    }
+    self.inner.as_slice().cmp(other.inner.as_slice())
   }
 }
 
@@ -92,15 +90,7 @@ impl Ord for WordSet {
 impl PartialOrd for WordSet {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-    match self.inner.len().cmp(&other.inner.len()) {
-      Ordering::Less => self.inner.is_subset(&other.inner).then_some(Ordering::Less),
-      Ordering::Greater => {
-        self.inner.is_superset(&other.inner).then_some(Ordering::Greater)
-      }
-      Ordering::Equal => {
-        self.inner.iter().sorted().partial_cmp(other.inner.iter().sorted())
-      }
-    }
+    Some(self.cmp(other))
   }
 }
 crate::ast::impl_self_builder!(WordSet);
@@ -138,16 +128,15 @@ impl hash::Hash for WordSet {
 }
 
 impl FromStr for WordSet {
-  type Err = fmt::Error;
-
+  type Err = Infallible;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self {
-      inner: s
-        .split(' ')
-        .filter_map(|_s| if _s.is_empty() { None } else { Some(String::from(_s)) })
-        .collect(),
-    })
+    let mut inner: IndexSet<_, _> = s
+      .split(' ')
+      .filter_map(|_s| if _s.is_empty() { None } else { Some(String::from(_s)) })
+      .collect();
+    inner.sort_unstable();
+    Ok(Self { inner })
   }
 }
 
@@ -171,51 +160,21 @@ pub struct DummyGroup<C: Ctx> {
 }
 impl<C: Ctx> GroupFn<C> for DummyGroup<C> {}
 
-// /// Recursive type for boolean expression tree.
-// #[derive(serde::Serialize, serde::Deserialize)]
-// #[derive(Clone, Debug, Eq, PartialEq)]
-// pub enum _Formula {
-//   Float(f64),
-//   Variable(String),
-//   Neg(Box<_Formula>),
-//   Add(Box<_Formula>, Box<_Formula>),
-//   Sub(Box<_Formula>, Box<_Formula>),
-//   Mul(Box<_Formula>, Box<_Formula>),
-//   Div(Box<_Formula>, Box<_Formula>),
-// }
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub enum NameList {
-  Name(String),
-  List(WordSet),
-}
-impl From<String> for NameList {
+impl From<String> for WordSet {
   #[inline]
   fn from(value: String) -> Self {
-    Self::Name(value)
+    let mut inner = IndexSet::with_capacity_and_hasher(1, RandomState::default());
+    _ = inner.insert(value);
+    Self { inner }
   }
 }
-impl From<&str> for NameList {
+
+impl From<&str> for WordSet {
   #[inline]
   fn from(value: &str) -> Self {
-    Self::Name(value.into())
-  }
-}
-impl NameList {
-  #[inline]
-  #[must_use]
-  pub fn contains(&self, name: &str) -> bool {
-    match self {
-      Self::Name(s) => s.as_str() == name,
-      Self::List(word_set) => word_set.inner.contains(name),
-    }
-  }
-}
-impl Default for NameList {
-  #[inline]
-  fn default() -> Self {
-    Self::Name(String::new())
+    let mut inner = IndexSet::with_capacity_and_hasher(1, RandomState::default());
+    _ = inner.insert(value.to_owned());
+    Self { inner }
   }
 }
 

@@ -1,7 +1,7 @@
 use crate::{
   Ctx,
   ast::{Attributes, GroupComments, GroupFn},
-  common::items::NameList,
+  common::items::WordSet,
   expression::LogicBooleanExpression,
   table::TableLookUp,
 };
@@ -26,10 +26,10 @@ pub struct InternalPower<C: Ctx> {
   // power_level
   #[id]
   #[liberty(simple)]
-  pub related_pin: NameList,
+  pub related_pin: WordSet,
   #[id]
   #[liberty(simple)]
-  pub related_pg_pin: NameList,
+  pub related_pg_pin: WordSet,
   // rising_together_group
   // switching_interval
   // switching_together_group

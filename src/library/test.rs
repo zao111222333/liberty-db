@@ -4,7 +4,7 @@ use simple_logger::SimpleLogger;
 use crate::{
   DefaultCtx,
   ast::{AttriValues, SimpleDefined},
-  common::{f64_eq, items::NameList},
+  common::f64_eq,
 };
 
 use super::*;
@@ -405,7 +405,7 @@ library (test) {
   dev_utils::init_logger();
   let library = parse_cmp(text, want);
   let cell = library.cell.get("AND").unwrap();
-  let bus = cell.bus.get(&NameList::from("A")).unwrap();
+  let bus = cell.bus.get("A").unwrap();
   let bus_type = &bus.bus_type;
   assert_eq!(bus_type.name, "BUS4");
   let bus_type_ctx = bus_type.ctx.as_ref().unwrap();
