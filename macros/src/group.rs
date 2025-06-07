@@ -288,7 +288,7 @@ fn group_field_fn(
             .into_iter()
             .map(|t| #build)
             .collect();
-          map.sort();
+          map.sort_unstable();
           map
         },
       };
@@ -372,7 +372,7 @@ fn group_field_fn(
             .into_iter()
             .map(|t| #build)
             .collect();
-          map.sort();
+          map.sort_unstable();
           map
         },
       };

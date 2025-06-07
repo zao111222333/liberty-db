@@ -81,6 +81,7 @@ pub use items::*;
 #[duplicated(
   name = Bundle,
   exclude(complex, group),
+  not_exclude(timing),
   docs(
     /// A bundle group uses the members complex attribute (unique to bundles) to group together
     /// in multibit cells—such as quad latches and 4-bit registers—several pins that have similar
@@ -1261,7 +1262,13 @@ mod test {
 liberty_db::cell::Cell (test_cell) {
 | pin (A) {
 | }
-| pin (B, C, D, E) {
+| pin (B) {
+| }
+| pin (C) {
+| }
+| pin (D) {
+| }
+| pin (E) {
 | }
 }"#,
     );
