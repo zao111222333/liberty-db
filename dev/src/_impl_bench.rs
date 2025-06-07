@@ -4,8 +4,10 @@ use criterion::black_box;
 use std::{
   ffi::{CString, c_char, c_int, c_void},
   io::Cursor,
+  path::Path,
   str::FromStr,
 };
+
 impl ProjLibrary for liberty_db_latest::Library<liberty_db_latest::DefaultCtx> {
   const INFO: ProjInfo = ProjInfo {
     name: "liberty-db",
@@ -16,8 +18,8 @@ impl ProjLibrary for liberty_db_latest::Library<liberty_db_latest::DefaultCtx> {
     parsed_boolexpr: true,
     other: "current version",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
-    Self::parse_lib(s, None).map_err(|_| ())
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
+    Self::parse_lib(s, Some(path)).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
     _ = black_box(self.to_string());
@@ -35,7 +37,7 @@ impl ProjLibrary for liberty_db_0p10p2::Library<liberty_db_0p10p2::DefaultCtx> {
     parsed_boolexpr: true,
     other: "published at 2025-03-30",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
@@ -54,7 +56,7 @@ impl ProjLibrary for liberty_db_0p9p6::Library<liberty_db_0p9p6::DefaultCtx> {
     parsed_boolexpr: true,
     other: "published at 2025-03-11",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
@@ -73,7 +75,7 @@ impl ProjLibrary for liberty_db_0p8p3::Library<liberty_db_0p8p3::DefaultCtx> {
     parsed_boolexpr: true,
     other: "published at 2024-12-01",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
@@ -92,7 +94,7 @@ impl ProjLibrary for liberty_db_0p7p4::Library {
     parsed_boolexpr: true,
     other: "published at 2024-12-01",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
@@ -111,7 +113,7 @@ impl ProjLibrary for liberty_db_0p6p14::Library {
     parsed_boolexpr: true,
     other: "published at 2024-11-07",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
@@ -130,7 +132,7 @@ impl ProjLibrary for liberty_db_0p5p9::Library {
     parsed_boolexpr: true,
     other: "published at 2024-08-27",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse_lib(s).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
@@ -149,7 +151,7 @@ impl ProjLibrary for liberty_db_0p4p13::Library {
     parsed_boolexpr: true,
     other: "published at 2024-08-13",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse(s).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
@@ -168,7 +170,7 @@ impl ProjLibrary for liberty_db_0p3p1::library::Library {
     parsed_boolexpr: false,
     other: "published at 2023-08-03",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse(s).map_err(|_| ())
   }
   fn write(&self) -> Result<(), ()> {
@@ -189,7 +191,7 @@ impl ProjLibrary for liberty_io::Group {
     parsed_boolexpr: false,
     other: "",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     let mut cursor = Cursor::new(s.as_bytes());
     liberty_io::read_liberty_bytes(&mut cursor).map_err(|_| ())
   }
@@ -205,7 +207,7 @@ impl ProjLibrary for libertyparse::Liberty {
     parsed_boolexpr: true,
     other: "",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::parse_str(s).map_err(|_| ())
   }
 }
@@ -231,7 +233,7 @@ impl ProjLibrary for OpenTimerLibrary {
     parsed_boolexpr: true,
     other: "STA tool's liberty component",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     let cstr = CString::new(s).unwrap();
     Ok(OpenTimerLibrary(unsafe { ot_parse_lib(cstr.as_ptr()) }))
   }
@@ -266,7 +268,7 @@ impl ProjLibrary for Si2drLibertyLibrary {
     parsed_boolexpr: true,
     other: "Synopsys's version at 2005, many attributes are not supported",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     let cstr = CString::new(s).unwrap();
     Ok(Si2drLibertyLibrary(unsafe { si2dr_liberty_parse_lib(cstr.as_ptr()) }))
   }
@@ -290,7 +292,7 @@ impl ProjLibrary for liberty2json::Liberty {
     parsed_boolexpr: false,
     other: "",
   };
-  fn parse(s: &str) -> Result<Self, ()> {
+  fn parse(s: &str, path: &Path) -> Result<Self, ()> {
     Self::from_str(s).map_err(|_| ())
   }
 }
