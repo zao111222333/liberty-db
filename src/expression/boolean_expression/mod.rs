@@ -301,30 +301,40 @@ impl core::hash::Hash for BddBooleanExpression {
   }
 }
 
+impl LogicBooleanExpression {
+  #[inline]
+  pub fn new(expr: Expr, logic_variables: &BddVariableSet) -> Self {
+    let bdd = logic_variables.safe_eval_expression(&expr);
+    if bdd.is_none() {
+      crate::error!("Failed to build BDD for [{}]", expr);
+    }
+    Self(BddBooleanExpression { expr, bdd })
+  }
+}
+
 impl<C: Ctx> ParsingBuilder<C> for LogicBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
-    let bdd = scope
-      .cell_extra_ctx
-      .logic_variables
-      .safe_eval_expression(&builder.expr);
-    if bdd.is_none() {
-      crate::error!("Failed to build BDD for [{}]", builder.expr);
-    }
-    Self(BddBooleanExpression { expr: builder.expr, bdd })
+    Self::new(builder.expr, &scope.cell_extra_ctx.logic_variables)
   }
 }
 
+impl PowerGroundBooleanExpression {
+  #[inline]
+  pub fn new(expr: Expr, pg_variables: &BddVariableSet) -> Self {
+    let bdd = pg_variables.safe_eval_expression(&expr);
+    if bdd.is_none() {
+      crate::error!("Failed to build BDD for [{}]", expr);
+    }
+    Self(BddBooleanExpression { expr, bdd })
+  }
+}
 impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
-    let bdd = scope.cell_extra_ctx.pg_variables.safe_eval_expression(&builder.expr);
-    if bdd.is_none() {
-      crate::error!("Failed to build BDD for [{}]", builder.expr);
-    }
-    Self(BddBooleanExpression { expr: builder.expr, bdd })
+    Self::new(builder.expr, &scope.cell_extra_ctx.pg_variables)
   }
 }
 
@@ -373,35 +383,43 @@ impl fmt::Display for PowerGroundBooleanExpression {
 }
 
 impl<C: Ctx> crate::Cell<C> {
-  #[deprecated(since = "0.10.0", note = "use `parse_logic_boolexpr` instead")]
   #[inline]
-  pub const fn parse_logic_booleanexpr() {}
-  #[inline]
-  pub fn parse_logic_boolexpr(
+  pub fn build_logic_boolexpr(
     &self,
-    s: &str,
+    expr: Expr,
   ) -> Result<LogicBooleanExpression, BoolExprErr> {
-    let expr = BooleanExpression::from_str(s)?.expr;
     let bdd = self.extra_ctx.logic_variables().safe_eval_expression(&expr);
     if bdd.is_none() {
       crate::error!("Failed to build BDD for [{expr}]");
     }
     Ok(LogicBooleanExpression(BddBooleanExpression { expr, bdd }))
   }
-  #[deprecated(since = "0.10.0", note = "use `parse_pg_boolexpr` instead")]
   #[inline]
-  pub const fn parse_pg_booleanexpr() {}
+  pub fn parse_logic_boolexpr(
+    &self,
+    s: &str,
+  ) -> Result<LogicBooleanExpression, BoolExprErr> {
+    let expr = BooleanExpression::from_str(s)?.expr;
+    self.build_logic_boolexpr(expr)
+  }
+  #[inline]
+  pub fn build_pg_boolexpr(
+    &self,
+    expr: Expr,
+  ) -> Result<PowerGroundBooleanExpression, BoolExprErr> {
+    let bdd = self.extra_ctx.pg_variables().safe_eval_expression(&expr);
+    if bdd.is_none() {
+      crate::error!("Failed to build BDD for [{expr}]");
+    }
+    Ok(PowerGroundBooleanExpression(BddBooleanExpression { expr, bdd }))
+  }
   #[inline]
   pub fn parse_pg_boolexpr(
     &self,
     s: &str,
   ) -> Result<PowerGroundBooleanExpression, BoolExprErr> {
     let expr = BooleanExpression::from_str(s)?.expr;
-    let bdd = self.extra_ctx.pg_variables().safe_eval_expression(&expr);
-    if bdd.is_none() {
-      crate::error!("Failed to build BDD for [{expr}]");
-    }
-    Ok(PowerGroundBooleanExpression(BddBooleanExpression { expr, bdd }))
+    self.build_pg_boolexpr(expr)
   }
 }
 
