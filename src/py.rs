@@ -61,12 +61,11 @@ impl<'py> FromPyObject<'py> for CapacitiveLoadUnit {
   #[inline]
   fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
     let (val, s_ff_pf) = ob.extract::<(f64, String)>()?;
-    let ff_pf = match s_ff_pf.as_str() {
-      "ff" => true,
-      "pf" => false,
-      _ => return Err(PyValueError::new_err("Matching variant not found")),
-    };
-    Ok(Self { ff_pf, val })
+    match s_ff_pf.as_str() {
+      "ff" => Ok(Self::FF(val)),
+      "pf" => Ok(Self::PF(val)),
+      _ => Err(PyValueError::new_err("Matching variant not found")),
+    }
   }
 }
 impl<'py> IntoPyObject<'py> for CapacitiveLoadUnit {
@@ -75,7 +74,10 @@ impl<'py> IntoPyObject<'py> for CapacitiveLoadUnit {
   type Error = PyErr;
   #[inline]
   fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-    (self.val, if self.ff_pf { "ff" } else { "pf" }).into_pyobject(py)
+    match self {
+      CapacitiveLoadUnit::FF(val) => (val, "ff"),
+      CapacitiveLoadUnit::PF(val) => (val, "pf"),
+    }.into_pyobject(py)
   }
 }
 impl PyStubType for CapacitiveLoadUnit {

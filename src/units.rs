@@ -204,12 +204,9 @@ crate::ast::impl_simple!(PullingResistanceUnit);
 /// </script>
 #[derive(Debug, Clone, Copy)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct CapacitiveLoadUnit {
-  /// `ff`: `true`
-  ///
-  /// `pf`: `false`
-  pub ff_pf: bool,
-  pub val: f64,
+pub enum CapacitiveLoadUnit {
+  FF(f64),
+  PF(f64),
 }
 
 impl Default for CapacitiveLoadUnit {
@@ -229,8 +226,10 @@ impl PartialEq for CapacitiveLoadUnit {
 impl fmt::Display for CapacitiveLoadUnit {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    f.write_fmt(format_args!("{}", self.val))?;
-    if self.ff_pf { f.write_str(" ff") } else { f.write_str(" pf") }
+    match self {
+      CapacitiveLoadUnit::FF(val) => write!(f, "{} ff", val),
+      CapacitiveLoadUnit::PF(val) => write!(f, "{} pf", val),
+    }
   }
 }
 
@@ -252,12 +251,15 @@ impl Ord for CapacitiveLoadUnit {
 
 impl CapacitiveLoadUnit {
   #[expect(non_upper_case_globals)]
-  pub const _1pf: Self = Self { ff_pf: false, val: 1.0 };
+  pub const _1pf: Self = Self::PF(1.0);
   #[inline]
   #[must_use]
   #[expect(clippy::float_arithmetic)]
   pub fn value(&self) -> f64 {
-    if self.ff_pf { self.val * 1e-15 } else { self.val * 1e-12 }
+    match self {
+      CapacitiveLoadUnit::FF(val) => val * 1e-15,
+      CapacitiveLoadUnit::PF(val) => val * 1e-12,
+    }
   }
 }
 crate::ast::impl_self_builder!(CapacitiveLoadUnit);
@@ -282,15 +284,26 @@ impl<C: Ctx> ComplexAttri<C> for CapacitiveLoadUnit {
     if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    Ok(Self { ff_pf, val })
+    Ok(match ff_pf {
+      true => Self::FF(val),
+      false => Self::PF(val),
+    })
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_num(self.val)?;
-    if self.ff_pf { f.write_str(", ff") } else { f.write_str(", pf") }
+    match *self {
+      Self::FF(val) => {
+        f.write_num(val)?;
+        f.write_str(", ff")
+      }
+      Self::PF(val) => {
+        f.write_num(val)?;
+        f.write_str(", pf")
+      }
+    }
   }
 }
 
