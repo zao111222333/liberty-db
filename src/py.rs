@@ -77,7 +77,8 @@ impl<'py> IntoPyObject<'py> for CapacitiveLoadUnit {
     match self {
       CapacitiveLoadUnit::FF(val) => (val, "ff"),
       CapacitiveLoadUnit::PF(val) => (val, "pf"),
-    }.into_pyobject(py)
+    }
+    .into_pyobject(py)
   }
 }
 impl PyStubType for CapacitiveLoadUnit {
