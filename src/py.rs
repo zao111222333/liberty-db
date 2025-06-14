@@ -75,8 +75,8 @@ impl<'py> IntoPyObject<'py> for CapacitiveLoadUnit {
   #[inline]
   fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
     match self {
-      CapacitiveLoadUnit::FF(val) => (val, "ff"),
-      CapacitiveLoadUnit::PF(val) => (val, "pf"),
+      Self::FF(val) => (val, "ff"),
+      Self::PF(val) => (val, "pf"),
     }
     .into_pyobject(py)
   }

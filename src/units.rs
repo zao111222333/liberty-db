@@ -227,8 +227,8 @@ impl fmt::Display for CapacitiveLoadUnit {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
-      CapacitiveLoadUnit::FF(val) => write!(f, "{} ff", val),
-      CapacitiveLoadUnit::PF(val) => write!(f, "{} pf", val),
+      Self::FF(val) => write!(f, "{val} ff"),
+      Self::PF(val) => write!(f, "{val} pf"),
     }
   }
 }
@@ -252,13 +252,15 @@ impl Ord for CapacitiveLoadUnit {
 impl CapacitiveLoadUnit {
   #[expect(non_upper_case_globals)]
   pub const _1pf: Self = Self::PF(1.0);
+  #[expect(non_upper_case_globals)]
+  pub const _1ff: Self = Self::FF(1.0);
   #[inline]
   #[must_use]
   #[expect(clippy::float_arithmetic)]
   pub fn value(&self) -> f64 {
     match self {
-      CapacitiveLoadUnit::FF(val) => val * 1e-15,
-      CapacitiveLoadUnit::PF(val) => val * 1e-12,
+      Self::FF(val) => val * 1e-15,
+      Self::PF(val) => val * 1e-12,
     }
   }
 }
@@ -273,10 +275,10 @@ impl<C: Ctx> ComplexAttri<C> for CapacitiveLoadUnit {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let ff_pf = match iter.next() {
+    let out = match iter.next() {
       Some(&s) => match s {
-        "ff" => true,
-        "pf" => false,
+        "ff" => Self::FF(val),
+        "pf" => Self::PF(val),
         _ => return Err(ComplexParseError::UnsupportedWord),
       },
       None => return Err(ComplexParseError::LengthDismatch),
@@ -284,10 +286,7 @@ impl<C: Ctx> ComplexAttri<C> for CapacitiveLoadUnit {
     if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    Ok(match ff_pf {
-      true => Self::FF(val),
-      false => Self::PF(val),
-    })
+    Ok(out)
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
