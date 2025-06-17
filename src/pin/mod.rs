@@ -9,7 +9,9 @@ use crate::{
   },
   ccsn::{CCSNStage, ReceiverCapacitance},
   common::{char_config::CharConfig, items::WordSet},
-  expression::{BooleanExpression, PowerGroundBooleanExpression, logic},
+  expression::{
+    BooleanExpression, LogicBooleanExpression, PowerGroundBooleanExpression, logic,
+  },
   internal_power::InternalPower,
   timing::Timing,
 };
@@ -541,7 +543,7 @@ pub struct Pin<C: Ctx> {
   /// =228.35
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub function: Option<BooleanExpression>,
+  pub function: Option<LogicBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

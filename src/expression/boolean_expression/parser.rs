@@ -263,6 +263,9 @@ pub enum BoolExprErr {
   /// `NoIdea`
   #[error("something go wrong, code=2")]
   NoIdea2,
+  /// `FailToBuildBdd`
+  #[error("Fail to build BDD")]
+  FailToBuildBdd,
 }
 
 /// **(internal)** Utility method to find first occurrence of a specific token in the token tree.

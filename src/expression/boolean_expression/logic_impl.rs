@@ -5,7 +5,6 @@ use core::ops::{BitAnd, BitOr, BitXor, Not};
 
 impl BitAnd for Static {
   type Output = Self;
-  #[must_use]
   #[inline]
   fn bitand(self, rhs: Self) -> Self::Output {
     match (self, rhs) {
@@ -20,7 +19,6 @@ impl BitAnd for Static {
 
 impl BitOr for Static {
   type Output = Self;
-  #[must_use]
   #[inline]
   fn bitor(self, rhs: Self) -> Self::Output {
     match (self, rhs) {
@@ -33,7 +31,6 @@ impl BitOr for Static {
 
 impl BitXor for Static {
   type Output = Self;
-  #[must_use]
   #[inline]
   fn bitxor(self, rhs: Self) -> Self::Output {
     match (self, rhs) {
@@ -46,7 +43,6 @@ impl BitXor for Static {
 
 impl Not for Static {
   type Output = Self;
-  #[must_use]
   #[inline]
   fn not(self) -> Self::Output {
     match self {
@@ -228,7 +224,6 @@ mod test {
 
 impl BitAnd for State {
   type Output = Self;
-  #[must_use]
   #[inline]
   fn bitand(self, rhs: Self) -> Self::Output {
     Self::lut_bitand(self, rhs)
@@ -237,7 +232,6 @@ impl BitAnd for State {
 
 impl BitOr for State {
   type Output = Self;
-  #[must_use]
   #[inline]
   fn bitor(self, rhs: Self) -> Self::Output {
     Self::lut_bitor(self, rhs)
@@ -246,7 +240,6 @@ impl BitOr for State {
 
 impl BitXor for State {
   type Output = Self;
-  #[must_use]
   #[inline]
   fn bitxor(self, rhs: Self) -> Self::Output {
     Self::lut_bitxor(self, rhs)
@@ -255,7 +248,6 @@ impl BitXor for State {
 
 impl Not for State {
   type Output = Self;
-  #[must_use]
   #[inline]
   fn not(self) -> Self::Output {
     Self::match_not(self)

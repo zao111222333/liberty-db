@@ -491,7 +491,7 @@ impl core::fmt::Display for ParseLoc<'_> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     if let Some(p) = &self.filename {
-      write!(f, "File {p:?}, ")?;
+      write!(f, "File \"{}\", ", p.display())?;
     }
     write!(f, "line {}.", self.line_num)
   }

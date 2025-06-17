@@ -22,7 +22,7 @@ use core::{
   cmp::Ordering,
   fmt::{self, Write},
   ops::{Deref, DerefMut},
-  str::FromStr,
+  str::FromStr as _,
 };
 use itertools::Itertools as _;
 use std::{collections::HashSet, sync::LazyLock};
@@ -32,13 +32,7 @@ use super::SdfExpression;
 static UNKNOWN: LazyLock<Box<Expr>> =
   LazyLock::new(|| Box::new(Expr::Variable("_unknown_".to_owned())));
 
-pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> + From<Expr> {
-  #[inline]
-  fn get_nodes(&self) -> HashSet<&str, crate::ast::RandomState> {
-    let mut node_set = HashSet::with_hasher(crate::ast::RandomState::default());
-    _get_nodes(self.borrow(), &mut node_set);
-    node_set
-  }
+pub trait BooleanExpressionLike: Borrow<Expr> + Into<Expr> {
   /// `A & B` -> `A* & B*`
   #[inline]
   fn previous(&self) -> Expr {
@@ -220,7 +214,7 @@ pub struct BddBooleanExpression {
   pub expr: Expr,
   /// Use [binary decision diagrams](https://en.wikipedia.org/wiki/Binary_decision_diagram) (BDDs)
   /// as `id`, to impl `hash` and `compare`
-  pub bdd: Option<Bdd>,
+  pub bdd: Bdd,
 }
 
 #[derive(Debug, Clone)]
@@ -245,12 +239,12 @@ impl From<BddBooleanExpression> for Expr {
     val.expr
   }
 }
-impl From<Expr> for BddBooleanExpression {
-  #[inline]
-  fn from(expr: Expr) -> Self {
-    BooleanExpression::from(expr).into()
-  }
-}
+// impl From<Expr> for BddBooleanExpression {
+//   #[inline]
+//   fn from(expr: Expr) -> Self {
+//     BooleanExpression::from(expr).into()
+//   }
+// }
 impl PartialEq for BddBooleanExpression {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
@@ -263,15 +257,14 @@ impl BddBooleanExpression {
   #[must_use]
   #[inline]
   pub fn sdf(&self, cell_variables: &BddVariableSet) -> SdfExpression {
-    let s = self.bdd.as_ref().map_or(String::new(), |bdd| {
-      bdd
-        .sat_valuations()
-        .map(|valuation| {
-          let expr = Bdd::from(valuation).to_boolean_expression(cell_variables);
-          as_sdf_str(&expr)
-        })
-        .join(") || ( ")
-    });
+    let s = self
+      .bdd
+      .sat_valuations()
+      .map(|valuation| {
+        let expr = Bdd::from(valuation).to_boolean_expression(cell_variables);
+        as_sdf_str(&expr)
+      })
+      .join(") || ( ");
     SdfExpression::new(format!("( {s} )"))
   }
 }
@@ -281,10 +274,7 @@ impl Eq for BddBooleanExpression {}
 impl PartialOrd for BddBooleanExpression {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-    match (&self.bdd, &other.bdd) {
-      (Some(b1), Some(b2)) => Some(Bdd::cmp_structural(b1, b2)),
-      _ => None,
-    }
+    Some(Bdd::cmp_structural(&self.bdd, &other.bdd))
   }
 }
 impl Ord for BddBooleanExpression {
@@ -302,13 +292,18 @@ impl core::hash::Hash for BddBooleanExpression {
 }
 
 impl LogicBooleanExpression {
+  #[must_use]
   #[inline]
   pub fn new(expr: Expr, logic_variables: &BddVariableSet) -> Self {
-    let bdd = logic_variables.safe_eval_expression(&expr);
-    if bdd.is_none() {
-      crate::error!("Failed to build BDD for [{}]", expr);
+    if let Some(bdd) = logic_variables.safe_eval_expression(&expr) {
+      Self(BddBooleanExpression { expr, bdd })
+    } else {
+      crate::error!("Failed to build BDD for [{expr}]");
+      Self(BddBooleanExpression {
+        expr,
+        bdd: logic_variables.eval_expression(&Expr::Const(false)),
+      })
     }
-    Self(BddBooleanExpression { expr, bdd })
   }
 }
 
@@ -321,13 +316,18 @@ impl<C: Ctx> ParsingBuilder<C> for LogicBooleanExpression {
 }
 
 impl PowerGroundBooleanExpression {
+  #[must_use]
   #[inline]
   pub fn new(expr: Expr, pg_variables: &BddVariableSet) -> Self {
-    let bdd = pg_variables.safe_eval_expression(&expr);
-    if bdd.is_none() {
-      crate::error!("Failed to build BDD for [{}]", expr);
+    if let Some(bdd) = pg_variables.safe_eval_expression(&expr) {
+      Self(BddBooleanExpression { expr, bdd })
+    } else {
+      crate::error!("Failed to build BDD for [{expr}]");
+      Self(BddBooleanExpression {
+        expr,
+        bdd: pg_variables.eval_expression(&Expr::Const(false)),
+      })
     }
-    Self(BddBooleanExpression { expr, bdd })
   }
 }
 impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
@@ -335,29 +335,6 @@ impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
   #[inline]
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
     Self::new(builder.expr, &scope.cell_extra_ctx.pg_variables)
-  }
-}
-
-impl From<BooleanExpression> for BddBooleanExpression {
-  #[inline]
-  fn from(value: BooleanExpression) -> Self {
-    let mut node_set: Vec<&str> = value.get_nodes().into_iter().collect();
-    node_set.sort_unstable();
-    let variables = BddVariableSet::new(&node_set);
-    let bdd = variables.safe_eval_expression(&value.expr);
-    if bdd.is_none() {
-      crate::error!("Failed to build BDD for [{}]", value.expr);
-    }
-    Self { expr: value.expr, bdd }
-  }
-}
-
-impl FromStr for BddBooleanExpression {
-  type Err = BoolExprErr;
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    let expr = BooleanExpression::from_str(s)?;
-    Ok(expr.into())
   }
 }
 
@@ -388,11 +365,13 @@ impl<C: Ctx> crate::Cell<C> {
     &self,
     expr: Expr,
   ) -> Result<LogicBooleanExpression, BoolExprErr> {
-    let bdd = self.extra_ctx.logic_variables().safe_eval_expression(&expr);
-    if bdd.is_none() {
-      crate::error!("Failed to build BDD for [{expr}]");
-    }
-    Ok(LogicBooleanExpression(BddBooleanExpression { expr, bdd }))
+    self
+      .extra_ctx
+      .logic_variables()
+      .safe_eval_expression(&expr)
+      .map_or(Err(BoolExprErr::FailToBuildBdd), |bdd| {
+        Ok(LogicBooleanExpression(BddBooleanExpression { expr, bdd }))
+      })
   }
   #[inline]
   pub fn parse_logic_boolexpr(
@@ -407,11 +386,13 @@ impl<C: Ctx> crate::Cell<C> {
     &self,
     expr: Expr,
   ) -> Result<PowerGroundBooleanExpression, BoolExprErr> {
-    let bdd = self.extra_ctx.pg_variables().safe_eval_expression(&expr);
-    if bdd.is_none() {
-      crate::error!("Failed to build BDD for [{expr}]");
-    }
-    Ok(PowerGroundBooleanExpression(BddBooleanExpression { expr, bdd }))
+    self
+      .extra_ctx
+      .pg_variables()
+      .safe_eval_expression(&expr)
+      .map_or(Err(BoolExprErr::FailToBuildBdd), |bdd| {
+        Ok(PowerGroundBooleanExpression(BddBooleanExpression { expr, bdd }))
+      })
   }
   #[inline]
   pub fn parse_pg_boolexpr(
@@ -469,6 +450,28 @@ mod test {
   use crate::DefaultCtx;
   use core::{f64::consts::E, str::FromStr as _};
   use itertools::Itertools as _;
+  impl From<BooleanExpression> for BddBooleanExpression {
+    #[inline]
+    fn from(value: BooleanExpression) -> Self {
+      let node_set = value.expr.support_set();
+      let mut node_set: Vec<&str> = node_set.iter().map(String::as_str).collect();
+      node_set.sort_unstable();
+      let variables = BddVariableSet::new(&node_set);
+      Self {
+        bdd: variables.eval_expression(&value.expr),
+        expr: value.expr,
+      }
+    }
+  }
+  impl std::str::FromStr for BddBooleanExpression {
+    type Err = BoolExprErr;
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+      let expr = BooleanExpression::from_str(s)?;
+      Ok(expr.into())
+    }
+  }
+
   #[test]
   fn parse_fmt_self_check() {
     for (should_success, s) in [
