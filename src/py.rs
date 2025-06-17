@@ -7,15 +7,15 @@ use pyo3_stub_gen::{PyStubType, TypeInfo};
 
 use crate::{
   cell::PgType,
+  expression::logic,
   units::{
     CapacitiveLoadUnit, CurrentUnit, LeakagePowerUnit, PullingResistanceUnit, TimeUnit,
     VoltageUnit,
   },
 };
-
 #[macro_export]
 macro_rules! impl_py_enum {
-  ($t:tt) => {
+  ($t:path) => {
     impl<'py> FromPyObject<'py> for $t {
       #[inline]
       fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
@@ -31,7 +31,8 @@ macro_rules! impl_py_enum {
       type Error = PyErr;
       #[inline]
       fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-        Ok(PyString::new(py, self.as_ref()))
+        let s: &'static str = self.into();
+        Ok(PyString::new(py, s))
       }
     }
     impl PyStubType for $t {
@@ -50,6 +51,7 @@ macro_rules! impl_py_enum {
   };
 }
 
+impl_py_enum!(logic::Edge);
 impl_py_enum!(TimeUnit);
 impl_py_enum!(VoltageUnit);
 impl_py_enum!(CurrentUnit);

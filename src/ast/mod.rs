@@ -543,14 +543,28 @@ pub(crate) type SimpleParseRes<'a, T> =
 pub(crate) type ComplexParseRes<'a, T> =
   IResult<&'a str, Result<T, (ComplexParseError, ComplexWrapper)>, Error<&'a str>>;
 #[inline]
+pub(crate) fn nom_parse_from<
+  'a,
+  C: Ctx,
+  T: SimpleAttri<C>,
+  E,
+  F: Fn(&str) -> Result<T, E>,
+>(
+  i: &'a str,
+  scope: &mut ParseScope<'_>,
+  parse_fn: F,
+) -> SimpleParseRes<'a, T> {
+  let (input, s) = parser::simple(i, &mut scope.loc.line_num)
+    .or(parser::complex_single(i, &mut scope.loc.line_num))?;
+  parse_fn(s).map_or(Ok((input, Err(String::from(s)))), |simple| Ok((input, Ok(simple))))
+}
+
+#[inline]
 pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
   i: &'a str,
   scope: &mut ParseScope<'_>,
 ) -> SimpleParseRes<'a, T> {
-  let (input, s) = parser::simple(i, &mut scope.loc.line_num)
-    .or(parser::complex_single(i, &mut scope.loc.line_num))?;
-  s.parse()
-    .map_or(Ok((input, Err(String::from(s)))), |simple| Ok((input, Ok(simple))))
+  nom_parse_from(i, scope, T::from_str)
 }
 
 /// Simple Attribute in Liberty

@@ -8,7 +8,7 @@ use core::{cmp::Ordering, hash::Hash};
 #[derive(Ord, PartialOrd)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
-#[derive(strum::Display, strum::EnumString, strum::EnumIter)]
+#[derive(strum::Display, strum::EnumString, strum::EnumIter, strum::IntoStaticStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Level {
   /// High
@@ -23,18 +23,41 @@ pub enum Level {
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display, strum::IntoStaticStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Edge {
   /// Fall
-  #[strum(serialize = "falling")]
+  #[strum(serialize = "F")]
   F,
   /// Rise
-  #[strum(serialize = "rising")]
+  #[strum(serialize = "R")]
   R,
 }
 crate::ast::impl_self_builder!(Edge);
-crate::ast::impl_simple!(Edge);
+impl<C: Ctx> crate::ast::SimpleAttri<C> for Edge {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope<'_>,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from::<C, _, _, _>(i, scope, |s| match s {
+      "fall" => Ok(Self::F),
+      "rise" => Ok(Self::R),
+      _ => Err(()),
+    })
+  }
+  #[inline]
+  fn fmt_self<T: core::fmt::Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    use core::fmt::Write as _;
+    f.write_str(match self {
+      Self::F => "fall",
+      Self::R => "rise",
+    })
+  }
+}
 
 /// Use the `output_switching_condition` attribute to specify the sense of the toggling
 /// output. If there is more than one `switching_group` group specified within the
