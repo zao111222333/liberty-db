@@ -1053,7 +1053,7 @@ impl<C: Ctx> GroupFn<C> for TableTemple<C> {}
 
 /// In Timing Delay Tables:
 ///
-/// Following are the values that you can assign for `variable_1`, `variable_2`, and `variable_3`  
+/// Following are the values that you can assign for `variable_1`, `variable_2`, and `variable_3`,
 /// to the templates for timing delay tables:
 /// + `input_net_transition`
 /// + `total_output_net_capacitance`
@@ -1088,7 +1088,7 @@ impl<C: Ctx> GroupFn<C> for TableTemple<C> {}
 ///
 /// In Wire Delay Tables:
 ///
-/// The following is the value set that you can assign for `variable_1`, `variable_2`, and `variable_3`  
+/// The following is the value set that you can assign for `variable_1`, `variable_2`, and `variable_3`,
 /// to the templates for wire delay tables:
 /// + `fanout_number`
 /// + `fanout_pin_capacitance`
@@ -1101,7 +1101,7 @@ impl<C: Ctx> GroupFn<C> for TableTemple<C> {}
 ///
 /// In Net Delay Tables:
 ///
-/// The following is the value set that you can assign for `variable_1`  and `variable_2`  
+/// The following is the value set that you can assign for `variable_1`  and `variable_2`,
 /// to the templates for net delay tables:
 /// + `output_transition`
 /// + `rc_product`

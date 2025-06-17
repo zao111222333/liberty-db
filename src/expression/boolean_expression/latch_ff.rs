@@ -578,13 +578,13 @@ pub trait LatchFF: __LatchFF {
   /// Get the `BooleanExpression` of variable1
   #[inline]
   fn variable1_expr(&self) -> BooleanExpression {
-    let present_state = Box::new(Expr::Variable(self.variable1().to_string()));
+    let present_state = Box::new(Expr::Variable(self.variable1().to_owned()));
     let active_edge_variable = self.next_state().as_ref().map_or(
-      Expr::Variable(self.variable1().to_string()),
+      Expr::Variable(self.variable1().to_owned()),
       |_next_state| {
         let next_state = Box::new(_next_state.expr.clone());
         match (self.active(), self.active_also()) {
-          (None, None) => Expr::Variable(self.variable1().to_string()),
+          (None, None) => Expr::Variable(self.variable1().to_owned()),
           (None, Some(active_also)) => {
             Expr::Cond(active_also, next_state, present_state.clone())
           }
@@ -650,13 +650,13 @@ pub trait LatchFF: __LatchFF {
   /// Get the `BooleanExpression` of variable2
   #[inline]
   fn variable2_expr(&self) -> BooleanExpression {
-    let present_state = Box::new(Expr::Variable(self.variable2().to_string()));
+    let present_state = Box::new(Expr::Variable(self.variable2().to_owned()));
     let active_edge_variable = self.next_state().as_ref().map_or(
-      Expr::Variable(self.variable2().to_string()),
+      Expr::Variable(self.variable2().to_owned()),
       |_next_state| {
         let next_state = Box::new(Expr::Not(Box::new(_next_state.expr.clone())));
         match (self.active(), self.active_also()) {
-          (None, None) => Expr::Variable(self.variable2().to_string()),
+          (None, None) => Expr::Variable(self.variable2().to_owned()),
           (None, Some(active_also)) => {
             Expr::Cond(active_also, next_state, present_state.clone())
           }
@@ -717,21 +717,21 @@ pub trait LatchFF: __LatchFF {
   #[expect(clippy::too_many_lines)]
   #[inline]
   fn variable_expr(&self) -> (BooleanExpression, BooleanExpression) {
-    let present_state1 = Box::new(Expr::Variable(self.variable1().to_string()));
-    let present_state2 = Box::new(Expr::Variable(self.variable2().to_string()));
+    let present_state1 = Box::new(Expr::Variable(self.variable1().to_owned()));
+    let present_state2 = Box::new(Expr::Variable(self.variable2().to_owned()));
     let (active_edge_variable1, active_edge_variable2) =
       self.next_state().as_ref().map_or(
         (
-          Expr::Variable(self.variable1().to_string()),
-          Expr::Variable(self.variable2().to_string()),
+          Expr::Variable(self.variable1().to_owned()),
+          Expr::Variable(self.variable2().to_owned()),
         ),
         |next_state| {
           let next_state1 = Box::new(next_state.expr.clone());
           let next_state2 = Box::new(Expr::Not(next_state1.clone()));
           match (self.active(), self.active_also()) {
             (None, None) => (
-              Expr::Variable(self.variable1().to_string()),
-              Expr::Variable(self.variable2().to_string()),
+              Expr::Variable(self.variable1().to_owned()),
+              Expr::Variable(self.variable2().to_owned()),
             ),
             (None, Some(active_also)) => (
               Expr::Cond(active_also.clone(), next_state1, present_state1.clone()),
