@@ -259,13 +259,14 @@ impl<C: Ctx> SimpleAttri<C> for Table {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
+    struct Sep<'a>(&'a str);
+    impl fmt::Display for Sep<'_> {
+      fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, " ,\\\n{}         ", self.0)
+      }
+    }
     let indent = f.indentation();
-    join_fmt(
-      self.v.iter(),
-      f,
-      |i, ff| write!(ff, "{i}"),
-      format!(" ,\\\n{indent}         ").as_str(),
-    )
+    join_fmt(self.v.iter(), f, |i, ff| write!(ff, "{i}"), Sep(&indent))
   }
 }
 

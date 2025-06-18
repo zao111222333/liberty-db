@@ -53,7 +53,7 @@ fn define() {
           my_define_integer: 4;
       }
   }"#,
-    r#"/* test */
+    r#"** test
 library (define) {
 | define (my_define_bool, library, boolean);
 | define (my_define_float, library, float);
@@ -145,16 +145,16 @@ fn comment() {
   library.cell = library.cell.into_iter().collect();
   fmt_cmp(
     &library,
-    r#"/* comment1
-** comment2
-** comment3 */
+    r#"/** comment1
+*** comment2
+*** comment3 */
 library (undefined) {
 | /* comment1
 | ** comment2
 | ** comment3 */
 | technology (cmos);
 | delay_model : table_lookup;
-| /* one line comment */
+| * one line comment
 | time_unit : 1ns;
 | voltage_unit : 1V;
 | slew_upper_threshold_pct_rise : 80.0;
@@ -245,7 +245,7 @@ fn serde() {
   }
 }
 "#;
-  let want = r#"/* test */
+  let want = r#"** test
 library (undefined) {
 | delay_model : table_lookup;
 | time_unit : 1ns;
@@ -298,7 +298,7 @@ fn formula() {
   }
   
 "#;
-  let want = r#"/* test */
+  let want = r#"** test
 library (test) {
 | delay_model : table_lookup;
 | time_unit : 1ns;
@@ -372,7 +372,7 @@ fn bus_type() {
   }
 }
 "#;
-  let want = r#"/* test */
+  let want = r#"** test
 library (test) {
 | delay_model : table_lookup;
 | time_unit : 1ns;
