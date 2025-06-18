@@ -266,7 +266,7 @@ impl<C: Ctx> SimpleAttri<C> for Table {
       }
     }
     let indent = f.indentation();
-    join_fmt(self.v.iter(), f, |i, ff| write!(ff, "{i}"), Sep(&indent))
+    join_fmt(self.v.iter(), f, |i, ff| write!(ff, "{i}"), Sep(indent))
   }
 }
 

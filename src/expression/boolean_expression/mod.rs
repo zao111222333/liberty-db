@@ -337,7 +337,7 @@ pub struct BooleanExpressionDisplay<'a>(pub &'a Expr);
 impl fmt::Display for BooleanExpressionDisplay<'_> {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    parser::_fmt(&self.0, f)
+    parser::_fmt(self.0, f)
   }
 }
 
