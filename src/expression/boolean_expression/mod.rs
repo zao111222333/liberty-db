@@ -239,12 +239,6 @@ impl From<BddBooleanExpression> for Expr {
     val.expr
   }
 }
-// impl From<Expr> for BddBooleanExpression {
-//   #[inline]
-//   fn from(expr: Expr) -> Self {
-//     BooleanExpression::from(expr).into()
-//   }
-// }
 impl PartialEq for BddBooleanExpression {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
@@ -338,24 +332,33 @@ impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
   }
 }
 
+#[derive(Debug)]
+pub struct BooleanExpressionDisplay<'a>(pub &'a Expr);
+impl fmt::Display for BooleanExpressionDisplay<'_> {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    parser::_fmt(&self.0, f)
+  }
+}
+
 impl fmt::Display for BooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    parser::_fmt(&self.expr, f)
+    write!(f, "{}", BooleanExpressionDisplay(&self.expr))
   }
 }
 
 impl fmt::Display for LogicBooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    parser::_fmt(&self.0.expr, f)
+    write!(f, "{}", BooleanExpressionDisplay(&self.expr))
   }
 }
 
 impl fmt::Display for PowerGroundBooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    parser::_fmt(&self.0.expr, f)
+    write!(f, "{}", BooleanExpressionDisplay(&self.expr))
   }
 }
 

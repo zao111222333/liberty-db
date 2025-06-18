@@ -209,6 +209,13 @@ pub struct Cell<C: Ctx> {
   pub clock_gating_integrated_cell: Option<ClockGatingIntegratedCell>,
   #[liberty(simple(type = Option))]
   pub cell_footprint: Option<String>,
+  /// Use the cell_leakage_power attribute to define the leakage power of a cell. You must
+  /// define this attribute for cells with state-dependent leakage power. If cell_leakage_power
+  /// is missing or negative, the value of the default_cell_leakage_power attribute defined in
+  /// the library is assumed.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=103.3&end=103.17
+  /// ">Reference</a>
   #[liberty(simple(type = Option))]
   pub cell_leakage_power: Option<f64>,
   /// The `em_temp_degradation_factor` attribute specifies the electromigration
@@ -255,9 +262,9 @@ pub struct Cell<C: Ctx> {
   /// The `is_pad`  attribute identifies a pad pin on
   /// any I/O cell. You can also specify the `is_pad` attribute
   /// on PG pins.
-  /// The valid values are true  and false.
+  /// The valid values are `true`  and `false`.
   /// If the cell-level `pad_cell` attribute is specified on
-  /// a I/O cell, the `is_pad`  attribute must be set to true
+  /// a I/O cell, the `is_pad`  attribute must be set to `true`
   /// in either a `pg_pin`  group or on a signal pin for that cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=111.5&end=111.8

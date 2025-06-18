@@ -371,6 +371,18 @@ pub struct PgPin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[liberty(simple)]
   pub user_pg_type: String,
+  /// The `is_pad`  attribute identifies a pad pin on
+  /// any I/O cell. You can also specify the `is_pad` attribute
+  /// on PG pins.
+  /// The valid values are `true`  and `false`.
+  /// If the cell-level `pad_cell` attribute is specified on
+  /// a I/O cell, the `is_pad`  attribute must be set to `true`
+  /// in either a `pg_pin`  group or on a signal pin for that cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=111.5&end=111.8
+  /// ">Reference</a>
+  #[liberty(simple(type = Option))]
+  pub is_pad: Option<bool>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=209.30&end=209.32
   /// ">Reference-Definition</a>
