@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.16.1"
+version = "0.16.2"
 license = "MIT"
 edition = "2024"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
