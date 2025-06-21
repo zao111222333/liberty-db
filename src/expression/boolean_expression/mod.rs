@@ -289,12 +289,13 @@ impl LogicBooleanExpression {
   #[must_use]
   #[inline]
   pub fn new(expr: Expr, logic_variables: &BddVariableSet) -> Self {
-    if let Some(bdd) = logic_variables.safe_eval_expression(&expr) {
-      Self(BddBooleanExpression { expr, bdd })
-    } else {
-      crate::error!("Failed to build BDD for [{expr}]");
-      Self(BddBooleanExpression { expr, bdd: logic_variables.mk_false() })
-    }
+    Self(BddBooleanExpression {
+      bdd: logic_variables.safe_eval_expression(&expr).unwrap_or_else(|| {
+        crate::error!("Failed to build BDD for [{expr}]");
+        logic_variables.mk_false()
+      }),
+      expr,
+    })
   }
 }
 
@@ -310,12 +311,13 @@ impl PowerGroundBooleanExpression {
   #[must_use]
   #[inline]
   pub fn new(expr: Expr, pg_variables: &BddVariableSet) -> Self {
-    if let Some(bdd) = pg_variables.safe_eval_expression(&expr) {
-      Self(BddBooleanExpression { expr, bdd })
-    } else {
-      crate::error!("Failed to build BDD for [{expr}]");
-      Self(BddBooleanExpression { expr, bdd: pg_variables.mk_false() })
-    }
+    Self(BddBooleanExpression {
+      bdd: pg_variables.safe_eval_expression(&expr).unwrap_or_else(|| {
+        crate::error!("Failed to build BDD for [{expr}]");
+        pg_variables.mk_false()
+      }),
+      expr,
+    })
   }
 }
 impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {

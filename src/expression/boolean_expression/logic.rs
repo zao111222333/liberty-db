@@ -79,12 +79,12 @@ impl From<Level> for State {
 #[derive(strum::EnumString, strum::EnumIter, strum::Display, strum::IntoStaticStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Edge {
-  /// Fall
-  #[strum(serialize = "F")]
-  F,
   /// Rise
   #[strum(serialize = "R")]
   R,
+  /// Fall
+  #[strum(serialize = "F")]
+  F,
 }
 impl From<Edge> for State {
   #[must_use]
