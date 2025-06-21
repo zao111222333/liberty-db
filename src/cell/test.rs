@@ -435,16 +435,16 @@ liberty_db::cell::Cell (my_pll) {
 | | timing () {
 | | | related_pin : REFCLK;
 | | | timing_sense : positive_unate;
-| | | timing_type : combinational_fall;
-| | | cell_fall (scalar) {
+| | | timing_type : combinational_rise;
+| | | cell_rise (scalar) {
 | | | | values ("0.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : REFCLK;
 | | | timing_sense : positive_unate;
-| | | timing_type : combinational_rise;
-| | | cell_rise (scalar) {
+| | | timing_type : combinational_fall;
+| | | cell_fall (scalar) {
 | | | | values ("0.0");
 | | | }
 | | }
@@ -455,16 +455,16 @@ liberty_db::cell::Cell (my_pll) {
 | | timing () {
 | | | related_pin : REFCLK;
 | | | timing_sense : positive_unate;
-| | | timing_type : combinational_fall;
-| | | cell_fall (scalar) {
+| | | timing_type : combinational_rise;
+| | | cell_rise (scalar) {
 | | | | values ("0.0");
 | | | }
 | | }
 | | timing () {
 | | | related_pin : REFCLK;
 | | | timing_sense : positive_unate;
-| | | timing_type : combinational_rise;
-| | | cell_rise (scalar) {
+| | | timing_type : combinational_fall;
+| | | cell_fall (scalar) {
 | | | | values ("0.0");
 | | | }
 | | }
