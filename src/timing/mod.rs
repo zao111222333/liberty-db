@@ -1548,7 +1548,7 @@ liberty_db::timing::Timing () {
     "#,
       r#"
 liberty_db::timing::Timing () {
-| /* LVF LUTs' index mismatch */
+| * LVF LUTs' index mismatch
 | cell_rise (delay_template_8x8) {
 | | index_1 ("0.0023, 0.0091, 0.0228, 0.0502, 0.105, 0.2145, 0.4335, 0.8715");
 | | index_2 ("0.00015, 0.00059, 0.00148, 0.00325, 0.00679, 0.01388, 0.02805, 0.05639");

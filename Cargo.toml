@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.16.1"
+version = "0.16.2"
 license = "MIT"
 edition = "2024"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -59,7 +59,7 @@ similar = { version = "2.7", features = ["inline"]}
 console = "0.15"
 nom = "8.0"
 lexical-core = "1.0"
-biodivine-lib-bdd = { version = "0.5.23", features = ["serde"] }
+biodivine-lib-bdd = { version = "0.5.25", features = ["serde"] }
 mut_set = "0.8.2"
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"

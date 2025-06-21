@@ -239,12 +239,6 @@ impl From<BddBooleanExpression> for Expr {
     val.expr
   }
 }
-// impl From<Expr> for BddBooleanExpression {
-//   #[inline]
-//   fn from(expr: Expr) -> Self {
-//     BooleanExpression::from(expr).into()
-//   }
-// }
 impl PartialEq for BddBooleanExpression {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
@@ -295,15 +289,13 @@ impl LogicBooleanExpression {
   #[must_use]
   #[inline]
   pub fn new(expr: Expr, logic_variables: &BddVariableSet) -> Self {
-    if let Some(bdd) = logic_variables.safe_eval_expression(&expr) {
-      Self(BddBooleanExpression { expr, bdd })
-    } else {
-      crate::error!("Failed to build BDD for [{expr}]");
-      Self(BddBooleanExpression {
-        expr,
-        bdd: logic_variables.eval_expression(&Expr::Const(false)),
-      })
-    }
+    Self(BddBooleanExpression {
+      bdd: logic_variables.safe_eval_expression(&expr).unwrap_or_else(|| {
+        crate::error!("Failed to build BDD for [{expr}]");
+        logic_variables.mk_false()
+      }),
+      expr,
+    })
   }
 }
 
@@ -319,15 +311,13 @@ impl PowerGroundBooleanExpression {
   #[must_use]
   #[inline]
   pub fn new(expr: Expr, pg_variables: &BddVariableSet) -> Self {
-    if let Some(bdd) = pg_variables.safe_eval_expression(&expr) {
-      Self(BddBooleanExpression { expr, bdd })
-    } else {
-      crate::error!("Failed to build BDD for [{expr}]");
-      Self(BddBooleanExpression {
-        expr,
-        bdd: pg_variables.eval_expression(&Expr::Const(false)),
-      })
-    }
+    Self(BddBooleanExpression {
+      bdd: pg_variables.safe_eval_expression(&expr).unwrap_or_else(|| {
+        crate::error!("Failed to build BDD for [{expr}]");
+        pg_variables.mk_false()
+      }),
+      expr,
+    })
   }
 }
 impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
@@ -338,24 +328,38 @@ impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
   }
 }
 
+pub struct BooleanExpressionDisplay<'a>(pub &'a Expr);
+impl fmt::Display for BooleanExpressionDisplay<'_> {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    parser::_fmt(self.0, f)
+  }
+}
+impl fmt::Debug for BooleanExpressionDisplay<'_> {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    f.debug_tuple("BoolExpr").field(&format!("{self}")).finish()
+  }
+}
+
 impl fmt::Display for BooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    parser::_fmt(&self.expr, f)
+    write!(f, "{}", BooleanExpressionDisplay(&self.expr))
   }
 }
 
 impl fmt::Display for LogicBooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    parser::_fmt(&self.0.expr, f)
+    write!(f, "{}", BooleanExpressionDisplay(&self.expr))
   }
 }
 
 impl fmt::Display for PowerGroundBooleanExpression {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    parser::_fmt(&self.0.expr, f)
+    write!(f, "{}", BooleanExpressionDisplay(&self.expr))
   }
 }
 

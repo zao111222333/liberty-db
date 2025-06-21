@@ -816,55 +816,50 @@ pub struct TableLookUp<C: Ctx> {
 impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
-    if builder.values.size2 == 1
+    if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
-      builder.values.size1 = builder.index_1.len();
-      builder.values.size2 = builder.index_2.len();
+      builder.values.chunk_size = builder.index_2.len();
     }
   }
 }
 impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
-    if builder.values.size2 == 1
+    if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
-      builder.values.size1 = builder.index_1.len();
-      builder.values.size2 = builder.index_2.len();
+      builder.values.chunk_size = builder.index_2.len();
     }
   }
 }
 impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
-    if builder.values.size2 == 1
+    if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
-      builder.values.size1 = builder.index_1.len();
-      builder.values.size2 = builder.index_2.len();
+      builder.values.chunk_size = builder.index_2.len();
     }
   }
 }
 impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
-    if builder.values.size2 == 1
+    if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
-      builder.values.size1 = builder.index_1.len();
-      builder.values.size2 = builder.index_2.len();
+      builder.values.chunk_size = builder.index_2.len();
     }
   }
 }
 impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
-    if builder.values.size2 == 1
+    if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
-      builder.values.size1 = builder.index_1.len();
-      builder.values.size2 = builder.index_2.len();
+      builder.values.chunk_size = builder.index_2.len();
     }
   }
 }
@@ -872,8 +867,7 @@ impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {
 #[derive(Debug, Default, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Values {
-  pub size1: usize,
-  pub size2: usize,
+  pub chunk_size: usize,
   pub inner: Vec<f64>,
 }
 crate::ast::impl_self_builder!(Values);
@@ -893,20 +887,18 @@ impl<C: Ctx> ComplexAttri<C> for Values {
   ) -> ast::ComplexParseRes<'a, Self> {
     match ast::parser::complex_values(i, &mut scope.loc.line_num) {
       Ok((_i, vec)) => {
-        let mut size1 = 0;
-        let mut size2 = 0;
+        let mut chunk_size = 0;
         let mut table_len_mismatch = false;
         let inner: Vec<f64> = vec
           .into_iter()
           .flat_map(|(n, v)| {
             scope.loc.line_num += n;
-            size2 += 1;
             let l = v.len();
             #[expect(clippy::else_if_without_else)]
             if l != 0 {
-              if size1 == 0 {
-                size1 = l;
-              } else if size1 != l {
+              if chunk_size == 0 {
+                chunk_size = l;
+              } else if chunk_size != l {
                 table_len_mismatch = true;
               }
             }
@@ -917,9 +909,9 @@ impl<C: Ctx> ComplexAttri<C> for Values {
           _i,
           if table_len_mismatch {
             crate::error!("{} table of values is NOT aligned", scope.loc);
-            Ok(Self { size1: inner.len(), size2: 1, inner })
+            Ok(Self { chunk_size: inner.len(), inner })
           } else {
-            Ok(Self { size1, size2, inner })
+            Ok(Self { chunk_size, inner })
           },
         ))
       }
@@ -938,7 +930,7 @@ impl<C: Ctx> ComplexAttri<C> for Values {
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     let indent = f.indentation();
-    let mut iter = self.inner.chunks(self.size1);
+    let mut iter = self.inner.chunks(self.chunk_size);
     if let Some(v) = iter.next() {
       ast::join_fmt(v.iter(), f, |float, ff| ff.write_num(*float), ", ")?;
     }
@@ -953,7 +945,7 @@ impl<C: Ctx> ComplexAttri<C> for Values {
 #[expect(clippy::field_scoped_visibility_modifiers)]
 pub(crate) struct DisplayValues<V: Iterator<Item = f64>> {
   pub(crate) len: usize,
-  pub(crate) size1: usize,
+  pub(crate) chunk_size: usize,
   pub(crate) inner: V,
 }
 
@@ -965,7 +957,7 @@ impl<V: Iterator<Item = f64>> DisplayValues<V> {
   ) -> fmt::Result {
     use itertools::Itertools as _;
     let indent = f.indentation();
-    let chunks = self.inner.chunks(self.size1);
+    let chunks = self.inner.chunks(self.chunk_size);
     let mut iter = chunks.into_iter();
     if let Some(v) = iter.next() {
       ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_num(float), ", ")?;
@@ -1388,8 +1380,7 @@ mod test {
     )
     .unwrap();
     let values = res.unwrap();
-    assert_eq!(values.size1, 3);
-    assert_eq!(values.size2, 2);
+    assert_eq!(values.chunk_size, 3);
   }
   #[test]
   fn values_vector31() {
@@ -1400,8 +1391,7 @@ mod test {
     )
     .unwrap();
     let values = res.unwrap();
-    assert_eq!(values.size1, 3);
-    assert_eq!(values.size2, 1);
+    assert_eq!(values.chunk_size, 3);
   }
   #[test]
   fn values_vector31_badiface() {
@@ -1412,8 +1402,7 @@ mod test {
     )
     .unwrap();
     let values = res.unwrap();
-    assert_eq!(values.size1, 3);
-    assert_eq!(values.size2, 1);
+    assert_eq!(values.chunk_size, 3);
   }
   #[test]
   fn values_scalar1() {
@@ -1424,8 +1413,7 @@ mod test {
     )
     .unwrap();
     let values = res.unwrap();
-    assert_eq!(values.size1, 1);
-    assert_eq!(values.size2, 1);
+    assert_eq!(values.chunk_size, 1);
   }
   #[test]
   fn values_scalar2() {
@@ -1436,8 +1424,7 @@ mod test {
     )
     .unwrap();
     let values = res.unwrap();
-    assert_eq!(values.size1, 1);
-    assert_eq!(values.size2, 1);
+    assert_eq!(values.chunk_size, 1);
   }
   #[test]
   fn table() {

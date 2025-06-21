@@ -624,14 +624,16 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
   pub inverted_output: Option<bool>, /* Required in statetable cells */
+  /// The `is_pad`  attribute identifies a pad pin on
+  /// any I/O cell. You can also specify the `is_pad` attribute
+  /// on PG pins.
+  /// The valid values are `true`  and `false`.
+  /// If the cell-level `pad_cell` attribute is specified on
+  /// a I/O cell, the `is_pad`  attribute must be set to `true`
+  /// in either a `pg_pin`  group or on a signal pin for that cell.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-  /// ?field=test
-  /// &bgn
-  /// =228.48
-  /// &end
-  /// =228.48
-  /// ">Reference-Instance</a>
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=111.5&end=111.8
+  /// ">Reference</a>
   #[liberty(simple(type = Option))]
   pub is_pad: Option<bool>,
   /// The `is_pll_reference_pin` Boolean attribute tags a pin as a reference pin on the phaselocked loop.

@@ -8,7 +8,7 @@ use core::{cmp::Ordering, hash::Hash};
 #[derive(Ord, PartialOrd)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
-#[derive(strum::Display, strum::EnumString, strum::EnumIter)]
+#[derive(strum::Display, strum::EnumString, strum::EnumIter, strum::IntoStaticStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Level {
   /// High
@@ -18,23 +18,127 @@ pub enum Level {
   #[strum(serialize = "l", serialize = "0", to_string = "L")]
   L,
 }
+impl From<Level> for bool {
+  #[must_use]
+  #[inline]
+  fn from(value: Level) -> Self {
+    match value {
+      Level::H => true,
+      Level::L => false,
+    }
+  }
+}
+impl Level {
+  #[must_use]
+  #[inline]
+  pub const fn inverse(self) -> Self {
+    match self {
+      Self::H => Self::L,
+      Self::L => Self::H,
+    }
+  }
+  #[must_use]
+  #[inline]
+  pub const fn toggle_self(&mut self) -> Edge {
+    match self {
+      Self::H => {
+        *self = Self::L;
+        Edge::F
+      }
+      Self::L => {
+        *self = Self::H;
+        Edge::R
+      }
+    }
+  }
+  #[must_use]
+  #[inline]
+  pub const fn edge(bgn: Self, end: Self) -> Option<Edge> {
+    match (bgn, end) {
+      (Self::H, Self::H) | (Self::L, Self::L) => None,
+      (Self::H, Self::L) => Some(Edge::F),
+      (Self::L, Self::H) => Some(Edge::R),
+    }
+  }
+}
+impl From<Level> for State {
+  #[must_use]
+  #[inline]
+  fn from(value: Level) -> Self {
+    match value {
+      Level::H => Self::H,
+      Level::L => Self::L,
+    }
+  }
+}
 
 /// Edge
 #[derive(Debug, Clone, Copy)]
 #[derive(Hash, PartialEq, Eq)]
 #[derive(Ord, PartialOrd)]
-#[derive(strum::EnumString, strum::EnumIter, strum::Display)]
+#[derive(strum::EnumString, strum::EnumIter, strum::Display, strum::IntoStaticStr)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum Edge {
-  /// Fall
-  #[strum(serialize = "falling")]
-  F,
   /// Rise
-  #[strum(serialize = "rising")]
+  #[strum(serialize = "R")]
   R,
+  /// Fall
+  #[strum(serialize = "F")]
+  F,
+}
+impl From<Edge> for State {
+  #[must_use]
+  #[inline]
+  fn from(value: Edge) -> Self {
+    match value {
+      Edge::F => Self::HL,
+      Edge::R => Self::LH,
+    }
+  }
+}
+impl Edge {
+  #[must_use]
+  #[inline]
+  pub const fn bgn(&self) -> Level {
+    match self {
+      Self::F => Level::H,
+      Self::R => Level::L,
+    }
+  }
+  #[must_use]
+  #[inline]
+  pub const fn end(&self) -> Level {
+    match self {
+      Self::F => Level::L,
+      Self::R => Level::H,
+    }
+  }
 }
 crate::ast::impl_self_builder!(Edge);
-crate::ast::impl_simple!(Edge);
+impl<C: Ctx> crate::ast::SimpleAttri<C> for Edge {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope<'_>,
+  ) -> crate::ast::SimpleParseRes<'a, Self> {
+    crate::ast::nom_parse_from::<C, _, _, _>(i, scope, |s| match s {
+      "fall" => Ok(Self::F),
+      "rise" => Ok(Self::R),
+      _ => Err(()),
+    })
+  }
+  #[inline]
+  fn fmt_self<T: core::fmt::Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    use core::fmt::Write as _;
+    f.write_str(match self {
+      Self::F => "fall",
+      Self::R => "rise",
+    })
+  }
+}
 
 /// Use the `output_switching_condition` attribute to specify the sense of the toggling
 /// output. If there is more than one `switching_group` group specified within the
@@ -111,6 +215,16 @@ pub enum UnInit {
   Z,
 }
 
+impl From<UnInit> for State {
+  #[inline]
+  fn from(value: UnInit) -> Self {
+    match value {
+      UnInit::X => Self::X,
+      UnInit::Z => Self::Z,
+    }
+  }
+}
+
 impl PartialOrd for UnInit {
   #[inline]
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -148,6 +262,18 @@ pub enum Normal {
 crate::ast::impl_self_builder!(Normal);
 crate::ast::impl_simple!(Normal);
 
+impl From<Normal> for State {
+  #[inline]
+  fn from(value: Normal) -> Self {
+    match value {
+      Normal::R => Self::LH,
+      Normal::F => Self::HL,
+      Normal::H => Self::H,
+      Normal::L => Self::L,
+    }
+  }
+}
+
 /// H L R F
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -165,6 +291,18 @@ pub enum Static {
   /// L
   #[strum(serialize = "L")]
   L,
+}
+
+impl From<Static> for State {
+  #[inline]
+  fn from(value: Static) -> Self {
+    match value {
+      Static::X => Self::X,
+      Static::Z => Self::Z,
+      Static::H => Self::H,
+      Static::L => Self::L,
+    }
+  }
 }
 
 /// State

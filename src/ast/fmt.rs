@@ -117,31 +117,31 @@ mod test {
   fn more_than_10_indent() {
     crate::ast::test_parse_fmt::<DummyGroup<DefaultCtx>>(
       r#"(0){
-        /* comment1 */
+        * comment1
         level(1){
-          /* comment2 */
+          * comment2
           level(2){
-            /* comment3 */
+            * comment3
             level(3){
-              /* comment4 */
+              * comment4
               level(4){
-                /* comment5 */
+                * comment5
                 level(5){
-                  /* comment6 */
+                  * comment6
                   level(6){
-                    /* comment7 */
+                    * comment7
                     level(7){
-                      /* comment8 */
+                      * comment8
                       level(8){
-                        /* comment9 */
+                        * comment9
                         level(9){
-                          /* comment10 */
+                          * comment10
                           level(10){
-                            /* comment11 */
+                            * comment11
                             level(11){
-                              /* comment12 */
+                              * comment12
                               level(12){
-                                /* comment13 */
+                                * comment13
                                 level(13){
                                 }
                               }
