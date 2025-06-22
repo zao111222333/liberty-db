@@ -1147,48 +1147,73 @@ pub enum Variable {
 crate::ast::impl_self_builder!(Variable);
 crate::ast::impl_simple!(Variable);
 
+impl Variable {
+  pub const INPUT_VOLTAGE: Self = Self::Voltage(VoltageVariable::InputVoltage);
+  pub const OUTPUT_VOLTAGE: Self = Self::Voltage(VoltageVariable::OutputVoltage);
+  pub const INPUT_NOISE_HEIGHT: Self = Self::Voltage(VoltageVariable::InputNoiseHeight);
+  pub const INPUT_TRANSITION_TIME: Self = Self::Time(TimeVariable::InputTransitionTime);
+  pub const INPUT_NET_TRANSITION: Self = Self::Time(TimeVariable::InputNetTransition);
+  pub const CONSTRAINED_PIN_TRANSITION: Self =
+    Self::Time(TimeVariable::ConstrainedPinTransition);
+  pub const RELATED_PIN_TRANSITION: Self = Self::Time(TimeVariable::RelatedPinTransition);
+  pub const DRIVER_SLEW: Self = Self::Time(TimeVariable::DriverSlew);
+  pub const OUTPUT_TRANSITION: Self = Self::Time(TimeVariable::OutputTransition);
+  pub const OUTPUT_PIN_TRANSITION: Self = Self::Time(TimeVariable::OutputPinTransition);
+  pub const CONNECT_DELAY: Self = Self::Time(TimeVariable::ConnectDelay);
+  pub const INPUT_NOISE_WIDTH: Self = Self::Time(TimeVariable::InputNoiseWidth);
+  pub const TIME: Self = Self::Time(TimeVariable::Time);
+  pub const TOTAL_OUTPUT_NET_CAPACITANCE: Self =
+    Self::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance);
+  pub const OUTPUT_NET_WIRE_CAP: Self =
+    Self::Capacitance(CapacitanceVariable::OutputNetWireCap);
+  pub const OUTPUT_NET_PIN_CAP: Self =
+    Self::Capacitance(CapacitanceVariable::OutputNetPinCap);
+  pub const RELATED_OUT_TOTAL_OUTPUT_NET_CAPACI: Self =
+    Self::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance);
+  pub const RELATED_OUT_OUTPUT_NET_WIRE_CAP: Self =
+    Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap);
+  pub const RELATED_OUT_OUTPUT_NET_PIN_CAP: Self =
+    Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap);
+  pub const FANOUT_PIN_CAPACITANCE: Self =
+    Self::Capacitance(CapacitanceVariable::FanoutPinCapacitance);
+  pub const OUTPUT_NET_LENGTH: Self = Self::Length(LengthVariable::OutputNetLength);
+  pub const RELATED_OUT_OUTPUT_NET_LENGTH: Self =
+    Self::Length(LengthVariable::RelatedOutOutputNetLength);
+  pub const FANOUT_NUMBER: Self = Self::Scalar(ScalarVariable::FanoutNumber);
+  pub const NORMALIZED_VOLTAGE: Self = Self::Scalar(ScalarVariable::NormalizedVoltage);
+  pub const RC_PRODUCT: Self = Self::RcProduct;
+}
+
 impl core::str::FromStr for Variable {
   type Err = strum::ParseError;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(match s {
-      "input_voltage" => Self::Voltage(VoltageVariable::InputVoltage),
-      "output_voltage" => Self::Voltage(VoltageVariable::OutputVoltage),
-      "input_noise_height" => Self::Voltage(VoltageVariable::InputNoiseHeight),
-      "input_transition_time" => Self::Time(TimeVariable::InputTransitionTime),
-      "input_net_transition" => Self::Time(TimeVariable::InputNetTransition),
-      "constrained_pin_transition" => Self::Time(TimeVariable::ConstrainedPinTransition),
-      "related_pin_transition" => Self::Time(TimeVariable::RelatedPinTransition),
-      "driver_slew" => Self::Time(TimeVariable::DriverSlew),
-      "output_transition" => Self::Time(TimeVariable::OutputTransition),
-      "output_pin_transition" => Self::Time(TimeVariable::OutputPinTransition),
-      "connect_delay" => Self::Time(TimeVariable::ConnectDelay),
-      "input_noise_width" => Self::Time(TimeVariable::InputNoiseWidth),
-      "time" => Self::Time(TimeVariable::Time),
-      "total_output_net_capacitance" => {
-        Self::Capacitance(CapacitanceVariable::TotalOutputNetCapacitance)
-      }
-      "output_net_wire_cap" => Self::Capacitance(CapacitanceVariable::OutputNetWireCap),
-      "output_net_pin_cap" => Self::Capacitance(CapacitanceVariable::OutputNetPinCap),
-      "related_out_total_output_net_capaci" => {
-        Self::Capacitance(CapacitanceVariable::RelatedOutTotalOutputNetCapacitance)
-      }
-      "related_out_output_net_wire_cap" => {
-        Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetWireCap)
-      }
-      "related_out_output_net_pin_cap" => {
-        Self::Capacitance(CapacitanceVariable::RelatedOutOutputNetPinCap)
-      }
-      "fanout_pin_capacitance" => {
-        Self::Capacitance(CapacitanceVariable::FanoutPinCapacitance)
-      }
-      "output_net_length" => Self::Length(LengthVariable::OutputNetLength),
-      "related_out_output_net_length" => {
-        Self::Length(LengthVariable::RelatedOutOutputNetLength)
-      }
-      "fanout_number" => Self::Scalar(ScalarVariable::FanoutNumber),
-      "normalized_voltage" => Self::Scalar(ScalarVariable::NormalizedVoltage),
-      "rc_product" => Self::RcProduct,
+      "input_voltage" => Self::INPUT_VOLTAGE,
+      "output_voltage" => Self::OUTPUT_VOLTAGE,
+      "input_noise_height" => Self::INPUT_NOISE_HEIGHT,
+      "input_transition_time" => Self::INPUT_TRANSITION_TIME,
+      "input_net_transition" => Self::INPUT_NET_TRANSITION,
+      "constrained_pin_transition" => Self::CONSTRAINED_PIN_TRANSITION,
+      "related_pin_transition" => Self::RELATED_PIN_TRANSITION,
+      "driver_slew" => Self::DRIVER_SLEW,
+      "output_transition" => Self::OUTPUT_TRANSITION,
+      "output_pin_transition" => Self::OUTPUT_PIN_TRANSITION,
+      "connect_delay" => Self::CONNECT_DELAY,
+      "input_noise_width" => Self::INPUT_NOISE_WIDTH,
+      "time" => Self::TIME,
+      "total_output_net_capacitance" => Self::TOTAL_OUTPUT_NET_CAPACITANCE,
+      "output_net_wire_cap" => Self::OUTPUT_NET_WIRE_CAP,
+      "output_net_pin_cap" => Self::OUTPUT_NET_PIN_CAP,
+      "related_out_total_output_net_capaci" => Self::RELATED_OUT_TOTAL_OUTPUT_NET_CAPACI,
+      "related_out_output_net_wire_cap" => Self::RELATED_OUT_OUTPUT_NET_WIRE_CAP,
+      "related_out_output_net_pin_cap" => Self::RELATED_OUT_OUTPUT_NET_PIN_CAP,
+      "fanout_pin_capacitance" => Self::FANOUT_PIN_CAPACITANCE,
+      "output_net_length" => Self::OUTPUT_NET_LENGTH,
+      "related_out_output_net_length" => Self::RELATED_OUT_OUTPUT_NET_LENGTH,
+      "fanout_number" => Self::FANOUT_NUMBER,
+      "normalized_voltage" => Self::NORMALIZED_VOLTAGE,
+      "rc_product" => Self::RC_PRODUCT,
       _ => {
         return Err(strum::ParseError::VariantNotFound);
       }
@@ -1199,14 +1224,34 @@ impl core::str::FromStr for Variable {
 impl fmt::Display for Variable {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    match self {
-      Self::Time(v) => v.fmt(f),
-      Self::Voltage(v) => v.fmt(f),
-      Self::Capacitance(v) => v.fmt(f),
-      Self::Length(v) => v.fmt(f),
-      Self::Scalar(v) => v.fmt(f),
-      Self::RcProduct => write!(f, "rc_product"),
-    }
+    let s = match *self {
+      Self::INPUT_VOLTAGE => "input_voltage",
+      Self::OUTPUT_VOLTAGE => "output_voltage",
+      Self::INPUT_NOISE_HEIGHT => "input_noise_height",
+      Self::INPUT_TRANSITION_TIME => "input_transition_time",
+      Self::INPUT_NET_TRANSITION => "input_net_transition",
+      Self::CONSTRAINED_PIN_TRANSITION => "constrained_pin_transition",
+      Self::RELATED_PIN_TRANSITION => "related_pin_transition",
+      Self::DRIVER_SLEW => "driver_slew",
+      Self::OUTPUT_TRANSITION => "output_transition",
+      Self::OUTPUT_PIN_TRANSITION => "output_pin_transition",
+      Self::CONNECT_DELAY => "connect_delay",
+      Self::INPUT_NOISE_WIDTH => "input_noise_width",
+      Self::TIME => "time",
+      Self::TOTAL_OUTPUT_NET_CAPACITANCE => "total_output_net_capacitance",
+      Self::OUTPUT_NET_WIRE_CAP => "output_net_wire_cap",
+      Self::OUTPUT_NET_PIN_CAP => "output_net_pin_cap",
+      Self::RELATED_OUT_TOTAL_OUTPUT_NET_CAPACI => "related_out_total_output_net_capaci",
+      Self::RELATED_OUT_OUTPUT_NET_WIRE_CAP => "related_out_output_net_wire_cap",
+      Self::RELATED_OUT_OUTPUT_NET_PIN_CAP => "related_out_output_net_pin_cap",
+      Self::FANOUT_PIN_CAPACITANCE => "fanout_pin_capacitance",
+      Self::OUTPUT_NET_LENGTH => "output_net_length",
+      Self::RELATED_OUT_OUTPUT_NET_LENGTH => "related_out_output_net_length",
+      Self::FANOUT_NUMBER => "fanout_number",
+      Self::NORMALIZED_VOLTAGE => "normalized_voltage",
+      Self::RC_PRODUCT => "rc_product",
+    };
+    f.write_str(s)
   }
 }
 

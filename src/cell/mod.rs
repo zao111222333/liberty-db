@@ -15,57 +15,49 @@ use crate::{
     RandomState,
   },
   common::char_config::CharConfig,
-  expression::{FF, FFBank, Latch, LatchBank},
+  expression::{BddVariableSet, FF, FFBank, Latch, LatchBank},
   pin::{AntennaDiodeType, Bundle, Bus, Pin},
   table::TableLookUp2D,
 };
 
 pub trait CellCtx {
-  fn logic_variables(&self) -> &biodivine_lib_bdd::BddVariableSet;
-  fn set_logic_variables(&mut self, variables: biodivine_lib_bdd::BddVariableSet);
-  fn pg_variables(&self) -> &biodivine_lib_bdd::BddVariableSet;
-  fn set_pg_variables(&mut self, variables: biodivine_lib_bdd::BddVariableSet);
+  fn logic_variables(&self) -> &BddVariableSet;
+  fn set_logic_variables(&mut self, variables: BddVariableSet);
+  fn pg_variables(&self) -> &BddVariableSet;
+  fn set_pg_variables(&mut self, variables: BddVariableSet);
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DefaultCellCtx {
-  pub logic_variables: biodivine_lib_bdd::BddVariableSet,
-  pub pg_variables: biodivine_lib_bdd::BddVariableSet,
+  pub logic_variables: BddVariableSet,
+  pub pg_variables: BddVariableSet,
 }
 impl CellCtx for DefaultCellCtx {
   #[inline]
-  fn logic_variables(&self) -> &biodivine_lib_bdd::BddVariableSet {
+  fn logic_variables(&self) -> &BddVariableSet {
     &self.logic_variables
   }
   #[inline]
-  fn set_logic_variables(&mut self, variables: biodivine_lib_bdd::BddVariableSet) {
+  fn set_logic_variables(&mut self, variables: BddVariableSet) {
     self.logic_variables = variables;
   }
   #[inline]
-  fn pg_variables(&self) -> &biodivine_lib_bdd::BddVariableSet {
+  fn pg_variables(&self) -> &BddVariableSet {
     &self.pg_variables
   }
   #[inline]
-  fn set_pg_variables(&mut self, variables: biodivine_lib_bdd::BddVariableSet) {
+  fn set_pg_variables(&mut self, variables: BddVariableSet) {
     self.pg_variables = variables;
   }
 }
-impl Debug for DefaultCellCtx {
-  #[inline]
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    f.debug_struct("DefaultCellCtx")
-      .field("logic_variables", &format_args!("{}", self.logic_variables))
-      .field("pg_variables", &format_args!("{}", self.pg_variables))
-      .finish()
-  }
-}
+
 impl Default for DefaultCellCtx {
   #[inline]
   fn default() -> Self {
     Self {
-      logic_variables: biodivine_lib_bdd::BddVariableSet::new(&[]),
-      pg_variables: biodivine_lib_bdd::BddVariableSet::new(&[]),
+      logic_variables: BddVariableSet::new(&[]),
+      pg_variables: BddVariableSet::new(&[]),
     }
   }
 }
@@ -702,14 +694,12 @@ impl<C: Ctx> GroupFn<C> for CellModel<C> {
       )
       .chain(builder.bus.iter().flat_map(|pin| pin.name.iter().map(String::as_str)));
     let logic_variables: BTreeSet<&str> = ff_latch_nodes.collect();
-    scope.cell_extra_ctx.logic_variables = biodivine_lib_bdd::BddVariableSet::new(
-      &logic_variables.into_iter().collect::<Vec<_>>(),
-    );
+    scope.cell_extra_ctx.logic_variables =
+      BddVariableSet::new(&logic_variables.into_iter().collect::<Vec<_>>());
     let mut pg_variable: Vec<&str> =
       builder.pg_pin.iter().map(|pg_pin| pg_pin.name.as_str()).collect();
     pg_variable.sort_unstable();
-    scope.cell_extra_ctx.pg_variables =
-      biodivine_lib_bdd::BddVariableSet::new(&pg_variable);
+    scope.cell_extra_ctx.pg_variables = BddVariableSet::new(&pg_variable);
   }
   fn after_build(&mut self, scope: &mut BuilderScope<C>) {
     let mut pin =
@@ -728,11 +718,11 @@ impl<C: Ctx> GroupFn<C> for CellModel<C> {
     self.pin = pin;
     self.extra_ctx.set_logic_variables(mem::replace(
       &mut scope.cell_extra_ctx.logic_variables,
-      biodivine_lib_bdd::BddVariableSet::new(&[]),
+      BddVariableSet::new(&[]),
     ));
     self.extra_ctx.set_pg_variables(mem::replace(
       &mut scope.cell_extra_ctx.pg_variables,
-      biodivine_lib_bdd::BddVariableSet::new(&[]),
+      BddVariableSet::new(&[]),
     ));
   }
 }
@@ -803,9 +793,8 @@ impl<C: Ctx> GroupFn<C> for TestCell<C> {
       )
       .chain(builder.pin.iter().flat_map(|pin| pin.name.iter().map(String::as_str)));
     let logic_variables: BTreeSet<&str> = ff_latch_nodes.collect();
-    scope.cell_extra_ctx.logic_variables = biodivine_lib_bdd::BddVariableSet::new(
-      &logic_variables.into_iter().collect::<Vec<_>>(),
-    );
+    scope.cell_extra_ctx.logic_variables =
+      BddVariableSet::new(&logic_variables.into_iter().collect::<Vec<_>>());
   }
   fn after_build(&mut self, scope: &mut BuilderScope<C>) {
     let mut pin =
@@ -824,11 +813,11 @@ impl<C: Ctx> GroupFn<C> for TestCell<C> {
     self.pin = pin;
     self.extra_ctx.set_logic_variables(mem::replace(
       &mut scope.cell_extra_ctx.logic_variables,
-      biodivine_lib_bdd::BddVariableSet::new(&[]),
+      BddVariableSet::new(&[]),
     ));
     self.extra_ctx.set_pg_variables(mem::replace(
       &mut scope.cell_extra_ctx.pg_variables,
-      biodivine_lib_bdd::BddVariableSet::new(&[]),
+      BddVariableSet::new(&[]),
     ));
   }
 }
