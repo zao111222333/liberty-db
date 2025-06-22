@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (test1) {
+library (test1) {
 	define (sec_acore_fall_power, sec_acore_internal_power, float);
 	define (sec_acore_rise_power, sec_acore_internal_power, float);
 	define (sec_acore_when, sec_acore_internal_power, string);

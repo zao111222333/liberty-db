@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (q) {
+library (q) {
 	define (siiattrib, sii, string);
 	delay_model : table_lookup;
 	define_group (sii, cell);

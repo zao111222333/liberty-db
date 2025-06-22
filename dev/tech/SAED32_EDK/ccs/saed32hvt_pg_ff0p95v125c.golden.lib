@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (saed32hvt_pg_ff0p95v125c) {
+library (saed32hvt_pg_ff0p95v125c) {
 	define (def_sim_opt, library, string);
 	define (driver_model, library, string);
 	define (simulator, library, string);

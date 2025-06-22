@@ -742,7 +742,12 @@ pub trait Group<C: Ctx>: Sized + GroupAttri<C> {
   /// `test_wrapper`
   #[inline]
   fn display(&self) -> GroupDisplay<'_, C, Self> {
-    GroupDisplay { inner: self, ___p: PhantomData }
+    GroupDisplay { inner: self, name: None, ___p: PhantomData }
+  }
+  /// `test_wrapper`
+  #[inline]
+  fn display_name(&self, name: &'static str) -> GroupDisplay<'_, C, Self> {
+    GroupDisplay { inner: self, name: Some(name), ___p: PhantomData }
   }
 }
 /// `GroupAttri`, internal Group APIs
@@ -928,6 +933,7 @@ impl<'a> ParserError<'a> {
 /// `GroupDisplay`
 #[derive(Debug)]
 pub struct GroupDisplay<'a, C: Ctx, G> {
+  pub name: Option<&'static str>,
   pub inner: &'a G,
   ___p: PhantomData<C>,
 }
@@ -936,12 +942,9 @@ impl<C: Ctx, G: GroupAttri<C>> core::fmt::Display for GroupDisplay<'_, C, G> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ff = DefaultCodeFormatter::new(f);
-    self.inner.fmt_liberty(
-      core::any::type_name::<G>()
-        .replace("<liberty_db::ctx::DefaultCtx>", "")
-        .as_str(),
-      &mut ff,
-    )
+    self
+      .inner
+      .fmt_liberty(self.name.unwrap_or(core::any::type_name::<G>()), &mut ff)
   }
 }
 

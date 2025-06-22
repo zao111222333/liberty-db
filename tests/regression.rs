@@ -43,7 +43,7 @@ fn make_golden() {
       let library = res.unwrap();
       let golden_lib = File::create(golden_lib_path).unwrap();
       let mut writer = BufWriter::new(golden_lib);
-      _ = write!(writer, "{}", library.display());
+      _ = write!(writer, "{}", library.display_name("library"));
     } else {
       assert!(res.is_err())
     }
@@ -60,7 +60,7 @@ fn regression() {
     if is_good {
       let library = res.unwrap();
       let golden = read_to_string(golden_lib_path).unwrap();
-      let new = library.display().to_string();
+      let new = library.display_name("library").to_string();
       text_diff(golden.as_str(), new.as_str());
     } else {
       assert!(res.is_err())

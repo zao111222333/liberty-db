@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (multi_pin) {
+library (multi_pin) {
 	delay_model : table_lookup;
 	time_unit : 1ns;
 	voltage_unit : 1V;

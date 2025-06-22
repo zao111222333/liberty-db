@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (typ) {
+library (typ) {
 	define (index_1, my_group, string);
 	define (index_1, my_template, string);
 	define (values, my_group, string);

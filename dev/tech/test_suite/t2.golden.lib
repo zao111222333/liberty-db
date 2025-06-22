@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (sample) {
+library (sample) {
 	delay_model : table_lookup;
 	nom_voltage : 5.0;
 	time_unit : 1ns;

@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (inverter) {
+library (inverter) {
 	delay_model : table_lookup;
 	nom_voltage : 1.6;
 	default_fanout_load : 1.0;

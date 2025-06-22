@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (t28) {
+library (t28) {
 	define (aaa, pin, integer);
 	delay_model : table_lookup;
 	time_unit : 1ns;
