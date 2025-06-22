@@ -590,7 +590,8 @@ pub(crate) trait SimpleAttri<C: Ctx>: Sized + ParsingBuilder<C> {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     if self.is_set() {
-      write!(f, "\n{}{key} : ", f.indentation())?;
+      f.write_new_line_indentation()?;
+      write!(f, "{key} : ")?;
       self.fmt_self(f)?;
       write!(f, ";")
     } else {
@@ -633,7 +634,7 @@ pub(crate) fn join_fmt<
   I: Iterator<Item = T>,
   W: Write,
   F: FnMut(T, &mut W) -> core::fmt::Result,
-  S: core::fmt::Display,
+  S: FnMut(&mut W) -> core::fmt::Result,
 >(
   iter: I,
   f: &mut W,
@@ -652,17 +653,17 @@ pub(crate) fn join_fmt_no_quote<
   I: Iterator<Item = T>,
   W: Write,
   F: FnMut(T, &mut W) -> core::fmt::Result,
-  S: core::fmt::Display,
+  S: FnMut(&mut W) -> core::fmt::Result,
 >(
   mut iter: I,
   f: &mut W,
   mut func: F,
-  sep: S,
+  mut sep: S,
 ) -> core::fmt::Result {
   if let Some(first) = iter.next() {
     func(first, f)?;
     while let Some(t) = iter.next() {
-      write!(f, "{sep}")?;
+      sep(f)?;
       func(t, f)?;
     }
   }
@@ -714,11 +715,11 @@ pub(crate) trait ComplexAttri<C: Ctx>: Sized + ParsingBuilder<C> {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     if self.is_set() {
-      let indent1 = f.indentation();
-      write!(f, "\n{indent1}{key} (")?;
-      f.indent(1);
+      f.write_new_line_indentation()?;
+      write!(f, "{key} (")?;
+      f.indent();
       self.fmt_self(f)?;
-      f.dedent(1);
+      f.dedent();
       write!(f, ");")
     } else {
       Ok(())
@@ -942,9 +943,14 @@ impl<C: Ctx, G: GroupAttri<C>> core::fmt::Display for GroupDisplay<'_, C, G> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ff = DefaultCodeFormatter::new(f);
-    self
-      .inner
-      .fmt_liberty(self.name.unwrap_or(core::any::type_name::<G>()), &mut ff)
+    self.inner.fmt_liberty(
+      self.name.unwrap_or(
+        core::any::type_name::<G>()
+          .replace(&format!("<{}>", core::any::type_name::<C>()), "")
+          .as_str(),
+      ),
+      &mut ff,
+    )
   }
 }
 
@@ -1082,25 +1088,21 @@ pub(crate) fn fmt_comment_liberty<T: Write, I: Indentation>(
   comments: Option<&String>,
   f: &mut CodeFormatter<'_, T, I>,
 ) -> core::fmt::Result {
-  struct Sep<'a>(&'a str);
-  impl core::fmt::Display for Sep<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-      write!(f, "\n{}** ", self.0)
-    }
-  }
   if let Some(s) = comments {
     if s.is_empty() {
       Ok(())
     } else {
-      let indent = f.indentation();
-      write!(f, "\n{indent}")?;
+      f.write_new_line_indentation()?;
       if s.contains('\n') {
         write!(f, "/* ")?;
         join_fmt_no_quote(
           s.split('\n'),
           f,
           |line, ff| write!(ff, "{line}"),
-          Sep(indent),
+          |ff| {
+            ff.write_new_line_indentation()?;
+            write!(ff, "** ")
+          },
         )?;
         write!(f, " */")
       } else {
@@ -1122,7 +1124,12 @@ pub(crate) fn fmt_library_beginning<T: Write, I: Indentation>(
       Ok(())
     } else if s.contains('\n') {
       write!(f, "/** ")?;
-      join_fmt_no_quote(s.split('\n'), f, |line, ff| write!(ff, "{line}"), "\n*** ")?;
+      join_fmt_no_quote(
+        s.split('\n'),
+        f,
+        |line, ff| write!(ff, "{line}"),
+        |ff| write!(ff, "\n*** "),
+      )?;
       write!(f, " */")
     } else {
       write!(f, "** {s}")
@@ -1162,18 +1169,19 @@ impl Format for GroupWrapper {
     key: &str,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
-    let indent = f.indentation();
-    write!(f, "\n{indent}{key} (")?;
+    f.write_new_line_indentation()?;
+    write!(f, "{key} (")?;
     join_fmt_no_quote(
       self.title.iter(),
       f,
       |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
-      ", ",
+      |ff| write!(ff, ", "),
     )?;
     write!(f, ") {{ {DEFINED_COMMENT}")?;
-    f.indent(1);
+    f.indent();
     attributs_fmt_liberty(&self.attri_map, f)?;
-    f.dedent(1);
-    write!(f, "\n{indent}}}")
+    f.dedent();
+    f.write_new_line_indentation()?;
+    write!(f, "}}")
   }
 }

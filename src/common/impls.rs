@@ -165,7 +165,7 @@ impl NameAttri for Vec<String> {
       self.iter(),
       f,
       |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
-      ", ",
+      |ff| write!(ff, ", "),
     )
   }
 }
@@ -193,7 +193,7 @@ impl<const N: usize> NameAttri for [String; N] {
       self.iter(),
       f,
       |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
-      ", ",
+      |ff| write!(ff, ", "),
     )
   }
 }
@@ -247,7 +247,7 @@ impl<const N: usize, C: Ctx> ComplexAttri<C> for [String; N] {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    join_fmt(self.iter(), f, |s, ff| write!(ff, "{s}"), ", ")
+    join_fmt(self.iter(), f, |s, ff| write!(ff, "{s}"), |ff| write!(ff, ", "))
   }
 }
 
@@ -281,7 +281,7 @@ impl<const N: usize, C: Ctx> ComplexAttri<C> for [f64; N] {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
+    join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
   }
 }
 crate::ast::impl_self_builder!((String, f64));
@@ -340,8 +340,9 @@ impl<C: Ctx> ComplexAttri<C> for super::items::IdVector {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     f.write_num(self.id)?;
-    write!(f, ", \\\n{}", f.indentation())?;
-    join_fmt(self.vec.iter(), f, |float, ff| ff.write_num(*float), ", ")
+    write!(f, ", \\")?;
+    f.write_new_line_indentation()?;
+    join_fmt(self.vec.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
   }
 }
 crate::ast::impl_self_builder!(Vec<f64>);
@@ -370,7 +371,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<f64> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), ", ")
+    join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
   }
 }
 impl<C: Ctx> ComplexAttri<C> for String {
@@ -443,7 +444,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<String> {
       self.iter(),
       f,
       |s, ff| if is_word(s) { write!(ff, "{s}") } else { write!(ff, "\"{s}\"") },
-      ", ",
+      |ff| write!(ff, ", "),
     )
   }
 }
@@ -468,7 +469,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<usize> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_num(*i), ", ")
+    join_fmt_no_quote(self.iter(), f, |i, ff| ff.write_num(*i), |ff| write!(ff, ", "))
   }
 }
 crate::ast::impl_self_builder!((f64, f64, String));

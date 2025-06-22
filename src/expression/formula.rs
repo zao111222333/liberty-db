@@ -69,7 +69,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for Formula {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_fmt(format_args!("{}", self.expr))
+    write!(f, "{}", self.expr)
   }
 }
 

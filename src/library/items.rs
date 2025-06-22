@@ -209,7 +209,7 @@ impl<C: Ctx> ComplexAttri<C> for SensitizationVector {
           }
         )
       },
-      " ",
+      |ff| write!(ff, " "),
     )
   }
 }
