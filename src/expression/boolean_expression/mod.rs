@@ -116,7 +116,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for BooleanExpression {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_fmt(format_args!("\"{self}\""))
+    write!(f, "\"{self}\"")
   }
 }
 impl<C: Ctx> crate::ast::SimpleAttri<C> for LogicBooleanExpression {
@@ -132,7 +132,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for LogicBooleanExpression {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_fmt(format_args!("\"{self}\""))
+    write!(f, "\"{self}\"")
   }
 }
 impl<C: Ctx> crate::ast::SimpleAttri<C> for PowerGroundBooleanExpression {
@@ -148,7 +148,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for PowerGroundBooleanExpression {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    f.write_fmt(format_args!("\"{self}\""))
+    write!(f, "\"{self}\"")
   }
 }
 

@@ -74,7 +74,12 @@ impl fmt::Display for WordSet {
     match self.inner.len() {
       0 => Ok(()),
       1 => write!(f, "{}", self.inner.iter().next().unwrap()),
-      _ => join_fmt(self.inner.iter().sorted(), f, |s, ff| ff.write_str(s.as_str()), " "),
+      _ => join_fmt(
+        self.inner.iter().sorted(),
+        f,
+        |s, ff| ff.write_str(s.as_str()),
+        |ff| write!(ff, " "),
+      ),
     }
   }
 }

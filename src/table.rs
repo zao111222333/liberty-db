@@ -590,7 +590,6 @@ impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
     &self,
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let indent = f.indentation();
     let mut iter = self.iter();
     #[inline]
     fn fmt_point<T: Write, I: ast::Indentation>(
@@ -618,7 +617,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
           value.points.iter(),
           f,
           |point, ff| fmt_point(point, ff),
-          ", ",
+          |ff| write!(ff, ", "),
         )?;
       }
       write!(f, "\"")
@@ -627,7 +626,8 @@ impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
       fmt_value(value, f)?;
     }
     while let Some(value) = iter.next() {
-      write!(f, ", \\\n{indent}")?;
+      write!(f, ", \\")?;
+      f.write_new_line_indentation()?;
       fmt_value(value, f)?;
     }
     Ok(())
@@ -929,14 +929,24 @@ impl<C: Ctx> ComplexAttri<C> for Values {
     &self,
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    let indent = f.indentation();
     let mut iter = self.inner.chunks(self.chunk_size);
     if let Some(v) = iter.next() {
-      ast::join_fmt(v.iter(), f, |float, ff| ff.write_num(*float), ", ")?;
+      ast::join_fmt(
+        v.iter(),
+        f,
+        |float, ff| ff.write_num(*float),
+        |ff| write!(ff, ", "),
+      )?;
     }
     while let Some(v) = iter.next() {
-      write!(f, ", \\\n{indent}")?;
-      ast::join_fmt(v.iter(), f, |float, ff| ff.write_num(*float), ", ")?;
+      write!(f, ", \\")?;
+      f.write_new_line_indentation()?;
+      ast::join_fmt(
+        v.iter(),
+        f,
+        |float, ff| ff.write_num(*float),
+        |ff| write!(ff, ", "),
+      )?;
     }
     Ok(())
   }
@@ -956,15 +966,25 @@ impl<V: Iterator<Item = f64>> DisplayValues<V> {
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     use itertools::Itertools as _;
-    let indent = f.indentation();
     let chunks = self.inner.chunks(self.chunk_size);
     let mut iter = chunks.into_iter();
     if let Some(v) = iter.next() {
-      ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_num(float), ", ")?;
+      ast::join_fmt(
+        v.into_iter(),
+        f,
+        |float, ff| ff.write_num(float),
+        |ff| write!(ff, ", "),
+      )?;
     }
     while let Some(v) = iter.next() {
-      write!(f, ", \\\n{indent}")?;
-      ast::join_fmt(v.into_iter(), f, |float, ff| ff.write_num(float), ", ")?;
+      write!(f, ", \\")?;
+      f.write_new_line_indentation()?;
+      ast::join_fmt(
+        v.into_iter(),
+        f,
+        |float, ff| ff.write_num(float),
+        |ff| write!(ff, ", "),
+      )?;
     }
     Ok(())
   }
@@ -987,23 +1007,24 @@ impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     use core::fmt::Write as _;
-    let indent = f.indentation();
-    f.write_fmt(format_args!("\n{indent}{key1}{key2} ("))?;
+    f.write_new_line_indentation()?;
+    write!(f, "{key1}{key2} (")?;
     ast::NameAttri::fmt_self(self.name, f)?;
-    f.write_fmt(format_args!(") {{"))?;
-    f.indent(1);
+    write!(f, ") {{")?;
+    f.indent();
     ComplexAttri::<C>::fmt_liberty(self.index_1, "index_1", f)?;
     ComplexAttri::<C>::fmt_liberty(self.index_2, "index_2", f)?;
-    let indent1 = f.indentation();
     if self.values.len > 0 {
-      write!(f, "\n{indent1}values (")?;
-      f.indent(1);
+      f.write_new_line_indentation()?;
+      write!(f, "values (")?;
+      f.indent();
       self.values.fmt_self(f)?;
-      f.dedent(1);
+      f.dedent();
       write!(f, ");")?;
     }
-    f.dedent(1);
-    f.write_fmt(format_args!("\n{indent}}}"))
+    f.dedent();
+    f.write_new_line_indentation()?;
+    write!(f, "}}")
   }
 }
 

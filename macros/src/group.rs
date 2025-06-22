@@ -627,7 +627,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       (
         quote! {return Ok((input, Ok(())));},
         quote! {
-          write!(f,"\n{indent}{key} () {{")?;
+          f.write_new_line_indentation()?;
+          write!(f,"{key} () {{")?;
         },
       )
     } else {
@@ -645,7 +646,8 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
           ));
         },
         quote! {
-          write!(f,"\n{indent}{key} (")?;
+          f.write_new_line_indentation()?;
+          write!(f,"{key} (")?;
           crate::ast::NamedGroup::<C>::fmt_name(self, f)?;
           write!(f,") {{")?;
         },
@@ -745,16 +747,16 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       impl<C: crate::Ctx> crate::ast::GroupAttri<C> for #ident<C> {
         fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
           use core::fmt::Write;
-          let indent = f.indentation();
           #write_title
-          f.indent(1);
+          f.indent();
           #write_simple_complex
           if !self.#attributes_name.is_empty(){
             crate::ast::attributs_fmt_liberty(&self.#attributes_name,f)?;
           }
           #write_group
-          f.dedent(1);
-          write!(f, "\n{indent}}}")
+          f.dedent();
+          f.write_new_line_indentation()?;
+          write!(f, "}}")
         }
         #[expect(unused_variables,clippy::collection_is_never_read)]
         fn nom_parse<'a, const IS_INCLUDED: bool>(

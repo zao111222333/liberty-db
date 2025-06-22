@@ -193,13 +193,23 @@ impl<C: Ctx> NamedGroup<C> for Statetable<C> {
     if self.input_nodes.len() == 1 {
       write!(f, "{}", self.input_nodes[0])?;
     } else {
-      join_fmt(self.input_nodes.iter(), f, |s, ff| write!(ff, "{s}"), " ")?;
+      join_fmt(
+        self.input_nodes.iter(),
+        f,
+        |s, ff| write!(ff, "{s}"),
+        |ff| write!(ff, " "),
+      )?;
     }
     write!(f, ", ")?;
     if self.internal_nodes.len() == 1 {
       write!(f, "{}", self.internal_nodes[0])
     } else {
-      join_fmt(self.internal_nodes.iter(), f, |s, ff| write!(ff, "{s}"), " ")
+      join_fmt(
+        self.internal_nodes.iter(),
+        f,
+        |s, ff| write!(ff, "{s}"),
+        |ff| write!(ff, " "),
+      )
     }
   }
 }
@@ -259,14 +269,16 @@ impl<C: Ctx> SimpleAttri<C> for Table {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    struct Sep<'a>(&'a str);
-    impl fmt::Display for Sep<'_> {
-      fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, " ,\\\n{}         ", self.0)
-      }
-    }
-    let indent = f.indentation();
-    join_fmt(self.v.iter(), f, |i, ff| write!(ff, "{i}"), Sep(indent))
+    join_fmt(
+      self.v.iter(),
+      f,
+      |i, ff| write!(ff, "{i}"),
+      |ff| {
+        write!(ff, " ,\\")?;
+        ff.write_new_line_indentation()?;
+        write!(ff, "         ")
+      },
+    )
   }
 }
 

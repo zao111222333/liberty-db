@@ -1,59 +1,56 @@
-use core::{fmt, marker::PhantomData, ops::Deref};
+use core::fmt;
 
 /// See more at [`DefaultIndentation`]
 pub trait Indentation {
-  const LUT: &'static [&'static str];
-  const LAST_LINE: &'static str = match Self::LUT.last() {
-    Some(s) => s,
-    None => "",
-  };
-  /// Get indentation
-  #[must_use]
-  #[inline]
-  fn indentation(level: usize) -> &'static str {
-    Self::LUT.get(level).map_or(Self::LAST_LINE, Deref::deref)
-  }
+  fn new() -> Self;
+  fn indent(&mut self);
+  fn dedent(&mut self);
+  fn indentation(&self) -> &str;
 }
 
 /// The Default Indentation implemt
-#[derive(Debug, Clone, Copy)]
-pub struct DefaultIndentation;
+#[derive(Debug)]
+pub struct DefaultIndentation(String);
+#[expect(clippy::cfg_not_test)]
 impl Indentation for DefaultIndentation {
-  #[cfg(test)]
-  const LUT: &'static [&'static str] = &[
-    "",
-    "| ",
-    "| | ",
-    "| | | ",
-    "| | | | ",
-    "| | | | | ",
-    "| | | | | | ",
-    "| | | | | | | ",
-    "| | | | | | | | ",
-    "| | | | | | | | | ",
-  ];
-  #[expect(clippy::cfg_not_test)]
-  #[cfg(not(test))]
-  const LUT: &'static [&'static str] = &[
-    "",
-    "\t",
-    "\t\t",
-    "\t\t\t",
-    "\t\t\t\t",
-    "\t\t\t\t\t",
-    "\t\t\t\t\t\t",
-    "\t\t\t\t\t\t\t",
-    "\t\t\t\t\t\t\t\t",
-    "\t\t\t\t\t\t\t\t\t",
-  ];
+  #[inline]
+  fn new() -> Self {
+    Self(String::with_capacity(10))
+  }
+  #[inline]
+  fn indent(&mut self) {
+    #[cfg(test)]
+    {
+      self.0 += "| ";
+    }
+    #[cfg(not(test))]
+    {
+      self.0.push('\t');
+    }
+  }
+  #[inline]
+  fn dedent(&mut self) {
+    #[cfg(test)]
+    {
+      _ = self.0.pop();
+      _ = self.0.pop();
+    }
+    #[cfg(not(test))]
+    {
+      _ = self.0.pop();
+    }
+  }
+  #[inline]
+  fn indentation(&self) -> &str {
+    &self.0
+  }
 }
 /// `CodeFormatter` with indent
 #[expect(missing_debug_implementations)]
 pub struct CodeFormatter<'a, F, I> {
   f: &'a mut F,
-  level: usize,
+  indent: I,
   buffer: [u8; lexical_core::BUFFER_SIZE],
-  __i: PhantomData<I>,
 }
 
 pub type DefaultCodeFormatter<'a, F> = CodeFormatter<'a, F, DefaultIndentation>;
@@ -68,12 +65,11 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
   /// Wrap the formatter `f`, use `indentation` as base string indentation and return a new
   /// formatter that implements `fmt::Write` that can be used with the macro `write!()`
   #[inline]
-  pub const fn new(f: &'a mut T) -> Self {
+  pub fn new(f: &'a mut T) -> Self {
     Self {
       f,
-      level: 0,
+      indent: I::new(),
       buffer: [b'0'; lexical_core::BUFFER_SIZE],
-      __i: PhantomData,
     }
   }
   #[inline]
@@ -83,29 +79,24 @@ impl<'a, T: fmt::Write, I: Indentation> CodeFormatter<'a, T, I> {
     let s = core::str::from_utf8(bytes).unwrap();
     self.f.write_str(s)
   }
-  /// Set the indentation level to a specific value
-  #[inline]
-  pub const fn set_level(&mut self, level: usize) {
-    self.level = level;
-  }
 
   /// Increase the indentation level by `inc`
   #[inline]
-  pub const fn indent(&mut self, inc: usize) {
-    self.level = self.level.saturating_add(inc);
+  pub fn indent(&mut self) {
+    self.indent.indent();
   }
 
   /// Decrease the indentation level by `inc`
   #[inline]
-  pub const fn dedent(&mut self, inc: usize) {
-    self.level = self.level.saturating_sub(inc);
+  pub fn dedent(&mut self) {
+    self.indent.dedent();
   }
 
   /// Get indentation
-  #[must_use]
   #[inline]
-  pub fn indentation(&self) -> &'static str {
-    I::indentation(self.level)
+  pub fn write_new_line_indentation(&mut self) -> fmt::Result {
+    self.f.write_char('\n')?;
+    self.f.write_str(self.indent.indentation())
   }
 }
 
@@ -168,14 +159,14 @@ liberty_db::common::items::DummyGroup (0) {
 | | | | | | | level (7) {  /* user defined attribute */
 | | | | | | | | level (8) {  /* user defined attribute */
 | | | | | | | | | level (9) {  /* user defined attribute */
-| | | | | | | | | level (10) {  /* user defined attribute */
-| | | | | | | | | level (11) {  /* user defined attribute */
-| | | | | | | | | level (12) {  /* user defined attribute */
-| | | | | | | | | level (13) {  /* user defined attribute */
-| | | | | | | | | }
-| | | | | | | | | }
-| | | | | | | | | }
-| | | | | | | | | }
+| | | | | | | | | | level (10) {  /* user defined attribute */
+| | | | | | | | | | | level (11) {  /* user defined attribute */
+| | | | | | | | | | | | level (12) {  /* user defined attribute */
+| | | | | | | | | | | | | level (13) {  /* user defined attribute */
+| | | | | | | | | | | | | }
+| | | | | | | | | | | | }
+| | | | | | | | | | | }
+| | | | | | | | | | }
 | | | | | | | | | }
 | | | | | | | | }
 | | | | | | | }
