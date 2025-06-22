@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (ccsn) {
+library (ccsn) {
 	define (char_when, receiver_capacitance, string);
 	define (is_propagating, receiver_capacitance, string);
 	define (load_cap_fall, input_ccb, float);

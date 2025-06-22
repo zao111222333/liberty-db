@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (inverter) {
+library (inverter) {
 	delay_model : polynomial;
 	default_fanout_load : 1.0;
 	default_inout_pin_cap : 1.0;

@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (pg_sample) {
+library (pg_sample) {
 	define (coefficients, pg_state_data, string);
 	define (coefficients, pg_timing_data, string);
 	define (related_pin, pg_timing_data, string);

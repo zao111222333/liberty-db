@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (a, b) {
+library (a, b) {
 	technology (cmos);
 	delay_model : table_lookup;
 	time_unit : 1ns;

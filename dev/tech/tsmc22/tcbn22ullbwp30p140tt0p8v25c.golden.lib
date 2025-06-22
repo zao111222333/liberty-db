@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (tcbn22ullbwp30p140tt0p8v25c) {
+library (tcbn22ullbwp30p140tt0p8v25c) {
 	technology (cmos);
 	delay_model : table_lookup;
 	date : "Fri Nov  6 18:11:02 2020 ";

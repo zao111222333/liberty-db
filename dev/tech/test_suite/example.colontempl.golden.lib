@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (em222e) {
+library (em222e) {
 	delay_model : table_lookup;
 	nom_process : 1.0;
 	nom_temperature : 25.0;

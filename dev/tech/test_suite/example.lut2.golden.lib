@@ -1,5 +1,5 @@
 
-liberty_db::library::Library (example) {
+library (example) {
 	technology (cmos);
 	delay_model : table_lookup;
 	simulation : false;
