@@ -747,7 +747,7 @@ pub trait Group<C: Ctx>: Sized + GroupAttri<C> {
   }
   /// `test_wrapper`
   #[inline]
-  fn display_name(&self, name: &'static str) -> GroupDisplay<'_, C, Self> {
+  fn display_name<'a>(&'a self, name: &'a str) -> GroupDisplay<'a, C, Self> {
     GroupDisplay { inner: self, name: Some(name), ___p: PhantomData }
   }
 }
@@ -934,7 +934,7 @@ impl<'a> ParserError<'a> {
 /// `GroupDisplay`
 #[derive(Debug)]
 pub struct GroupDisplay<'a, C: Ctx, G> {
-  pub name: Option<&'static str>,
+  pub name: Option<&'a str>,
   pub inner: &'a G,
   ___p: PhantomData<C>,
 }
