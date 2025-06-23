@@ -19,7 +19,6 @@ pub enum Level {
   L,
 }
 impl From<Level> for bool {
-  #[must_use]
   #[inline]
   fn from(value: Level) -> Self {
     match value {
@@ -62,7 +61,6 @@ impl Level {
   }
 }
 impl From<Level> for State {
-  #[must_use]
   #[inline]
   fn from(value: Level) -> Self {
     match value {
@@ -87,7 +85,6 @@ pub enum Edge {
   F,
 }
 impl From<Edge> for State {
-  #[must_use]
   #[inline]
   fn from(value: Edge) -> Self {
     match value {
