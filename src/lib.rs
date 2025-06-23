@@ -216,7 +216,7 @@ pub use timing::{Timing, TimingId};
 #[cfg(feature = "py")]
 mod py;
 pub mod units;
-pub use mut_set::MutSetExt;
+pub use mut_set::{Item, MutSetExt};
 
 pub mod ast;
 pub use ast::Group;

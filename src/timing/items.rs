@@ -2,7 +2,7 @@
 //! `Timing`.
 #![allow(clippy::multiple_inherent_impl)]
 use crate::{
-  Ctx,
+  Ctx, Group,
   ast::{
     self, BuilderScope, GroupComments, GroupFn, ParsingBuilder, fmt_comment_liberty,
   },
@@ -454,10 +454,16 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     Some(out)
   }
 }
-impl<C: Ctx> TimingTableLookUp<C> {
+impl<C: Ctx> ParsingBuilder<C> for TimingTableLookUp<C> {
+  type Builder = ();
+  fn build(_: Self::Builder, _: &mut BuilderScope<C>) -> Self {
+    unreachable!()
+  }
+}
+impl<C: Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
   #[inline]
   #[expect(clippy::float_arithmetic)]
-  pub(crate) fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation>(
+  fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation>(
     &self,
     key: &str,
     f: &mut ast::CodeFormatter<'_, T, I>,
@@ -516,4 +522,14 @@ impl<C: Ctx> TimingTableLookUp<C> {
     }
     Ok(())
   }
+  fn nom_parse<'a, const IS_INCLUDED: bool>(
+    _: &mut Self::Builder,
+    _: &'a str,
+    _: &str,
+    _: &mut ast::ParseScope<'_>,
+  ) -> nom::IResult<&'a str, Result<(), ast::IdError>, nom::error::Error<&'a str>> {
+    unreachable!()
+  }
 }
+
+impl<C: Ctx> Group<C> for TimingTableLookUp<C> {}

@@ -98,16 +98,24 @@ impl Edge {
   #[inline]
   pub const fn bgn(&self) -> Level {
     match self {
-      Self::F => Level::H,
       Self::R => Level::L,
+      Self::F => Level::H,
     }
   }
   #[must_use]
   #[inline]
   pub const fn end(&self) -> Level {
     match self {
-      Self::F => Level::L,
       Self::R => Level::H,
+      Self::F => Level::L,
+    }
+  }
+  #[must_use]
+  #[inline]
+  pub const fn full_name(&self) -> &'static str {
+    match self {
+      Self::R => "rise",
+      Self::F => "fall",
     }
   }
 }
@@ -130,10 +138,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for Edge {
     f: &mut crate::ast::CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     use core::fmt::Write as _;
-    f.write_str(match self {
-      Self::F => "fall",
-      Self::R => "rise",
-    })
+    f.write_str(self.full_name())
   }
 }
 

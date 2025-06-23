@@ -1,5 +1,6 @@
-use liberty_db::{DefaultCtx, Library, cell::CellCtx, expression::SdfExpression};
-use mut_set::MutSetExt as _;
+use liberty_db::{
+  DefaultCtx, Library, MutSetExt as _, cell::CellCtx, expression::SdfExpression,
+};
 use std::{
   env,
   fs::File,
