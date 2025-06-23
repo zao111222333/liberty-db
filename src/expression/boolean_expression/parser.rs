@@ -4,6 +4,7 @@
   clippy::arithmetic_side_effects,
   clippy::wildcard_enum_match_arm
 )]
+use crate::ast::parser::{char_in_key, key};
 use biodivine_lib_bdd::boolean_expression::BooleanExpression as Expr;
 use core::fmt;
 use nom::{
@@ -19,37 +20,7 @@ use nom::{
   sequence::delimited,
 };
 
-use crate::ast::parser::{char_in_key, key};
-
-/// only not(variable) and variable
-#[inline]
-pub(super) fn as_sdf_str(expr: &Expr) -> String {
-  match expr {
-    Expr::Variable(s) => s.as_bytes().first().map_or(String::new(), |s1| {
-      if s1.is_ascii_digit() {
-        format!("\\\"{s}\\\" == 1'b1")
-      } else {
-        format!("{s} == 1'b1")
-      }
-    }),
-    Expr::Not(e) => match e.as_ref() {
-      Expr::Variable(s) => {
-        format!("{s} == 1'b0")
-      }
-      _ => unreachable!(),
-    },
-    Expr::And(e1, e2) => {
-      format!("{} && {}", as_sdf_str(e1), as_sdf_str(e2))
-    }
-    Expr::Const(_)
-    | Expr::Xor(_, _)
-    | Expr::Imp(_, _)
-    | Expr::Or(_, _)
-    | Expr::Iff(_, _)
-    | Expr::Cond(_, _, _) => unreachable!(),
-  }
-}
-
+#[expect(clippy::too_many_lines)]
 #[inline]
 pub(super) fn _fmt(expr: &Expr, f: &mut fmt::Formatter<'_>) -> fmt::Result {
   match expr {
@@ -123,11 +94,32 @@ pub(super) fn _fmt(expr: &Expr, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     }
     Expr::Cond(e1, e2, e3) => {
       write!(f, "(")?;
-      _fmt(e1, f)?;
+      match **e1 {
+        Expr::Or(_, _) | Expr::And(_, _) => {
+          write!(f, "(")?;
+          _fmt(e1, f)?;
+          write!(f, ")")?;
+        }
+        _ => _fmt(e1, f)?,
+      }
       write!(f, "?")?;
-      _fmt(e2, f)?;
+      match **e2 {
+        Expr::Or(_, _) | Expr::And(_, _) => {
+          write!(f, "(")?;
+          _fmt(e2, f)?;
+          write!(f, ")")?;
+        }
+        _ => _fmt(e2, f)?,
+      }
       write!(f, ":")?;
-      _fmt(e3, f)?;
+      match **e3 {
+        Expr::Or(_, _) | Expr::And(_, _) => {
+          write!(f, "(")?;
+          _fmt(e3, f)?;
+          write!(f, ")")?;
+        }
+        _ => _fmt(e3, f)?,
+      }
       write!(f, ")")
     }
     Expr::Imp(_, _) | Expr::Iff(_, _) => unreachable!(),

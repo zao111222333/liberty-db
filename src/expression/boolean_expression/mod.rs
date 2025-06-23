@@ -12,7 +12,7 @@ use crate::{
   cell::CellCtx as _,
 };
 pub use latch_ff::{FF, FFBank, Latch, LatchBank, LatchFF};
-use parser::{BoolExprErr, as_sdf_str};
+use parser::BoolExprErr;
 
 pub use biodivine_lib_bdd::{
   Bdd, BddVariableSet, boolean_expression::BooleanExpression as Expr,
@@ -24,10 +24,7 @@ use core::{
   ops::{Deref, DerefMut},
   str::FromStr as _,
 };
-use itertools::Itertools as _;
 use std::{collections::HashSet, sync::LazyLock};
-
-use super::SdfExpression;
 
 static UNKNOWN: LazyLock<Box<Expr>> =
   LazyLock::new(|| Box::new(Expr::Variable("_unknown_".to_owned())));
@@ -246,23 +243,6 @@ impl PartialEq for BddBooleanExpression {
   }
 }
 
-impl BddBooleanExpression {
-  /// convert `BooleanExpression` to sdf
-  #[must_use]
-  #[inline]
-  pub fn sdf(&self, cell_variables: &BddVariableSet) -> SdfExpression {
-    let s = self
-      .bdd
-      .sat_valuations()
-      .map(|valuation| {
-        let expr = Bdd::from(valuation).to_boolean_expression(cell_variables);
-        as_sdf_str(&expr)
-      })
-      .join(") || ( ");
-    SdfExpression::new(format!("( {s} )"))
-  }
-}
-
 impl Eq for BddBooleanExpression {}
 #[expect(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for BddBooleanExpression {
@@ -437,7 +417,7 @@ fn _previous(expr: &mut Expr) {
   match expr {
     Expr::Const(_) => (),
     Expr::Variable(node) => {
-      *node += "*";
+      *node += "~";
     }
     Expr::Not(e) => _previous(e),
     Expr::And(e1, e2) | Expr::Or(e1, e2) | Expr::Xor(e1, e2) => {
@@ -580,14 +560,6 @@ mod test {
     }
     .into();
     assert_eq!(cond, or_and);
-  }
-  #[test]
-  fn sdf() {
-    let variables = BddVariableSet::new(&["A", "B", "C", "D"]);
-    assert_eq!(
-      SdfExpression::new("( A == 1'b0 && B == 1'b1 && C == 1'b1) || ( A == 1'b1 && B == 1'b0 && C == 1'b1) || ( A == 1'b1 && B == 1'b1 && C == 1'b1 )".into()), 
-      BddBooleanExpression::from_str("(A+B)*C").unwrap().sdf(&variables),
-    );
   }
   #[test]
   fn lid_bdd() {
