@@ -56,21 +56,21 @@ ordered-float = "5.0"
 fast-float2 = "0.2"
 walkdir = "2"
 similar = { version = "2.7", features = ["inline"]}
-console = "0.15"
+console = "0.16"
 nom = "8.0"
 lexical-core = "1.0"
 biodivine-lib-bdd = { version = "0.5.25", features = ["serde"] }
 mut_set = "0.9.0"
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
-criterion = { version = "0.5", features = ["html_reports"] }
+criterion = { version = "0.6", features = ["html_reports"] }
 sysinfo = "0.35"
 chrono = "0.4"
 anyhow = "1.0"
 foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
 pyo3 = "0.25"
-pyo3-stub-gen = { version = "0.8", default-features = false }
+pyo3-stub-gen = { version = "0.10", default-features = false }
 # pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
 bincode = { version= "2", features = ["serde"] }
 indexmap = { version = "2.9", features = ["serde"] }
