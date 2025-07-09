@@ -11,7 +11,7 @@ use crate::{
   ast::{CodeFormatter, Indentation, ParseScope, ParsingBuilder},
   cell::CellCtx as _,
 };
-pub use latch_ff::{FF, FFBank, Latch, LatchBank, LatchFF};
+pub use latch_ff::{ClearPresetState, FF, FFBank, Latch, LatchBank, LatchFF};
 use parser::BoolExprErr;
 
 pub use biodivine_lib_bdd::{
@@ -277,6 +277,14 @@ impl LogicBooleanExpression {
       expr,
     })
   }
+  #[must_use]
+  #[inline]
+  pub fn bdd_new(bdd: Bdd, logic_variables: &BddVariableSet) -> Self {
+    Self(BddBooleanExpression {
+      expr: bdd.to_boolean_expression(logic_variables),
+      bdd,
+    })
+  }
 }
 
 impl<C: Ctx> ParsingBuilder<C> for LogicBooleanExpression {
@@ -298,6 +306,11 @@ impl PowerGroundBooleanExpression {
       }),
       expr,
     })
+  }
+  #[must_use]
+  #[inline]
+  pub fn bdd_new(bdd: Bdd, pg_variables: &BddVariableSet) -> Self {
+    Self(BddBooleanExpression { expr: bdd.to_boolean_expression(pg_variables), bdd })
   }
 }
 impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {

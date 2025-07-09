@@ -64,6 +64,9 @@ pub struct FF<C: Ctx> {
   /// The clear  attribute gives the active value for the clear input.
   #[liberty(simple(type = Option))]
   pub clear: Option<LogicBooleanExpression>,
+  /// The `preset` attribute gives the active value for the preset input.
+  #[liberty(simple(type = Option))]
+  pub preset: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
   #[liberty(simple(type = Option))]
@@ -93,9 +96,6 @@ pub struct FF<C: Ctx> {
   /// The value of `variable1` after the active edge.
   #[liberty(simple(type = Option))]
   pub next_state: Option<LogicBooleanExpression>,
-  /// The `preset` attribute gives the active value for the preset input.
-  #[liberty(simple(type = Option))]
-  pub preset: Option<LogicBooleanExpression>,
   #[liberty(simple(type = Option))]
   pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
