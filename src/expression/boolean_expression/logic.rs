@@ -136,6 +136,14 @@ impl Edge {
   }
   #[must_use]
   #[inline]
+  pub const fn inverse(&self) -> Self {
+    match self {
+      Self::R => Self::F,
+      Self::F => Self::R,
+    }
+  }
+  #[must_use]
+  #[inline]
   pub const fn full_name(&self) -> &'static str {
     match self {
       Self::R => "rise",
