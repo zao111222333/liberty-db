@@ -21,7 +21,9 @@ macro_rules! impl_py_enum {
       fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
         match ob.extract::<alloc::borrow::Cow<'_, str>>()?.parse() {
           Ok(t) => Ok(t),
-          Err(_) => Err(PyValueError::new_err("Matching variant not found")),
+          Err(_) => {
+            Err(pyo3::exceptions::PyValueError::new_err("Matching variant not found"))
+          }
         }
       }
     }
