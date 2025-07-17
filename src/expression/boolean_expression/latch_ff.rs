@@ -971,11 +971,11 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clear : "!CD";
+| preset : "!PD";
 | clear_preset_var1 : L;
 | clear_preset_var2 : L;
 | clocked_on : "CP";
 | next_state : "D";
-| preset : "!PD";
 }"#,
     );
     let var1_expr = ff.variable1_expr();
@@ -1013,11 +1013,11 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clear : "!CD";
+| preset : "!PD";
 | clear_preset_var1 : L;
 | clear_preset_var2 : L;
 | clocked_on : "CP";
 | next_state : "TE*TI+!TE*J*!K+!TE*!J*!K*IQ+!TE*J*K*!IQ";
-| preset : "!PD";
 }"#,
     );
     let var1_expr = ff.variable1_expr();
@@ -1088,12 +1088,12 @@ liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
       r#"
 liberty_db::expression::boolean_expression::latch_ff::FF (IQ, IQN) {
 | clear : "!CDN";
+| preset : "!PDN";
 | clear_preset_var1 : H;
 | clear_preset_var2 : H;
 | clocked_on : "CLK";
 | clocked_on_also : "!CLKN";
 | next_state : "D";
-| preset : "!PDN";
 }"#,
     );
     let var1_expr = ff.variable1_expr();

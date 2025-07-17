@@ -23,8 +23,8 @@ library (example) {
 		area : 2.0;
 		ff (ff1, ff2) {
 			clear : "gee";
-			clear_preset_var1 : H;
 			preset : "wow";
+			clear_preset_var1 : H;
 		}
 		pin (A) {
 			capacitance : 1.0;

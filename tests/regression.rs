@@ -10,7 +10,8 @@ use tracing::{debug, error, info, trace, warn};
 use dev_utils::{all_files, init_logger, text_diff};
 use liberty_db::{DefaultCtx, Library, ast::Group};
 use std::{
-  fs::read_to_string,
+  fs::{File, read_to_string},
+  io::{BufWriter, Write},
   path::{Path, PathBuf},
 };
 
@@ -30,10 +31,6 @@ fn golden_path(test_lib_path: &Path) -> PathBuf {
 #[test]
 #[ignore]
 fn make_golden() {
-  use std::{
-    fs::File,
-    io::{BufWriter, Write},
-  };
   init_logger();
   for (is_good, test_lib_path) in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());
