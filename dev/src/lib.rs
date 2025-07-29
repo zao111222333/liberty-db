@@ -3,11 +3,11 @@ pub mod _impl_bench;
 #[cfg(feature = "compare")]
 pub mod _impl_compare;
 pub mod projs;
-use criterion::{Criterion, black_box};
+use criterion::Criterion;
 use dev_utils::all_files;
 use itertools::Itertools as _;
 use serde_json::Value;
-use std::{fs::read_to_string, panic, path::Path, time::Duration};
+use std::{fs::read_to_string, hint::black_box, panic, path::Path, time::Duration};
 
 #[cfg(feature = "compare")]
 pub const COMPARE: bool = true;

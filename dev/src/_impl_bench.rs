@@ -1,8 +1,8 @@
 #![expect(unused_imports)]
 use crate::{ProjInfo, ProjLibrary, TypedSupport};
-use criterion::black_box;
 use std::{
   ffi::{CString, c_char, c_int, c_void},
+  hint::black_box,
   io::Cursor,
   path::Path,
   str::FromStr,

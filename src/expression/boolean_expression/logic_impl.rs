@@ -57,6 +57,7 @@ impl Not for Static {
 mod test {
   use super::*;
   use crate::{DefaultCtx, IntoEnumIterator as _};
+  use core::hint::black_box;
 
   impl State {
     fn combine_op2(self, rhs: Self, f: fn(Static, Static) -> Static) -> Self {
@@ -142,7 +143,7 @@ mod test {
       for _ in 0..n {
         for l in State::iter() {
           for r in State::iter() {
-            _ = criterion::black_box(State::combine_op2(l, r, static_op2));
+            _ = black_box(State::combine_op2(l, r, static_op2));
           }
         }
       }
@@ -152,7 +153,7 @@ mod test {
       for _ in 0..n {
         for l in State::iter() {
           for r in State::iter() {
-            _ = criterion::black_box(match_op2(l, r));
+            _ = black_box(match_op2(l, r));
           }
         }
       }
@@ -162,7 +163,7 @@ mod test {
       for _ in 0..n {
         for l in State::iter() {
           for r in State::iter() {
-            _ = criterion::black_box(lut_op2(l, r));
+            _ = black_box(lut_op2(l, r));
           }
         }
       }
@@ -191,7 +192,7 @@ mod test {
     for _ in 0..n {
       for l in State::iter() {
         let combine = State::combine_bgn_end(l.bgn().not(), l.end().not());
-        _ = criterion::black_box(combine);
+        _ = black_box(combine);
       }
     }
     let runtime_combine = SystemTime::now().duration_since(start_combine).unwrap();
@@ -199,7 +200,7 @@ mod test {
     let start_match = SystemTime::now();
     for _ in 0..n {
       for l in State::iter() {
-        _ = criterion::black_box(State::match_not(l));
+        _ = black_box(State::match_not(l));
       }
     }
     let runtime_match = SystemTime::now().duration_since(start_match).unwrap();
@@ -208,7 +209,7 @@ mod test {
     for _ in 0..n {
       for l in State::iter() {
         for r in State::iter() {
-          _ = criterion::black_box(State::lut_not(l));
+          _ = black_box(State::lut_not(l));
         }
       }
     }
