@@ -4,7 +4,7 @@
 //! </script>
 mod latch_ff;
 pub mod logic;
-mod logic_impl;
+// mod logic_impl;
 mod parser;
 use crate::{
   Ctx, DefaultCtx,

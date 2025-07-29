@@ -1199,9 +1199,9 @@ liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
       r#"
 liberty_db::expression::boolean_expression::latch_ff::Latch (IQ, IQN) {
 | clear : "!S";
+| preset : "!R";
 | clear_preset_var1 : L;
 | clear_preset_var2 : L;
-| preset : "!R";
 }"#,
     );
     let var1_expr = latch.variable1_expr();
