@@ -1,10 +1,7 @@
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::multiple_inherent_impl)]
 use super::logic::{State, Static};
-use core::{
-  hint::black_box,
-  ops::{BitAnd, BitOr, BitXor, Not},
-};
+use core::ops::{BitAnd, BitOr, BitXor, Not};
 
 impl BitAnd for Static {
   type Output = Self;
@@ -60,6 +57,7 @@ impl Not for Static {
 mod test {
   use super::*;
   use crate::{DefaultCtx, IntoEnumIterator as _};
+  use core::hint::black_box;
 
   impl State {
     fn combine_op2(self, rhs: Self, f: fn(Static, Static) -> Static) -> Self {
