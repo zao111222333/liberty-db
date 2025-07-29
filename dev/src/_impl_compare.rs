@@ -1,6 +1,5 @@
 use crate::{ProjInfo, ProjLibrary, TypedSupport};
-use criterion::black_box;
-use std::path::Path;
+use std::{hint::black_box, path::Path};
 
 impl ProjLibrary for liberty_db_incoming::Library<liberty_db_incoming::DefaultCtx> {
   const INFO: ProjInfo = ProjInfo {
