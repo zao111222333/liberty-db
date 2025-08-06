@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.16.2"
+version = "0.16.3"
 license = "MIT"
 edition = "2024"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -71,7 +71,7 @@ anyhow = "1.0"
 foldhash = "0.1"
 dev_utils = { path = "dev/utils" }
 pyo3 = "0.25"
-pyo3-stub-gen = { version = "0.11.1", default-features = false }
+pyo3-stub-gen = { version = "0.12.1", default-features = false }
 # pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
 bincode = { version= "2", features = ["serde"] }
 indexmap = { version = "2.9", features = ["serde"] }
