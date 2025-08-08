@@ -548,12 +548,12 @@ trait __LatchFF {
   fn variable1(&self) -> &String;
   fn variable2(&self) -> &String;
   fn clear(&self) -> Option<&LogicBooleanExpression>;
+  fn preset(&self) -> Option<&LogicBooleanExpression>;
   fn clear_preset_var1(&self) -> Option<&ClearPresetState>;
   fn clear_preset_var2(&self) -> Option<&ClearPresetState>;
   fn active(&self) -> Option<Box<Expr>>;
   fn active_also(&self) -> Option<Box<Expr>>;
   fn next_state(&self) -> Option<&LogicBooleanExpression>;
-  fn preset(&self) -> Option<&LogicBooleanExpression>;
 }
 
 #[duplicate::duplicate_item(
@@ -575,6 +575,45 @@ impl<C: Ctx> GroupFn<C> for AllTypes<C> {}
 /// trait for `FF` and `FFBank`
 #[expect(private_bounds)]
 pub trait LatchFF: __LatchFF {
+  fn logically_eq(&self, other: &Self) -> bool {
+    self.clear() == other.clear()
+      && self.preset() == other.preset()
+      && self.clear_preset_var1() == other.clear_preset_var1()
+      && self.clear_preset_var2() == other.clear_preset_var2()
+      && self.active() == other.active()
+      && self.active_also() == other.active_also()
+      && self.next_state() == other.next_state()
+  }
+  fn logically_inverse(&self, other: &Self) -> bool {
+    self.clear() == other.preset()
+      && self.preset() == other.clear()
+      && self.clear_preset_var1() == other.clear_preset_var2()
+      && self.clear_preset_var1() == other.clear_preset_var2()
+      && self.active() == other.active()
+      && self.active_also() == other.active_also()
+      && match (self.next_state(), other.next_state()) {
+        (Some(s1), Some(s2)) => s1.bdd.not().eq(&s2.bdd),
+        (None, None) => true,
+        _ => false,
+      }
+  }
+  fn exist_variable<'a, I: 'a + Iterator<Item = &'a Self>>(
+    &self,
+    exists: I,
+  ) -> Option<&'a String>
+  where
+    Self: 'a,
+  {
+    for exist in exists.into_iter() {
+      if self.logically_eq(exist) {
+        return Some(exist.variable1());
+      }
+      if self.logically_inverse(exist) {
+        return Some(exist.variable2());
+      }
+    }
+    None
+  }
   /// Get the `BooleanExpression` of variable1
   #[inline]
   fn variable1_expr(&self) -> BooleanExpression {
@@ -885,8 +924,74 @@ crate::ast::impl_simple!(ClearPresetState);
 mod test {
   use crate::{
     DefaultCtx,
-    expression::{BddBooleanExpression, FF, FFBank, Latch, LatchBank, LatchFF as _},
+    expression::{BddBooleanExpression, FF, FFBank, Latch, LatchBank, LatchFF},
   };
+  #[test]
+  fn eq_inverse_logic() {
+    let latch1 = crate::ast::test_parse_fmt_variables::<Latch<DefaultCtx>>(
+      &["CDN", "SDN", "E", "D"],
+      r#"(IQ0, IQN0) {
+        clear : "!CDN";
+        preset : "!SDN";
+        clear_preset_var1 : H;
+        clear_preset_var2 : L;
+        enable : "E";
+        data_in : "D";
+      }"#,
+      r#"
+liberty_db::expression::boolean_expression::latch_ff::Latch (IQ0, IQN0) {
+| clear : "!CDN";
+| preset : "!SDN";
+| clear_preset_var1 : H;
+| clear_preset_var2 : L;
+| enable : "E";
+| data_in : "D";
+}"#,
+    );
+    let latch2 = crate::ast::test_parse_fmt_variables::<Latch<DefaultCtx>>(
+      &["CDN", "SDN", "E", "D"],
+      r#"(IQN1, IQNN1) {
+        clear : "!SDN";
+        preset : "!CDN";
+        clear_preset_var1 : L;
+        clear_preset_var2 : H;
+        enable : "E";
+        data_in : "!D";
+      }"#,
+      r#"
+liberty_db::expression::boolean_expression::latch_ff::Latch (IQN1, IQNN1) {
+| clear : "!SDN";
+| preset : "!CDN";
+| clear_preset_var1 : L;
+| clear_preset_var2 : H;
+| enable : "E";
+| data_in : "!D";
+}"#,
+    );
+    let latch3 = crate::ast::test_parse_fmt_variables::<Latch<DefaultCtx>>(
+      &["CDN", "SDN", "E", "D"],
+      r#"(IQN1, IQNN1) {
+        clear : "!SDN";
+        preset : "!CDN";
+        clear_preset_var1 : L;
+        clear_preset_var2 : H;
+        enable : "E";
+        data_in : "D";
+      }"#,
+      r#"
+liberty_db::expression::boolean_expression::latch_ff::Latch (IQN1, IQNN1) {
+| clear : "!SDN";
+| preset : "!CDN";
+| clear_preset_var1 : L;
+| clear_preset_var2 : H;
+| enable : "E";
+| data_in : "D";
+}"#,
+    );
+    assert!(latch1.logically_eq(&latch1));
+    assert!(latch1.logically_inverse(&latch2));
+    assert!(!latch1.logically_inverse(&latch3));
+  }
   #[test]
   fn special_boolean_expression() {
     let ff = crate::ast::test_parse_fmt_variables::<FF<DefaultCtx>>(
