@@ -842,13 +842,15 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
   pub multicell_pad_pin: Option<bool>,
+  /// In a pin  group, the `nextstate_type` attribute defines the type of the `next_state` attribute.
+  /// You define a `next_state`  attribute in an `ff`  group or an `ff_bank`  group.
+  ///
+  /// Note:
+  ///
+  /// Specify a `nextstate_type`  attribute to ensure that the synchronous set (or synchronous reset) pin
+  /// and the D pin of a sequential cell are not swapped when the design is instantiated.
   /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
-  /// ?field=test
-  /// &bgn
-  /// =228.62
-  /// &end
-  /// =228.62
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=228.62+265.12&end=228.62+265.17
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
   pub nextstate_type: Option<NextstateType>,
@@ -1076,7 +1078,7 @@ pub struct Pin<C: Ctx> {
   /// =229.23
   /// ">Reference-Instance</a>
   #[liberty(simple(type = Option))]
-  pub three_state: Option<BooleanExpression>,
+  pub three_state: Option<LogicBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
   /// ?field=test

@@ -255,19 +255,26 @@ impl fmt::Display for AllDriverType {
   }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Default, Display, EnumString)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum NextstateType {
+  /// Identifies the pin as a synchronous data pin. This is the default value.
+  #[default]
   #[strum(serialize = "data")]
   Data,
+  /// Identifies the pin as a synchronous preset pin.
   #[strum(serialize = "preset")]
   Preset,
+  /// Identifies the pin as a synchronous clear pin.
   #[strum(serialize = "clear")]
   Clear,
+  /// Identifies the pin as a synchronous load pin.
   #[strum(serialize = "load")]
   Load,
+  /// Identifies the pin as a synchronous scan-in pin.
   #[strum(serialize = "scan_in")]
   ScanIn,
+  /// Identifies the pin as a synchronous scan-enable pin.
   #[strum(serialize = "scan_enable")]
   ScanEnable,
 }
