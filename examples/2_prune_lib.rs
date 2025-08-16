@@ -1,13 +1,7 @@
 use liberty_db::{
   DefaultCtx, Library, MutSetExt as _, cell::CellCtx, expression::SdfExpression,
 };
-use std::{
-  env,
-  fs::File,
-  io::{BufWriter, Write},
-  path::Path,
-  process::ExitCode,
-};
+use std::{env, path::Path, process::ExitCode};
 
 // cargo run /path/to/xxx.lib
 // Use the first arg as input file name,
@@ -84,8 +78,6 @@ fn main() -> ExitCode {
   let out_file_name =
     format!("example2_{}", input_lib.file_name().unwrap().to_str().unwrap());
   log::info!("Output to [file] {} ...", out_file_name);
-  let out_file = File::create(out_file_name).unwrap();
-  let mut writer = BufWriter::new(out_file);
-  write!(&mut writer, "{}", library).unwrap();
+  library.write_lib_file(&out_file_name).unwrap();
   ExitCode::SUCCESS
 }

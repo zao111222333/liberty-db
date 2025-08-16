@@ -10,8 +10,7 @@ use tracing::{debug, error, info, trace, warn};
 use dev_utils::{all_files, init_logger, text_diff};
 use liberty_db::{DefaultCtx, Library, ast::Group};
 use std::{
-  fs::{File, read_to_string},
-  io::{BufWriter, Write},
+  fs::read_to_string,
   path::{Path, PathBuf},
 };
 
@@ -34,13 +33,12 @@ fn make_golden() {
   init_logger();
   for (is_good, test_lib_path) in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());
-    let golden_lib_path = golden_path(&test_lib_path);
     let res = Library::<DefaultCtx>::parse_lib_file(&test_lib_path);
     if is_good {
-      let library = res.unwrap();
-      let golden_lib = File::create(golden_lib_path).unwrap();
-      let mut writer = BufWriter::new(golden_lib);
-      _ = write!(writer, "{}", library.display_name("library"));
+      let golden_lib_path = golden_path(&test_lib_path);
+      let mut library = res.unwrap();
+      library.comments_this_entry().insert_entry("golden".to_string());
+      library.write_lib_file(&golden_lib_path).unwrap();
     } else {
       assert!(res.is_err())
     }
@@ -52,10 +50,10 @@ fn regression() {
   init_logger();
   for (is_good, test_lib_path) in all_files("dev/tech") {
     println!("================\n{}", test_lib_path.display());
-    let golden_lib_path = golden_path(&test_lib_path);
     let res = Library::<DefaultCtx>::parse_lib_file(&test_lib_path);
     if is_good {
       let library = res.unwrap();
+      let golden_lib_path = golden_path(&test_lib_path);
       let golden = read_to_string(golden_lib_path).unwrap();
       let new = library.display_name("library").to_string();
       text_diff(golden.as_str(), new.as_str());
