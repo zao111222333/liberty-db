@@ -1,4 +1,4 @@
-
+** golden
 library (t28) {
 	define (aaa, pin, integer);
 	delay_model : table_lookup;

@@ -1,4 +1,4 @@
-
+** golden
 library (example_ccs_1) {
 	delay_model : table_lookup;
 	date : "Thu Jul  6 19:44:59 2005";

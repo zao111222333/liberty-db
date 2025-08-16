@@ -1,4 +1,4 @@
-
+** golden
 library (inverter) {
 	delay_model : polynomial;
 	default_fanout_load : 1.0;
