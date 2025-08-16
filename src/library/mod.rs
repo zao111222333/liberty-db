@@ -733,6 +733,9 @@ impl<C: Ctx> Library<C> {
   #[inline]
   pub fn write_lib_file<P: AsRef<Path>>(&self, filename: P) -> std::io::Result<()> {
     use std::io::{BufWriter, Write as _};
+    if let Some(dir) = filename.as_ref().parent() {
+      _ = std::fs::create_dir_all(dir);
+    }
     let file = std::fs::File::create(filename)?;
     let mut writer = BufWriter::new(file);
     write!(&mut writer, "{self}")?;
