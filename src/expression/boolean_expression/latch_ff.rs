@@ -575,6 +575,7 @@ impl<C: Ctx> GroupFn<C> for AllTypes<C> {}
 /// trait for `FF` and `FFBank`
 #[expect(private_bounds)]
 pub trait LatchFF: __LatchFF {
+  #[inline]
   fn logically_eq(&self, other: &Self) -> bool {
     self.clear() == other.clear()
       && self.preset() == other.preset()
@@ -584,6 +585,7 @@ pub trait LatchFF: __LatchFF {
       && self.active_also() == other.active_also()
       && self.next_state() == other.next_state()
   }
+  #[inline]
   fn logically_inverse(&self, other: &Self) -> bool {
     self.clear() == other.preset()
       && self.preset() == other.clear()
@@ -597,6 +599,7 @@ pub trait LatchFF: __LatchFF {
         _ => false,
       }
   }
+  #[inline]
   fn exist_variable<'a, I: 'a + Iterator<Item = &'a Self>>(
     &self,
     exists: I,
@@ -604,7 +607,7 @@ pub trait LatchFF: __LatchFF {
   where
     Self: 'a,
   {
-    for exist in exists.into_iter() {
+    for exist in exists {
       if self.logically_eq(exist) {
         return Some(exist.variable1());
       }
