@@ -482,7 +482,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       return Err(syn::Error::new(Span::call_site(), "This macro only supports struct."));
     }
   };
-  let builder_ident = Ident::new(&format!("{}Builder", ident), Span::call_site());
+  let builder_ident = Ident::new(&format!("{ident}Builder"), Span::call_site());
   if let Fields::Named(named) = &st.fields {
     let fields = &named.named;
     let (

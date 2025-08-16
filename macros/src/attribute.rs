@@ -115,7 +115,7 @@ pub(crate) fn parse_fields_type(
         None => {
           return Err(syn::Error::new(
             proc_macro2::Span::call_site(),
-            format!("{}: Can not find #[liberty ...].", field_name),
+            format!("{field_name}: Can not find #[liberty ...]."),
           ));
         }
       };
@@ -127,7 +127,7 @@ pub(crate) fn parse_fields_type(
           if let Some(name) = &_attributes_name {
             return Err(syn::Error::new(
               proc_macro2::Span::call_site(),
-              format!("duplicated attributes {}.", name),
+              format!("duplicated attributes {name}."),
             ));
           } else {
             _attributes_name = Some(field_name);
@@ -137,7 +137,7 @@ pub(crate) fn parse_fields_type(
           if let Some(name) = &_comments_name {
             return Err(syn::Error::new(
               proc_macro2::Span::call_site(),
-              format!("duplicated comment {}.", name),
+              format!("duplicated comment {name}."),
             ));
           } else {
             _comments_name = Some(field_name);
@@ -147,7 +147,7 @@ pub(crate) fn parse_fields_type(
           if let Some((name, _)) = &_extra_ctx {
             return Err(syn::Error::new(
               proc_macro2::Span::call_site(),
-              format!("duplicated extra_ctx {}.", name),
+              format!("duplicated extra_ctx {name}."),
             ));
           } else {
             _extra_ctx = Some((field_name, &field.ty));
