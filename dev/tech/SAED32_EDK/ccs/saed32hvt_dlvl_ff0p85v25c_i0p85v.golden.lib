@@ -1,4 +1,4 @@
-
+** golden
 library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 	define (def_sim_opt, library, string);
 	define (driver_model, library, string);

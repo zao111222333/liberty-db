@@ -1,4 +1,4 @@
-
+** golden
 library (q) {
 	define (siiattrib, sii, string);
 	delay_model : table_lookup;

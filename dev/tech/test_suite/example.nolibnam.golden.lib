@@ -1,4 +1,4 @@
-
+** golden
 library () {
 	technology (cmos);
 	delay_model : table_lookup;

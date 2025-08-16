@@ -1,4 +1,4 @@
-
+** golden
 library (example) {
 	technology (fpga);
 	delay_model : table_lookup;

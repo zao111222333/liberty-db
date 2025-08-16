@@ -1,4 +1,4 @@
-
+** golden
 library (ccsn) {
 	define (char_when, receiver_capacitance, string);
 	define (is_propagating, receiver_capacitance, string);

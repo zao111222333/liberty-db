@@ -1,4 +1,4 @@
-
+** golden
 library (gscl45nm) {
 	delay_model : table_lookup;
 	nom_process : 1.0;

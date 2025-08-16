@@ -1,4 +1,4 @@
-
+** golden
 library (tcbn22ullbwp30p140tt0p8v25c) {
 	technology (cmos);
 	delay_model : table_lookup;

@@ -1,4 +1,4 @@
-
+** golden
 library (em222e) {
 	delay_model : table_lookup;
 	nom_process : 1.0;

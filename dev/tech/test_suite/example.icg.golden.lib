@@ -1,4 +1,4 @@
-
+** golden
 library (asap7sc7p5t_SEQ_LVT_SS_nldm_201020) {
 	delay_model : table_lookup;
 	date : "$Date: Wed Dec  2 00:16:48 2020 $";
