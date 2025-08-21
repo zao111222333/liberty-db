@@ -10,7 +10,7 @@ use crate::{
   expression::logic,
   table::{DisplayTableLookUp, DisplayValues, TableLookUp2D},
 };
-use core::ops::{Add, Mul, Not as _, Sub};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Not as _, Sub};
 use itertools::izip;
 use strum::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
@@ -314,6 +314,49 @@ pub struct LVFValue {
   pub skewness: f64,
 }
 impl LVFValue {
+  pub const MAX: Self = Self {
+    mean: f64::MAX,
+    std_dev: f64::MAX,
+    skewness: f64::MAX,
+  };
+  /// PeBay/West one-pass estimations
+  /// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online
+  #[inline]
+  #[must_use]
+  pub fn estimate<I: Iterator<Item = f64>>(data: I) -> Option<Self> {
+    let mut n: usize = 0;
+    let mut mean = 0.0;
+    let mut m2 = 0.0; // sum (x - mean)^2
+    let mut m3 = 0.0; // sum (x - mean)^3
+
+    for x in data {
+      n += 1;
+      let n_f = n as f64;
+
+      // PeBay/West one-pass
+      let delta = x - mean;
+      let delta_n = delta / n_f;
+      let term1 = delta * delta_n * (n_f - 1.0);
+
+      m3 += term1 * delta_n * (n_f - 2.0) - 3.0 * delta_n * m2;
+      m2 += term1;
+      mean += delta_n;
+    }
+
+    if n == 0 {
+      return None;
+    }
+
+    let n_f = n as f64;
+    let std_dev = (m2 / n_f).sqrt();
+    let skewness = if n >= 2 && std_dev > 0.0 {
+      m3 / ((n_f - 1.0) * std_dev * std_dev * std_dev)
+    } else {
+      0.0
+    };
+
+    Some(Self { mean, std_dev, skewness })
+  }
   #[inline]
   #[must_use]
   /// self * a + b
@@ -346,6 +389,15 @@ impl Add for LVFValue {
   }
 }
 #[expect(clippy::float_arithmetic)]
+impl AddAssign for LVFValue {
+  #[inline]
+  fn add_assign(&mut self, rhs: Self) {
+    self.mean += rhs.mean;
+    self.std_dev += rhs.std_dev;
+    self.skewness += rhs.skewness;
+  }
+}
+#[expect(clippy::float_arithmetic)]
 impl Sub for LVFValue {
   type Output = Self;
   #[inline]
@@ -354,7 +406,7 @@ impl Sub for LVFValue {
     Self {
       mean: self.mean - rhs.mean,
       // TODO: check - or + ?
-      std_dev: self.std_dev - rhs.std_dev,
+      std_dev: self.std_dev + rhs.std_dev,
       skewness: self.skewness - rhs.skewness,
     }
   }
@@ -369,6 +421,34 @@ impl Mul<f64> for LVFValue {
       std_dev: self.std_dev * rhs,
       skewness: self.skewness * rhs,
     }
+  }
+}
+#[expect(clippy::float_arithmetic)]
+impl MulAssign<f64> for LVFValue {
+  fn mul_assign(&mut self, rhs: f64) {
+    self.mean *= rhs;
+    self.std_dev *= rhs;
+    self.skewness *= rhs;
+  }
+}
+#[expect(clippy::float_arithmetic)]
+impl Div<f64> for LVFValue {
+  type Output = Self;
+  #[inline]
+  fn div(self, rhs: f64) -> Self::Output {
+    Self {
+      mean: self.mean / rhs,
+      std_dev: self.std_dev / rhs,
+      skewness: self.skewness / rhs,
+    }
+  }
+}
+#[expect(clippy::float_arithmetic)]
+impl DivAssign<f64> for LVFValue {
+  fn div_assign(&mut self, rhs: f64) {
+    self.mean /= rhs;
+    self.std_dev /= rhs;
+    self.skewness /= rhs;
   }
 }
 
