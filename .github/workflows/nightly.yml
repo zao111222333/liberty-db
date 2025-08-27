@@ -14,7 +14,7 @@ jobs:
     outputs:
       DATE: ${{ steps.date.outputs.DATE }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get Date
         id: date
         run: echo "DATE=$(date '+%Y%m%d' -d '-1 day')" >> $GITHUB_OUTPUT
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: prepare
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Package
         run: .github/workflows/package.sh ${{ needs.prepare.outputs.DATE }}
       - name: Archive package
