@@ -320,9 +320,15 @@ impl LVFValue {
     skewness: f64::MAX,
   };
   /// PeBay/West one-pass estimations
-  /// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online
+  /// <https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online>
   #[inline]
   #[must_use]
+  #[expect(
+    clippy::as_conversions,
+    clippy::float_arithmetic,
+    clippy::cast_precision_loss,
+    clippy::arithmetic_side_effects
+  )]
   pub fn estimate<I: Iterator<Item = f64>>(data: I) -> Option<Self> {
     let mut n: usize = 0;
     let mut mean = 0.0;
@@ -338,7 +344,8 @@ impl LVFValue {
       let delta_n = delta / n_f;
       let term1 = delta * delta_n * (n_f - 1.0);
 
-      m3 += term1 * delta_n * (n_f - 2.0) - 3.0 * delta_n * m2;
+      m3 += (term1 * delta_n).mul_add(n_f - 2.0, -(3.0 * delta_n * m2));
+      // m3 += term1 * delta_n * (n_f - 2.0) - 3.0 * delta_n * m2;
       m2 += term1;
       mean += delta_n;
     }
@@ -425,6 +432,7 @@ impl Mul<f64> for LVFValue {
 }
 #[expect(clippy::float_arithmetic)]
 impl MulAssign<f64> for LVFValue {
+  #[inline]
   fn mul_assign(&mut self, rhs: f64) {
     self.mean *= rhs;
     self.std_dev *= rhs;
@@ -445,6 +453,7 @@ impl Div<f64> for LVFValue {
 }
 #[expect(clippy::float_arithmetic)]
 impl DivAssign<f64> for LVFValue {
+  #[inline]
   fn div_assign(&mut self, rhs: f64) {
     self.mean /= rhs;
     self.std_dev /= rhs;
