@@ -55,7 +55,7 @@ fn regression() {
       let library = res.unwrap();
       let golden_lib_path = golden_path(&test_lib_path);
       let golden = read_to_string(golden_lib_path).unwrap();
-      let new = library.display_name("library").to_string();
+      let new = format!("** golden{}\n", library.display_name("library"));
       text_diff(golden.as_str(), new.as_str());
     } else {
       assert!(res.is_err())

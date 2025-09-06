@@ -761,10 +761,10 @@ impl<C: Ctx> ComplexAttri<C> for Define {
     if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    let define_id = crate::ast::define_id(scope.hasher, &group_name, &attribute_name);
-    _ = scope
-      .define_map
-      .insert(define_id, DefinedType::Simple(attribute_type));
+    _ = scope.define_map.insert(
+      (group_name.clone(), attribute_name.clone()),
+      DefinedType::Simple(attribute_type),
+    );
     Ok(Self { attribute_name, group_name, attribute_type })
   }
   #[inline]
@@ -817,8 +817,9 @@ impl<C: Ctx> ComplexAttri<C> for DefineGroup {
     if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
-    let define_id = crate::ast::define_id(scope.hasher, &parent_name, &group);
-    _ = scope.define_map.insert(define_id, DefinedType::Group);
+    _ = scope
+      .define_map
+      .insert((parent_name.clone(), group.clone()), DefinedType::Group);
     Ok(Self { group, parent_name })
   }
   #[inline]

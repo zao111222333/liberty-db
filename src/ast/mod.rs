@@ -17,13 +17,7 @@ use crate::{
 use alloc::borrow::Cow;
 #[cfg(feature = "lut_template")]
 use alloc::sync::Arc;
-use core::{
-  cmp::Ordering,
-  fmt::Write,
-  hash::{BuildHasher as _, Hash as _, Hasher as _},
-  marker::PhantomData,
-  str::FromStr,
-};
+use core::{cmp::Ordering, fmt::Write, marker::PhantomData, str::FromStr};
 pub use fmt::{CodeFormatter, DefaultCodeFormatter, DefaultIndentation, Indentation};
 use indexmap::IndexSet;
 use itertools::{Itertools as _, izip};
@@ -310,7 +304,7 @@ pub(crate) fn attributs_set_undefined_attri(
   scope: &ParseScope<'_>,
   undefined: UndefinedAttriValue,
 ) {
-  match scope.define_map.get(&define_id(scope.hasher, group_name, key)) {
+  match scope.define_map.get(&(group_name.to_owned(), key.to_owned())) {
     None => {
       crate::warn!("{} undefined {}", scope.loc, key);
       if let Some(value) = attri_map.get_mut(key) {
@@ -476,9 +470,8 @@ pub enum DefinedType {
 pub(crate) struct ParseScope<'a> {
   pub(crate) loc: ParseLoc<'a>,
   pub(crate) include_files: IndexSet<PathBuf>,
-  pub(crate) define_map: HashMap<u64, DefinedType, mut_set::NoHashBuildHasher>,
+  pub(crate) define_map: HashMap<(String, String), DefinedType, RandomState>,
   pub(crate) variables: HashMap<String, Formula, RandomState>,
-  pub(crate) hasher: RandomState,
 }
 
 #[derive(Debug, Default)]
@@ -496,16 +489,6 @@ impl core::fmt::Display for ParseLoc<'_> {
     write!(f, "line {}.", self.line_num)
   }
 }
-
-#[inline]
-#[must_use]
-pub(crate) fn define_id(hash_builder: RandomState, group_name: &str, key: &str) -> u64 {
-  let mut hasher = hash_builder.build_hasher();
-  group_name.hash(&mut hasher);
-  key.hash(&mut hasher);
-  hasher.finish()
-}
-
 // /// Reference: https://rustcc.cn/article?id=ac75148b-6eb0-4249-b36d-0a14875b736e
 // #[derive(Debug, Clone)]
 // #[derive(serde::Serialize, serde::Deserialize)]
