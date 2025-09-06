@@ -1,4 +1,4 @@
-
+** golden
 library (sky130_fd_sc_hs_tt_1p80V_25C_ccsnoise) {
 	delay_model : table_lookup;
 	time_unit : 1ns;

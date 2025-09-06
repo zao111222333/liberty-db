@@ -1,4 +1,4 @@
-
+** golden
 library (some) {
 	delay_model : table_lookup;
 	time_unit : 1ns;

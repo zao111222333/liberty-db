@@ -722,17 +722,6 @@ pub struct Library<C: Ctx> {
 }
 
 impl<C: Ctx> fmt::Display for Library<C> {
-  /// Format [Library] struct as `.lib` file, see more at [examples](https://github.com/zao111222333/liberty-db/tree/main/examples)
-  /// ```
-  /// use liberty_db::{Library, DefaultCtx};
-  /// use std::{
-  /// fs::{self, File},
-  /// io::{BufWriter, Write},
-  /// path::Path};
-  /// let library  = Library::<DefaultCtx>::default();
-  /// let mut writer = BufWriter::new(File::create(Path::new("out.lib")).unwrap());
-  /// write!(&mut writer, "{}", library).unwrap();
-  /// ```
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
     self.fmt_lib::<DefaultIndentation>(f)
@@ -741,9 +730,20 @@ impl<C: Ctx> fmt::Display for Library<C> {
 use crate::ast::{GroupAttri, parser};
 impl<C: Ctx> Library<C> {
   const KEY: &'static str = "library";
+  #[inline]
+  pub fn write_lib_file<P: AsRef<Path>>(&self, filename: P) -> std::io::Result<()> {
+    use std::io::{BufWriter, Write as _};
+    if let Some(dir) = filename.as_ref().parent() {
+      _ = std::fs::create_dir_all(dir);
+    }
+    let file = std::fs::File::create(filename)?;
+    let mut writer = BufWriter::new(file);
+    write!(&mut writer, "{self}")?;
+    Ok(())
+  }
   /// Parse `.lib` file as a [Library] struct.
   #[inline]
-  pub fn parse_lib_file(filename: &'_ Path) -> Result<Self, ParserError<'_>> {
+  pub fn parse_lib_file(filename: &Path) -> Result<Self, ParserError<'_>> {
     let s = std::fs::read_to_string(filename)
       .map_err(|e| ParserError::IO(filename.to_path_buf(), e))?;
     Self::parse_lib(&s, Some(filename))

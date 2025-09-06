@@ -4,7 +4,7 @@
 members = ["macros", "dev", "dev/utils", "dev/include/liberty2json"]
 
 [workspace.package]
-version = "0.16.3"
+version = "0.16.5"
 license = "MIT"
 edition = "2024"
 authors = ["Junzhuo <zhou@junzhuo.site>"]
@@ -59,13 +59,13 @@ similar = { version = "2.7", features = ["inline"]}
 console = "0.16"
 nom = "8.0"
 lexical-core = "1.0"
-biodivine-lib-bdd = { version = "0.5.26", features = ["serde"] }
+biodivine-lib-bdd = { version = "0.5.27", features = ["serde"] }
 # biodivine-lib-bdd = { path = "../../biodivine-lib-bdd", features = ["serde"] }
 mut_set = "0.9.0"
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
 criterion = { version = "0.7", features = ["html_reports"] }
-sysinfo = "0.36"
+sysinfo = "0.37"
 chrono = "0.4"
 anyhow = "1.0"
 foldhash = "0.1"
@@ -76,6 +76,7 @@ pyo3-stub-gen = { version = "0.12.1", default-features = false }
 bincode = { version= "2", features = ["serde"] }
 indexmap = { version = "2.9", features = ["serde"] }
 bitflags = { version = "2.9", features = ["serde"] }
+pprof = { version = "0.15", features = ["flamegraph", "protobuf", "protobuf-codec"] }
 
 [dependencies]
 liberty-macros = { path = "macros" }
@@ -105,3 +106,4 @@ simple_logger.workspace = true
 criterion.workspace = true
 bincode.workspace = true
 anyhow.workspace = true
+pprof.workspace = true

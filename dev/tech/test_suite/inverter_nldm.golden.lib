@@ -1,4 +1,4 @@
-
+** golden
 library (inverter) {
 	delay_model : table_lookup;
 	nom_voltage : 1.6;

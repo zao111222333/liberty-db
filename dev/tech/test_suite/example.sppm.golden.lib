@@ -1,4 +1,4 @@
-
+** golden
 library (sppm) {
 	delay_model : polynomial;
 	time_unit : 1ns;

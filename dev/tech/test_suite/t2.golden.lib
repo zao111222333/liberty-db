@@ -1,4 +1,4 @@
-
+** golden
 library (sample) {
 	delay_model : table_lookup;
 	nom_voltage : 5.0;
