@@ -413,7 +413,7 @@ impl Sub for LVFValue {
     Self {
       mean: self.mean - rhs.mean,
       // TODO: check - or + ?
-      std_dev: self.std_dev + rhs.std_dev,
+      std_dev: self.std_dev - rhs.std_dev,
       skewness: self.skewness - rhs.skewness,
     }
   }
