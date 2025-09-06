@@ -590,7 +590,7 @@ pub trait LatchFF: __LatchFF {
     self.clear() == other.preset()
       && self.preset() == other.clear()
       && self.clear_preset_var1() == other.clear_preset_var2()
-      && self.clear_preset_var1() == other.clear_preset_var2()
+      && self.clear_preset_var2() == other.clear_preset_var1()
       && self.active() == other.active()
       && self.active_also() == other.active_also()
       && match (self.next_state(), other.next_state()) {
@@ -600,22 +600,16 @@ pub trait LatchFF: __LatchFF {
       }
   }
   #[inline]
-  fn exist_variable<'a, I: 'a + Iterator<Item = &'a Self>>(
-    &self,
-    exists: I,
-  ) -> Option<&'a String>
-  where
-    Self: 'a,
-  {
-    for exist in exists {
-      if self.logically_eq(exist) {
-        return Some(exist.variable1());
+  fn partial_logically_inverse(&self, other: &Self) -> bool {
+    self.clear() == other.preset()
+      && self.preset() == other.clear()
+      && self.active() == other.active()
+      && self.active_also() == other.active_also()
+      && match (self.next_state(), other.next_state()) {
+        (Some(s1), Some(s2)) => s1.bdd.not().eq(&s2.bdd),
+        (None, None) => true,
+        _ => false,
       }
-      if self.logically_inverse(exist) {
-        return Some(exist.variable2());
-      }
-    }
-    None
   }
   /// Get the `BooleanExpression` of variable1
   #[inline]
