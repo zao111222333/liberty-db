@@ -59,7 +59,7 @@ similar = { version = "2.7", features = ["inline"]}
 console = "0.16"
 nom = "8.0"
 lexical-core = "1.0"
-biodivine-lib-bdd = { version = "0.5.27", features = ["serde"] }
+biodivine-lib-bdd = { version = "0.6.0", features = ["serde"] }
 # biodivine-lib-bdd = { path = "../../biodivine-lib-bdd", features = ["serde"] }
 mut_set = "0.9.0"
 # mut_set = { path = "../mut_set" }
