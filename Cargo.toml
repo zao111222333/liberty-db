@@ -59,7 +59,7 @@ similar = { version = "2.7", features = ["inline"]}
 console = "0.16"
 nom = "8.0"
 lexical-core = "1.0"
-biodivine-lib-bdd = { version = "0.5.27", features = ["serde"] }
+biodivine-lib-bdd = { version = "0.6", features = ["serde"] }
 # biodivine-lib-bdd = { path = "../../biodivine-lib-bdd", features = ["serde"] }
 mut_set = "0.9.0"
 # mut_set = { path = "../mut_set" }
@@ -80,6 +80,7 @@ pprof = { version = "0.15", features = ["flamegraph", "protobuf", "protobuf-code
 
 [dependencies]
 liberty-macros = { path = "macros" }
+# liberty-macros = "0.16.4"
 foldhash.workspace = true
 log.workspace = true
 tracing = { workspace = true, optional = true }
