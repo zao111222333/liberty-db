@@ -10,7 +10,7 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_VERSION: "1.86.0"
+  RUST_VERSION: "1.88.0"
 
 jobs:
   compare-and-report:
@@ -55,7 +55,7 @@ jobs:
           sed -i 's|^## liberty-db-incoming|liberty-db-incoming|' dev/Cargo.toml
 
       - name: Post report as PR comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');
