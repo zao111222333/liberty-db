@@ -329,13 +329,16 @@ impl LVFValue {
     clippy::cast_precision_loss,
     clippy::arithmetic_side_effects
   )]
-  pub fn estimate<I: Iterator<Item = f64>>(data: I) -> Option<Self> {
+  pub fn estimate<E, I: Iterator<Item = Result<f64, E>>>(
+    data: I,
+  ) -> Result<Option<Self>, E> {
     let mut n: usize = 0;
     let mut mean = 0.0;
     let mut m2 = 0.0; // sum (x - mean)^2
     let mut m3 = 0.0; // sum (x - mean)^3
 
     for x in data {
+      let x = x?;
       n += 1;
       let n_f = n as f64;
 
@@ -351,7 +354,7 @@ impl LVFValue {
     }
 
     if n == 0 {
-      return None;
+      return Ok(None);
     }
 
     let n_f = n as f64;
@@ -362,7 +365,7 @@ impl LVFValue {
       0.0
     };
 
-    Some(Self { mean, std_dev, skewness })
+    Ok(Some(Self { mean, std_dev, skewness }))
   }
   #[inline]
   #[must_use]
