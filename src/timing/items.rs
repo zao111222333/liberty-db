@@ -322,7 +322,6 @@ impl LVFValue {
   /// PeBay/West one-pass estimations
   /// <https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online>
   #[inline]
-  #[must_use]
   #[expect(
     clippy::as_conversions,
     clippy::float_arithmetic,
@@ -338,12 +337,11 @@ impl LVFValue {
     let mut m3 = 0.0; // sum (x - mean)^3
 
     for x in data {
-      let x = x?;
       n += 1;
       let n_f = n as f64;
 
       // PeBay/West one-pass
-      let delta = x - mean;
+      let delta = x? - mean;
       let delta_n = delta / n_f;
       let term1 = delta * delta_n * (n_f - 1.0);
 
