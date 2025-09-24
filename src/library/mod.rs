@@ -752,16 +752,16 @@ impl<C: Ctx> Library<C> {
     let buf = BufWriter::new(file);
     let mut writer = GzEncoder::new(buf, Compression::default());
     write!(&mut writer, "{self}")?;
-    let mut buf = writer.finish()?;
-    buf.flush()?;
-    buf.get_mut().sync_all()?;
+    let mut buf_finish = writer.finish()?;
+    buf_finish.flush()?;
+    buf_finish.get_mut().sync_all()?;
     Ok(())
   }
   /// Parse `.lib` file as a [Library] struct.
   #[inline]
   pub fn parse_lib_file(filename: &Path) -> Result<Self, ParserError<'_>> {
     use flate2::read::GzDecoder;
-    use std::io::{self, BufRead, BufReader, Read};
+    use std::io::{self, BufRead as _, BufReader, Read as _};
 
     fn read_maybe_gz_file(filename: &Path) -> io::Result<Vec<u8>> {
       let file = std::fs::File::open(filename)?;

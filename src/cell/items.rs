@@ -549,7 +549,7 @@ impl<C: Ctx> ComplexAttri<C> for SwitchingCondition {
         _ => return Err(ComplexParseError::UnsupportedWord),
       },
       None => return Ok(res),
-    };
+    }
     if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }

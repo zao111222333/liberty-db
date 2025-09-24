@@ -6914,8 +6914,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_2) {
 						values ("-0.0120157, 46.2593307, 96, 0.0062781965, 342.1111659, 550, 1.3399737, 15.5559464", \
@@ -7077,8 +7077,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_2) {
 						values ("-0.0119993, 15.6399201, 579, 0.0903299, 311.5236369, 727, 1.9645268, 46.1350573", \
@@ -7508,8 +7508,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_1) {
 						values ("-0.0120322, 4.774528, 96, 0.0251954, 27.2608688, 97, 1.8278518, 3.3807046", \
@@ -7671,8 +7671,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_1) {
 						values ("-0.0120322, 3.4209227, 96, 0.0337315, 31.7456557, 115, 1.9085888, 4.777859", \
@@ -8102,8 +8102,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_6) {
 						values ("-0.0119931, 101.1912609, 96, 0.024299, 409.3344046, 953, 1.6519696, 29.3541361", \
@@ -8265,8 +8265,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_6) {
 						values ("-0.0120344, 29.3724133, 1094, 0.1231986, 780.0719272, 553, 2.1770559, 100.9972912", \
@@ -8696,8 +8696,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_3) {
 						values ("-0.0120286, 10.3740149, 96, 0.0104745, 79.1843302, 109, 0.1902881, 5.4618304", \
@@ -8859,8 +8859,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_3) {
 						values ("-0.0120397, 5.3843305, 96, 0.006223159, 94.4282454, 1087, 1.7566788, 10.3592056", \
@@ -9290,8 +9290,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_5) {
 						values ("-0.0120353, 21.7619308, 96, 0.0209097, 114.4802747, 452, 1.6346913, 8.7385415", \
@@ -9453,8 +9453,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_5) {
 						values ("-0.0120046, 8.7082581, 1363, 0.0496416, 182.8840062, 109, 0.3328102, 21.7297948", \
@@ -9882,7 +9882,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120259, 0.95, 228, 0.0878485, 0.7351255, 228, 0.5681969, 0.95", \
@@ -9907,7 +9907,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VSSG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120335, -0.0001545, 96, -0.0073359134, 111.6364554, 997, 0.3922001, 0.124097", \
@@ -10012,7 +10012,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120322, 0.95, 808, 0.0922176, 0.0, 243, 1.5051224, 0.95", \
@@ -10037,7 +10037,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VSSG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120344, -0.000017791164, 96, -0.0073563378, 13.9946324, 96, 0.0331414, 0.0026525", \
@@ -10142,7 +10142,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120268, 0.95, 160, 0.1508476, 0.0952384, 228, 1.1376748, 0.95", \
@@ -10167,7 +10167,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120211, 0.95, 154, 0.0979675, 0.7964701, 183, 0.5618324, 0.95", \
@@ -10283,7 +10283,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120259, 0.95, 367, 0.1332626, 0.1276355, 353, 1.0306327, 0.95", \
@@ -10308,7 +10308,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120295, 0.95, 770, 0.3075481, 0.5717636, 148, 0.7115424, 0.95", \
@@ -10424,7 +10424,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VSSG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120259, 0.0, 96, -0.0074281692, -45.1143425, 96, 0.001767364, -54.932276, 1455, 0.28097, 0.0198202", \
@@ -10438,7 +10438,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120357, 0.95, 407, 0.0881111, 0.6783037, 1369, 0.6310121, 0.95", \
@@ -10556,8 +10556,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_7) {
 						values ("-0.0120002, -1.7637195e-9, 96, 0.00708269, 1.6062154, 96, 0.0452484, -1.5403383, 160, 0.1236441, -0.0001162", \
@@ -10719,8 +10719,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_7) {
 						values ("-0.0119971, 0.0, 96, 0.0473934, -1.7213458, 96, 0.086987, 0.2194148, 2185, 2.36362, -0.0014771", \
@@ -11150,8 +11150,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_1) {
 						values ("-0.0119984, -5.3108534e-9, 96, 0.0062560845, 1.1600258, 96, 0.0427651, -1.1340541, 1969, 0.6450657, 0.0012956", \
@@ -11313,8 +11313,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_1) {
 						values ("-0.0119957, 0.0, 96, 0.0118387, -1.9956595, 158, 0.1071764, 0.0590571, 96, 2.8958048, 0.0099625", \
@@ -11744,8 +11744,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_3) {
 						values ("-0.0120082, -3.5857768e-8, 96, 0.009916612, 3.7385835, 96, 0.0537662, -3.5654846, 243, 0.1443157, -0.0014492", \
@@ -11907,8 +11907,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_3) {
 						values ("-0.0119997, -1.5908126e-11, 763, 0.0438141, -6.3913652, 2895, 0.1182326, 0.7733706, 2896, 2.2577645, 0.0085092", \
@@ -12338,8 +12338,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_5) {
 						values ("-0.012006, -1.8019867e-8, 96, 0.0055961754, 4.2823772, 96, 0.0408004, -3.6934048, 2380, 0.2932992, -0.0065934", \
@@ -12501,8 +12501,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_5) {
 						values ("-0.0119988, -4.4941874e-11, 1895, 0.041855, -3.4860069, 250, 0.1136602, 0.0573175, 96, 2.1421562, 0.0406227", \
@@ -12932,8 +12932,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 			related_inputs : SLEEP;
 			related_outputs : SLEEPOUT;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_2) {
 						values ("-0.0120055, -3.8082381e-8, 96, 0.0078083836, 7.1214091, 96, 0.0474362, -6.7664655, 243, 0.1311675, -0.0082936", \
@@ -13095,8 +13095,8 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDD) {
 					compact_ccs_power (c_ccs_pwr_template_2) {
 						values ("-0.0119984, -6.0947409e-11, 96, 0.0182424, -7.6279881, 2670, 0.1392057, 0.195311, 96, 3.6169001, 0.042206", \
@@ -13524,7 +13524,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120282, 0.0001518, 96, -0.0070209986, -155.6861136, 1892, 0.4159891, -0.0101143", \
@@ -13538,7 +13538,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120384, -1.2469155e-8, 96, -0.007733932, 124.157001, 96, 0.00087494456, 160.2361694, 441, 0.2789328, 0.0232584", \
@@ -13643,7 +13643,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120131, 0.000017699245, 96, -0.0063388776, -19.1414202, 2514, 0.405784, -0.0169985", \
@@ -13657,7 +13657,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120299, 7.239899e-11, 1249, 0.0013485102, 19.1083916, 603, 0.2854193, 0.0021196", \
@@ -13762,7 +13762,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120055, 0.0003073, 96, -0.0066393261, -311.3155128, 117, 0.4103228, -0.0938547", \
@@ -13776,7 +13776,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120259, 9.1177879e-9, 96, -0.0044089066, 281.7589253, 136, 0.4459543, 0.0901445", \
@@ -13881,7 +13881,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120099, 0.000036187144, 96, -0.0071567715, -38.869228, 2290, 0.0324499, -0.0388951", \
@@ -13895,7 +13895,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120339, -5.2252488e-10, 96, -0.0023182493, 34.9755318, 1455, 0.4315599, 0.0107225", \
@@ -14000,7 +14000,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 		dynamic_current () {
 			related_inputs : SLEEP;
 			switching_group () {
-				input_switching_condition (fall);
+				input_switching_condition (rise);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120144, 0.000074122972, 96, -0.0075710512, -77.8036122, 2810, 0.4103404, -0.0822898", \
@@ -14014,7 +14014,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
+				input_switching_condition (fall);
 				pg_current (VDDG) {
 					compact_ccs_power (c_ccs_pwr_template_4) {
 						values ("-0.0120322, 1.0765924e-9, 96, 0.00032736036, 66.2215692, 232, 0.0775955, -0.0117796", \
