@@ -288,19 +288,18 @@ crate::ast::impl_self_builder!((String, f64));
 impl<C: Ctx> ComplexAttri<C> for (String, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let v1 = match i.next() {
+    let v1 = match iter.next() {
       Some(&s) => s.to_owned(),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v2 = match i.next() {
+    let v2 = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok((v1, v2))
@@ -377,15 +376,14 @@ impl<C: Ctx> ComplexAttri<C> for Vec<f64> {
 impl<C: Ctx> ComplexAttri<C> for String {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let v1 = match i.next() {
+    let v1 = match iter.next() {
       Some(&s) => Self::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(v1)
@@ -401,15 +399,14 @@ impl<C: Ctx> ComplexAttri<C> for String {
 impl<C: Ctx> ComplexAttri<C> for f64 {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let v1: Self = match i.next() {
+    let v1: Self = match iter.next() {
       Some(&s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(v1)
@@ -476,23 +473,22 @@ crate::ast::impl_self_builder!((f64, f64, String));
 impl<C: Ctx> ComplexAttri<C> for (f64, f64, String) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let v1 = match i.next() {
+    let v1 = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v2 = match i.next() {
+    let v2 = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v3: String = match i.next() {
+    let v3: String = match iter.next() {
       Some(&s) => String::from(s),
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok((v1, v2, v3))
@@ -513,19 +509,18 @@ crate::ast::impl_self_builder!((i64, f64));
 impl<C: Ctx> ComplexAttri<C> for (i64, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let v1 = match i.next() {
+    let v1 = match iter.next() {
       Some(s) => lexical_core::parse(s.as_bytes())?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v2 = match i.next() {
+    let v2 = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok((v1, v2))
@@ -544,19 +539,18 @@ crate::ast::impl_self_builder!((f64, f64));
 impl<C: Ctx> ComplexAttri<C> for (f64, f64) {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let v1 = match i.next() {
+    let v1 = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let v2 = match i.next() {
+    let v2 = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok((v1, v2))

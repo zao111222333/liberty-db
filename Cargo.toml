@@ -67,6 +67,7 @@ duplicate = "2.0.0"
 criterion = { version = "0.7", features = ["html_reports"] }
 sysinfo = "0.37"
 chrono = "0.4"
+flate2 = "1"
 anyhow = "1.0"
 foldhash = "0.2"
 dev_utils = { path = "dev/utils" }
@@ -99,6 +100,7 @@ pyo3-stub-gen = { workspace = true, optional = true }
 indexmap.workspace = true
 mut_set.workspace = true
 bitflags.workspace = true
+flate2.workspace = true
 
 [dev-dependencies]
 dev_utils.workspace = true

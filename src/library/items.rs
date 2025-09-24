@@ -652,15 +652,14 @@ crate::ast::impl_self_builder!(Technology);
 impl<C: Ctx> ComplexAttri<C> for Technology {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let v1: Self = match i.next() {
+    let v1: Self = match iter.next() {
       Some(&s) => s.parse()?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(v1)

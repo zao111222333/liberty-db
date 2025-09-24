@@ -10,6 +10,7 @@ use crate::{
     Attributes, BuilderScope, DefaultIndentation, GroupComments, GroupFn, GroupSet,
     ParseLoc, ParseScope, ParserError, ParsingBuilder,
   },
+  ast::{GroupAttri, parser},
   cell::{Cell, Model},
   common::char_config::CharConfig,
   pin::BusType,
@@ -727,7 +728,6 @@ impl<C: Ctx> fmt::Display for Library<C> {
     self.fmt_lib::<DefaultIndentation>(f)
   }
 }
-use crate::ast::{GroupAttri, parser};
 impl<C: Ctx> Library<C> {
   const KEY: &'static str = "library";
   #[inline]
@@ -741,12 +741,55 @@ impl<C: Ctx> Library<C> {
     write!(&mut writer, "{self}")?;
     Ok(())
   }
+  #[inline]
+  pub fn write_lib_file_gz<P: AsRef<Path>>(&self, filename: P) -> std::io::Result<()> {
+    use flate2::{Compression, write::GzEncoder};
+    use std::io::{BufWriter, Write as _};
+    if let Some(dir) = filename.as_ref().parent() {
+      _ = std::fs::create_dir_all(dir);
+    }
+    let file = std::fs::File::create(filename)?;
+    let buf = BufWriter::new(file);
+    let mut writer = GzEncoder::new(buf, Compression::default());
+    write!(&mut writer, "{self}")?;
+    let mut buf = writer.finish()?;
+    buf.flush()?;
+    buf.get_mut().sync_all()?;
+    Ok(())
+  }
   /// Parse `.lib` file as a [Library] struct.
   #[inline]
   pub fn parse_lib_file(filename: &Path) -> Result<Self, ParserError<'_>> {
-    let s = std::fs::read_to_string(filename)
+    use flate2::read::GzDecoder;
+    use std::io::{self, BufRead, BufReader, Read};
+
+    fn read_maybe_gz_file(filename: &Path) -> io::Result<Vec<u8>> {
+      let file = std::fs::File::open(filename)?;
+      let mut buf = BufReader::new(file);
+
+      // https://www.rfc-editor.org/rfc/rfc1952#page-5
+      let head = buf.fill_buf()?;
+      let is_gz = head.starts_with(&[0x1F, 0x8B]);
+
+      let mut bytes = Vec::new();
+      _ = if is_gz {
+        GzDecoder::new(buf).read_to_end(&mut bytes)?
+      } else {
+        buf.read_to_end(&mut bytes)?
+      };
+
+      Ok(bytes)
+    }
+    let bytes = read_maybe_gz_file(filename)
       .map_err(|e| ParserError::IO(filename.to_path_buf(), e))?;
-    Self::parse_lib(&s, Some(filename))
+    // UTF-8 or lossy
+    match String::from_utf8(bytes) {
+      Ok(s) => Self::parse_lib(&s, Some(filename)),
+      Err(e) => {
+        let s = String::from_utf8_lossy(e.as_bytes());
+        Self::parse_lib(&s, Some(filename))
+      }
+    }
   }
   /// Parse `.lib` string as a [Library] struct.
   /// Specify `filename` for better error information.

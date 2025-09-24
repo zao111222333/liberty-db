@@ -1,7 +1,4 @@
-use crate::{
-  Ctx,
-  ast::{ComplexAttri, ComplexParseError, ParseScope},
-};
+use crate::{Ctx, ast::ParseScope};
 use core::{cmp::Ordering, hash::Hash};
 
 /// Level
@@ -171,56 +168,6 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for Edge {
   ) -> core::fmt::Result {
     use core::fmt::Write as _;
     f.write_str(self.full_name())
-  }
-}
-
-/// Use the `output_switching_condition` attribute to specify the sense of the toggling
-/// output. If there is more than one `switching_group` group specified within the
-/// `dynamic_current` group, you can place the attribute in any order. The order in the list of
-/// the `output_switching_condition` attribute is mapped to the same order of output pins in
-/// the `related_outputs` attribute.
-/// The valid values are rise and fall. rise represents a rising pin and fall represents a
-/// falling pin.
-/// ### Syntax
-/// `output_switching_condition (enum(rise, fall));`
-///
-/// `enum(rise, fall)`
-/// Enumerated type specifying the rise or fall condition.
-///
-/// ### Example
-/// `output_switching_condition (rise, fall);`
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.17&end=151.29
-/// ">Reference</a>
-impl<C: Ctx> ComplexAttri<C> for Edge {
-  #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope<'_>,
-  ) -> Result<Self, ComplexParseError> {
-    let res = match iter.next() {
-      Some(&s) => match s {
-        "rise" => Self::R,
-        "fall" => Self::F,
-        _ => return Err(ComplexParseError::UnsupportedWord),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(res)
-  }
-  #[inline]
-  fn fmt_self<T: core::fmt::Write, I: crate::ast::Indentation>(
-    &self,
-    f: &mut crate::ast::CodeFormatter<'_, T, I>,
-  ) -> core::fmt::Result {
-    use core::fmt::Write as _;
-    f.write_str(match self {
-      Self::F => "rise",
-      Self::R => "fall",
-    })
   }
 }
 
