@@ -1,8 +1,4 @@
-use pyo3::{
-  exceptions::PyValueError,
-  prelude::*,
-  types::{PyString, PyTuple},
-};
+use pyo3::{prelude::*, types::PyTuple};
 use pyo3_stub_gen::{PyStubType, TypeInfo};
 
 use crate::{
@@ -28,13 +24,13 @@ macro_rules! impl_py_enum {
       }
     }
     impl<'py> IntoPyObject<'py> for $t {
-      type Target = PyString;
+      type Target = pyo3::types::PyString;
       type Output = Bound<'py, Self::Target>;
       type Error = PyErr;
       #[inline]
       fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
         let s: &'static str = self.into();
-        Ok(PyString::new(py, s))
+        Ok(pyo3::types::PyString::new(py, s))
       }
     }
     impl PyStubType for $t {
@@ -68,7 +64,7 @@ impl<'py> FromPyObject<'py> for CapacitiveLoadUnit {
     match s_ff_pf.as_str() {
       "ff" => Ok(Self::FF(val)),
       "pf" => Ok(Self::PF(val)),
-      _ => Err(PyValueError::new_err("Matching variant not found")),
+      _ => Err(pyo3::exceptions::PyValueError::new_err("Matching variant not found")),
     }
   }
 }

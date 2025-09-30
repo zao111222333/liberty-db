@@ -1,15 +1,18 @@
 use liberty_db::{DefaultCtx, Library};
-use std::{env, fs::File, path::Path, process::ExitCode, time::Instant};
+use std::{env, path::Path, process::ExitCode, time::Instant};
 
+const PROFILE: bool = false;
 // cargo run /path/to/xxx.lib
 // Use the first arg as input file name,
 // parse it, and then write it into example1_xxx.lib
 fn main() -> ExitCode {
-  let guard = pprof::ProfilerGuardBuilder::default()
-    .frequency(1000)
-    .blocklist(&["libc", "libgcc", "pthread", "vdso"])
-    .build()
-    .unwrap();
+  let guard = PROFILE.then(|| {
+    pprof::ProfilerGuardBuilder::default()
+      .frequency(1000)
+      .blocklist(&["libc", "libgcc", "pthread", "vdso"])
+      .build()
+      .unwrap()
+  });
 
   dev_utils::init_logger();
   let args: Vec<String> = env::args().collect();
@@ -32,13 +35,15 @@ fn main() -> ExitCode {
   library.write_lib_file(&out_file_name).unwrap();
   let elapsed_write = now.elapsed();
   log::info!("DONE");
-  log::info!("parse: {elapsed_parse:?}");
-  log::info!("write: {elapsed_write:?}");
-  if let Ok(report) = guard.report().build() {
-    let file = File::create("example1_flamegraph.svg").unwrap();
-    let mut options = pprof::flamegraph::Options::default();
-    options.image_width = Some(10000);
-    report.flamegraph_with_options(file, &mut options).unwrap();
-  };
+  log::info!("parse: {elapsed_parse:.2?}");
+  log::info!("write: {elapsed_write:.2?}");
+  guard.inspect(|guard| {
+    if let Ok(report) = guard.report().build() {
+      let file = std::fs::File::create("example1_flamegraph.svg").unwrap();
+      let mut options = pprof::flamegraph::Options::default();
+      options.image_width = Some(10000);
+      report.flamegraph_with_options(file, &mut options).unwrap();
+    }
+  });
   ExitCode::SUCCESS
 }

@@ -17,8 +17,8 @@ library (test) {
 			related_inputs : A;
 			related_outputs : Y;
 			switching_group () {
-				input_switching_condition (fall);
-				output_switching_condition (fall);
+				input_switching_condition (rise);
+				output_switching_condition (rise);
 				pg_current (VDDH) {
 					compact_ccs_power (c_ccs_pwr_template_3) {
 						values ("0.0358012, 0.0206745, 2505, 0.0480925, 1.1701594, 2506, 1.4011397, 0.0724034", \
@@ -180,8 +180,8 @@ library (test) {
 				}
 			}
 			switching_group () {
-				input_switching_condition (rise);
-				output_switching_condition (rise);
+				input_switching_condition (fall);
+				output_switching_condition (fall);
 				pg_current (VDDH) {
 					compact_ccs_power (c_ccs_pwr_template_3) {
 						values ("-0.0120259, 0.0715857, 13, 0.0094341905, 31.2795089, 113, 0.1886596, 0.020282", \

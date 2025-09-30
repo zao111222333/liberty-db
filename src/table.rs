@@ -57,7 +57,7 @@ macro_rules! use_current_template {
     #[cfg(feature = "lut_template")]
     crate::table::TableCtx::set_lut_template(
       &mut $table.extra_ctx,
-      $scope.output_current_template.get(&$table.name),
+      $scope.current_template.get(&$table.name),
     )
   };
 }
@@ -368,12 +368,12 @@ pub struct Vector3D<C: Ctx> {
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
-#[mut_set::derive::item]
+// #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
 pub struct ReferenceTimeVector3D<C: Ctx> {
   #[liberty(name)]
-  #[id(borrow = str)]
+  // #[id(borrow = str)]
   pub name: String,
   /// group comments
   #[liberty(comments)]
@@ -383,15 +383,15 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
+  // #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(simple)]
   pub reference_time: f64,
-  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
+  // #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
   #[liberty(complex)]
   pub index_1: f64,
-  #[id(into_hash_ord_fn = crate::common::f64_into_hash_ord_fn)]
+  // #[id(into_hash_ord_fn = crate::common::f64_vec_into_hash_ord_fn)]
   #[liberty(complex)]
-  pub index_2: f64,
+  pub index_2: Vec<f64>,
   #[liberty(complex)]
   pub index_3: Vec<f64>,
   #[liberty(complex)]
@@ -672,9 +672,9 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(group(type = Set))]
+  #[liberty(group(type = Vec))]
   #[liberty(after_build = use_current_template!)]
-  pub vector: GroupSet<ReferenceTimeVector3D<C>>,
+  pub vector: Vec<ReferenceTimeVector3D<C>>,
 }
 
 #[derive(Debug, Clone)]

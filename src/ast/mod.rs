@@ -43,7 +43,7 @@ pub(crate) struct BuilderScope<C: Ctx> {
   #[cfg(feature = "lut_template")]
   pub(crate) power_lut_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
   #[cfg(feature = "lut_template")]
-  pub(crate) output_current_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
+  pub(crate) current_template: HashMap<String, Arc<TableTemple<C>>, RandomState>,
   #[cfg(feature = "lut_template")]
   pub(crate) compact_lut_template:
     HashMap<String, Arc<CompactLutTemplate<C>>, RandomState>,

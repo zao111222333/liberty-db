@@ -7,7 +7,7 @@ use crate::{
   common::items::WordSet,
   expression::{LogicBooleanExpression, PowerGroundBooleanExpression, logic},
   pin::Direction,
-  table::CompactCcsPower,
+  table::{CompactCcsPower, ReferenceTimeVector3D, use_current_template},
 };
 use core::{
   fmt::{self, Write},
@@ -555,7 +555,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// ">Reference</a>
   #[id]
   #[liberty(complex(type = Option))]
-  pub output_switching_condition: Option<logic::Edge>,
+  pub output_switching_condition: Option<Vec<logic::Edge>>,
   /// The `min_input_switching_count` attribute specifies the minimum number of
   /// bits in the input bus that are switching simultaneously. The following applies to the
   /// `min_input_switching_count` attribute:
@@ -732,6 +732,23 @@ pub struct PgCurrent<C: Ctx> {
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_compact_template!)]
   pub compact_ccs_power: GroupSet<CompactCcsPower<C>>,
+  /// Use the vector group to specify the current waveform for a power and ground pin. This
+  /// group represents a single current waveform based on specified input slew and output load.
+  /// + Data in this group is represented as a dense table, if a template with two
+  /// total_output_net_capacitance variables is applied to the group. If a dense table
+  /// is applied, the order of total_output_net_capacitance variables must map to the
+  /// order of values in the related_outputs attribute.
+  /// + Data in this group is represented as a sparse cross table, if the index_output attribute
+  /// is defined in the group.
+  /// + Data in this group is represented as a sparse diagonal table, if no
+  /// index_output attribute is defined in the group and a template with exact one
+  /// total_output_net_capacitance variable is applied to the group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=155.14&end=155.27
+  /// ">Reference</a>
+  #[liberty(group(type = Vec))]
+  #[liberty(after_build = use_current_template!)]
+  pub vector: Vec<ReferenceTimeVector3D<C>>,
 }
 impl<C: Ctx> GroupFn<C> for PgCurrent<C> {}
 

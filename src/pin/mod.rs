@@ -169,6 +169,23 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[liberty(simple)]
   pub related_ground_pin: String,
+  /// The `related_power_pin`  and `related_ground_pin`  attributes
+  /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
+  /// The `related_power_pin`  and `related_ground_pin` attributes are used
+  /// to associate a predefined power and ground pin with the signal pin,
+  /// in which they are defined. This behavior only applies to standard cells.
+  /// For special cells, you must specify this relationship explicitly.
+  /// The `pg_pin`  groups are mandatory for each cell.
+  /// Because a cell must have at least one `primary_power`  and
+  /// at least one `primary_ground`  pin,
+  /// a default `related_power_pin`  and `related_ground_pin`  always exists in any cell.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
+  /// ">Reference-Definition</a>
+  #[liberty(simple)]
+  pub related_power_pin: String,
+  #[liberty(simple)]
+  pub related_bias_pin: WordSet,
   /// The `retention_pin` complex attribute identifies the retention pins of a retention cell. The
   /// attribute defines the following information:
   /// + pin class
@@ -195,21 +212,6 @@ pub struct Pin<C: Ctx> {
   /// ">Reference-Definition</a>
   #[liberty(complex(type = Option))]
   pub retention_pin: Option<RetentionPin>,
-  /// The `related_power_pin`  and `related_ground_pin`  attributes
-  /// are defined at the `pin` level for `output`, `input`, and `inout` pins.
-  /// The `related_power_pin`  and `related_ground_pin` attributes are used
-  /// to associate a predefined power and ground pin with the signal pin,
-  /// in which they are defined. This behavior only applies to standard cells.
-  /// For special cells, you must specify this relationship explicitly.
-  /// The `pg_pin`  groups are mandatory for each cell.
-  /// Because a cell must have at least one `primary_power`  and
-  /// at least one `primary_ground`  pin,
-  /// a default `related_power_pin`  and `related_ground_pin`  always exists in any cell.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=269.26&end=269.33
-  /// ">Reference-Definition</a>
-  #[liberty(simple)]
-  pub related_power_pin: String,
   // NOTICE: Simple Attributes in a pin Group
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

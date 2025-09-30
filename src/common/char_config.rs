@@ -750,19 +750,18 @@ ast::impl_self_builder!(CharModeMethod);
 impl<C: Ctx> ComplexAttri<C> for CharModeMethod {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let char_mode = match i.next() {
+    let char_mode = match iter.next() {
       Some(&s) => s.parse()?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let method = match i.next() {
+    let method = match iter.next() {
       Some(s) => s.parse()?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { char_mode, method })
@@ -790,19 +789,18 @@ ast::impl_self_builder!(CharModeValue);
 impl<C: Ctx> ComplexAttri<C> for CharModeValue {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    iter: I,
+    mut iter: I,
     _scope: &mut ParseScope<'_>,
   ) -> Result<Self, ComplexParseError> {
-    let mut i = iter;
-    let char_mode = match i.next() {
+    let char_mode = match iter.next() {
       Some(&s) => s.parse()?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    let value = match i.next() {
+    let value = match iter.next() {
       Some(s) => parse_f64(s)?,
       None => return Err(ComplexParseError::LengthDismatch),
     };
-    if i.next().is_some() {
+    if iter.next().is_some() {
       return Err(ComplexParseError::LengthDismatch);
     }
     Ok(Self { char_mode, value })

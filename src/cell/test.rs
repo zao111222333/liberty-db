@@ -1,5 +1,19 @@
-use super::{Cell, Model};
+use super::{Cell, Model, items::SwitchingGroup};
 use crate::{DefaultCtx, Group};
+#[test]
+fn example_switching_group() {
+  let cell = crate::ast::test_parse_fmt::<SwitchingGroup<DefaultCtx>>(
+    r#"(test) {
+    input_switching_condition (rise);
+    output_switching_condition (fall rise);
+}"#,
+    r#"
+liberty_db::cell::items::SwitchingGroup (test) {
+| input_switching_condition (rise);
+| output_switching_condition (fall, rise);
+}"#,
+  );
+}
 /// In the following example, pins IP and OP are logically inverse.
 /// ``` text
 /// pin_opposite ("IP", "OP") ;

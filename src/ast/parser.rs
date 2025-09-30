@@ -573,8 +573,8 @@ pub(crate) fn complex<'a>(
       comment_space_newline_slash,
       space_newline,
       separated_list0(
-        char(','),
-        (comment_space_newline_slash, terminated(alt((word, unquote)), space)),
+        alt((terminated(space, char(',')), space1)),
+        (comment_space_newline_slash, alt((word, unquote))),
       ),
       opt(char(',')),
       comment_space_newline_slash,
