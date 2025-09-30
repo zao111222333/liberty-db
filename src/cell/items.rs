@@ -5,9 +5,9 @@ use crate::{
     Indentation, NamedGroup, ParseScope, SimpleAttri, SimpleParseRes, join_fmt,
   },
   common::items::WordSet,
-  expression::{LogicBooleanExpression, PowerGroundBooleanExpression},
+  expression::{LogicBooleanExpression, PowerGroundBooleanExpression, logic},
   pin::Direction,
-  table::CompactCcsPower,
+  table::{CompactCcsPower, ReferenceTimeVector3D, use_current_template},
 };
 use core::{
   fmt::{self, Write},
@@ -491,82 +491,6 @@ pub struct DynamicCurrent<C: Ctx> {
 }
 impl<C: Ctx> GroupFn<C> for DynamicCurrent<C> {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-#[derive(serde::Serialize, serde::Deserialize)]
-pub enum SwitchingCondition {
-  /// rise
-  Rise,
-  /// fall
-  Fall,
-  /// rise, fall
-  Both,
-}
-crate::ast::impl_self_builder!(SwitchingCondition);
-/// Use the `output_switching_condition` attribute to specify the sense of the toggling
-/// output. If there is more than one `switching_group` group specified within the
-/// `dynamic_current` group, you can place the attribute in any order. The order in the list of
-/// the `output_switching_condition` attribute is mapped to the same order of output pins in
-/// the `related_outputs` attribute.
-/// The valid values are rise and fall. rise represents a rising pin and fall represents a
-/// falling pin.
-/// ### Syntax
-/// `output_switching_condition (enum(rise, fall));`
-///
-/// `enum(rise, fall)`
-/// Enumerated type specifying the rise or fall condition.
-///
-/// ### Example
-/// `output_switching_condition (rise, fall);`
-/// <a name ="reference_link" href="
-/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=151.17&end=151.29
-/// ">Reference</a>
-impl<C: Ctx> ComplexAttri<C> for SwitchingCondition {
-  #[inline]
-  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
-    mut iter: I,
-    _scope: &mut ParseScope<'_>,
-  ) -> Result<Self, ComplexParseError> {
-    let mut res = match iter.next() {
-      Some(s) => match *s {
-        "rise" => Self::Rise,
-        "fall" => Self::Fall,
-        _ => return Err(ComplexParseError::UnsupportedWord),
-      },
-      None => return Err(ComplexParseError::LengthDismatch),
-    };
-    match iter.next() {
-      Some(s) => match *s {
-        "rise" => match res {
-          Self::Rise => {}
-          Self::Fall => res = Self::Both,
-          Self::Both => unreachable!(),
-        },
-        "fall" => match res {
-          Self::Rise => res = Self::Both,
-          Self::Fall => {}
-          Self::Both => unreachable!(),
-        },
-        _ => return Err(ComplexParseError::UnsupportedWord),
-      },
-      None => return Ok(res),
-    }
-    if iter.next().is_some() {
-      return Err(ComplexParseError::LengthDismatch);
-    }
-    Ok(res)
-  }
-  #[inline]
-  fn fmt_self<T: Write, I: Indentation>(
-    &self,
-    f: &mut CodeFormatter<'_, T, I>,
-  ) -> fmt::Result {
-    f.write_str(match self {
-      Self::Rise => "rise",
-      Self::Fall => "fall",
-      Self::Both => "rise, fall",
-    })
-  }
-}
 /// Use the switching_group group to specify a current waveform vector when the power
 /// and ground current is dependent on pin switching conditions.
 /// <a name ="reference_link" href="
@@ -610,7 +534,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// ">Reference</a>
   #[id]
   #[liberty(complex(type = Option))]
-  pub input_switching_condition: Option<SwitchingCondition>,
+  pub input_switching_condition: Option<logic::Edge>,
   /// Use the `output_switching_condition` attribute to specify the sense of the toggling
   /// output. If there is more than one `switching_group` group specified within the
   /// `dynamic_current` group, you can place the attribute in any order. The order in the list of
@@ -631,7 +555,7 @@ pub struct SwitchingGroup<C: Ctx> {
   /// ">Reference</a>
   #[id]
   #[liberty(complex(type = Option))]
-  pub output_switching_condition: Option<SwitchingCondition>,
+  pub output_switching_condition: Option<Vec<logic::Edge>>,
   /// The `min_input_switching_count` attribute specifies the minimum number of
   /// bits in the input bus that are switching simultaneously. The following applies to the
   /// `min_input_switching_count` attribute:
@@ -808,6 +732,23 @@ pub struct PgCurrent<C: Ctx> {
   #[liberty(group(type = Set))]
   #[liberty(after_build = crate::table::use_compact_template!)]
   pub compact_ccs_power: GroupSet<CompactCcsPower<C>>,
+  /// Use the vector group to specify the current waveform for a power and ground pin. This
+  /// group represents a single current waveform based on specified input slew and output load.
+  /// + Data in this group is represented as a dense table, if a template with two
+  /// total_output_net_capacitance variables is applied to the group. If a dense table
+  /// is applied, the order of total_output_net_capacitance variables must map to the
+  /// order of values in the related_outputs attribute.
+  /// + Data in this group is represented as a sparse cross table, if the index_output attribute
+  /// is defined in the group.
+  /// + Data in this group is represented as a sparse diagonal table, if no
+  /// index_output attribute is defined in the group and a template with exact one
+  /// total_output_net_capacitance variable is applied to the group.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=155.14&end=155.27
+  /// ">Reference</a>
+  #[liberty(group(type = Vec))]
+  #[liberty(after_build = use_current_template!)]
+  pub vector: Vec<ReferenceTimeVector3D<C>>,
 }
 impl<C: Ctx> GroupFn<C> for PgCurrent<C> {}
 

@@ -1,5 +1,8 @@
-use crate::{Ctx, ast::ParseScope};
-use core::{cmp::Ordering, hash::Hash};
+use crate::{
+  Ctx,
+  ast::{ParseScope, impl_self_builder},
+};
+use core::{cmp::Ordering, fmt::Write, hash::Hash};
 
 /// Level
 #[derive(Ord, PartialOrd)]
@@ -162,12 +165,73 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for Edge {
     })
   }
   #[inline]
-  fn fmt_self<T: core::fmt::Write, I: crate::ast::Indentation>(
+  fn fmt_self<T: Write, I: crate::ast::Indentation>(
     &self,
     f: &mut crate::ast::CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     use core::fmt::Write as _;
     f.write_str(self.full_name())
+  }
+}
+impl<C: Ctx> crate::ast::ComplexAttri<C> for Edge {
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
+    _: &mut ParseScope<'_>,
+  ) -> Result<Self::Builder, crate::ast::ComplexParseError> {
+    match iter.next().copied() {
+      Some("rise") => {
+        if iter.next().is_some() {
+          Err(crate::ast::ComplexParseError::LengthDismatch)
+        } else {
+          Ok(Self::R)
+        }
+      }
+      Some("fall") => {
+        if iter.next().is_some() {
+          Err(crate::ast::ComplexParseError::LengthDismatch)
+        } else {
+          Ok(Self::F)
+        }
+      }
+      Some(_) => Err(crate::ast::ComplexParseError::UnsupportedWord),
+      None => Err(crate::ast::ComplexParseError::LengthDismatch),
+    }
+  }
+
+  fn fmt_self<T: Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    use core::fmt::Write as _;
+    f.write_str(self.full_name())
+  }
+}
+impl_self_builder!(Vec<Edge>);
+impl<C: Ctx> crate::ast::ComplexAttri<C> for Vec<Edge> {
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    iter: I,
+    _: &mut ParseScope<'_>,
+  ) -> Result<Self::Builder, crate::ast::ComplexParseError> {
+    iter
+      .into_iter()
+      .map(|s| match *s {
+        "rise" => Ok(Edge::R),
+        "fall" => Ok(Edge::F),
+        _ => Err(crate::ast::ComplexParseError::UnsupportedWord),
+      })
+      .collect()
+  }
+
+  fn fmt_self<T: Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    crate::ast::join_fmt_no_quote(
+      self.iter(),
+      f,
+      |edge, f| f.write_str(edge.full_name()),
+      |f| f.write_str(", "),
+    )
   }
 }
 

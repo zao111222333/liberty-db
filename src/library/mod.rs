@@ -597,6 +597,15 @@ pub struct Library<C: Ctx> {
   /// ">Reference</a>
   #[liberty(group(type = Set))]
   pub output_current_template: GroupSet<TableTemple<C>>,
+  /// In the composite current source (CCS) power library format, instantaneous
+  /// power data is specified as 1- to n- dimensional tables of current waveforms in the
+  /// pg_current_template group. This library-level group creates templates of common
+  /// information that power and ground current vectors use.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=82.22&end=82.25
+  /// ">Reference</a>
+  #[liberty(group(type = Set))]
+  pub pg_current_template: GroupSet<TableTemple<C>>,
   /// The `power_lut_template` group is defined within the `library` group, as shown here:
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=83.34&end=83.35
@@ -893,9 +902,10 @@ impl<C: Ctx> GroupFn<C> for Library<C> {
           (lut.name.clone(), Arc::new(lut))
         })
         .collect();
-      scope.output_current_template = builder
+      scope.current_template = builder
         .output_current_template
         .iter()
+        .chain(builder.pg_current_template.iter())
         .map(|_lut| {
           let lut =
             <TableTemple<C> as ParsingBuilder<C>>::build(_lut.clone(), &mut empty_scope);
