@@ -204,7 +204,7 @@ liberty_db::common::demo::Timing () {
       r#"
 liberty_db::common::demo::Pin (A) {
 | timing () {
-| | values ("0.0");
+| | values (0.0);
 | | t1 : combinational;
 | }
 }"#,
@@ -219,7 +219,7 @@ liberty_db::common::demo::Pin (A) {
       r#"
 liberty_db::common::demo::Pin (B) {
 | timing () {
-| | values ("0.0");
+| | values (0.0);
 | | t1 : combinational;
 | }
 }"#,
@@ -270,13 +270,13 @@ liberty_db::common::demo::Cell (INV) {
 | }
 | pin (A) {
 | | timing () {
-| | | values ("0.0");
+| | | values (0.0);
 | | | t1 : combinational;
 | | }
 | }
 | pin (Y) {
 | | timing () {
-| | | values ("0.0");
+| | | values (0.0);
 | | | t1 : foo_error; /* user defined attribute */
 | | | test_table ("1,2,", "4,5,6", "4 , 5 , 6"); /* user defined attribute */
 | | }
@@ -331,7 +331,7 @@ liberty_db::common::demo::Cell (INV) {
 | }
 | pin (A) {
 | | timing () {
-| | | values ("0.0");
+| | | values (0.0);
 | | | t1 : combinational;
 | | }
 | }
