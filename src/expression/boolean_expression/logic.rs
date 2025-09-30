@@ -229,8 +229,8 @@ impl<C: Ctx> crate::ast::ComplexAttri<C> for Vec<Edge> {
     crate::ast::join_fmt_no_quote(
       self.iter(),
       f,
-      |edge, f| f.write_str(edge.full_name()),
-      |f| f.write_str(", "),
+      |edge, ff| ff.write_str(edge.full_name()),
+      |ff| ff.write_str(", "),
     )
   }
 }

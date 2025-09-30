@@ -365,6 +365,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<f64> {
   fn is_set(&self) -> bool {
     !self.is_empty()
   }
+  #[expect(clippy::indexing_slicing)]
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
