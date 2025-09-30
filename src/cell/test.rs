@@ -4,13 +4,13 @@ use crate::{DefaultCtx, Group};
 fn example_switching_group() {
   let cell = crate::ast::test_parse_fmt::<SwitchingGroup<DefaultCtx>>(
     r#"(test) {
-    input_switching_condition (fall rise);
-    output_switching_condition (rise);
+    input_switching_condition (rise);
+    output_switching_condition (fall rise);
 }"#,
     r#"
 liberty_db::cell::items::SwitchingGroup (test) {
-| input_switching_condition (rise, fall);
-| output_switching_condition (rise);
+| input_switching_condition (rise);
+| output_switching_condition (fall, rise);
 }"#,
   );
 }
