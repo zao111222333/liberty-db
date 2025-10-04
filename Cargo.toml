@@ -40,7 +40,6 @@ default = ["lut_template"]
 py = ["dep:pyo3", "dep:pyo3-stub-gen"]
 lut_template = []
 tracing = ["dep:tracing", "dev_utils/tracing"]
-__test_runtime_assert = []
 
 [workspace.dependencies]
 log = { version = "0.4", features = ["std", "serde"] }
