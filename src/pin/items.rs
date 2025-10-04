@@ -39,8 +39,8 @@ crate::ast::impl_simple!(AntennaDiodeType);
 /// In timing analysis, use a tlatch group to describe the relationship between the data pin
 /// and the enable pin on a transparent level-sensitive latch.
 /// You define the tlatch group in a pin group, but it is only effective if you also define the
-/// timing_model_type attribute in the cell that the pin belongs to. For more information
-/// about the timing_model_type attribute,
+/// `timing_model_type` attribute in the cell that the pin belongs to. For more information
+/// about the `timing_model_type` attribute,
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=372.33&end=372.37
 /// ">Reference-Definition</a>
@@ -52,7 +52,7 @@ crate::ast::impl_simple!(AntennaDiodeType);
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct TLatch<C: 'static+Ctx> {
+pub struct TLatch<C: 'static + Ctx> {
   /// Name of the pin
   #[liberty(name)]
   #[id(borrow = str)]
@@ -72,7 +72,7 @@ pub struct TLatch<C: 'static+Ctx> {
   pub tdisable: Option<bool>,
 }
 
-impl<C: 'static+Ctx> GroupFn<C> for TLatch<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for TLatch<C> {}
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -149,7 +149,7 @@ bitflags::bitflags! {
 }
 
 crate::ast::impl_self_builder!(AllDriverType);
-impl<C: 'static+Ctx> SimpleAttri<C> for AllDriverType {
+impl<C: 'static + Ctx> SimpleAttri<C> for AllDriverType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -424,14 +424,14 @@ impl FromStr for TwoValue {
       return Err(strum::ParseError::VariantNotFound);
     }
     let mut i = s.chars();
-    if let Some(c1) = i.next() {
-      if let Some(c2) = i.next() {
-        let mut tmp = [0; 1];
-        return Ok(Self(
-          OneValue::from_str(c1.encode_utf8(&mut tmp))?,
-          OneValue::from_str(c2.encode_utf8(&mut tmp))?,
-        ));
-      }
+    if let Some(c1) = i.next()
+      && let Some(c2) = i.next()
+    {
+      let mut tmp = [0; 1];
+      return Ok(Self(
+        OneValue::from_str(c1.encode_utf8(&mut tmp))?,
+        OneValue::from_str(c2.encode_utf8(&mut tmp))?,
+      ));
     }
     Err(strum::ParseError::VariantNotFound)
   }
@@ -511,7 +511,7 @@ pub struct RetentionPin {
   pub disable_value: Static,
 }
 crate::ast::impl_self_builder!(RetentionPin);
-impl<C: 'static+Ctx> ComplexAttri<C> for RetentionPin {
+impl<C: 'static + Ctx> ComplexAttri<C> for RetentionPin {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,

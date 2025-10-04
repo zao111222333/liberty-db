@@ -532,8 +532,8 @@ pub struct CompactCcsPower<C: 'static + Ctx> {
   /// the size is 14 = 8+3*2. Therefore, the curve parameters are as follows:
   ///
   /// "init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, \
-  /// point_time2, point_current2, bc_id3, point_time3, point_current3,
-  /// bc_id4,\
+  /// `point_time2`, `point_current2`, `bc_id3`, `point_time3`, `point_current3`,
+  /// `bc_id4`,\
   /// end_time, end_current"
   ///
   /// The elements in the values attribute are floating-point numbers for time and current and

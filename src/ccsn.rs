@@ -20,7 +20,7 @@ use core::fmt::{self, Write};
 ///
 /// A `ccsn_first_stage` or `ccsn_last_stage` group contains the following information:
 /// • A set of channel-connected block parameters: the `is_needed`, `is_inverting`,
-/// stage_type, `miller_cap_rise`, `miller_cap_fall`, and optional `related_ccb_node`
+/// `stage_type`, `miller_cap_rise`, `miller_cap_fall`, and optional `related_ccb_node`
 /// attributes
 /// • The optional `when` and `mode` attributes for conditional data modeling
 /// • The optional `output_signal_level` or `input_signal_level` attribute to model CCS
@@ -207,17 +207,17 @@ pub struct CCSNStage<C: 'static + Ctx> {
 impl<C: 'static + Ctx> GroupFn<C> for CCSNStage<C> {
   #[inline]
   fn before_build(builder: &mut Self::Builder, _scope: &mut BuilderScope<C>) {
-    if let Some(miller_cap_fall) = builder.miller_cap_fall.as_mut() {
-      if miller_cap_fall.is_sign_negative() {
-        *miller_cap_fall = 0.0;
-        crate::warn!("miller_cap_fall is negative!");
-      }
+    if let Some(miller_cap_fall) = builder.miller_cap_fall.as_mut()
+      && miller_cap_fall.is_sign_negative()
+    {
+      *miller_cap_fall = 0.0;
+      crate::warn!("miller_cap_fall is negative!");
     }
-    if let Some(miller_cap_rise) = builder.miller_cap_rise.as_mut() {
-      if miller_cap_rise.is_sign_negative() {
-        *miller_cap_rise = 0.0;
-        crate::warn!("miller_cap_rise is negative!");
-      }
+    if let Some(miller_cap_rise) = builder.miller_cap_rise.as_mut()
+      && miller_cap_rise.is_sign_negative()
+    {
+      *miller_cap_rise = 0.0;
+      crate::warn!("miller_cap_rise is negative!");
     }
   }
 }
@@ -256,14 +256,14 @@ crate::ast::impl_simple!(StageType);
 /// Groups
 ///
 /// For two-segment receiver capacitance model
-/// + receiver_capacitance1_fall
-/// + receiver_capacitance1_rise
-/// + receiver_capacitance2_fall
-/// + receiver_capacitance2_rise
+/// + `receiver_capacitance1_fall`
+/// + `receiver_capacitance1_rise`
+/// + `receiver_capacitance2_fall`
+/// + `receiver_capacitance2_rise`
 ///
 /// For multisegment receiver capacitance model
-/// + receiver_capacitance_fall
-/// + receiver_capacitance_rise
+/// + `receiver_capacitance_fall`
+/// + `receiver_capacitance_rise`
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=316.5&end=316.31
 /// ">Reference-Definition</a>
@@ -298,7 +298,7 @@ pub struct ReceiverCapacitance<C: 'static + Ctx> {
   #[liberty(after_build = TableLookUpMultiSegment::use_common_template)]
   pub receiver_capacitance_rise: LibertySet<TableLookUpMultiSegment<C>>,
   /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
-  /// switching input_ccb groups of the input pin that do not propagate the noise in the timing
+  /// switching `input_ccb` groups of the input pin that do not propagate the noise in the timing
   /// arc or the receiver capacitance load.
   /// You can also specify this attribute in the `receiver_capacitance` group of the input pin.
   ///

@@ -164,7 +164,7 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub dont_touch: Option<bool>,
-  /// CellId
+  /// `CellId`
   #[liberty(simple)]
   pub single_bit_degenerate: Option<String>,
   #[liberty(simple)]
@@ -201,9 +201,9 @@ pub struct Cell<C: 'static + Ctx> {
   pub clock_gating_integrated_cell: Option<ClockGatingIntegratedCell>,
   #[liberty(simple)]
   pub cell_footprint: Option<String>,
-  /// Use the cell_leakage_power attribute to define the leakage power of a cell. You must
-  /// define this attribute for cells with state-dependent leakage power. If cell_leakage_power
-  /// is missing or negative, the value of the default_cell_leakage_power attribute defined in
+  /// Use the `cell_leakage_power` attribute to define the leakage power of a cell. You must
+  /// define this attribute for cells with state-dependent leakage power. If `cell_leakage_power`
+  /// is missing or negative, the value of the `default_cell_leakage_power` attribute defined in
   /// the library is assumed.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=103.3&end=103.17
@@ -243,7 +243,7 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub interface_timing: Option<bool>,
-  /// Use the io_type  attribute to define the I/O standard used by this I/O cell.
+  /// Use the `io_type`  attribute to define the I/O standard used by this I/O cell.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=110.25&end=110.26
   /// ">Reference</a>
@@ -333,7 +333,7 @@ pub struct Cell<C: 'static + Ctx> {
   ///
   /// + `LH`: Low to High
   /// + `HL`: High to Low
-  /// + `HL_LH`: High to Low and Low to HighThe
+  /// + `HL_LH`: High to Low and Low to `HighThe`
   ///
   /// `level_shifter_type`  attribute is optional
   /// <a name ="reference_link" href="
@@ -434,7 +434,7 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(complex)]
   pub output_voltage_range: Option<(f64, f64)>,
-  /// Use the pin_opposite attribute to describe functionally opposite (logically inverse) groups
+  /// Use the `pin_opposite` attribute to describe functionally opposite (logically inverse) groups
   /// of input or output pins.
   /// ### Syntax
   ///
@@ -442,14 +442,14 @@ pub struct Cell<C: 'static + Ctx> {
   /// pin_opposite ("name_list1", "name_list2") ;
   /// ```
   ///
-  /// + `name_list1`: A name_list of output pins requires the supplied output values to be opposite.
-  /// + `name_list2`: A name_list of input pins requires the supplied input values to be opposite.
+  /// + `name_list1`: A `name_list` of output pins requires the supplied output values to be opposite.
+  /// + `name_list2`: A `name_list` of input pins requires the supplied input values to be opposite.
   ///
   /// In the following example, pins IP and OP are logically inverse.
   /// ``` text
   /// pin_opposite ("IP", "OP") ;
   /// ```
-  /// The pin_opposite attribute also incorporates the functionality of the `pin_equal` complex
+  /// The `pin_opposite` attribute also incorporates the functionality of the `pin_equal` complex
   /// attribute.
   ///
   /// In the following example, Q1, Q2, and Q3 are equal; QB1 and QB2 are equal; and the pins
@@ -582,13 +582,13 @@ pub struct Cell<C: 'static + Ctx> {
   /// Groups
   /// + intrinsic_capacitance
   /// + intrinsic_resistance
-  /// + total_capacitance
+  /// + `total_capacitance`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=176.24+177.2&end=176.49+177.25
   /// ">Reference</a>
   #[liberty(group)]
   pub intrinsic_parasitic: LibertySet<IntrinsicParasitic<C>>,
-  /// The preset_condition group is a group of attributes for a condition check on the normal
+  /// The `preset_condition` group is a group of attributes for a condition check on the normal
   /// mode preset expression.
   ///
   /// If preset is asserted during the restore operation, it needs to extend beyond the restore

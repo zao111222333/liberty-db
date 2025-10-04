@@ -482,7 +482,7 @@ pub struct OperatingConditions<C: 'static + Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  /// An optional attribute, you can use calc_mode  to specify an associated process mode.
+  /// An optional attribute, you can use `calc_mode`  to specify an associated process mode.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.28&end=72.28
   /// ">Reference</a>
@@ -502,7 +502,7 @@ pub struct OperatingConditions<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub process: f64,
-  /// Use the process_label  attribute to specify the name of the current process.
+  /// Use the `process_label`  attribute to specify the name of the current process.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.9&end=73.10
   /// ">Reference</a>
@@ -1033,11 +1033,11 @@ pub struct FanoutLength {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.22&end=96.23
   /// ">Reference</a>
   pub length: f64,
-  /// average_capacitance
+  /// `average_capacitance`
   pub average_capacitance: Option<f64>,
-  /// standard_deviation
+  /// `standard_deviation`
   pub standard_deviation: Option<f64>,
-  /// number_of_nets
+  /// `number_of_nets`
   pub number_of_nets: Option<u32>,
 }
 crate::ast::impl_self_builder!(FanoutLength);

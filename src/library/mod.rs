@@ -36,7 +36,7 @@ use std::path::Path;
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Library: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Library<C: 'static+Ctx> {
+pub struct Library<C: 'static + Ctx> {
   /// library name
   #[id(borrow = [String])]
   #[liberty(name)]
@@ -362,7 +362,7 @@ pub struct Library<C: 'static+Ctx> {
   pub time_unit: units::TimeUnit,
   /// This attribute specifies the unit for all capacitance
   /// values within the logic library, including
-  /// default capacitances, max_fanout capacitances,
+  /// default capacitances, `max_fanout` capacitances,
   /// pin capacitances, and wire capacitances.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=44.7&end=44.19
@@ -599,7 +599,7 @@ pub struct Library<C: 'static+Ctx> {
   pub output_current_template: LibertySet<TableTemple<C>>,
   /// In the composite current source (CCS) power library format, instantaneous
   /// power data is specified as 1- to n- dimensional tables of current waveforms in the
-  /// pg_current_template group. This library-level group creates templates of common
+  /// `pg_current_template` group. This library-level group creates templates of common
   /// information that power and ground current vectors use.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=82.22&end=82.25
@@ -731,13 +731,13 @@ pub struct Library<C: 'static+Ctx> {
   pub cell: LibertySet<Cell<C>>,
 }
 
-impl<C: 'static+Ctx> fmt::Display for Library<C> {
+impl<C: 'static + Ctx> fmt::Display for Library<C> {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
     self.fmt_lib::<DefaultIndentation>(f)
   }
 }
-impl<C: 'static+Ctx> Library<C> {
+impl<C: 'static + Ctx> Library<C> {
   const KEY: &'static str = "library";
   #[inline]
   pub fn write_lib_file<P: AsRef<Path>>(&self, filename: P) -> std::io::Result<()> {
@@ -877,7 +877,7 @@ impl<C: 'static+Ctx> Library<C> {
   }
 }
 
-impl<C: 'static+Ctx> GroupFn<C> for Library<C> {
+impl<C: 'static + Ctx> GroupFn<C> for Library<C> {
   #[cfg_attr(not(feature = "lut_template"), expect(unused_variables))]
   fn before_build(builder: &mut Self::Builder, scope: &mut BuilderScope<C>) {
     #[cfg(feature = "lut_template")]

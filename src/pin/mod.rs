@@ -639,7 +639,7 @@ pub struct Pin<C: 'static + Ctx> {
   #[liberty(simple)]
   pub is_pad: Option<bool>,
   /// The `is_pll_reference_pin` Boolean attribute tags a pin as a reference pin on the phaselocked loop.
-  /// In a phase-locked loop cell group, the is_pll_reference_pin attribute
+  /// In a phase-locked loop cell group, the `is_pll_reference_pin` attribute
   /// should be set to true in only one input pin group.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=256.17&end=256.19
@@ -696,9 +696,9 @@ pub struct Pin<C: 'static + Ctx> {
   ///
   /// The attribute is applicable to pins of macro cells
   ///
-  /// When the isolation_enable_condition  attribute is defined in a bus  or  bundle  group, the corresponding Boolean expression can include pins, and buses and bundles of the same bit-width. For example, when the Boolean expression includes a bus and a bundle, both of them must have the same bit-width.
+  /// When the `isolation_enable_condition`  attribute is defined in a bus  or  bundle  group, the corresponding Boolean expression can include pins, and buses and bundles of the same bit-width. For example, when the Boolean expression includes a bus and a bundle, both of them must have the same bit-width.
   ///
-  /// Pins, buses, and bundles that have the isolation_enable_condition  attribute must also have the always_on  attribute.
+  /// Pins, buses, and bundles that have the `isolation_enable_condition`  attribute must also have the `always_on`  attribute.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=260.3&end=260.13
   /// ">Reference</a>
@@ -906,7 +906,7 @@ pub struct Pin<C: 'static + Ctx> {
   /// ">Reference-Instance</a>
   #[liberty(simple)]
   pub pin_func_type: Option<PinFuncType>,
-  /// The prefer_tied attribute describes an input pin of a flip-flop or latch.
+  /// The `prefer_tied` attribute describes an input pin of a flip-flop or latch.
   /// It indicates what the library developer wants this pin connected to.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -1181,8 +1181,8 @@ pub struct Pin<C: 'static + Ctx> {
   /// In timing analysis, use a tlatch group to describe the relationship between the data pin
   /// and the enable pin on a transparent level-sensitive latch.
   /// You define the tlatch group in a pin group, but it is only effective if you also define the
-  /// timing_model_type attribute in the cell that the pin belongs to. For more information
-  /// about the timing_model_type attribute,
+  /// `timing_model_type` attribute in the cell that the pin belongs to. For more information
+  /// about the `timing_model_type` attribute,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=372.33&end=372.37
   /// ">Reference-Definition</a>
@@ -1217,14 +1217,14 @@ pub struct Pin<C: 'static + Ctx> {
   /// Groups
   ///
   /// For two-segment receiver capacitance model
-  /// + receiver_capacitance1_fall
-  /// + receiver_capacitance1_rise
-  /// + receiver_capacitance2_fall
-  /// + receiver_capacitance2_rise
+  /// + `receiver_capacitance1_fall`
+  /// + `receiver_capacitance1_rise`
+  /// + `receiver_capacitance2_fall`
+  /// + `receiver_capacitance2_rise`
   ///
   /// For multisegment receiver capacitance model
-  /// + receiver_capacitance_fall
-  /// + receiver_capacitance_rise
+  /// + `receiver_capacitance_fall`
+  /// + `receiver_capacitance_rise`
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=316.5&end=316.31
   /// ">Reference-Definition</a>

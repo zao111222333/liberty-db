@@ -200,7 +200,10 @@ pub(crate) fn variable<'a>(
     |(_, _, expr, _, _, n)| {
       scope.loc.line_num += n;
       let formula = Formula {
-        value: expr.eval(&expr, |k: &str| scope.variables.get(k).and_then(|f| f.value)),
+        value: expr.eval(&expr, |k: &str| {
+          let f = scope.variables.get(k)?;
+          f.value
+        }),
         expr,
       };
       _ = scope.variables.insert(name.to_owned(), formula);

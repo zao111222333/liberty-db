@@ -84,7 +84,7 @@ pub(crate) trait ParsingSet<C: 'static + Ctx, T: 'static + ParsingBuilder<C>>:
     before_build: Option<fn(&mut T::Builder, &mut BuilderScope<C>)>,
     after_build: Option<fn(&mut T, &mut BuilderScope<C>)>,
   ) -> Self;
-  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T>;
+  fn iter_set(&self) -> impl '_ + Iterator<Item = &T>;
 }
 
 impl<C: 'static + Ctx, T: 'static + Sized + Default + ParsingBuilder<C>> ParsingSet<C, T>
@@ -102,7 +102,7 @@ impl<C: 'static + Ctx, T: 'static + Sized + Default + ParsingBuilder<C>> Parsing
   ) -> Self {
     T::build_full(builder, scope, before_build, after_build)
   }
-  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T> {
+  fn iter_set(&self) -> impl '_ + Iterator<Item = &T> {
     core::iter::once(self)
   }
 }
@@ -122,7 +122,7 @@ impl<C: 'static + Ctx, T: 'static + Sized + ParsingBuilder<C>> ParsingSet<C, T>
   ) -> Self {
     builder.map(|b| T::build_full(b, scope, before_build, after_build))
   }
-  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T> {
+  fn iter_set(&self) -> impl '_ + Iterator<Item = &T> {
     self.iter()
   }
 }
@@ -145,7 +145,7 @@ impl<C: 'static + Ctx, T: 'static + Sized + ParsingBuilder<C>> ParsingSet<C, T>
       .map(|b| T::build_full(b, scope, before_build, after_build))
       .collect()
   }
-  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T> {
+  fn iter_set(&self) -> impl '_ + Iterator<Item = &T> {
     self.iter()
   }
 }
@@ -165,14 +165,14 @@ impl<
     before_build: Option<fn(&mut T::Builder, &mut BuilderScope<C>)>,
     after_build: Option<fn(&mut T, &mut BuilderScope<C>)>,
   ) -> Self {
-    let mut set: LibertySet<T> = builder
+    let mut set: Self = builder
       .into_iter()
       .map(|b| T::build_full(b, scope, before_build, after_build))
       .collect();
     set.sort_unstable();
     set
   }
-  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T> {
+  fn iter_set(&self) -> impl '_ + Iterator<Item = &T> {
     self.iter()
   }
 }

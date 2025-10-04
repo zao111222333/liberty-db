@@ -33,7 +33,7 @@ use core::fmt;
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Pin: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct BusType<C: 'static+Ctx> {
+pub struct BusType<C: 'static + Ctx> {
   #[id(borrow = str)]
   #[liberty(name)]
   pub name: String,
@@ -89,7 +89,7 @@ pub struct BusType<C: 'static+Ctx> {
   pub downto: Option<bool>,
 }
 
-impl<C: 'static+Ctx> ast::GroupFn<C> for BusType<C> {
+impl<C: 'static + Ctx> ast::GroupFn<C> for BusType<C> {
   fn before_build(builder: &mut Self::Builder, scope: &mut ast::BuilderScope<C>) {
     _ = scope.bus_type.insert(
       builder.name.clone(),
@@ -155,14 +155,14 @@ pub struct BusTypeCtx {
   pub downto: Option<bool>,
 }
 
-impl<C: 'static+Ctx> ast::ParsingBuilder<C> for SimpleBusType {
+impl<C: 'static + Ctx> ast::ParsingBuilder<C> for SimpleBusType {
   type Builder = String;
   #[expect(clippy::renamed_function_params)]
   fn build(name: Self::Builder, scope: &mut ast::BuilderScope<C>) -> Self {
     Self { ctx: scope.bus_type.get(&name).copied(), name }
   }
 }
-impl<C: 'static+Ctx> ast::SimpleAttri<C> for SimpleBusType {
+impl<C: 'static + Ctx> ast::SimpleAttri<C> for SimpleBusType {
   fn nom_parse<'a>(
     i: &'a str,
     scope: &mut ast::ParseScope<'_>,

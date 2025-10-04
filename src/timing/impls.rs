@@ -16,7 +16,7 @@ use super::{Timing, TimingType};
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=330.5&end=330.6
 /// ">Reference</a>
-pub(super) fn need_timing_sense_when_timing_type_is_clear_or_preset<C: 'static+Ctx>(
+pub(super) fn need_timing_sense_when_timing_type_is_clear_or_preset<C: 'static + Ctx>(
   timing: &Timing<C>,
 ) {
   if matches!(timing.timing_type, Some(TimingType::CLEAR | TimingType::PRESET))
@@ -32,7 +32,7 @@ pub(super) fn need_timing_sense_when_timing_type_is_clear_or_preset<C: 'static+C
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=330.6&end=330.7
 /// ">Reference</a>
-pub(super) const fn need_timing_sense_when_related_pin_is_output<C: 'static+Ctx>(
+pub(super) const fn need_timing_sense_when_related_pin_is_output<C: 'static + Ctx>(
   _timing: &Timing<C>,
 ) {
   // TODO

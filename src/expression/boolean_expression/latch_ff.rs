@@ -24,7 +24,7 @@ use core::fmt::Write;
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct FF<C: 'static+Ctx> {
+pub struct FF<C: 'static + Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -111,7 +111,7 @@ pub struct FF<C: 'static+Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct FFBank<C: 'static+Ctx> {
+pub struct FFBank<C: 'static + Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -200,7 +200,7 @@ pub struct FFBank<C: 'static+Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Latch<C: 'static+Ctx> {
+pub struct Latch<C: 'static + Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -263,7 +263,7 @@ pub struct Latch<C: 'static+Ctx> {
   /// The `enable_also`  attribute gives the state of the `enable`
   /// input when you are describing master and slave cells.
   /// The `enable_also`  attribute is optional.
-  /// If you use `enable_also`, you must also use the enable  and data_in  attributes
+  /// If you use `enable_also`, you must also use the enable  and `data_in`  attributes
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.23&end=185.25
   /// ">Reference-Definition</a>
@@ -286,7 +286,7 @@ pub struct Latch<C: 'static+Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct LatchBank<C: 'static+Ctx> {
+pub struct LatchBank<C: 'static + Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -349,7 +349,7 @@ pub struct LatchBank<C: 'static+Ctx> {
   /// The `enable_also`  attribute gives the state of the `enable`
   /// input when you are describing master and slave cells.
   /// The `enable_also`  attribute is optional.
-  /// If you use `enable_also`, you must also use the enable  and data_in  attributes
+  /// If you use `enable_also`, you must also use the enable  and `data_in`  attributes
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.23&end=185.25
   /// ">Reference-Definition</a>
@@ -370,7 +370,7 @@ pub struct LatchBank<C: 'static+Ctx> {
   [Latch];
   [FF];
 )]
-impl<C: 'static+Ctx> NamedGroup<C> for LatchFF_type<C> {
+impl<C: 'static + Ctx> NamedGroup<C> for LatchFF_type<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -404,7 +404,7 @@ impl<C: 'static+Ctx> NamedGroup<C> for LatchFF_type<C> {
   [LatchBank];
   [FFBank];
 )]
-impl<C: 'static+Ctx> NamedGroup<C> for LatchFFBank_type<C> {
+impl<C: 'static + Ctx> NamedGroup<C> for LatchFFBank_type<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -449,7 +449,7 @@ impl<C: 'static+Ctx> NamedGroup<C> for LatchFFBank_type<C> {
   [LatchBank];
   [Latch];
 )]
-impl<C: 'static+Ctx> __LatchFF for Latch_type<C> {
+impl<C: 'static + Ctx> __LatchFF for Latch_type<C> {
   #[inline]
   fn variable1(&self) -> &String {
     &self.variable1
@@ -493,7 +493,7 @@ impl<C: 'static+Ctx> __LatchFF for Latch_type<C> {
   [FFBank];
   [FF];
 )]
-impl<C: 'static+Ctx> __LatchFF for FF_type<C> {
+impl<C: 'static + Ctx> __LatchFF for FF_type<C> {
   #[inline]
   fn variable1(&self) -> &String {
     &self.variable1
@@ -563,7 +563,7 @@ trait __LatchFF {
   [LatchBank];
   [Latch];
 )]
-impl<C: 'static+Ctx> LatchFF for AllTypes<C> {}
+impl<C: 'static + Ctx> LatchFF for AllTypes<C> {}
 #[duplicate::duplicate_item(
   AllTypes;
   [FFBank];
@@ -571,7 +571,7 @@ impl<C: 'static+Ctx> LatchFF for AllTypes<C> {}
   [LatchBank];
   [Latch];
 )]
-impl<C: 'static+Ctx> GroupFn<C> for AllTypes<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for AllTypes<C> {}
 /// trait for `FF` and `FFBank`
 #[expect(private_bounds)]
 pub trait LatchFF: __LatchFF {

@@ -422,7 +422,7 @@ pub struct PgPin<C: 'static + Ctx> {
   /// The attribute Boolean expression is checked during library compile to
   /// ensure that only one `pg_pin`  is always active at this virtual or derived PG pin.
   /// If more than one `pg_pin`  is found to be active at the virtual or the derived
-  /// pg_pin  output, the `read_lib` command generates an error
+  /// `pg_pin`  output, the `read_lib` command generates an error
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=266.21&end=266.26
   /// ">Reference-Definition</a>
@@ -482,7 +482,7 @@ pub struct DynamicCurrent<C: 'static + Ctx> {
   pub related_outputs: WordSet,
   #[liberty(complex)]
   pub typical_capacitances: Option<Vec<f64>>,
-  /// Use the switching_group group to specify a current waveform vector when the power
+  /// Use the `switching_group` group to specify a current waveform vector when the power
   /// and ground current is dependent on pin switching conditions.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=150.18&end=150.19
@@ -492,7 +492,7 @@ pub struct DynamicCurrent<C: 'static + Ctx> {
 }
 impl<C: 'static + Ctx> GroupFn<C> for DynamicCurrent<C> {}
 
-/// Use the switching_group group to specify a current waveform vector when the power
+/// Use the `switching_group` group to specify a current waveform vector when the power
 /// and ground current is dependent on pin switching conditions.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=150.18&end=150.19
@@ -736,14 +736,14 @@ pub struct PgCurrent<C: 'static + Ctx> {
   /// Use the vector group to specify the current waveform for a power and ground pin. This
   /// group represents a single current waveform based on specified input slew and output load.
   /// + Data in this group is represented as a dense table, if a template with two
-  /// total_output_net_capacitance variables is applied to the group. If a dense table
-  /// is applied, the order of total_output_net_capacitance variables must map to the
-  /// order of values in the related_outputs attribute.
-  /// + Data in this group is represented as a sparse cross table, if the index_output attribute
+  /// `total_output_net_capacitance` variables is applied to the group. If a dense table
+  /// is applied, the order of `total_output_net_capacitance` variables must map to the
+  /// order of values in the `related_outputs` attribute.
+  /// + Data in this group is represented as a sparse cross table, if the `index_output` attribute
   /// is defined in the group.
   /// + Data in this group is represented as a sparse diagonal table, if no
-  /// index_output attribute is defined in the group and a template with exact one
-  /// total_output_net_capacitance variable is applied to the group.
+  /// `index_output` attribute is defined in the group and a template with exact one
+  /// `total_output_net_capacitance` variable is applied to the group.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=155.14&end=155.27
   /// ">Reference</a>
@@ -805,7 +805,7 @@ impl<C: 'static + Ctx> GroupFn<C> for PgCurrent<C> {}
 /// Groups
 /// + intrinsic_capacitance
 /// + intrinsic_resistance
-/// + total_capacitance
+/// + `total_capacitance`
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=176.24+177.2&end=176.49+177.25
 /// ">Reference</a>
@@ -1026,9 +1026,9 @@ pub struct IntrinsicCapacitance<C: 'static + Ctx> {
   pub reference_pg_pin: Option<String>,
   /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
   /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
-  /// tables, define the lut_values group. You can add the `lut_values` group to both the
+  /// tables, define the `lut_values` group. You can add the `lut_values` group to both the
   /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The `lut_values` group
-  /// uses the `variable_1` variable, which is defined within the lu_table_template group,
+  /// uses the `variable_1` variable, which is defined within the `lu_table_template` group,
   /// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
   /// `pg_voltage_difference`.
   ///
@@ -1148,9 +1148,9 @@ pub struct IntrinsicResistance<C: 'static + Ctx> {
   pub reference_pg_pin: Option<String>,
   /// Voltage-dependent intrinsic parasitics are modeled by lookup tables. A lookup table
   /// consists of intrinsic parasitic values for different values of VDD. To use these lookup
-  /// tables, define the lut_values group. You can add the `lut_values` group to both the
+  /// tables, define the `lut_values` group. You can add the `lut_values` group to both the
   /// `intrinsic_resistance` and `intrinsic_capacitance` groups. The `lut_values` group
-  /// uses the `variable_1` variable, which is defined within the lu_table_template group,
+  /// uses the `variable_1` variable, which is defined within the `lu_table_template` group,
   /// at the library level. The valid values of the `variable_1` variable are `pg_voltage` and
   /// `pg_voltage_difference`.
   ///
@@ -1301,7 +1301,7 @@ pub struct GateLeakage<C: 'static + Ctx> {
   /// + The gate leakage current flow is measured from the power pin of a cell to the ground
   /// pin of its driver cell.
   /// + The input pin is pulled up to low.
-  /// + The `input_low_value` attribute is not required for a gate_leakage group.
+  /// + The `input_low_value` attribute is not required for a `gate_leakage` group.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=198.3&end=198.22
   /// ">Reference</a>
@@ -1313,7 +1313,7 @@ pub struct GateLeakage<C: 'static + Ctx> {
   /// ground pin of the cell itself.
   /// + A positive floating-point number value is required.
   /// + The input pin is pulled up to high.
-  /// + The `input_high_value` attribute is not required for a gate_leakage group.
+  /// + The `input_high_value` attribute is not required for a `gate_leakage` group.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=198.24&end=198.38
   /// ">Reference</a>
@@ -1375,7 +1375,7 @@ pub struct LeakageCurrent<C: 'static + Ctx> {
   pub when: Option<LogicBooleanExpression>,
   /// When a cell has a single power and ground pin, omit the `pg_current` group and specify
   /// the leakage current value. Otherwise, specify the value in the `pg_current` group. Current
-  /// conservation is applied for each leakage_current group. The value attribute specifies
+  /// conservation is applied for each `leakage_current` group. The value attribute specifies
   /// the absolute value of leakage current on a single power and ground pin.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=195.34+196.2&end=195.35+196.9
