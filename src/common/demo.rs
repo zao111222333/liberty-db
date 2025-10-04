@@ -3,7 +3,7 @@
 //! cargo expand common::demo --no-default-features
 use crate::{
   Ctx,
-  ast::{Attributes, GroupComments, GroupFn, GroupSet, NamedGroup},
+  ast::{Attributes, GroupComments, GroupFn, LibertySet, LibertyVec, NamedGroup},
   cell::Statetable,
   table::TableLookUp2D,
   timing::{TimingTableLookUp, TimingType},
@@ -14,7 +14,7 @@ use core::fmt::Write;
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub(crate) struct Timing<C: Ctx> {
+pub(crate) struct Timing<C: 'static + Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,
@@ -26,9 +26,9 @@ pub(crate) struct Timing<C: Ctx> {
   #[liberty(complex)]
   #[liberty(default = vec![0.0])]
   pub values: Vec<f64>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   t1: Option<TimingType>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   t2: Option<TimingType>,
   #[liberty(supergroup(
     cell_fall: Option<TableLookUp2D<C>>,
@@ -39,7 +39,7 @@ pub(crate) struct Timing<C: Ctx> {
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub cell_fall: Option<TimingTableLookUp<C>>,
 }
-impl<C: Ctx> GroupFn<C> for Timing<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for Timing<C> {}
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
@@ -47,7 +47,7 @@ impl<C: Ctx> GroupFn<C> for Timing<C> {}
 // #[derive(liberty_macros::Nothing)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub(crate) struct Pin<C: Ctx> {
+pub(crate) struct Pin<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   name: String,
@@ -59,17 +59,17 @@ pub(crate) struct Pin<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,
-  #[liberty(group(type = Vec))]
-  timing: Vec<Timing<C>>,
+  #[liberty(group)]
+  timing: LibertyVec<Timing<C>>,
 }
-impl<C: Ctx> GroupFn<C> for Pin<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for Pin<C> {}
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub(crate) struct FF<C: Ctx> {
+pub(crate) struct FF<C: 'static + Ctx> {
   #[id(borrow = str)]
   #[liberty(name)]
   variable1: String,
@@ -84,11 +84,11 @@ pub(crate) struct FF<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   next_state: Option<String>,
 }
-impl<C: Ctx> GroupFn<C> for FF<C> {}
-impl<C: Ctx> NamedGroup<C> for FF<C> {
+impl<C: 'static + Ctx> GroupFn<C> for FF<C> {}
+impl<C: 'static + Ctx> NamedGroup<C> for FF<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -125,7 +125,7 @@ impl<C: Ctx> NamedGroup<C> for FF<C> {
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub(crate) struct Cell<C: Ctx> {
+pub(crate) struct Cell<C: 'static + Ctx> {
   #[liberty(name)]
   name: String,
   /// group comments
@@ -136,16 +136,16 @@ pub(crate) struct Cell<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   attributes: Attributes,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   area: Option<f64>,
-  #[liberty(group(type = Set))]
-  ff: GroupSet<FF<C>>,
-  #[liberty(group(type = Set))]
-  pin: GroupSet<Pin<C>>,
-  #[liberty(group(type = Option))]
+  #[liberty(group)]
+  ff: LibertySet<FF<C>>,
+  #[liberty(group)]
+  pin: LibertySet<Pin<C>>,
+  #[liberty(group)]
   statetable: Option<Statetable<C>>,
 }
-impl<C: Ctx> GroupFn<C> for Cell<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for Cell<C> {}
 
 #[cfg(test)]
 mod test {

@@ -97,7 +97,7 @@ impl PartialOrd for WordSet {
   }
 }
 crate::ast::impl_self_builder!(WordSet);
-impl<C: Ctx> SimpleAttri<C> for WordSet {
+impl<C: 'static+Ctx> SimpleAttri<C> for WordSet {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -144,7 +144,7 @@ impl FromStr for WordSet {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct DummyGroup<C: Ctx> {
+pub struct DummyGroup<C: 'static+Ctx> {
   #[liberty(name)]
   #[id]
   name: Option<String>,
@@ -157,7 +157,7 @@ pub struct DummyGroup<C: Ctx> {
   #[liberty(attributes)]
   pub attributes: crate::ast::Attributes,
 }
-impl<C: Ctx> GroupFn<C> for DummyGroup<C> {}
+impl<C: 'static+Ctx> GroupFn<C> for DummyGroup<C> {}
 
 impl From<String> for WordSet {
   #[inline]

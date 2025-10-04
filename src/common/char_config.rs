@@ -6,7 +6,7 @@ use crate::{
   Ctx,
   ast::{
     self, CodeFormatter, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    GroupSet, Indentation, ParseScope,
+    Indentation, LibertySet, ParseScope,
   },
 };
 
@@ -60,7 +60,7 @@ use super::parse_f64;
 #[derive(liberty_macros::Group)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct CharConfig<C: Ctx> {
+pub struct CharConfig<C: 'static + Ctx> {
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
@@ -90,7 +90,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=49.20&end=49.36
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub internal_power_calculation: Option<InternalPowerCalculation>,
   /// The `three_state_disable_measurement_method` attribute specifies the method to
   /// identify the three-state condition of a pin. In a pin group, this attribute is valid only for a
@@ -107,7 +107,7 @@ pub struct CharConfig<C: Ctx> {
   /// ``` text
   /// three_state_disable_measurement_method : current ;
   /// ```
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub three_state_disable_measurement_method: Option<ThreeStateDisableMeasurementMethod>,
   /// The `three_state_disable_current_threshold_abs` attribute specifies the
   /// absolute current threshold value to distinguish between the low- and high-impedance
@@ -127,7 +127,7 @@ pub struct CharConfig<C: Ctx> {
   /// ``` text
   /// three_state_disable_current_threshold_abs : 0.05 ;
   /// ```
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub three_state_disable_current_threshold_abs: Option<f64>,
   /// The `three_state_disable_current_threshold_rel` attribute specifies the relative
   /// current threshold value to distinguish between the low- and high-impedance states of a
@@ -147,7 +147,7 @@ pub struct CharConfig<C: Ctx> {
   /// ``` text
   /// three_state_disable_current_threshold_rel : 2.0 ;
   /// ```
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub three_state_disable_current_threshold_rel: Option<f64>,
   /// The `three_state_disable_monitor_node` attribute specifies the internal node that
   /// is probed for the three-state voltage measurement method.
@@ -162,7 +162,7 @@ pub struct CharConfig<C: Ctx> {
   /// ``` text
   /// three_state_disable_monitor_node : tri_monitor ;
   /// ```
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub three_state_disable_monitor_node: Option<String>,
   /// The `three_state_cap_add_to_load_index` attribute specifies that the pin
   /// capacitance of a three-state pin is added to each index value of the
@@ -177,7 +177,7 @@ pub struct CharConfig<C: Ctx> {
   /// ``` text
   /// three_state_cap_add_to_load_index : true ;
   /// ```
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub three_state_cap_add_to_load_index: Option<bool>,
   /// The `ccs_timing_segment_voltage_tolerance_rel` attribute specifies the maximum
   /// permissible voltage difference between the simulation waveform and the CCS waveform to
@@ -196,7 +196,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=49.38+50.2&end=49.39+50.8
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub ccs_timing_segment_voltage_tolerance_rel: Option<f64>,
   /// The `ccs_timing_delay_tolerance_rel` attribute specifies the acceptable difference
   /// between the CCS waveform delay and the delay measured from simulation. The floating-
@@ -216,7 +216,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.10&end=50.18
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub ccs_timing_delay_tolerance_rel: Option<f64>,
   /// The `ccs_timing_voltage_margin_tolerance_rel` attribute specifies the voltage
   /// tolerance for a signal to acquire the rail-voltage value. The floating-point value is specified
@@ -234,7 +234,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.20&end=50.27
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub ccs_timing_voltage_margin_tolerance_rel: Option<f64>,
   /// The following CCS receiver capacitance attributes specify the current-integration limits, as
   /// a percentage of the voltage, to calculate the CCS receiver capacitances. The floating-point
@@ -242,7 +242,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.29+51.2&end=50.31+51.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub receiver_capacitance1_voltage_lower_threshold_pct_rise: Option<f64>,
   /// The following CCS receiver capacitance attributes specify the current-integration limits, as
   /// a percentage of the voltage, to calculate the CCS receiver capacitances. The floating-point
@@ -250,7 +250,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.29+51.2&end=50.31+51.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub receiver_capacitance1_voltage_upper_threshold_pct_rise: Option<f64>,
   /// The following CCS receiver capacitance attributes specify the current-integration limits, as
   /// a percentage of the voltage, to calculate the CCS receiver capacitances. The floating-point
@@ -258,7 +258,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.29+51.2&end=50.31+51.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub receiver_capacitance1_voltage_lower_threshold_pct_fall: Option<f64>,
   /// The following CCS receiver capacitance attributes specify the current-integration limits, as
   /// a percentage of the voltage, to calculate the CCS receiver capacitances. The floating-point
@@ -266,7 +266,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.29+51.2&end=50.31+51.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub receiver_capacitance1_voltage_upper_threshold_pct_fall: Option<f64>,
   /// The following CCS receiver capacitance attributes specify the current-integration limits, as
   /// a percentage of the voltage, to calculate the CCS receiver capacitances. The floating-point
@@ -274,7 +274,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.29+51.2&end=50.31+51.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub receiver_capacitance2_voltage_lower_threshold_pct_rise: Option<f64>,
   /// The following CCS receiver capacitance attributes specify the current-integration limits, as
   /// a percentage of the voltage, to calculate the CCS receiver capacitances. The floating-point
@@ -282,7 +282,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.29+51.2&end=50.31+51.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub receiver_capacitance2_voltage_upper_threshold_pct_rise: Option<f64>,
   /// The following CCS receiver capacitance attributes specify the current-integration limits, as
   /// a percentage of the voltage, to calculate the CCS receiver capacitances. The floating-point
@@ -290,7 +290,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.29+51.2&end=50.31+51.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub receiver_capacitance2_voltage_lower_threshold_pct_fall: Option<f64>,
   /// The following CCS receiver capacitance attributes specify the current-integration limits, as
   /// a percentage of the voltage, to calculate the CCS receiver capacitances. The floating-point
@@ -298,7 +298,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=50.29+51.2&end=50.31+51.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub receiver_capacitance2_voltage_upper_threshold_pct_fall: Option<f64>,
   /// The following input-capacitance measurement attributes specify the corresponding
   /// threshold values for the rising and falling voltage waveforms, to calculate the NLDM input-
@@ -307,7 +307,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=51.22&end=51.36
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub capacitance_voltage_lower_threshold_pct_rise: Option<f64>,
   /// The following input-capacitance measurement attributes specify the corresponding
   /// threshold values for the rising and falling voltage waveforms, to calculate the NLDM input-
@@ -316,7 +316,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=51.22&end=51.36
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub capacitance_voltage_lower_threshold_pct_fall: Option<f64>,
   /// The following input-capacitance measurement attributes specify the corresponding
   /// threshold values for the rising and falling voltage waveforms, to calculate the NLDM input-
@@ -325,7 +325,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=51.22&end=51.36
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub capacitance_voltage_upper_threshold_pct_rise: Option<f64>,
   /// The following input-capacitance measurement attributes specify the corresponding
   /// threshold values for the rising and falling voltage waveforms, to calculate the NLDM input-
@@ -334,7 +334,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=51.22&end=51.36
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub capacitance_voltage_upper_threshold_pct_fall: Option<f64>,
   /// The `driver_waveform` attribute defines the driver waveform to characterize a specific
   /// characterization model.
@@ -354,7 +354,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=51.38+52.2&end=51.39+52.9
   /// ">Reference</a>
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub driver_waveform: Option<[String; 2]>,
   /// The `driver_waveform_rise` attribute defines a specific rising driver waveform to
   /// characterize a specific characterization model.
@@ -374,7 +374,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=52.11&end=52.21
   /// ">Reference</a>
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub driver_waveform_rise: Option<[String; 2]>,
   /// The `driver_waveform_fall` attribute defines a specific falling driver waveform to
   /// characterize a specific characterization model.
@@ -395,7 +395,7 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=52.23+53.2&end=52.31+53.3
   /// ">Reference</a>
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub driver_waveform_fall: Option<[String; 2]>,
   /// The `input_stimulus_transition` attribute specifies the transition time for all the input-
   /// signal edges except the arc input pin's last transition, during generation of the input
@@ -414,8 +414,8 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=53.5&end=53.14
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub input_stimulus_transition: GroupSet<CharModeValue>,
+  #[liberty(complex)]
+  pub input_stimulus_transition: LibertySet<CharModeValue>,
   /// The `input_stimulus_interval` attribute specifies the time-interval between the input-
   /// signal toggles to generate the input stimulus for a characterization cell. The time units of
   /// this attribute are specified by the library-level `time_unit` attribute.
@@ -433,8 +433,8 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=53.16&end=53.23
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub input_stimulus_interval: GroupSet<CharModeValue>,
+  #[liberty(complex)]
+  pub input_stimulus_interval: LibertySet<CharModeValue>,
   /// The `unrelated_output_net_capacitance` attribute specifies a load value for an output
   /// pin that is not a related output pin of the characterization model. The valid value is a
   /// floating-point number, and is defined by the library-level `capacitive_load_unit` attribute.
@@ -453,8 +453,8 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=53.25+54.2&end=53.30+54.5
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub unrelated_output_net_capacitance: GroupSet<CharModeValue>,
+  #[liberty(complex)]
+  pub unrelated_output_net_capacitance: LibertySet<CharModeValue>,
   /// The `default_value_selection_method` attribute defines the method of selecting a
   /// default value for
   /// + The delay arc from state-dependent delay arcs
@@ -476,8 +476,8 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=54.7&end=54.27
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub default_value_selection_method: GroupSet<CharModeMethod>,
+  #[liberty(complex)]
+  pub default_value_selection_method: LibertySet<CharModeMethod>,
   /// Use the `default_value_selection_method_rise` attribute when the selection method
   /// for rise is different from the selection method for fall.
   /// You must define either the `default_value_selection_method`
@@ -491,8 +491,8 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=54.29+55.2&end=54.36+55.3
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub default_value_selection_method_rise: GroupSet<CharModeMethod>,
+  #[liberty(complex)]
+  pub default_value_selection_method_rise: LibertySet<CharModeMethod>,
   /// Use the `default_value_selection_method_fall` attribute when the selection method
   /// for fall is different from the selection method for rise.
   /// You must define either the `default_value_selection_method`
@@ -501,8 +501,8 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=55.5&end=55.14
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub default_value_selection_method_fall: GroupSet<CharModeMethod>,
+  #[liberty(complex)]
+  pub default_value_selection_method_fall: LibertySet<CharModeMethod>,
   /// The `merge_tolerance_abs` attribute specifies the absolute tolerance to merge arc
   /// simulation results. Specify the absolute tolerance value in the corresponding library unit.
   /// If you specify both the `merge_tolerance_abs` and `merge_tolerance_rel` attributes, the
@@ -511,8 +511,8 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=55.16&end=55.24
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub merge_tolerance_abs: GroupSet<CharModeValue>,
+  #[liberty(complex)]
+  pub merge_tolerance_abs: LibertySet<CharModeValue>,
   /// The `merge_tolerance_rel` attribute specifies the relative tolerance to merge arc
   /// simulation results. Specify the relative tolerance value in percent, for example, 10.0 for 10
   /// percent.
@@ -522,8 +522,8 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=55.26+56.2&end=55.31+56.5
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub merge_tolerance_rel: GroupSet<CharModeValue>,
+  #[liberty(complex)]
+  pub merge_tolerance_rel: LibertySet<CharModeValue>,
   /// The `merge_selection` attribute specifies the method to select the merged data. When
   /// multiple sets of state-dependent data are merged, the attribute selects a particular set of
   /// the state-dependent data to represent the merged data.
@@ -532,10 +532,10 @@ pub struct CharConfig<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=56.7&end=56.18
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub merge_selection: GroupSet<CharModeMethod>,
+  #[liberty(complex)]
+  pub merge_selection: LibertySet<CharModeMethod>,
 }
-impl<C: Ctx> GroupFn<C> for CharConfig<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for CharConfig<C> {}
 
 /// To specify the characterization method to account for the switching energy in the
 /// `internal_power` tables, set the `internal_power_calculation` attribute. Specify this
@@ -747,7 +747,7 @@ pub struct CharModeMethod {
   method: SelectionMethod,
 }
 ast::impl_self_builder!(CharModeMethod);
-impl<C: Ctx> ComplexAttri<C> for CharModeMethod {
+impl<C: 'static + Ctx> ComplexAttri<C> for CharModeMethod {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -786,7 +786,7 @@ pub struct CharModeValue {
   value: f64,
 }
 ast::impl_self_builder!(CharModeValue);
-impl<C: Ctx> ComplexAttri<C> for CharModeValue {
+impl<C: 'static + Ctx> ComplexAttri<C> for CharModeValue {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,

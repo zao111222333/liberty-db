@@ -30,11 +30,13 @@ const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
 pub(crate) type RandomState = foldhash::quality::RandomState;
 
-pub type GroupSet<T> = IndexSet<T, RandomState>;
+pub type LibertySet<T> = IndexSet<T, RandomState>;
+/// Just `Vec<T>`. (`LibertyVec` is a keyword for macro)
+pub type LibertyVec<T> = Vec<T>;
 
 #[expect(clippy::field_scoped_visibility_modifiers)]
 #[derive(Default)]
-pub(crate) struct BuilderScope<C: Ctx> {
+pub(crate) struct BuilderScope<C: 'static + Ctx> {
   pub(crate) cell_extra_ctx: crate::cell::DefaultCellCtx,
   #[cfg(not(feature = "lut_template"))]
   ___p: PhantomData<C>,
@@ -51,14 +53,133 @@ pub(crate) struct BuilderScope<C: Ctx> {
   pub(crate) bus_type: HashMap<String, BusTypeCtx, RandomState>,
 }
 
-pub(crate) trait ParsingBuilder<C: Ctx>: Sized {
+pub(crate) trait ParsingBuilder<C: 'static + Ctx>: Sized {
   type Builder;
   fn build(builder: Self::Builder, scope: &mut BuilderScope<C>) -> Self;
+  fn build_full(
+    mut builder: Self::Builder,
+    scope: &mut BuilderScope<C>,
+    extra_before_build: Option<fn(&mut Self::Builder, &mut BuilderScope<C>)>,
+    extra_after_build: Option<fn(&mut Self, &mut BuilderScope<C>)>,
+  ) -> Self {
+    if let Some(before_build) = extra_before_build {
+      before_build(&mut builder, scope);
+    }
+    let mut t = Self::build(builder, scope);
+    if let Some(after_build) = extra_after_build {
+      after_build(&mut t, scope);
+    }
+    t
+  }
+}
+
+pub(crate) trait ParsingSet<C: 'static + Ctx, T: 'static + ParsingBuilder<C>>:
+  Sized + Default
+{
+  type BuilderSet;
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder);
+  fn build_set(
+    builder: Self::BuilderSet,
+    scope: &mut BuilderScope<C>,
+    before_build: Option<fn(&mut T::Builder, &mut BuilderScope<C>)>,
+    after_build: Option<fn(&mut T, &mut BuilderScope<C>)>,
+  ) -> Self;
+  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T>;
+}
+
+impl<C: 'static + Ctx, T: 'static + Sized + Default + ParsingBuilder<C>> ParsingSet<C, T>
+  for T
+{
+  type BuilderSet = T::Builder;
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder) {
+    *builder = item;
+  }
+  fn build_set(
+    builder: Self::BuilderSet,
+    scope: &mut BuilderScope<C>,
+    before_build: Option<fn(&mut T::Builder, &mut BuilderScope<C>)>,
+    after_build: Option<fn(&mut T, &mut BuilderScope<C>)>,
+  ) -> Self {
+    T::build_full(builder, scope, before_build, after_build)
+  }
+  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T> {
+    core::iter::once(self)
+  }
+}
+
+impl<C: 'static + Ctx, T: 'static + Sized + ParsingBuilder<C>> ParsingSet<C, T>
+  for Option<T>
+{
+  type BuilderSet = Option<T::Builder>;
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder) {
+    *builder = Some(item);
+  }
+  fn build_set(
+    builder: Self::BuilderSet,
+    scope: &mut BuilderScope<C>,
+    before_build: Option<fn(&mut T::Builder, &mut BuilderScope<C>)>,
+    after_build: Option<fn(&mut T, &mut BuilderScope<C>)>,
+  ) -> Self {
+    builder.map(|b| T::build_full(b, scope, before_build, after_build))
+  }
+  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T> {
+    self.iter()
+  }
+}
+
+impl<C: 'static + Ctx, T: 'static + Sized + ParsingBuilder<C>> ParsingSet<C, T>
+  for Vec<T>
+{
+  type BuilderSet = Vec<T::Builder>;
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder) {
+    builder.push(item);
+  }
+  fn build_set(
+    builder: Self::BuilderSet,
+    scope: &mut BuilderScope<C>,
+    before_build: Option<fn(&mut T::Builder, &mut BuilderScope<C>)>,
+    after_build: Option<fn(&mut T, &mut BuilderScope<C>)>,
+  ) -> Self {
+    builder
+      .into_iter()
+      .map(|b| T::build_full(b, scope, before_build, after_build))
+      .collect()
+  }
+  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T> {
+    self.iter()
+  }
+}
+
+impl<
+  C: 'static + Ctx,
+  T: 'static + Sized + ParsingBuilder<C> + core::hash::Hash + Eq + Ord,
+> ParsingSet<C, T> for LibertySet<T>
+{
+  type BuilderSet = Vec<T::Builder>;
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder) {
+    builder.push(item);
+  }
+  fn build_set(
+    builder: Self::BuilderSet,
+    scope: &mut BuilderScope<C>,
+    before_build: Option<fn(&mut T::Builder, &mut BuilderScope<C>)>,
+    after_build: Option<fn(&mut T, &mut BuilderScope<C>)>,
+  ) -> Self {
+    let mut set: LibertySet<T> = builder
+      .into_iter()
+      .map(|b| T::build_full(b, scope, before_build, after_build))
+      .collect();
+    set.sort_unstable();
+    set
+  }
+  fn iter_set<'a>(&'a self) -> impl 'a + Iterator<Item = &'a T> {
+    self.iter()
+  }
 }
 
 macro_rules! impl_self_builder {
   ($t:ty) => {
-    impl<C: crate::Ctx> crate::ast::ParsingBuilder<C> for $t {
+    impl<C: 'static + crate::Ctx> crate::ast::ParsingBuilder<C> for $t {
       type Builder = Self;
       #[inline]
       fn build(builder: Self::Builder, _scope: &mut crate::ast::BuilderScope<C>) -> Self {
@@ -69,7 +190,7 @@ macro_rules! impl_self_builder {
 }
 macro_rules! impl_simple {
   ($t:ty) => {
-    impl<C: crate::Ctx> crate::ast::SimpleAttri<C> for $t {
+    impl<C: 'static + crate::Ctx> crate::ast::SimpleAttri<C> for $t {
       #[inline]
       fn nom_parse<'a>(
         i: &'a str,
@@ -528,7 +649,7 @@ pub(crate) type ComplexParseRes<'a, T> =
 #[inline]
 pub(crate) fn nom_parse_from<
   'a,
-  C: Ctx,
+  C: 'static + Ctx,
   T: SimpleAttri<C>,
   E,
   F: Fn(&str) -> Result<T, E>,
@@ -543,7 +664,7 @@ pub(crate) fn nom_parse_from<
 }
 
 #[inline]
-pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
+pub(crate) fn nom_parse_from_str<'a, C: 'static + Ctx, T: SimpleAttri<C> + FromStr>(
   i: &'a str,
   scope: &mut ParseScope<'_>,
 ) -> SimpleParseRes<'a, T> {
@@ -551,7 +672,7 @@ pub(crate) fn nom_parse_from_str<'a, C: Ctx, T: SimpleAttri<C> + FromStr>(
 }
 
 /// Simple Attribute in Liberty
-pub(crate) trait SimpleAttri<C: Ctx>: Sized + ParsingBuilder<C> {
+pub(crate) trait SimpleAttri<C: 'static + Ctx>: Sized + ParsingBuilder<C> {
   /// `nom_parse`, auto implement
   fn nom_parse<'a>(
     i: &'a str,
@@ -654,7 +775,9 @@ pub(crate) fn join_fmt_no_quote<
 }
 
 /// Complex Attribute in Liberty
-pub(crate) trait ComplexAttri<C: Ctx>: Sized + ParsingBuilder<C> {
+pub(crate) trait ComplexAttri<C: 'static + Ctx>:
+  Sized + ParsingBuilder<C>
+{
   /// basic `parser`
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -710,7 +833,7 @@ pub(crate) trait ComplexAttri<C: Ctx>: Sized + ParsingBuilder<C> {
   }
 }
 /// Group Functions
-pub(crate) trait GroupFn<C: Ctx>: ParsingBuilder<C> {
+pub(crate) trait GroupFn<C: 'static + Ctx>: ParsingBuilder<C> {
   /// `before_build` call back
   #[inline]
   #[expect(unused_variables)]
@@ -722,7 +845,7 @@ pub(crate) trait GroupFn<C: Ctx>: ParsingBuilder<C> {
 }
 /// Export Group APIs
 #[expect(private_bounds)]
-pub trait Group<C: Ctx>: Sized + GroupAttri<C> {
+pub trait Group<C: 'static + Ctx>: Sized + GroupAttri<C> {
   /// `test_wrapper`
   #[inline]
   fn display(&self) -> GroupDisplay<'_, C, Self> {
@@ -735,7 +858,7 @@ pub trait Group<C: Ctx>: Sized + GroupAttri<C> {
   }
 }
 /// `GroupAttri`, internal Group APIs
-pub(crate) trait GroupAttri<C: Ctx>:
+pub(crate) trait GroupAttri<C: 'static + Ctx>:
   Sized + ParsingBuilder<C, Builder: Default>
 {
   /// `nom_parse`, will be implemented by macros
@@ -849,7 +972,7 @@ impl IdError {
 
 /// If more than one `#[liberty(name)]`,
 /// need to impl `NamedGroup` manually
-pub(crate) trait NamedGroup<C: Ctx>: GroupAttri<C> {
+pub(crate) trait NamedGroup<C: 'static + Ctx>: GroupAttri<C> {
   /// parse name from `v: &[&str]` and then set self
   fn parse_set_name(builder: &mut Self::Builder, v: Vec<&str>) -> Result<(), IdError>;
   /// `fmt_liberty`
@@ -916,13 +1039,13 @@ impl<'a> ParserError<'a> {
 
 /// `GroupDisplay`
 #[derive(Debug)]
-pub struct GroupDisplay<'a, C: Ctx, G> {
+pub struct GroupDisplay<'a, C: 'static + Ctx, G> {
   pub name: Option<&'a str>,
   pub inner: &'a G,
   ___p: PhantomData<C>,
 }
 
-impl<C: Ctx, G: GroupAttri<C>> core::fmt::Display for GroupDisplay<'_, C, G> {
+impl<C: 'static + Ctx, G: GroupAttri<C>> core::fmt::Display for GroupDisplay<'_, C, G> {
   #[inline]
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ff = DefaultCodeFormatter::new(f);

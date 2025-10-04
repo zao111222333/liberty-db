@@ -1,8 +1,8 @@
 use crate::{
   Ctx,
   ast::{
-    self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn, GroupSet,
-    ParseScope,
+    self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
+    LibertySet, LibertyVec, ParseScope,
   },
 };
 #[cfg(feature = "lut_template")]
@@ -12,7 +12,7 @@ use core::fmt::{self, Write};
 use core::marker::PhantomData;
 use strum::{Display, EnumString};
 
-pub trait TableCtx<C: Ctx> {
+pub trait TableCtx<C: 'static + Ctx> {
   /// Comes from one of
   /// + `lu_table_template`
   /// + `power_lut_template`
@@ -23,67 +23,85 @@ pub trait TableCtx<C: Ctx> {
   fn set_lut_template(&mut self, template: Option<&Arc<TableTemple<C>>>);
 }
 
-pub trait CompactTableCtx<C: Ctx> {
+pub trait CompactTableCtx<C: 'static + Ctx> {
   #[cfg(feature = "lut_template")]
   fn compact_lut_template(&self) -> &Option<Arc<CompactLutTemplate<C>>>;
   #[cfg(feature = "lut_template")]
   fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>);
 }
 
-macro_rules! use_common_template {
-  ($table:tt, $scope:tt) => {
-    #[cfg(feature = "lut_template")]
-    crate::table::TableCtx::set_lut_template(
-      &mut $table.extra_ctx,
-      $scope.lu_table_template.get(&$table.name),
-    )
+macro_rules! add_use_common_template {
+  ($table_ty:tt) => {
+    impl<C: 'static + Ctx> $table_ty<C> {
+      #[inline]
+      pub(crate) fn use_common_template(&mut self, scope: &mut ast::BuilderScope<C>) {
+        #[cfg(feature = "lut_template")]
+        TableCtx::set_lut_template(
+          &mut self.extra_ctx,
+          scope.lu_table_template.get(&self.name),
+        )
+      }
+    }
   };
 }
-pub(crate) use use_common_template;
+macro_rules! add_use_power_template {
+  ($table_ty:tt) => {
+    impl<C: 'static + Ctx> $table_ty<C> {
+      #[inline]
+      pub(crate) fn use_power_template(&mut self, scope: &mut ast::BuilderScope<C>) {
+        #[cfg(feature = "lut_template")]
+        TableCtx::set_lut_template(
+          &mut self.extra_ctx,
+          scope.power_lut_template.get(&self.name),
+        )
+      }
+    }
+  };
+}
+macro_rules! add_use_current_template {
+  ($table_ty:tt) => {
+    impl<C: 'static + Ctx> $table_ty<C> {
+      #[inline]
+      pub(crate) fn use_current_template(&mut self, scope: &mut ast::BuilderScope<C>) {
+        #[cfg(feature = "lut_template")]
+        TableCtx::set_lut_template(
+          &mut self.extra_ctx,
+          scope.current_template.get(&self.name),
+        )
+      }
+    }
+  };
+}
+macro_rules! add_use_compact_template {
+  ($table_ty:tt) => {
+    impl<C: 'static + Ctx> $table_ty<C> {
+      #[inline]
+      pub(crate) fn use_compact_template(&mut self, scope: &mut ast::BuilderScope<C>) {
+        #[cfg(feature = "lut_template")]
+        CompactTableCtx::set_compact_lut_template(
+          &mut self.extra_ctx,
+          scope.compact_lut_template.get(&self.name),
+        )
+      }
+    }
+  };
+}
 
-macro_rules! use_power_template {
-  ($table:tt, $scope:tt) => {
-    #[cfg(feature = "lut_template")]
-    crate::table::TableCtx::set_lut_template(
-      &mut $table.extra_ctx,
-      $scope.power_lut_template.get(&$table.name),
-    )
-  };
-}
-pub(crate) use use_power_template;
-
-macro_rules! use_current_template {
-  ($table:tt, $scope:tt) => {
-    #[cfg(feature = "lut_template")]
-    crate::table::TableCtx::set_lut_template(
-      &mut $table.extra_ctx,
-      $scope.current_template.get(&$table.name),
-    )
-  };
-}
-pub(crate) use use_current_template;
-
-macro_rules! use_compact_template {
-  ($table:tt, $scope:tt) => {
-    #[cfg(feature = "lut_template")]
-    crate::table::CompactTableCtx::set_compact_lut_template(
-      &mut $table.extra_ctx,
-      $scope.compact_lut_template.get(&$table.name),
-    )
-  };
-}
-pub(crate) use use_compact_template;
+pub(crate) use add_use_common_template;
+pub(crate) use add_use_compact_template;
+pub(crate) use add_use_current_template;
+pub(crate) use add_use_power_template;
 
 #[derive(Clone, Default, Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct DefaultTableCtx<C: Ctx> {
+pub struct DefaultTableCtx<C: 'static + Ctx> {
   #[cfg(feature = "lut_template")]
   pub lut_template: Option<Arc<TableTemple<C>>>,
   #[cfg(not(feature = "lut_template"))]
   ___p: PhantomData<C::Other>,
 }
-impl<C: Ctx> TableCtx<C> for DefaultTableCtx<C> {
+impl<C: 'static + Ctx> TableCtx<C> for DefaultTableCtx<C> {
   #[inline]
   #[cfg(feature = "lut_template")]
   fn lut_template(&self) -> &Option<Arc<TableTemple<C>>> {
@@ -98,13 +116,13 @@ impl<C: Ctx> TableCtx<C> for DefaultTableCtx<C> {
 #[derive(Clone, Default, Debug)]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct DefaultCompactTableCtx<C: Ctx> {
+pub struct DefaultCompactTableCtx<C: 'static + Ctx> {
   #[cfg(feature = "lut_template")]
   pub compact_lut_template: Option<Arc<CompactLutTemplate<C>>>,
   #[cfg(not(feature = "lut_template"))]
   ___p: PhantomData<C::Other>,
 }
-impl<C: Ctx> CompactTableCtx<C> for DefaultCompactTableCtx<C> {
+impl<C: 'static + Ctx> CompactTableCtx<C> for DefaultCompactTableCtx<C> {
   #[inline]
   #[cfg(feature = "lut_template")]
   fn compact_lut_template(&self) -> &Option<Arc<CompactLutTemplate<C>>> {
@@ -122,7 +140,7 @@ impl<C: Ctx> CompactTableCtx<C> for DefaultCompactTableCtx<C> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct TableLookUpMultiSegment<C: Ctx> {
+pub struct TableLookUpMultiSegment<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -148,13 +166,14 @@ pub struct TableLookUpMultiSegment<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
+add_use_common_template!(TableLookUpMultiSegment);
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct DriverWaveform<C: Ctx> {
+pub struct DriverWaveform<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -171,7 +190,7 @@ pub struct DriverWaveform<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=71.24&end=71.31
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   #[id]
   pub driver_waveform_name: Option<String>,
   /// group comments
@@ -199,7 +218,7 @@ pub struct DriverWaveform<C: Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct TableLookUp2D<C: Ctx> {
+pub struct TableLookUp2D<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -218,7 +237,7 @@ pub struct TableLookUp2D<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-
+add_use_common_template!(TableLookUp2D);
 /// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling.
 ///
 /// <a name ="reference_link" href="
@@ -228,7 +247,7 @@ pub struct TableLookUp2D<C: Ctx> {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct CompactLutTemplate<C: Ctx> {
+pub struct CompactLutTemplate<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -240,13 +259,13 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub base_curves_group: Option<String>,
   /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub variable_1: Option<VariableTypeCompactLutTemplateIndex12>,
   /// The `index_1`  and `index_2`  attributes are required.
   /// The `index_1`  and `index_2`  attributes define the
@@ -262,7 +281,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub variable_2: Option<VariableTypeCompactLutTemplateIndex12>,
   /// The `index_1`  and `index_2`  attributes are required.
   /// The `index_1`  and `index_2`  attributes define the
@@ -279,7 +298,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   /// `base_curve_type`  value, the following six string values (parameters)
   /// should be defined: `init_current`, `peak_current`, `peak_voltage`, `peak_time`, `left_id`, `right_id`;
   /// their order is not fixed.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub variable_3: Option<VariableTypeCompactLutTemplateIndex3>,
   /// The string values in `index_3`  are determined by the `base_curve_type` value
   /// in the `base_curve`  group. When `ccs_timing_half_curve` is the
@@ -296,7 +315,7 @@ pub struct CompactLutTemplate<C: Ctx> {
   pub index_3: Vec<String>,
 }
 
-impl<C: Ctx> GroupFn<C> for CompactLutTemplate<C> {
+impl<C: 'static + Ctx> GroupFn<C> for CompactLutTemplate<C> {
   #[cfg(feature = "lut_template")]
   fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
     self
@@ -342,7 +361,7 @@ crate::ast::impl_simple!(VariableTypeCompactLutTemplateIndex3);
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Vector3D<C: Ctx> {
+pub struct Vector3D<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -365,13 +384,14 @@ pub struct Vector3D<C: Ctx> {
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
+add_use_common_template!(Vector3D);
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 // #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct ReferenceTimeVector3D<C: Ctx> {
+pub struct ReferenceTimeVector3D<C: 'static + Ctx> {
   #[liberty(name)]
   // #[id(borrow = str)]
   pub name: String,
@@ -397,13 +417,14 @@ pub struct ReferenceTimeVector3D<C: Ctx> {
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
+add_use_current_template!(ReferenceTimeVector3D);
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Vector4D<C: Ctx> {
+pub struct Vector4D<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -429,6 +450,7 @@ pub struct Vector4D<C: Ctx> {
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
+add_use_common_template!(Vector4D);
 
 /// The `compact_ccs_power` group contains a detailed description for compact CCS
 /// power data. The `compact_ccs_power` group includes the following optional attributes:
@@ -479,7 +501,7 @@ pub struct Vector4D<C: Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct CompactCcsPower<C: Ctx> {
+pub struct CompactCcsPower<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -491,9 +513,9 @@ pub struct CompactCcsPower<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub base_curves_group: Option<String>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub index_output: Option<String>,
   #[liberty(complex)]
   pub index_1: Vec<f64>,
@@ -537,7 +559,7 @@ pub struct CompactCcsPower<C: Ctx> {
   #[liberty(complex)]
   pub values: Vec<CcsPowerValue>,
 }
-
+add_use_compact_template!(CompactCcsPower);
 #[derive(Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CcsPowerValue {
@@ -554,7 +576,7 @@ pub struct CcsPowerPoint {
   pub point_current: f64,
 }
 crate::ast::impl_self_builder!(Vec<CcsPowerValue>);
-impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
+impl<C: 'static + Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
@@ -638,7 +660,7 @@ impl<C: Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Vector3DGrpup<C: Ctx> {
+pub struct Vector3DGrpup<C: 'static + Ctx> {
   #[liberty(name)]
   #[id]
   pub name: Option<String>,
@@ -650,9 +672,9 @@ pub struct Vector3DGrpup<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = use_common_template!)]
-  pub vector: GroupSet<Vector3D<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = Vector3D::use_common_template)]
+  pub vector: LibertySet<Vector3D<C>>,
 }
 
 #[derive(Debug, Clone)]
@@ -660,7 +682,7 @@ pub struct Vector3DGrpup<C: Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
+pub struct ReferenceTimeVector3DGrpup<C: 'static + Ctx> {
   #[liberty(name)]
   #[id]
   pub name: Option<String>,
@@ -672,9 +694,9 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(group(type = Vec))]
-  #[liberty(after_build = use_current_template!)]
-  pub vector: Vec<ReferenceTimeVector3D<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = ReferenceTimeVector3D::use_current_template)]
+  pub vector: LibertyVec<ReferenceTimeVector3D<C>>,
 }
 
 #[derive(Debug, Clone)]
@@ -682,7 +704,7 @@ pub struct ReferenceTimeVector3DGrpup<C: Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Vector4DGrpup<C: Ctx> {
+pub struct Vector4DGrpup<C: 'static + Ctx> {
   #[liberty(name)]
   #[id]
   pub name: Option<String>,
@@ -694,17 +716,17 @@ pub struct Vector4DGrpup<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = use_common_template!)]
-  pub vector: GroupSet<Vector4D<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = Vector4D::use_common_template)]
+  pub vector: LibertySet<Vector4D<C>>,
 }
-impl<C: Ctx> GroupFn<C> for Vector4DGrpup<C> {}
-impl<C: Ctx> GroupFn<C> for Vector3DGrpup<C> {}
-impl<C: Ctx> GroupFn<C> for Vector3D<C> {}
-impl<C: Ctx> GroupFn<C> for Vector4D<C> {}
-impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3D<C> {}
-impl<C: Ctx> GroupFn<C> for ReferenceTimeVector3DGrpup<C> {}
-impl<C: Ctx> GroupFn<C> for CompactCcsPower<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for Vector4DGrpup<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for Vector3DGrpup<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for Vector3D<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for Vector4D<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for ReferenceTimeVector3D<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for ReferenceTimeVector3DGrpup<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for CompactCcsPower<C> {}
 
 /// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the
 /// `ocv_sigma_cell_rise`, `ocv_sigma_cell_fall`, `ocv_sigma_rise_transition`, and
@@ -714,7 +736,7 @@ impl<C: Ctx> GroupFn<C> for CompactCcsPower<C> {}
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct OcvSigmaTable<C: Ctx> {
+pub struct OcvSigmaTable<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -755,7 +777,7 @@ pub struct OcvSigmaTable<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-
+add_use_common_template!(OcvSigmaTable);
 /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
 ///
 /// <a name ="reference_link" href="
@@ -766,7 +788,7 @@ pub struct OcvSigmaTable<C: Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::CompactTable: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct CompactCcsTable<C: Ctx> {
+pub struct CompactCcsTable<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -783,14 +805,15 @@ pub struct CompactCcsTable<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-impl<C: Ctx> GroupFn<C> for CompactCcsTable<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for CompactCcsTable<C> {}
+add_use_compact_template!(CompactCcsTable);
 
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct TableLookUp<C: Ctx> {
+pub struct TableLookUp<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -813,7 +836,10 @@ pub struct TableLookUp<C: Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
+add_use_common_template!(TableLookUp);
+add_use_power_template!(TableLookUp);
+
+impl<C: 'static + Ctx> GroupFn<C> for TableLookUp<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
@@ -823,7 +849,7 @@ impl<C: Ctx> GroupFn<C> for TableLookUp<C> {
     }
   }
 }
-impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
+impl<C: 'static + Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
@@ -833,7 +859,7 @@ impl<C: Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
     }
   }
 }
-impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
+impl<C: 'static + Ctx> GroupFn<C> for TableLookUp2D<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
@@ -843,7 +869,7 @@ impl<C: Ctx> GroupFn<C> for TableLookUp2D<C> {
     }
   }
 }
-impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
+impl<C: 'static + Ctx> GroupFn<C> for OcvSigmaTable<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
@@ -853,7 +879,7 @@ impl<C: Ctx> GroupFn<C> for OcvSigmaTable<C> {
     }
   }
 }
-impl<C: Ctx> GroupFn<C> for DriverWaveform<C> {
+impl<C: 'static + Ctx> GroupFn<C> for DriverWaveform<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
@@ -871,7 +897,7 @@ pub struct Values {
   pub inner: Vec<f64>,
 }
 crate::ast::impl_self_builder!(Values);
-impl<C: Ctx> ComplexAttri<C> for Values {
+impl<C: 'static + Ctx> ComplexAttri<C> for Values {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     _iter: I,
@@ -1000,7 +1026,7 @@ pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = f64>> {
 
 impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
   #[inline]
-  pub(crate) fn fmt_self<T: Write, I: ast::Indentation, C: Ctx>(
+  pub(crate) fn fmt_self<T: Write, I: ast::Indentation, C: 'static + Ctx>(
     self,
     key1: &str,
     key2: &str,
@@ -1033,7 +1059,7 @@ impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct TableTemple<C: Ctx> {
+pub struct TableTemple<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -1045,24 +1071,24 @@ pub struct TableTemple<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub variable_1: Option<Variable>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub variable_2: Option<Variable>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub variable_3: Option<Variable>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub variable_4: Option<Variable>,
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub index_1: Option<Vec<f64>>,
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub index_2: Option<Vec<f64>>,
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub index_3: Option<Vec<f64>>,
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub index_4: Option<Vec<f64>>,
 }
-impl<C: Ctx> GroupFn<C> for TableTemple<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for TableTemple<C> {}
 
 /// In Timing Delay Tables:
 ///

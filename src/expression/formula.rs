@@ -42,7 +42,7 @@ impl Default for FormulaExpr {
   }
 }
 
-impl<C: Ctx> crate::ast::ParsingBuilder<C> for Formula {
+impl<C: 'static+Ctx> crate::ast::ParsingBuilder<C> for Formula {
   type Builder = FormulaExpr;
   #[inline]
   #[expect(clippy::renamed_function_params)]
@@ -51,7 +51,7 @@ impl<C: Ctx> crate::ast::ParsingBuilder<C> for Formula {
     Self { expr, value }
   }
 }
-impl<C: Ctx> crate::ast::SimpleAttri<C> for Formula {
+impl<C: 'static+Ctx> crate::ast::SimpleAttri<C> for Formula {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,

@@ -265,7 +265,7 @@ impl CapacitiveLoadUnit {
   }
 }
 crate::ast::impl_self_builder!(CapacitiveLoadUnit);
-impl<C: Ctx> ComplexAttri<C> for CapacitiveLoadUnit {
+impl<C: 'static+Ctx> ComplexAttri<C> for CapacitiveLoadUnit {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,

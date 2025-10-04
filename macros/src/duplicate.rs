@@ -202,17 +202,17 @@ pub(crate) fn inner(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
       for f in mem::take(&mut named.named) {
         if !config.not_exclude.contains(f.ident.as_ref().unwrap()) {
           match parse_field_attrs(&f.attrs)? {
-            Some(FieldType::Attri(AttriType::Simple(_))) => {
+            Some(FieldType::Attri(AttriType::Simple)) => {
               if config.exclude_simple {
                 continue;
               }
             }
-            Some(FieldType::Attri(AttriType::Complex(_))) => {
+            Some(FieldType::Attri(AttriType::Complex)) => {
               if config.exclude_complex {
                 continue;
               }
             }
-            Some(FieldType::Attri(AttriType::Group(_))) => {
+            Some(FieldType::Attri(AttriType::Group)) => {
               if config.exclude_group {
                 continue;
               }
@@ -252,7 +252,7 @@ fn test_attrs_config() {
       pub foo2: T2,
     ),
   )]
-  pub(crate) struct Timing<C: Ctx> {}"#;
+  pub(crate) struct Timing<C: 'static+Ctx> {}"#;
   let ast: syn::DeriveInput = syn::parse_str(input).unwrap();
   let config = attrs_config(&ast.attrs).unwrap();
   dbg!(config);

@@ -6,7 +6,7 @@ use crate::{
   Ctx,
   ast::{
     Attributes, BuilderScope, CodeFormatter, ComplexAttri, ComplexParseError,
-    GroupComments, GroupFn, GroupSet, Indentation, ParseScope,
+    GroupComments, GroupFn, Indentation, LibertySet, ParseScope,
   },
   expression::LogicBooleanExpression,
   table::{
@@ -45,7 +45,7 @@ use core::fmt::{self, Write};
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct CCSNStage<C: Ctx> {
+pub struct CCSNStage<C: 'static + Ctx> {
   /// group name
   #[liberty(name)]
   #[id(borrow = [String])]
@@ -58,9 +58,9 @@ pub struct CCSNStage<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub load_cap_fall: Option<f64>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub load_cap_rise: Option<f64>,
   /// Use the `is_inverting`  attribute to specify whether the channel-connecting block is inverting.
   /// This attribute is mandatory if the `is_needed` attribute value is true.
@@ -71,14 +71,14 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=285.31&end=285.36
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub is_inverting: Option<bool>,
   /// Use the `is_needed`  attribute to specify
   /// whether composite current source (CCS) noise modeling data is required.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=286.5&end=286.6
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub is_needed: Option<bool>,
   /// The `is_pass_gate`  attribute is defined in a ccsn_*_stage  group,
   /// such as the `ccsn_first_stage`  group,
@@ -87,21 +87,21 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=286.17&end=286.19
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub is_pass_gate: Option<bool>,
   /// Use the `miller_cap_fall`  attribute to specify the Miller capacitance value for the channel-connecting block.
   /// A floating-point number representing the Miller capacitance value. The value must be greater or equal to zero.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=286.25&end=286.26
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub miller_cap_fall: Option<f64>,
   /// Use the `miller_cap_rise`  attribute to specify the Miller capacitance value for the channel-connecting block.
   /// A floating-point number representing the Miller capacitance value. The value must be greater or equal to zero.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.3&end=287.11
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub miller_cap_rise: Option<f64>,
   /// The optional `related_ccb_node`  attribute specifies the SPICE node
   /// in the subcircuit netlist that is used for the `dc_current`  
@@ -109,7 +109,7 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.15&end=287.17
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   #[id]
   pub related_ccb_node: Option<String>,
   /// Use the `stage_type`  attribute to specify the stage type of the channel-connecting block output voltage.
@@ -120,9 +120,9 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.27+288.2&end=287.36+288.5
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub stage_type: Option<StageType>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   #[id]
   pub when: Option<LogicBooleanExpression>,
   /// The pin-based mode  attribute is provided in the `ccsn_first_stage`  
@@ -132,7 +132,7 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=287.23&end=287.25
   /// ">Reference-Definition</a>
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub mode: Option<[String; 2]>,
   /// Use the `dc_current`  group to specify the input and output voltage values
   /// of a two-dimensional current table for a channel-connecting block.
@@ -145,8 +145,8 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
   /// ">Reference-Definition</a>
-  #[liberty(group(type = Option))]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp2D::use_common_template)]
   pub dc_current: Option<TableLookUp2D<C>>,
   /// Use the `output_voltage_fall`  group to specify vector groups that describe
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
@@ -160,7 +160,7 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.6&end=289.26
   /// ">Reference-Definition</a>
-  #[liberty(group(type = Option))]
+  #[liberty(group)]
   pub output_voltage_fall: Option<Vector3DGrpup<C>>,
   /// Use the `output_voltage_rise`  group to specify `vector` groups that describe
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
@@ -170,7 +170,7 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.28&end=289.30
   /// ">Reference-Definition</a>
-  #[liberty(group(type = Option))]
+  #[liberty(group)]
   pub output_voltage_rise: Option<Vector3DGrpup<C>>,
   /// The `propagated_noise_low`  group uses `vector` groups to specify the
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
@@ -185,7 +185,7 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=290.19&end=290.20
   /// ">Reference-Definition</a>
-  #[liberty(group(type = Option))]
+  #[liberty(group)]
   pub propagated_noise_low: Option<Vector4DGrpup<C>>,
   /// The `propagated_noise_high`  group uses `vector` groups to specify the
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
@@ -200,11 +200,11 @@ pub struct CCSNStage<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.33&end=289.35
   /// ">Reference-Definition</a>
-  #[liberty(group(type = Option))]
+  #[liberty(group)]
   pub propagated_noise_high: Option<Vector4DGrpup<C>>,
 }
 
-impl<C: Ctx> GroupFn<C> for CCSNStage<C> {
+impl<C: 'static + Ctx> GroupFn<C> for CCSNStage<C> {
   #[inline]
   fn before_build(builder: &mut Self::Builder, _scope: &mut BuilderScope<C>) {
     if let Some(miller_cap_fall) = builder.miller_cap_fall.as_mut() {
@@ -275,7 +275,7 @@ crate::ast::impl_simple!(StageType);
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct ReceiverCapacitance<C: Ctx> {
+pub struct ReceiverCapacitance<C: 'static + Ctx> {
   /// group name
   #[liberty(name)]
   #[id]
@@ -288,15 +288,15 @@ pub struct ReceiverCapacitance<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  #[liberty(simple(type=Option))]
+  #[liberty(simple)]
   #[id]
   pub when: Option<LogicBooleanExpression>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUpMultiSegment::use_common_template)]
+  pub receiver_capacitance_fall: LibertySet<TableLookUpMultiSegment<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUpMultiSegment::use_common_template)]
+  pub receiver_capacitance_rise: LibertySet<TableLookUpMultiSegment<C>>,
   /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
   /// switching input_ccb groups of the input pin that do not propagate the noise in the timing
   /// arc or the receiver capacitance load.
@@ -316,19 +316,19 @@ pub struct ReceiverCapacitance<C: Ctx> {
   #[liberty(complex)]
   pub active_input_ccb: Vec<String>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub receiver_capacitance1_fall: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub receiver_capacitance1_rise: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub receiver_capacitance2_fall: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub receiver_capacitance2_rise: Option<TableLookUp<C>>,
 }
-impl<C: Ctx> GroupFn<C> for ReceiverCapacitance<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for ReceiverCapacitance<C> {}
 
 /// The `propagating_ccb`  attribute lists all the channel-connected block noise groups that propagate
 /// the noise to the output pin in a particular timing arc.
@@ -347,7 +347,7 @@ pub struct PropagatingCcb {
   pub output_ccb_name: Option<String>,
 }
 crate::ast::impl_self_builder!(PropagatingCcb);
-impl<C: Ctx> ComplexAttri<C> for PropagatingCcb {
+impl<C: 'static + Ctx> ComplexAttri<C> for PropagatingCcb {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,

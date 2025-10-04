@@ -119,7 +119,7 @@ crate::ast::impl_simple!(TimingSenseType);
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct CellDegradation<C: Ctx> {
+pub struct CellDegradation<C: 'static+Ctx> {
   /// name
   #[liberty(name)]
   #[id(borrow = str)]
@@ -145,11 +145,11 @@ pub struct CellDegradation<C: Ctx> {
   #[liberty(complex)]
   pub values: Vec<f64>,
 }
-impl<C: Ctx> GroupFn<C> for CellDegradation<C> {}
+impl<C: 'static+Ctx> GroupFn<C> for CellDegradation<C> {}
 
 #[derive(Debug, Clone, Default)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct TimingTableLookUp<C: Ctx> {
+pub struct TimingTableLookUp<C: 'static+Ctx> {
   pub extra_ctx: C::Table,
   pub name: String,
   pub comments: String,
@@ -169,7 +169,7 @@ pub struct TimingTableLookUp<C: Ctx> {
   clippy::indexing_slicing,
   clippy::arithmetic_side_effects
 )]
-impl<C: Ctx> TimingTableLookUp<C> {
+impl<C: 'static+Ctx> TimingTableLookUp<C> {
   #[inline]
   #[expect(clippy::needless_pass_by_ref_mut)]
   pub(crate) fn use_common_template(
@@ -462,7 +462,7 @@ impl DivAssign<f64> for LVFValue {
   }
 }
 
-impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
+impl<C: 'static+Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
   /// `value`, `mean_shift`, `std_dev`, `skewness`
   type Builder = (
     // value
@@ -478,7 +478,7 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
   #[expect(clippy::float_arithmetic)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope<C>) -> Self {
     #[inline]
-    fn eq_index<C: Ctx>(
+    fn eq_index<C: 'static+Ctx>(
       lhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
       rhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
     ) -> bool {
@@ -544,13 +544,13 @@ impl<C: Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     Some(out)
   }
 }
-impl<C: Ctx> ParsingBuilder<C> for TimingTableLookUp<C> {
+impl<C: 'static+Ctx> ParsingBuilder<C> for TimingTableLookUp<C> {
   type Builder = ();
   fn build(_: Self::Builder, _: &mut BuilderScope<C>) -> Self {
     unreachable!()
   }
 }
-impl<C: Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
+impl<C: 'static+Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
   #[inline]
   #[expect(clippy::float_arithmetic)]
   fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation>(
@@ -622,4 +622,4 @@ impl<C: Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
   }
 }
 
-impl<C: Ctx> Group<C> for TimingTableLookUp<C> {}
+impl<C: 'static+Ctx> Group<C> for TimingTableLookUp<C> {}

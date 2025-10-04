@@ -52,7 +52,7 @@ crate::ast::impl_simple!(AntennaDiodeType);
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct TLatch<C: Ctx> {
+pub struct TLatch<C: 'static+Ctx> {
   /// Name of the pin
   #[liberty(name)]
   #[id(borrow = str)]
@@ -66,13 +66,13 @@ pub struct TLatch<C: Ctx> {
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// Valid values are rising and falling.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub edge_type: Option<Edge>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub tdisable: Option<bool>,
 }
 
-impl<C: Ctx> GroupFn<C> for TLatch<C> {}
+impl<C: 'static+Ctx> GroupFn<C> for TLatch<C> {}
 
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
@@ -149,7 +149,7 @@ bitflags::bitflags! {
 }
 
 crate::ast::impl_self_builder!(AllDriverType);
-impl<C: Ctx> SimpleAttri<C> for AllDriverType {
+impl<C: 'static+Ctx> SimpleAttri<C> for AllDriverType {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -511,7 +511,7 @@ pub struct RetentionPin {
   pub disable_value: Static,
 }
 crate::ast::impl_self_builder!(RetentionPin);
-impl<C: Ctx> ComplexAttri<C> for RetentionPin {
+impl<C: 'static+Ctx> ComplexAttri<C> for RetentionPin {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,

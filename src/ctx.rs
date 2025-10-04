@@ -1,7 +1,12 @@
 use crate::table::{CompactTableCtx, DefaultCompactTableCtx, DefaultTableCtx, TableCtx};
 
 pub trait Ctx:
-  serde::Serialize + serde::de::DeserializeOwned + Default + Clone + core::fmt::Debug
+  'static
+  + serde::Serialize
+  + serde::de::DeserializeOwned
+  + Default
+  + Clone
+  + core::fmt::Debug
 {
   type Library: core::fmt::Debug
     + Clone

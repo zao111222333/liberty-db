@@ -19,23 +19,23 @@ mod group;
 /// // Simple liberty attribute, defualt=Default
 /// #[liberty(simple)]
 /// // Simple liberty attribute, Default
-/// #[liberty(simple(type=Default))]
+/// #[liberty(simple)]
 /// // Simple liberty attribute, Option
-/// #[liberty(simple(type = Option))]
+/// #[liberty(simple)]
 /// // Complex liberty attribute, default=Default
 /// #[liberty(complex)]
 /// // Complex liberty attribute, Default
-/// #[liberty(complex(type=Default))]
+/// #[liberty(complex)]
 /// // Complex liberty attribute, Option
-/// #[liberty(complex(type = Option))]
+/// #[liberty(complex)]
 /// // Complex group attribute, defualt=Option
 /// #[liberty(group)]
 /// // Complex group attribute, Option
-/// #[liberty(group(type = Option))]
+/// #[liberty(group)]
 /// // Complex group attribute, Map
-/// #[liberty(group(type=Map))]
+/// #[liberty(group)]
 /// // Complex group attribute, Vec
-/// #[liberty(group(type=Vec))]
+/// #[liberty(group)]
 /// ```
 #[proc_macro_derive(Group, attributes(liberty))]
 pub fn macro_group(input: TokenStream) -> TokenStream {

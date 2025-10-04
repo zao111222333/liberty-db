@@ -95,7 +95,7 @@ impl From<BooleanExpression> for Expr {
 }
 
 crate::ast::impl_self_builder!(BooleanExpression);
-impl<C: Ctx> crate::ast::SimpleAttri<C> for BooleanExpression {
+impl<C: 'static+Ctx> crate::ast::SimpleAttri<C> for BooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -116,7 +116,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for BooleanExpression {
     write!(f, "\"{self}\"")
   }
 }
-impl<C: Ctx> crate::ast::SimpleAttri<C> for LogicBooleanExpression {
+impl<C: 'static+Ctx> crate::ast::SimpleAttri<C> for LogicBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -132,7 +132,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for LogicBooleanExpression {
     write!(f, "\"{self}\"")
   }
 }
-impl<C: Ctx> crate::ast::SimpleAttri<C> for PowerGroundBooleanExpression {
+impl<C: 'static+Ctx> crate::ast::SimpleAttri<C> for PowerGroundBooleanExpression {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -287,7 +287,7 @@ impl LogicBooleanExpression {
   }
 }
 
-impl<C: Ctx> ParsingBuilder<C> for LogicBooleanExpression {
+impl<C: 'static+Ctx> ParsingBuilder<C> for LogicBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
@@ -313,7 +313,7 @@ impl PowerGroundBooleanExpression {
     Self(BddBooleanExpression { expr: bdd.to_boolean_expression(pg_variables), bdd })
   }
 }
-impl<C: Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
+impl<C: 'static+Ctx> ParsingBuilder<C> for PowerGroundBooleanExpression {
   type Builder = BooleanExpression;
   #[inline]
   fn build(builder: Self::Builder, scope: &mut crate::ast::BuilderScope<C>) -> Self {
@@ -356,7 +356,7 @@ impl fmt::Display for PowerGroundBooleanExpression {
   }
 }
 
-impl<C: Ctx> crate::Cell<C> {
+impl<C: 'static+Ctx> crate::Cell<C> {
   #[inline]
   pub fn build_logic_boolexpr(
     &self,
