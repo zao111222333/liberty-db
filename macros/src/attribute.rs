@@ -208,64 +208,65 @@ pub(crate) fn parse_field_attrs(
 ) -> syn::Result<Option<FieldType>> {
   for attri in field_attrs.iter() {
     if let Some(seg_title) = attri.path().segments.first()
-      && "liberty" == &seg_title.ident.to_string() {
-        if let syn::Meta::List(list) = &attri.meta {
-          let mut tokens: proc_macro2::token_stream::IntoIter =
-            list.tokens.clone().into_iter();
-          if let Some(proc_macro2::TokenTree::Ident(token_id)) = tokens.next() {
-            match token_id.to_string().as_str() {
-              "name" => {
-                return Ok(Some(FieldType::Internal(InternalType::Name {
-                  flatten: parse_name_flatten(tokens)?,
-                })));
-              }
-              "attributes" => {
-                return Ok(Some(FieldType::Internal(InternalType::AttributeList)));
-              }
-              "comments" => return Ok(Some(FieldType::Internal(InternalType::Comment))),
-              "extra_ctx" => {
-                return Ok(Some(FieldType::Internal(InternalType::ExtraCtx)));
-              }
-              "simple" => {
-                // let simple_type = parse_simple_type(tokens)?;
-                return Ok(Some(FieldType::Attri(AttriType::Simple)));
-              }
-              "complex" => {
-                // let complex_type = parse_complex_type(tokens)?;
-                return Ok(Some(FieldType::Attri(AttriType::Complex)));
-              }
-              "group" => {
-                // let group_type = parse_group_type(tokens)?;
-                return Ok(Some(FieldType::Attri(AttriType::Group)));
-              }
-              "supergroup" => {
-                return Ok(Some(FieldType::Attri(AttriType::SuperGroup(
-                  parse_supergroup_type(tokens)?,
-                ))));
-              }
-              "default" => {
-                continue;
-              }
-              _ => {
-                return Err(syn::Error::new(
-                  proc_macro2::Span::call_site(),
-                  format!("Unsupported token {}.", token_id.to_string().as_str()),
-                ));
-              }
+      && "liberty" == &seg_title.ident.to_string()
+    {
+      if let syn::Meta::List(list) = &attri.meta {
+        let mut tokens: proc_macro2::token_stream::IntoIter =
+          list.tokens.clone().into_iter();
+        if let Some(proc_macro2::TokenTree::Ident(token_id)) = tokens.next() {
+          match token_id.to_string().as_str() {
+            "name" => {
+              return Ok(Some(FieldType::Internal(InternalType::Name {
+                flatten: parse_name_flatten(tokens)?,
+              })));
             }
-          } else {
-            return Err(syn::Error::new(
-              proc_macro2::Span::call_site(),
-              "No token.".to_string(),
-            ));
+            "attributes" => {
+              return Ok(Some(FieldType::Internal(InternalType::AttributeList)));
+            }
+            "comments" => return Ok(Some(FieldType::Internal(InternalType::Comment))),
+            "extra_ctx" => {
+              return Ok(Some(FieldType::Internal(InternalType::ExtraCtx)));
+            }
+            "simple" => {
+              // let simple_type = parse_simple_type(tokens)?;
+              return Ok(Some(FieldType::Attri(AttriType::Simple)));
+            }
+            "complex" => {
+              // let complex_type = parse_complex_type(tokens)?;
+              return Ok(Some(FieldType::Attri(AttriType::Complex)));
+            }
+            "group" => {
+              // let group_type = parse_group_type(tokens)?;
+              return Ok(Some(FieldType::Attri(AttriType::Group)));
+            }
+            "supergroup" => {
+              return Ok(Some(FieldType::Attri(AttriType::SuperGroup(
+                parse_supergroup_type(tokens)?,
+              ))));
+            }
+            "default" => {
+              continue;
+            }
+            _ => {
+              return Err(syn::Error::new(
+                proc_macro2::Span::call_site(),
+                format!("Unsupported token {}.", token_id.to_string().as_str()),
+              ));
+            }
           }
         } else {
           return Err(syn::Error::new(
             proc_macro2::Span::call_site(),
-            "Incorrect format for using the `liberty` attribute.".to_string(),
+            "No token.".to_string(),
           ));
         }
+      } else {
+        return Err(syn::Error::new(
+          proc_macro2::Span::call_site(),
+          "Incorrect format for using the `liberty` attribute.".to_string(),
+        ));
       }
+    }
   }
   Ok(None)
 }
