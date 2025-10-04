@@ -20,7 +20,6 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_VERSION: "1.88.0"
   CACHE_KEY_BENCH: bench-report
 jobs:
   regression:
@@ -37,8 +36,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ env.RUST_VERSION }}
       - name: Obtain baseline data (result of last time)
         uses: actions/cache/restore@v4
         with:

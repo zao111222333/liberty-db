@@ -24,7 +24,7 @@ use core::fmt::Write;
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct FF<C: Ctx> {
+pub struct FF<C: 'static + Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -62,18 +62,18 @@ pub struct FF<C: Ctx> {
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear: Option<LogicBooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub preset: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear_preset_var1: Option<ClearPresetState>,
   /// The `clear_preset_var2` attribute gives the value that `variable2`
   ///  has when `clear` and `preset` are both active at the same time.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear_preset_var2: Option<ClearPresetState>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
   /// the active edge of the clock signals and are required in all `ff`  groups.
@@ -82,7 +82,7 @@ pub struct FF<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=159.24&end=159.27
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clocked_on: Option<LogicBooleanExpression>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
   /// the active edge of the clock signals and are required in all `ff`  groups.
@@ -91,12 +91,12 @@ pub struct FF<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=159.24&end=159.27
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clocked_on_also: Option<LogicBooleanExpression>,
   /// The value of `variable1` after the active edge.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub next_state: Option<LogicBooleanExpression>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 /// The `ff` group describes either a single-stage or a master-slave flip-flop
@@ -111,7 +111,7 @@ pub struct FF<C: Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct FFBank<C: Ctx> {
+pub struct FFBank<C: 'static + Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -152,15 +152,15 @@ pub struct FFBank<C: Ctx> {
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear_preset_var1: Option<ClearPresetState>,
   /// The `clear_preset_var2` attribute gives the value that `variable2`
   ///  has when `clear` and `preset` are both active at the same time.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear_preset_var2: Option<ClearPresetState>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
   /// the active edge of the clock signals and are required in all `ff`  groups.
@@ -169,7 +169,7 @@ pub struct FFBank<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=159.24&end=159.27
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clocked_on: Option<LogicBooleanExpression>,
   /// The `clocked_on`  and `clocked_on_also`  attributes identify
   /// the active edge of the clock signals and are required in all `ff`  groups.
@@ -178,15 +178,15 @@ pub struct FFBank<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=159.24&end=159.27
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clocked_on_also: Option<LogicBooleanExpression>,
   /// The value of `variable1` after the active edge.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub next_state: Option<LogicBooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub preset: Option<LogicBooleanExpression>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
@@ -200,7 +200,7 @@ pub struct FFBank<C: Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Latch<C: Ctx> {
+pub struct Latch<C: 'static + Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -238,18 +238,18 @@ pub struct Latch<C: Ctx> {
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear: Option<LogicBooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub preset: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear_preset_var1: Option<ClearPresetState>,
   /// The `clear_preset_var2` attribute gives the value that `variable2`
   ///  has when `clear` and `preset` are both active at the same time.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear_preset_var2: Option<ClearPresetState>,
   /// The `enable`  attribute gives the state of the enable input,
   /// and `data_in`  attribute gives the state of the data input.
@@ -258,21 +258,21 @@ pub struct Latch<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.11&end=185.13
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub enable: Option<LogicBooleanExpression>,
   /// The `enable_also`  attribute gives the state of the `enable`
   /// input when you are describing master and slave cells.
   /// The `enable_also`  attribute is optional.
-  /// If you use `enable_also`, you must also use the enable  and data_in  attributes
+  /// If you use `enable_also`, you must also use the enable  and `data_in`  attributes
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.23&end=185.25
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub enable_also: Option<LogicBooleanExpression>,
   /// The value of `variable1` after the active edge.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub data_in: Option<LogicBooleanExpression>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
@@ -286,7 +286,7 @@ pub struct Latch<C: Ctx> {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::FFLatch: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct LatchBank<C: Ctx> {
+pub struct LatchBank<C: 'static + Ctx> {
   /// The `variable1` (`variable[0]`) value is the state of the
   /// noninverting output of the flip-flop;
   /// the `variable2` (`variable[1]`) value is the state of the inverting output.
@@ -327,15 +327,15 @@ pub struct LatchBank<C: Ctx> {
   #[liberty(attributes)]
   pub attributes: Attributes,
   /// The clear  attribute gives the active value for the clear input.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear: Option<LogicBooleanExpression>,
   /// The `clear_preset_var1` attribute gives the value that `variable1`
   ///  has when `clear` and `preset` are both active at the same time.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear_preset_var1: Option<ClearPresetState>,
   /// The `clear_preset_var2` attribute gives the value that `variable2`
   ///  has when `clear` and `preset` are both active at the same time.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clear_preset_var2: Option<ClearPresetState>,
   /// The `enable`  attribute gives the state of the enable input,
   /// and `data_in`  attribute gives the state of the data input.
@@ -344,24 +344,24 @@ pub struct LatchBank<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.11&end=185.13
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub enable: Option<LogicBooleanExpression>,
   /// The `enable_also`  attribute gives the state of the `enable`
   /// input when you are describing master and slave cells.
   /// The `enable_also`  attribute is optional.
-  /// If you use `enable_also`, you must also use the enable  and data_in  attributes
+  /// If you use `enable_also`, you must also use the enable  and `data_in`  attributes
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=185.23&end=185.25
   /// ">Reference-Definition</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub enable_also: Option<LogicBooleanExpression>,
   /// The value of `variable1` after the active edge.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub data_in: Option<LogicBooleanExpression>,
   /// The `preset` attribute gives the active value for the preset input.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub preset: Option<LogicBooleanExpression>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub power_down_function: Option<PowerGroundBooleanExpression>,
 }
 
@@ -370,7 +370,7 @@ pub struct LatchBank<C: Ctx> {
   [Latch];
   [FF];
 )]
-impl<C: Ctx> NamedGroup<C> for LatchFF_type<C> {
+impl<C: 'static + Ctx> NamedGroup<C> for LatchFF_type<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -404,7 +404,7 @@ impl<C: Ctx> NamedGroup<C> for LatchFF_type<C> {
   [LatchBank];
   [FFBank];
 )]
-impl<C: Ctx> NamedGroup<C> for LatchFFBank_type<C> {
+impl<C: 'static + Ctx> NamedGroup<C> for LatchFFBank_type<C> {
   #[inline]
   fn parse_set_name(
     builder: &mut Self::Builder,
@@ -449,7 +449,7 @@ impl<C: Ctx> NamedGroup<C> for LatchFFBank_type<C> {
   [LatchBank];
   [Latch];
 )]
-impl<C: Ctx> __LatchFF for Latch_type<C> {
+impl<C: 'static + Ctx> __LatchFF for Latch_type<C> {
   #[inline]
   fn variable1(&self) -> &String {
     &self.variable1
@@ -493,7 +493,7 @@ impl<C: Ctx> __LatchFF for Latch_type<C> {
   [FFBank];
   [FF];
 )]
-impl<C: Ctx> __LatchFF for FF_type<C> {
+impl<C: 'static + Ctx> __LatchFF for FF_type<C> {
   #[inline]
   fn variable1(&self) -> &String {
     &self.variable1
@@ -563,7 +563,7 @@ trait __LatchFF {
   [LatchBank];
   [Latch];
 )]
-impl<C: Ctx> LatchFF for AllTypes<C> {}
+impl<C: 'static + Ctx> LatchFF for AllTypes<C> {}
 #[duplicate::duplicate_item(
   AllTypes;
   [FFBank];
@@ -571,7 +571,7 @@ impl<C: Ctx> LatchFF for AllTypes<C> {}
   [LatchBank];
   [Latch];
 )]
-impl<C: Ctx> GroupFn<C> for AllTypes<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for AllTypes<C> {}
 /// trait for `FF` and `FFBank`
 #[expect(private_bounds)]
 pub trait LatchFF: __LatchFF {

@@ -152,7 +152,7 @@ impl Edge {
   }
 }
 crate::ast::impl_self_builder!(Edge);
-impl<C: Ctx> crate::ast::SimpleAttri<C> for Edge {
+impl<C: 'static + Ctx> crate::ast::SimpleAttri<C> for Edge {
   #[inline]
   fn nom_parse<'a>(
     i: &'a str,
@@ -173,7 +173,7 @@ impl<C: Ctx> crate::ast::SimpleAttri<C> for Edge {
     f.write_str(self.full_name())
   }
 }
-impl<C: Ctx> crate::ast::ComplexAttri<C> for Edge {
+impl<C: 'static + Ctx> crate::ast::ComplexAttri<C> for Edge {
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
     _: &mut ParseScope<'_>,
@@ -207,7 +207,7 @@ impl<C: Ctx> crate::ast::ComplexAttri<C> for Edge {
   }
 }
 impl_self_builder!(Vec<Edge>);
-impl<C: Ctx> crate::ast::ComplexAttri<C> for Vec<Edge> {
+impl<C: 'static + Ctx> crate::ast::ComplexAttri<C> for Vec<Edge> {
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
     _: &mut ParseScope<'_>,

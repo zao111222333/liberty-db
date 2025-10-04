@@ -11,7 +11,7 @@ pub mod impls;
 pub mod items;
 use crate::{
   Ctx,
-  ast::{Attributes, GroupComments, GroupFn, GroupSet},
+  ast::{Attributes, GroupComments, GroupFn, LibertySet},
   ccsn::PropagatingCcb,
   common::{
     char_config::CharConfig,
@@ -54,7 +54,7 @@ pub use items::*;
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Timing: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Timing<C: Ctx> {
+pub struct Timing<C: 'static + Ctx> {
   #[liberty(name)]
   pub name: Vec<String>,
   /// group comments
@@ -74,7 +74,7 @@ pub struct Timing<C: Ctx> {
   /// `clock_gating_flag : bool ; `
   ///
   /// `Boolean`: Valid values are true and false. The value true is applicable
-  /// only when the value of the timing_type attribute is setup, hold, or nochange.
+  /// only when the value of the `timing_type` attribute is setup, hold, or nochange.
   /// When not defined for a timing arc, the value false is assumed,
   /// indicating the timing arc is part of a standard sequential device.
   ///
@@ -85,7 +85,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=322.21&end=322.32
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub clock_gating_flag: Option<bool>,
   /// The `default_timing` attribute allows you to specify one timing arc as the default
   /// in the case of multiple timing arcs with when statements.
@@ -100,7 +100,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=322.34+323.2&end=322.37+323.3
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub default_timing: Option<bool>,
   /// The `fpga_arc_condition` attribute specifies a Boolean condition that enables
   /// a timing arc.
@@ -117,7 +117,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=323.5&end=323.14
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub fpga_arc_condition: Option<LogicBooleanExpression>,
   /// Use pairs of `interdependence_id` attributes to identify interdependent pairs
   /// of `setup` and `hold` constraint tables. Interdependence data is supported
@@ -185,11 +185,11 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=323.16+324.2+325.2&end=323.41+324.49+325.3
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub interdependence_id: Option<usize>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub intrinsic_rise: Option<f64>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub intrinsic_fall: Option<f64>,
   /// The `related_bus_pins` attribute defines the pin or pins that
   /// are the startpoint of the timing arc. The primary use of
@@ -231,7 +231,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=325.26&end=325.33
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub related_output_pin: Option<String>,
   /// The `related_pin` attribute defines the pin or pins representing
   /// the beginning point of the timing arc. It is required in all timing groups.
@@ -311,7 +311,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.3&end=327.14
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub sdf_cond: Option<SdfExpression>,
   /// The `sdf_cond_end` attribute defines a timing-check condition specific to the end event
   /// in VHDL models. The expression must conform to OVI SDF 2.1 timing-check condition
@@ -332,7 +332,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.16&end=327.24
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub sdf_cond_end: Option<SdfExpression>,
   /// The `sdf_cond_start` attribute defines a timing-check condition specific to the start event
   /// in full-timing gate-level simulation (FTGS) models. The expression must conform to OVI
@@ -353,7 +353,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=327.26+328.2&end=327.30+328.5
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub sdf_cond_start: Option<SdfExpression>,
   /// The `sdf_edges` attribute defines the edge specification on both
   /// the start pin and the end pin. The default is noedge.
@@ -373,7 +373,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=328.7&end=328.17
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub sdf_edges: Option<SdfEdgeType>,
   /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
   /// <a name ="reference_link" href="
@@ -424,7 +424,7 @@ pub struct Timing<C: Ctx> {
   ///
   /// Timing arcs with a timing type of `clear` or `preset` require a `timing_sense` attribute.
   /// If `related_pin` is an output pin, you must define a `timing_sense`` attribute for that pin.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   #[id]
   pub timing_sense: Option<TimingSenseType>,
   /// The `timing_type` attribute distinguishes between combinational
@@ -561,7 +561,7 @@ pub struct Timing<C: Ctx> {
   /// + `max_clock_tree_path`: Used in timing groups under a clock pin. Defines the maximum clock tree path constraint.
   /// + `min_clock_tree_path`: Used in timing groups under a clock pin. Defines the minimum clock tree path constraint.
   /// #### Example
-  /// A sample library with the timing_type attribute and minimum_pulse_width and minimum_period values.
+  /// A sample library with the `timing_type` attribute and `minimum_pulse_width` and `minimum_period` values.
   /// ``` liberty
   /// library(ASIC) {  
   ///     ...  
@@ -611,16 +611,16 @@ pub struct Timing<C: Ctx> {
   /// the data pin with a nonclock pin as the `related_pin`. It requires the signal of
   /// a pin to be stable for a specified period of time before and after another pin of
   /// the same cell range state so that the cell can function as expected.
-  /// + `non_seq_setup_rising`: Defines (with non_seq_setup_falling) the timing arcs used
+  /// + `non_seq_setup_rising`: Defines (with `non_seq_setup_falling`) the timing arcs used
   /// for setup checks between pins with nonsequential behavior. The related pin in
   /// a timing arc is used for the timing check.
-  /// + `non_seq_setup_falling`: Defines (with non_seq_setup_rising) the timing arcs used
+  /// + `non_seq_setup_falling`: Defines (with `non_seq_setup_rising`) the timing arcs used
   /// for setup checks between pins with nonsequential behavior. The related pin in
   /// a timing arc is used for the timing check.
-  /// + `non_seq_hold_rising`: Defines (with non_seq_hold_falling) the timing arcs used
+  /// + `non_seq_hold_rising`: Defines (with `non_seq_hold_falling`) the timing arcs used
   /// for hold checks between pins with nonsequential behavior. The related pin in
   /// a timing arc is used for the timing check.
-  /// + `non_seq_hold_falling`: Defines (with non_seq_hold_rising) the timing arcs used
+  /// + `non_seq_hold_falling`: Defines (with `non_seq_hold_rising`) the timing arcs used
   /// for hold checks between pins with nonsequential behavior. The related pin in
   /// a timing arc is used for the timing check.
   /// #### No-Change Timing Arcs
@@ -636,7 +636,7 @@ pub struct Timing<C: Ctx> {
   /// the constrained pin and a positive pulse on the related pin.
   /// + `nochange_low_low` (negative/negative): Indicates a negative pulse on
   /// the constrained pin and a negative pulse on the related pin.
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   #[id]
   pub timing_type: Option<TimingType>,
   /// The when attribute is used in state-dependent timing and conditional timing checks.
@@ -667,21 +667,21 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=337.12&end=337.26
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   #[id]
   pub when: Option<LogicBooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=338.13&end=338.20
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub when_end: Option<BooleanExpression>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=338.22&end=338.30
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub when_start: Option<BooleanExpression>,
   /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
-  /// switching input_ccb groups of the input pin that do not propagate the noise in the timing
+  /// switching `input_ccb` groups of the input pin that do not propagate the noise in the timing
   /// arc or the receiver capacitance load.
   /// You can also specify this attribute in the `receiver_capacitance` group of the input pin.
   ///
@@ -713,9 +713,9 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=339.12&end=339.18
   /// ">Reference-Instance</a>
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub active_output_ccb: Option<String>,
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub propagating_ccb: Option<PropagatingCcb>,
   /// You define the mode attribute within a timing group.
   /// A mode attribute pertains to an individual timing arc.
@@ -725,7 +725,7 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=340.23+341.2+342.2+343.2+344.2&end=340.36+341.53+342.54+343.54+344.46
   /// ">Reference</a>
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub mode: Option<[String; 2]>,
   /// The `char_config` group is a group of attributes including simple and complex attributes.
   /// These attributes represent library characterization configuration, and specify the settings
@@ -780,11 +780,11 @@ pub struct Timing<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33+348.2&end=347.42+348.20
   /// ">Reference</a>
-  #[liberty(group(type = Set))]
-  pub cell_degradation: GroupSet<CellDegradation<C>>,
-  #[liberty(simple(type = Option))]
+  #[liberty(group)]
+  pub cell_degradation: LibertySet<CellDegradation<C>>,
+  #[liberty(simple)]
   pub rise_resistance: Option<f64>,
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub fall_resistance: Option<f64>,
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=347.33+348.2&end=347.42+348.20
@@ -800,9 +800,9 @@ pub struct Timing<C: Ctx> {
   /// Defines cell delay lookup tables (independently of transition delay) in CMOS nonlinear timing models.
   ///
   /// **Note:**
-  /// The same k-factors that scale the cell_fall and cell_rise values also scale the
-  /// retaining_fall and retaining_rise values. There are no separate k-factors for
-  /// the retaining_fall and retaining_rise values.
+  /// The same k-factors that scale the `cell_fall` and `cell_rise` values also scale the
+  /// `retaining_fall` and `retaining_rise` values. There are no separate k-factors for
+  /// the `retaining_fall` and `retaining_rise` values.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=348.22+349.2&end=348.49+349.32
   /// ">Reference</a>
@@ -879,137 +879,137 @@ pub struct Timing<C: Ctx> {
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub retain_fall_slew: Option<TimingTableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub fall_propagation: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub noise_immunity_above_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub noise_immunity_below_low: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub noise_immunity_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub noise_immunity_low: Option<TableLookUp<C>>,
   #[liberty(group)]
   pub output_current_fall: Option<ReferenceTimeVector3DGrpup<C>>,
   #[liberty(group)]
   pub output_current_rise: Option<ReferenceTimeVector3DGrpup<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_height_above_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_height_below_low: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_height_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_height_low: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_peak_time_ratio_above_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_peak_time_ratio_below_low: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_peak_time_ratio_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_peak_time_ratio_low: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_width_above_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_width_below_low: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_width_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub propogated_noise_width_low: Option<TableLookUp<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub receiver_capacitance_fall: GroupSet<TableLookUpMultiSegment<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub receiver_capacitance_rise: GroupSet<TableLookUpMultiSegment<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUpMultiSegment::use_common_template)]
+  pub receiver_capacitance_fall: LibertySet<TableLookUpMultiSegment<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUpMultiSegment::use_common_template)]
+  pub receiver_capacitance_rise: LibertySet<TableLookUpMultiSegment<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub receiver_capacitance1_fall: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub receiver_capacitance1_rise: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub receiver_capacitance2_fall: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub receiver_capacitance2_rise: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub rise_propagation: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub steady_state_current_high: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub steady_state_current_low: Option<TableLookUp<C>>,
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_common_template!)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
   pub steady_state_current_tristate: Option<TableLookUp<C>>,
   /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
   /// ">Reference-Definition</a>
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_compact_template!)]
+  #[liberty(after_build = CompactCcsTable::use_compact_template)]
   pub compact_ccs_rise: Option<CompactCcsTable<C>>,
   /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=352.40&end=352.41
   /// ">Reference-Definition</a>
   #[liberty(group)]
-  #[liberty(after_build = crate::table::use_compact_template!)]
+  #[liberty(after_build = CompactCcsTable::use_compact_template)]
   pub compact_ccs_fall: Option<CompactCcsTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_cell_fall: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_cell_rise: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_fall_constraint: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_fall_transition: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_rise_constraint: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_rise_transition: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_retaining_fall: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_retaining_rise: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_retain_fall_slew: GroupSet<OcvSigmaTable<C>>,
-  #[liberty(group(type = Set))]
-  #[liberty(after_build = crate::table::use_common_template!)]
-  pub ocv_sigma_retain_rise_slew: GroupSet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_cell_fall: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_cell_rise: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_fall_constraint: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_fall_transition: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_rise_constraint: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_rise_transition: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_retaining_fall: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_retaining_rise: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_retain_fall_slew: LibertySet<OcvSigmaTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = OcvSigmaTable::use_common_template)]
+  pub ocv_sigma_retain_rise_slew: LibertySet<OcvSigmaTable<C>>,
 }
 
-impl<C: Ctx> GroupFn<C> for Timing<C> {
+impl<C: 'static + Ctx> GroupFn<C> for Timing<C> {
   fn after_build(&mut self, _: &mut crate::ast::BuilderScope<C>) {
     impls::need_timing_sense_when_timing_type_is_clear_or_preset(self);
     impls::need_timing_sense_when_related_pin_is_output(self);

@@ -7,7 +7,7 @@ use crate::{
   Ctx,
   ast::{
     Attributes, BuilderScope, CodeFormatter, ComplexAttri, ComplexParseError,
-    DefinedType, GroupComments, GroupFn, GroupSet, Indentation, ParseScope,
+    DefinedType, GroupComments, GroupFn, Indentation, LibertySet, LibertyVec, ParseScope,
   },
   common::{items::IdVector, parse_f64},
   expression::{Formula, logic},
@@ -33,7 +33,7 @@ use core::fmt::{self, Write};
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct Sensitization<C: Ctx> {
+pub struct Sensitization<C: 'static + Ctx> {
   /// name
   #[id(borrow = str)]
   #[liberty(name)]
@@ -101,8 +101,8 @@ pub struct Sensitization<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=89.5&end=89.29
   /// ">Reference</a>
-  #[liberty(complex(type = Vec))]
-  pub vector: Vec<SensitizationVector>,
+  #[liberty(complex)]
+  pub vector: LibertyVec<SensitizationVector>,
 }
 
 /// # vector Complex Attribute
@@ -155,7 +155,7 @@ pub struct SensitizationVector {
   states: Vec<logic::Static>,
 }
 crate::ast::impl_self_builder!(SensitizationVector);
-impl<C: Ctx> ComplexAttri<C> for SensitizationVector {
+impl<C: 'static + Ctx> ComplexAttri<C> for SensitizationVector {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -277,7 +277,7 @@ liberty_db::library::items::Sensitization (sensitization_nand2) {
     assert!(sense1.attributes.len() == 1);
   }
 }
-impl<C: Ctx> GroupFn<C> for Sensitization<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for Sensitization<C> {}
 
 /// Use the `voltage_map`  attribute to associate a voltage name
 /// with relative voltage values referenced by the cell-level `pg_pin`  groups.
@@ -296,12 +296,12 @@ pub struct VoltageMap {
   pub voltage: f64,
 }
 impl VoltageMap {
-  pub(super) fn add2scope<C: Ctx>(&self, scope: &mut BuilderScope<C>) {
+  pub(super) fn add2scope<C: 'static + Ctx>(&mut self, scope: &mut BuilderScope<C>) {
     _ = scope.voltage_map.insert(self.name.clone(), self.voltage);
   }
 }
 crate::ast::impl_self_builder!(VoltageMap);
-impl<C: Ctx> ComplexAttri<C> for VoltageMap {
+impl<C: 'static + Ctx> ComplexAttri<C> for VoltageMap {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -341,7 +341,7 @@ impl<C: Ctx> ComplexAttri<C> for VoltageMap {
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct InputVoltage<C: Ctx> {
+pub struct InputVoltage<C: 'static + Ctx> {
   /// name
   #[id(borrow = str)]
   #[liberty(name)]
@@ -379,7 +379,7 @@ pub struct InputVoltage<C: Ctx> {
   #[liberty(simple)]
   pub vimax: Formula,
 }
-impl<C: Ctx> GroupFn<C> for InputVoltage<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for InputVoltage<C> {}
 
 /// You define an `output_voltage` group in the `library` group to designate a set of output
 /// voltage level ranges to drive output cells.
@@ -392,7 +392,7 @@ impl<C: Ctx> GroupFn<C> for InputVoltage<C> {}
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct OutputVoltage<C: Ctx> {
+pub struct OutputVoltage<C: 'static + Ctx> {
   /// name
   #[id(borrow = str)]
   #[liberty(name)]
@@ -430,7 +430,7 @@ pub struct OutputVoltage<C: Ctx> {
   #[liberty(simple)]
   pub vomax: Formula,
 }
-impl<C: Ctx> GroupFn<C> for OutputVoltage<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for OutputVoltage<C> {}
 
 /// Use the `delay_model`  attribute to specify which delay model
 /// to use in the delay calculations.
@@ -469,7 +469,7 @@ crate::ast::impl_simple!(DelayModel);
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct OperatingConditions<C: Ctx> {
+pub struct OperatingConditions<C: 'static + Ctx> {
   /// name
   #[id(borrow = str)]
   #[liberty(name)]
@@ -482,17 +482,17 @@ pub struct OperatingConditions<C: Ctx> {
   /// group undefined attributes
   #[liberty(attributes)]
   pub attributes: Attributes,
-  /// An optional attribute, you can use calc_mode  to specify an associated process mode.
+  /// An optional attribute, you can use `calc_mode`  to specify an associated process mode.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.28&end=72.28
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub calc_mode: Option<String>,
   /// Use this optional attribute to specify values for up to five user-defined variables.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=72.36&end=72.37
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub parameteri: Option<f64>,
   /// Use the `process`  attribute to specify a scaling factor to account for variations in the outcome of the actual semiconductor manufacturing steps.
   ///
@@ -502,11 +502,11 @@ pub struct OperatingConditions<C: Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub process: f64,
-  /// Use the process_label  attribute to specify the name of the current process.
+  /// Use the `process_label`  attribute to specify the name of the current process.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.9&end=73.10
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub process_label: Option<String>,
   /// Use the `temperature`  attribute to specify the ambient temperature in which the design is to operate.
   /// <a name ="reference_link" href="
@@ -520,7 +520,7 @@ pub struct OperatingConditions<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=73.24+73.30&end=73.25+73.31
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub tree_type: Option<TreeType>,
   /// Use the `voltage`  attribute to specify the operating voltage of the design; typically 5 volts for a CMOS library.
   ///
@@ -532,7 +532,7 @@ pub struct OperatingConditions<C: Ctx> {
   #[liberty(default = 5.0)]
   pub voltage: f64,
 }
-impl<C: Ctx> GroupFn<C> for OperatingConditions<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for OperatingConditions<C> {}
 
 /// You can define one or more `fpga_isd`  groups at the library level
 /// to specify the drive current, I/O voltages, and slew rates for FPGA parts and cells
@@ -548,7 +548,7 @@ impl<C: Ctx> GroupFn<C> for OperatingConditions<C> {}
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct FpgaIsd<C: Ctx> {
+pub struct FpgaIsd<C: 'static + Ctx> {
   /// name
   #[liberty(name)]
   #[id(borrow = str)]
@@ -577,10 +577,10 @@ pub struct FpgaIsd<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=64.27&end=64.28
   /// ">Reference</a>
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   pub slew: Option<FPGASlew>,
 }
-impl<C: Ctx> GroupFn<C> for FpgaIsd<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for FpgaIsd<C> {}
 
 /// The `slew`  attribute is optional and specifies whether the slew of the FPGA part or the FPGA cell is FAST or SLOW.
 ///
@@ -649,7 +649,7 @@ pub enum Technology {
   FPGA,
 }
 crate::ast::impl_self_builder!(Technology);
-impl<C: Ctx> ComplexAttri<C> for Technology {
+impl<C: 'static + Ctx> ComplexAttri<C> for Technology {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -739,7 +739,7 @@ pub enum AttributeType {
   Float,
 }
 crate::ast::impl_self_builder!(Define);
-impl<C: Ctx> ComplexAttri<C> for Define {
+impl<C: 'static + Ctx> ComplexAttri<C> for Define {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -799,7 +799,7 @@ pub struct DefineGroup {
   pub parent_name: String,
 }
 crate::ast::impl_self_builder!(DefineGroup);
-impl<C: Ctx> ComplexAttri<C> for DefineGroup {
+impl<C: 'static + Ctx> ComplexAttri<C> for DefineGroup {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -892,7 +892,7 @@ pub enum ResourceType {
   PadDriverSites,
 }
 crate::ast::impl_self_builder!(DefineCellArea);
-impl<C: Ctx> ComplexAttri<C> for DefineCellArea {
+impl<C: 'static + Ctx> ComplexAttri<C> for DefineCellArea {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -932,7 +932,7 @@ impl<C: Ctx> ComplexAttri<C> for DefineCellArea {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct WireLoad<C: Ctx> {
+pub struct WireLoad<C: 'static + Ctx> {
   /// name
   #[id(borrow = str)]
   #[liberty(name)]
@@ -991,10 +991,10 @@ pub struct WireLoad<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.3&end=96.34
   /// ">Reference</a>
-  #[liberty(complex(type = Set))]
-  pub fanout_length: GroupSet<FanoutLength>,
+  #[liberty(complex)]
+  pub fanout_length: LibertySet<FanoutLength>,
 }
-impl<C: Ctx> GroupFn<C> for WireLoad<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for WireLoad<C> {}
 
 /// Use this attribute to define values for fanout and length
 /// when you create the wire load manually.
@@ -1033,15 +1033,15 @@ pub struct FanoutLength {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=96.22&end=96.23
   /// ">Reference</a>
   pub length: f64,
-  /// average_capacitance
+  /// `average_capacitance`
   pub average_capacitance: Option<f64>,
-  /// standard_deviation
+  /// `standard_deviation`
   pub standard_deviation: Option<f64>,
-  /// number_of_nets
+  /// `number_of_nets`
   pub number_of_nets: Option<u32>,
 }
 crate::ast::impl_self_builder!(FanoutLength);
-impl<C: Ctx> ComplexAttri<C> for FanoutLength {
+impl<C: 'static + Ctx> ComplexAttri<C> for FanoutLength {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     mut iter: I,
@@ -1107,7 +1107,7 @@ impl<C: Ctx> ComplexAttri<C> for FanoutLength {
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct WireLoadSection<C: Ctx> {
+pub struct WireLoadSection<C: 'static + Ctx> {
   /// name
   #[id(borrow = str)]
   #[liberty(name)]
@@ -1127,7 +1127,7 @@ pub struct WireLoadSection<C: Ctx> {
   #[liberty(complex)]
   pub wire_load_from_area: (f64, f64, String),
 }
-impl<C: Ctx> GroupFn<C> for WireLoadSection<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for WireLoadSection<C> {}
 
 /// The `base_curve_type` attribute specifies the type of base curve.
 ///
@@ -1192,7 +1192,7 @@ crate::ast::impl_simple!(BaseCurveType);
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct BaseCurves<C: Ctx> {
+pub struct BaseCurves<C: 'static + Ctx> {
   /// name
   #[liberty(name)]
   #[id(borrow = str)]
@@ -1226,11 +1226,11 @@ pub struct BaseCurves<C: Ctx> {
   pub base_curve_type: BaseCurveType,
   #[liberty(complex)]
   pub curve_x: Vec<f64>,
-  #[liberty(complex(type = Set))]
-  pub curve_y: GroupSet<IdVector>,
+  #[liberty(complex)]
+  pub curve_y: LibertySet<IdVector>,
 }
 
-impl<C: Ctx> GroupFn<C> for BaseCurves<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for BaseCurves<C> {}
 
 #[cfg(test)]
 mod test {

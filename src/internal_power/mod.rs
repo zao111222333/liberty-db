@@ -11,7 +11,7 @@ use crate::{
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::InternalPower: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct InternalPower<C: Ctx> {
+pub struct InternalPower<C: 'static + Ctx> {
   /// group comments
   #[liberty(comments)]
   comments: GroupComments,
@@ -33,7 +33,7 @@ pub struct InternalPower<C: Ctx> {
   // rising_together_group
   // switching_interval
   // switching_together_group
-  #[liberty(simple(type = Option))]
+  #[liberty(simple)]
   #[id]
   pub when: Option<LogicBooleanExpression>,
   // NOTICE: Complex Attribute
@@ -51,20 +51,20 @@ pub struct InternalPower<C: Ctx> {
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=305.9&end=305.14
   /// ">Reference-Definition</a>
-  #[liberty(complex(type = Option))]
+  #[liberty(complex)]
   pub mode: Option<[String; 2]>,
   // NOTICE: Group Statements
-  // #[liberty(group(type = Option))]
+  // #[liberty(group)]
   // pub domain: Option<Domain<C>>,
-  #[liberty(group(type = Option))]
-  #[liberty(after_build = crate::table::use_power_template!)]
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_power_template)]
   pub rise_power: Option<TableLookUp<C>>,
-  #[liberty(group(type = Option))]
-  #[liberty(after_build = crate::table::use_power_template!)]
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_power_template)]
   pub fall_power: Option<TableLookUp<C>>,
-  #[liberty(group(type = Option))]
-  #[liberty(after_build = crate::table::use_power_template!)]
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_power_template)]
   pub power: Option<TableLookUp<C>>,
 }
 
-impl<C: Ctx> GroupFn<C> for InternalPower<C> {}
+impl<C: 'static + Ctx> GroupFn<C> for InternalPower<C> {}

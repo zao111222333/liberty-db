@@ -8,7 +8,6 @@ permissions:
   contents: write
 env:
   CARGO_TERM_COLOR: always
-  RUST_VERSION: "1.88.0"
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -25,8 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ env.RUST_VERSION }}
       # - name: Check semver
       #   uses: obi1kenobi/cargo-semver-checks-action@v2
       - name: cargo login

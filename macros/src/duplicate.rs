@@ -98,81 +98,78 @@ impl Parse for Args {
 fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
   let mut configs = Vec::new();
   for attr in attrs {
-    if attr.path().is_ident("duplicated") {
-      if let syn::Meta::List(list) = &attr.meta {
-        let tokens: proc_macro2::token_stream::IntoIter = list.tokens.clone().into_iter();
-        let args: Args = syn::parse2(tokens.clone().collect())?;
+    if attr.path().is_ident("duplicated")
+      && let syn::Meta::List(list) = &attr.meta
+    {
+      let tokens: proc_macro2::token_stream::IntoIter = list.tokens.clone().into_iter();
+      let args: Args = syn::parse2(tokens.clone().collect())?;
 
-        let mut maybe_name: Option<Ident> = None;
-        let mut maybe_new_attrs: Option<Punctuated<Field, Token![,]>> = None;
-        let mut maybe_docs: Option<Vec<Attribute>> = None;
-        let mut not_exclude = HashSet::new();
-        let mut exclude_simple = false;
-        let mut exclude_complex = false;
-        let mut exclude_group = false;
-        for arg in args.args {
-          match arg {
-            DuplicatedArg::Name(ident) => {
-              if maybe_name.is_some() {
-                return Err(syn::Error::new(ident.span(), "duplicated `name` attribute"));
-              }
-              maybe_name = Some(ident);
+      let mut maybe_name: Option<Ident> = None;
+      let mut maybe_new_attrs: Option<Punctuated<Field, Token![,]>> = None;
+      let mut maybe_docs: Option<Vec<Attribute>> = None;
+      let mut not_exclude = HashSet::new();
+      let mut exclude_simple = false;
+      let mut exclude_complex = false;
+      let mut exclude_group = false;
+      for arg in args.args {
+        match arg {
+          DuplicatedArg::Name(ident) => {
+            if maybe_name.is_some() {
+              return Err(syn::Error::new(ident.span(), "duplicated `name` attribute"));
             }
-            DuplicatedArg::NewAttrs(fields) => {
-              if maybe_new_attrs.is_some() {
-                return Err(syn::Error::new(
-                  fields.span(),
-                  "duplicated `additional_attrs` attribute",
-                ));
-              }
-              maybe_new_attrs = Some(fields);
+            maybe_name = Some(ident);
+          }
+          DuplicatedArg::NewAttrs(fields) => {
+            if maybe_new_attrs.is_some() {
+              return Err(syn::Error::new(
+                fields.span(),
+                "duplicated `additional_attrs` attribute",
+              ));
             }
-            DuplicatedArg::Docs(docs) => {
-              if maybe_new_attrs.is_some() {
-                return Err(syn::Error::new(
-                  docs[0].span(),
-                  "duplicated `docs` attribute",
-                ));
-              }
-              maybe_docs = Some(docs);
+            maybe_new_attrs = Some(fields);
+          }
+          DuplicatedArg::Docs(docs) => {
+            if maybe_new_attrs.is_some() {
+              return Err(syn::Error::new(docs[0].span(), "duplicated `docs` attribute"));
             }
-            DuplicatedArg::Exclude(excludes) => {
-              for exclude in excludes {
-                match exclude.to_string().as_str() {
-                  "simple" => exclude_simple = true,
-                  "complex" => exclude_complex = true,
-                  "group" => exclude_group = true,
-                  _ => {
-                    return Err(syn::Error::new(
-                      exclude.span(),
-                      format!("unsupport exclude {exclude}"),
-                    ));
-                  }
+            maybe_docs = Some(docs);
+          }
+          DuplicatedArg::Exclude(excludes) => {
+            for exclude in excludes {
+              match exclude.to_string().as_str() {
+                "simple" => exclude_simple = true,
+                "complex" => exclude_complex = true,
+                "group" => exclude_group = true,
+                _ => {
+                  return Err(syn::Error::new(
+                    exclude.span(),
+                    format!("unsupport exclude {exclude}"),
+                  ));
                 }
               }
             }
-            DuplicatedArg::NotExclude(_not_exclude) => not_exclude = _not_exclude,
           }
+          DuplicatedArg::NotExclude(_not_exclude) => not_exclude = _not_exclude,
         }
-        let name = maybe_name.ok_or_else(|| {
-          syn::Error::new(proc_macro2::Span::call_site(), "miss `name = ...`")
-        })?;
-        let additional_attrs = maybe_new_attrs.ok_or_else(|| {
-          syn::Error::new(proc_macro2::Span::call_site(), "miss `additional_attrs(...)`")
-        })?;
-        let docs = maybe_docs.ok_or_else(|| {
-          syn::Error::new(proc_macro2::Span::call_site(), "miss `docs(...)`")
-        })?;
-        configs.push(Config {
-          name,
-          additional_attrs,
-          docs,
-          not_exclude,
-          exclude_simple,
-          exclude_complex,
-          exclude_group,
-        });
       }
+      let name = maybe_name.ok_or_else(|| {
+        syn::Error::new(proc_macro2::Span::call_site(), "miss `name = ...`")
+      })?;
+      let additional_attrs = maybe_new_attrs.ok_or_else(|| {
+        syn::Error::new(proc_macro2::Span::call_site(), "miss `additional_attrs(...)`")
+      })?;
+      let docs = maybe_docs.ok_or_else(|| {
+        syn::Error::new(proc_macro2::Span::call_site(), "miss `docs(...)`")
+      })?;
+      configs.push(Config {
+        name,
+        additional_attrs,
+        docs,
+        not_exclude,
+        exclude_simple,
+        exclude_complex,
+        exclude_group,
+      });
     }
   }
 
@@ -202,17 +199,17 @@ pub(crate) fn inner(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
       for f in mem::take(&mut named.named) {
         if !config.not_exclude.contains(f.ident.as_ref().unwrap()) {
           match parse_field_attrs(&f.attrs)? {
-            Some(FieldType::Attri(AttriType::Simple(_))) => {
+            Some(FieldType::Attri(AttriType::Simple)) => {
               if config.exclude_simple {
                 continue;
               }
             }
-            Some(FieldType::Attri(AttriType::Complex(_))) => {
+            Some(FieldType::Attri(AttriType::Complex)) => {
               if config.exclude_complex {
                 continue;
               }
             }
-            Some(FieldType::Attri(AttriType::Group(_))) => {
+            Some(FieldType::Attri(AttriType::Group)) => {
               if config.exclude_group {
                 continue;
               }
@@ -252,7 +249,7 @@ fn test_attrs_config() {
       pub foo2: T2,
     ),
   )]
-  pub(crate) struct Timing<C: Ctx> {}"#;
+  pub(crate) struct Timing<C: 'static+Ctx> {}"#;
   let ast: syn::DeriveInput = syn::parse_str(input).unwrap();
   let config = attrs_config(&ast.attrs).unwrap();
   dbg!(config);

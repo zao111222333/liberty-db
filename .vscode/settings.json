@@ -7,41 +7,11 @@
     // "rust-analyzer.checkOnSave": true,
     // "rust-analyzer.check.command": "clippy",
     // "rust-analyzer.check.extraArgs": [], // "--all-features"
+    "rust-analyzer.server.path": "rust-analyzer",
     "rust-analyzer.procMacro.enable": true,
+    "rust-analyzer.showUnlinkedFileNotification": false,
     // "rust-analyzer.cargo.features": ["py"],
     // "rust-analyzer.cargo.features": ["tracing"],
-    // vscode-lldb need glibc 2.28
-    // "rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
-    // "lldb.launch.initCommands": ["settings set target.disable-aslr false"],
-    // "rust-analyzer.debug.engine": "ms-vscode.cpptools",
-    // "rust-analyzer.debug.engineSettings": {
-    //     "cppdbg": {            
-    //         "miDebuggerPath": "${env:HOME}/.cargo/bin/rust-gdb",
-    //         "setupCommands": [
-    //             {
-    //                 "description": "Enable pretty-printing for gdb",
-    //                 "text": "-enable-pretty-printing",
-    //                 "ignoreFailures": false
-    //             }
-    //         ],
-    //     }
-    // },
-    // "rust-analyzer.server.extraEnv": { 
-    //     "RUSTUP_TOOLCHAIN": "stable",
-    //     "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
-    //     "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
-    // },
-    // "terminal.integrated.env.linux": {
-    //     "RUSTUP_TOOLCHAIN": "stable",
-    //     "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
-    //     "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
-    // },
-    // "terminal.integrated.env.osx": {
-    //     "RUSTUP_TOOLCHAIN": "stable",
-    //     "RUSTUP_DIST_SERVER":"https://rsproxy.cn",
-    //     "RUSTUP_UPDATE_ROOT":"https://rsproxy.cn/rustup"
-    // },
-    "terminal.integrated.copyOnSelection": true,
     "todo-tree.general.tags":[
         "BUG",
         "HACK",
@@ -84,7 +54,6 @@
             "gutterIcon": true,
         },
     },
-    "rust-analyzer.showUnlinkedFileNotification": false,
     "files.associations": {
         "*.wasm": "wasm",
         "*.cdl": "spice",
@@ -92,6 +61,5 @@
         "iostream": "cpp",
         "new": "cpp",
         "iosfwd": "cpp"
-    },
-
+    }
 }
