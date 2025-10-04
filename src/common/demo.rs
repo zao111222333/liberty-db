@@ -5,7 +5,7 @@ use crate::{
   Ctx,
   ast::{Attributes, GroupComments, GroupFn, LibertySet, LibertyVec, NamedGroup},
   cell::Statetable,
-  table::TableLookUp2D,
+  table::{OcvSigmaTable, TableLookUp2D},
   timing::{TimingTableLookUp, TimingType},
 };
 use core::fmt::Write;
@@ -35,6 +35,7 @@ pub(crate) struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_cell_fall: Option<TableLookUp2D<C>>,
     ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
+    ocv_sigma_cell_fall: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub cell_fall: Option<TimingTableLookUp<C>>,

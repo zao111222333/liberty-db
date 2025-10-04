@@ -30,6 +30,8 @@ const DEFINED_COMMENT: &str = " /* user defined attribute */";
 
 pub(crate) type RandomState = foldhash::quality::RandomState;
 
+#[deprecated(since = "0.17.0", note = "use `LibertySet<T>`")]
+pub type GroupSet<T> = LibertySet<T>;
 pub type LibertySet<T> = IndexSet<T, RandomState>;
 /// Just `Vec<T>`. (`LibertyVec` is a keyword for macro)
 pub type LibertyVec<T> = Vec<T>;
@@ -78,7 +80,7 @@ pub(crate) trait ParsingSet<C: 'static + Ctx, T: 'static + ParsingBuilder<C>>:
   Sized + Default
 {
   type BuilderSet;
-  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder);
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder, scope: &ParseScope<'_>);
   #[expect(clippy::type_complexity)]
   fn build_set(
     builder: Self::BuilderSet,
@@ -93,7 +95,7 @@ impl<C: 'static + Ctx, T: 'static + Sized + Default + ParsingBuilder<C>> Parsing
   for T
 {
   type BuilderSet = T::Builder;
-  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder) {
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder, _: &ParseScope<'_>) {
     *builder = item;
   }
   fn build_set(
@@ -113,7 +115,11 @@ impl<C: 'static + Ctx, T: 'static + Sized + ParsingBuilder<C>> ParsingSet<C, T>
   for Option<T>
 {
   type BuilderSet = Option<T::Builder>;
-  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder) {
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder, scope: &ParseScope<'_>) {
+    if builder.is_some() {
+      let e = IdError::RepeatAttri;
+      crate::error!("{} error={}", scope.loc, e);
+    }
     *builder = Some(item);
   }
   fn build_set(
@@ -133,7 +139,7 @@ impl<C: 'static + Ctx, T: 'static + Sized + ParsingBuilder<C>> ParsingSet<C, T>
   for Vec<T>
 {
   type BuilderSet = Vec<T::Builder>;
-  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder) {
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder, _: &ParseScope<'_>) {
     builder.push(item);
   }
   fn build_set(
@@ -158,7 +164,7 @@ impl<
 > ParsingSet<C, T> for LibertySet<T>
 {
   type BuilderSet = Vec<T::Builder>;
-  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder) {
+  fn push_set(builder: &mut Self::BuilderSet, item: T::Builder, _: &ParseScope<'_>) {
     builder.push(item);
   }
   fn build_set(

@@ -77,7 +77,7 @@ fn group_field_fn(
           input = new_input;
           match simple_res {
             Ok(simple) => {
-              <#field_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#field_name, simple);
+              <#field_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#field_name, simple, scope);
             },
             Err(undefined) => {
               crate::error!("{} Key={}; Value={:?}",scope.loc,key,undefined);
@@ -100,7 +100,7 @@ fn group_field_fn(
           input = new_input;
           match complex_res {
             Ok(complex) => {
-              <#field_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#field_name, complex);
+              <#field_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#field_name, complex, scope);
             },
             Err((e,undefined)) => {
               crate::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
@@ -125,7 +125,7 @@ fn group_field_fn(
           input = new_input;
           match group_res {
             Ok(_) => {
-              <#field_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#field_name, group_builder);
+              <#field_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#field_name, group_builder, scope);
             },
             Err(e) => {
               crate::error!("{} error={}",scope.loc,e);
@@ -158,11 +158,7 @@ fn group_field_fn(
             input = new_input;
             match group_res {
               Ok(_) => {
-                if let Some(old) = &builder.#sub_name {
-                  let e = crate::ast::IdError::RepeatAttri;
-                  crate::error!("{} error={}",scope.loc, e);
-                }
-                builder.#sub_name = Some(group_builder);
+                <#sub_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#sub_name, group_builder, scope);
               },
               Err(e) => {
                 crate::error!("{} error={}",scope.loc,e);
@@ -174,7 +170,7 @@ fn group_field_fn(
           }
         });
         _builder_field.push(quote! {
-          pub(crate) #sub_name: Option<<#ty as crate::ast::ParsingBuilder<C>>::Builder>,
+          pub(crate) #sub_name: <#sub_type as crate::ast::ParsingSet<C,#ty>>::BuilderSet,
         });
         _build_arm.push(quote! {builder.#sub_name,});
         _builder_init.push(quote! {#sub_name: Default::default(),});

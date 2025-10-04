@@ -11,7 +11,7 @@ pub mod impls;
 pub mod items;
 use crate::{
   Ctx,
-  ast::{Attributes, GroupComments, GroupFn, LibertySet},
+  ast::{Attributes, GroupComments, GroupFn, LibertySet, LibertyVec},
   ccsn::PropagatingCcb,
   common::{
     char_config::CharConfig,
@@ -794,6 +794,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_cell_rise: Option<TableLookUp2D<C>>,
     ocv_std_dev_cell_rise: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_rise: Option<TableLookUp2D<C>>,
+    ocv_sigma_cell_rise: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub cell_rise: Option<TimingTableLookUp<C>>,
@@ -811,6 +812,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_cell_fall: Option<TableLookUp2D<C>>,
     ocv_std_dev_cell_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_cell_fall: Option<TableLookUp2D<C>>,
+    ocv_sigma_cell_fall: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub cell_fall: Option<TimingTableLookUp<C>>,
@@ -819,6 +821,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_rise_transition: Option<TableLookUp2D<C>>,
     ocv_std_dev_rise_transition: Option<TableLookUp2D<C>>,
     ocv_skewness_rise_transition: Option<TableLookUp2D<C>>,
+    ocv_sigma_rise_transition: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub rise_transition: Option<TimingTableLookUp<C>>,
@@ -827,6 +830,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_fall_transition: Option<TableLookUp2D<C>>,
     ocv_std_dev_fall_transition: Option<TableLookUp2D<C>>,
     ocv_skewness_fall_transition: Option<TableLookUp2D<C>>,
+    ocv_sigma_fall_transition: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub fall_transition: Option<TimingTableLookUp<C>>,
@@ -835,6 +839,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_rise_constraint: Option<TableLookUp2D<C>>,
     ocv_std_dev_rise_constraint: Option<TableLookUp2D<C>>,
     ocv_skewness_rise_constraint: Option<TableLookUp2D<C>>,
+    ocv_sigma_rise_constraint: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub rise_constraint: Option<TimingTableLookUp<C>>,
@@ -843,6 +848,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_fall_constraint: Option<TableLookUp2D<C>>,
     ocv_std_dev_fall_constraint: Option<TableLookUp2D<C>>,
     ocv_skewness_fall_constraint: Option<TableLookUp2D<C>>,
+    ocv_sigma_fall_constraint: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub fall_constraint: Option<TimingTableLookUp<C>>,
@@ -851,6 +857,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_retaining_rise: Option<TableLookUp2D<C>>,
     ocv_std_dev_retaining_rise: Option<TableLookUp2D<C>>,
     ocv_skewness_retaining_rise: Option<TableLookUp2D<C>>,
+    ocv_sigma_retaining_rise: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub retaining_rise: Option<TimingTableLookUp<C>>,
@@ -859,6 +866,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_retaining_fall: Option<TableLookUp2D<C>>,
     ocv_std_dev_retaining_fall: Option<TableLookUp2D<C>>,
     ocv_skewness_retaining_fall: Option<TableLookUp2D<C>>,
+    ocv_sigma_retaining_fall: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub retaining_fall: Option<TimingTableLookUp<C>>,
@@ -867,6 +875,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_retain_rise_slew: Option<TableLookUp2D<C>>,
     ocv_std_dev_retain_rise_slew: Option<TableLookUp2D<C>>,
     ocv_skewness_retain_rise_slew: Option<TableLookUp2D<C>>,
+    ocv_sigma_retain_rise_slew: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub retain_rise_slew: Option<TimingTableLookUp<C>>,
@@ -875,6 +884,7 @@ pub struct Timing<C: 'static + Ctx> {
     ocv_mean_shift_retain_fall_slew: Option<TableLookUp2D<C>>,
     ocv_std_dev_retain_fall_slew: Option<TableLookUp2D<C>>,
     ocv_skewness_retain_fall_slew: Option<TableLookUp2D<C>>,
+    ocv_sigma_retain_fall_slew: LibertyVec<OcvSigmaTable<C>>,
   ))]
   #[liberty(after_build = TimingTableLookUp::use_common_template)]
   pub retain_fall_slew: Option<TimingTableLookUp<C>>,
@@ -977,36 +987,6 @@ pub struct Timing<C: 'static + Ctx> {
   #[liberty(group)]
   #[liberty(after_build = CompactCcsTable::use_compact_template)]
   pub compact_ccs_fall: Option<CompactCcsTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_cell_fall: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_cell_rise: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_fall_constraint: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_fall_transition: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_rise_constraint: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_rise_transition: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_retaining_fall: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_retaining_rise: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_retain_fall_slew: LibertySet<OcvSigmaTable<C>>,
-  #[liberty(group)]
-  #[liberty(after_build = OcvSigmaTable::use_common_template)]
-  pub ocv_sigma_retain_rise_slew: LibertySet<OcvSigmaTable<C>>,
 }
 
 impl<C: 'static + Ctx> GroupFn<C> for Timing<C> {
@@ -1548,7 +1528,7 @@ liberty_db::timing::Timing () {
     "#,
       r#"
 liberty_db::timing::Timing () {
-| * LVF LUTs' index mismatch
+| * LVF moments LUTs' index mismatch
 | cell_rise (delay_template_8x8) {
 | | index_1 ("0.0023, 0.0091, 0.0228, 0.0502, 0.105, 0.2145, 0.4335, 0.8715");
 | | index_2 ("0.00015, 0.00059, 0.00148, 0.00325, 0.00679, 0.01388, 0.02805, 0.05639");
@@ -1653,8 +1633,8 @@ liberty_db::timing::Timing () {
     assert_fn(14.0, 42.0, 280.0);
     let assert_lvf_fn = |idx1: f64, idx2: f64, want: f64| {
       assert_eq!(
-        Some(LVFValue { mean: want, std_dev: want, skewness: want }),
-        table.lookup_lvf(&idx1, &idx2)
+        Some(LVFMoments { mean: want, std_dev: want, skewness: want }),
+        table.lookup_lvf_moments(&idx1, &idx2)
       );
     };
     assert_lvf_fn(10.0, 30.0, 100.0);
@@ -1753,8 +1733,8 @@ liberty_db::timing::Timing () {
     assert_fn(14.0, 42.0, 280.0);
     let assert_lvf_fn = |idx1: f64, idx2: f64, want: f64| {
       assert_eq!(
-        Some(LVFValue { mean: want, std_dev: want, skewness: want }),
-        table.lookup_lvf(&idx1, &idx2)
+        Some(LVFMoments { mean: want, std_dev: want, skewness: want }),
+        table.lookup_lvf_moments(&idx1, &idx2)
       );
     };
     assert_lvf_fn(10.0, 30.0, 100.0);

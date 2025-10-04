@@ -55,22 +55,22 @@ fn main() -> ExitCode {
         }
         // remove LVF's LUT
         if let Some(table) = timing.cell_rise.as_mut() {
-          table.lvf_values.clear()
+          table.lvf_moments_values.clear()
         };
         if let Some(table) = timing.cell_fall.as_mut() {
-          table.lvf_values.clear()
+          table.lvf_moments_values.clear()
         };
         if let Some(table) = timing.rise_transition.as_mut() {
-          table.lvf_values.clear()
+          table.lvf_moments_values.clear()
         };
         if let Some(table) = timing.fall_transition.as_mut() {
-          table.lvf_values.clear()
+          table.lvf_moments_values.clear()
         };
         if let Some(table) = timing.rise_constraint.as_mut() {
-          table.lvf_values.clear()
+          table.lvf_moments_values.clear()
         };
         if let Some(table) = timing.fall_constraint.as_mut() {
-          table.lvf_values.clear()
+          table.lvf_moments_values.clear()
         };
       }
     }
