@@ -13,9 +13,9 @@ use crate::{
     TableLookUp2D, TableLookUp2DBuilder,
   },
 };
+use core::iter::zip;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Not as _, Sub};
 use itertools::izip;
-use std::iter::zip;
 use strum::{Display, EnumString};
 /// The `timing_sense` attribute describes the way an input pin logically affects an output pin.
 ///
@@ -215,14 +215,15 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
       Ok(i1_) => {
         match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
           Ok(i_1) => self.get_value(i1_, i_1),
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).and_then(|(i_1, i_2)| {
+          Err(pos2) => {
+            let (i_1, i_2) = Self::find_pos(self.index_2.len(), pos2)?;
             let q_1 = self.get_value(i1_, i_1)?;
             let q_2 = self.get_value(i1_, i_2)?;
             let x_1 = self.index_2[i_1];
             let x_2 = self.index_2[i_2];
             // q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
             Some((q_2 - q_1).mul_add((idx2 - x_1) / (x_2 - x_1), q_1))
-          }),
+          }
         }
       }
       Err(pos1) => {
@@ -236,7 +237,8 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
             // Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
             Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
           }
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).and_then(|(i_1, i_2)| {
+          Err(pos2) => {
+            let (i_1, i_2) = Self::find_pos(self.index_2.len(), pos2)?;
             let q11 = self.get_value(i1_, i_1)?;
             let q12 = self.get_value(i1_, i_2)?;
             let q21 = self.get_value(i2_, i_1)?;
@@ -249,7 +251,7 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
             let q2_ = (q22 - q21).mul_add((idx2 - x_1) / (x_2 - x_1), q21);
             // q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
             Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
-          }),
+          }
         }
       }
     }
@@ -264,14 +266,15 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
       Ok(i1_) => {
         match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
           Ok(i_1) => self.get_lvf_moments_value(i1_, i_1),
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).and_then(|(i_1, i_2)| {
+          Err(pos2) => {
+            let (i_1, i_2) = Self::find_pos(self.index_2.len(), pos2)?;
             let q_1 = self.get_lvf_moments_value(i1_, i_1)?;
             let q_2 = self.get_lvf_moments_value(i1_, i_2)?;
             let x_1 = self.index_2[i_1];
             let x_2 = self.index_2[i_2];
             // q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
             Some((q_2 - q_1).mul_add((idx2 - x_1) / (x_2 - x_1), q_1))
-          }),
+          }
         }
       }
       Err(pos1) => {
@@ -285,7 +288,8 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
             // Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
             Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
           }
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).and_then(|(i_1, i_2)| {
+          Err(pos2) => {
+            let (i_1, i_2) = Self::find_pos(self.index_2.len(), pos2)?;
             let q11 = self.get_lvf_moments_value(i1_, i_1)?;
             let q12 = self.get_lvf_moments_value(i1_, i_2)?;
             let q21 = self.get_lvf_moments_value(i2_, i_1)?;
@@ -298,7 +302,7 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
             let q2_ = (q22 - q21).mul_add((idx2 - x_1) / (x_2 - x_1), q21);
             // q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
             Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
-          }),
+          }
         }
       }
     }
@@ -483,7 +487,7 @@ impl<C: 'static + Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     Vec<<OcvSigmaTable<C> as ParsingBuilder<C>>::Builder>,
   );
   #[inline]
-  #[expect(clippy::float_arithmetic)]
+  #[expect(clippy::float_arithmetic, clippy::too_many_lines)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope<C>) -> Self {
     #[inline]
     fn eq_index<C: 'static + Ctx>(
@@ -494,20 +498,20 @@ impl<C: 'static + Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
         && lhs.index_2 == rhs.index_2
         && lhs.values.inner.len() == rhs.values.inner.len()
     }
+    #[inline]
+    fn ocv_eq_index<C: 'static + Ctx>(
+      lhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
+      rhs: &<OcvSigmaTable<C> as ParsingBuilder<C>>::Builder,
+    ) -> bool {
+      lhs.index_1 == rhs.index_1
+        && lhs.index_2 == rhs.index_2
+        && lhs.values.inner.len() == rhs.values.inner.len()
+    }
     fn obtain_ocv_sigma<C: 'static + Ctx>(
       value: &TableLookUp2DBuilder<C>,
       comments: &mut String,
       ocv_sigma: Vec<OcvSigmaTableBuilder<C>>,
     ) -> Vec<LVFEarlyLate> {
-      #[inline]
-      fn ocv_eq_index<C: 'static + Ctx>(
-        lhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
-        rhs: &<OcvSigmaTable<C> as ParsingBuilder<C>>::Builder,
-      ) -> bool {
-        lhs.index_1 == rhs.index_1
-          && lhs.index_2 == rhs.index_2
-          && lhs.values.inner.len() == rhs.values.inner.len()
-      }
       let mut early = None;
       let mut late = None;
       let mut early_late = None;
@@ -518,9 +522,9 @@ impl<C: 'static + Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
           SigmaType::EarlyAndLate => early_late = Some(table),
         }
       }
-      if let (Some(early), Some(late)) = (early, late) {
-        if ocv_eq_index(value, &early) && ocv_eq_index(value, &late) {
-          zip(early.values.inner, late.values.inner)
+      if let (Some(early_table), Some(late_table)) = (early, late) {
+        if ocv_eq_index(value, &early_table) && ocv_eq_index(value, &late_table) {
+          zip(early_table.values.inner, late_table.values.inner)
             .map(|(early_sigma, late_sigma)| LVFEarlyLate { early_sigma, late_sigma })
             .collect()
         } else {
@@ -528,9 +532,9 @@ impl<C: 'static + Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
           comments.push_str("LVF early_late LUTs' index mismatch");
           Vec::new()
         }
-      } else if let Some(early_late) = early_late {
-        if ocv_eq_index(value, &early_late) {
-          early_late
+      } else if let Some(early_late_table) = early_late {
+        if ocv_eq_index(value, &early_late_table) {
+          early_late_table
             .values
             .inner
             .into_iter()
@@ -548,10 +552,10 @@ impl<C: 'static + Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     let mut comments = String::new();
     match builder {
       (Some(_value), Some(_mean_shift), Some(_std_dev), Some(_skewness), ocv_sigma) => {
-        let valid_lvf_moments = eq_index(&_value, &_mean_shift)
+        let lvf_moments_values = if eq_index(&_value, &_mean_shift)
           && eq_index(&_mean_shift, &_std_dev)
-          && eq_index(&_std_dev, &_skewness);
-        let lvf_moments_values = if valid_lvf_moments {
+          && eq_index(&_std_dev, &_skewness)
+        {
           izip!(
             _value.values.inner.iter(),
             _mean_shift.values.inner,
