@@ -8,8 +8,12 @@ use crate::{
   },
   common::f64_into_hash_ord_fn,
   expression::logic,
-  table::{DisplayTableLookUp, DisplayValues, TableLookUp2D},
+  table::{
+    DisplayTableLookUp, DisplayValues, OcvSigmaTable, OcvSigmaTableBuilder, SigmaType,
+    TableLookUp2D, TableLookUp2DBuilder,
+  },
 };
+use core::iter::zip;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Not as _, Sub};
 use itertools::izip;
 use strum::{Display, EnumString};
@@ -156,13 +160,8 @@ pub struct TimingTableLookUp<C: 'static + Ctx> {
   pub index_1: Vec<f64>,
   pub index_2: Vec<f64>,
   pub values: Vec<f64>,
-  /// when `!lvf_values.is_empty() && lvf_index_1.is_empty()`
-  /// directly use `index_1`
-  pub lvf_index_1: Vec<f64>,
-  /// when `!lvf_values.is_empty() && lvf_index_2.is_empty()`
-  /// directly use `index_1`
-  pub lvf_index_2: Vec<f64>,
-  pub lvf_values: Vec<LVFValue>,
+  pub lvf_moments_values: Vec<LVFMoments>,
+  pub lvf_early_late_values: Vec<LVFEarlyLate>,
 }
 #[expect(
   clippy::similar_names,
@@ -198,12 +197,12 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
     }
   }
   #[inline]
-  fn get_value(&self, ix: usize, iy: usize) -> f64 {
-    self.values[ix * self.index_2.len() + iy]
+  fn get_value(&self, ix: usize, iy: usize) -> Option<f64> {
+    self.values.get(ix * self.index_2.len() + iy).copied()
   }
   #[inline]
-  fn get_lvf_value(&self, ix: usize, iy: usize) -> LVFValue {
-    self.lvf_values[ix * self.index_2.len() + iy]
+  fn get_lvf_moments_value(&self, ix: usize, iy: usize) -> Option<LVFMoments> {
+    self.lvf_moments_values.get(ix * self.index_2.len() + iy).copied()
   }
   /// The linear interpolation & extrapolation
   #[must_use]
@@ -215,15 +214,16 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
     match self.index_1.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx1_)) {
       Ok(i1_) => {
         match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
-          Ok(i_1) => Some(self.get_value(i1_, i_1)),
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
-            let q_1 = self.get_value(i1_, i_1);
-            let q_2 = self.get_value(i1_, i_2);
+          Ok(i_1) => self.get_value(i1_, i_1),
+          Err(pos2) => {
+            let (i_1, i_2) = Self::find_pos(self.index_2.len(), pos2)?;
+            let q_1 = self.get_value(i1_, i_1)?;
+            let q_2 = self.get_value(i1_, i_2)?;
             let x_1 = self.index_2[i_1];
             let x_2 = self.index_2[i_2];
             // q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
-            (q_2 - q_1).mul_add((idx2 - x_1) / (x_2 - x_1), q_1)
-          }),
+            Some((q_2 - q_1).mul_add((idx2 - x_1) / (x_2 - x_1), q_1))
+          }
         }
       }
       Err(pos1) => {
@@ -232,16 +232,17 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
         let x2_ = self.index_1[i2_];
         match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
           Ok(i_1) => {
-            let q1_ = self.get_value(i1_, i_1);
-            let q2_ = self.get_value(i2_, i_1);
+            let q1_ = self.get_value(i1_, i_1)?;
+            let q2_ = self.get_value(i2_, i_1)?;
             // Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
             Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
           }
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
-            let q11 = self.get_value(i1_, i_1);
-            let q12 = self.get_value(i1_, i_2);
-            let q21 = self.get_value(i2_, i_1);
-            let q22 = self.get_value(i2_, i_2);
+          Err(pos2) => {
+            let (i_1, i_2) = Self::find_pos(self.index_2.len(), pos2)?;
+            let q11 = self.get_value(i1_, i_1)?;
+            let q12 = self.get_value(i1_, i_2)?;
+            let q21 = self.get_value(i2_, i_1)?;
+            let q22 = self.get_value(i2_, i_2)?;
             let x_1 = self.index_2[i_1];
             let x_2 = self.index_2[i_2];
             // let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
@@ -249,8 +250,8 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
             // let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
             let q2_ = (q22 - q21).mul_add((idx2 - x_1) / (x_2 - x_1), q21);
             // q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
-            (q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_)
-          }),
+            Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
+          }
         }
       }
     }
@@ -258,21 +259,22 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
   #[must_use]
   #[inline]
   #[expect(clippy::float_arithmetic)]
-  pub fn lookup_lvf(&self, idx1: &f64, idx2: &f64) -> Option<LVFValue> {
+  pub fn lookup_lvf_moments(&self, idx1: &f64, idx2: &f64) -> Option<LVFMoments> {
     let idx1_ = f64_into_hash_ord_fn(idx1);
     let idx2_ = f64_into_hash_ord_fn(idx2);
     match self.index_1.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx1_)) {
       Ok(i1_) => {
         match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
-          Ok(i_1) => Some(self.get_lvf_value(i1_, i_1)),
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
-            let q_1 = self.get_lvf_value(i1_, i_1);
-            let q_2 = self.get_lvf_value(i1_, i_2);
+          Ok(i_1) => self.get_lvf_moments_value(i1_, i_1),
+          Err(pos2) => {
+            let (i_1, i_2) = Self::find_pos(self.index_2.len(), pos2)?;
+            let q_1 = self.get_lvf_moments_value(i1_, i_1)?;
+            let q_2 = self.get_lvf_moments_value(i1_, i_2)?;
             let x_1 = self.index_2[i_1];
             let x_2 = self.index_2[i_2];
             // q_1 + (q_2 - q_1) * ((idx2 - x_1) / (x_2 - x_1))
-            (q_2 - q_1).mul_add((idx2 - x_1) / (x_2 - x_1), q_1)
-          }),
+            Some((q_2 - q_1).mul_add((idx2 - x_1) / (x_2 - x_1), q_1))
+          }
         }
       }
       Err(pos1) => {
@@ -281,16 +283,17 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
         let x2_ = self.index_1[i2_];
         match self.index_2.binary_search_by(|v| f64_into_hash_ord_fn(v).cmp(&idx2_)) {
           Ok(i_1) => {
-            let q1_ = self.get_lvf_value(i1_, i_1);
-            let q2_ = self.get_lvf_value(i2_, i_1);
+            let q1_ = self.get_lvf_moments_value(i1_, i_1)?;
+            let q2_ = self.get_lvf_moments_value(i2_, i_1)?;
             // Some(q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_)))
             Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
           }
-          Err(pos2) => Self::find_pos(self.index_2.len(), pos2).map(|(i_1, i_2)| {
-            let q11 = self.get_lvf_value(i1_, i_1);
-            let q12 = self.get_lvf_value(i1_, i_2);
-            let q21 = self.get_lvf_value(i2_, i_1);
-            let q22 = self.get_lvf_value(i2_, i_2);
+          Err(pos2) => {
+            let (i_1, i_2) = Self::find_pos(self.index_2.len(), pos2)?;
+            let q11 = self.get_lvf_moments_value(i1_, i_1)?;
+            let q12 = self.get_lvf_moments_value(i1_, i_2)?;
+            let q21 = self.get_lvf_moments_value(i2_, i_1)?;
+            let q22 = self.get_lvf_moments_value(i2_, i_2)?;
             let x_1 = self.index_2[i_1];
             let x_2 = self.index_2[i_2];
             // let q1_ = q11 + (q12 - q11) * ((idx2 - x_1) / (x_2 - x_1));
@@ -298,8 +301,8 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
             // let q2_ = q21 + (q22 - q21) * ((idx2 - x_1) / (x_2 - x_1));
             let q2_ = (q22 - q21).mul_add((idx2 - x_1) / (x_2 - x_1), q21);
             // q1_ + (q2_ - q1_) * ((idx1 - x1_) / (x2_ - x1_))
-            (q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_)
-          }),
+            Some((q2_ - q1_).mul_add((idx1 - x1_) / (x2_ - x1_), q1_))
+          }
         }
       }
     }
@@ -308,13 +311,19 @@ impl<C: 'static + Ctx> TimingTableLookUp<C> {
 
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Debug, Default, Clone, Copy)]
-pub struct LVFValue {
+pub struct LVFMoments {
   /// `mean` = `nominal` + `mean_shift`
   pub mean: f64,
   pub std_dev: f64,
   pub skewness: f64,
 }
-impl LVFValue {
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Default, Clone, Copy)]
+pub struct LVFEarlyLate {
+  pub early_sigma: f64,
+  pub late_sigma: f64,
+}
+impl LVFMoments {
   pub const MAX: Self = Self {
     mean: f64::MAX,
     std_dev: f64::MAX,
@@ -377,7 +386,7 @@ impl LVFValue {
     }
   }
 }
-impl PartialEq for LVFValue {
+impl PartialEq for LVFMoments {
   #[inline]
   fn eq(&self, other: &Self) -> bool {
     f64_into_hash_ord_fn(&self.mean) == f64_into_hash_ord_fn(&other.mean)
@@ -386,7 +395,7 @@ impl PartialEq for LVFValue {
   }
 }
 #[expect(clippy::float_arithmetic)]
-impl Add for LVFValue {
+impl Add for LVFMoments {
   type Output = Self;
   #[inline]
   fn add(self, rhs: Self) -> Self::Output {
@@ -398,7 +407,7 @@ impl Add for LVFValue {
   }
 }
 #[expect(clippy::float_arithmetic)]
-impl AddAssign for LVFValue {
+impl AddAssign for LVFMoments {
   #[inline]
   fn add_assign(&mut self, rhs: Self) {
     self.mean += rhs.mean;
@@ -407,7 +416,7 @@ impl AddAssign for LVFValue {
   }
 }
 #[expect(clippy::float_arithmetic)]
-impl Sub for LVFValue {
+impl Sub for LVFMoments {
   type Output = Self;
   #[inline]
   /// TODO: check
@@ -421,7 +430,7 @@ impl Sub for LVFValue {
   }
 }
 #[expect(clippy::float_arithmetic)]
-impl Mul<f64> for LVFValue {
+impl Mul<f64> for LVFMoments {
   type Output = Self;
   #[inline]
   fn mul(self, rhs: f64) -> Self::Output {
@@ -433,7 +442,7 @@ impl Mul<f64> for LVFValue {
   }
 }
 #[expect(clippy::float_arithmetic)]
-impl MulAssign<f64> for LVFValue {
+impl MulAssign<f64> for LVFMoments {
   #[inline]
   fn mul_assign(&mut self, rhs: f64) {
     self.mean *= rhs;
@@ -442,7 +451,7 @@ impl MulAssign<f64> for LVFValue {
   }
 }
 #[expect(clippy::float_arithmetic)]
-impl Div<f64> for LVFValue {
+impl Div<f64> for LVFMoments {
   type Output = Self;
   #[inline]
   fn div(self, rhs: f64) -> Self::Output {
@@ -454,7 +463,7 @@ impl Div<f64> for LVFValue {
   }
 }
 #[expect(clippy::float_arithmetic)]
-impl DivAssign<f64> for LVFValue {
+impl DivAssign<f64> for LVFMoments {
   #[inline]
   fn div_assign(&mut self, rhs: f64) {
     self.mean /= rhs;
@@ -464,7 +473,7 @@ impl DivAssign<f64> for LVFValue {
 }
 
 impl<C: 'static + Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
-  /// `value`, `mean_shift`, `std_dev`, `skewness`
+  /// `value`, `mean_shift`, `std_dev`, `skewness`, `early/late-sigma`
   type Builder = (
     // value
     Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
@@ -474,75 +483,122 @@ impl<C: 'static + Ctx> ParsingBuilder<C> for Option<TimingTableLookUp<C>> {
     Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
     // skewness
     Option<<TableLookUp2D<C> as ParsingBuilder<C>>::Builder>,
+    // early/late sigma
+    Vec<<OcvSigmaTable<C> as ParsingBuilder<C>>::Builder>,
   );
   #[inline]
-  #[expect(clippy::float_arithmetic)]
+  #[expect(clippy::float_arithmetic, clippy::too_many_lines)]
   fn build(builder: Self::Builder, _scope: &mut BuilderScope<C>) -> Self {
     #[inline]
     fn eq_index<C: 'static + Ctx>(
       lhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
       rhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
     ) -> bool {
-      lhs.index_1 == rhs.index_1 && lhs.index_2 == rhs.index_2
+      lhs.index_1 == rhs.index_1
+        && lhs.index_2 == rhs.index_2
+        && lhs.values.inner.len() == rhs.values.inner.len()
     }
-    let out: TimingTableLookUp<C> = match builder {
-      (Some(_value), Some(_mean_shift), Some(_std_dev), Some(_skewness)) => {
-        let lvf_nomial_same_index = eq_index(&_value, &_mean_shift);
-        let valid_lvf_index =
-          eq_index(&_mean_shift, &_std_dev) && eq_index(&_std_dev, &_skewness);
-        let (lvf_values, comments) = if valid_lvf_index {
-          (
-            izip!(
-              _value.values.inner.iter(),
-              _mean_shift.values.inner,
-              _std_dev.values.inner,
-              _skewness.values.inner
-            )
-            .map(|(value, mean_shift, std_dev, skewness)| {
-              let mean = value + mean_shift;
-              LVFValue { mean, std_dev, skewness }
-            })
-            .collect(),
-            String::new(),
-          )
+    #[inline]
+    fn ocv_eq_index<C: 'static + Ctx>(
+      lhs: &<TableLookUp2D<C> as ParsingBuilder<C>>::Builder,
+      rhs: &<OcvSigmaTable<C> as ParsingBuilder<C>>::Builder,
+    ) -> bool {
+      lhs.index_1 == rhs.index_1
+        && lhs.index_2 == rhs.index_2
+        && lhs.values.inner.len() == rhs.values.inner.len()
+    }
+    fn obtain_ocv_sigma<C: 'static + Ctx>(
+      value: &TableLookUp2DBuilder<C>,
+      comments: &mut String,
+      ocv_sigma: Vec<OcvSigmaTableBuilder<C>>,
+    ) -> Vec<LVFEarlyLate> {
+      let mut early = None;
+      let mut late = None;
+      let mut early_late = None;
+      for table in ocv_sigma {
+        match table.sigma_type {
+          SigmaType::Early => early = Some(table),
+          SigmaType::Late => late = Some(table),
+          SigmaType::EarlyAndLate => early_late = Some(table),
+        }
+      }
+      if let (Some(early_table), Some(late_table)) = (early, late) {
+        if ocv_eq_index(value, &early_table) && ocv_eq_index(value, &late_table) {
+          zip(early_table.values.inner, late_table.values.inner)
+            .map(|(early_sigma, late_sigma)| LVFEarlyLate { early_sigma, late_sigma })
+            .collect()
         } else {
-          crate::error!("LVF LUTs' index mismatch");
-          (Vec::new(), String::from("LVF LUTs' index mismatch"))
+          crate::error!("LVF early_late LUTs' index mismatch");
+          comments.push_str("LVF early_late LUTs' index mismatch");
+          Vec::new()
+        }
+      } else if let Some(early_late_table) = early_late {
+        if ocv_eq_index(value, &early_late_table) {
+          early_late_table
+            .values
+            .inner
+            .into_iter()
+            .map(|sigma| LVFEarlyLate { early_sigma: sigma, late_sigma: sigma })
+            .collect()
+        } else {
+          crate::error!("LVF early_late LUTs' index mismatch");
+          comments.push_str("LVF early_late LUTs' index mismatch");
+          Vec::new()
+        }
+      } else {
+        Vec::new()
+      }
+    }
+    let mut comments = String::new();
+    match builder {
+      (Some(_value), Some(_mean_shift), Some(_std_dev), Some(_skewness), ocv_sigma) => {
+        let lvf_moments_values = if eq_index(&_value, &_mean_shift)
+          && eq_index(&_mean_shift, &_std_dev)
+          && eq_index(&_std_dev, &_skewness)
+        {
+          izip!(
+            _value.values.inner.iter(),
+            _mean_shift.values.inner,
+            _std_dev.values.inner,
+            _skewness.values.inner
+          )
+          .map(|(value, mean_shift, std_dev, skewness)| {
+            let mean = value + mean_shift;
+            LVFMoments { mean, std_dev, skewness }
+          })
+          .collect()
+        } else {
+          crate::error!("LVF moments LUTs' index mismatch");
+          comments.push_str("LVF moments LUTs' index mismatch");
+          Vec::new()
         };
-        TimingTableLookUp {
+        let lvf_early_late_values = obtain_ocv_sigma(&_value, &mut comments, ocv_sigma);
+        Some(TimingTableLookUp {
           extra_ctx: C::Table::default(),
           name: _value.name,
           comments,
           index_1: _value.index_1,
           index_2: _value.index_2,
           values: _value.values.inner,
-          lvf_index_1: if lvf_nomial_same_index {
-            Vec::new()
-          } else {
-            _mean_shift.index_1
-          },
-          lvf_index_2: if lvf_nomial_same_index {
-            Vec::new()
-          } else {
-            _mean_shift.index_2
-          },
-          lvf_values,
-        }
+          lvf_moments_values,
+          lvf_early_late_values,
+        })
       }
-      (Some(_value), None, None, None) => TimingTableLookUp {
-        extra_ctx: C::Table::default(),
-        name: _value.name,
-        comments: String::new(),
-        index_1: _value.index_1,
-        index_2: _value.index_2,
-        values: _value.values.inner,
-        lvf_index_1: Vec::new(),
-        lvf_index_2: Vec::new(),
-        lvf_values: Vec::new(),
-      },
-      _ => return None,
-    };
-    Some(out)
+      (Some(_value), None, None, None, ocv_sigma) => {
+        let lvf_early_late_values = obtain_ocv_sigma(&_value, &mut comments, ocv_sigma);
+        Some(TimingTableLookUp {
+          extra_ctx: C::Table::default(),
+          name: _value.name,
+          comments,
+          index_1: _value.index_1,
+          index_2: _value.index_2,
+          values: _value.values.inner,
+          lvf_moments_values: Vec::new(),
+          lvf_early_late_values,
+        })
+      }
+      _ => None,
+    }
   }
 }
 impl<C: 'static + Ctx> ParsingBuilder<C> for TimingTableLookUp<C> {
@@ -567,6 +623,7 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
       name: &self.name,
       index_1: &self.index_1,
       index_2: &self.index_2,
+      sigma_type: None,
       values: DisplayValues {
         len,
         chunk_size,
@@ -574,42 +631,70 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
       },
     }
     .fmt_self::<_, _, C>("", key, f)?;
-    if !self.lvf_values.is_empty() {
-      let mismatch_index = !self.lvf_index_1.is_empty();
+    if !self.lvf_moments_values.is_empty() {
       DisplayTableLookUp {
         name: &self.name,
-        index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
-        index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
+        index_1: &self.index_1,
+        index_2: &self.index_2,
+        sigma_type: None,
         values: DisplayValues {
           len,
           chunk_size,
-          inner: izip!(self.values.iter(), self.lvf_values.iter())
+          inner: izip!(self.values.iter(), self.lvf_moments_values.iter())
             .map(|(value, lvf)| lvf.mean - value),
         },
       }
       .fmt_self::<_, _, C>("ocv_mean_shift_", key, f)?;
       DisplayTableLookUp {
         name: &self.name,
-        index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
-        index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
+        index_1: &self.index_1,
+        index_2: &self.index_2,
+        sigma_type: None,
         values: DisplayValues {
           len,
           chunk_size,
-          inner: self.lvf_values.iter().map(|lvf| lvf.std_dev),
+          inner: self.lvf_moments_values.iter().map(|lvf| lvf.std_dev),
         },
       }
       .fmt_self::<_, _, C>("ocv_std_dev_", key, f)?;
       DisplayTableLookUp {
         name: &self.name,
-        index_1: if mismatch_index { &self.lvf_index_1 } else { &self.index_1 },
-        index_2: if mismatch_index { &self.lvf_index_2 } else { &self.index_2 },
+        index_1: &self.index_1,
+        index_2: &self.index_2,
+        sigma_type: None,
         values: DisplayValues {
           len,
           chunk_size,
-          inner: self.lvf_values.iter().map(|lvf| lvf.skewness),
+          inner: self.lvf_moments_values.iter().map(|lvf| lvf.skewness),
         },
       }
       .fmt_self::<_, _, C>("ocv_skewness_", key, f)?;
+    }
+    if !self.lvf_early_late_values.is_empty() {
+      DisplayTableLookUp {
+        name: &self.name,
+        index_1: &self.index_1,
+        index_2: &self.index_2,
+        sigma_type: Some(SigmaType::Early),
+        values: DisplayValues {
+          len,
+          chunk_size,
+          inner: self.lvf_early_late_values.iter().map(|lvf| lvf.early_sigma),
+        },
+      }
+      .fmt_self::<_, _, C>("ocv_sigma_", key, f)?;
+      DisplayTableLookUp {
+        name: &self.name,
+        index_1: &self.index_1,
+        index_2: &self.index_2,
+        sigma_type: Some(SigmaType::Late),
+        values: DisplayValues {
+          len,
+          chunk_size,
+          inner: self.lvf_early_late_values.iter().map(|lvf| lvf.late_sigma),
+        },
+      }
+      .fmt_self::<_, _, C>("ocv_sigma_", key, f)?;
     }
     Ok(())
   }

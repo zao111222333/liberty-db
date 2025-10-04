@@ -2,7 +2,7 @@ use crate::{
   Ctx,
   ast::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    LibertySet, LibertyVec, ParseScope,
+    LibertySet, LibertyVec, ParseScope, SimpleAttri,
   },
 };
 #[cfg(feature = "lut_template")]
@@ -777,7 +777,6 @@ pub struct OcvSigmaTable<C: 'static + Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-add_use_common_template!(OcvSigmaTable);
 /// The `compact_ccs_rise`  and `compact_ccs_fall`  groups define the compact CCS timing data in the timing arc.
 ///
 /// <a name ="reference_link" href="
@@ -1021,6 +1020,7 @@ pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = f64>> {
   pub(crate) name: &'a String,
   pub(crate) index_1: &'a Vec<f64>,
   pub(crate) index_2: &'a Vec<f64>,
+  pub(crate) sigma_type: Option<SigmaType>,
   pub(crate) values: DisplayValues<V>,
 }
 
@@ -1038,6 +1038,9 @@ impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
     ast::NameAttri::fmt_self(self.name, f)?;
     write!(f, ") {{")?;
     f.indent();
+    if let Some(sigma_type) = self.sigma_type {
+      SimpleAttri::<C>::fmt_liberty(&sigma_type, "sigma_type", f)?;
+    }
     ComplexAttri::<C>::fmt_liberty(self.index_1, "index_1", f)?;
     ComplexAttri::<C>::fmt_liberty(self.index_2, "index_2", f)?;
     if self.values.len > 0 {
