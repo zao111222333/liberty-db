@@ -562,19 +562,15 @@ fn main() {
   println!("{}", out)
 }
 fn extract_type(ty: &Type) -> &Type {
-  if let Type::Path(type_path) = ty {
-    if let Some(last_segment) = type_path.path.segments.last() {
-      if last_segment.ident == "Option"
-        || last_segment.ident == "LibertyVec"
-        || last_segment.ident == "LibertySet"
-      {
-        if let PathArguments::AngleBracketed(ref args) = last_segment.arguments {
-          if let Some(GenericArgument::Type(inner_type)) = args.args.first() {
-            return inner_type;
-          }
-        }
-      }
-    }
+  if let Type::Path(type_path) = ty
+    && let Some(last_segment) = type_path.path.segments.last()
+    && (last_segment.ident == "Option"
+      || last_segment.ident == "LibertyVec"
+      || last_segment.ident == "LibertySet")
+    && let PathArguments::AngleBracketed(ref args) = last_segment.arguments
+    && let Some(GenericArgument::Type(inner_type)) = args.args.first()
+  {
+    return inner_type;
   }
   ty
 }

@@ -207,8 +207,8 @@ pub(crate) fn parse_field_attrs(
   field_attrs: &[syn::Attribute],
 ) -> syn::Result<Option<FieldType>> {
   for attri in field_attrs.iter() {
-    if let Some(seg_title) = attri.path().segments.first() {
-      if "liberty" == &seg_title.ident.to_string() {
+    if let Some(seg_title) = attri.path().segments.first()
+      && "liberty" == &seg_title.ident.to_string() {
         if let syn::Meta::List(list) = &attri.meta {
           let mut tokens: proc_macro2::token_stream::IntoIter =
             list.tokens.clone().into_iter();
@@ -266,7 +266,6 @@ pub(crate) fn parse_field_attrs(
           ));
         }
       }
-    }
   }
   Ok(None)
 }

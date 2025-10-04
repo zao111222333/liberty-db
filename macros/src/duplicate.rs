@@ -98,8 +98,8 @@ impl Parse for Args {
 fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
   let mut configs = Vec::new();
   for attr in attrs {
-    if attr.path().is_ident("duplicated") {
-      if let syn::Meta::List(list) = &attr.meta {
+    if attr.path().is_ident("duplicated")
+      && let syn::Meta::List(list) = &attr.meta {
         let tokens: proc_macro2::token_stream::IntoIter = list.tokens.clone().into_iter();
         let args: Args = syn::parse2(tokens.clone().collect())?;
 
@@ -173,7 +173,6 @@ fn attrs_config(attrs: &[Attribute]) -> syn::Result<Vec<Config>> {
           exclude_group,
         });
       }
-    }
   }
 
   Ok(configs)

@@ -171,7 +171,6 @@ pub struct TimingTableLookUp<C: 'static + Ctx> {
 )]
 impl<C: 'static + Ctx> TimingTableLookUp<C> {
   #[inline]
-  #[expect(clippy::needless_pass_by_ref_mut)]
   pub(crate) fn use_common_template(
     table: &mut Option<Self>,
     scope: &mut BuilderScope<C>,

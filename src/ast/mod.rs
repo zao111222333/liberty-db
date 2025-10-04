@@ -56,6 +56,7 @@ pub(crate) struct BuilderScope<C: 'static + Ctx> {
 pub(crate) trait ParsingBuilder<C: 'static + Ctx>: Sized {
   type Builder;
   fn build(builder: Self::Builder, scope: &mut BuilderScope<C>) -> Self;
+  #[expect(clippy::type_complexity)]
   fn build_full(
     mut builder: Self::Builder,
     scope: &mut BuilderScope<C>,
@@ -78,6 +79,7 @@ pub(crate) trait ParsingSet<C: 'static + Ctx, T: 'static + ParsingBuilder<C>>:
 {
   type BuilderSet;
   fn push_set(builder: &mut Self::BuilderSet, item: T::Builder);
+  #[expect(clippy::type_complexity)]
   fn build_set(
     builder: Self::BuilderSet,
     scope: &mut BuilderScope<C>,

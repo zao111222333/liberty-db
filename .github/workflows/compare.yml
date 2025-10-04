@@ -10,7 +10,6 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_VERSION: "1.88.0"
 
 jobs:
   compare-and-report:
@@ -30,8 +29,6 @@ jobs:
           repository: ${{ github.event.pull_request.base.repo.full_name }}
           path: base_branch
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: ${{ env.RUST_VERSION }}
       - name: Build commit URLs
         id: buildurl
         run: |
