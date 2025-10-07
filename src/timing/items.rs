@@ -323,12 +323,92 @@ pub struct LVFEarlyLate {
   pub early_sigma: f64,
   pub late_sigma: f64,
 }
+#[expect(clippy::float_arithmetic)]
 impl LVFMoments {
-  pub const MAX: Self = Self {
-    mean: f64::MAX,
-    std_dev: f64::MAX,
-    skewness: f64::MAX,
-  };
+  /// Cornish–Fisher:
+  /// `quantile ≈ μ + σ[ z + γ*​​(z^2−1)/6 − γ^2*​​(2*z^3−5*z)/36 ]`
+  const Z: f64 = 3.0;
+  const TMP1: f64 = (Self::Z * Self::Z - 1.0) / 6.0;
+  const TMP2: f64 = (2.0 * Self::Z * Self::Z * Self::Z - 5.0 * Self::Z) / 36.0;
+  #[inline]
+  #[must_use]
+  #[deprecated = "TODO"]
+  /// `q+ ​​= μ + σ[ z + γ*TMP1 − γ^2*TMP2 ] = z*late_sigma - nominal`
+  ///
+  /// `​q− = μ + σ[−z + γ*TMP1 + γ^2*TMP2 ] = nominal - z*early_sigma`
+  pub const fn to_early_late(&self, nominal: f64) -> Option<LVFEarlyLate> {
+    if !(self.std_dev >= 0.0
+      && nominal.is_finite()
+      && self.mean.is_finite()
+      && self.std_dev.is_finite()
+      && self.skewness.is_finite())
+    {
+      return None;
+    }
+    let quantile_plus_3sigma = self.mean
+      + self.std_dev
+        * (self.skewness * Self::TMP1 + Self::Z
+          - self.skewness * self.skewness * Self::TMP2);
+    let quantile_minus_3sigma = self.mean
+      + self.std_dev
+        * (self.skewness * Self::TMP1 - Self::Z
+          + self.skewness * self.skewness * Self::TMP2);
+    Some(LVFEarlyLate {
+      early_sigma: (nominal - quantile_minus_3sigma) / Self::Z,
+      late_sigma: (quantile_plus_3sigma - nominal) / Self::Z,
+    })
+  }
+}
+
+#[expect(clippy::float_arithmetic)]
+impl LVFEarlyLate {
+  /// `q+ ​​= μ + σ[ z + γ*TMP1 − γ^2*TMP2 ] = z*late_sigma - nominal`
+  ///
+  /// `​q− = μ + σ[−z + γ*TMP1 + γ^2*TMP2 ] = nominal - z*early_sigma`
+  ///
+  /// `Δ = q+ - q- = z*(early_sigma+late_sigma) - 2*nominal`
+  ///
+  /// `a = (q+ + q-)/2 = z*(late_sigma-early_sigma)/2`
+  #[inline]
+  #[must_use]
+  #[expect(clippy::suboptimal_flops)]
+  #[deprecated = "TODO"]
+  pub fn to_moments(&self, nominal: f64, mean: f64) -> Option<LVFMoments> {
+    if !(self.early_sigma >= 0.0
+      && self.late_sigma >= 0.0
+      && nominal.is_finite()
+      && mean.is_finite()
+      && self.early_sigma.is_finite()
+      && self.late_sigma.is_finite())
+    {
+      return None;
+    }
+
+    let delta = LVFMoments::Z * (self.early_sigma + self.late_sigma) - 2.0 * nominal;
+    let a = LVFMoments::Z * (self.late_sigma - self.early_sigma) / 2.0;
+    let a_minus_mean = a - mean;
+
+    // K = 2*TMP2*(a-mean)^2 / TMP1^2
+    let k = 2.0 * LVFMoments::TMP2 * a_minus_mean * a_minus_mean
+      / (LVFMoments::TMP1 * LVFMoments::TMP1);
+
+    // disc = delta^2 + 8*Z*k
+    let disc = delta * delta + 8.0 * LVFMoments::Z * k;
+    if !disc.is_finite() {
+      return None;
+    }
+    let std_dev = (delta + disc.sqrt()) / (4.0 * LVFMoments::Z);
+    if !(std_dev.is_finite() && std_dev >= 0.0) {
+      return None;
+    } // skewness=0 when std_dev==0
+    let skewness =
+      if std_dev > 0.0 { a_minus_mean / (std_dev * LVFMoments::TMP1) } else { 0.0 };
+
+    Some(LVFMoments { mean, std_dev, skewness })
+  }
+}
+
+impl LVFMoments {
   /// PeBay/West one-pass estimations
   /// <https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online>
   #[inline]
@@ -416,6 +496,14 @@ impl AddAssign for LVFMoments {
   }
 }
 #[expect(clippy::float_arithmetic)]
+impl AddAssign for LVFEarlyLate {
+  #[inline]
+  fn add_assign(&mut self, rhs: Self) {
+    self.early_sigma += rhs.early_sigma;
+    self.late_sigma += rhs.late_sigma;
+  }
+}
+#[expect(clippy::float_arithmetic)]
 impl Sub for LVFMoments {
   type Output = Self;
   #[inline]
@@ -469,6 +557,14 @@ impl DivAssign<f64> for LVFMoments {
     self.mean /= rhs;
     self.std_dev /= rhs;
     self.skewness /= rhs;
+  }
+}
+#[expect(clippy::float_arithmetic)]
+impl DivAssign<f64> for LVFEarlyLate {
+  #[inline]
+  fn div_assign(&mut self, rhs: f64) {
+    self.early_sigma /= rhs;
+    self.late_sigma /= rhs;
   }
 }
 
@@ -709,3 +805,25 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
 }
 
 impl<C: 'static + Ctx> Group<C> for TimingTableLookUp<C> {}
+
+#[cfg(test)]
+mod test {
+  use super::{LVFEarlyLate, LVFMoments};
+
+  #[test]
+  #[expect(deprecated)]
+  fn lvf_convert() {
+    let nominal = 0.5065;
+    let mean_shift = 0.005352;
+    let std_dev = 0.04952;
+    let skewness = 0.03483;
+    let early_sigma = 0.0422;
+    let late_sigma = 0.0624;
+    let mean = nominal + mean_shift;
+    let moments = LVFMoments { mean, std_dev, skewness };
+    let early_late = LVFEarlyLate { early_sigma, late_sigma };
+    dbg!(moments.to_early_late(nominal));
+    dbg!(moments.to_early_late(nominal).unwrap().to_moments(nominal, mean));
+    dbg!(early_late.to_moments(nominal, mean));
+  }
+}
