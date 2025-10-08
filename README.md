@@ -14,12 +14,11 @@ Fully defined liberty (std. cells in VLSI) data structure, efficient parser & fo
 
 ## Highlight Features
 
-+ Support all `liberty` attributes with typed datastructure, rather than syntax tree (AST) only, in the definition of [Liberty Version R-2020.09, September 2020](https://zao111222333.github.io/liberty-db/2020.09/reference_manual.pdf)
++ Support all [Liberty Version R-2020.09, September 2020](https://zao111222333.github.io/liberty-db/2020.09/reference_manual.pdf) data-structures, rather than syntax tree (AST) only.
++ High preformance: [example1](examples/1_parse_fmt_file.rs) requires 45s parsing time & 20s writing time, for processing 5M lines (5GB in size) tsmc 5nm ccsp .lib file.
++ Tiny binary size: ~6MB parser & formatter ([example1](examples/1_parse_fmt_file.rs)).
 + Support [`liberty` boolean expression syntax](https://docs.rs/liberty-db/latest/liberty_db/expression/struct.BddBooleanExpression.html), use [binary decesion diagram (BDD)](https://github.com/sybila/biodivine-lib-bdd) to identify (hashing)
-+ Parser & formatter are implemented by static macros, providing a good preformance and tiny ~5MB `parser & formatter` binary. See [benchmark summary](https://zao111222333.github.io/liberty-db/bench)
-+ Support generics [user-defined context](https://docs.rs/liberty-db/latest/liberty_db/trait.Ctx.html) for library, cell, and more.
-+ Support `define define_group` user-defined attributes
-+ Verified with library-complier, well defined [document](https://docs.rs/liberty-db/latest/liberty_db/library/struct.Library.html), and [examples](examples) provided
++ Verified with library-complier, well defined [document](https://docs.rs/liberty-db/latest/liberty_db/library/struct.Library.html), and [examples](examples).
 
 ## Usage
 
