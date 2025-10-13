@@ -708,9 +708,11 @@ pub(crate) fn title<'a>(
       char(')'),
       comment_space_newline,
       char('{'),
+      space,
+      opt(char('\\')),
       comment_space_newline,
     ),
-    |(_, _, _, v, _, _, _, _, n)| {
+    |(_, _, _, v, _, _, _, _, _, _, n)| {
       *line_num += n;
       v
     },

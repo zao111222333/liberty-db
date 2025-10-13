@@ -2,7 +2,7 @@ use liberty_db::{DefaultCtx, Library};
 use std::{env, path::Path, process::ExitCode, time::Instant};
 
 const PROFILE: bool = false;
-// cargo run /path/to/xxx.lib
+// cargo run --example 1_parse_fmt_file -- /path/to/xxx.lib
 // Use the first arg as input file name,
 // parse it, and then write it into example1_xxx.lib
 fn main() -> ExitCode {

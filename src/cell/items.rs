@@ -307,6 +307,24 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 |          L   -  - : - : N";
 }"#,
     );
+    _ = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
+      r#"("CLK ENA SE", "IQ") { \
+        table : "L L L : - : L , \
+                 L L H : - : H ,\
+                 L H L : - : H ,\
+                 L H H : - : H ,\
+                 H - - : - : N ";
+     }
+  "#,
+      r#"
+liberty_db::cell::items::Statetable ("CLK ENA SE", IQ) {
+| table : "L L L : - : L ,\
+|          L L H : - : H ,\
+|          L H L : - : H ,\
+|          L H H : - : H ,\
+|          H - - : - : N";
+}"#,
+    );
   }
 }
 
