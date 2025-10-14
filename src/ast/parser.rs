@@ -82,7 +82,7 @@ pub(crate) fn space1(i: &str) -> IResult<&str, ()> {
   map(take_while1(|c| matches!(c, '\t' | '\r' | ' ')), |_| ()).parse_complete(i)
 }
 #[inline]
-fn space_newline(i: &str) -> IResult<&str, usize> {
+pub(crate) fn space_newline(i: &str) -> IResult<&str, usize> {
   map(take_while(|c| matches!(c, '\t' | '\n' | '\r' | ' ')), |s: &str| {
     s.chars().filter(|&x| x == '\n').count()
   })
@@ -300,30 +300,6 @@ pub(crate) fn word(i: &str) -> IResult<&str, &str> {
   take_while1(char_in_word)(i)
 }
 
-#[inline]
-pub(crate) fn simple_multi<'a>(
-  i: &'a str,
-  line_num: &mut usize,
-) -> IResult<&'a str, &'a str> {
-  map(
-    (
-      space,
-      char(':'),
-      space,
-      char('"'),
-      take_while(move |c| c != '"'),
-      take(1_usize),
-      space,
-      char(';'),
-      comment_space_newline,
-    ),
-    |(_, _, _, _, s, _, _, _, n)| {
-      *line_num += n + s.chars().filter(|&x| x == '\n').count();
-      s
-    },
-  )
-  .parse_complete(i)
-}
 #[inline]
 pub(crate) fn simple_custom<'a, T>(
   i: &'a str,

@@ -15,6 +15,7 @@ use core::{
   hash::Hash,
   str::FromStr,
 };
+use strum::{Display, EnumString};
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=199.5&end=199.6
@@ -219,51 +220,142 @@ impl<C: 'static + Ctx> NamedGroup<C> for Statetable<C> {
 #[derive(Default, Debug, Clone)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Table {
-  pub v: Vec<String>,
+  pub inner: Vec<TableNodeValues>,
+}
+#[derive(Default, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct TableNodeValues {
+  pub input_node_values: Vec<InputNodeValue>,
+  pub current_next_internal_node_values:
+    Vec<(CurrentInternalNodeValue, NextInternalNodeValue)>,
 }
 
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=142.4&end=142.17
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString, Hash, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum InputNodeValue {
+  /// Low
+  #[strum(serialize = " L ")]
+  L,
+  /// High
+  #[strum(serialize = " H ")]
+  H,
+  /// Don't care
+  #[strum(serialize = " - ")]
+  DontCare,
+  /// Expands to both L and H
+  #[strum(serialize = "L/H")]
+  LH,
+  /// Expands to both H and L
+  #[strum(serialize = "H/L")]
+  HL,
+  /// Rising edge (from low to high)
+  #[strum(serialize = " R ")]
+  R,
+  /// Falling edge (from high to low)
+  #[strum(serialize = " F ")]
+  F,
+  /// Not rising edge
+  #[strum(serialize = "~R ")]
+  NotR,
+  /// Not falling edge
+  #[strum(serialize = "~F ")]
+  NotF,
+}
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=142.4&end=142.17
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString, Hash, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum CurrentInternalNodeValue {
+  /// Low
+  #[strum(serialize = " L ")]
+  L,
+  /// High
+  #[strum(serialize = " H ")]
+  H,
+  /// Don't care
+  #[strum(serialize = " - ")]
+  DontCare,
+  /// Expands to both L and H
+  #[strum(serialize = "L/H")]
+  LH,
+  /// Expands to both H and L
+  #[strum(serialize = "H/L")]
+  HL,
+}
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=142.18&end=142.33
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString, Hash, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum NextInternalNodeValue {
+  /// Low
+  #[strum(serialize = " L ")]
+  L,
+  /// High
+  #[strum(serialize = " H ")]
+  H,
+  /// Output is not specified
+  #[strum(serialize = " - ")]
+  NotSpecified,
+  /// Expands to both L and H
+  #[strum(serialize = "L/H")]
+  LH,
+  /// Expands to both H and L
+  #[strum(serialize = "H/L")]
+  HL,
+  /// Unknown
+  #[strum(serialize = " X ")]
+  X,
+  /// No event from current value. Hold.
+  /// Use only when all asynchronous inputs and clocks are inactive
+  #[strum(serialize = " N ")]
+  N,
+}
+impl fmt::Display for TableNodeValues {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    for v in &self.input_node_values {
+      write!(f, "{v} ")?;
+    }
+    write!(f, ": ")?;
+    for (v, _) in &self.current_next_internal_node_values {
+      write!(f, "{v} ")?;
+    }
+    write!(f, ":")?;
+    for (_, v) in &self.current_next_internal_node_values {
+      write!(f, " {v}")?;
+    }
+    Ok(())
+  }
+}
 impl fmt::Display for Table {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    fmt::Debug::fmt(&self.v, f)
+    fmt::Debug::fmt(&self.inner, f)
   }
 }
 
-impl FromStr for Table {
-  type Err = fmt::Error;
-  /// To prevent syntax errors, the line continuation character
-  /// must be followed immediately by the next line character.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.18&end=141.21
-  /// ">Reference</a>
-  #[inline]
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
-    Ok(Self {
-      v: s
-        .split("\\\n")
-        .filter_map(|line| {
-          let _l = line
-            .trim_start()
-            .trim_end_matches(|c: char| c == ',' || c.is_ascii_whitespace());
-          if _l.is_empty() { None } else { Some(String::from(_l)) }
-        })
-        .collect(),
-    })
-  }
-}
 crate::ast::impl_self_builder!(Table);
 impl<C: 'static + Ctx> SimpleAttri<C> for Table {
   #[inline]
   fn is_set(&self) -> bool {
-    !self.v.is_empty()
+    !self.inner.is_empty()
   }
   #[inline]
+  #[expect(clippy::arithmetic_side_effects)]
   fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> SimpleParseRes<'a, Self> {
-    let (input, simple_multi) =
-      crate::ast::parser::simple_multi(i, &mut scope.loc.line_num)?;
-    simple_multi
-      .parse()
-      .map_or(Ok((input, Err(String::from(simple_multi)))), |s| Ok((input, Ok(s))))
+    if let Ok((input, (line_num, table))) = Self::parse(i) {
+      scope.loc.line_num += line_num;
+      Ok((input, Ok(table)))
+    } else {
+      let (input, simple_multi) =
+        super::parser::simple_multi(i, &mut scope.loc.line_num)?;
+      Ok((input, Err(String::from(simple_multi))))
+    }
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
@@ -271,11 +363,11 @@ impl<C: 'static + Ctx> SimpleAttri<C> for Table {
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
     join_fmt(
-      self.v.iter(),
+      self.inner.iter(),
       f,
       |i, ff| write!(ff, "{i}"),
       |ff| {
-        write!(ff, " ,\\")?;
+        write!(ff, ",\\")?;
         ff.write_new_line_indentation()?;
         write!(ff, "         ")
       },
@@ -285,11 +377,14 @@ impl<C: 'static + Ctx> SimpleAttri<C> for Table {
 
 #[cfg(test)]
 mod test_statetable {
+  use dev_utils::init_logger;
+
   use super::*;
   use crate::DefaultCtx;
   #[test]
   fn statetable_test() {
-    _ = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
+    init_logger();
+    let statetable = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
       r#"(" CLK EN SE",ENL) {
         table : "	H   L  L : - : L ,\
         H   L  H : - : H ,\
@@ -300,11 +395,31 @@ mod test_statetable {
   "#,
       r#"
 liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
-| table : "H   L  L : - : L ,\
-|          H   L  H : - : H ,\
-|          H   H  L : - : H ,\
-|          H   H  H : - : H ,\
-|          L   -  - : - : N";
+| table : " H   L   L  :  -  :  L ,\
+|           H   L   H  :  -  :  H ,\
+|           H   H   L  :  -  :  H ,\
+|           H   H   H  :  -  :  H ,\
+|           L   -   -  :  -  :  N ";
+}"#,
+    );
+    dbg!(statetable.table);
+    _ = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
+      r#"(" CLK EN SE",ENL) {
+        table : "	H   L  L \
+        : - : L ,\
+        H   L  H : - : H ,\
+        H   H  L : - : H ,\
+        H   H  H : - : H ,\
+        L   -  - : - : N ";
+    }
+  "#,
+      r#"
+liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
+| table : " H   L   L  :  -  :  L ,\
+|           H   L   H  :  -  :  H ,\
+|           H   H   L  :  -  :  H ,\
+|           H   H   H  :  -  :  H ,\
+|           L   -   -  :  -  :  N ";
 }"#,
     );
     _ = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
@@ -318,11 +433,29 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
   "#,
       r#"
 liberty_db::cell::items::Statetable ("CLK ENA SE", IQ) {
-| table : "L L L : - : L ,\
-|          L L H : - : H ,\
-|          L H L : - : H ,\
-|          L H H : - : H ,\
-|          H - - : - : N";
+| table : " L   L   L  :  -  :  L ,\
+|           L   L   H  :  -  :  H ,\
+|           L   H   L  :  -  :  H ,\
+|           L   H   H  :  -  :  H ,\
+|           H   -   -  :  -  :  N ";
+}"#,
+    );
+    _ = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
+      r#"(" D CP CPN", "MQ SQ") {
+        table : " H/L R ~F : - - : H/L N,\
+        -  ~R F : H/L - : N H/L,\
+        H/L R F : L - : H/L L,\
+        H/L R F : H - : H/L H,\
+        -  ~R ~F : - - : N N";
+        }
+  "#,
+      r#"
+liberty_db::cell::items::Statetable ("D CP CPN", "MQ SQ") {
+| table : "H/L  R  ~F  :  -   -  : H/L  N ,\
+|           -  ~R   F  : H/L  -  :  N  H/L,\
+|          H/L  R   F  :  L   -  : H/L  L ,\
+|          H/L  R   F  :  H   -  : H/L  H ,\
+|           -  ~R  ~F  :  -   -  :  N   N ";
 }"#,
     );
   }

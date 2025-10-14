@@ -2,6 +2,7 @@
 //! IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
 //! </script>
 mod items;
+mod parser;
 pub use items::*;
 #[cfg(test)]
 mod test;

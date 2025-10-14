@@ -254,7 +254,11 @@ library (asap7sc7p5t_SEQ_LVT_SS_nldm_201020) {
 			value : 0.0;
 		}
 		statetable ("CLK ENA SE", IQ) {
-			table : "L L L : - : L ,  L L H : - : H , L H L : - : H , L H H : - : H , H - - : - : N";
+			table : " L   L   L  :  -  :  L ,\
+			          L   L   H  :  -  :  H ,\
+			          L   H   L  :  -  :  H ,\
+			          L   H   H  :  -  :  H ,\
+			          H   -   -  :  -  :  N ";
 		}
 		pin (CLK) {
 			driver_waveform_rise : PreDriver20.5:rise;
