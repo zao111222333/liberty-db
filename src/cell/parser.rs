@@ -18,15 +18,21 @@ impl super::InputNodeValue {
   #[inline]
   fn parse(i: &str) -> IResult<&str, Self> {
     alt((
-      map(tag("-"), |_| Self::DontCare),
-      map(tag("L/H"), |_| Self::LH),
-      map(tag("H/L"), |_| Self::HL),
-      map(tag("L"), |_| Self::L),
-      map(tag("H"), |_| Self::H),
-      map(tag("R"), |_| Self::R),
-      map(tag("F"), |_| Self::F),
-      map(tag("~R"), |_| Self::NotR),
-      map(tag("~F"), |_| Self::NotF),
+      map(char('-'), |_| Self::DontCare),
+      preceded(
+        char('L'),
+        map(opt(tag("/H")), |_h| if _h.is_some() { Self::LH } else { Self::L }),
+      ),
+      preceded(
+        char('H'),
+        map(opt(tag("/L")), |_l| if _l.is_some() { Self::HL } else { Self::H }),
+      ),
+      map(char('R'), |_| Self::R),
+      map(char('F'), |_| Self::F),
+      preceded(
+        char('~'),
+        alt((map(char('R'), |_| Self::NotR), map(char('F'), |_| Self::NotF))),
+      ),
     ))
     .parse_complete(i)
   }
@@ -35,11 +41,15 @@ impl super::CurrentInternalNodeValue {
   #[inline]
   fn parse(i: &str) -> IResult<&str, Self> {
     alt((
-      map(tag("-"), |_| Self::DontCare),
-      map(tag("L/H"), |_| Self::LH),
-      map(tag("H/L"), |_| Self::HL),
-      map(tag("L"), |_| Self::L),
-      map(tag("H"), |_| Self::H),
+      map(char('-'), |_| Self::DontCare),
+      preceded(
+        char('L'),
+        map(opt(tag("/H")), |_h| if _h.is_some() { Self::LH } else { Self::L }),
+      ),
+      preceded(
+        char('H'),
+        map(opt(tag("/L")), |_l| if _l.is_some() { Self::HL } else { Self::H }),
+      ),
     ))
     .parse_complete(i)
   }
@@ -48,11 +58,15 @@ impl super::NextInternalNodeValue {
   #[inline]
   fn parse(i: &str) -> IResult<&str, Self> {
     alt((
-      map(tag("-"), |_| Self::NotSpecified),
-      map(tag("L/H"), |_| Self::LH),
-      map(tag("H/L"), |_| Self::HL),
-      map(tag("L"), |_| Self::L),
-      map(tag("H"), |_| Self::H),
+      map(char('-'), |_| Self::NotSpecified),
+      preceded(
+        char('L'),
+        map(opt(tag("/H")), |_h| if _h.is_some() { Self::LH } else { Self::L }),
+      ),
+      preceded(
+        char('H'),
+        map(opt(tag("/L")), |_l| if _l.is_some() { Self::HL } else { Self::H }),
+      ),
       map(tag("X"), |_| Self::X),
       map(tag("N"), |_| Self::N),
     ))
