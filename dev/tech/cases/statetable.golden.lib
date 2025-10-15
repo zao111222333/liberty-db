@@ -1,0 +1,51 @@
+** golden
+library (statetable) {
+	delay_model : table_lookup;
+	time_unit : 1ns;
+	voltage_unit : 1V;
+	slew_upper_threshold_pct_rise : 80.0;
+	slew_lower_threshold_pct_rise : 20.0;
+	slew_derate_from_library : 1.0;
+	slew_lower_threshold_pct_fall : 20.0;
+	slew_upper_threshold_pct_fall : 80.0;
+	input_threshold_pct_fall : 50.0;
+	input_threshold_pct_rise : 50.0;
+	output_threshold_pct_rise : 50.0;
+	output_threshold_pct_fall : 50.0;
+	cell (CELL1) {
+		statetable ("CLK EN SE", ENL) {
+			table : " H   L   L  :  -  :  L ,\
+			          H   L   H  :  -  :  H ,\
+			          H   H   L  :  -  :  H ,\
+			          H   H   H  :  -  :  H ,\
+			          L   -   -  :  -  :  N ";
+		}
+	}
+	cell (CELL2) {
+		statetable ("CLK EN SE", ENL) {
+			table : " H   L   L  :  -  :  L ,\
+			          H   L   H  :  -  :  H ,\
+			          H   H   L  :  -  :  H ,\
+			          H   H   H  :  -  :  H ,\
+			          L   -   -  :  -  :  N ";
+		}
+	}
+	cell (CELL3) {
+		statetable ("CLK ENA SE", IQ) {
+			table : " L   L   L  :  -  :  L ,\
+			          L   L   H  :  -  :  H ,\
+			          L   H   L  :  -  :  H ,\
+			          L   H   H  :  -  :  H ,\
+			          H   -   -  :  -  :  N ";
+		}
+	}
+	cell (CELL4) {
+		statetable ("D CP CPN", "MQ SQ") {
+			table : "H/L  R  ~F  :  -   -  : H/L  N ,\
+			          -  ~R   F  : H/L  -  :  N  H/L,\
+			         H/L  R   F  :  L   -  : H/L  L ,\
+			         H/L  R   F  :  H   -  : H/L  H ,\
+			          -  ~R  ~F  :  -   -  :  N   N ";
+		}
+	}
+}

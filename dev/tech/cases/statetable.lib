@@ -1,0 +1,39 @@
+library(statetable) {
+  cell (CELL1) {
+    statetable (" CLK EN SE",ENL) {
+        table : "	H   L  L : - : L ,\
+        H   L  H : - : H ,\
+        H   H  L : - : H ,\
+        H   H  H : - : H ,\
+        L   -  - : - : N ";
+    }
+  }
+  cell (CELL2) {
+    statetable (" CLK EN SE",ENL) {
+        table : "	H   L  L \
+        : - : L ,\
+        H   L  H : - : H ,\
+        H   H  L : - : H ,\
+        H   H  H : - : H ,\
+        L   -  - : - : N ";
+    }
+  }
+  cell (CELL3) {
+    statetable ("CLK ENA SE", "IQ") { \
+        table : "L L L : - : L , \
+                 L L H : - : H ,\
+                 L H L : - : H ,\
+                 L H H : - : H ,\
+                 H - - : - : N ";
+    }
+  }
+  cell (CELL4) {
+    statetable (" D CP CPN", "MQ SQ") {
+        table : " H/L R ~F : - - : H/L N,\
+        -  ~R F : H/L - : N H/L,\
+        H/L R F : L - : H/L L,\
+        H/L R F : H - : H/L H,\
+        -  ~R ~F : - - : N N";
+    }
+  }
+}
