@@ -12,9 +12,10 @@ use crate::{
 #[macro_export]
 macro_rules! impl_py_enum {
   ($t:path) => {
-    impl<'py> FromPyObject<'py> for $t {
+    impl<'py> FromPyObject<'_, 'py> for $t {
+      type Error = pyo3::PyErr;
       #[inline]
-      fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+      fn extract(ob: pyo3::Borrowed<'_, 'py, PyAny>) -> PyResult<Self> {
         match ob.extract::<alloc::borrow::Cow<'_, str>>()?.parse() {
           Ok(t) => Ok(t),
           Err(_) => {
@@ -57,9 +58,11 @@ impl_py_enum!(PullingResistanceUnit);
 impl_py_enum!(LeakagePowerUnit);
 impl_py_enum!(PgType);
 
-impl<'py> FromPyObject<'py> for CapacitiveLoadUnit {
+impl<'py> FromPyObject<'_, 'py> for CapacitiveLoadUnit {
+  type Error = PyErr;
+
   #[inline]
-  fn extract_bound(ob: &Bound<'py, PyAny>) -> PyResult<Self> {
+  fn extract(ob: Borrowed<'_, 'py, PyAny>) -> PyResult<Self> {
     let (val, s_ff_pf) = ob.extract::<(f64, String)>()?;
     match s_ff_pf.as_str() {
       "ff" => Ok(Self::FF(val)),
