@@ -149,6 +149,35 @@ pub struct Cell<C: 'static + Ctx> {
   pub attributes: Attributes,
   #[liberty(simple)]
   pub area: Option<f64>,
+  /// The bus_naming_style attribute defines the naming convention for buses in the library.
+  ///
+  /// *Syntax*
+  /// ```text
+  /// bus_naming_style : "string";
+  /// ```
+  /// Contains alphanumeric characters, braces, underscores, dashes, or
+  /// parentheses. Must contain one `%s` symbol and one `%d` symbol. The `%s` and `%d`
+  /// symbols can appear in any order with at least one nonnumeric character in
+  /// between.
+  ///
+  /// The colon character is not allowed in a bus_naming_style attribute value
+  /// because the colon is used to denote a range of bus members. You construct a
+  /// complete bused-pin name by using the name of the owning bus and the member
+  /// number. The owning bus name is substituted for the `%s`, and the member
+  /// number replaces the `%d`.
+  ///
+  /// If you do not define the bus_naming_style attribute, the default naming convention is
+  /// applied, as shown.
+  ///
+  /// *Example*
+  /// ```text
+  /// bus_naming_style : "%s[%d]" ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=21.14&end=21.30
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub bus_naming_style: Option<String>,
   /// The `dont_use`  attribute with a true value indicates
   /// that a cell should not be added to a design
   /// during optimization
@@ -165,6 +194,8 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub dont_touch: Option<bool>,
+  #[liberty(simple)]
+  pub map_only: Option<bool>,
   /// `CellId`
   #[liberty(simple)]
   pub single_bit_degenerate: Option<String>,
@@ -463,6 +494,30 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(complex)]
   pub pin_opposite: Option<PinOpposite>,
+  /// The memory group is in the cell group. The memory group tags the cell as a memory
+  /// cell and contains general information about the memory cell, described with these
+  ///
+  /// attributes:
+  /// + type
+  /// + address_width
+  /// + word_width
+  /// + column_address
+  /// + row_address
+  ///
+  /// Syntax:
+  /// ```text
+  /// cell()
+  ///  memory() {
+  ///  type : [ram | rom ];
+  ///  address_width : “integer” ;
+  ///  word_width : “integer” ;
+  ///  column_address : ”integer” ;
+  ///  row_address : ”integer” ;
+  ///  }
+  /// }
+  /// ```
+  #[liberty(group)]
+  pub memory: Option<Memory<C>>,
   /// The `char_config` group is a group of attributes including simple and complex attributes.
   /// These attributes represent library characterization configuration, and specify the settings
   /// to characterize the library. Use the `char_config` group syntax to apply an attribute value

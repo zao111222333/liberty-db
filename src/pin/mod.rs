@@ -76,6 +76,10 @@ pub use items::*;
     #[liberty(simple)]
     #[liberty(default = false)]
     pub scan_pin_inverted: bool,
+    #[liberty(group)]
+    pub memory_write: Option<MemoryWrite<C>>,
+    #[liberty(group)]
+    pub memory_read: Option<MemoryRead<C>>,
     /// You can define a `pin` group within a [`cell`](crate::cell::Cell),
     /// [`test_cell`](crate::cell::TestCell), [`model`](crate::cell::Model),
     /// or [`bus`](crate::pin::Bus) group.

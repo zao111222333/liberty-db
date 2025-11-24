@@ -45,7 +45,27 @@ impl<C: 'static + Ctx> SimpleAttri<C> for f64 {
   }
 }
 crate::ast::impl_self_builder!(bool);
-crate::ast::impl_simple!(bool);
+impl<C: 'static + Ctx> SimpleAttri<C> for bool {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope<'_>,
+  ) -> ast::SimpleParseRes<'a, Self> {
+    ast::nom_parse_from::<C, _, _, _>(i, scope, |s| match s {
+      "true" | "TRUE" => Ok(true),
+      "false" | "FALSE" => Ok(true),
+      _ => Err(()),
+    })
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    use fmt::Write as _;
+    write!(f, "{self}")
+  }
+}
 
 crate::ast::impl_self_builder!(usize);
 impl<C: 'static + Ctx> SimpleAttri<C> for usize {

@@ -74,6 +74,91 @@ pub struct TLatch<C: 'static + Ctx> {
 
 impl<C: 'static + Ctx> GroupFn<C> for TLatch<C> {}
 
+/// The memory_write group is in the bus group. All data input requires a memory_write
+/// group to define how the data is written into the memory block. The attributes in this group
+/// are
+/// + address
+/// + clocked_on
+/// + enable
+///
+/// *Syntax*:
+/// ```text
+/// cell()
+///  bus() {
+///  ...
+///  memory_write() {
+///  address : bus ;
+///  clocked_on : name ;
+///  enable : name ;
+///  }
+///  }
+/// }
+/// ```
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct MemoryWrite<C: 'static + Ctx> {
+  /// Name of the pin
+  #[liberty(name)]
+  pub name: Option<String>,
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::Other,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  #[liberty(simple)]
+  pub address: Option<String>,
+  #[liberty(simple)]
+  pub clocked_on: Option<String>,
+  #[liberty(simple)]
+  pub enable: Option<String>,
+}
+impl<C: 'static + Ctx> GroupFn<C> for MemoryWrite<C> {}
+
+/// The `memory_read` group is in the bus group. All memory-block output requires a
+/// `memory_read` group to define how the output functions. This group is allowed only on
+/// output buses and internal buses. It cannot be used in input bus groups.
+///
+/// Note: The bus cannot have a `state_function` attribute or an `internal_node` attribute.
+///
+/// *Syntax*:
+/// ```text
+/// cell()
+///  ...
+///  bus() {
+///  ...
+///  memory_read() {
+///  address : bus ;
+///  }
+///  }
+/// }
+/// ```
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct MemoryRead<C: 'static + Ctx> {
+  /// Name of the pin
+  #[liberty(name)]
+  pub name: Option<String>,
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::Other,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  #[liberty(simple)]
+  pub address: Option<String>,
+}
+
+impl<C: 'static + Ctx> GroupFn<C> for MemoryRead<C> {}
+
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html
 /// ?field=test

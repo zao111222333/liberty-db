@@ -110,6 +110,35 @@ pub struct Library<C: 'static + Ctx> {
   /// Used in TSMC PDK
   #[liberty(simple)]
   pub simulation: Option<bool>,
+  /// The bus_naming_style attribute defines the naming convention for buses in the library.
+  ///
+  /// *Syntax*
+  /// ```text
+  /// bus_naming_style : "string";
+  /// ```
+  /// Contains alphanumeric characters, braces, underscores, dashes, or
+  /// parentheses. Must contain one `%s` symbol and one `%d` symbol. The `%s` and `%d`
+  /// symbols can appear in any order with at least one nonnumeric character in
+  /// between.
+  ///
+  /// The colon character is not allowed in a bus_naming_style attribute value
+  /// because the colon is used to denote a range of bus members. You construct a
+  /// complete bused-pin name by using the name of the owning bus and the member
+  /// number. The owning bus name is substituted for the `%s`, and the member
+  /// number replaces the `%d`.
+  ///
+  /// If you do not define the bus_naming_style attribute, the default naming convention is
+  /// applied, as shown.
+  ///
+  /// *Example*
+  /// ```text
+  /// bus_naming_style : "%s[%d]" ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=21.14&end=21.30
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub bus_naming_style: Option<String>,
   /// The `nom_process`  attribute defines process scaling,
   /// one of the nominal operating conditions for a library.
   ///
@@ -524,6 +553,28 @@ pub struct Library<C: 'static + Ctx> {
   #[liberty(simple)]
   #[liberty(default = 50.0)]
   pub output_threshold_pct_fall: f64,
+  /// You can define power factors only in libraries that use a CMOS technology. Power scaling
+  /// factors scale the power computation according to process, temperature, and voltage.
+  /// The power-scaling factors are listed below. In the following syntax, multiplier is a floatingpoint number:
+  ///
+  /// Specifies process derating factors for the cell_leakage_power attribute.
+  #[liberty(simple)]
+  pub k_process_cell_leakage_power: Option<f64>,
+  /// Specifies process derating factors for the internal_power attribute.
+  #[liberty(simple)]
+  pub k_process_internal_power: Option<f64>,
+  /// Specifies temperature derating factors for the cell_leakage_power attribute.
+  #[liberty(simple)]
+  pub k_temp_cell_leakage_power: Option<f64>,
+  /// Specifies temperature derating factors for the internal_power attribute.
+  #[liberty(simple)]
+  pub k_temp_internal_power: Option<f64>,
+  /// Specifies voltage derating factors for the cell_leakage_power attribute.
+  #[liberty(simple)]
+  pub k_volt_cell_leakage_power: Option<f64>,
+  /// Specifies voltage derating factors for the internal_power attribute.
+  #[liberty(simple)]
+  pub k_volt_internal_power: Option<f64>,
   /// The `is_soi`  attribute specifies that the cell is a
   /// silicon-on-insulator (SOI) cell.
   /// The default is false, which means that the cell is a

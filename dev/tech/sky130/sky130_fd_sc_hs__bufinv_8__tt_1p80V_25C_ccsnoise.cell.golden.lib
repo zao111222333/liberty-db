@@ -44,7 +44,7 @@ library (sky130_fd_sc_hs_tt_1p80V_25C_ccsnoise) {
 			related_ground_pin : vgnd;
 			related_power_pin : vpwr;
 			capacitance : 0.00284;
-			clock : false;
+			clock : true;
 			direction : input;
 			max_transition : 1.0;
 			ccsn_first_stage () {
