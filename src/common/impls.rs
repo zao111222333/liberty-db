@@ -10,6 +10,7 @@ use crate::{
     join_fmt, join_fmt_no_quote,
   },
   expression,
+  library::PolyTemplateVariable,
 };
 use core::fmt::{self, Write};
 
@@ -473,6 +474,44 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Vec<String> {
     )
   }
 }
+
+crate::ast::impl_self_builder!(Vec<PolyTemplateVariable>);
+impl<C: 'static + Ctx> ComplexAttri<C> for Vec<PolyTemplateVariable> {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    iter: I,
+    _scope: &mut ParseScope<'_>,
+  ) -> Result<Self, ComplexParseError> {
+    Ok(iter.map(|&s| s.parse()).collect::<Result<_, _>>()?)
+  }
+  #[inline]
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    join_fmt_no_quote(self.iter(), f, |s, ff| write!(ff, "{}", s), |ff| write!(ff, ", "))
+  }
+  // #[inline]
+  // fn fmt_liberty<T: Write, I: Indentation>(
+  //   &self,
+  //   key: &str,
+  //   f: &mut CodeFormatter<'_, T, I>,
+  // ) -> fmt::Result {
+  //   if <Self as ComplexAttri<C>>::is_set(self) {
+  //     f.write_new_line_indentation()?;
+  //     write!(f, "{key} (")?;
+  //     <Self as ComplexAttri<C>>::fmt_self(self, f)?;
+  //     write!(f, ");")
+  //   } else {
+  //     Ok(())
+  //   }
+  // }
+}
+
 crate::ast::impl_self_builder!(Vec<usize>);
 impl<C: 'static + Ctx> ComplexAttri<C> for Vec<usize> {
   #[inline]

@@ -4,6 +4,7 @@ use crate::{
     self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
     LibertySet, LibertyVec, ParseScope, SimpleAttri,
   },
+  library::{PolyTemplateVariable, VoltageMapping},
 };
 #[cfg(feature = "lut_template")]
 use alloc::sync::Arc;
@@ -30,6 +31,13 @@ pub trait CompactTableCtx<C: 'static + Ctx> {
   fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>);
 }
 
+pub trait PolyTableCtx<C: 'static + Ctx> {
+  #[cfg(feature = "lut_template")]
+  fn poly_template(&self) -> &Option<Arc<PolyTemplate<C>>>;
+  #[cfg(feature = "lut_template")]
+  fn set_poly_template(&mut self, template: Option<&Arc<PolyTemplate<C>>>);
+}
+
 macro_rules! add_use_common_template {
   ($table_ty:tt) => {
     impl<C: 'static + Ctx> $table_ty<C> {
@@ -53,6 +61,20 @@ macro_rules! add_use_power_template {
         TableCtx::set_lut_template(
           &mut self.extra_ctx,
           scope.power_lut_template.get(&self.name),
+        )
+      }
+    }
+  };
+}
+macro_rules! add_use_poly_template {
+  ($table_ty:tt) => {
+    impl<C: 'static + Ctx> $table_ty<C> {
+      #[inline]
+      pub(crate) fn use_poly_template(&mut self, scope: &mut ast::BuilderScope<C>) {
+        #[cfg(feature = "lut_template")]
+        PolyTableCtx::set_poly_template(
+          &mut self.extra_ctx,
+          scope.poly_template.get(&self.name),
         )
       }
     }
@@ -90,6 +112,7 @@ macro_rules! add_use_compact_template {
 pub(crate) use add_use_common_template;
 pub(crate) use add_use_compact_template;
 pub(crate) use add_use_current_template;
+pub(crate) use add_use_poly_template;
 pub(crate) use add_use_power_template;
 
 #[derive(Clone, Default, Debug)]
@@ -132,6 +155,28 @@ impl<C: 'static + Ctx> CompactTableCtx<C> for DefaultCompactTableCtx<C> {
   #[cfg(feature = "lut_template")]
   fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>) {
     self.compact_lut_template = template.cloned();
+  }
+}
+
+#[derive(Clone, Default, Debug)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct DefaultPolyTableCtx<C: 'static + Ctx> {
+  #[cfg(feature = "lut_template")]
+  pub poly_template: Option<Arc<PolyTemplate<C>>>,
+  #[cfg(not(feature = "lut_template"))]
+  ___p: PhantomData<C::Other>,
+}
+impl<C: 'static + Ctx> PolyTableCtx<C> for DefaultPolyTableCtx<C> {
+  #[inline]
+  #[cfg(feature = "lut_template")]
+  fn poly_template(&self) -> &Option<Arc<PolyTemplate<C>>> {
+    &self.poly_template
+  }
+  #[inline]
+  #[cfg(feature = "lut_template")]
+  fn set_poly_template(&mut self, template: Option<&Arc<PolyTemplate<C>>>) {
+    self.poly_template = template.cloned();
   }
 }
 
@@ -323,6 +368,77 @@ impl<C: 'static + Ctx> GroupFn<C> for CompactLutTemplate<C> {
       .set_compact_lut_template(scope.compact_lut_template.get(&self.name));
   }
 }
+
+/// As with the lookup table model, you can describe an I-V characteristics curve in your
+/// libraries by using the polynomial representation. To define your polynomial, use the
+/// following groups and attributes:
+/// + The `poly_template` group in the library group
+/// + The `steady_state_current_high`, `steady_state_current_low`, and
+/// `steady_state_current_tristate` groups within the timing group
+/// `poly_template` Group
+///
+/// You can define a `poly_template` group at the library level to specify the equation
+/// variables, the variable ranges, the voltages mapping, and the piecewise data. The valid
+/// values for the variables are extended to include `iv_output_voltage`, `voltage`, `voltagei`,
+/// and `temperature`.
+///
+/// Syntax
+/// ```text
+/// library(namestring) {
+/// ...
+/// poly_template(template_namestring) {
+/// variables(variable_1enum,..., variable_nenum);
+/// variable_i_range: (float, float);
+/// ...
+/// variable_n_range: (float, float);
+/// mapping(voltageenum, power_railid);
+/// domain(domain_namestring) {
+/// variable_i_range: (float, float);
+/// ...
+/// variable_n_range: (float, float);
+/// }
+/// ...
+/// }
+/// ...
+/// }
+/// ```
+/// The syntax of the poly_template group is the same as that used for the delay model,
+/// except that the variables used in the format are
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=609.11&end=609.57
+/// ">Reference</a>
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PolyTemplate<C: 'static + Ctx> {
+  #[liberty(name)]
+  #[id(borrow = str)]
+  pub name: String,
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::PolyTable,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  #[liberty(complex)]
+  pub variables: Vec<PolyTemplateVariable>,
+  #[liberty(complex)]
+  pub mapping: LibertySet<VoltageMapping>,
+  // #[liberty(complex)]
+  // pub variable_range: LibertyVec<[f64; 2]>,
+}
+
+impl<C: 'static + Ctx> GroupFn<C> for PolyTemplate<C> {
+  #[cfg(feature = "lut_template")]
+  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
+    self.extra_ctx.set_poly_template(scope.poly_template.get(&self.name));
+  }
+}
+
+add_use_poly_template!(PolyTemplate);
 
 /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
 ///

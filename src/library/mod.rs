@@ -7,14 +7,13 @@ mod test;
 use crate::{
   Ctx,
   ast::{
-    Attributes, BuilderScope, DefaultIndentation, GroupComments, GroupFn, LibertySet,
-    ParseLoc, ParseScope, ParserError, ParsingBuilder,
+    Attributes, BuilderScope, DefaultIndentation, GroupAttri, GroupComments, GroupFn,
+    LibertySet, ParseLoc, ParseScope, ParserError, ParsingBuilder, parser,
   },
-  ast::{GroupAttri, parser},
   cell::{Cell, Model},
   common::char_config::CharConfig,
   pin::BusType,
-  table::{CompactLutTemplate, DriverWaveform, TableTemple},
+  table::{CompactLutTemplate, DriverWaveform, PolyTemplate, TableTemple},
   units,
 };
 use alloc::borrow::Cow;
@@ -670,6 +669,8 @@ pub struct Library<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(group)]
   pub lu_table_template: LibertySet<TableTemple<C>>,
+  #[liberty(group)]
+  pub poly_template: LibertySet<PolyTemplate<C>>,
   /// The `base_curves`  group is a library-level group that contains
   /// the detailed description of normalized base curves.
   ///

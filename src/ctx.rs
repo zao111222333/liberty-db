@@ -1,4 +1,7 @@
-use crate::table::{CompactTableCtx, DefaultCompactTableCtx, DefaultTableCtx, TableCtx};
+use crate::table::{
+  CompactTableCtx, DefaultCompactTableCtx, DefaultPolyTableCtx, DefaultTableCtx,
+  PolyTableCtx, TableCtx,
+};
 
 pub trait Ctx:
   'static
@@ -51,6 +54,12 @@ pub trait Ctx:
     + Default
     + serde::Serialize
     + serde::de::DeserializeOwned;
+  type PolyTable: PolyTableCtx<Self>
+    + core::fmt::Debug
+    + Clone
+    + Default
+    + serde::Serialize
+    + serde::de::DeserializeOwned;
   /// TODO: Specify more types of Ctx
   type Other: core::fmt::Debug
     + Clone
@@ -73,5 +82,6 @@ impl Ctx for DefaultCtx {
   type InternalPower = ();
   type Table = DefaultTableCtx<Self>;
   type CompactTable = DefaultCompactTableCtx<Self>;
+  type PolyTable = DefaultPolyTableCtx<Self>;
   type Other = ();
 }

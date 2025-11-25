@@ -13,6 +13,7 @@ use crate::{
   expression::Formula,
   library::AttributeType,
   pin::BusTypeCtx,
+  table::PolyTemplate,
 };
 use alloc::borrow::Cow;
 #[cfg(feature = "lut_template")]
@@ -51,6 +52,8 @@ pub(crate) struct BuilderScope<C: 'static + Ctx> {
   #[cfg(feature = "lut_template")]
   pub(crate) compact_lut_template:
     HashMap<String, Arc<CompactLutTemplate<C>>, RandomState>,
+  #[cfg(feature = "lut_template")]
+  pub(crate) poly_template: HashMap<String, Arc<PolyTemplate<C>>, RandomState>,
   pub(crate) voltage_map: HashMap<String, f64, RandomState>,
   pub(crate) bus_type: HashMap<String, BusTypeCtx, RandomState>,
 }
@@ -831,9 +834,9 @@ pub(crate) trait ComplexAttri<C: 'static + Ctx>:
     if self.is_set() {
       f.write_new_line_indentation()?;
       write!(f, "{key} (")?;
-      f.indent();
+      // f.indent();
       self.fmt_self(f)?;
-      f.dedent();
+      // f.dedent();
       write!(f, ");")
     } else {
       Ok(())

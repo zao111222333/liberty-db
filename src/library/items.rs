@@ -12,7 +12,10 @@ use crate::{
   common::{items::IdVector, parse_f64},
   expression::{Formula, logic},
 };
-use core::fmt::{self, Write};
+use core::{
+  fmt::{self, Write},
+  str::FromStr,
+};
 
 /// The `sensitization` group defined at the library level describes.
 ///
@@ -330,6 +333,132 @@ impl<C: 'static + Ctx> ComplexAttri<C> for VoltageMap {
   }
 }
 
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Default, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct VoltageName {
+  pub i: Option<usize>,
+}
+impl FromStr for VoltageName {
+  type Err = lexical_core::Error;
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    const S: &str = "voltage";
+    #[expect(clippy::string_slice)]
+    match s.len().cmp(&S.len()) {
+      core::cmp::Ordering::Less => Err(lexical_core::Error::InvalidBasePrefix),
+      core::cmp::Ordering::Equal => {
+        if s == S {
+          Ok(Self { i: None })
+        } else {
+          Err(lexical_core::Error::InvalidBasePrefix)
+        }
+      }
+      core::cmp::Ordering::Greater => {
+        if &s[..S.len()] == S {
+          Ok(Self {
+            i: Some(lexical_core::parse(s[S.len()..].as_bytes())?),
+          })
+        } else {
+          Err(lexical_core::Error::InvalidBasePrefix)
+        }
+      }
+    }
+  }
+}
+impl fmt::Display for VoltageName {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "voltage")?;
+    if let Some(i) = self.i { write!(f, "{i}") } else { Ok(()) }
+  }
+}
+
+#[mut_set::derive::item]
+#[derive(Debug, Clone, Default)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct VoltageMapping {
+  /// name
+  #[id]
+  pub name: VoltageName,
+  /// value
+  pub value: String,
+}
+crate::ast::impl_self_builder!(VoltageMapping);
+impl<C: 'static + Ctx> ComplexAttri<C> for VoltageMapping {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
+    _scope: &mut ParseScope<'_>,
+  ) -> Result<Self, ComplexParseError> {
+    let name = match iter.next() {
+      Some(&s) => s.parse()?,
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let value = match iter.next() {
+      Some(&s) => String::from(s),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if iter.next().is_some() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok(Self { name, value })
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    write!(f, "{}, {}", self.name, self.value)
+  }
+}
+// #[derive(serde::Serialize, serde::Deserialize)]
+// #[derive(Debug, Clone, Copy)]
+// pub struct PolyTemplateVariableRange {
+//   pub variable: PolyTemplateVariable,
+//   pub range: Option<[f64; 2]>,
+// }
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum PolyTemplateVariable {
+  /// `iv_output_voltage`
+  IvOutputVoltage,
+  /// `input_noise_width`
+  InputNoiseWidth,
+  /// `input_noise_height`
+  InputNoiseHeight,
+  /// `input_peak_time_ratio`
+  InputPeakTimeRatio,
+  /// `total_output_net_capacitance`
+  TotalOutputNetCapacitance,
+  /// `temperature`
+  Temperature,
+  Voltage(VoltageName),
+}
+impl FromStr for PolyTemplateVariable {
+  type Err = lexical_core::Error;
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
+      "iv_output_voltage" => Ok(Self::IvOutputVoltage),
+      "input_noise_width" => Ok(Self::InputNoiseWidth),
+      "input_noise_height" => Ok(Self::InputNoiseHeight),
+      "input_peak_time_ratio" => Ok(Self::InputPeakTimeRatio),
+      "total_output_net_capacitance" => Ok(Self::TotalOutputNetCapacitance),
+      "temperature" => Ok(Self::Temperature),
+      _ => Ok(Self::Voltage(s.parse()?)),
+    }
+  }
+}
+impl fmt::Display for PolyTemplateVariable {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Self::IvOutputVoltage => write!(f, "iv_output_voltage"),
+      Self::InputNoiseWidth => write!(f, "input_noise_width"),
+      Self::InputNoiseHeight => write!(f, "input_noise_height"),
+      Self::InputPeakTimeRatio => write!(f, "input_peak_time_ratio"),
+      Self::TotalOutputNetCapacitance => write!(f, "total_output_net_capacitance"),
+      Self::Temperature => write!(f, "temperature"),
+      Self::Voltage(name) => write!(f, "{name}"),
+    }
+  }
+}
 /// An `input_voltage`  group is defined in the library  group to designate
 /// a set of input voltage ranges for your cells.
 ///
