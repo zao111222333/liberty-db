@@ -427,8 +427,8 @@ pub struct PolyTemplate<C: 'static + Ctx> {
   pub variables: Vec<PolyTemplateVariable>,
   #[liberty(complex)]
   pub mapping: LibertySet<VoltageMapping>,
-  // #[liberty(complex)]
-  // pub variable_range: LibertyVec<[f64; 2]>,
+  #[liberty(complex)]
+  pub variable_range: LibertyVec<[f64; 2]>,
 }
 
 impl<C: 'static + Ctx> GroupFn<C> for PolyTemplate<C> {
@@ -760,6 +760,7 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
       }
       write!(f, "\"")
     }
+    f.indent();
     if let Some(value) = iter.next() {
       fmt_value(value, f)?;
     }
@@ -768,6 +769,7 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Vec<CcsPowerValue> {
       f.write_new_line_indentation()?;
       fmt_value(value, f)?;
     }
+    f.dedent();
     Ok(())
   }
 }
@@ -1079,6 +1081,7 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Values {
         |ff| write!(ff, ", "),
       )?;
     }
+    f.indent();
     while let Some(v) = iter.next() {
       write!(f, ", \\")?;
       f.write_new_line_indentation()?;
@@ -1089,6 +1092,7 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Values {
         |ff| write!(ff, ", "),
       )?;
     }
+    f.dedent();
     Ok(())
   }
 }

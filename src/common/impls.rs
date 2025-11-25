@@ -364,7 +364,9 @@ impl<C: 'static + Ctx> ComplexAttri<C> for super::items::IdVector {
   ) -> fmt::Result {
     f.write_num(self.id)?;
     write!(f, ", \\")?;
+    f.indent();
     f.write_new_line_indentation()?;
+    f.dedent();
     join_fmt(self.vec.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
   }
 }

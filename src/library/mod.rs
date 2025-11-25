@@ -671,6 +671,8 @@ pub struct Library<C: 'static + Ctx> {
   pub lu_table_template: LibertySet<TableTemple<C>>,
   #[liberty(group)]
   pub poly_template: LibertySet<PolyTemplate<C>>,
+  #[liberty(group)]
+  pub power_poly_template: LibertySet<PolyTemplate<C>>,
   /// The `base_curves`  group is a library-level group that contains
   /// the detailed description of normalized base curves.
   ///

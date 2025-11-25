@@ -12,13 +12,13 @@ library (sppm) {
 	input_threshold_pct_rise : 50.0;
 	output_threshold_pct_rise : 50.0;
 	output_threshold_pct_fall : 50.0;
-	poly_template (delay_pt) {  /* user defined attribute */
+	power_model : polynomial; /* user defined attribute */
+	poly_template (delay_pt) {
 		variable_1_range (1, 5); /* user defined attribute */
 		variable_2_range (2.7, 3.6); /* user defined attribute */
 		variables (input_net_transition, voltage); /* user defined attribute */
 	}
-	power_model : polynomial; /* user defined attribute */
-	power_poly_template (power_pt) {  /* user defined attribute */
+	power_poly_template (power_pt) {
 		variable_1_range (1, 5); /* user defined attribute */
 		variable_2_range (2.7, 3.6); /* user defined attribute */
 		variables (input_net_transition, voltage); /* user defined attribute */

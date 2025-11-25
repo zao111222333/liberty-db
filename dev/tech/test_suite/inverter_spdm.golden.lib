@@ -19,7 +19,45 @@ library (inverter) {
 	input_threshold_pct_rise : 50.0;
 	output_threshold_pct_rise : 50.0;
 	output_threshold_pct_fall : 50.0;
-	poly_template (my_noise_reject) {  /* user defined attribute */
+	power_supply () {  /* user defined attribute */
+		default_power_rail : VDD; /* user defined attribute */
+		power_rail (VDD1, 1.6); /* user defined attribute */
+		power_rail (VDD2, 1.3); /* user defined attribute */
+	}
+	input_voltage (MY_CMOS_IN) {
+		vil : 0.3;
+		vih : 1.1;
+		vimin : -0.3;
+		vimax : VDD + 0.3;
+	}
+	output_voltage (MY_CMOS_OUT) {
+		vol : 0.1;
+		voh : 1.4;
+		vomin : -0.3;
+		vomax : VDD + 0.3;
+	}
+	poly_template (my_current_high) {
+		variables (iv_output_voltage, voltage, voltage1, temperature);
+		mapping (voltage, VDD1);
+		mapping (voltage1, VDD2);
+		variable_1_range (-1, 2); /* user defined attribute */
+		variable_2_range (1.4, 1.8); /* user defined attribute */
+		variable_3_range (1.1, 1.5); /* user defined attribute */
+		variable_4_range (-40, 125); /* user defined attribute */
+	}
+	poly_template (my_current_low) {
+		variables (iv_output_voltage, voltage, voltage1, temperature);
+		mapping (voltage, VDD1);
+		mapping (voltage1, VDD2);
+		variable_1_range (-1, 2); /* user defined attribute */
+		variable_2_range (1.4, 1.8); /* user defined attribute */
+		variable_3_range (1.1, 1.5); /* user defined attribute */
+		variable_4_range (-40, 125); /* user defined attribute */
+	}
+	poly_template (my_noise_reject) {
+		variables (input_noise_width, voltage, voltage1, temperature, total_output_net_capacitance);
+		mapping (voltage, VDD1);
+		mapping (voltage1, VDD2);
 		domain (typ) {  /* user defined attribute */
 			mapping (voltage, VDD1); /* user defined attribute */
 			mapping (voltage1, VDD2); /* user defined attribute */
@@ -48,45 +86,25 @@ library (inverter) {
 			variable_4_range (125, 125); /* user defined attribute */
 			variables (input_noise_width, voltage, voltage1, temperature); /* user defined attribute */
 		}
-		mapping (voltage, VDD1); /* user defined attribute */
-		mapping (voltage1, VDD2); /* user defined attribute */
 		variable_1_range (0, 2); /* user defined attribute */
 		variable_2_range (1.4, 1.8); /* user defined attribute */
 		variable_3_range (1.1, 1.5); /* user defined attribute */
 		variable_4_range (-40, 125); /* user defined attribute */
 		variable_5_range (0.01, 1.0); /* user defined attribute */
-		variables (input_noise_width, voltage, voltage1, temperature, total_output_net_capacitance); /* user defined attribute */
 	}
-	poly_template (my_noise_reject_outside_rail) {  /* user defined attribute */
-		mapping (voltage, VDD1); /* user defined attribute */
-		mapping (voltage1, VDD2); /* user defined attribute */
+	poly_template (my_noise_reject_outside_rail) {
+		variables (input_noise_width, voltage, voltage1, temperature);
+		mapping (voltage, VDD1);
+		mapping (voltage1, VDD2);
 		variable_1_range (0, 2); /* user defined attribute */
 		variable_2_range (1.4, 1.8); /* user defined attribute */
 		variable_3_range (1.1, 1.5); /* user defined attribute */
 		variable_4_range (-40, 125); /* user defined attribute */
-		variables (input_noise_width, voltage, voltage1, temperature); /* user defined attribute */
 	}
-	poly_template (my_current_low) {  /* user defined attribute */
-		mapping (voltage, VDD1); /* user defined attribute */
-		mapping (voltage1, VDD2); /* user defined attribute */
-		variable_1_range (-1, 2); /* user defined attribute */
-		variable_2_range (1.4, 1.8); /* user defined attribute */
-		variable_3_range (1.1, 1.5); /* user defined attribute */
-		variable_4_range (-40, 125); /* user defined attribute */
-		variables (iv_output_voltage, voltage, voltage1, temperature); /* user defined attribute */
-	}
-	poly_template (my_current_high) {  /* user defined attribute */
-		mapping (voltage, VDD1); /* user defined attribute */
-		mapping (voltage1, VDD2); /* user defined attribute */
-		variable_1_range (-1, 2); /* user defined attribute */
-		variable_2_range (1.4, 1.8); /* user defined attribute */
-		variable_3_range (1.1, 1.5); /* user defined attribute */
-		variable_4_range (-40, 125); /* user defined attribute */
-		variables (iv_output_voltage, voltage, voltage1, temperature); /* user defined attribute */
-	}
-	poly_template (my_propagated_noise) {  /* user defined attribute */
-		mapping (voltage, VDD1); /* user defined attribute */
-		mapping (voltage1, VDD2); /* user defined attribute */
+	poly_template (my_propagated_noise) {
+		variables (input_noise_width, input_noise_height, input_peak_time_ratio, total_output_net_capacitance, voltage, voltage1, temperature);
+		mapping (voltage, VDD1);
+		mapping (voltage1, VDD2);
 		variable_1_range (0.01, 2); /* user defined attribute */
 		variable_2_range (0, 0.8); /* user defined attribute */
 		variable_3_range (0.0, 1.0); /* user defined attribute */
@@ -94,24 +112,6 @@ library (inverter) {
 		variable_5_range (1.4, 1.8); /* user defined attribute */
 		variable_6_range (1.1, 1.5); /* user defined attribute */
 		variable_7_range (-40, 125); /* user defined attribute */
-		variables (input_noise_width, input_noise_height, input_peak_time_ratio, total_output_net_capacitance, voltage, voltage1, temperature); /* user defined attribute */
-	}
-	power_supply () {  /* user defined attribute */
-		default_power_rail : VDD; /* user defined attribute */
-		power_rail (VDD1, 1.6); /* user defined attribute */
-		power_rail (VDD2, 1.3); /* user defined attribute */
-	}
-	input_voltage (MY_CMOS_IN) {
-		vil : 0.3;
-		vih : 1.1;
-		vimin : -0.3;
-		vimax : VDD + 0.3;
-	}
-	output_voltage (MY_CMOS_OUT) {
-		vol : 0.1;
-		voh : 1.4;
-		vomin : -0.3;
-		vomax : VDD + 0.3;
 	}
 	cell (INV) {
 		area : 1.0;

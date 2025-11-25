@@ -177,8 +177,7 @@ pub struct Cell<C: 'static + Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=21.14&end=21.30
   /// ">Reference</a>
   #[liberty(simple)]
-  #[liberty(default = String::from("%s[%d]"))]
-  pub bus_naming_style: String,
+  pub bus_naming_style: Option<String>,
   /// The `dont_use`  attribute with a true value indicates
   /// that a cell should not be added to a design
   /// during optimization
