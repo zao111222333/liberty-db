@@ -188,6 +188,13 @@ impl<
   }
 }
 
+pub(crate) trait DynamicName {
+  type Key: core::hash::Hash + Eq;
+  type T;
+  fn name2key(name: &str) -> Option<Self::Key>;
+}
+type DynamicNameBuilder<N: DynamicName> = HashMap<N::Key, N::T>;
+
 macro_rules! impl_self_builder {
   ($t:ty) => {
     impl<C: 'static + crate::Ctx> crate::ast::ParsingBuilder<C> for $t {

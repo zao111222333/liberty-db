@@ -200,17 +200,17 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
   let builder_ident = Ident::new(&format!("{ident}Builder"), Span::call_site());
   if let Fields::Named(named) = &st.fields {
     let fields = &named.named;
-    let (
+    let FieldsType {
       attri_type_map,
       default_map,
+      dynamic_name_map,
       before_build_map,
       after_build_map,
       name_vec,
       attributes_name,
       comments_name,
       extra_ctx_name,
-      _extra_ctx_type,
-    ) = parse_fields_type(fields)?;
+    } = parse_fields_type(fields)?;
     let mut comment_fns = quote! {
       #[inline]
       pub fn comments_this(&self)-> Option<&String> {

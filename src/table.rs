@@ -1,8 +1,8 @@
 use crate::{
   Ctx,
   ast::{
-    self, Attributes, ComplexAttri, ComplexParseError, GroupComments, GroupFn,
-    LibertySet, LibertyVec, ParseScope, SimpleAttri,
+    self, Attributes, ComplexAttri, ComplexParseError, DynamicName, GroupComments,
+    GroupFn, LibertySet, LibertyVec, ParseScope, SimpleAttri,
   },
   library::{PolyTemplateVariable, VoltageMapping},
 };
@@ -428,7 +428,17 @@ pub struct PolyTemplate<C: 'static + Ctx> {
   #[liberty(complex)]
   pub mapping: LibertySet<VoltageMapping>,
   #[liberty(complex)]
+  #[liberty(dynamic_name = VariableRangeName)]
   pub variable_range: LibertyVec<[f64; 2]>,
+}
+
+struct VariableRangeName;
+impl DynamicName for VariableRangeName {
+  type Key = usize;
+  type T = [f64; 2];
+  fn name2key(name: &str) -> Option<Self::Key> {
+    name.strip_prefix("variable_")?.strip_suffix("_range")?.parse().ok()
+  }
 }
 
 impl<C: 'static + Ctx> GroupFn<C> for PolyTemplate<C> {
