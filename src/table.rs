@@ -1,8 +1,9 @@
 use crate::{
   Ctx,
   ast::{
-    self, Attributes, ComplexAttri, ComplexParseError, DynamicName, GroupComments,
-    GroupFn, LibertySet, LibertyVec, ParseScope, SimpleAttri,
+    self, Attributes, BuilderScope, ComplexAttri, ComplexParseError, DynamicKey,
+    DynamicKeyBuilderSet, GroupComments, GroupFn, LibertySet, LibertyVec, ParseScope,
+    ParsingBuilder, SimpleAttri,
   },
   library::{PolyTemplateVariable, VoltageMapping},
 };
@@ -362,7 +363,7 @@ pub struct CompactLutTemplate<C: 'static + Ctx> {
 
 impl<C: 'static + Ctx> GroupFn<C> for CompactLutTemplate<C> {
   #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
+  fn after_build(&mut self, scope: &mut BuilderScope<C>) {
     self
       .extra_ctx
       .set_compact_lut_template(scope.compact_lut_template.get(&self.name));
@@ -407,11 +408,28 @@ impl<C: 'static + Ctx> GroupFn<C> for CompactLutTemplate<C> {
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=609.11&end=609.57
 /// ">Reference</a>
+#[derive(liberty_macros::Duplicate)]
+#[duplicated(
+  name = PolyTemplate,
+  docs(
+    /// A `bus` group, defined in a [`cell`](crate::cell::Cell) group or a [`model`](crate::cell::Model) group, defines the bused pins in the
+    /// library. Before you can define a `bus` group you must first define a [`type`](crate::pin::BusType) group at the `library`
+    /// level.
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=136.4&end=136.9
+    /// ">Reference</a>
+  ),
+  additional_attrs(
+    #[liberty(group)]
+    pub domain: LibertySet<PolyTemplateDomain<C>>,
+  )
+)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct PolyTemplate<C: 'static + Ctx> {
+#[serde(bound = "C::PolyTable: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct PolyTemplateDomain<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -428,27 +446,58 @@ pub struct PolyTemplate<C: 'static + Ctx> {
   #[liberty(complex)]
   pub mapping: LibertySet<VoltageMapping>,
   #[liberty(complex)]
-  #[liberty(dynamic_name = VariableRangeName)]
-  pub variable_range: LibertyVec<[f64; 2]>,
+  #[liberty(dynamic_key = VariableRangeName)]
+  pub variable_range: LibertyVec<Option<[f64; 2]>>,
 }
-
-struct VariableRangeName;
-impl DynamicName for VariableRangeName {
-  type Key = usize;
-  type T = [f64; 2];
-  fn name2key(name: &str) -> Option<Self::Key> {
-    name.strip_prefix("variable_")?.strip_suffix("_range")?.parse().ok()
-  }
-}
-
+impl<C: 'static + Ctx> GroupFn<C> for PolyTemplateDomain<C> {}
 impl<C: 'static + Ctx> GroupFn<C> for PolyTemplate<C> {
   #[cfg(feature = "lut_template")]
-  fn after_build(&mut self, scope: &mut ast::BuilderScope<C>) {
+  fn after_build(&mut self, scope: &mut BuilderScope<C>) {
     self.extra_ctx.set_poly_template(scope.poly_template.get(&self.name));
   }
 }
 
 add_use_poly_template!(PolyTemplate);
+
+struct VariableRangeName;
+struct VariableRangeKeyFmt(usize);
+impl fmt::Display for VariableRangeKeyFmt {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "variable_{}_range", self.0)
+  }
+}
+impl<C: 'static + Ctx> DynamicKey<C> for VariableRangeName {
+  type Id = usize;
+  type T = [f64; 2];
+  type Set = LibertyVec<Option<[f64; 2]>>;
+  type KeyFmt = VariableRangeKeyFmt;
+  fn key2id(key: &str) -> Option<Self::Id> {
+    key.strip_prefix("variable_")?.strip_suffix("_range")?.parse().ok()
+  }
+  fn build_set(
+    builder: DynamicKeyBuilderSet<C, Self>,
+    scope: &mut BuilderScope<C>,
+    before_build: Option<
+      fn(&mut <Self::T as ParsingBuilder<C>>::Builder, &mut BuilderScope<C>),
+    >,
+    after_build: Option<fn(&mut Self::T, &mut BuilderScope<C>)>,
+  ) -> Self::Set {
+    let mut set = vec![None; builder.len()];
+    for (i, item) in builder {
+      if i > set.len() {
+        set.resize(i, None);
+      }
+      set[i - 1] = Some(<[f64; 2]>::build_full(item, scope, before_build, after_build));
+    }
+    set
+  }
+  fn iter_set(set: &Self::Set) -> impl '_ + Iterator<Item = (Self::KeyFmt, &Self::T)> {
+    set
+      .iter()
+      .enumerate()
+      .filter_map(|(i, t)| t.as_ref().map(|_t| (VariableRangeKeyFmt(i + 1), _t)))
+  }
+}
 
 /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
 ///
@@ -968,7 +1017,7 @@ add_use_power_template!(TableLookUp);
 
 impl<C: 'static + Ctx> GroupFn<C> for TableLookUp<C> {
   #[expect(clippy::arithmetic_side_effects)]
-  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+  fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
@@ -978,7 +1027,7 @@ impl<C: 'static + Ctx> GroupFn<C> for TableLookUp<C> {
 }
 impl<C: 'static + Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
   #[expect(clippy::arithmetic_side_effects)]
-  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+  fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
@@ -988,7 +1037,7 @@ impl<C: 'static + Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
 }
 impl<C: 'static + Ctx> GroupFn<C> for TableLookUp2D<C> {
   #[expect(clippy::arithmetic_side_effects)]
-  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+  fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
@@ -998,7 +1047,7 @@ impl<C: 'static + Ctx> GroupFn<C> for TableLookUp2D<C> {
 }
 impl<C: 'static + Ctx> GroupFn<C> for OcvSigmaTable<C> {
   #[expect(clippy::arithmetic_side_effects)]
-  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+  fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
@@ -1008,7 +1057,7 @@ impl<C: 'static + Ctx> GroupFn<C> for OcvSigmaTable<C> {
 }
 impl<C: 'static + Ctx> GroupFn<C> for DriverWaveform<C> {
   #[expect(clippy::arithmetic_side_effects)]
-  fn before_build(builder: &mut Self::Builder, _: &mut ast::BuilderScope<C>) {
+  fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
     if builder.values.chunk_size == builder.values.inner.len()
       && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
     {
@@ -1156,13 +1205,19 @@ pub(crate) struct DisplayTableLookUp<'a, V: Iterator<Item = f64>> {
 
 impl<V: Iterator<Item = f64>> DisplayTableLookUp<'_, V> {
   #[inline]
-  pub(crate) fn fmt_self<T: Write, I: ast::Indentation, C: 'static + Ctx>(
+  pub(crate) fn fmt_self<
+    T: Write,
+    I: ast::Indentation,
+    C: 'static + Ctx,
+    K1: fmt::Display,
+    K2: fmt::Display,
+  >(
     self,
-    key1: &str,
-    key2: &str,
+    key1: K1,
+    key2: K2,
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    use core::fmt::Write as _;
+    use fmt::Write as _;
     f.write_new_line_indentation()?;
     write!(f, "{key1}{key2} (")?;
     ast::NameAttri::fmt_self(self.name, f)?;

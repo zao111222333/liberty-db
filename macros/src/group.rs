@@ -11,10 +11,12 @@ fn group_field_fn(
   default: Option<&Expr>,
   before_build: Option<&Path>,
   after_build: Option<&Path>,
+  dynamic_key: Option<&Expr>,
   arrti_type: &AttriType,
   attributes_name: &Ident,
   comments_name: &Ident,
 ) -> syn::Result<(
+  bool,
   proc_macro2::TokenStream,
   proc_macro2::TokenStream,
   proc_macro2::TokenStream,
@@ -22,6 +24,7 @@ fn group_field_fn(
   proc_macro2::TokenStream,
   proc_macro2::TokenStream,
 )> {
+  let has_dynamic_key = dynamic_key.is_some();
   let s_field_name = field_name.to_string();
   let s_field_name = s_field_name.strip_prefix("r#").unwrap_or(&s_field_name);
   let comment_fn_name =
@@ -44,7 +47,12 @@ fn group_field_fn(
   } else {
     quote! { #field_name: Default::default(), }
   };
-  let ty = extract_type(field_type);
+  let ty = if let Some(_dynamic_key) = dynamic_key {
+    quote! { <#_dynamic_key as crate::ast::DynamicKey<C>>::T }
+  } else {
+    let t = extract_type(field_type);
+    quote! { #t }
+  };
   let before_build = if let Some(f) = before_build {
     quote! { Some(#f) }
   } else {
@@ -55,25 +63,46 @@ fn group_field_fn(
   } else {
     quote! { None }
   };
-  let mut builder_field = quote! {
-    pub(crate) #field_name: <#field_type as crate::ast::ParsingSet<C,#ty>>::BuilderSet,
-  };
-  let mut build_arm = quote! {
-    #field_name: <#field_type as crate::ast::ParsingSet<C,#ty>>::build_set(builder.#field_name, scope, #before_build, #after_build),
+  let (mut builder_field, mut build_arm, iter_set) = if let Some(_dynamic_key) =
+    dynamic_key
+  {
+    (
+      quote! {
+        pub(crate) #field_name: crate::ast::DynamicKeyBuilderSet<C, #_dynamic_key>,
+      },
+      quote! {
+        #field_name: <#_dynamic_key as crate::ast::DynamicKey<C>>::build_set(builder.#field_name, scope, #before_build, #after_build),
+      },
+      quote! {
+        <#_dynamic_key as crate::ast::DynamicKey<C>>::iter_set(&self.#field_name)
+      },
+    )
+  } else {
+    (
+      quote! {
+        pub(crate) #field_name: <#field_type as crate::ast::ParsingSet<C,#ty>>::BuilderSet,
+      },
+      quote! {
+        #field_name: <#field_type as crate::ast::ParsingSet<C,#ty>>::build_set(builder.#field_name, scope, #before_build, #after_build),
+      },
+      quote! {
+        <#field_type as crate::ast::ParsingSet<C,#ty>>::iter_set(&self.#field_name, #s_field_name)
+      },
+    )
   };
   let parser_arm: proc_macro2::TokenStream;
   let write_field: proc_macro2::TokenStream;
   match arrti_type {
     AttriType::Simple => {
       write_field = quote! {
-        for simple in <#field_type as crate::ast::ParsingSet<C,#ty>>::iter_set(&self.#field_name) {
+        for (key, simple) in #iter_set {
           crate::ast::fmt_comment_liberty(self.#comment_fn_name(), f)?;
-          crate::ast::SimpleAttri::<C>::fmt_liberty(simple, #s_field_name, f)?;
+          crate::ast::SimpleAttri::<C>::fmt_liberty(simple, key, f)?;
         }
       };
       parser_arm = quote! {
         #s_field_name => {
-          let (new_input,simple_res) = <#ty as crate::ast::SimpleAttri<C>>::nom_parse(input, scope)?;
+          let (new_input, simple_res) = <#ty as crate::ast::SimpleAttri<C>>::nom_parse(input, scope)?;
           input = new_input;
           match simple_res {
             Ok(simple) => {
@@ -89,23 +118,42 @@ fn group_field_fn(
     }
     AttriType::Complex => {
       write_field = quote! {
-        for complex in <#field_type as crate::ast::ParsingSet<C,#ty>>::iter_set(&self.#field_name) {
+        for (key, complex) in #iter_set {
           crate::ast::fmt_comment_liberty(self.#comment_fn_name(), f)?;
-          crate::ast::ComplexAttri::<C>::fmt_liberty(complex, #s_field_name, f)?;
+          crate::ast::ComplexAttri::<C>::fmt_liberty(complex, key, f)?;
         }
       };
-      parser_arm = quote! {
-        #s_field_name => {
-          let (new_input,complex_res) = <#ty as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
-          input = new_input;
-          match complex_res {
-            Ok(complex) => {
-              <#field_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#field_name, complex, scope);
-            },
-            Err((e,undefined)) => {
-              crate::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
-              crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
-            },
+      parser_arm = if let Some(_dynamic_key) = dynamic_key {
+        quote! {
+          if let Some(id) = <#_dynamic_key as crate::ast::DynamicKey<C>>::key2id(key) {
+            let (new_input, complex_res) = <#ty as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
+            input = new_input;
+            match complex_res {
+              Ok(complex) => {
+                <#_dynamic_key as crate::ast::DynamicKey<C>>::push_set(&mut builder.#field_name, id, complex, scope);
+              },
+              Err((e,undefined)) => {
+                crate::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
+                crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
+              },
+            }
+            continue;
+          }
+        }
+      } else {
+        quote! {
+          #s_field_name => {
+            let (new_input, complex_res) = <#ty as crate::ast::ComplexAttri<C>>::nom_parse(input, scope)?;
+            input = new_input;
+            match complex_res {
+              Ok(complex) => {
+                <#field_type as crate::ast::ParsingSet<C,#ty>>::push_set(&mut builder.#field_name, complex, scope);
+              },
+              Err((e,undefined)) => {
+                crate::error!("{} Key={}; Value={:?}; Err={}",scope.loc,key,undefined,e);
+                crate::ast::attributs_set_undefined_complex(&mut builder.#attributes_name, key, undefined);
+              },
+            }
           }
         }
       };
@@ -113,9 +161,9 @@ fn group_field_fn(
     AttriType::Group => {
       comment_fn = quote! {};
       write_field = quote! {
-        for group in <#field_type as crate::ast::ParsingSet<C,#ty>>::iter_set(&self.#field_name) {
+        for (key, group) in #iter_set {
           crate::ast::fmt_comment_liberty(group.#comment_this_fn(), f)?;
-          crate::ast::GroupAttri::<C>::fmt_liberty(group, #s_field_name, f)?;
+          crate::ast::GroupAttri::<C>::fmt_liberty(group, key, f)?;
         }
       };
       parser_arm = quote! {
@@ -186,7 +234,15 @@ fn group_field_fn(
       builder_init = quote! { #(#_builder_init)* };
     }
   }
-  Ok((comment_fn, write_field, builder_init, parser_arm, builder_field, build_arm))
+  Ok((
+    has_dynamic_key,
+    comment_fn,
+    write_field,
+    builder_init,
+    parser_arm,
+    builder_field,
+    build_arm,
+  ))
 }
 
 pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
@@ -203,7 +259,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     let FieldsType {
       attri_type_map,
       default_map,
-      dynamic_name_map,
+      dynamic_key_map,
       before_build_map,
       after_build_map,
       name_vec,
@@ -265,6 +321,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       };
     }
     let mut parser_arms = quote! {};
+    let mut dynamic_parser_arms = quote! {};
     let defalut_impl = fields.iter().fold(quote! {}, |old, field| {
       let i = field.ident.as_ref().unwrap();
       if let Some(defalut) = default_map.get(i) {
@@ -291,18 +348,26 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     for (idx, (field_name, arrti_type, field_type)) in
       field_name_arrti_type.into_iter().enumerate()
     {
-      let (comment_fn, write_field, builder_init, parser_arm, builder_field, build_arm) =
-        group_field_fn(
-          (idx + 1) as u64,
-          field_name,
-          field_type,
-          default_map.get(field_name),
-          before_build_map.get(field_name),
-          after_build_map.get(field_name),
-          arrti_type,
-          attributes_name,
-          comments_name,
-        )?;
+      let (
+        has_dynamic_key,
+        comment_fn,
+        write_field,
+        builder_init,
+        parser_arm,
+        builder_field,
+        build_arm,
+      ) = group_field_fn(
+        (idx + 1) as u64,
+        field_name,
+        field_type,
+        default_map.get(field_name),
+        before_build_map.get(field_name),
+        after_build_map.get(field_name),
+        dynamic_key_map.get(field_name),
+        arrti_type,
+        attributes_name,
+        comments_name,
+      )?;
       comment_fns = quote! {
         #comment_fns
         #comment_fn
@@ -311,10 +376,17 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         #builder_inits
         #builder_init
       };
-      parser_arms = quote! {
-        #parser_arms
-        #parser_arm
-      };
+      if has_dynamic_key {
+        dynamic_parser_arms = quote! {
+          #dynamic_parser_arms
+          #parser_arm
+        };
+      } else {
+        parser_arms = quote! {
+          #parser_arms
+          #parser_arm
+        };
+      }
       builder_fields = quote! {
         #builder_fields
         #builder_field
@@ -460,7 +532,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
       #[doc(hidden)]
       #[allow(non_upper_case_globals, unused_attributes, unused_qualifications, clippy::too_many_lines)]
       impl<C: 'static + crate::Ctx> crate::ast::GroupAttri<C> for #ident<C> {
-        fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation>(&self, key: &str, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
+        fn fmt_liberty<T: core::fmt::Write, I: crate::ast::Indentation, K:core::fmt::Display>(&self, key: K, f: &mut crate::ast::CodeFormatter<'_, T, I>) -> core::fmt::Result {
           use core::fmt::Write;
           #write_title
           f.indent();
@@ -506,6 +578,7 @@ pub(crate) fn inner(ast: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
                     (input, _) = Self::include_file(builder, input, group_name, scope)?;
                   },
                   _ => {
+                    #dynamic_parser_arms;
                     if let Ok((new_input,undefined)) = crate::ast::parser::undefine(input, key, scope) {
                       input = new_input;
                       crate::ast::attributs_set_undefined_attri(
@@ -587,37 +660,26 @@ fn main_extended() {
 fn test_group() {
   use syn::parse_str;
   let input = r#"
-  pub struct DynamicCurrent<C: 'static+Ctx> {
+  pub struct PolyTemplate<C: 'static + Ctx> {
     #[liberty(name)]
-    #[id]
-    pub name: Option<String>,
+    #[id(borrow = str)]
+    pub name: String,
     /// group comments
     #[liberty(comments)]
     comments: GroupComments,
     #[liberty(extra_ctx)]
-    pub extra_ctx: C::Other,
+    pub extra_ctx: C::PolyTable,
     /// group undefined attributes
     #[liberty(attributes)]
-    pub attributes: crate::ast::Attributes,
-    #[id]
-    #[liberty(simple)]
-    pub when: Option<LogicBooleanExpression>,
-    #[id]
-    #[liberty(simple)]
-    pub related_inputs: WordSet,
-    #[id]
-    #[liberty(simple)]
-    pub related_outputs: WordSet,
+    pub attributes: Attributes,
     #[liberty(complex)]
-    pub typical_capacitances: Option<Vec<f64>>,
-    /// Use the switching_group group to specify a current waveform vector when the power
-    /// and ground current is dependent on pin switching conditions.
-    /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=150.18&end=150.19
-    /// ">Reference</a>
-    #[liberty(group)]
-    pub switching_group: LibertySet<SwitchingGroup<C>>,
-  }
+    pub variables: Vec<PolyTemplateVariable>,
+    #[liberty(complex)]
+    pub mapping: LibertySet<VoltageMapping>,
+    #[liberty(complex)]
+    #[liberty(dynamic_key = VariableRangeName)]
+    pub variable_range: LibertyVec<Option<[f64; 2]>>,
+  }  
     "#;
   let item: DeriveInput = parse_str(input).unwrap();
   let out = inner(&item).unwrap_or_else(|err| err.to_compile_error());

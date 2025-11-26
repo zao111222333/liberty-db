@@ -91,7 +91,10 @@ pub(crate) trait ParsingSet<C: 'static + Ctx, T: 'static + ParsingBuilder<C>>:
     before_build: Option<fn(&mut T::Builder, &mut BuilderScope<C>)>,
     after_build: Option<fn(&mut T, &mut BuilderScope<C>)>,
   ) -> Self;
-  fn iter_set(&self) -> impl '_ + Iterator<Item = &T>;
+  fn iter_set<K: 'static + Copy + core::fmt::Display>(
+    &self,
+    key: K,
+  ) -> impl '_ + Iterator<Item = (K, &T)>;
 }
 
 impl<C: 'static + Ctx, T: 'static + Sized + Default + ParsingBuilder<C>> ParsingSet<C, T>
@@ -109,8 +112,11 @@ impl<C: 'static + Ctx, T: 'static + Sized + Default + ParsingBuilder<C>> Parsing
   ) -> Self {
     T::build_full(builder, scope, before_build, after_build)
   }
-  fn iter_set(&self) -> impl '_ + Iterator<Item = &T> {
-    core::iter::once(self)
+  fn iter_set<K: 'static + Copy + core::fmt::Display>(
+    &self,
+    key: K,
+  ) -> impl '_ + Iterator<Item = (K, &T)> {
+    core::iter::once((key, self))
   }
 }
 
@@ -133,8 +139,11 @@ impl<C: 'static + Ctx, T: 'static + Sized + ParsingBuilder<C>> ParsingSet<C, T>
   ) -> Self {
     builder.map(|b| T::build_full(b, scope, before_build, after_build))
   }
-  fn iter_set(&self) -> impl '_ + Iterator<Item = &T> {
-    self.iter()
+  fn iter_set<K: 'static + Copy + core::fmt::Display>(
+    &self,
+    key: K,
+  ) -> impl '_ + Iterator<Item = (K, &T)> {
+    self.iter().map(move |t| (key, t))
   }
 }
 
@@ -156,8 +165,11 @@ impl<C: 'static + Ctx, T: 'static + Sized + ParsingBuilder<C>> ParsingSet<C, T>
       .map(|b| T::build_full(b, scope, before_build, after_build))
       .collect()
   }
-  fn iter_set(&self) -> impl '_ + Iterator<Item = &T> {
-    self.iter()
+  fn iter_set<K: 'static + Copy + core::fmt::Display>(
+    &self,
+    key: K,
+  ) -> impl '_ + Iterator<Item = (K, &T)> {
+    self.iter().map(move |t| (key, t))
   }
 }
 
@@ -183,17 +195,44 @@ impl<
     set.sort_unstable();
     set
   }
-  fn iter_set(&self) -> impl '_ + Iterator<Item = &T> {
-    self.iter()
+  fn iter_set<K: 'static + Copy + core::fmt::Display>(
+    &self,
+    key: K,
+  ) -> impl '_ + Iterator<Item = (K, &T)> {
+    self.iter().map(move |t| (key, t))
   }
 }
 
-pub(crate) trait DynamicName {
-  type Key: core::hash::Hash + Eq;
-  type T;
-  fn name2key(name: &str) -> Option<Self::Key>;
+pub(crate) trait DynamicKey<C: 'static + Ctx> {
+  type Id: core::hash::Hash + Eq;
+  type T: 'static + ParsingBuilder<C> + Sized;
+  type Set;
+  type KeyFmt: 'static + core::fmt::Display;
+  fn key2id(key: &str) -> Option<Self::Id>;
+  fn build_set(
+    builder: DynamicKeyBuilderSet<C, Self>,
+    scope: &mut BuilderScope<C>,
+    before_build: Option<
+      fn(&mut <Self::T as ParsingBuilder<C>>::Builder, &mut BuilderScope<C>),
+    >,
+    after_build: Option<fn(&mut Self::T, &mut BuilderScope<C>)>,
+  ) -> Self::Set;
+  fn push_set(
+    builder: &mut DynamicKeyBuilderSet<C, Self>,
+    id: Self::Id,
+    item: <Self::T as ParsingBuilder<C>>::Builder,
+    scope: &ParseScope<'_>,
+  ) {
+    _ = scope;
+    if builder.insert(id, item).is_some() {
+      crate::error!("{} error={}", scope.loc, IdError::RepeatAttri);
+    }
+  }
+  fn iter_set(set: &Self::Set) -> impl '_ + Iterator<Item = (Self::KeyFmt, &Self::T)>;
 }
-type DynamicNameBuilder<N: DynamicName> = HashMap<N::Key, N::T>;
+#[expect(type_alias_bounds)]
+pub(crate) type DynamicKeyBuilderSet<C: 'static + Ctx, N: DynamicKey<C>> =
+  HashMap<N::Id, <N::T as ParsingBuilder<C>>::Builder, RandomState>;
 
 macro_rules! impl_self_builder {
   ($t:ty) => {
@@ -706,9 +745,9 @@ pub(crate) trait SimpleAttri<C: 'static + Ctx>: Sized + ParsingBuilder<C> {
   ) -> core::fmt::Result;
   /// `fmt_liberty`
   #[inline]
-  fn fmt_liberty<T: Write, I: Indentation>(
+  fn fmt_liberty<T: Write, I: Indentation, K: core::fmt::Display>(
     &self,
-    key: &str,
+    key: K,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     if self.is_set() {
@@ -833,9 +872,9 @@ pub(crate) trait ComplexAttri<C: 'static + Ctx>:
   ) -> core::fmt::Result;
   /// `fmt_liberty`
   #[inline]
-  fn fmt_liberty<T: Write, I: Indentation>(
+  fn fmt_liberty<T: Write, I: Indentation, K: core::fmt::Display>(
     &self,
-    key: &str,
+    key: K,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     if self.is_set() {
@@ -949,9 +988,9 @@ pub(crate) trait GroupAttri<C: 'static + Ctx>:
     Ok((i, Ok(())))
   }
   /// `fmt_liberty`
-  fn fmt_liberty<T: Write, I: Indentation>(
+  fn fmt_liberty<T: Write, I: Indentation, K: core::fmt::Display>(
     &self,
-    key: &str,
+    key: K,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result;
 }

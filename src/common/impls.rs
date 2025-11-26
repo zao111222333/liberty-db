@@ -298,14 +298,19 @@ impl<const N: usize, C: 'static + Ctx> ComplexAttri<C> for [f64; N] {
   }
   #[inline]
   fn is_set(&self) -> bool {
-    N == 0
+    N != 0
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
+    join_fmt_no_quote(
+      self.iter(),
+      f,
+      |float, ff| ff.write_num(*float),
+      |ff| write!(ff, ", "),
+    )
   }
 }
 crate::ast::impl_self_builder!((String, f64));

@@ -41,7 +41,7 @@ pub(crate) struct FieldsType<'a> {
   /// default map
   pub(crate) default_map: HashMap<&'a Ident, Expr>,
   /// dynamic name map
-  pub(crate) dynamic_name_map: HashMap<&'a Ident, Expr>,
+  pub(crate) dynamic_key_map: HashMap<&'a Ident, Expr>,
   /// before_build_map
   pub(crate) before_build_map: HashMap<&'a Ident, Path>,
   /// after_build_map
@@ -66,7 +66,7 @@ pub(crate) fn parse_fields_type(
   let mut _extra_ctx_name = None;
   let mut attri_type_map = HashMap::new();
   let mut default_map = HashMap::new();
-  let mut dynamic_name_map = HashMap::new();
+  let mut dynamic_key_map = HashMap::new();
   let mut before_build_map = HashMap::new();
   let mut after_build_map = HashMap::new();
   for field in fields {
@@ -75,8 +75,8 @@ pub(crate) fn parse_fields_type(
       if let Some(default) = parse_field_default(field_attrs)? {
         _ = default_map.insert(field_name, default);
       }
-      if let Some(default) = parse_field_dynamic_name(field_attrs)? {
-        _ = dynamic_name_map.insert(field_name, default);
+      if let Some(default) = parse_field_dynamic_key(field_attrs)? {
+        _ = dynamic_key_map.insert(field_name, default);
       }
 
       match parse_field_build(field_attrs)? {
@@ -160,7 +160,7 @@ pub(crate) fn parse_fields_type(
       Ok(FieldsType {
         attri_type_map,
         default_map,
-        dynamic_name_map,
+        dynamic_key_map,
         before_build_map,
         after_build_map,
         name_vec,
@@ -210,7 +210,7 @@ pub(crate) fn parse_field_attrs(
                 parse_supergroup_type(tokens)?,
               ))));
             }
-            "default" | "dynamic_name" => {
+            "default" | "dynamic_key" => {
               continue;
             }
             _ => {
@@ -264,7 +264,7 @@ fn parse_field_default(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Exp
   }
   Ok(None)
 }
-fn parse_field_dynamic_name(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Expr>> {
+fn parse_field_dynamic_key(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Expr>> {
   for attr in field_attrs {
     if attr.path().is_ident("liberty") {
       let res = attr.parse_args_with(|input: ParseStream| {
@@ -274,7 +274,7 @@ fn parse_field_dynamic_name(field_attrs: &[syn::Attribute]) -> syn::Result<Optio
         }
         let key: Ident = input.parse()?;
 
-        if key == "dynamic_name" {
+        if key == "dynamic_key" {
           let _eq: Token![=] = input.parse()?;
           let expr: Expr = input.parse()?;
 
