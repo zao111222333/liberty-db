@@ -111,7 +111,7 @@ pub struct Library<C: 'static + Ctx> {
   /// Used in TSMC PDK
   #[liberty(simple)]
   pub simulation: Option<bool>,
-  /// The bus_naming_style attribute defines the naming convention for buses in the library.
+  /// The `bus_naming_style` attribute defines the naming convention for buses in the library.
   ///
   /// *Syntax*
   /// ```text
@@ -122,13 +122,13 @@ pub struct Library<C: 'static + Ctx> {
   /// symbols can appear in any order with at least one nonnumeric character in
   /// between.
   ///
-  /// The colon character is not allowed in a bus_naming_style attribute value
+  /// The colon character is not allowed in a `bus_naming_style` attribute value
   /// because the colon is used to denote a range of bus members. You construct a
   /// complete bused-pin name by using the name of the owning bus and the member
   /// number. The owning bus name is substituted for the `%s`, and the member
   /// number replaces the `%d`.
   ///
-  /// If you do not define the bus_naming_style attribute, the default naming convention is
+  /// If you do not define the `bus_naming_style` attribute, the default naming convention is
   /// applied, as shown.
   ///
   /// *Example*
@@ -585,22 +585,22 @@ pub struct Library<C: 'static + Ctx> {
   /// factors scale the power computation according to process, temperature, and voltage.
   /// The power-scaling factors are listed below. In the following syntax, multiplier is a floatingpoint number:
   ///
-  /// Specifies process derating factors for the cell_leakage_power attribute.
+  /// Specifies process derating factors for the `cell_leakage_power` attribute.
   #[liberty(simple)]
   pub k_process_cell_leakage_power: Option<f64>,
-  /// Specifies process derating factors for the internal_power attribute.
+  /// Specifies process derating factors for the `internal_power` attribute.
   #[liberty(simple)]
   pub k_process_internal_power: Option<f64>,
-  /// Specifies temperature derating factors for the cell_leakage_power attribute.
+  /// Specifies temperature derating factors for the `cell_leakage_power` attribute.
   #[liberty(simple)]
   pub k_temp_cell_leakage_power: Option<f64>,
-  /// Specifies temperature derating factors for the internal_power attribute.
+  /// Specifies temperature derating factors for the `internal_power` attribute.
   #[liberty(simple)]
   pub k_temp_internal_power: Option<f64>,
-  /// Specifies voltage derating factors for the cell_leakage_power attribute.
+  /// Specifies voltage derating factors for the `cell_leakage_power` attribute.
   #[liberty(simple)]
   pub k_volt_cell_leakage_power: Option<f64>,
-  /// Specifies voltage derating factors for the internal_power attribute.
+  /// Specifies voltage derating factors for the `internal_power` attribute.
   #[liberty(simple)]
   pub k_volt_internal_power: Option<f64>,
   /// The `is_soi`  attribute specifies that the cell is a

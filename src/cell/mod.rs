@@ -126,7 +126,7 @@ impl Default for DefaultCellCtx {
 #[duplicated(
   name = ScaledCell,
   docs(
-    /// You can use the scaled_cell group to supply an alternate set of values for an existing
+    /// You can use the `scaled_cell` group to supply an alternate set of values for an existing
     /// cell. The choice is based on the set of operating conditions used.
     /// Syntax:
     /// ```text
@@ -137,7 +137,7 @@ impl Default for DefaultCellCtx {
     /// existing_cell
     /// The name of a cell defined in a previous cell group.
     /// 
-    /// The library-level operating_conditions group with which the scaled cell is
+    /// The library-level `operating_conditions` group with which the scaled cell is
     /// associated.
     /// 
     /// Example:
@@ -214,7 +214,7 @@ pub struct Cell<C: 'static + Ctx> {
   pub attributes: Attributes,
   #[liberty(simple)]
   pub area: Option<f64>,
-  /// The bus_naming_style attribute defines the naming convention for buses in the library.
+  /// The `bus_naming_style` attribute defines the naming convention for buses in the library.
   ///
   /// *Syntax*
   /// ```text
@@ -225,13 +225,13 @@ pub struct Cell<C: 'static + Ctx> {
   /// symbols can appear in any order with at least one nonnumeric character in
   /// between.
   ///
-  /// The colon character is not allowed in a bus_naming_style attribute value
+  /// The colon character is not allowed in a `bus_naming_style` attribute value
   /// because the colon is used to denote a range of bus members. You construct a
   /// complete bused-pin name by using the name of the owning bus and the member
   /// number. The owning bus name is substituted for the `%s`, and the member
   /// number replaces the `%d`.
   ///
-  /// If you do not define the bus_naming_style attribute, the default naming convention is
+  /// If you do not define the `bus_naming_style` attribute, the default naming convention is
   /// applied, as shown.
   ///
   /// *Example*
@@ -450,14 +450,14 @@ pub struct Cell<C: 'static + Ctx> {
   #[liberty(simple)]
   pub retention_cell: Option<String>,
   /// Note:
-  /// The `power_gating_cell` attribute has been replaced by the retention_cell
+  /// The `power_gating_cell` attribute has been replaced by the `retention_cell`
   /// attribute. See `retention_cell` Simple Attribute on page 118.
   ///
   /// The cell-level `power_gating_cell` attribute specifies that a cell is a power-switch cell. A
   /// power-switch cell has two modes. When functioning in normal mode, the power-switch
   /// cell functions as a regular cell. When functioning in power-saving mode, the power-switch
   /// cell’s power supply is shut off.
-  /// The pin-level map_to_logic attribute specifies which logic level the `power_gating_cell`
+  /// The pin-level `map_to_logic` attribute specifies which logic level the `power_gating_cell`
   /// is tied to when the cell is functioning in normal mode.
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=117.26&end=117.33

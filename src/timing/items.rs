@@ -164,7 +164,6 @@ pub struct TimingTableLookUp<C: 'static + Ctx> {
   pub lvf_early_late_values: Vec<LVFEarlyLate>,
 }
 #[expect(
-  clippy::similar_names,
   clippy::indexing_slicing,
   clippy::arithmetic_side_effects
 )]

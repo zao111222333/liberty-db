@@ -319,9 +319,9 @@ pub struct DriverWaveform<C: 'static + Ctx> {
   name = DcCurrent,
   docs(
     /// The cell-level `dc_current` group models the steady state current information, similar to
-    /// the lu_table_template group. The table is used to specify the DC current through the
+    /// the `lu_table_template` group. The table is used to specify the DC current through the
     /// cell’s output pin (generally the `related_internal_pg_pin`) in the current units specified
-    /// at the library level using the current_unit attribute.
+    /// at the library level using the `current_unit` attribute.
     /// 
     /// The `dc_current` group includes the `related_switch_pin`, `related_pg_pin`, and
     /// `related_internal_pg_pin` attributes, which are described in the following sections.
@@ -552,7 +552,7 @@ impl<C: 'static + Ctx> GroupFn<C> for PropagationLutTemplate<C> {
 /// ...
 /// }
 /// ```
-/// The syntax of the poly_template group is the same as that used for the delay model,
+/// The syntax of the `poly_template` group is the same as that used for the delay model,
 /// except that the variables used in the format are
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=609.11&end=609.57
@@ -594,7 +594,7 @@ impl<C: 'static + Ctx> GroupFn<C> for PropagationLutTemplate<C> {
     /// ...
     /// }
     /// ```
-    /// The syntax of the poly_template group is the same as that used for the delay model,
+    /// The syntax of the `poly_template` group is the same as that used for the delay model,
     /// except that the variables used in the format are
     /// <a name ="reference_link" href="
     /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=609.11&end=609.57

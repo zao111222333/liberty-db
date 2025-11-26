@@ -129,7 +129,6 @@
     clippy::exhaustive_structs,
     clippy::exhaustive_enums,
     clippy::missing_panics_doc, // TODO: add panic docs
-    clippy::panic_in_result_fn,
     clippy::print_stdout,
     clippy::absolute_paths,
     clippy::use_debug,

@@ -111,9 +111,9 @@ impl<C: 'static + Ctx> GroupFn<C> for TLatch<C> {}
 /// below and above the rails and have tables for high and low tables on the same pin.
 /// + When no table or hyperbolic function is defined for a given pin, the application checks
 /// other measures for noise immunity, such as DC noise margins.
-/// + The unit for height and height_coefficient is the library unit of voltage. The
-/// unit for width and width_coefficient is the library unit of time. The unit for
-/// area_coefficient is the library unit of voltage multiplied by the library unit of time.
+/// + The unit for height and `height_coefficient` is the library unit of voltage. The
+/// unit for width and `width_coefficient` is the library unit of time. The unit for
+/// `area_coefficient` is the library unit of voltage multiplied by the library unit of time.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=620.3&end=620.46
 /// ">Reference-Definition</a>
