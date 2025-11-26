@@ -166,6 +166,7 @@
     clippy::unwrap_used,
     clippy::expect_used,
     clippy::too_many_lines,
+    clippy::float_arithmetic,
     clippy::non_ascii_literal,
     clippy::must_use_candidate,
     clippy::needless_raw_strings,

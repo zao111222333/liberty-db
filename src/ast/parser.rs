@@ -654,7 +654,7 @@ pub(crate) fn complex_single<'a>(
 mod test_key {
   use super::*;
   #[test]
-  fn test_complex1() {
+  fn complex1() {
     assert_eq!(
       Ok(("}", vec![(0, "3"), (0, "4"), (0, "5")])),
       complex(r#" (3, 4, 5,); }"#, &mut 1)

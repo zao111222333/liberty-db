@@ -921,7 +921,7 @@ crate::ast::impl_simple!(ClearPresetState);
 mod test {
   use crate::{
     DefaultCtx,
-    expression::{BddBooleanExpression, FF, FFBank, Latch, LatchBank, LatchFF},
+    expression::{BddBooleanExpression, FF, FFBank, Latch, LatchBank, LatchFF as _},
   };
   #[test]
   fn eq_inverse_logic() {

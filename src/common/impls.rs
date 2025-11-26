@@ -54,7 +54,7 @@ impl<C: 'static + Ctx> SimpleAttri<C> for bool {
   ) -> ast::SimpleParseRes<'a, Self> {
     ast::nom_parse_from::<C, _, _, _>(i, scope, |s| match s {
       "true" | "TRUE" => Ok(true),
-      "false" | "FALSE" => Ok(true),
+      "false" | "FALSE" => Ok(false),
       _ => Err(()),
     })
   }
@@ -536,7 +536,7 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Vec<Variable> {
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    join_fmt_no_quote(self.iter(), f, |s, ff| write!(ff, "{}", s), |ff| write!(ff, ", "))
+    join_fmt_no_quote(self.iter(), f, |s, ff| write!(ff, "{s}"), |ff| write!(ff, ", "))
   }
   // #[inline]
   // fn fmt_liberty<T: Write, I: Indentation>(

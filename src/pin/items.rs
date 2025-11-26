@@ -147,11 +147,11 @@ pub struct HyperbolicNoise<C: 'static + Ctx> {
 }
 impl<C: 'static + Ctx> GroupFn<C> for HyperbolicNoise<C> {}
 
-/// The memory_write group is in the bus group. All data input requires a memory_write
+/// The `memory_write` group is in the bus group. All data input requires a `memory_write`
 /// group to define how the data is written into the memory block. The attributes in this group
 /// are
 /// + address
-/// + clocked_on
+/// + `clocked_on`
 /// + enable
 ///
 /// *Syntax*:

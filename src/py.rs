@@ -62,8 +62,8 @@ impl<'py> FromPyObject<'_, 'py> for CapacitiveLoadUnit {
   type Error = PyErr;
 
   #[inline]
-  fn extract(ob: Borrowed<'_, 'py, PyAny>) -> PyResult<Self> {
-    let (val, s_ff_pf) = ob.extract::<(f64, String)>()?;
+  fn extract(obj: Borrowed<'_, 'py, PyAny>) -> PyResult<Self> {
+    let (val, s_ff_pf) = obj.extract::<(f64, String)>()?;
     match s_ff_pf.as_str() {
       "ff" => Ok(Self::FF(val)),
       "pf" => Ok(Self::PF(val)),

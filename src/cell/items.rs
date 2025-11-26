@@ -62,7 +62,7 @@ mod test_sort {
   use crate::DefaultCtx;
 
   #[test]
-  fn test_leakage_sort() {
+  fn leakage_sort() {
     let cell = crate::ast::test_parse::<crate::Cell<DefaultCtx>>(
       r#"(CELL) {
       pin(A){}
@@ -134,10 +134,10 @@ mod test_sort {
 ///
 /// attributes:
 /// + type
-/// + address_width
-/// + word_width
-/// + column_address
-/// + row_address
+/// + `address_width`
+/// + `word_width`
+/// + `column_address`
+/// + `row_address`
 ///
 /// Syntax:
 /// ```text
@@ -490,7 +490,6 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 |           L   -   -  :  -  :  N ";
 }"#,
     );
-    dbg!(statetable.table);
     _ = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
       r#"(" CLK EN SE",ENL) {
         table : "	H   L  L \

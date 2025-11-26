@@ -822,8 +822,8 @@ mod test {
     let mean = nominal + mean_shift;
     let moments = LVFMoments { mean, std_dev, skewness };
     let early_late = LVFEarlyLate { early_sigma, late_sigma };
-    dbg!(moments.to_early_late(nominal));
-    dbg!(moments.to_early_late(nominal).unwrap().to_moments(nominal, mean));
-    dbg!(early_late.to_moments(nominal, mean));
+    moments.to_early_late(nominal);
+    moments.to_early_late(nominal).unwrap().to_moments(nominal, mean);
+    early_late.to_moments(nominal, mean);
   }
 }

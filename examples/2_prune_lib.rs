@@ -77,7 +77,7 @@ fn main() -> ExitCode {
   }
   let out_file_name =
     format!("example2_{}", input_lib.file_name().unwrap().to_str().unwrap());
-  log::info!("Output to [file] {} ...", out_file_name);
+  log::info!("Output to [file] {out_file_name} ...");
   library.write_lib_file(&out_file_name).unwrap();
   ExitCode::SUCCESS
 }

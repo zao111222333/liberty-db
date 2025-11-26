@@ -1795,7 +1795,7 @@ liberty_db::timing::Timing () {
     assert_lvf_fn(14.0, 30.0, 220.0);
   }
   // FIXME:
-  #[ignore]
+  #[ignore = "FIXME"]
   #[test]
   fn table_lookup_mismatch_lvf() {
     use crate::ast::GroupAttri;

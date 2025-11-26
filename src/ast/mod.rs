@@ -212,6 +212,7 @@ pub(crate) trait DynamicKey<C: 'static + Ctx> {
   type Set;
   type KeyFmt: 'static + core::fmt::Display;
   fn key2id(key: &str) -> Option<Self::Id>;
+  #[expect(clippy::type_complexity)]
   fn build_set(
     builder: DynamicKeyBuilderSet<C, Self>,
     scope: &mut BuilderScope<C>,
@@ -1131,7 +1132,7 @@ pub(crate) fn test_parse<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
     Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
-  };
+  }
   let mut builder_scope = BuilderScope::<DefaultCtx>::default();
   let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
   println!("{}", g.display());
@@ -1150,7 +1151,7 @@ pub(crate) fn test_parse_fmt<G: GroupAttri<DefaultCtx> + Group<DefaultCtx>>(
     Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
-  };
+  }
   let mut builder_scope = BuilderScope::<DefaultCtx>::default();
   let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
   let fmt_str = g.display().to_string();
@@ -1171,7 +1172,7 @@ pub(crate) fn test_parse_fmt_included<G: GroupAttri<DefaultCtx> + Group<DefaultC
     Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
-  };
+  }
   let mut builder_scope = BuilderScope::<DefaultCtx>::default();
   let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);
   let fmt_str = g.display().to_string();
@@ -1195,7 +1196,7 @@ pub(crate) fn test_parse_fmt_variables<G: GroupAttri<DefaultCtx> + Group<Default
     Ok((_, Ok(_))) => {}
     Ok((_, Err(e))) => panic!("{e}"),
     Err(e) => panic!("{e}"),
-  };
+  }
   let mut builder_scope = BuilderScope::<DefaultCtx>::default();
   builder_scope.cell_extra_ctx.logic_variables = BddVariableSet::new(variable);
   let g = <G as ParsingBuilder<DefaultCtx>>::build(builder, &mut builder_scope);

@@ -655,6 +655,7 @@ impl<C: 'static + Ctx> DynamicKey<C> for VariableRangeName {
   fn key2id(key: &str) -> Option<Self::Id> {
     key.strip_prefix("variable_")?.strip_suffix("_range")?.parse().ok()
   }
+  #[expect(clippy::arithmetic_side_effects, clippy::indexing_slicing)]
   fn build_set(
     builder: DynamicKeyBuilderSet<C, Self>,
     scope: &mut BuilderScope<C>,
@@ -672,6 +673,7 @@ impl<C: 'static + Ctx> DynamicKey<C> for VariableRangeName {
     }
     set
   }
+  #[expect(clippy::arithmetic_side_effects)]
   fn iter_set(set: &Self::Set) -> impl '_ + Iterator<Item = (Self::KeyFmt, &Self::T)> {
     set
       .iter()
@@ -697,11 +699,11 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
 crate::ast::impl_simple!(VariableTypeCompactLutTemplateIndex12);
 
-/// The table template specifying propagated noise can have three variables (variable_1,
-/// variable_2, and variable_3). The variables indicate the parameters used to index
+/// The table template specifying propagated noise can have three variables (`variable_1`,
+/// `variable_2`, and `variable_3`). The variables indicate the parameters used to index
 /// the lookup table along the first, second, and third table axes. The parameters are
 /// `input_noise_width`, `input_noise_height`, and `total_output_net_capacitance`.
-/// The index values in the index_1, index_2, and index_3 attributes are a list of positive
+/// The index values in the `index_1`, `index_2`, and `index_3` attributes are a list of positive
 /// floating-point numbers. The values in the list must be in increasing order.
 /// The unit for `input_noise_width` and `input_noise_height` is the library time unit.
 /// <a name ="reference_link" href="
@@ -1749,6 +1751,8 @@ pub struct VoltageName {
 }
 impl FromStr for VoltageName {
   type Err = lexical_core::Error;
+  #[inline]
+  #[expect(clippy::indexing_slicing)]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     const S: &str = "voltage";
     #[expect(clippy::string_slice)]
@@ -1764,7 +1768,7 @@ impl FromStr for VoltageName {
       core::cmp::Ordering::Greater => {
         if &s[..S.len()] == S {
           Ok(Self {
-            i: Some(lexical_core::parse(s[S.len()..].as_bytes())?),
+            i: Some(lexical_core::parse(&s.as_bytes()[S.len()..])?),
           })
         } else {
           Err(lexical_core::Error::InvalidFlags)
@@ -1774,9 +1778,10 @@ impl FromStr for VoltageName {
   }
 }
 impl fmt::Display for VoltageName {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "voltage")?;
-    if let Some(i) = self.i { write!(f, "{i}") } else { Ok(()) }
+    self.i.map_or(Ok(()), |i| write!(f, "{i}"))
   }
 }
 

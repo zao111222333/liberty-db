@@ -459,7 +459,7 @@ mod test {
       }
     }
   }
-  impl std::str::FromStr for BddBooleanExpression {
+  impl core::str::FromStr for BddBooleanExpression {
     type Err = BoolExprErr;
     #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
