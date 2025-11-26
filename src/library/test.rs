@@ -60,6 +60,7 @@ library (define) {
 | define (my_define_integer, cell, integer);
 | define (my_define_str, library, string);
 | delay_model : table_lookup;
+| power_model : table_lookup;
 | time_unit : 1ns;
 | voltage_unit : 1V;
 | slew_upper_threshold_pct_rise : 80.0;
@@ -154,6 +155,7 @@ library (undefined) {
 | ** comment3 */
 | technology (cmos);
 | delay_model : table_lookup;
+| power_model : table_lookup;
 | * one line comment
 | time_unit : 1ns;
 | voltage_unit : 1V;
@@ -248,6 +250,7 @@ fn serde() {
   let want = r#"** test
 library (undefined) {
 | delay_model : table_lookup;
+| power_model : table_lookup;
 | time_unit : 1ns;
 | voltage_unit : 1V;
 | slew_upper_threshold_pct_rise : 80.0;
@@ -301,6 +304,7 @@ fn formula() {
   let want = r#"** test
 library (test) {
 | delay_model : table_lookup;
+| power_model : table_lookup;
 | time_unit : 1ns;
 | voltage_unit : 1V;
 | voltage_map (TVDD, 0.8);
@@ -375,6 +379,7 @@ fn bus_type() {
   let want = r#"** test
 library (test) {
 | delay_model : table_lookup;
+| power_model : table_lookup;
 | time_unit : 1ns;
 | voltage_unit : 1V;
 | slew_upper_threshold_pct_rise : 80.0;

@@ -3,7 +3,7 @@ library (example) {
 	technology (cmos);
 	delay_model : table_lookup;
 	power_model : table_lookup;
-	simulation : true;
+	simulation : false;
 	nom_process : 1.0;
 	nom_temperature : 85.0;
 	nom_voltage : 3.0;
@@ -60,7 +60,7 @@ library (example) {
 	}
 	cell (AN2) {
 		area : 2.0;
-		interface_timing : true;
+		interface_timing : false;
 		memory (memx) {
 			address_width : 11;
 		}

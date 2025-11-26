@@ -226,7 +226,7 @@ pub struct Pin<C: 'static + Ctx> {
   /// `power_gating_cell` Simple Attribute on page 117.
   ///
   /// Syntax
-  /// ```text
+  /// ``` text
   /// `power_gating_pin` ("power_pin_[1-5]", enumerated_type) ;
   /// ```
   ///
@@ -239,7 +239,7 @@ pub struct Pin<C: 'static + Ctx> {
   /// cell functions as a normal cell.
   ///
   /// Example
-  /// ```
+  /// ``` text
   /// power_gating_pin ( "power_pin_1", 0) ;
   /// ```
   /// <a name ="reference_link" href="
