@@ -71,8 +71,81 @@ pub struct TLatch<C: 'static + Ctx> {
   #[liberty(simple)]
   pub tdisable: Option<bool>,
 }
-
 impl<C: 'static + Ctx> GroupFn<C> for TLatch<C> {}
+
+/// To specify hyperbolic noise immunity information, use the
+/// `hyperbolic_noise_above_high`, `hyperbolic_noise_below_low`,
+/// `hyperbolic_noise_high`, and `hyperbolic_noise_low` groups within the pin group.
+///
+/// Syntax
+/// ```text
+/// pin(namestring) {
+/// ...
+/// hyperbolic_noise_above_high() {
+/// height_coefficient : float;
+/// area_coefficient : float;
+/// width_coefficient : float;
+/// }
+/// hyperbolic_noise_below_low() {
+/// ...
+/// }
+/// hyperbolic_noise_high() {
+/// ...
+/// }
+/// hyperbolic_noise_low() {
+/// ...
+/// }
+/// ...
+/// }
+/// ```
+///
+/// The coefficient values for height, width, and area must be 0 or a positive number.
+///
+/// The following rules apply to noise immunity groups:
+/// + The hyperbolic noise groups are optional, and each can be defined separately from the
+/// other three.
+/// + For the same region (above-high, below-low, high, or low), the hyperbolic noise groups
+/// can coexist with normal noise immunity tables.
+/// + For different regions (above-high, below-low, high, or low), a combination of tables and
+/// hyperbolic functions is allowed. For example, you might have a hyperbolic function for
+/// below and above the rails and have tables for high and low tables on the same pin.
+/// + When no table or hyperbolic function is defined for a given pin, the application checks
+/// other measures for noise immunity, such as DC noise margins.
+/// + The unit for height and height_coefficient is the library unit of voltage. The
+/// unit for width and width_coefficient is the library unit of time. The unit for
+/// area_coefficient is the library unit of voltage multiplied by the library unit of time.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=620.3&end=620.46
+/// ">Reference-Definition</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html');
+/// </script>
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct HyperbolicNoise<C: 'static + Ctx> {
+  /// Name of the pin
+  #[liberty(name)]
+  #[id]
+  pub name: Option<String>,
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::Other,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  #[liberty(simple)]
+  pub height_coefficient: f64,
+  #[liberty(simple)]
+  pub area_coefficient: f64,
+  #[liberty(simple)]
+  pub width_coefficient: f64,
+}
+impl<C: 'static + Ctx> GroupFn<C> for HyperbolicNoise<C> {}
 
 /// The memory_write group is in the bus group. All data input requires a memory_write
 /// group to define how the data is written into the memory block. The attributes in this group

@@ -1361,6 +1361,54 @@ pub struct BaseCurves<C: 'static + Ctx> {
 
 impl<C: 'static + Ctx> GroupFn<C> for BaseCurves<C> {}
 
+/// The `power_supply` group captures all nominal information about voltage variation.
+/// It is defined before the `operating_conditions` group and before the `cell` groups.
+/// All the power supply names defined in the `power_supply` group exist in the
+/// `operating_conditions` group. Define the `power_supply` group at the library level.
+///
+/// Syntax
+/// ```text
+/// power_supply () {
+///   default_power_rail : string ;
+///   power_rail (string, float) ;
+///   power_rail (string, float) ;
+///   ...
+/// }
+/// ```
+/// Example
+/// ```text
+/// power_supply () {
+///   default_power_rail : VDD0;
+///   power_rail (VDD1, 5.0) ;
+///   power_rail (VDD2, 3.3) ;
+/// }
+/// ```
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=51.33+52.2&end=51.34+52.16
+/// ">Reference</a>
+/// <script>
+/// IFRAME('https://zao111222333.github.io/liberty-db/2020.09/user_guide.html');
+/// </script>
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct PowerSupply<C: 'static + Ctx> {
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::Other,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  #[liberty(simple)]
+  pub default_power_rail: Option<String>,
+  #[liberty(complex)]
+  pub power_rail: LibertySet<VoltageMap>,
+}
+impl<C: 'static + Ctx> GroupFn<C> for PowerSupply<C> {}
+
 #[cfg(test)]
 mod test {
   use crate::DefaultCtx;

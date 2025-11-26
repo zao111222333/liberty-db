@@ -409,6 +409,42 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Vec<f64> {
     }
   }
 }
+
+crate::ast::impl_self_builder!(Vec<isize>);
+impl<C: 'static + Ctx> ComplexAttri<C> for Vec<isize> {
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    _iter: I,
+    _scope: &mut ParseScope<'_>,
+  ) -> Result<Self, ComplexParseError> {
+    unreachable!()
+  }
+  #[inline]
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> ComplexParseRes<'a, Self> {
+    match ast::parser::complex_isize_vec(i, &mut scope.loc.line_num) {
+      Ok((_i, v)) => Ok((_i, Ok(v))),
+      Err(_) => {
+        Err(nom::Err::Error(nom::error::Error::new(i, nom::error::ErrorKind::Many0)))
+      }
+    }
+  }
+  #[inline]
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[expect(clippy::indexing_slicing)]
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    if self.len() == 1 {
+      f.write_num(self[0])
+    } else {
+      join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
+    }
+  }
+}
+
 impl<C: 'static + Ctx> ComplexAttri<C> for String {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(

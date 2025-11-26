@@ -13,7 +13,7 @@ use crate::{
   expression::Formula,
   library::AttributeType,
   pin::BusTypeCtx,
-  table::PolyTemplate,
+  table::{PolyTemplate, PropagationLutTemplate},
 };
 use alloc::borrow::Cow;
 #[cfg(feature = "lut_template")]
@@ -54,6 +54,9 @@ pub(crate) struct BuilderScope<C: 'static + Ctx> {
     HashMap<String, Arc<CompactLutTemplate<C>>, RandomState>,
   #[cfg(feature = "lut_template")]
   pub(crate) poly_template: HashMap<String, Arc<PolyTemplate<C>>, RandomState>,
+  #[cfg(feature = "lut_template")]
+  pub(crate) propagation_lut_template:
+    HashMap<String, Arc<PropagationLutTemplate<C>>, RandomState>,
   pub(crate) voltage_map: HashMap<String, f64, RandomState>,
   pub(crate) bus_type: HashMap<String, BusTypeCtx, RandomState>,
 }

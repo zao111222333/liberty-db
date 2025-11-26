@@ -1,6 +1,5 @@
 use crate::table::{
-  CompactTableCtx, DefaultCompactTableCtx, DefaultPolyTableCtx, DefaultTableCtx,
-  PolyTableCtx, TableCtx,
+  CompactTableCtx, DefaultCompactTableCtx, DefaultPolyTableCtx, DefaultPropagationTable, DefaultTableCtx, PolyTableCtx, PropagationTableCtx, TableCtx
 };
 
 pub trait Ctx:
@@ -48,6 +47,12 @@ pub trait Ctx:
     + Default
     + serde::Serialize
     + serde::de::DeserializeOwned;
+  type PropagationTable: PropagationTableCtx<Self>
+    + core::fmt::Debug
+    + Clone
+    + Default
+    + serde::Serialize
+    + serde::de::DeserializeOwned;
   type CompactTable: CompactTableCtx<Self>
     + core::fmt::Debug
     + Clone
@@ -81,6 +86,7 @@ impl Ctx for DefaultCtx {
   type Timing = ();
   type InternalPower = ();
   type Table = DefaultTableCtx<Self>;
+  type PropagationTable = DefaultPropagationTable<Self>;
   type CompactTable = DefaultCompactTableCtx<Self>;
   type PolyTable = DefaultPolyTableCtx<Self>;
   type Other = ();

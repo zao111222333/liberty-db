@@ -388,6 +388,56 @@ pub(crate) fn int_isize(i: &str) -> IResult<&str, isize> {
     Err(_) => Err(nom::Err::Error(Error::new(i, ErrorKind::Digit))),
   }
 }
+#[inline]
+fn isize_vec(i: &str) -> IResult<&str, Vec<isize>> {
+  fn _isize_vec(i: &str) -> IResult<&str, Vec<isize>> {
+    map(
+      (
+        space,
+        separated_list0(
+          alt((
+            delimited((space, char(',')), space, opt(slash_newline)),
+            terminated(space1, opt(slash_newline)),
+          )),
+          int_isize,
+        ),
+        opt(char(',')),
+        space,
+      ),
+      |(_, list, _, _)| list,
+    )
+    .parse_complete(i)
+  }
+  alt((delimited(char('"'), _isize_vec, char('"')), _isize_vec)).parse_complete(i)
+}
+
+#[inline]
+pub(crate) fn complex_isize_vec<'a>(
+  i: &'a str,
+  line_num: &mut usize,
+) -> IResult<&'a str, Vec<isize>> {
+  map(
+    (
+      space,
+      char('('),
+      comment_space_newline_slash,
+      space_newline,
+      isize_vec,
+      comment_space_newline_slash,
+      space_newline,
+      char(')'),
+      alt((
+        preceded((space, char(';')), comment_space_newline),
+        comment_space_newline_many1,
+      )),
+    ),
+    |(_, _, n0, n1, vec, n2, n3, _, n4)| {
+      *line_num += n0 + n1 + n2 + n3 + n4;
+      vec
+    },
+  )
+  .parse_complete(i)
+}
 
 #[inline]
 pub(crate) fn int_usize(i: &str) -> IResult<&str, usize> {

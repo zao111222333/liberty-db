@@ -1125,6 +1125,14 @@ pub struct Pin<C: 'static + Ctx> {
   /// ">Reference-Instance</a>
   #[liberty(complex)]
   pub rise_capacitance_range: Option<(f64, f64)>,
+  #[liberty(group)]
+  pub hyperbolic_noise_above_high: Option<HyperbolicNoise<C>>,
+  #[liberty(group)]
+  pub hyperbolic_noise_below_low: Option<HyperbolicNoise<C>>,
+  #[liberty(group)]
+  pub hyperbolic_noise_high: Option<HyperbolicNoise<C>>,
+  #[liberty(group)]
+  pub hyperbolic_noise_low: Option<HyperbolicNoise<C>>,
   // NOTICE: Group Attributes in a pin Group
   // electromigration () { }
   /// The `char_config` group is a group of attributes including simple and complex attributes.

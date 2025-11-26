@@ -10,7 +10,7 @@ use crate::{
     Attributes, BuilderScope, DefaultIndentation, GroupAttri, GroupComments, GroupFn,
     LibertySet, ParseLoc, ParseScope, ParserError, ParsingBuilder, parser,
   },
-  cell::{Cell, Model},
+  cell::{Cell, Model, ScaledCell},
   common::char_config::CharConfig,
   pin::BusType,
   table::{CompactLutTemplate, DriverWaveform, PolyTemplate, TableTemple},
@@ -237,6 +237,33 @@ pub struct Library<C: 'static + Ctx> {
   /// ```
   #[liberty(group)]
   pub r#type: LibertySet<BusType<C>>,
+  /// The `power_supply` group captures all nominal information about voltage variation.
+  /// It is defined before the `operating_conditions` group and before the `cell` groups.
+  /// All the power supply names defined in the `power_supply` group exist in the
+  /// `operating_conditions` group. Define the `power_supply` group at the library level.
+  ///
+  /// Syntax
+  /// ```text
+  /// power_supply () {
+  ///   default_power_rail : string ;
+  ///   power_rail (string, float) ;
+  ///   power_rail (string, float) ;
+  ///   ...
+  /// }
+  /// ```
+  /// Example
+  /// ```text
+  /// power_supply () {
+  ///   default_power_rail : VDD0;
+  ///   power_rail (VDD1, 5.0) ;
+  ///   power_rail (VDD2, 3.3) ;
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=51.33+52.2&end=51.34+52.16
+  /// ">Reference</a>
+  #[liberty(group)]
+  pub power_supply: Option<PowerSupply<C>>,
   /// Use this group to define operating conditions;
   /// that is, `process`, `voltage`, and `temperature`.
   /// You define an `operating_conditions`  group at the library-level, as shown here:
@@ -670,6 +697,12 @@ pub struct Library<C: 'static + Ctx> {
   #[liberty(group)]
   pub lu_table_template: LibertySet<TableTemple<C>>,
   #[liberty(group)]
+  pub noise_lut_template: LibertySet<TableTemple<C>>,
+  #[liberty(group)]
+  pub iv_lut_template: LibertySet<TableTemple<C>>,
+  #[liberty(group)]
+  pub propagation_lut_template: LibertySet<TableTemple<C>>,
+  #[liberty(group)]
   pub poly_template: LibertySet<PolyTemplate<C>>,
   #[liberty(group)]
   pub power_poly_template: LibertySet<PolyTemplate<C>>,
@@ -783,6 +816,8 @@ pub struct Library<C: 'static + Ctx> {
   pub model: LibertySet<Model<C>>,
   #[liberty(group)]
   pub cell: LibertySet<Cell<C>>,
+  #[liberty(group)]
+  pub scaled_cell: LibertySet<ScaledCell<C>>,
 }
 
 impl<C: 'static + Ctx> fmt::Display for Library<C> {

@@ -53,9 +53,6 @@ pub struct InternalPower<C: 'static + Ctx> {
   /// ">Reference-Definition</a>
   #[liberty(complex)]
   pub mode: Option<[String; 2]>,
-  // NOTICE: Group Statements
-  // #[liberty(group)]
-  // pub domain: Option<Domain<C>>,
   #[liberty(group)]
   #[liberty(after_build = TableLookUp::use_power_template)]
   pub rise_power: Option<TableLookUp<C>>,

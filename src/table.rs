@@ -32,6 +32,16 @@ pub trait CompactTableCtx<C: 'static + Ctx> {
   fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>);
 }
 
+pub trait PropagationTableCtx<C: 'static + Ctx> {
+  #[cfg(feature = "lut_template")]
+  fn propagation_lut_template(&self) -> &Option<Arc<PropagationLutTemplate<C>>>;
+  #[cfg(feature = "lut_template")]
+  fn set_propagation_lut_template(
+    &mut self,
+    template: Option<&Arc<PropagationLutTemplate<C>>>,
+  );
+}
+
 pub trait PolyTableCtx<C: 'static + Ctx> {
   #[cfg(feature = "lut_template")]
   fn poly_template(&self) -> &Option<Arc<PolyTemplate<C>>>;
@@ -67,20 +77,37 @@ macro_rules! add_use_power_template {
     }
   };
 }
-macro_rules! add_use_poly_template {
-  ($table_ty:tt) => {
-    impl<C: 'static + Ctx> $table_ty<C> {
-      #[inline]
-      pub(crate) fn use_poly_template(&mut self, scope: &mut ast::BuilderScope<C>) {
-        #[cfg(feature = "lut_template")]
-        PolyTableCtx::set_poly_template(
-          &mut self.extra_ctx,
-          scope.poly_template.get(&self.name),
-        )
-      }
-    }
-  };
-}
+// macro_rules! add_use_propagation_lut_template {
+//   ($table_ty:tt) => {
+//     impl<C: 'static + Ctx> $table_ty<C> {
+//       #[inline]
+//       pub(crate) fn use_propagation_lut_template(
+//         &mut self,
+//         scope: &mut ast::BuilderScope<C>,
+//       ) {
+//         #[cfg(feature = "lut_template")]
+//         PropagationTableCtx::set_propagation_lut_template(
+//           &mut self.extra_ctx,
+//           scope.propagation_lut_template.get(&self.name),
+//         )
+//       }
+//     }
+//   };
+// }
+// macro_rules! add_use_poly_template {
+//   ($table_ty:tt) => {
+//     impl<C: 'static + Ctx> $table_ty<C> {
+//       #[inline]
+//       pub(crate) fn use_poly_template(&mut self, scope: &mut ast::BuilderScope<C>) {
+//         #[cfg(feature = "lut_template")]
+//         PolyTableCtx::set_poly_template(
+//           &mut self.extra_ctx,
+//           scope.poly_template.get(&self.name),
+//         )
+//       }
+//     }
+//   };
+// }
 macro_rules! add_use_current_template {
   ($table_ty:tt) => {
     impl<C: 'static + Ctx> $table_ty<C> {
@@ -113,7 +140,7 @@ macro_rules! add_use_compact_template {
 pub(crate) use add_use_common_template;
 pub(crate) use add_use_compact_template;
 pub(crate) use add_use_current_template;
-pub(crate) use add_use_poly_template;
+// pub(crate) use add_use_poly_template;
 pub(crate) use add_use_power_template;
 
 #[derive(Clone, Default, Debug)]
@@ -156,6 +183,31 @@ impl<C: 'static + Ctx> CompactTableCtx<C> for DefaultCompactTableCtx<C> {
   #[cfg(feature = "lut_template")]
   fn set_compact_lut_template(&mut self, template: Option<&Arc<CompactLutTemplate<C>>>) {
     self.compact_lut_template = template.cloned();
+  }
+}
+
+#[derive(Clone, Default, Debug)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct DefaultPropagationTable<C: 'static + Ctx> {
+  #[cfg(feature = "lut_template")]
+  pub propagation_lut_template: Option<Arc<PropagationLutTemplate<C>>>,
+  #[cfg(not(feature = "lut_template"))]
+  ___p: PhantomData<C::Other>,
+}
+impl<C: 'static + Ctx> PropagationTableCtx<C> for DefaultPropagationTable<C> {
+  #[inline]
+  #[cfg(feature = "lut_template")]
+  fn propagation_lut_template(&self) -> &Option<Arc<PropagationLutTemplate<C>>> {
+    &self.propagation_lut_template
+  }
+  #[inline]
+  #[cfg(feature = "lut_template")]
+  fn set_propagation_lut_template(
+    &mut self,
+    template: Option<&Arc<PropagationLutTemplate<C>>>,
+  ) {
+    self.propagation_lut_template = template.cloned();
   }
 }
 
@@ -313,6 +365,19 @@ pub struct CompactLutTemplate<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub variable_1: Option<VariableTypeCompactLutTemplateIndex12>,
+  /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub variable_2: Option<VariableTypeCompactLutTemplateIndex12>,
+  /// The string values in `index_3`  are determined by the `base_curve_type` value
+  /// in the `base_curve`  group. When `ccs_timing_half_curve` is the
+  /// `base_curve_type`  value, the following six string values (parameters)
+  /// should be defined: `init_current`, `peak_current`, `peak_voltage`, `peak_time`, `left_id`, `right_id`;
+  /// their order is not fixed.
+  #[liberty(simple)]
+  pub variable_3: Option<VariableTypeCompactLutTemplateIndex3>,
   /// The `index_1`  and `index_2`  attributes are required.
   /// The `index_1`  and `index_2`  attributes define the
   /// `input_net_transition`  and `total_output_net_capacitance`  values.
@@ -323,12 +388,6 @@ pub struct CompactLutTemplate<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(complex)]
   pub index_1: Vec<f64>,
-  /// The only valid values for the `variable_1`  and `variable_2`  attributes are `input_net_transition`  and `total_output_net_capacitance`.
-  /// <a name ="reference_link" href="
-  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=42.21&end=42.22
-  /// ">Reference</a>
-  #[liberty(simple)]
-  pub variable_2: Option<VariableTypeCompactLutTemplateIndex12>,
   /// The `index_1`  and `index_2`  attributes are required.
   /// The `index_1`  and `index_2`  attributes define the
   /// `input_net_transition`  and `total_output_net_capacitance`  values.
@@ -339,13 +398,6 @@ pub struct CompactLutTemplate<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(complex)]
   pub index_2: Vec<f64>,
-  /// The string values in `index_3`  are determined by the `base_curve_type` value
-  /// in the `base_curve`  group. When `ccs_timing_half_curve` is the
-  /// `base_curve_type`  value, the following six string values (parameters)
-  /// should be defined: `init_current`, `peak_current`, `peak_voltage`, `peak_time`, `left_id`, `right_id`;
-  /// their order is not fixed.
-  #[liberty(simple)]
-  pub variable_3: Option<VariableTypeCompactLutTemplateIndex3>,
   /// The string values in `index_3`  are determined by the `base_curve_type` value
   /// in the `base_curve`  group. When `ccs_timing_half_curve` is the
   /// `base_curve_type`  value, the following six string values (parameters)
@@ -367,6 +419,50 @@ impl<C: 'static + Ctx> GroupFn<C> for CompactLutTemplate<C> {
     self
       .extra_ctx
       .set_compact_lut_template(scope.compact_lut_template.get(&self.name));
+  }
+}
+
+/// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling.
+///
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=41.20&end=41.21
+/// ">Reference</a>
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[mut_set::derive::item]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PropagationLutTemplate<C: 'static + Ctx> {
+  #[liberty(name)]
+  #[id(borrow = str)]
+  pub name: String,
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::PropagationTable,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: Attributes,
+  #[liberty(simple)]
+  pub variable_1: Option<VariableTypePropagationLutTemplate>,
+  #[liberty(simple)]
+  pub variable_2: Option<VariableTypePropagationLutTemplate>,
+  #[liberty(simple)]
+  pub variable_3: Option<VariableTypePropagationLutTemplate>,
+  #[liberty(complex)]
+  pub index_1: Vec<f64>,
+  #[liberty(complex)]
+  pub index_2: Vec<f64>,
+  #[liberty(complex)]
+  pub index_3: Vec<f64>,
+}
+
+impl<C: 'static + Ctx> GroupFn<C> for PropagationLutTemplate<C> {
+  #[cfg(feature = "lut_template")]
+  fn after_build(&mut self, scope: &mut BuilderScope<C>) {
+    self
+      .extra_ctx
+      .set_propagation_lut_template(scope.propagation_lut_template.get(&self.name));
   }
 }
 
@@ -412,11 +508,43 @@ impl<C: 'static + Ctx> GroupFn<C> for CompactLutTemplate<C> {
 #[duplicated(
   name = PolyTemplate,
   docs(
-    /// A `bus` group, defined in a [`cell`](crate::cell::Cell) group or a [`model`](crate::cell::Model) group, defines the bused pins in the
-    /// library. Before you can define a `bus` group you must first define a [`type`](crate::pin::BusType) group at the `library`
-    /// level.
+    /// As with the lookup table model, you can describe an I-V characteristics curve in your
+    /// libraries by using the polynomial representation. To define your polynomial, use the
+    /// following groups and attributes:
+    /// + The `poly_template` group in the library group
+    /// + The `steady_state_current_high`, `steady_state_current_low`, and
+    /// `steady_state_current_tristate` groups within the timing group
+    /// `poly_template` Group
+    ///
+    /// You can define a `poly_template` group at the library level to specify the equation
+    /// variables, the variable ranges, the voltages mapping, and the piecewise data. The valid
+    /// values for the variables are extended to include `iv_output_voltage`, `voltage`, `voltagei`,
+    /// and `temperature`.
+    ///
+    /// Syntax
+    /// ```text
+    /// library(namestring) {
+    /// ...
+    /// poly_template(template_namestring) {
+    /// variables(variable_1enum,..., variable_nenum);
+    /// variable_i_range: (float, float);
+    /// ...
+    /// variable_n_range: (float, float);
+    /// mapping(voltageenum, power_railid);
+    /// domain(domain_namestring) {
+    /// variable_i_range: (float, float);
+    /// ...
+    /// variable_n_range: (float, float);
+    /// }
+    /// ...
+    /// }
+    /// ...
+    /// }
+    /// ```
+    /// The syntax of the poly_template group is the same as that used for the delay model,
+    /// except that the variables used in the format are
     /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=136.4&end=136.9
+    /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=609.11&end=609.57
     /// ">Reference</a>
   ),
   additional_attrs(
@@ -457,7 +585,7 @@ impl<C: 'static + Ctx> GroupFn<C> for PolyTemplate<C> {
   }
 }
 
-add_use_poly_template!(PolyTemplate);
+// add_use_poly_template!(PolyTemplate);
 
 struct VariableRangeName;
 struct VariableRangeKeyFmt(usize);
@@ -516,6 +644,30 @@ pub enum VariableTypeCompactLutTemplateIndex12 {
 crate::ast::impl_self_builder!(VariableTypeCompactLutTemplateIndex12);
 crate::ast::impl_simple!(VariableTypeCompactLutTemplateIndex12);
 
+/// The table template specifying propagated noise can have three variables (variable_1,
+/// variable_2, and variable_3). The variables indicate the parameters used to index
+/// the lookup table along the first, second, and third table axes. The parameters are
+/// `input_noise_width`, `input_noise_height`, and `total_output_net_capacitance`.
+/// The index values in the index_1, index_2, and index_3 attributes are a list of positive
+/// floating-point numbers. The values in the list must be in increasing order.
+/// The unit for `input_noise_width` and `input_noise_height` is the library time unit.
+/// <a name ="reference_link" href="
+/// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=622.31&end=622.37
+/// ">Reference</a>
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(strum::Display, strum::EnumString)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum VariableTypePropagationLutTemplate {
+  #[strum(serialize = "input_noise_width")]
+  InputNoiseWidth,
+  #[strum(serialize = "input_noise_height")]
+  InputNoiseHeight,
+  #[strum(serialize = "total_output_net_capacitance")]
+  TotalOutputNetCapacitance,
+}
+crate::ast::impl_self_builder!(VariableTypePropagationLutTemplate);
+crate::ast::impl_simple!(VariableTypePropagationLutTemplate);
+
 /// The only legal string value for the `variable_3`  attribute is `curve_parameters`.
 ///
 /// <a name ="reference_link" href="
@@ -561,6 +713,120 @@ pub struct Vector3D<C: 'static + Ctx> {
 }
 add_use_common_template!(Vector3D);
 
+// /// To specify polynomial representation, use the `propagated_noise_height_above_high`,
+// /// `propagated_noise_height_below_low`, `propagated_noise_height_high`,
+// /// `propagated_noise_height_low`, `propagated_noise_width_above_high`,
+// /// `propagated_noise_width_below_low`, `propagated_noise_width_high`,
+// /// `propagated_noise_width_low`, `propagated_noise_peak_time_ratio_above_high`,
+// /// `propagated_noise_peak_time_ratio_below_low`,
+// /// `propagated_noise_peak_time_ratio_high`, and
+// /// `propagated_noise_peak_time_ratio_low` groups within the timing group to define the
+// /// polynomial.
+// ///
+// /// The `peak_time_ratio` groups are supported only in the polynomial model.
+// ///
+// /// Syntax for Polynomial
+// /// ```text
+// /// timing() {
+// /// ...
+// /// propagated_noise_height_above_high (temp_namestring) {
+// /// variable_i_range: (float, float);
+// /// orders("integer,..., integer");
+// /// coefs("float,..., float");
+// /// domain(domain_namestring) {
+// /// variable_i_range: (float, float);
+// /// orders("integer,..., integer");
+// /// coefs("float,..., float");
+// /// propagated_noise_width_above_high (temp_namestring) {
+// /// }
+// /// }
+// /// propagated_noise_height_below_low (temp_namestring) {
+// /// }
+// /// ...
+// /// ...
+// /// ...
+// /// propagated_noise_width_below_low (temp_namestring) {
+// ///   propagated_noise_height_high(temp_namestring) {
+// ///   propagated_noise_width_high(temp_namestring) {
+// ///   propagated_noise_height_low(temp_namestring) {
+// ///   propagated_noise_width_low(temp_namestring) {
+// ///   propagated_noise_peak_time_ratio_above_high (temp_namestring) {
+// ///   ...
+// ///   propagated_noise_peak_time_ratio_below_low( temp_namestring) {
+// ///   ...
+// ///   propagated_noise_peak_time_ratio_high (temp_namestring) {
+// ///   propagated_noise_peak_time_ratio_low (temp_namestring) {
+// ///   }
+// ///   }
+// ///   }
+// ///   }
+// ///   }
+// ///   }
+// ///   }
+// ///   }
+// ///   }
+// ///   }
+// ///   }
+// /// ```
+// /// Because the polynomial model is a superset of the lookup table model, all syntax
+// /// supported in the lookup table is also supported in the polynomial model. For
+// /// example, you can have a `propagated_noise_width_high` polynomial and a
+// /// `propagated_noise_width_low` table defined in the same group in a scalable
+// /// polynomial delay model library.
+// ///
+// /// Example
+// /// ```text
+// /// propagated_noise_width_high(my_propagated_noise) {
+// /// orders("1, 1, 1, 1 ");
+// /// coefs("1, 2, 3, 4 ,\
+// /// 1, 2, 3, 4 ,\
+// /// 1, 2, 3, 4 ,\
+// /// 1, 2, 3, 4 ");
+// /// }
+// /// propagated_noise_height_high(my_propagated_noise) {
+// /// orders("1, 1, 1, 1 ");
+// /// coefs("1, 2, 3, 4 ,\
+// /// 1, 2, 3, 4 ,\
+// /// 1, 2, 3, 4 ,\
+// /// 1, 2, 3, 4 ");
+// /// }
+// /// ```
+// ///
+// /// The unit for `input_noise_width` and `input_noise_height` is the library time unit.
+// /// <a name ="reference_link" href="
+// /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=626.16+627.3&end=626.52+627.68
+// /// ">Reference</a>
+// #[derive(Debug, Clone)]
+// #[derive(liberty_macros::Group)]
+// #[mut_set::derive::item]
+// #[derive(serde::Serialize, serde::Deserialize)]
+// #[serde(bound = "C::PropagationTable: serde::Serialize + serde::de::DeserializeOwned")]
+// pub struct PropagatedNoiseLUT<C: 'static + Ctx> {
+//   #[liberty(name)]
+//   #[id(borrow = str)]
+//   pub name: String,
+//   /// group comments
+//   #[liberty(comments)]
+//   comments: GroupComments,
+//   #[liberty(extra_ctx)]
+//   pub extra_ctx: C::PropagationTable,
+//   /// group undefined attributes
+//   #[liberty(attributes)]
+//   pub attributes: Attributes,
+//   #[liberty(complex)]
+//   pub variable_i_range: Option<[f64; 2]>,
+//   #[liberty(complex)]
+//   pub orders: Vec<f64>,
+//   #[liberty(complex)]
+//   pub coefs: Values,
+// }
+// add_use_propagation_lut_template!(PropagatedNoiseLUT);
+// impl<C: 'static + Ctx> GroupFn<C> for PropagatedNoiseLUT<C> {
+//   #[expect(clippy::arithmetic_side_effects)]
+//   fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
+//     builder.coefs.chunk_size = builder.orders.len();
+//   }
+// }
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 // #[mut_set::derive::item]
@@ -984,12 +1250,23 @@ pub struct CompactCcsTable<C: 'static + Ctx> {
 impl<C: 'static + Ctx> GroupFn<C> for CompactCcsTable<C> {}
 add_use_compact_template!(CompactCcsTable);
 
+#[derive(liberty_macros::Duplicate)]
+#[duplicated(
+  name = TableLookUp,
+  docs(
+    /// Basic LUT
+  ),
+  additional_attrs(
+    #[liberty(group)]
+    pub domain: LibertySet<TableLookUpDomain<C>>,
+  )
+)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(bound = "C::Table: serde::Serialize + serde::de::DeserializeOwned")]
-pub struct TableLookUp<C: 'static + Ctx> {
+pub struct TableLookUpDomain<C: 'static + Ctx> {
   #[liberty(name)]
   #[id(borrow = str)]
   pub name: String,
@@ -1011,10 +1288,25 @@ pub struct TableLookUp<C: 'static + Ctx> {
   pub index_4: Vec<f64>,
   #[liberty(complex)]
   pub values: Values,
+  #[liberty(complex)]
+  pub orders: Vec<isize>,
+  #[liberty(complex)]
+  pub coefs: Values,
 }
 add_use_common_template!(TableLookUp);
 add_use_power_template!(TableLookUp);
 
+impl<C: 'static + Ctx> GroupFn<C> for TableLookUpDomain<C> {
+  #[expect(clippy::arithmetic_side_effects)]
+  fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
+    if builder.values.chunk_size == builder.values.inner.len()
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.chunk_size = builder.index_2.len();
+    }
+    builder.coefs.chunk_size = builder.orders.len();
+  }
+}
 impl<C: 'static + Ctx> GroupFn<C> for TableLookUp<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
@@ -1023,6 +1315,7 @@ impl<C: 'static + Ctx> GroupFn<C> for TableLookUp<C> {
     {
       builder.values.chunk_size = builder.index_2.len();
     }
+    builder.coefs.chunk_size = builder.orders.len();
   }
 }
 impl<C: 'static + Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
@@ -1378,6 +1671,7 @@ pub enum Variable {
   RcProduct,
   Length(LengthVariable),
   Scalar(ScalarVariable),
+  IVOutputVoltage,
 }
 crate::ast::impl_self_builder!(Variable);
 crate::ast::impl_simple!(Variable);
@@ -1417,6 +1711,7 @@ impl Variable {
   pub const FANOUT_NUMBER: Self = Self::Scalar(ScalarVariable::FanoutNumber);
   pub const NORMALIZED_VOLTAGE: Self = Self::Scalar(ScalarVariable::NormalizedVoltage);
   pub const RC_PRODUCT: Self = Self::RcProduct;
+  pub const IV_OUTPUT_VOLTAGE: Self = Self::IVOutputVoltage;
 }
 
 impl core::str::FromStr for Variable {
@@ -1449,6 +1744,7 @@ impl core::str::FromStr for Variable {
       "fanout_number" => Self::FANOUT_NUMBER,
       "normalized_voltage" => Self::NORMALIZED_VOLTAGE,
       "rc_product" => Self::RC_PRODUCT,
+      "iv_output_voltage" => Self::IV_OUTPUT_VOLTAGE,
       _ => {
         return Err(strum::ParseError::VariantNotFound);
       }
@@ -1485,6 +1781,7 @@ impl fmt::Display for Variable {
       Self::FANOUT_NUMBER => "fanout_number",
       Self::NORMALIZED_VOLTAGE => "normalized_voltage",
       Self::RC_PRODUCT => "rc_product",
+      Self::IV_OUTPUT_VOLTAGE => "iv_output_voltage",
     };
     f.write_str(s)
   }

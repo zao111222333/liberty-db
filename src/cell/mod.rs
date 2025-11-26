@@ -123,6 +123,20 @@ impl Default for DefaultCellCtx {
     pub short: LibertyVec<Vec<String>>,
   )
 )]
+#[duplicated(
+  name = ScaledCell,
+  docs(
+    /// A model group can include all the attributes that are valid in a cell group, as well as the
+    /// two additional attributes described in this section. For information about the cell group
+    /// attributes, see Attributes and Values on page 99.
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.23&end=225.29
+    /// ">Reference</a>
+  ),
+  additional_attrs(
+    
+  )
+)]
 /// cell group
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=98.23&end=98.32
@@ -713,6 +727,7 @@ pub struct Cell<C: 'static + Ctx> {
 #[duplicate::duplicate_item(
   CellModel;
   [Cell];
+  [ScaledCell];
   [Model];
 )]
 impl<C: 'static + Ctx> GroupFn<C> for CellModel<C> {
