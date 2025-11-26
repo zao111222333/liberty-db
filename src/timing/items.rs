@@ -163,10 +163,7 @@ pub struct TimingTableLookUp<C: 'static + Ctx> {
   pub lvf_moments_values: Vec<LVFMoments>,
   pub lvf_early_late_values: Vec<LVFEarlyLate>,
 }
-#[expect(
-  clippy::indexing_slicing,
-  clippy::arithmetic_side_effects
-)]
+#[expect(clippy::indexing_slicing, clippy::arithmetic_side_effects)]
 impl<C: 'static + Ctx> TimingTableLookUp<C> {
   #[inline]
   pub(crate) fn use_common_template(
