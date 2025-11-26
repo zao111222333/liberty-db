@@ -1,6 +1,7 @@
 ** golden
 library (sample) {
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	nom_voltage : 5.0;
 	time_unit : 1ns;
 	voltage_unit : 1V;

@@ -2,6 +2,7 @@
 library (tcbn22ullbwp30p140tt0p8v25c) {
 	technology (cmos);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	revision : 110;
 	simulation : true;
 	nom_process : 1.0;

@@ -5,13 +5,16 @@ use crate::{
     DynamicKeyBuilderSet, GroupComments, GroupFn, LibertySet, LibertyVec, ParseScope,
     ParsingBuilder, SimpleAttri,
   },
-  library::{PolyTemplateVariable, VoltageMapping},
+  library::VoltageMapping,
 };
 #[cfg(feature = "lut_template")]
 use alloc::sync::Arc;
-use core::fmt::{self, Write};
 #[cfg(not(feature = "lut_template"))]
 use core::marker::PhantomData;
+use core::{
+  fmt::{self, Write},
+  str::FromStr,
+};
 use strum::{Display, EnumString};
 
 pub trait TableCtx<C: 'static + Ctx> {
@@ -311,6 +314,55 @@ pub struct DriverWaveform<C: 'static + Ctx> {
   pub values: Values,
 }
 
+#[derive(liberty_macros::Duplicate)]
+#[duplicated(
+  name = DcCurrent,
+  docs(
+    /// The cell-level `dc_current` group models the steady state current information, similar to
+    /// the lu_table_template group. The table is used to specify the DC current through the
+    /// cell’s output pin (generally the `related_internal_pg_pin`) in the current units specified
+    /// at the library level using the current_unit attribute.
+    /// 
+    /// The `dc_current` group includes the `related_switch_pin`, `related_pg_pin`, and
+    /// `related_internal_pg_pin` attributes, which are described in the following sections.
+    /// 
+    /// ### `related_switch_pin` Attribute
+    /// The `related_switch_pin` string attribute specifies the name of the related switch pin for
+    /// the coarse-grain switch cell.
+    /// ### `related_pg_pin` Attribute
+    /// The `related_pg_pin` string attribute is used to specify the name of the power and ground
+    /// pin that represents the VDD or VSS power source.
+    /// ### `related_internal_pg_pin` Attribute
+    /// The `related_internal_pg_pin` string attribute is used to specify the name of the power
+    /// and ground pin that represents the virtual VDD or virtual VSS power source.
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=471.3&end=471.17
+    /// ">Reference</a>
+  ),
+  additional_attrs(
+    /// The `related_switch_pin` string attribute specifies the name of the related switch pin for
+    /// the coarse-grain switch cell.
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=471.3&end=471.17
+    /// ">Reference</a>
+    #[liberty(simple)]
+    pub related_switch_pin: Option<String>,
+    /// The `related_pg_pin` string attribute is used to specify the name of the power and ground
+    /// pin that represents the VDD or VSS power source.
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=471.3&end=471.17
+    /// ">Reference</a>
+    #[liberty(simple)]
+    pub related_pg_pin: Option<String>,
+    /// The `related_internal_pg_pin` string attribute is used to specify the name of the power
+    /// and ground pin that represents the virtual VDD or virtual VSS power source.
+    /// <a name ="reference_link" href="
+    /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=471.3&end=471.17
+    /// ">Reference</a>
+    #[liberty(simple)]
+    pub related_internal_pg_pin: Option<String>,
+  )
+)]
 #[derive(Debug, Clone)]
 #[derive(liberty_macros::Group)]
 #[mut_set::derive::item]
@@ -335,7 +387,8 @@ pub struct TableLookUp2D<C: 'static + Ctx> {
   #[liberty(complex)]
   pub values: Values,
 }
-add_use_common_template!(TableLookUp2D);
+// add_use_common_template!(TableLookUp2D);
+add_use_common_template!(DcCurrent);
 /// The `compact_lut_template`  group is a lookup table template used for compact CCS timing and power modeling.
 ///
 /// <a name ="reference_link" href="
@@ -570,7 +623,7 @@ pub struct PolyTemplateDomain<C: 'static + Ctx> {
   #[liberty(attributes)]
   pub attributes: Attributes,
   #[liberty(complex)]
-  pub variables: Vec<PolyTemplateVariable>,
+  pub variables: Vec<Variable>,
   #[liberty(complex)]
   pub mapping: LibertySet<VoltageMapping>,
   #[liberty(complex)]
@@ -1328,6 +1381,17 @@ impl<C: 'static + Ctx> GroupFn<C> for TableLookUpMultiSegment<C> {
     }
   }
 }
+
+impl<C: 'static + Ctx> GroupFn<C> for DcCurrent<C> {
+  #[expect(clippy::arithmetic_side_effects)]
+  fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
+    if builder.values.chunk_size == builder.values.inner.len()
+      && builder.values.inner.len() == builder.index_1.len() * builder.index_2.len()
+    {
+      builder.values.chunk_size = builder.index_2.len();
+    }
+  }
+}
 impl<C: 'static + Ctx> GroupFn<C> for TableLookUp2D<C> {
   #[expect(clippy::arithmetic_side_effects)]
   fn before_build(builder: &mut Self::Builder, _: &mut BuilderScope<C>) {
@@ -1672,9 +1736,49 @@ pub enum Variable {
   Length(LengthVariable),
   Scalar(ScalarVariable),
   IVOutputVoltage,
+  Temperature,
+  VoltageName(VoltageName),
 }
 crate::ast::impl_self_builder!(Variable);
 crate::ast::impl_simple!(Variable);
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Default, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct VoltageName {
+  pub i: Option<usize>,
+}
+impl FromStr for VoltageName {
+  type Err = lexical_core::Error;
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    const S: &str = "voltage";
+    #[expect(clippy::string_slice)]
+    match s.len().cmp(&S.len()) {
+      core::cmp::Ordering::Less => Err(lexical_core::Error::InvalidFlags),
+      core::cmp::Ordering::Equal => {
+        if s == S {
+          Ok(Self { i: None })
+        } else {
+          Err(lexical_core::Error::InvalidFlags)
+        }
+      }
+      core::cmp::Ordering::Greater => {
+        if &s[..S.len()] == S {
+          Ok(Self {
+            i: Some(lexical_core::parse(s[S.len()..].as_bytes())?),
+          })
+        } else {
+          Err(lexical_core::Error::InvalidFlags)
+        }
+      }
+    }
+  }
+}
+impl fmt::Display for VoltageName {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "voltage")?;
+    if let Some(i) = self.i { write!(f, "{i}") } else { Ok(()) }
+  }
+}
 
 impl Variable {
   pub const INPUT_VOLTAGE: Self = Self::Voltage(VoltageVariable::InputVoltage);
@@ -1712,10 +1816,13 @@ impl Variable {
   pub const NORMALIZED_VOLTAGE: Self = Self::Scalar(ScalarVariable::NormalizedVoltage);
   pub const RC_PRODUCT: Self = Self::RcProduct;
   pub const IV_OUTPUT_VOLTAGE: Self = Self::IVOutputVoltage;
+  pub const TEMPERATURE: Self = Self::Temperature;
+  pub const INPUT_PEAK_TIME_RATIO: Self =
+    Self::Scalar(ScalarVariable::InputPeakTimeRatio);
 }
 
-impl core::str::FromStr for Variable {
-  type Err = strum::ParseError;
+impl FromStr for Variable {
+  type Err = lexical_core::Error;
   #[inline]
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     Ok(match s {
@@ -1745,9 +1852,9 @@ impl core::str::FromStr for Variable {
       "normalized_voltage" => Self::NORMALIZED_VOLTAGE,
       "rc_product" => Self::RC_PRODUCT,
       "iv_output_voltage" => Self::IV_OUTPUT_VOLTAGE,
-      _ => {
-        return Err(strum::ParseError::VariantNotFound);
-      }
+      "temperature" => Self::TEMPERATURE,
+      "input_peak_time_ratio" => Self::INPUT_PEAK_TIME_RATIO,
+      _ => Self::VoltageName(s.parse()?),
     })
   }
 }
@@ -1755,35 +1862,43 @@ impl core::str::FromStr for Variable {
 impl fmt::Display for Variable {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let s = match *self {
-      Self::INPUT_VOLTAGE => "input_voltage",
-      Self::OUTPUT_VOLTAGE => "output_voltage",
-      Self::INPUT_NOISE_HEIGHT => "input_noise_height",
-      Self::INPUT_TRANSITION_TIME => "input_transition_time",
-      Self::INPUT_NET_TRANSITION => "input_net_transition",
-      Self::CONSTRAINED_PIN_TRANSITION => "constrained_pin_transition",
-      Self::RELATED_PIN_TRANSITION => "related_pin_transition",
-      Self::DRIVER_SLEW => "driver_slew",
-      Self::OUTPUT_TRANSITION => "output_transition",
-      Self::OUTPUT_PIN_TRANSITION => "output_pin_transition",
-      Self::CONNECT_DELAY => "connect_delay",
-      Self::INPUT_NOISE_WIDTH => "input_noise_width",
-      Self::TIME => "time",
-      Self::TOTAL_OUTPUT_NET_CAPACITANCE => "total_output_net_capacitance",
-      Self::OUTPUT_NET_WIRE_CAP => "output_net_wire_cap",
-      Self::OUTPUT_NET_PIN_CAP => "output_net_pin_cap",
-      Self::RELATED_OUT_TOTAL_OUTPUT_NET_CAPACI => "related_out_total_output_net_capaci",
-      Self::RELATED_OUT_OUTPUT_NET_WIRE_CAP => "related_out_output_net_wire_cap",
-      Self::RELATED_OUT_OUTPUT_NET_PIN_CAP => "related_out_output_net_pin_cap",
-      Self::FANOUT_PIN_CAPACITANCE => "fanout_pin_capacitance",
-      Self::OUTPUT_NET_LENGTH => "output_net_length",
-      Self::RELATED_OUT_OUTPUT_NET_LENGTH => "related_out_output_net_length",
-      Self::FANOUT_NUMBER => "fanout_number",
-      Self::NORMALIZED_VOLTAGE => "normalized_voltage",
-      Self::RC_PRODUCT => "rc_product",
-      Self::IV_OUTPUT_VOLTAGE => "iv_output_voltage",
-    };
-    f.write_str(s)
+    match *self {
+      Self::INPUT_VOLTAGE => f.write_str("input_voltage"),
+      Self::OUTPUT_VOLTAGE => f.write_str("output_voltage"),
+      Self::INPUT_NOISE_HEIGHT => f.write_str("input_noise_height"),
+      Self::INPUT_TRANSITION_TIME => f.write_str("input_transition_time"),
+      Self::INPUT_NET_TRANSITION => f.write_str("input_net_transition"),
+      Self::CONSTRAINED_PIN_TRANSITION => f.write_str("constrained_pin_transition"),
+      Self::RELATED_PIN_TRANSITION => f.write_str("related_pin_transition"),
+      Self::DRIVER_SLEW => f.write_str("driver_slew"),
+      Self::OUTPUT_TRANSITION => f.write_str("output_transition"),
+      Self::OUTPUT_PIN_TRANSITION => f.write_str("output_pin_transition"),
+      Self::CONNECT_DELAY => f.write_str("connect_delay"),
+      Self::INPUT_NOISE_WIDTH => f.write_str("input_noise_width"),
+      Self::TIME => f.write_str("time"),
+      Self::TOTAL_OUTPUT_NET_CAPACITANCE => f.write_str("total_output_net_capacitance"),
+      Self::OUTPUT_NET_WIRE_CAP => f.write_str("output_net_wire_cap"),
+      Self::OUTPUT_NET_PIN_CAP => f.write_str("output_net_pin_cap"),
+      Self::RELATED_OUT_TOTAL_OUTPUT_NET_CAPACI => {
+        f.write_str("related_out_total_output_net_capaci")
+      }
+      Self::RELATED_OUT_OUTPUT_NET_WIRE_CAP => {
+        f.write_str("related_out_output_net_wire_cap")
+      }
+      Self::RELATED_OUT_OUTPUT_NET_PIN_CAP => {
+        f.write_str("related_out_output_net_pin_cap")
+      }
+      Self::FANOUT_PIN_CAPACITANCE => f.write_str("fanout_pin_capacitance"),
+      Self::OUTPUT_NET_LENGTH => f.write_str("output_net_length"),
+      Self::RELATED_OUT_OUTPUT_NET_LENGTH => f.write_str("related_out_output_net_length"),
+      Self::FANOUT_NUMBER => f.write_str("fanout_number"),
+      Self::NORMALIZED_VOLTAGE => f.write_str("normalized_voltage"),
+      Self::RC_PRODUCT => f.write_str("rc_product"),
+      Self::IV_OUTPUT_VOLTAGE => f.write_str("iv_output_voltage"),
+      Self::INPUT_PEAK_TIME_RATIO => f.write_str("input_peak_time_ratio"),
+      Self::TEMPERATURE => f.write_str("temperature"),
+      Self::VoltageName(name) => write!(f, "{name}"),
+    }
   }
 }
 
@@ -1905,6 +2020,8 @@ pub enum ScalarVariable {
   /// ">Reference-Definition</a>
   #[strum(serialize = "normalized_voltage")]
   NormalizedVoltage,
+  #[strum(serialize = "input_peak_time_ratio")]
+  InputPeakTimeRatio,
 }
 
 /// Specify the optional `sigma_type` attribute to define the type of arrival time listed in the

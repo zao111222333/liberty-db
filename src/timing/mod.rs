@@ -792,6 +792,10 @@ pub struct Timing<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub steady_state_resistance_low: Option<f64>,
+  #[liberty(simple)]
+  pub slope_rise: Option<f64>,
+  #[liberty(simple)]
+  pub slope_fall: Option<f64>,
   /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
   /// switching `input_ccb` groups of the input pin that do not propagate the noise in the timing
   /// arc or the receiver capacitance load.

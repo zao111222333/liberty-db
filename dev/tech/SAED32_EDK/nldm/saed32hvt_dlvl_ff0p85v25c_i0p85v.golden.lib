@@ -5,6 +5,7 @@ library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 	define (simulator, library, string);
 	technology (cmos);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	date : "[2010 APRIL 28]";
 	revision : 1.0000000;
 	nom_process : 1.01;

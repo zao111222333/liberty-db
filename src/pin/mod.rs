@@ -216,6 +216,37 @@ pub struct Pin<C: 'static + Ctx> {
   /// ">Reference-Definition</a>
   #[liberty(complex)]
   pub retention_pin: Option<RetentionPin>,
+  /// Note:
+  /// The `power_gating_pin` attribute has been replaced by the `retention_pin`
+  /// attribute. See `retention_pin` Complex Attribute on page 282.
+  /// The `power_gating_pin` attribute specifies a pair of pin values for a power-switch
+  /// cell. The first value represents the power gating pin class. The second value specifies
+  /// which logic level (default) the power-switch cell is tied to when the power-switch cell is
+  /// functioning in normal mode. For more information about specifying power-switch cells, see
+  /// `power_gating_cell` Simple Attribute on page 117.
+  ///
+  /// Syntax
+  /// ```text
+  /// `power_gating_pin` ("power_pin_[1-5]", enumerated_type) ;
+  /// ```
+  ///
+  /// ### `value_1`
+  /// A string that represents one of five predefined classes of power gating pins:
+  /// `power_pin_[1-5]`.
+  ///
+  /// ### `value_2`
+  /// An integer that specifies the default logic level for the pin when the power-switch
+  /// cell functions as a normal cell.
+  ///
+  /// Example
+  /// ```
+  /// power_gating_pin ( "power_pin_1", 0) ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
+  /// ">Reference-Definition</a>
+  #[liberty(complex)]
+  pub power_gating_pin: Option<(String, usize)>,
   // NOTICE: Simple Attributes in a pin Group
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html

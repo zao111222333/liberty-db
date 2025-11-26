@@ -1,6 +1,7 @@
 ** golden
 library (newstuff) {
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	time_unit : 1ns;
 	voltage_unit : 1V;
 	slew_upper_threshold_pct_rise : 80.0;
@@ -14,11 +15,11 @@ library (newstuff) {
 	output_threshold_pct_fall : 50.0;
 	cell (cell1) {
 		retention_cell : x;
-		power_gating_cell : y; /* user defined attribute */
+		power_gating_cell : y;
 		pin (pin1) {
 			retention_pin (pin2, z);
+			power_gating_pin (pin2, 2);
 			map_to_logic : 1;
-			power_gating_pin (pin2, 2); /* user defined attribute */
 		}
 		pin (pin2) {
 			retention_pin (pin1, z);
@@ -35,7 +36,7 @@ library (newstuff) {
 			std_cell_main_rail : true;
 		}
 		pin (pin1) {
-			power_gating_pin (pin2, 2); /* user defined attribute */
+			power_gating_pin (pin2, 2);
 		}
 	}
 	cell (cell3) {

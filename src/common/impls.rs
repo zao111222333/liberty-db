@@ -10,7 +10,7 @@ use crate::{
     join_fmt, join_fmt_no_quote,
   },
   expression,
-  library::PolyTemplateVariable,
+  table::Variable,
 };
 use core::fmt::{self, Write};
 
@@ -518,8 +518,8 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Vec<String> {
   }
 }
 
-crate::ast::impl_self_builder!(Vec<PolyTemplateVariable>);
-impl<C: 'static + Ctx> ComplexAttri<C> for Vec<PolyTemplateVariable> {
+crate::ast::impl_self_builder!(Vec<Variable>);
+impl<C: 'static + Ctx> ComplexAttri<C> for Vec<Variable> {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
     iter: I,
@@ -613,6 +613,36 @@ impl<C: 'static + Ctx> ComplexAttri<C> for (f64, f64, String) {
     f.write_num(self.1)?;
     f.write_str(", ")?;
     f.write_str(&self.2)
+  }
+}
+crate::ast::impl_self_builder!((String, usize));
+impl<C: 'static + Ctx> ComplexAttri<C> for (String, usize) {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
+    _scope: &mut ParseScope<'_>,
+  ) -> Result<Self, ComplexParseError> {
+    let v1 = match iter.next() {
+      Some(&s) => String::from(s),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let v2 = match iter.next() {
+      Some(s) => lexical_core::parse(s.as_bytes())?,
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if iter.next().is_some() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok((v1, v2))
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    f.write_str(&self.0)?;
+    f.write_str(", ")?;
+    f.write_num(self.1)
   }
 }
 crate::ast::impl_self_builder!((i64, f64));

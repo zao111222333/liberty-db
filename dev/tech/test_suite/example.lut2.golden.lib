@@ -2,6 +2,7 @@
 library (example) {
 	technology (cmos);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	simulation : true;
 	nom_process : 1.0;
 	nom_temperature : 85.0;

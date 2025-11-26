@@ -1,6 +1,7 @@
 ** golden
 library (gscl45nm) {
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	nom_process : 1.0;
 	nom_temperature : 27.0;
 	nom_voltage : 1.1;

@@ -18,7 +18,7 @@ use crate::{
   common::char_config::CharConfig,
   expression::{BddVariableSet, FF, FFBank, Latch, LatchBank},
   pin::{AntennaDiodeType, Bundle, Bus, Pin},
-  table::TableLookUp2D,
+  table::DcCurrent,
 };
 
 pub trait CellCtx {
@@ -126,15 +126,66 @@ impl Default for DefaultCellCtx {
 #[duplicated(
   name = ScaledCell,
   docs(
-    /// A model group can include all the attributes that are valid in a cell group, as well as the
-    /// two additional attributes described in this section. For information about the cell group
-    /// attributes, see Attributes and Values on page 99.
-    /// <a name ="reference_link" href="
-    /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=test&bgn=225.23&end=225.29
-    /// ">Reference</a>
+    /// You can use the scaled_cell group to supply an alternate set of values for an existing
+    /// cell. The choice is based on the set of operating conditions used.
+    /// Syntax:
+    /// ```text
+    /// scaled_cell (existing_cell, operating_conditions_group) {
+    /// ... scaled cell description ...
+    /// }
+    /// ```
+    /// existing_cell
+    /// The name of a cell defined in a previous cell group.
+    /// 
+    /// The library-level operating_conditions group with which the scaled cell is
+    /// associated.
+    /// 
+    /// Example:
+    /// ```text
+    /// library (example) {
+    ///     operating_conditions(WCCOM) {
+    ///         ...
+    ///     }
+    ///     cell(INV) {
+    ///         pin(A) {
+    ///             direction : input ;
+    ///             capacitance : 1.0 :
+    ///         }
+    ///         pin(Z) {
+    ///             direction : output ;
+    ///             function : ”A’” ;
+    ///             timing() {
+    ///                 intrinsic_rise : 0.36 ;
+    ///                 intrinsic_fall : 0.16 ;
+    ///                 rise_resistance : 0.0653 ;
+    ///                 fall_resistance : 0.0331 ;
+    ///                 related_pin : ”A” ;
+    ///             }
+    ///         }
+    ///     }
+    ///     scaled_cell(INV, WCCOM) {
+    ///         pin(A) {
+    ///             direction : input ;
+    ///             capacitance : 0.7 ;
+    ///         }
+    ///         pin(Z) {
+    ///             direction : output ;
+    ///             timing() {
+    ///                 intrinsic_rise : 0.12 ;
+    ///                 intrinsic_fall : 0.13 ;
+    ///                 rise_resistance : 0.605 ;
+    ///                 fall_resistance : 0.493 ;
+    ///                 related_pin : ”A” ;
+    ///             }
+    ///         }
+    ///     }
+    /// }
+    /// ```
   ),
   additional_attrs(
-    
+    #[id(borrow = str)]
+    #[liberty(name)]
+    pub condition: String,
   )
 )]
 /// cell group
@@ -398,6 +449,21 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub retention_cell: Option<String>,
+  /// Note:
+  /// The `power_gating_cell` attribute has been replaced by the retention_cell
+  /// attribute. See `retention_cell` Simple Attribute on page 118.
+  ///
+  /// The cell-level `power_gating_cell` attribute specifies that a cell is a power-switch cell. A
+  /// power-switch cell has two modes. When functioning in normal mode, the power-switch
+  /// cell functions as a regular cell. When functioning in power-saving mode, the power-switch
+  /// cell’s power supply is shut off.
+  /// The pin-level map_to_logic attribute specifies which logic level the `power_gating_cell`
+  /// is tied to when the cell is functioning in normal mode.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=117.26&end=117.33
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub power_gating_cell: Option<String>,
   /// The `switch_cell_type`  cell-level attribute specifies
   /// the type of the switch cell for direct inference.
   ///
@@ -444,8 +510,8 @@ pub struct Cell<C: 'static + Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
   /// ">Reference-Definition</a>
   #[liberty(group)]
-  #[liberty(after_build = TableLookUp2D::use_common_template)]
-  pub dc_current: Option<TableLookUp2D<C>>,
+  #[liberty(after_build = DcCurrent::use_common_template)]
+  pub dc_current: Option<DcCurrent<C>>,
   /// The `input_voltage_range`  attribute specifies the allowed
   /// voltage range of the level-shifter input pin and the voltage
   /// range for all input pins of the cell under all possible operating conditions
@@ -724,6 +790,40 @@ pub struct Cell<C: 'static + Ctx> {
   #[liberty(group)]
   pub bundle: LibertySet<Bundle<C>>,
 }
+impl<C: 'static + Ctx> crate::ast::NamedGroup<C> for ScaledCell<C> {
+  #[inline]
+  fn parse_set_name(
+    builder: &mut Self::Builder,
+    mut v: Vec<&str>,
+  ) -> Result<(), crate::ast::IdError> {
+    let l = v.len();
+    if l != 2 {
+      return Err(crate::ast::IdError::length_dismatch(2, l, v));
+    }
+    v.pop().map_or(
+      Err(crate::ast::IdError::Other("Unkown pop error".into())),
+      |condition| {
+        v.pop().map_or(
+          Err(crate::ast::IdError::Other("Unkown pop error".into())),
+          |name| {
+            builder.name = name.into();
+            builder.condition = condition.into();
+            Ok(())
+          },
+        )
+      },
+    )
+  }
+  #[inline]
+  fn fmt_name<T: core::fmt::Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    use core::fmt::Write as _;
+    write!(f, "{}, {}", self.name, self.condition)
+  }
+}
+
 #[duplicate::duplicate_item(
   CellModel;
   [Cell];

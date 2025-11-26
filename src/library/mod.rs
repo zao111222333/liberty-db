@@ -87,6 +87,8 @@ pub struct Library<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub delay_model: DelayModel,
+  #[liberty(simple)]
+  pub power_model: DelayModel,
   /// You can use any format within the quotation marks to report the date
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=23.5&end=23.5

@@ -5,6 +5,7 @@ library (ccsn) {
 	define (load_cap_fall, input_ccb, float);
 	define (load_cap_rise, input_ccb, float);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	date : "$Date: Tue Mar 19 20:55:51 2024 $";
 	revision : 1.0;
 	nom_process : 1.0;

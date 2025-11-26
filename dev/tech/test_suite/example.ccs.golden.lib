@@ -1,6 +1,7 @@
 ** golden
 library (example_ccs_1) {
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	date : "Thu Jul  6 19:44:59 2005";
 	revision : 1.0;
 	nom_process : 1.0;

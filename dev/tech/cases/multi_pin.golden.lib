@@ -1,6 +1,7 @@
 ** golden
 library (multi_pin) {
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	time_unit : 1ns;
 	voltage_unit : 1V;
 	slew_upper_threshold_pct_rise : 80.0;

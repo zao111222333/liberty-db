@@ -1,6 +1,7 @@
 ** golden
 library (tcbn22ullbwp30p140tt0p8v25c) {
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	revision : 110;
 	nom_process : 1.0;
 	nom_temperature : 25.0;

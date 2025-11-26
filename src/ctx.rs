@@ -1,5 +1,6 @@
 use crate::table::{
-  CompactTableCtx, DefaultCompactTableCtx, DefaultPolyTableCtx, DefaultPropagationTable, DefaultTableCtx, PolyTableCtx, PropagationTableCtx, TableCtx
+  CompactTableCtx, DefaultCompactTableCtx, DefaultPolyTableCtx, DefaultPropagationTable,
+  DefaultTableCtx, PolyTableCtx, PropagationTableCtx, TableCtx,
 };
 
 pub trait Ctx:
