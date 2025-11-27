@@ -11,7 +11,6 @@ pub trait Indentation {
 /// The Default Indentation implemt
 #[derive(Debug)]
 pub struct DefaultIndentation(String);
-#[expect(clippy::cfg_not_test)]
 impl Indentation for DefaultIndentation {
   #[inline]
   fn new() -> Self {
@@ -23,6 +22,7 @@ impl Indentation for DefaultIndentation {
     {
       self.0 += "| ";
     }
+    #[expect(clippy::cfg_not_test)]
     #[cfg(not(test))]
     {
       self.0.push('\t');
@@ -35,6 +35,7 @@ impl Indentation for DefaultIndentation {
       _ = self.0.pop();
       _ = self.0.pop();
     }
+    #[expect(clippy::cfg_not_test)]
     #[cfg(not(test))]
     {
       _ = self.0.pop();

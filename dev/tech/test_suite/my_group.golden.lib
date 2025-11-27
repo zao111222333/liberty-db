@@ -6,6 +6,7 @@ library (typ) {
 	define (variable_1, my_template, string);
 	define (when, my_group, string);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	define_group (my_group, pin);
 	define_group (my_template, library);
 	time_unit : 1ns;

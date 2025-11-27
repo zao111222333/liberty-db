@@ -2,6 +2,7 @@
 library (q) {
 	define (siiattrib, sii, string);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	define_group (sii, cell);
 	define_group (sii, pin);
 	time_unit : 1ns;

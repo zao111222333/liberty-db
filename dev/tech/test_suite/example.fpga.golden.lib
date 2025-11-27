@@ -2,6 +2,7 @@
 library (example) {
 	technology (fpga);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	time_unit : 1ns;
 	voltage_unit : 1V;
 	slew_upper_threshold_pct_rise : 80.0;
@@ -52,10 +53,10 @@ library (example) {
 				intrinsic_rise : 0.38;
 				intrinsic_fall : 0.85;
 				related_pin : "A B";
+				slope_rise : 0.0;
+				slope_fall : 0.0;
 				rise_resistance : 0.1443;
 				fall_resistance : 0.0589;
-				slope_fall : 0.0; /* user defined attribute */
-				slope_rise : 0.0; /* user defined attribute */
 			}
 		}
 	}

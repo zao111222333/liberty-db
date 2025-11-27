@@ -1,6 +1,7 @@
 ** golden
 library (em222e) {
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	nom_process : 1.0;
 	nom_temperature : 25.0;
 	nom_voltage : 2.5;

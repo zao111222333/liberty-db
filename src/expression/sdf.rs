@@ -80,7 +80,7 @@ impl SdfExpression {
 mod test {
   use super::*;
   use crate::expression::BddBooleanExpression;
-  use std::str::FromStr as _;
+  use core::str::FromStr as _;
   #[test]
   fn sdf() {
     let variables = BddVariableSet::new(&["A", "B", "C", "D"]);

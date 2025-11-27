@@ -67,7 +67,6 @@ pub struct WordSet {
   pub inner: IndexSet<String, RandomState>,
 }
 impl fmt::Display for WordSet {
-  #[expect(clippy::unwrap_in_result)]
   #[expect(clippy::unwrap_used)]
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

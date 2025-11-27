@@ -163,11 +163,7 @@ pub struct TimingTableLookUp<C: 'static + Ctx> {
   pub lvf_moments_values: Vec<LVFMoments>,
   pub lvf_early_late_values: Vec<LVFEarlyLate>,
 }
-#[expect(
-  clippy::similar_names,
-  clippy::indexing_slicing,
-  clippy::arithmetic_side_effects
-)]
+#[expect(clippy::indexing_slicing, clippy::arithmetic_side_effects)]
 impl<C: 'static + Ctx> TimingTableLookUp<C> {
   #[inline]
   pub(crate) fn use_common_template(
@@ -706,9 +702,9 @@ impl<C: 'static + Ctx> ParsingBuilder<C> for TimingTableLookUp<C> {
 impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
   #[inline]
   #[expect(clippy::float_arithmetic)]
-  fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation>(
+  fn fmt_liberty<T: core::fmt::Write, I: ast::Indentation, K: core::fmt::Display>(
     &self,
-    key: &str,
+    key: K,
     f: &mut ast::CodeFormatter<'_, T, I>,
   ) -> core::fmt::Result {
     let chunk_size =
@@ -726,7 +722,7 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
         inner: self.values.iter().copied(),
       },
     }
-    .fmt_self::<_, _, C>("", key, f)?;
+    .fmt_self::<_, _, C, _, _>("", &key, f)?;
     if !self.lvf_moments_values.is_empty() {
       DisplayTableLookUp {
         name: &self.name,
@@ -740,7 +736,7 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
             .map(|(value, lvf)| lvf.mean - value),
         },
       }
-      .fmt_self::<_, _, C>("ocv_mean_shift_", key, f)?;
+      .fmt_self::<_, _, C, _, _>("ocv_mean_shift_", &key, f)?;
       DisplayTableLookUp {
         name: &self.name,
         index_1: &self.index_1,
@@ -752,7 +748,7 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
           inner: self.lvf_moments_values.iter().map(|lvf| lvf.std_dev),
         },
       }
-      .fmt_self::<_, _, C>("ocv_std_dev_", key, f)?;
+      .fmt_self::<_, _, C, _, _>("ocv_std_dev_", &key, f)?;
       DisplayTableLookUp {
         name: &self.name,
         index_1: &self.index_1,
@@ -764,7 +760,7 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
           inner: self.lvf_moments_values.iter().map(|lvf| lvf.skewness),
         },
       }
-      .fmt_self::<_, _, C>("ocv_skewness_", key, f)?;
+      .fmt_self::<_, _, C, _, _>("ocv_skewness_", &key, f)?;
     }
     if !self.lvf_early_late_values.is_empty() {
       DisplayTableLookUp {
@@ -778,7 +774,7 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
           inner: self.lvf_early_late_values.iter().map(|lvf| lvf.early_sigma),
         },
       }
-      .fmt_self::<_, _, C>("ocv_sigma_", key, f)?;
+      .fmt_self::<_, _, C, _, _>("ocv_sigma_", &key, f)?;
       DisplayTableLookUp {
         name: &self.name,
         index_1: &self.index_1,
@@ -790,7 +786,7 @@ impl<C: 'static + Ctx> ast::GroupAttri<C> for TimingTableLookUp<C> {
           inner: self.lvf_early_late_values.iter().map(|lvf| lvf.late_sigma),
         },
       }
-      .fmt_self::<_, _, C>("ocv_sigma_", key, f)?;
+      .fmt_self::<_, _, C, _, _>("ocv_sigma_", &key, f)?;
     }
     Ok(())
   }
@@ -822,8 +818,8 @@ mod test {
     let mean = nominal + mean_shift;
     let moments = LVFMoments { mean, std_dev, skewness };
     let early_late = LVFEarlyLate { early_sigma, late_sigma };
-    dbg!(moments.to_early_late(nominal));
-    dbg!(moments.to_early_late(nominal).unwrap().to_moments(nominal, mean));
-    dbg!(early_late.to_moments(nominal, mean));
+    moments.to_early_late(nominal);
+    moments.to_early_late(nominal).unwrap().to_moments(nominal, mean);
+    early_late.to_moments(nominal, mean);
   }
 }

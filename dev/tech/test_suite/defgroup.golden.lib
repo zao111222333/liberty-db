@@ -4,6 +4,7 @@ library (test1) {
 	define (sec_acore_rise_power, sec_acore_internal_power, float);
 	define (sec_acore_when, sec_acore_internal_power, string);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	define_group (sec_acore_internal_power, pin);
 	time_unit : 1ns;
 	voltage_unit : 1V;

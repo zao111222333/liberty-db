@@ -18,7 +18,7 @@ use crate::{
   common::char_config::CharConfig,
   expression::{BddVariableSet, FF, FFBank, Latch, LatchBank},
   pin::{AntennaDiodeType, Bundle, Bus, Pin},
-  table::TableLookUp2D,
+  table::DcCurrent,
 };
 
 pub trait CellCtx {
@@ -123,6 +123,71 @@ impl Default for DefaultCellCtx {
     pub short: LibertyVec<Vec<String>>,
   )
 )]
+#[duplicated(
+  name = ScaledCell,
+  docs(
+    /// You can use the `scaled_cell` group to supply an alternate set of values for an existing
+    /// cell. The choice is based on the set of operating conditions used.
+    /// Syntax:
+    /// ```text
+    /// scaled_cell (existing_cell, operating_conditions_group) {
+    /// ... scaled cell description ...
+    /// }
+    /// ```
+    /// existing_cell
+    /// The name of a cell defined in a previous cell group.
+    /// 
+    /// The library-level `operating_conditions` group with which the scaled cell is
+    /// associated.
+    /// 
+    /// Example:
+    /// ```text
+    /// library (example) {
+    ///     operating_conditions(WCCOM) {
+    ///         ...
+    ///     }
+    ///     cell(INV) {
+    ///         pin(A) {
+    ///             direction : input ;
+    ///             capacitance : 1.0 :
+    ///         }
+    ///         pin(Z) {
+    ///             direction : output ;
+    ///             function : ”A’” ;
+    ///             timing() {
+    ///                 intrinsic_rise : 0.36 ;
+    ///                 intrinsic_fall : 0.16 ;
+    ///                 rise_resistance : 0.0653 ;
+    ///                 fall_resistance : 0.0331 ;
+    ///                 related_pin : ”A” ;
+    ///             }
+    ///         }
+    ///     }
+    ///     scaled_cell(INV, WCCOM) {
+    ///         pin(A) {
+    ///             direction : input ;
+    ///             capacitance : 0.7 ;
+    ///         }
+    ///         pin(Z) {
+    ///             direction : output ;
+    ///             timing() {
+    ///                 intrinsic_rise : 0.12 ;
+    ///                 intrinsic_fall : 0.13 ;
+    ///                 rise_resistance : 0.605 ;
+    ///                 fall_resistance : 0.493 ;
+    ///                 related_pin : ”A” ;
+    ///             }
+    ///         }
+    ///     }
+    /// }
+    /// ```
+  ),
+  additional_attrs(
+    #[id(borrow = str)]
+    #[liberty(name)]
+    pub condition: String,
+  )
+)]
 /// cell group
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=98.23&end=98.32
@@ -149,6 +214,35 @@ pub struct Cell<C: 'static + Ctx> {
   pub attributes: Attributes,
   #[liberty(simple)]
   pub area: Option<f64>,
+  /// The `bus_naming_style` attribute defines the naming convention for buses in the library.
+  ///
+  /// *Syntax*
+  /// ```text
+  /// bus_naming_style : "string";
+  /// ```
+  /// Contains alphanumeric characters, braces, underscores, dashes, or
+  /// parentheses. Must contain one `%s` symbol and one `%d` symbol. The `%s` and `%d`
+  /// symbols can appear in any order with at least one nonnumeric character in
+  /// between.
+  ///
+  /// The colon character is not allowed in a `bus_naming_style` attribute value
+  /// because the colon is used to denote a range of bus members. You construct a
+  /// complete bused-pin name by using the name of the owning bus and the member
+  /// number. The owning bus name is substituted for the `%s`, and the member
+  /// number replaces the `%d`.
+  ///
+  /// If you do not define the `bus_naming_style` attribute, the default naming convention is
+  /// applied, as shown.
+  ///
+  /// *Example*
+  /// ```text
+  /// bus_naming_style : "%s[%d]" ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=21.14&end=21.30
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub bus_naming_style: Option<String>,
   /// The `dont_use`  attribute with a true value indicates
   /// that a cell should not be added to a design
   /// during optimization
@@ -165,6 +259,8 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub dont_touch: Option<bool>,
+  #[liberty(simple)]
+  pub map_only: Option<bool>,
   /// `CellId`
   #[liberty(simple)]
   pub single_bit_degenerate: Option<String>,
@@ -353,6 +449,21 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub retention_cell: Option<String>,
+  /// Note:
+  /// The `power_gating_cell` attribute has been replaced by the `retention_cell`
+  /// attribute. See `retention_cell` Simple Attribute on page 118.
+  ///
+  /// The cell-level `power_gating_cell` attribute specifies that a cell is a power-switch cell. A
+  /// power-switch cell has two modes. When functioning in normal mode, the power-switch
+  /// cell functions as a regular cell. When functioning in power-saving mode, the power-switch
+  /// cell’s power supply is shut off.
+  /// The pin-level `map_to_logic` attribute specifies which logic level the `power_gating_cell`
+  /// is tied to when the cell is functioning in normal mode.
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=117.26&end=117.33
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub power_gating_cell: Option<String>,
   /// The `switch_cell_type`  cell-level attribute specifies
   /// the type of the switch cell for direct inference.
   ///
@@ -399,8 +510,8 @@ pub struct Cell<C: 'static + Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
   /// ">Reference-Definition</a>
   #[liberty(group)]
-  #[liberty(after_build = TableLookUp2D::use_common_template)]
-  pub dc_current: Option<TableLookUp2D<C>>,
+  #[liberty(after_build = DcCurrent::use_common_template)]
+  pub dc_current: Option<DcCurrent<C>>,
   /// The `input_voltage_range`  attribute specifies the allowed
   /// voltage range of the level-shifter input pin and the voltage
   /// range for all input pins of the cell under all possible operating conditions
@@ -463,6 +574,30 @@ pub struct Cell<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(complex)]
   pub pin_opposite: Option<PinOpposite>,
+  /// The memory group is in the cell group. The memory group tags the cell as a memory
+  /// cell and contains general information about the memory cell, described with these
+  ///
+  /// attributes:
+  /// + type
+  /// + address_width
+  /// + word_width
+  /// + column_address
+  /// + row_address
+  ///
+  /// Syntax:
+  /// ```text
+  /// cell()
+  ///  memory() {
+  ///  type : [ram | rom ];
+  ///  address_width : “integer” ;
+  ///  word_width : “integer” ;
+  ///  column_address : ”integer” ;
+  ///  row_address : ”integer” ;
+  ///  }
+  /// }
+  /// ```
+  #[liberty(group)]
+  pub memory: Option<Memory<C>>,
   /// The `char_config` group is a group of attributes including simple and complex attributes.
   /// These attributes represent library characterization configuration, and specify the settings
   /// to characterize the library. Use the `char_config` group syntax to apply an attribute value
@@ -655,9 +790,44 @@ pub struct Cell<C: 'static + Ctx> {
   #[liberty(group)]
   pub bundle: LibertySet<Bundle<C>>,
 }
+impl<C: 'static + Ctx> crate::ast::NamedGroup<C> for ScaledCell<C> {
+  #[inline]
+  fn parse_set_name(
+    builder: &mut Self::Builder,
+    mut v: Vec<&str>,
+  ) -> Result<(), crate::ast::IdError> {
+    let l = v.len();
+    if l != 2 {
+      return Err(crate::ast::IdError::length_dismatch(2, l, v));
+    }
+    v.pop().map_or(
+      Err(crate::ast::IdError::Other("Unkown pop error".into())),
+      |condition| {
+        v.pop().map_or(
+          Err(crate::ast::IdError::Other("Unkown pop error".into())),
+          |name| {
+            builder.name = name.into();
+            builder.condition = condition.into();
+            Ok(())
+          },
+        )
+      },
+    )
+  }
+  #[inline]
+  fn fmt_name<T: core::fmt::Write, I: crate::ast::Indentation>(
+    &self,
+    f: &mut crate::ast::CodeFormatter<'_, T, I>,
+  ) -> core::fmt::Result {
+    use core::fmt::Write as _;
+    write!(f, "{}, {}", self.name, self.condition)
+  }
+}
+
 #[duplicate::duplicate_item(
   CellModel;
   [Cell];
+  [ScaledCell];
   [Model];
 )]
 impl<C: 'static + Ctx> GroupFn<C> for CellModel<C> {

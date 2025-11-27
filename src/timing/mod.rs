@@ -680,6 +680,122 @@ pub struct Timing<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub when_start: Option<BooleanExpression>,
+  /// To represent steady-state drive resistance values, use the following attributes to define the
+  /// four regions:
+  /// + `steady_state_resistance_above_high`
+  /// + `steady_state_resistance_below_low`
+  /// + `steady_state_resistance_high`
+  /// + `steady_state_resistance_low`
+  /// These attributes are defined within the timing group to represent the steady-state drive
+  /// resistance. If one of these attributes is missing, the model becomes inaccurate.
+  ///
+  /// Syntax
+  /// ```text
+  /// pin(name) {
+  ///   ...
+  ///   timing() {
+  ///     ...
+  ///     steady_state_resistance_above_high : float;
+  ///     steady_state_resistance_below_low : float;
+  ///     steady_state_resistance_high : float;
+  ///     steady_state_resistance_low : float;
+  ///     ...
+  ///   }
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=611.21+612.2&end=611.43+612.9
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub steady_state_resistance_above_high: Option<f64>,
+  /// To represent steady-state drive resistance values, use the following attributes to define the
+  /// four regions:
+  /// + `steady_state_resistance_above_high`
+  /// + `steady_state_resistance_below_low`
+  /// + `steady_state_resistance_high`
+  /// + `steady_state_resistance_low`
+  /// These attributes are defined within the timing group to represent the steady-state drive
+  /// resistance. If one of these attributes is missing, the model becomes inaccurate.
+  ///
+  /// Syntax
+  /// ```text
+  /// pin(name) {
+  ///   ...
+  ///   timing() {
+  ///     ...
+  ///     steady_state_resistance_above_high : float;
+  ///     steady_state_resistance_below_low : float;
+  ///     steady_state_resistance_high : float;
+  ///     steady_state_resistance_low : float;
+  ///     ...
+  ///   }
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=611.21+612.2&end=611.43+612.9
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub steady_state_resistance_below_low: Option<f64>,
+  /// To represent steady-state drive resistance values, use the following attributes to define the
+  /// four regions:
+  /// + `steady_state_resistance_above_high`
+  /// + `steady_state_resistance_below_low`
+  /// + `steady_state_resistance_high`
+  /// + `steady_state_resistance_low`
+  /// These attributes are defined within the timing group to represent the steady-state drive
+  /// resistance. If one of these attributes is missing, the model becomes inaccurate.
+  ///
+  /// Syntax
+  /// ```text
+  /// pin(name) {
+  ///   ...
+  ///   timing() {
+  ///     ...
+  ///     steady_state_resistance_above_high : float;
+  ///     steady_state_resistance_below_low : float;
+  ///     steady_state_resistance_high : float;
+  ///     steady_state_resistance_low : float;
+  ///     ...
+  ///   }
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=611.21+612.2&end=611.43+612.9
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub steady_state_resistance_high: Option<f64>,
+  /// To represent steady-state drive resistance values, use the following attributes to define the
+  /// four regions:
+  /// + `steady_state_resistance_above_high`
+  /// + `steady_state_resistance_below_low`
+  /// + `steady_state_resistance_high`
+  /// + `steady_state_resistance_low`
+  /// These attributes are defined within the timing group to represent the steady-state drive
+  /// resistance. If one of these attributes is missing, the model becomes inaccurate.
+  ///
+  /// Syntax
+  /// ```text
+  /// pin(name) {
+  ///   ...
+  ///   timing() {
+  ///     ...
+  ///     steady_state_resistance_above_high : float;
+  ///     steady_state_resistance_below_low : float;
+  ///     steady_state_resistance_high : float;
+  ///     steady_state_resistance_low : float;
+  ///     ...
+  ///   }
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=611.21+612.2&end=611.43+612.9
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub steady_state_resistance_low: Option<f64>,
+  #[liberty(simple)]
+  pub slope_rise: Option<f64>,
+  #[liberty(simple)]
+  pub slope_fall: Option<f64>,
   /// In referenced CCS noise modeling, the `active_input_ccb` attribute lists the active or
   /// switching `input_ccb` groups of the input pin that do not propagate the noise in the timing
   /// arc or the receiver capacitance load.
@@ -987,6 +1103,42 @@ pub struct Timing<C: 'static + Ctx> {
   #[liberty(group)]
   #[liberty(after_build = CompactCcsTable::use_compact_template)]
   pub compact_ccs_fall: Option<CompactCcsTable<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_height_above_high: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_height_below_low: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_height_high: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_height_low: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_width_above_high: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_width_below_low: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_width_high: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_width_low: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_peak_time_ratio_above_high: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_peak_time_ratio_below_low: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_peak_time_ratio_high: Option<TableLookUp<C>>,
+  #[liberty(group)]
+  #[liberty(after_build = TableLookUp::use_common_template)]
+  pub propagated_noise_peak_time_ratio_low: Option<TableLookUp<C>>,
 }
 
 impl<C: 'static + Ctx> GroupFn<C> for Timing<C> {
@@ -1643,7 +1795,7 @@ liberty_db::timing::Timing () {
     assert_lvf_fn(14.0, 30.0, 220.0);
   }
   // FIXME:
-  #[ignore]
+  #[ignore = "FIXME"]
   #[test]
   fn table_lookup_mismatch_lvf() {
     use crate::ast::GroupAttri;

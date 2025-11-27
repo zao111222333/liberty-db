@@ -35,35 +35,38 @@ pub(crate) enum FieldType {
   Attri(AttriType),
 }
 
+pub(crate) struct FieldsType<'a> {
+  // attri map
+  pub(crate) attri_type_map: HashMap<&'a Ident, AttriType>,
+  /// default map
+  pub(crate) default_map: HashMap<&'a Ident, Expr>,
+  /// dynamic name map
+  pub(crate) dynamic_key_map: HashMap<&'a Ident, Expr>,
+  /// before_build_map
+  pub(crate) before_build_map: HashMap<&'a Ident, Path>,
+  /// after_build_map
+  pub(crate) after_build_map: HashMap<&'a Ident, Path>,
+  /// Name (flatten, field)
+  pub(crate) name_vec: Vec<(bool, &'a syn::Field)>,
+  /// attributes name
+  pub(crate) attributes_name: &'a Ident,
+  /// comment name
+  pub(crate) comments_name: &'a Ident,
+  /// extra_ctx name
+  pub(crate) extra_ctx_name: &'a Ident,
+}
+
 #[allow(clippy::type_complexity)]
 pub(crate) fn parse_fields_type(
   fields: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
-) -> syn::Result<(
-  // attri map
-  HashMap<&Ident, AttriType>,
-  // default map
-  HashMap<&Ident, Expr>,
-  // before_build_map
-  HashMap<&Ident, Path>,
-  // after_build_map
-  HashMap<&Ident, Path>,
-  // Name (flatten, field)
-  Vec<(bool, &syn::Field)>,
-  // attributes name
-  &Ident,
-  // comment name
-  &Ident,
-  // extra_ctx name
-  &Ident,
-  // extra_ctx type
-  &Type,
-)> {
-  let mut _name_vec = Vec::new();
+) -> syn::Result<FieldsType<'_>> {
+  let mut name_vec = Vec::new();
   let mut _attributes_name = None;
   let mut _comments_name = None;
-  let mut _extra_ctx = None;
+  let mut _extra_ctx_name = None;
   let mut attri_type_map = HashMap::new();
   let mut default_map = HashMap::new();
+  let mut dynamic_key_map = HashMap::new();
   let mut before_build_map = HashMap::new();
   let mut after_build_map = HashMap::new();
   for field in fields {
@@ -72,6 +75,10 @@ pub(crate) fn parse_fields_type(
       if let Some(default) = parse_field_default(field_attrs)? {
         _ = default_map.insert(field_name, default);
       }
+      if let Some(default) = parse_field_dynamic_key(field_attrs)? {
+        _ = dynamic_key_map.insert(field_name, default);
+      }
+
       match parse_field_build(field_attrs)? {
         (None, None) => {}
         (None, Some(after)) => _ = after_build_map.insert(field_name, after),
@@ -92,7 +99,7 @@ pub(crate) fn parse_fields_type(
       };
       match attr {
         FieldType::Internal(InternalType::Name { flatten }) => {
-          _name_vec.push((flatten, field));
+          name_vec.push((flatten, field));
         }
         FieldType::Internal(InternalType::AttributeList) => {
           if let Some(name) = &_attributes_name {
@@ -115,13 +122,13 @@ pub(crate) fn parse_fields_type(
           }
         }
         FieldType::Internal(InternalType::ExtraCtx) => {
-          if let Some((name, _)) = &_extra_ctx {
+          if let Some(name) = &_extra_ctx_name {
             return Err(syn::Error::new(
               proc_macro2::Span::call_site(),
               format!("duplicated extra_ctx {name}."),
             ));
           } else {
-            _extra_ctx = Some((field_name, &field.ty));
+            _extra_ctx_name = Some(field_name);
           }
         }
         FieldType::Attri(attri_type) => {
@@ -136,7 +143,7 @@ pub(crate) fn parse_fields_type(
     }
   }
 
-  match (_attributes_name, _comments_name, _extra_ctx) {
+  match (_attributes_name, _comments_name, _extra_ctx_name) {
     (None, _, _) => Err(syn::Error::new(
       proc_macro2::Span::call_site(),
       "Can not find attributes".to_string(),
@@ -149,21 +156,19 @@ pub(crate) fn parse_fields_type(
       proc_macro2::Span::call_site(),
       "Can not find extra_ctx".to_string(),
     )),
-    (
-      Some(attributes_name),
-      Some(comments_name),
-      Some((extra_ctx_name, extra_ctx_type)),
-    ) => Ok((
-      attri_type_map,
-      default_map,
-      before_build_map,
-      after_build_map,
-      _name_vec,
-      attributes_name,
-      comments_name,
-      extra_ctx_name,
-      extra_ctx_type,
-    )),
+    (Some(attributes_name), Some(comments_name), Some(extra_ctx_name)) => {
+      Ok(FieldsType {
+        attri_type_map,
+        default_map,
+        dynamic_key_map,
+        before_build_map,
+        after_build_map,
+        name_vec,
+        attributes_name,
+        comments_name,
+        extra_ctx_name,
+      })
+    }
   }
 }
 
@@ -205,7 +210,7 @@ pub(crate) fn parse_field_attrs(
                 parse_supergroup_type(tokens)?,
               ))));
             }
-            "default" => {
+            "default" | "dynamic_key" => {
               continue;
             }
             _ => {
@@ -242,6 +247,34 @@ fn parse_field_default(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Exp
         let key: Ident = input.parse()?;
 
         if key == "default" {
+          let _eq: Token![=] = input.parse()?;
+          let expr: Expr = input.parse()?;
+
+          default_expr = Some(expr);
+        }
+        while !input.is_empty() {
+          _ = input.parse::<proc_macro2::TokenStream>()?;
+        }
+        Ok(default_expr)
+      });
+      if let Ok(Some(expr)) = res {
+        return Ok(Some(expr));
+      }
+    }
+  }
+  Ok(None)
+}
+fn parse_field_dynamic_key(field_attrs: &[syn::Attribute]) -> syn::Result<Option<Expr>> {
+  for attr in field_attrs {
+    if attr.path().is_ident("liberty") {
+      let res = attr.parse_args_with(|input: ParseStream| {
+        let mut default_expr = None;
+        if input.is_empty() {
+          return Ok(default_expr);
+        }
+        let key: Ident = input.parse()?;
+
+        if key == "dynamic_key" {
           let _eq: Token![=] = input.parse()?;
           let expr: Expr = input.parse()?;
 

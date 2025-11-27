@@ -5,6 +5,7 @@ library (saed32hvt_pg_ff0p95v125c) {
 	define (simulator, library, string);
 	technology (cmos);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	date : "[2012 JAN 31]";
 	revision : "updated 6.FEB.2012";
 	nom_process : 1.01;
@@ -6118,82 +6119,82 @@ library (saed32hvt_pg_ff0p95v125c) {
 	compact_lut_template (c_ccs_drv_template_1) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_drv_template_2) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002, 81.9999992");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002, 81.9999992");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_drv_template_3) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_drv_template_4) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_drv_template_5) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 8.0, 16.0000001, 32.0000001, 64.0000002, 128.0000005, 167.9999998");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 8.0, 16.0000001, 32.0000001, 64.0000002, 128.0000005, 167.9999998");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_drv_template_6) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_pwr_template_1) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	compact_lut_template (c_ccs_pwr_template_2) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002, 81.9999992");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002, 81.9999992");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	compact_lut_template (c_ccs_pwr_template_3) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	compact_lut_template (c_ccs_pwr_template_4) {
@@ -6204,28 +6205,28 @@ library (saed32hvt_pg_ff0p95v125c) {
 	compact_lut_template (c_ccs_pwr_template_5) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	compact_lut_template (c_ccs_pwr_template_6) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 8.0, 16.0000001, 32.0000001, 64.0000002, 128.0000005, 167.9999998");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 8.0, 16.0000001, 32.0000001, 64.0000002, 128.0000005, 167.9999998");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	compact_lut_template (c_ccs_pwr_template_7) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	normalized_driver_waveform (driver_waveform_template) {
@@ -6877,6 +6878,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 72713.98;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-44.430344, -221.25599, -407.8577, -604.83435, -810.95914, -1018.0945, -1206.8467, -1382.5115, -1591.2426, -1918.3949", \
@@ -6889,9 +6893,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-101.86543, -102.03765, -102.19641, -102.37789, -102.6637, -103.18015, -104.22931, -106.72861, -114.41464, -152.8299", \
 				"-43.807126, -43.853437, -43.896336, -43.945976, -44.024873, -44.168886, -44.465934, -45.192272, -47.548983, -61.335864", \
 				"-15.639878, -15.673222, -15.704138, -15.740043, -15.797226, -15.901778, -16.117938, -16.648652, -18.385479, -28.821016");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -7471,6 +7472,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 72713.98;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-4.6695645, -26.494608, -49.462771, -73.617324, -98.728517, -123.61385, -146.00097, -167.30498, -193.20054, -234.17633", \
@@ -7483,9 +7487,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-62.952102, -68.798392, -74.269687, -79.060919, -83.809107, -89.481728, -96.889926, -107.20149, -122.95066, -152.34452", \
 				"-27.155564, -27.185983, -27.214137, -27.246064, -27.296081, -27.386097, -27.56791, -27.996643, -29.287203, -35.351459", \
 				"-3.4209186, -3.4236896, -3.4262769, -3.4292821, -3.4340717, -3.4428465, -3.4610464, -3.5059661, -3.654508, -4.5747515");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -8065,6 +8066,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 72713.98;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-93.027302, -428.03216, -782.56865, -1157.8775, -1551.9327, -1950.1152, -2315.3229, -2654.297, -3055.9578, -3686.3335", \
@@ -8077,9 +8081,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-108.89943, -109.05196, -109.19296, -109.35489, -109.61129, -110.07786, -111.03597, -113.36093, -120.78619, -162.19194", \
 				"-57.901681, -57.982877, -58.058085, -58.145066, -58.283353, -58.535934, -59.057445, -60.334885, -64.495041, -89.107612", \
 				"-29.372075, -29.440864, -29.504608, -29.578558, -29.696284, -29.911493, -30.356339, -31.448133, -35.01846, -56.418001");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -8659,6 +8660,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 72713.98;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-10.125724, -54.709679, -101.69506, -151.21234, -202.89968, -254.57822, -301.41606, -345.29288, -397.80795, -480.31515", \
@@ -8671,9 +8675,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-112.32048, -114.76415, -116.96311, -119.16421, -122.13612, -126.67167, -133.9764, -146.30516, -168.51389, -215.34966", \
 				"-31.683896, -31.708802, -31.731874, -31.758365, -31.800253, -31.876334, -32.032134, -32.408312, -33.597003, -40.011553", \
 				"-5.384325, -5.3913577, -5.3978983, -5.4054967, -5.417603, -5.4397583, -5.4856291, -5.5985188, -5.9696999, -8.2308588");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -9253,6 +9254,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 72713.98;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-21.16108, -110.58155, -204.87107, -304.31678, -408.25628, -512.47067, -607.20585, -695.56665, -800.79993, -965.7882", \
@@ -9265,9 +9269,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-116.43954, -116.93889, -117.39411, -117.90006, -118.67545, -120.03218, -122.65969, -128.43507, -143.61423, -195.84726", \
 				"-36.096553, -36.126199, -36.153666, -36.185378, -36.23571, -36.327452, -36.5163, -36.976417, -38.458114, -46.926467", \
 				"-8.7082517, -8.7237531, -8.7381422, -8.7548588, -8.7814878, -8.8301931, -8.9309478, -9.178545, -9.9903318, -14.894677");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -9846,6 +9847,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : FOOT;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-9.9608586e-22, -9.9608586e-22, -9.9608586e-22, -9.9608586e-22, -9.9608586e-22, -9.9608586e-22, -9.9608586e-22, -9.9608586e-22, -9.9608586e-22, -9.9608586e-22", \
@@ -9858,9 +9862,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-6.1059764e-6, -6.1059764e-6, -6.1059764e-6, -6.1059764e-6, -6.1059764e-6, -6.1059764e-6, -6.1059764e-6, -6.1059764e-6, -6.1059764e-6, -6.1059764e-6", \
 				"-0.000025310858, -0.000025310858, -0.000025310858, -0.000025310858, -0.000025310858, -0.000025310858, -0.000025310858, -0.000025310858, -0.000025310858, -0.000025310858", \
 				"-0.0001544597, -0.0001544597, -0.0001544597, -0.0001544597, -0.0001544597, -0.0001544597, -0.0001544597, -0.0001544597, -0.0001544597, -0.0001544597");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -9976,6 +9977,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : FOOT;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-1.5786778e-22, -1.5786778e-22, -1.5786778e-22, -1.5786778e-22, -1.5786778e-22, -1.5786778e-22, -1.5786778e-22, -1.5786778e-22, -1.5786778e-22, -1.5786778e-22", \
@@ -9988,9 +9992,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-6.8512432e-7, -6.8512432e-7, -6.8512432e-7, -6.8512432e-7, -6.8512432e-7, -6.8512432e-7, -6.8512432e-7, -6.8512432e-7, -6.8512432e-7, -6.8512432e-7", \
 				"-2.8296233e-6, -2.8296233e-6, -2.8296233e-6, -2.8296233e-6, -2.8296233e-6, -2.8296233e-6, -2.8296233e-6, -2.8296233e-6, -2.8296233e-6, -2.8296233e-6", \
 				"-0.000017791163, -0.000017791163, -0.000017791163, -0.000017791163, -0.000017791163, -0.000017791163, -0.000017791163, -0.000017791163, -0.000017791163, -0.000017791163");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -10106,6 +10107,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : FOOT;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-3.279849e-7, -3.279849e-7, -3.279849e-7, -3.279849e-7, -3.279849e-7, -3.279849e-7, -3.279849e-7, -3.279849e-7, -3.279849e-7, -3.279849e-7", \
@@ -10118,9 +10122,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-0.000012711649, -0.000012711649, -0.000012711649, -0.000012711649, -0.000012711649, -0.000012711649, -0.000012711649, -0.000012711649, -0.000012711649, -0.000012711649", \
 				"-0.00005267637, -0.00005267637, -0.00005267637, -0.00005267637, -0.00005267637, -0.00005267637, -0.00005267637, -0.00005267637, -0.00005267637, -0.00005267637", \
 				"-0.0003180142, -0.0003180142, -0.0003180142, -0.0003180142, -0.0003180142, -0.0003180142, -0.0003180142, -0.0003180142, -0.0003180142, -0.0003180142");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -10247,6 +10248,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : FOOT;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-3.1297385e-22, -3.1297385e-22, -3.1297385e-22, -3.1297385e-22, -3.1297385e-22, -3.1297385e-22, -3.1297385e-22, -3.1297385e-22, -3.1297385e-22, -3.1297385e-22", \
@@ -10259,9 +10263,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-1.3720811e-6, -1.3720811e-6, -1.3720811e-6, -1.3720811e-6, -1.3720811e-6, -1.3720811e-6, -1.3720811e-6, -1.3720811e-6, -1.3720811e-6, -1.3720811e-6", \
 				"-5.667329e-6, -5.667329e-6, -5.667329e-6, -5.667329e-6, -5.667329e-6, -5.667329e-6, -5.667329e-6, -5.667329e-6, -5.667329e-6, -5.667329e-6", \
 				"-0.000035619719, -0.000035619719, -0.000035619719, -0.000035619719, -0.000035619719, -0.000035619719, -0.000035619719, -0.000035619719, -0.000035619719, -0.000035619719");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -10388,6 +10389,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : FOOT;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VSSG;
+			related_internal_pg_pin : VSS;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("-5.7928492e-22, -5.7928492e-22, -5.7928492e-22, -5.7928492e-22, -5.7928492e-22, -5.7928492e-22, -5.7928492e-22, -5.7928492e-22, -5.7928492e-22, -5.7928492e-22", \
@@ -10400,9 +10404,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"-2.9226903e-6, -2.9226903e-6, -2.9226903e-6, -2.9226903e-6, -2.9226903e-6, -2.9226903e-6, -2.9226903e-6, -2.9226903e-6, -2.9226903e-6, -2.9226903e-6", \
 				"-0.000012109731, -0.000012109731, -0.000012109731, -0.000012109731, -0.000012109731, -0.000012109731, -0.000012109731, -0.000012109731, -0.000012109731, -0.000012109731", \
 				"-0.000074787988, -0.000074787988, -0.000074787988, -0.000074787988, -0.000074787988, -0.000074787988, -0.000074787988, -0.000074787988, -0.000074787988, -0.000074787988");
-			related_internal_pg_pin : VSS; /* user defined attribute */
-			related_pg_pin : VSSG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : input;
@@ -10519,6 +10520,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 544588.6;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("83.001738, 76.49466, 70.350899, 64.622516, 59.367405, 54.650365, 50.544641, 47.134465, 44.517834, 42.408687", \
@@ -10531,9 +10535,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"1624.3175, 1556.5183, 1482.5186, 1401.0128, 1310.2292, 1207.6836, 1089.7531, 950.91393, 782.1995, 471.51904", \
 				"2778.7529, 2681.2186, 2573.2841, 2452.3675, 2314.7501, 2154.7605, 1962.9959, 1721.5032, 1380.8261, 144.5431", \
 				"3238.6363, 3131.5014, 3012.6239, 2879.0135, 2726.3225, 2547.8257, 2332.1041, 2056.1768, 1643.6481, 25.623274");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -11113,6 +11114,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 72713.98;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("8.9898049, 8.3281402, 7.7063642, 7.1292998, 6.6022767, 6.1312371, 5.7228972, 5.3850085, 5.1266506, 4.9192231", \
@@ -11125,9 +11129,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"212.67099, 204.23948, 195.0396, 184.91028, 173.63351, 160.90425, 146.27971, 129.09003, 108.26656, 70.401431", \
 				"350.14402, 338.07382, 324.7206, 309.76679, 292.7554, 272.99052, 249.32105, 219.55972, 177.77803, 28.170944", \
 				"392.90587, 379.72056, 365.09655, 348.66907, 329.90848, 307.99783, 281.55607, 247.83262, 198.01877, 4.2437327");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -11707,6 +11708,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 1084169.0;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("170.82087, 157.31913, 144.55979, 132.65258, 121.7198, 111.89838, 103.34317, 96.232186, 90.772315, 86.368105", \
@@ -11719,9 +11723,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"3228.9682, 3093.3986, 2945.4317, 2782.4563, 2600.9309, 2395.8883, 2160.0861, 1882.482, 1545.1581, 924.18736", \
 				"5559.6968, 5364.3533, 5148.1714, 4905.975, 4630.3091, 4309.8005, 3925.5889, 3441.639, 2758.4543, 274.56324", \
 				"6513.488, 6298.6175, 6060.177, 5792.1596, 5485.8294, 5127.6661, 4694.6956, 4140.5889, 3310.2839, 49.549668");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -12301,6 +12302,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 139597.6;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("17.904975, 16.5156, 15.208657, 13.994493, 12.884558, 11.89162, 11.030111, 10.316664, 9.7707361, 9.3320486", \
@@ -12313,9 +12317,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"400.64522, 383.86974, 365.57045, 345.42929, 323.01631, 297.73172, 268.70792, 234.64166, 193.48545, 119.41943", \
 				"684.09799, 659.94507, 633.22444, 603.30023, 569.25783, 529.70386, 482.33379, 422.76716, 339.12144, 39.347491", \
 				"789.91352, 763.44929, 734.09459, 701.1157, 663.44719, 619.44447, 566.32498, 498.53383, 398.13676, 6.7568935");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -12895,6 +12896,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_leakage_power : 274628.4;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("38.962597, 35.94689, 33.104869, 30.459829, 28.037624, 25.867123, 23.980941, 22.416636, 21.218, 20.253325", \
@@ -12907,9 +12911,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"809.0451, 775.43635, 738.77082, 698.40963, 653.48821, 602.79935, 544.59431, 476.23832, 393.56572, 244.13745", \
 				"1381.4367, 1332.9569, 1279.3171, 1219.2386, 1150.8805, 1071.4377, 976.26622, 856.52387, 688.08615, 81.456965", \
 				"1600.3656, 1547.1149, 1488.0376, 1421.6525, 1345.807, 1257.175, 1150.1192, 1013.34, 809.82165, 13.811366");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -13488,6 +13489,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : HEAD;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("3243.8198, 3136.1841, 3016.7357, 2882.4622, 2728.9824, 2549.513, 2332.5228, 2054.7253, 1608.8964, 0.000075398146", \
@@ -13500,9 +13504,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"981.14309, 917.99884, 849.3528, 774.12126, 690.87342, 597.68098, 491.90753, 369.99059, 227.62542, 4.9945551e-6", \
 				"448.49917, 405.70091, 360.55958, 312.94502, 262.81751, 210.34635, 156.1588, 101.8582, 51.021081, 1.3003399e-6", \
 				"39.050447, 32.774584, 26.854284, 21.338945, 16.283451, 11.749162, 7.8054245, 4.5320298, 2.0219213, -1.1082757e-8");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -13607,6 +13608,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : HEAD;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("391.26349, 378.03527, 363.36234, 346.87805, 328.05, 306.05632, 279.50661, 245.62585, 192.22326, 8.8508263e-6", \
@@ -13619,9 +13623,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"112.99865, 105.38722, 97.13148, 88.109926, 78.165052, 67.090492, 54.617216, 40.416064, 24.201552, 5.8497808e-7", \
 				"49.294154, 44.323882, 39.116767, 33.670185, 27.996521, 22.137934, 16.194464, 10.376496, 5.0917447, 1.5374938e-7", \
 				"3.8779144, 3.2458936, 2.6525163, 2.1022968, 1.6002202, 1.151842, 0.76344401, 0.442285, 0.19688051, 1.915322e-10");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -13726,6 +13727,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : HEAD;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("6527.9528, 6312.0439, 6072.4188, 5803.0263, 5495.0588, 5134.8773, 4699.2702, 4141.2693, 3243.7744, 0.00015237502", \
@@ -13738,9 +13742,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"1989.9723, 1862.9029, 1724.7102, 1573.1888, 1405.4178, 1217.4448, 1003.8281, 757.11333, 467.94608, 0.000010090137", \
 				"916.82025, 830.17413, 738.68333, 642.04657, 540.13036, 433.20502, 322.44626, 211.00222, 106.09776, 2.6518969e-6", \
 				"81.286802, 68.25837, 55.956843, 44.486496, 33.963359, 24.517258, 16.294971, 9.4652896, 4.2246115, -1.0076083e-8");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -13845,6 +13846,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : HEAD;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("791.60114, 764.99954, 735.48802, 702.32712, 664.4422, 620.173, 566.70647, 498.40781, 390.01301, 0.000018074309", \
@@ -13857,9 +13861,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"232.09935, 216.69394, 199.97165, 181.68039, 161.49125, 138.96904, 113.53671, 84.462023, 51.017694, 1.1951387e-6", \
 				"102.80933, 92.622606, 81.926468, 70.707356, 58.97972, 46.815941, 34.404962, 22.165657, 10.943917, 3.1399975e-7", \
 				"8.3464693, 6.991721, 5.7180218, 4.5353495, 3.4547365, 2.4884846, 1.6504968, 0.95681241, 0.4262038, 4.6944218e-10");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;
@@ -13964,6 +13965,9 @@ library (saed32hvt_pg_ff0p95v125c) {
 		cell_footprint : HEAD;
 		switch_cell_type : coarse_grain;
 		dc_current (template_mtc_0) {
+			related_switch_pin : SLEEP;
+			related_pg_pin : VDDG;
+			related_internal_pg_pin : VDD;
 			index_1 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			index_2 ("0.0, 0.0434696, 0.0920645, 0.1471569, 0.2107563, 0.2859785, 0.378043, 0.4967348, 0.6640215, 0.95");
 			values ("1602.8687, 1549.3525, 1489.9725, 1423.2359, 1346.9723, 1257.8254, 1150.0983, 1012.3339, 792.29975, 0.000036942449", \
@@ -13976,9 +13980,6 @@ library (saed32hvt_pg_ff0p95v125c) {
 				"477.54045, 446.33975, 412.44514, 375.33313, 334.31634, 288.47629, 236.57508, 176.98728, 107.90872, 2.4423866e-6", \
 				"214.9761, 194.07684, 172.08114, 148.94294, 124.66719, 99.369659, 73.398616, 47.578746, 23.657713, 6.4004141e-7", \
 				"18.073117, 15.153619, 12.4043, 9.847392, 7.5075322, 5.4122156, 3.5925141, 2.0842158, 0.92910642, -1.7329872e-9");
-			related_internal_pg_pin : VDD; /* user defined attribute */
-			related_pg_pin : VDDG; /* user defined attribute */
-			related_switch_pin : SLEEP; /* user defined attribute */
 		}
 		pg_pin (VDD) {
 			direction : output;

@@ -10,6 +10,7 @@ use crate::{
     join_fmt, join_fmt_no_quote,
   },
   expression,
+  table::Variable,
 };
 use core::fmt::{self, Write};
 
@@ -45,7 +46,27 @@ impl<C: 'static + Ctx> SimpleAttri<C> for f64 {
   }
 }
 crate::ast::impl_self_builder!(bool);
-crate::ast::impl_simple!(bool);
+impl<C: 'static + Ctx> SimpleAttri<C> for bool {
+  #[inline]
+  fn nom_parse<'a>(
+    i: &'a str,
+    scope: &mut ParseScope<'_>,
+  ) -> ast::SimpleParseRes<'a, Self> {
+    ast::nom_parse_from::<C, _, _, _>(i, scope, |s| match s {
+      "true" | "TRUE" => Ok(true),
+      "false" | "FALSE" => Ok(false),
+      _ => Err(()),
+    })
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    use fmt::Write as _;
+    write!(f, "{self}")
+  }
+}
 
 crate::ast::impl_self_builder!(usize);
 impl<C: 'static + Ctx> SimpleAttri<C> for usize {
@@ -277,14 +298,19 @@ impl<const N: usize, C: 'static + Ctx> ComplexAttri<C> for [f64; N] {
   }
   #[inline]
   fn is_set(&self) -> bool {
-    N == 0
+    N != 0
   }
   #[inline]
   fn fmt_self<T: Write, I: Indentation>(
     &self,
     f: &mut CodeFormatter<'_, T, I>,
   ) -> fmt::Result {
-    join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
+    join_fmt_no_quote(
+      self.iter(),
+      f,
+      |float, ff| ff.write_num(*float),
+      |ff| write!(ff, ", "),
+    )
   }
 }
 crate::ast::impl_self_builder!((String, f64));
@@ -343,7 +369,9 @@ impl<C: 'static + Ctx> ComplexAttri<C> for super::items::IdVector {
   ) -> fmt::Result {
     f.write_num(self.id)?;
     write!(f, ", \\")?;
+    f.indent();
     f.write_new_line_indentation()?;
+    f.dedent();
     join_fmt(self.vec.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
   }
 }
@@ -381,6 +409,42 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Vec<f64> {
     }
   }
 }
+
+crate::ast::impl_self_builder!(Vec<isize>);
+impl<C: 'static + Ctx> ComplexAttri<C> for Vec<isize> {
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    _iter: I,
+    _scope: &mut ParseScope<'_>,
+  ) -> Result<Self, ComplexParseError> {
+    unreachable!()
+  }
+  #[inline]
+  fn nom_parse<'a>(i: &'a str, scope: &mut ParseScope<'_>) -> ComplexParseRes<'a, Self> {
+    match ast::parser::complex_isize_vec(i, &mut scope.loc.line_num) {
+      Ok((_i, v)) => Ok((_i, Ok(v))),
+      Err(_) => {
+        Err(nom::Err::Error(nom::error::Error::new(i, nom::error::ErrorKind::Many0)))
+      }
+    }
+  }
+  #[inline]
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[expect(clippy::indexing_slicing)]
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    if self.len() == 1 {
+      f.write_num(self[0])
+    } else {
+      join_fmt(self.iter(), f, |float, ff| ff.write_num(*float), |ff| write!(ff, ", "))
+    }
+  }
+}
+
 impl<C: 'static + Ctx> ComplexAttri<C> for String {
   #[inline]
   fn parse<'a, I: Iterator<Item = &'a &'a str>>(
@@ -453,6 +517,44 @@ impl<C: 'static + Ctx> ComplexAttri<C> for Vec<String> {
     )
   }
 }
+
+crate::ast::impl_self_builder!(Vec<Variable>);
+impl<C: 'static + Ctx> ComplexAttri<C> for Vec<Variable> {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    iter: I,
+    _scope: &mut ParseScope<'_>,
+  ) -> Result<Self, ComplexParseError> {
+    Ok(iter.map(|&s| s.parse()).collect::<Result<_, _>>()?)
+  }
+  #[inline]
+  fn is_set(&self) -> bool {
+    !self.is_empty()
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    join_fmt_no_quote(self.iter(), f, |s, ff| write!(ff, "{s}"), |ff| write!(ff, ", "))
+  }
+  // #[inline]
+  // fn fmt_liberty<T: Write, I: Indentation>(
+  //   &self,
+  //   key: &str,
+  //   f: &mut CodeFormatter<'_, T, I>,
+  // ) -> fmt::Result {
+  //   if <Self as ComplexAttri<C>>::is_set(self) {
+  //     f.write_new_line_indentation()?;
+  //     write!(f, "{key} (")?;
+  //     <Self as ComplexAttri<C>>::fmt_self(self, f)?;
+  //     write!(f, ");")
+  //   } else {
+  //     Ok(())
+  //   }
+  // }
+}
+
 crate::ast::impl_self_builder!(Vec<usize>);
 impl<C: 'static + Ctx> ComplexAttri<C> for Vec<usize> {
   #[inline]
@@ -511,6 +613,36 @@ impl<C: 'static + Ctx> ComplexAttri<C> for (f64, f64, String) {
     f.write_num(self.1)?;
     f.write_str(", ")?;
     f.write_str(&self.2)
+  }
+}
+crate::ast::impl_self_builder!((String, usize));
+impl<C: 'static + Ctx> ComplexAttri<C> for (String, usize) {
+  #[inline]
+  fn parse<'a, I: Iterator<Item = &'a &'a str>>(
+    mut iter: I,
+    _scope: &mut ParseScope<'_>,
+  ) -> Result<Self, ComplexParseError> {
+    let v1 = match iter.next() {
+      Some(&s) => String::from(s),
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    let v2 = match iter.next() {
+      Some(s) => lexical_core::parse(s.as_bytes())?,
+      None => return Err(ComplexParseError::LengthDismatch),
+    };
+    if iter.next().is_some() {
+      return Err(ComplexParseError::LengthDismatch);
+    }
+    Ok((v1, v2))
+  }
+  #[inline]
+  fn fmt_self<T: Write, I: Indentation>(
+    &self,
+    f: &mut CodeFormatter<'_, T, I>,
+  ) -> fmt::Result {
+    f.write_str(&self.0)?;
+    f.write_str(", ")?;
+    f.write_num(self.1)
   }
 }
 crate::ast::impl_self_builder!((i64, f64));

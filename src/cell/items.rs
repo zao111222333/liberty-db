@@ -62,7 +62,7 @@ mod test_sort {
   use crate::DefaultCtx;
 
   #[test]
-  fn test_leakage_sort() {
+  fn leakage_sort() {
     let cell = crate::ast::test_parse::<crate::Cell<DefaultCtx>>(
       r#"(CELL) {
       pin(A){}
@@ -129,6 +129,94 @@ mod test_sort {
     );
   }
 }
+/// The memory group is in the cell group. The memory group tags the cell as a memory
+/// cell and contains general information about the memory cell, described with these
+///
+/// attributes:
+/// + type
+/// + `address_width`
+/// + `word_width`
+/// + `column_address`
+/// + `row_address`
+///
+/// Syntax:
+/// ```text
+/// cell()
+///  memory() {
+///  type : [ram | rom ];
+///  address_width : “integer” ;
+///  word_width : “integer” ;
+///  column_address : ”integer” ;
+///  row_address : ”integer” ;
+///  }
+/// }
+/// ```
+#[derive(Debug, Clone)]
+#[derive(liberty_macros::Group)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(bound = "C::Other: serde::Serialize + serde::de::DeserializeOwned")]
+pub struct Memory<C: 'static + Ctx> {
+  #[liberty(name)]
+  pub name: Vec<String>,
+  /// group comments
+  #[liberty(comments)]
+  comments: GroupComments,
+  #[liberty(extra_ctx)]
+  pub extra_ctx: C::Other,
+  /// group undefined attributes
+  #[liberty(attributes)]
+  pub attributes: crate::ast::Attributes,
+  #[liberty(simple)]
+  pub r#type: Option<MemoryType>,
+  #[liberty(simple)]
+  pub address_width: Option<usize>,
+  #[liberty(simple)]
+  pub word_width: Option<usize>,
+  /// This attribute specifies the number or range of numbers of indexes for a column.
+  /// *Syntax*:
+  /// ```text
+  /// column_address : ”index1 [range1 index2 index3 ...]” ;
+  /// ```
+  /// Number or range of numbers of indexes. Separate the numbers in a range with a
+  /// colon.
+  ///
+  /// *Example*:
+  /// ```text
+  /// column_address : ”0:4 5” ;
+  /// ```
+  #[liberty(simple)]
+  pub column_address: Option<String>,
+  /// This attribute specifies the number or range of numbers of indexes for a row.
+  ///
+  /// *Syntax*:
+  /// ```text
+  /// row_address : ”index1 [range1 index2 index3 ...]” ;
+  /// ```
+  /// Number or range of numbers of indexes. Separate the numbers in a range with a
+  /// colon.
+  ///
+  /// *Example*:
+  /// ```text
+  /// row_address : ”6:9” ;
+  /// ```
+  /// Example 6-16 at the end of this chapter shows a RAM cell with a memory description
+  /// that includes the `column_address` and `row_address` attributes.
+  #[liberty(simple)]
+  pub row_address: Option<String>,
+}
+impl<C: 'static + Ctx> GroupFn<C> for Memory<C> {}
+#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString, Hash, Eq, PartialOrd, Ord)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub enum MemoryType {
+  /// Low
+  #[strum(serialize = "ram")]
+  RAM,
+  /// High
+  #[strum(serialize = "rom")]
+  ROM,
+}
+crate::ast::impl_self_builder!(MemoryType);
+crate::ast::impl_simple!(MemoryType);
 /// Contains a table consisting of a single string.
 /// <a name ="reference_link" href="
 /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=141.4&end=141.5
@@ -402,7 +490,6 @@ liberty_db::cell::items::Statetable ("CLK EN SE", ENL) {
 |           L   -   -  :  -  :  N ";
 }"#,
     );
-    dbg!(statetable.table);
     _ = crate::ast::test_parse_fmt::<Statetable<DefaultCtx>>(
       r#"(" CLK EN SE",ENL) {
         table : "	H   L  L \

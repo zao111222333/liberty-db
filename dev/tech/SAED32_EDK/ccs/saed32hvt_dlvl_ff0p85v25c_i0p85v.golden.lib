@@ -5,6 +5,7 @@ library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 	define (simulator, library, string);
 	technology (cmos);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	date : "[2012 JAN 31]";
 	revision : "updated 6.FEB.2012";
 	nom_process : 1.01;
@@ -10835,37 +10836,37 @@ library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 	compact_lut_template (c_ccs_drv_template_1) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_drv_template_2) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_drv_template_3) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_drv_template_4) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
 		index_3 ("init_current, peak_current, peak_voltage, peak_time, left_id, right_id");
 	}
 	compact_lut_template (c_ccs_pwr_template_1) {
@@ -10876,37 +10877,37 @@ library (saed32hvt_dlvl_ff0p85v25c_i0p85v) {
 	compact_lut_template (c_ccs_pwr_template_2) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	compact_lut_template (c_ccs_pwr_template_3) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0000001");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	compact_lut_template (c_ccs_pwr_template_4) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 1.0, 2.0, 4.0, 8.0, 16.0000001, 32.0000001");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	compact_lut_template (c_ccs_pwr_template_5) {
 		base_curves_group : nc_compact_ccs_curve_1;
 		variable_1 : input_net_transition;
-		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
 		variable_2 : total_output_net_capacitance;
-		index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
 		variable_3 : curve_parameters;
+		index_1 ("0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024");
+		index_2 ("0.1, 2.0, 4.0, 8.0, 16.0000001, 32.0000001, 64.0000002");
 		index_3 ("init_time, init_current, bc_id1, point_time1, point_current1, bc_id2, [point_time2, point_current2, bc_id3, ...], end_time, end_current");
 	}
 	normalized_driver_waveform (driver_waveform_template) {

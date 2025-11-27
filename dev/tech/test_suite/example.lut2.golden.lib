@@ -2,6 +2,7 @@
 library (example) {
 	technology (cmos);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	simulation : false;
 	nom_process : 1.0;
 	nom_temperature : 85.0;
@@ -60,8 +61,8 @@ library (example) {
 	cell (AN2) {
 		area : 2.0;
 		interface_timing : false;
-		memory (memx) {  /* user defined attribute */
-			address_width : 11; /* user defined attribute */
+		memory (memx) {
+			address_width : 11;
 		}
 		ff_bank (IQ, IQN, 2) {
 			clocked_on : "CP";

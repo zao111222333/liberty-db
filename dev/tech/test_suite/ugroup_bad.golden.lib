@@ -6,6 +6,7 @@ library (pg_sample) {
 	define (state, pg_state_data, string);
 	define (values, pg_cell_table, string);
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	define_group (pg_cell_table, cell);
 	define_group (pg_state_data, cell);
 	define_group (pg_timing_data, pin);

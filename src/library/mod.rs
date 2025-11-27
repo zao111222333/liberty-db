@@ -7,14 +7,13 @@ mod test;
 use crate::{
   Ctx,
   ast::{
-    Attributes, BuilderScope, DefaultIndentation, GroupComments, GroupFn, LibertySet,
-    ParseLoc, ParseScope, ParserError, ParsingBuilder,
+    Attributes, BuilderScope, DefaultIndentation, GroupAttri, GroupComments, GroupFn,
+    LibertySet, ParseLoc, ParseScope, ParserError, ParsingBuilder, parser,
   },
-  ast::{GroupAttri, parser},
-  cell::{Cell, Model},
+  cell::{Cell, Model, ScaledCell},
   common::char_config::CharConfig,
   pin::BusType,
-  table::{CompactLutTemplate, DriverWaveform, TableTemple},
+  table::{CompactLutTemplate, DriverWaveform, PolyTemplate, TableTemple},
   units,
 };
 use alloc::borrow::Cow;
@@ -88,6 +87,8 @@ pub struct Library<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(simple)]
   pub delay_model: DelayModel,
+  #[liberty(simple)]
+  pub power_model: DelayModel,
   /// You can use any format within the quotation marks to report the date
   /// <a name ="reference_link" href="
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=23.5&end=23.5
@@ -110,6 +111,35 @@ pub struct Library<C: 'static + Ctx> {
   /// Used in TSMC PDK
   #[liberty(simple)]
   pub simulation: Option<bool>,
+  /// The `bus_naming_style` attribute defines the naming convention for buses in the library.
+  ///
+  /// *Syntax*
+  /// ```text
+  /// bus_naming_style : "string";
+  /// ```
+  /// Contains alphanumeric characters, braces, underscores, dashes, or
+  /// parentheses. Must contain one `%s` symbol and one `%d` symbol. The `%s` and `%d`
+  /// symbols can appear in any order with at least one nonnumeric character in
+  /// between.
+  ///
+  /// The colon character is not allowed in a `bus_naming_style` attribute value
+  /// because the colon is used to denote a range of bus members. You construct a
+  /// complete bused-pin name by using the name of the owning bus and the member
+  /// number. The owning bus name is substituted for the `%s`, and the member
+  /// number replaces the `%d`.
+  ///
+  /// If you do not define the `bus_naming_style` attribute, the default naming convention is
+  /// applied, as shown.
+  ///
+  /// *Example*
+  /// ```text
+  /// bus_naming_style : "%s[%d]" ;
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=21.14&end=21.30
+  /// ">Reference</a>
+  #[liberty(simple)]
+  pub bus_naming_style: Option<String>,
   /// The `nom_process`  attribute defines process scaling,
   /// one of the nominal operating conditions for a library.
   ///
@@ -209,6 +239,33 @@ pub struct Library<C: 'static + Ctx> {
   /// ```
   #[liberty(group)]
   pub r#type: LibertySet<BusType<C>>,
+  /// The `power_supply` group captures all nominal information about voltage variation.
+  /// It is defined before the `operating_conditions` group and before the `cell` groups.
+  /// All the power supply names defined in the `power_supply` group exist in the
+  /// `operating_conditions` group. Define the `power_supply` group at the library level.
+  ///
+  /// Syntax
+  /// ```text
+  /// power_supply () {
+  ///   default_power_rail : string ;
+  ///   power_rail (string, float) ;
+  ///   power_rail (string, float) ;
+  ///   ...
+  /// }
+  /// ```
+  /// Example
+  /// ```text
+  /// power_supply () {
+  ///   default_power_rail : VDD0;
+  ///   power_rail (VDD1, 5.0) ;
+  ///   power_rail (VDD2, 3.3) ;
+  /// }
+  /// ```
+  /// <a name ="reference_link" href="
+  /// https://zao111222333.github.io/liberty-db/2020.09/user_guide.html?field=null&bgn=51.33+52.2&end=51.34+52.16
+  /// ">Reference</a>
+  #[liberty(group)]
+  pub power_supply: Option<PowerSupply<C>>,
   /// Use this group to define operating conditions;
   /// that is, `process`, `voltage`, and `temperature`.
   /// You define an `operating_conditions`  group at the library-level, as shown here:
@@ -524,6 +581,28 @@ pub struct Library<C: 'static + Ctx> {
   #[liberty(simple)]
   #[liberty(default = 50.0)]
   pub output_threshold_pct_fall: f64,
+  /// You can define power factors only in libraries that use a CMOS technology. Power scaling
+  /// factors scale the power computation according to process, temperature, and voltage.
+  /// The power-scaling factors are listed below. In the following syntax, multiplier is a floatingpoint number:
+  ///
+  /// Specifies process derating factors for the `cell_leakage_power` attribute.
+  #[liberty(simple)]
+  pub k_process_cell_leakage_power: Option<f64>,
+  /// Specifies process derating factors for the `internal_power` attribute.
+  #[liberty(simple)]
+  pub k_process_internal_power: Option<f64>,
+  /// Specifies temperature derating factors for the `cell_leakage_power` attribute.
+  #[liberty(simple)]
+  pub k_temp_cell_leakage_power: Option<f64>,
+  /// Specifies temperature derating factors for the `internal_power` attribute.
+  #[liberty(simple)]
+  pub k_temp_internal_power: Option<f64>,
+  /// Specifies voltage derating factors for the `cell_leakage_power` attribute.
+  #[liberty(simple)]
+  pub k_volt_cell_leakage_power: Option<f64>,
+  /// Specifies voltage derating factors for the `internal_power` attribute.
+  #[liberty(simple)]
+  pub k_volt_internal_power: Option<f64>,
   /// The `is_soi`  attribute specifies that the cell is a
   /// silicon-on-insulator (SOI) cell.
   /// The default is false, which means that the cell is a
@@ -619,6 +698,16 @@ pub struct Library<C: 'static + Ctx> {
   /// ">Reference</a>
   #[liberty(group)]
   pub lu_table_template: LibertySet<TableTemple<C>>,
+  #[liberty(group)]
+  pub noise_lut_template: LibertySet<TableTemple<C>>,
+  #[liberty(group)]
+  pub iv_lut_template: LibertySet<TableTemple<C>>,
+  #[liberty(group)]
+  pub propagation_lut_template: LibertySet<TableTemple<C>>,
+  #[liberty(group)]
+  pub poly_template: LibertySet<PolyTemplate<C>>,
+  #[liberty(group)]
+  pub power_poly_template: LibertySet<PolyTemplate<C>>,
   /// The `base_curves`  group is a library-level group that contains
   /// the detailed description of normalized base curves.
   ///
@@ -729,6 +818,8 @@ pub struct Library<C: 'static + Ctx> {
   pub model: LibertySet<Model<C>>,
   #[liberty(group)]
   pub cell: LibertySet<Cell<C>>,
+  #[liberty(group)]
+  pub scaled_cell: LibertySet<ScaledCell<C>>,
 }
 
 impl<C: 'static + Ctx> fmt::Display for Library<C> {

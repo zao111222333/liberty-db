@@ -30,7 +30,7 @@ fn main() -> ExitCode {
   let elapsed_parse = now.elapsed();
   let out_file_name =
     format!("example1_{}", input_lib.file_name().unwrap().to_str().unwrap());
-  log::info!("Output to [file] {} ...", out_file_name);
+  log::info!("Output to [file] {out_file_name} ...");
   let now = Instant::now();
   library.write_lib_file(&out_file_name).unwrap();
   let elapsed_write = now.elapsed();

@@ -10,7 +10,7 @@ use crate::{
   },
   expression::LogicBooleanExpression,
   table::{
-    TableLookUp, TableLookUp2D, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
+    DcCurrent, TableLookUp, TableLookUpMultiSegment, Vector3DGrpup, Vector4DGrpup,
   },
 };
 use core::fmt::{self, Write};
@@ -146,8 +146,8 @@ pub struct CCSNStage<C: 'static + Ctx> {
   /// https://zao111222333.github.io/liberty-db/2020.09/reference_manual.html?field=null&bgn=289.2+288.24&end=289.4+288.25
   /// ">Reference-Definition</a>
   #[liberty(group)]
-  #[liberty(after_build = TableLookUp2D::use_common_template)]
-  pub dc_current: Option<TableLookUp2D<C>>,
+  #[liberty(after_build = DcCurrent::use_common_template)]
+  pub dc_current: Option<DcCurrent<C>>,
   /// Use the `output_voltage_fall`  group to specify vector groups that describe
   /// three-dimensional `output_voltage`  tables of the channel-connecting block
   /// whose output node’s voltage values are falling.

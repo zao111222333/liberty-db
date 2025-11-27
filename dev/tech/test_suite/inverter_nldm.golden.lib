@@ -1,6 +1,7 @@
 ** golden
 library (inverter) {
 	delay_model : table_lookup;
+	power_model : table_lookup;
 	nom_voltage : 1.6;
 	default_fanout_load : 1.0;
 	default_inout_pin_cap : 1.0;
@@ -20,34 +21,6 @@ library (inverter) {
 	input_threshold_pct_rise : 50.0;
 	output_threshold_pct_rise : 50.0;
 	output_threshold_pct_fall : 50.0;
-	iv_lut_template (my_current_low) {  /* user defined attribute */
-		index_1 ("-1, -0.1, 0, 0.1 0.8, 1.6, 2"); /* user defined attribute */
-		variable_1 : iv_output_voltage; /* user defined attribute */
-	}
-	iv_lut_template (my_current_high) {  /* user defined attribute */
-		index_1 ("-1, 0, 0.3, 0.5, 0.8, 1.5, 1.6, 1.7, 2"); /* user defined attribute */
-		variable_1 : iv_output_voltage; /* user defined attribute */
-	}
-	noise_lut_template (my_noise_reject) {  /* user defined attribute */
-		index_1 ("0, 0.1, 0.3, 1, 2"); /* user defined attribute */
-		index_2 ("0, 0.1, 0.3, 1, 2"); /* user defined attribute */
-		variable_1 : input_noise_width; /* user defined attribute */
-		variable_2 : total_output_net_capacitance; /* user defined attribute */
-	}
-	noise_lut_template (my_noise_reject_outside_rail) {  /* user defined attribute */
-		index_1 ("0, 0.1, 2"); /* user defined attribute */
-		index_2 ("0, 0.1, 2"); /* user defined attribute */
-		variable_1 : input_noise_width; /* user defined attribute */
-		variable_2 : total_output_net_capacitance; /* user defined attribute */
-	}
-	propagation_lut_template (my_propagated_noise) {  /* user defined attribute */
-		index_1 ("0.01, 0.2, 2"); /* user defined attribute */
-		index_2 ("0.2, 0.8"); /* user defined attribute */
-		index_3 ("0, 2"); /* user defined attribute */
-		variable_1 : input_noise_width; /* user defined attribute */
-		variable_2 : input_noise_height; /* user defined attribute */
-		variable_3 : total_output_net_capacitance; /* user defined attribute */
-	}
 	input_voltage (MY_CMOS_IN) {
 		vil : 0.3;
 		vih : 1.1;
@@ -60,6 +33,34 @@ library (inverter) {
 		vomin : -0.3;
 		vomax : VDD + 0.3;
 	}
+	noise_lut_template (my_noise_reject) {
+		variable_1 : input_noise_width;
+		variable_2 : total_output_net_capacitance;
+		index_1 ("0.0, 0.1, 0.3, 1.0, 2.0");
+		index_2 ("0.0, 0.1, 0.3, 1.0, 2.0");
+	}
+	noise_lut_template (my_noise_reject_outside_rail) {
+		variable_1 : input_noise_width;
+		variable_2 : total_output_net_capacitance;
+		index_1 ("0.0, 0.1, 2.0");
+		index_2 ("0.0, 0.1, 2.0");
+	}
+	iv_lut_template (my_current_high) {
+		variable_1 : iv_output_voltage;
+		index_1 ("-1.0, 0.0, 0.3, 0.5, 0.8, 1.5, 1.6, 1.7, 2.0");
+	}
+	iv_lut_template (my_current_low) {
+		variable_1 : iv_output_voltage;
+		index_1 ("-1.0, -0.1, 0.0, 0.1, 0.8, 1.6, 2.0");
+	}
+	propagation_lut_template (my_propagated_noise) {
+		variable_1 : input_noise_width;
+		variable_2 : input_noise_height;
+		variable_3 : total_output_net_capacitance;
+		index_1 ("0.01, 0.2, 2.0");
+		index_2 ("0.2, 0.8");
+		index_3 ("0.0, 2.0");
+	}
 	cell (INV) {
 		area : 1.0;
 		pin (A) {
@@ -67,25 +68,25 @@ library (inverter) {
 			direction : input;
 			fanout_load : 1.0;
 			input_voltage : MY_CMOS_IN;
-			hyperbolic_noise_above_high () {  /* user defined attribute */
-				area_coefficient : 0.3; /* user defined attribute */
-				height_coefficient : 0.1; /* user defined attribute */
-				width_coefficient : 0.01; /* user defined attribute */
+			hyperbolic_noise_above_high () {
+				height_coefficient : 0.1;
+				area_coefficient : 0.3;
+				width_coefficient : 0.01;
 			}
-			hyperbolic_noise_below_low () {  /* user defined attribute */
-				area_coefficient : 0.3; /* user defined attribute */
-				height_coefficient : 0.1; /* user defined attribute */
-				width_coefficient : 0.01; /* user defined attribute */
+			hyperbolic_noise_below_low () {
+				height_coefficient : 0.1;
+				area_coefficient : 0.3;
+				width_coefficient : 0.01;
 			}
-			hyperbolic_noise_high () {  /* user defined attribute */
-				area_coefficient : 0.9; /* user defined attribute */
-				height_coefficient : 0.3; /* user defined attribute */
-				width_coefficient : 0.1; /* user defined attribute */
+			hyperbolic_noise_high () {
+				height_coefficient : 0.3;
+				area_coefficient : 0.9;
+				width_coefficient : 0.1;
 			}
-			hyperbolic_noise_low () {  /* user defined attribute */
-				area_coefficient : 1.1; /* user defined attribute */
-				height_coefficient : 0.4; /* user defined attribute */
-				width_coefficient : 0.1; /* user defined attribute */
+			hyperbolic_noise_low () {
+				height_coefficient : 0.4;
+				area_coefficient : 1.1;
+				width_coefficient : 0.1;
 			}
 		}
 		pin (Y) {
@@ -95,34 +96,10 @@ library (inverter) {
 			output_voltage : MY_CMOS_OUT;
 			timing () {
 				related_pin : A;
-				propagated_noise_height_above_high (my_propagated_noise) {  /* user defined attribute */
-					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
-				}
-				propagated_noise_height_below_low (my_propagated_noise) {  /* user defined attribute */
-					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
-				}
-				propagated_noise_height_high (my_propagated_noise) {  /* user defined attribute */
-					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
-				}
-				propagated_noise_height_low (my_propagated_noise) {  /* user defined attribute */
-					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
-				}
-				propagated_noise_width_above_high (my_propagated_noise) {  /* user defined attribute */
-					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
-				}
-				propagated_noise_width_below_low (my_propagated_noise) {  /* user defined attribute */
-					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
-				}
-				propagated_noise_width_high (my_propagated_noise) {  /* user defined attribute */
-					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
-				}
-				propagated_noise_width_low (my_propagated_noise) {  /* user defined attribute */
-					values ("0.01, 0.10", "0.15, 0.18", "0.04, 0.14", "0.18, 0.25", "0.07, 0.17", "0.32, 0.35"); /* user defined attribute */
-				}
-				steady_state_resistance_above_high : 200; /* user defined attribute */
-				steady_state_resistance_below_low : 100; /* user defined attribute */
-				steady_state_resistance_high : 1500; /* user defined attribute */
-				steady_state_resistance_low : 1100; /* user defined attribute */
+				steady_state_resistance_above_high : 200.0;
+				steady_state_resistance_below_low : 100.0;
+				steady_state_resistance_high : 1500.0;
+				steady_state_resistance_low : 1100.0;
 				cell_rise (scalar) {
 					values ("0.0");
 				}
@@ -164,6 +141,70 @@ library (inverter) {
 				}
 				steady_state_current_low (my_current_low) {
 					values ("0.1, 0.05, 0.0, -0.1, -0.25, -1.0, -1.8");
+				}
+				propagated_noise_height_above_high (my_propagated_noise) {
+					values ("0.01, 0.1", \
+						"0.15, 0.18", \
+						"0.04, 0.14", \
+						"0.18, 0.25", \
+						"0.07, 0.17", \
+						"0.32, 0.35");
+				}
+				propagated_noise_height_below_low (my_propagated_noise) {
+					values ("0.01, 0.1", \
+						"0.15, 0.18", \
+						"0.04, 0.14", \
+						"0.18, 0.25", \
+						"0.07, 0.17", \
+						"0.32, 0.35");
+				}
+				propagated_noise_height_high (my_propagated_noise) {
+					values ("0.01, 0.1", \
+						"0.15, 0.18", \
+						"0.04, 0.14", \
+						"0.18, 0.25", \
+						"0.07, 0.17", \
+						"0.32, 0.35");
+				}
+				propagated_noise_height_low (my_propagated_noise) {
+					values ("0.01, 0.1", \
+						"0.15, 0.18", \
+						"0.04, 0.14", \
+						"0.18, 0.25", \
+						"0.07, 0.17", \
+						"0.32, 0.35");
+				}
+				propagated_noise_width_above_high (my_propagated_noise) {
+					values ("0.01, 0.1", \
+						"0.15, 0.18", \
+						"0.04, 0.14", \
+						"0.18, 0.25", \
+						"0.07, 0.17", \
+						"0.32, 0.35");
+				}
+				propagated_noise_width_below_low (my_propagated_noise) {
+					values ("0.01, 0.1", \
+						"0.15, 0.18", \
+						"0.04, 0.14", \
+						"0.18, 0.25", \
+						"0.07, 0.17", \
+						"0.32, 0.35");
+				}
+				propagated_noise_width_high (my_propagated_noise) {
+					values ("0.01, 0.1", \
+						"0.15, 0.18", \
+						"0.04, 0.14", \
+						"0.18, 0.25", \
+						"0.07, 0.17", \
+						"0.32, 0.35");
+				}
+				propagated_noise_width_low (my_propagated_noise) {
+					values ("0.01, 0.1", \
+						"0.15, 0.18", \
+						"0.04, 0.14", \
+						"0.18, 0.25", \
+						"0.07, 0.17", \
+						"0.32, 0.35");
 				}
 			}
 		}
