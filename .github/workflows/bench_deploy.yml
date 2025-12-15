@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - name: Obtain baseline data (result of last time)
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: target/criterion
           key: ${{ env.CACHE_KEY_BENCH }}
@@ -50,7 +50,7 @@ jobs:
           gh extension install actions/gh-actions-cache
           gh actions-cache delete ${{ env.CACHE_KEY_BENCH }} --confirm -R ${{ github.repository }}
       - name: Archive bench results
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           key: ${{ env.CACHE_KEY_BENCH }}
           path: target/criterion
@@ -71,7 +71,7 @@ jobs:
       # If the target path doesn't match the source path, 
       # restore reports "Cache not found for input keys"
       - name: Load bench results
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: target/criterion
           key: ${{ env.CACHE_KEY_BENCH }}
