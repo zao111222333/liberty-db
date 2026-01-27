@@ -63,17 +63,17 @@ biodivine-lib-bdd = { version = "0.6", features = ["serde"] }
 mut_set = "0.9.0"
 # mut_set = { path = "../mut_set" }
 duplicate = "2.0.0"
-criterion = { version = "0.7", features = ["html_reports"] }
-sysinfo = "0.37"
+criterion = { version = "0.8", features = ["html_reports"] }
+sysinfo = "0.38"
 chrono = "0.4"
 flate2 = "1"
 anyhow = "1.0"
 foldhash = "0.2"
 dev_utils = { path = "dev/utils" }
 pyo3 = "0.27"
-pyo3-stub-gen = { version = "0.17", default-features = false }
+pyo3-stub-gen = { version = "0.18", default-features = false }
 # pyo3-stub-gen = { path = "../../pyo3-stub-gen-main/pyo3-stub-gen", default-features = false }
-bincode = { version= "2", features = ["serde"] }
+bincode = { version= "3", features = ["serde"] }
 indexmap = { version = "2.9", features = ["serde"] }
 bitflags = { version = "2.9", features = ["serde"] }
 pprof = { version = "0.15", features = ["flamegraph", "protobuf", "protobuf-codec"] }
